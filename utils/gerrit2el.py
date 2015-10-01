@@ -1,30 +1,35 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
 import json
 import os
 import subprocess
+import time
 import urllib2
 
-def json_serial(obj):
-    """JSON serializer for objects not serializable by default json code"""
 
-    if isinstance(obj, datetime):
-#        serial = obj.isoformat()
-        serial = int((obj - datetime(1970,1,1)).total_seconds())
-        return serial
-    raise TypeError ("Type not serializable")
-
-def json_dumps(data, compact = True):
-    if compact:
-        return json.dumps(data, sort_keys=False,
-                          separators=(',',':'),
-                          default=json_serial)
-    else:
-        return json.dumps(data, sort_keys=False, 
-                          indent=4, separators=(',', ': '),
-                          default=json_serial)
+def fix_review_dates(item):
+    # Convert dates so ES detect them
+    for date_field in ['timestamp','createdOn','lastUpdated']:
+        if date_field in item.keys():
+            date_ts = item[date_field]
+            item[date_field] = time.strftime('%Y-%m-%dT%H:%M:%S',
+                                              time.localtime(date_ts))
+    if 'patchSets' in item.keys():
+        for patch in item['patchSets']:
+            pdate_ts = patch['createdOn']
+            patch['createdOn'] = time.strftime('%Y-%m-%dT%H:%M:%S',
+                                               time.localtime(pdate_ts))
+            if 'approvals' in patch:
+                for approval in patch['approvals']:
+                    adate_ts = approval['grantedOn']
+                    approval['grantedOn'] = time.strftime('%Y-%m-%dT%H:%M:%S',
+                                                          time.localtime(adate_ts))
+    if 'comments' in item.keys():
+        for comment in item['comments']:
+            cdate_ts = comment['timestamp']
+            comment['timestamp'] = time.strftime('%Y-%m-%dT%H:%M:%S',
+                                                 time.localtime(cdate_ts))
 
 
 if __name__ == '__main__':
@@ -33,7 +38,7 @@ if __name__ == '__main__':
 
     max_items = "500"
 
-    elasticsearch_url = "http://sega.bitergia.net:9200"
+    # elasticsearch_url = "http://sega.bitergia.net:9200"
     elasticsearch_url = "http://localhost:9200"
     elasticsearch_index = "gerrit/reviews"
     project = "VisualEditor/VisualEditor"
@@ -64,8 +69,11 @@ if __name__ == '__main__':
     opener = urllib2.build_opener(urllib2.HTTPHandler)
     for item in gerrit_json:
         if 'project' in item.keys():
-            # In a review JSON object
-            data_json = json_dumps(item, compact = True)
+            # Detected review JSON object
+
+            fix_review_dates(item)
+
+            data_json = json.dumps(item)
             url = elasticsearch_url + "/"+elasticsearch_index
             url += "/"+str(item["id"])
             request = urllib2.Request(url, data=data_json)
