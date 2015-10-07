@@ -25,6 +25,7 @@
 #
 
 import json
+import logging
 import os
 import subprocess
 import time
@@ -54,26 +55,101 @@ def fix_review_dates(item):
             comment['timestamp'] = time.strftime('%Y-%m-%dT%H:%M:%S',
                                                  time.localtime(cdate_ts))
 
+def get_projects():
+    # First we need all projects
+    cache_file = "gerrit-projects_cache.json"
+    cache_file = os.path.join(cache_dir, cache_file)
 
-if __name__ == '__main__':
+    if not os.path.isfile(cache_file):
+        gerrit_cmd_projects = gerrit_cmd + "ls-projects "
+        raw_data = subprocess.check_output(gerrit_cmd_projects, shell = True)
+        with open(cache_file, 'w') as f:
+            f.write(raw_data)
+    else:
+        with open(cache_file) as f:
+            raw_data = f.read()
 
-    # Get reviews JSON data from gerrit using SSH
+    print raw_data
 
-    max_items = "500"
+    projects = raw_data.split("\n")
+    projects.pop() # Remove last empty line
 
-    # elasticsearch_url = "http://sega.bitergia.net:9200"
-    elasticsearch_url = "http://localhost:9200"
-    elasticsearch_index = "gerrit/reviews"
-    project = "VisualEditor/VisualEditor"
-    gerrit_cmd  = "ssh -p 29418 acs@gerrit.wikimedia.org "
-    gerrit_cmd += "gerrit query project:"+project+" "
-    gerrit_cmd += "limit:"+max_items+" --all-approvals --comments --format=JSON"
+    return projects
+
+def fetch_events(review):
+    """ Fetch in ES patches and comments (events) as documents """
+
+    bulk_json = ""  # Bulk JSON to be feeded in ES
+
+    # Review fields included in all events
+    bulk_json_review  = '"review_id":"%s",' % review['id']
+    bulk_json_review += '"review_createdOn":"%s",' % review['createdOn']
+    bulk_json_review += '"review_email":"%s",' % review['owner']['email']
+    bulk_json_review += '"review_status":"%s"' % review['status']
+    # bulk_json_review += '"review_subject":"%s"' % review['subject']
+    # bulk_json_review += '"review_topic":"%s"' % review['topic']
+
+    for patch in review['patchSets']:
+        # Patch fields included in all patch events
+        bulk_json_patch  = '"patchSet_id":"%s",' % patch['number']
+        bulk_json_patch += '"patchSet_createdOn":"%s",' % patch['createdOn']
+        if 'author' in patch and 'email' in patch['author']:
+            bulk_json_patch += '"patchSet_email":"%s"' % patch['author']['email']
+        else:
+            bulk_json_patch += '"patchSet_email":None'
+
+        app_count = 0  # Approval counter for unique id
+        if 'approvals' not in patch:
+            bulk_json_ap  = '"approval_type":None,'
+            bulk_json_ap += '"approval_value":None,'
+            bulk_json_ap += '"approval_email":None'
+
+            bulk_json_event = '{%s,%s,%s}' % (bulk_json_review,
+                                              bulk_json_patch, bulk_json_ap)
+
+            event_id = "%s_%s_%s" % (review['id'], patch['number'], app_count)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (event_id)  # Bulk operation
+            bulk_json += bulk_json_event +"\n"  # Bulk document
+
+        else:
+            for app in patch['approvals']:
+                bulk_json_ap  = '"approval_type":"%s",' % app['type']
+                bulk_json_ap += '"approval_value":%i,' % int(app['value'])
+                bulk_json_ap += '"approval_grantedOn":"%s",' % app['grantedOn']
+                if 'email' in app['by']:
+                    bulk_json_ap += '"approval_email":"%s",' % app['by']['email']
+                else:
+                    bulk_json_ap += '"approval_email":None,'
+                if 'username' in app['by']:
+                    bulk_json_ap += '"approval_username":"%s"' % app['by']['username']
+                else:
+                    bulk_json_ap += '"approval_username":None'
+                bulk_json_event = '{%s,%s,%s}' % (bulk_json_review,
+                                                  bulk_json_patch, bulk_json_ap)
+
+                event_id = "%s_%s_%s" % (review['id'], patch['number'], app_count)
+                bulk_json += '{"index" : {"_id" : "%s" } }\n' % (event_id)  # Bulk operation
+                bulk_json += bulk_json_event +"\n"  # Bulk document
+                app_count += 1
+
+    url = elasticsearch_url+'/gerrit/reviews_events/_bulk'
+    request = urllib2.Request(url, data=bulk_json)
+    request.get_method = lambda: 'POST'
+
+    opener.open(request)
+
+
+def project_reviews_to_es(project):
+
+    gerrit_cmd_prj = gerrit_cmd + " query project:"+project+" "
+    gerrit_cmd_prj += "limit:" + max_items + " --all-approvals --comments --format=JSON"
 
     cache_file = "gerrit-"+project.replace("/","_")+"_cache.json"
+    cache_file = os.path.join(cache_dir, cache_file)
 
     if not os.path.isfile(cache_file):
         # If data is not in cache, gather it
-        raw_data = subprocess.check_output(gerrit_cmd, shell = True)
+        raw_data = subprocess.check_output(gerrit_cmd_prj, shell = True)
 
         # Complete the raw_data to be a complete JSON document
         raw_data = "[" + raw_data.replace("\n", ",") + "]"
@@ -88,8 +164,6 @@ if __name__ == '__main__':
     # Parse JSON document
     gerrit_json = json.loads(raw_data)
 
-    # Feed the reviews items in EL
-    opener = urllib2.build_opener(urllib2.HTTPHandler)
     for item in gerrit_json:
         if 'project' in item.keys():
             # Detected review JSON object
@@ -101,4 +175,39 @@ if __name__ == '__main__':
             url += "/"+str(item["id"])
             request = urllib2.Request(url, data=data_json)
             request.get_method = lambda: 'PUT'
-            response = opener.open(request)
+            opener.open(request)
+
+            fetch_events(item)
+
+if __name__ == '__main__':
+
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+
+    cache_dir = "cache"
+    if not os.path.exists(cache_dir):
+
+        os.makedirs(cache_dir)
+    # Get reviews JSON data from gerrit using SSH
+
+    max_items = "500"
+
+    elasticsearch_url = "http://sega.bitergia.net:9200"
+    elasticsearch_url = "http://localhost:9200"
+    elasticsearch_index = "gerrit/reviews"
+    gerrit_cmd  = "ssh -p 29418 acs@gerrit.wikimedia.org "
+    gerrit_cmd += "gerrit "
+
+    # Feed the reviews items in EL
+    opener = urllib2.build_opener(urllib2.HTTPHandler)
+
+    # First we need all projects
+    projects = get_projects()
+
+    total = len(projects)
+    done = 0
+
+    for project in projects:
+        logging.info("Processing project:" + project + " " +
+                     str(done) + "/" + str(total))
+        project_reviews_to_es(project)
+        done += 1
