@@ -3,6 +3,11 @@ elasticsearch:
     ports:
         - 9200:9200
 
+elasticsearch2:
+    image: elasticsearch:2
+    ports:
+        - 9200:9200
+
 kibana:
     image: kibana
     links:
