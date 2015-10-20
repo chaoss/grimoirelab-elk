@@ -24,10 +24,12 @@
 #
 # TODO: Just a playing script yet.
 
+from datetime import datetime
 import json
 import logging
 import MySQLdb
 import os
+import re
 import subprocess
 import time
 import urllib2
@@ -117,8 +119,6 @@ def get_projects():
         with open(cache_file) as f:
             raw_data = f.read()
 
-    print raw_data
-
     projects = raw_data.split("\n")
     projects.pop() # Remove last empty line
 
@@ -136,9 +136,20 @@ def get_organization(email):
 
     return org
 
-def fetch_events(review):
-    """ Fetch in ES patches and comments (events) as documents """
+def get_isbot(email):
+    """ Get if an email is a bot  """
 
+    bot = False
+    try:
+        bot = email2bot[email]
+    except:
+        # logging.info("Can't find org for " + email)
+        pass
+
+    return bot
+
+
+def create_events_map():
     elasticsearch_type = "reviews_events"
     url = elasticsearch_url + "/"+elasticsearch_index
     url_type = url + "/" + elasticsearch_type
@@ -220,6 +231,9 @@ def fetch_events(review):
     opener.open(request)
 
 
+def fetch_events(review):
+    """ Fetch in ES patches and comments (events) as documents """
+
     bulk_json = ""  # Bulk JSON to be feeded in ES
 
     # Review fields included in all events
@@ -229,9 +243,11 @@ def fetch_events(review):
         email = review['owner']['email']
         bulk_json_review += '"review_email":"%s",' % email
         bulk_json_review += '"review_organization":"%s",' % get_organization(email)
+        bulk_json_review += '"review_bot":"%s",' % get_isbot(email)
     else:
         bulk_json_review += '"review_email":null,'
         bulk_json_review += '"review_organization":null,'
+        bulk_json_review += '"review_bot":null,'
     bulk_json_review += '"review_status":"%s",' % review['status']
     bulk_json_review += '"review_project":"%s",' % review['project']
     bulk_json_review += '"review_branch":"%s"' % review['branch']
@@ -245,17 +261,20 @@ def fetch_events(review):
         if 'author' in patch and 'email' in patch['author']:
             email = patch['author']['email']
             bulk_json_patch += '"patchSet_email":"%s",' % email
-            bulk_json_patch += '"patchSet_organization":"%s"' % get_organization(email)
+            bulk_json_patch += '"patchSet_organization":"%s",' % get_organization(email)
+            bulk_json_patch += '"patchSet_bot":"%s"' % get_isbot(email)
         else:
             bulk_json_patch += '"patchSet_email":null,'
-            bulk_json_patch += '"patchSet_organization":null'
+            bulk_json_patch += '"patchSet_organization":null,'
+            bulk_json_patch += '"patchSet_bot":null'
 
         app_count = 0  # Approval counter for unique id
         if 'approvals' not in patch:
             bulk_json_ap  = '"approval_type":null,'
             bulk_json_ap += '"approval_value":null,'
             bulk_json_ap += '"approval_email":null,'
-            bulk_json_ap += '"approval_organization":null'
+            bulk_json_ap += '"approval_organization":null,'
+            bulk_json_ap += '"approval_bot":null'
 
             bulk_json_event = '{%s,%s,%s}' % (bulk_json_review,
                                               bulk_json_patch, bulk_json_ap)
@@ -272,19 +291,43 @@ def fetch_events(review):
                 if 'email' in app['by']:
                     bulk_json_ap += '"approval_email":"%s",' % app['by']['email']
                     bulk_json_ap += '"approval_organization":"%s",' % get_organization(app['by']['email'])
+                    bulk_json_ap += '"approval_bot":"%s",' % get_isbot(app['by']['email'])
                 else:
                     bulk_json_ap += '"approval_email":null,'
                     bulk_json_ap += '"approval_organization":null,'
+                    bulk_json_ap += '"approval_bot":null,'
                 if 'username' in app['by']:
-                    bulk_json_ap += '"approval_username":"%s"' % app['by']['username']
+                    bulk_json_ap += '"approval_username":"%s",' % app['by']['username']
                 else:
-                    bulk_json_ap += '"approval_username":null'
+                    bulk_json_ap += '"approval_username":null,'
+
+                # Time to add the time diffs
+                app_time = \
+                    datetime.strptime(app['grantedOn'], "%Y-%m-%dT%H:%M:%S")
+                patch_time = \
+                    datetime.strptime(patch['createdOn'], "%Y-%m-%dT%H:%M:%S")
+                review_time = \
+                    datetime.strptime(review['createdOn'], "%Y-%m-%dT%H:%M:%S")
+
+                seconds_day = float(60*60*24)
+                approval_time = \
+                    (app_time-review_time).total_seconds() / seconds_day
+                approval_patch_time = \
+                    (app_time-patch_time).total_seconds() / seconds_day
+                patch_time = \
+                    (patch_time-review_time).total_seconds() / seconds_day
+                bulk_json_ap += '"approval_time_days":%.2f,' % approval_time
+                bulk_json_ap += '"approval_patch_time_days":%.2f,' % \
+                    approval_patch_time
+                bulk_json_ap += '"patch_time_days":%.2f' % patch_time
+
                 bulk_json_event = '{%s,%s,%s}' % (bulk_json_review,
                                                   bulk_json_patch, bulk_json_ap)
 
                 event_id = "%s_%s_%s" % (review['id'], patch['number'], app_count)
                 bulk_json += '{"index" : {"_id" : "%s" } }\n' % (event_id)  # Bulk operation
                 bulk_json += bulk_json_event +"\n"  # Bulk document
+
                 app_count += 1
 
     url = elasticsearch_url+'/gerrit/reviews_events/_bulk'
@@ -292,24 +335,93 @@ def fetch_events(review):
     request = urllib2.Request(url, data=bulk_json)
     request.get_method = lambda: 'POST'
 
-    opener.open(request)
+    try:
+        opener.open(request)
+    except UnicodeEncodeError:
+        logging.error("Events for review lost because Unicode error")
+        print bulk_json
+        request = urllib2.Request(url,
+                                  data = bulk_json.encode('ascii', 'ignore'))
+        request.get_method = lambda: 'POST'
+        opener.open(request)
 
 
-def project_reviews_to_es(project):
+def getGerritVersion():
+    gerrit_cmd_prj = gerrit_cmd + " version "
+
+    raw_data = subprocess.check_output(gerrit_cmd_prj, shell = True)
+
+    # output: gerrit version 2.10-rc1-988-g333a9dd
+    m = re.match("gerrit version (\d+)\.(\d+).*", raw_data)
+
+    if not m:
+        raise Exception("Invalid gerrit version %s" % raw_data)
+
+    try:
+        mayor = int(m.group(1))
+        minor = int(m.group(2))
+    except Exception, e:
+        raise Exception("Invalid gerrit version %s. Error: %s" %
+                        (raw_data, str(e)))
+
+    return [mayor, minor]
+
+def get_project_reviews(project):
+    """ Get all reviews for a project """
+
+    gerrit_version = getGerritVersion()
+    last_item = None
+    if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
+        last_item = 0
 
     gerrit_cmd_prj = gerrit_cmd + " query project:"+project+" "
-    gerrit_cmd_prj += "limit:" + max_items + " --all-approvals --comments --format=JSON"
+    gerrit_cmd_prj += "limit:" + str(max_items)
+    gerrit_cmd_prj += " --all-approvals --comments --format=JSON"
+
+    number_results = max_items
+
+    reviews = []
+
+    while (number_results == max_items or
+           number_results == max_items + 1):  # wikimedia gerrit returns limit+1
+
+        cmd = gerrit_cmd_prj
+        if last_item is not None:
+            if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
+                cmd += " --start=" + str(last_item)
+            else:
+                cmd += " resume_sortkey:" + last_item
+
+        raw_data = subprocess.check_output(cmd, shell = True)
+        tickets_raw = "[" + raw_data.replace("\n", ",") + "]"
+        tickets_raw = tickets_raw.replace(",]", "]")
+
+        tickets = json.loads(tickets_raw)
+
+        for entry in tickets:
+            if 'project' in entry.keys():
+                reviews.append(entry)
+                if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
+                    last_item += 1
+                else:
+                    last_item = entry['sortKey']
+            elif 'rowCount' in entry.keys():
+                # logging.info("CONTINUE FROM: " + str(last_item))
+                number_results = entry['rowCount']
+
+    logging.info("Total reviews: %i" % len(reviews))
+
+    return reviews
+
+def project_reviews_to_es(project):
 
     cache_file = "gerrit-"+project.replace("/","_")+"_cache.json"
     cache_file = os.path.join(cache_dir, cache_file)
 
     if not os.path.isfile(cache_file):
         # If data is not in cache, gather it
-        raw_data = subprocess.check_output(gerrit_cmd_prj, shell = True)
-
-        # Complete the raw_data to be a complete JSON document
-        raw_data = "[" + raw_data.replace("\n", ",") + "]"
-        raw_data = raw_data.replace(",]", "]")
+        reviews = get_project_reviews(project)
+        raw_data = json.dumps(reviews)
         with open(cache_file, 'w') as f:
             f.write(raw_data)
 
@@ -321,24 +433,27 @@ def project_reviews_to_es(project):
     gerrit_json = json.loads(raw_data)
 
     elasticsearch_type = "reviews"
+
+    # Create the mapping for storing the events
+    create_events_map()
+
     for item in gerrit_json:
-        if 'project' in item.keys():
-            # Detected review JSON object
+        fix_review_dates(item)
 
-            fix_review_dates(item)
+        data_json = json.dumps(item)
+        url = elasticsearch_url + "/"+elasticsearch_index
+        url += "/"+elasticsearch_type
+        url += "/"+str(item["id"])
+        request = urllib2.Request(url, data=data_json)
+        request.get_method = lambda: 'PUT'
+        opener.open(request)
 
-            data_json = json.dumps(item)
-            url = elasticsearch_url + "/"+elasticsearch_index
-            url += "/"+elasticsearch_type
-            url += "/"+str(item["id"])
-            request = urllib2.Request(url, data=data_json)
-            request.get_method = lambda: 'PUT'
-            opener.open(request)
-
-            fetch_events(item)
+        fetch_events(item)
 
 def sortinghat_to_es():
     """ Load all identities data in SH """
+
+    logging.info("Loading Sorting Hat identities in Elasticsearch")
 
     elasticsearch_type = "profiles"
     url = elasticsearch_url + "/"+elasticsearch_index
@@ -398,6 +513,9 @@ def sortinghat_to_es():
         organization = profile[3]
 
         email2org[email] = organization
+        email2bot[email] = is_bot
+
+        continue  ## Not storing in ES orgs info
 
         if email is None: continue
         profile_json = "{"
@@ -433,13 +551,13 @@ if __name__ == '__main__':
         os.makedirs(cache_dir)
 
     # Reviews will be added to ES using its API REST
-    elasticsearch_url = "http://sega.bitergia.net:9200"
+    # elasticsearch_url = "http://sega.bitergia.net:9200"
     elasticsearch_url = "http://localhost:9200"
     elasticsearch_index = "gerrit"
     elasticsearch_index = "gerrit_openstack"
 
     # Get reviews JSON data from gerrit using SSH
-    max_items = "500"
+    max_items = 500
     gerrit_cmd  = "ssh -p 29418 acs@gerrit.wikimedia.org "
     gerrit_cmd  = "ssh -p 29418 acs@review.openstack.org "
     gerrit_cmd += "gerrit "
@@ -448,16 +566,18 @@ if __name__ == '__main__':
 
     # Add profiles to sortinghat
     email2org = {}
+    email2bot = {}
     sortinghat_to_es()
 
     # First we need all projects
     projects = get_projects()
 
     total = len(projects)
-    done = 0
+    current_prj = 1
 
     for project in projects:
+        # if project != "openstack/cinder": continue
         logging.info("Processing project:" + project + " " +
-                     str(done) + "/" + str(total))
+                     str(current_prj) + "/" + str(total))
         project_reviews_to_es(project)
-        done += 1
+        current_prj += 1
