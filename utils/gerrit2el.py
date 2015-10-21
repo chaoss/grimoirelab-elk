@@ -224,6 +224,13 @@ def create_events_map():
         }
     }
     """
+
+    # Create the index if it not exists
+    request = urllib2.Request(url, data=None)
+    request.get_method = lambda: 'PUT'
+    opener.open(request)
+
+
     # Create mappings
     url_map = url_type+"/_mapping"
     request = urllib2.Request(url_map, data=reviews_events_map)
@@ -253,6 +260,9 @@ def fetch_events(review):
     bulk_json_review += '"review_branch":"%s"' % review['branch']
     # bulk_json_review += '"review_subject":"%s"' % review['subject']
     # bulk_json_review += '"review_topic":"%s"' % review['topic']
+
+    # To be used as review['createdOn'] which is wrong in OpenStack/Wikimedia
+    firstPatchCreatedOn = review['patchSets'][0]['createdOn']
 
     for patch in review['patchSets']:
         # Patch fields included in all patch events
@@ -306,8 +316,10 @@ def fetch_events(review):
                     datetime.strptime(app['grantedOn'], "%Y-%m-%dT%H:%M:%S")
                 patch_time = \
                     datetime.strptime(patch['createdOn'], "%Y-%m-%dT%H:%M:%S")
+                # review_time = \
+                #    datetime.strptime(review['createdOn'], "%Y-%m-%dT%H:%M:%S")
                 review_time = \
-                    datetime.strptime(review['createdOn'], "%Y-%m-%dT%H:%M:%S")
+                    datetime.strptime(firstPatchCreatedOn, "%Y-%m-%dT%H:%M:%S")
 
                 seconds_day = float(60*60*24)
                 approval_time = \
@@ -434,9 +446,6 @@ def project_reviews_to_es(project):
 
     elasticsearch_type = "reviews"
 
-    # Create the mapping for storing the events
-    create_events_map()
-
     for item in gerrit_json:
         fix_review_dates(item)
 
@@ -484,7 +493,7 @@ def sortinghat_to_es():
     url_map = url_type+"/_mapping"
     request = urllib2.Request(url_map, data=profile_map)
     request.get_method = lambda: 'PUT'
-    opener.open(request)
+    # opener.open(request)
 
     sortinghat_db = "acs_sortinghat_mediawiki_5879"
     sortinghat_db = "amartin_sortinghat_openstack_sh"
@@ -574,6 +583,9 @@ if __name__ == '__main__':
 
     total = len(projects)
     current_prj = 1
+
+    # Create the mapping for storing the events
+    create_events_map()
 
     for project in projects:
         # if project != "openstack/cinder": continue
