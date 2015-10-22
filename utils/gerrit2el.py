@@ -209,7 +209,7 @@ def get_org_by_email(email, action_date_str):
 def get_isbot(uuid):
     """ Get if an uuid is a bot  """
 
-    bot = False
+    bot = 0 # Default uuid is not a bot
     try:
         bot = uuid2bot[uuid]
     except:
