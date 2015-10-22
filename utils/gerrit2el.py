@@ -23,6 +23,9 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 # TODO: Just a playing script yet.
+#    - Add params support so config options are not hard coded
+#    - Analyze all repos if there is no projects db
+#    - Check needed dbs exists
 
 from datetime import datetime
 import json
@@ -104,10 +107,10 @@ def fix_review_dates(item):
             comment['timestamp'] = time.strftime('%Y-%m-%dT%H:%M:%S',
                                                  time.localtime(cdate_ts))
 
-def get_projects():
-    """ Get all projects in gerrit """
+def get_repositories():
+    """ Get all repositories in gerrit """
 
-    cache_file = "gerrit-projects_cache.json"
+    cache_file = "gerrit-repositories_cache.json"
     cache_file = os.path.join(cache_dir, cache_file)
 
     if not os.path.isfile(cache_file):
@@ -124,24 +127,91 @@ def get_projects():
 
     return projects
 
-def get_organization(email):
-    """ Get in the most efficient way the organization for an email """
+def get_repositories_from_projects():
+    """ Get the repositories list from OpenStack official projects """
 
-    org = "Unknown"
+    repos_list = []
+
+    gerrit_projects_db = "amartin_projects_openstack_sh"
+
+    db = Database (user = "root", passwd = "",
+                   host = "localhost", port = 3306,
+                   scrdb = None, shdb = gerrit_projects_db, prjdb = None)
+
+    sql = """
+        SELECT DISTINCT(repository_name) 
+        FROM project_repositories
+        WHERE data_source='scr'
+    """
+
+    repos_list_raw = db.execute(sql)
+
+    # Convert from review.openstack.org_openstack/rpm-packaging-tools to
+    # openstack_rpm-packaging-tools
+    for repo in repos_list_raw:
+        repo_name = repo[0].replace("review.openstack.org_","")
+        repos_list.append(repo_name)
+
+    return repos_list
+
+
+def get_uuid(email):
+    """ Get in the most efficient way the uuid (people unique identifier)
+        for an email """
+
+    uuid = None
     try:
-        org = email2org[email]
+        uuid = email2uuid[email]
+    except:
+        emailNOuuid.add(email)
+        pass
+
+    return uuid
+
+
+def get_org(uuid, action_date_str):
+    """ Get in the most efficient way the organization for
+        uuid in the date when an action was done  """
+
+    org_found = "Unknown"
+    action_date = datetime.strptime(action_date_str, "%Y-%m-%dT%H:%M:%S")
+
+    try:
+        orgs = uuid2orgs[uuid]
+        # Take the org active in action_date
+        for org in orgs:
+            if org['start'] < action_date and org['end'] >= action_date:
+                org_found = org['name']
+                break
     except:
         # logging.info("Can't find org for " + email)
         pass
 
-    return org
+    return org_found
 
-def get_isbot(email):
-    """ Get if an email is a bot  """
+def get_org_by_email(email, action_date_str):
+    """ Get in the most efficient way the organization for
+        email in the date when an action was done  """
+
+    org_found = get_org(get_uuid(email), action_date_str)
+
+    if org_found == "Unknown":
+        # Try to get the org from the email domain
+        try:
+            domain = email.split('@')[1]
+            org_found = domain2org[domain]
+        except:
+            pass # domain not found
+
+    return org_found
+
+
+def get_isbot(uuid):
+    """ Get if an uuid is a bot  """
 
     bot = False
     try:
-        bot = email2bot[email]
+        bot = uuid2bot[uuid]
     except:
         # logging.info("Can't find org for " + email)
         pass
@@ -226,9 +296,13 @@ def create_events_map():
     """
 
     # Create the index if it not exists
-    request = urllib2.Request(url, data=None)
+    request = urllib2.Request(url)
     request.get_method = lambda: 'PUT'
-    opener.open(request)
+    try:
+        opener.open(request)
+    except:
+        # The index already exists
+        pass
 
 
     # Create mappings
@@ -247,14 +321,18 @@ def fetch_events(review):
     bulk_json_review  = '"review_id":"%s",' % review['id']
     bulk_json_review += '"review_createdOn":"%s",' % review['createdOn']
     if 'owner' in review and 'email' in review['owner']:
-        email = review['owner']['email']
-        bulk_json_review += '"review_email":"%s",' % email
-        bulk_json_review += '"review_organization":"%s",' % get_organization(email)
-        bulk_json_review += '"review_bot":"%s",' % get_isbot(email)
+        remail = review['owner']['email']
+        ruuid = get_uuid(remail)
+        bulk_json_review += '"review_email":"%s",' % remail
+        bulk_json_review += '"review_uuid":"%s",' % ruuid
+        bulk_json_review += '"review_organization":"%s",' % \
+            get_org_by_email(remail, review['createdOn'])
+        bulk_json_review += '"review_bot":"%s",' % get_isbot(ruuid)
     else:
         bulk_json_review += '"review_email":null,'
         bulk_json_review += '"review_organization":null,'
         bulk_json_review += '"review_bot":null,'
+        bulk_json_review += '"review_uuid":null,'
     bulk_json_review += '"review_status":"%s",' % review['status']
     bulk_json_review += '"review_project":"%s",' % review['project']
     bulk_json_review += '"review_branch":"%s"' % review['branch']
@@ -269,12 +347,16 @@ def fetch_events(review):
         bulk_json_patch  = '"patchSet_id":"%s",' % patch['number']
         bulk_json_patch += '"patchSet_createdOn":"%s",' % patch['createdOn']
         if 'author' in patch and 'email' in patch['author']:
-            email = patch['author']['email']
-            bulk_json_patch += '"patchSet_email":"%s",' % email
-            bulk_json_patch += '"patchSet_organization":"%s",' % get_organization(email)
-            bulk_json_patch += '"patchSet_bot":"%s"' % get_isbot(email)
+            pemail = patch['author']['email']
+            puuid = get_uuid(pemail)
+            bulk_json_patch += '"patchSet_email":"%s",' % pemail
+            bulk_json_patch += '"patchSet_uuid":"%s",' % puuid
+            bulk_json_patch += '"patchSet_organization":"%s",' % \
+                get_org_by_email(pemail, patch['createdOn'])
+            bulk_json_patch += '"patchSet_bot":"%s"' % get_isbot(puuid)
         else:
             bulk_json_patch += '"patchSet_email":null,'
+            bulk_json_patch += '"patchSet_uuid":null,'
             bulk_json_patch += '"patchSet_organization":null,'
             bulk_json_patch += '"patchSet_bot":null'
 
@@ -283,6 +365,7 @@ def fetch_events(review):
             bulk_json_ap  = '"approval_type":null,'
             bulk_json_ap += '"approval_value":null,'
             bulk_json_ap += '"approval_email":null,'
+            bulk_json_ap += '"approval_uuid":null,'
             bulk_json_ap += '"approval_organization":null,'
             bulk_json_ap += '"approval_bot":null'
 
@@ -299,11 +382,16 @@ def fetch_events(review):
                 bulk_json_ap += '"approval_value":%i,' % int(app['value'])
                 bulk_json_ap += '"approval_grantedOn":"%s",' % app['grantedOn']
                 if 'email' in app['by']:
-                    bulk_json_ap += '"approval_email":"%s",' % app['by']['email']
-                    bulk_json_ap += '"approval_organization":"%s",' % get_organization(app['by']['email'])
-                    bulk_json_ap += '"approval_bot":"%s",' % get_isbot(app['by']['email'])
+                    aemail = app['by']['email']
+                    auuid = get_uuid(aemail)
+                    bulk_json_ap += '"approval_email":"%s",' % aemail
+                    bulk_json_ap += '"approval_uuid":"%s",' % auuid
+                    bulk_json_ap += '"approval_organization":"%s",' % \
+                        get_org_by_email(aemail, app['grantedOn'])
+                    bulk_json_ap += '"approval_bot":"%s",' % get_isbot(auuid)
                 else:
                     bulk_json_ap += '"approval_email":null,'
+                    bulk_json_ap += '"approval_uuid":null,'
                     bulk_json_ap += '"approval_organization":null,'
                     bulk_json_ap += '"approval_bot":null,'
                 if 'username' in app['by']:
@@ -459,97 +547,81 @@ def project_reviews_to_es(project):
 
         fetch_events(item)
 
+
 def sortinghat_to_es():
-    """ Load all identities data in SH """
+    """ Load all identities data in SH in memory """
 
-    logging.info("Loading Sorting Hat identities in Elasticsearch")
-
-    elasticsearch_type = "profiles"
-    url = elasticsearch_url + "/"+elasticsearch_index
-    url_type = url + "/" + elasticsearch_type
-
-    profile_map = """
-    {
-        "properties": {
-           "email": {
-              "type": "string",
-              "index":"not_analyzed"
-           },
-           "uuid": {
-              "type": "string"
-           },
-           "is_bot": {
-              "type": "boolean"
-           },
-           "organization": {
-              "type": "string",
-              "index":"not_analyzed"
-           }
-        }
-    }
-    """
-
-    # Create mappings
-    url_map = url_type+"/_mapping"
-    request = urllib2.Request(url_map, data=profile_map)
-    request.get_method = lambda: 'PUT'
-    # opener.open(request)
+    logging.info("Loading Sorting Hat identities")
 
     sortinghat_db = "acs_sortinghat_mediawiki_5879"
     sortinghat_db = "amartin_sortinghat_openstack_sh"
+    gerrit_grimoirelib_db = "amartin_bicho_gerrit_openstack_sh"
     db = Database (user = "root", passwd = "",
                    host = "localhost", port = 3306,
                    scrdb = None, shdb = sortinghat_db, prjdb = None)
 
+    # Create the domain to orgs mapping
     sql = """
-        SELECT p.uuid, email, is_bot, o.name as organization
+        SELECT domain, name
+        FROM domains_organizations do
+        JOIN organizations o ON o.id = do.organization_id;
+    """
+    domain2org_raw = db.execute(sql)
+    for item in domain2org_raw:
+        domain = item[0]
+        org = item[1]
+        domain2org[domain] = org
+
+    # Create the uuids to orgs dict
+    sql = """
+        SELECT uuid, name, start, end
+        FROM enrollments e
+        JOIN organizations o ON e.organization_id = o.id
+    """
+
+    uuid2orgs_raw = db.execute(sql)
+
+    for enrollment in uuid2orgs_raw:
+        uuid = enrollment[0]
+        org_name = enrollment[1]
+        start = enrollment[2]
+        end = enrollment[3]
+        if uuid not in uuid2orgs: uuid2orgs[uuid] = []
+        uuid2orgs[uuid].append({"name":org_name,
+                                "start":start,
+                                "end":end})
+
+    # First using the email in profile table from sorting hat
+    sql = """
+        SELECT p.uuid, email, is_bot
         FROM profiles p
-        JOIN enrollments e ON e.uuid=p.uuid
-        JOIN organizations o ON o.id = e.organization_id
         WHERE email is not NULL
         """
     profiles = db.execute(sql)
-
-    # bulk_json = ""# To Load in ES quickly
-    profiles_count = 0
-    profiles_error = 0
-
 
     for profile in profiles:
         uuid = profile[0]
         email = profile[1]
         is_bot = profile[2]
-        organization = profile[3]
 
-        email2org[email] = organization
-        email2bot[email] = is_bot
+        email2uuid[email] = uuid
+        uuid2bot[uuid] = is_bot
 
-        continue  ## Not storing in ES orgs info
+    # Now using directly the grimoirelib gerrit identities
+    sql = """
+        SELECT uuid, email
+        FROM %s.people p
+        JOIN %s.people_uidentities pup ON p.id = pup.people_id
+        """ % (gerrit_grimoirelib_db, gerrit_grimoirelib_db)
 
-        if email is None: continue
-        profile_json = "{"
-        profile_json += '"uuid":"%s",' % uuid
-        profile_json += '"email":"%s",' % email
-        profile_json += '"is_bot":"%s",' % is_bot
-        profile_json += '"organization":"%s"' % organization
-        profile_json += "}"
+    profiles = db.execute(sql)
 
-        url_profile = url_type + "/"+str(uuid)
-        request = urllib2.Request(url_profile, data=profile_json)
-        request.get_method = lambda: 'PUT'
-        try:
-            opener.open(request)
-            profiles_count += 1
-        except:
-            logging.error("Can't add: " + email)
-            profiles_error += 1
+    for profile in profiles:
+        uuid = profile[0]
+        email = profile[1]
 
-#         bulk_json += '{"index" : {"_id" : "%s" } }\n' % (uuid)  # Bulk operation
-#         bulk_json += profile_json +"\n"  # Bulk document
+        email2uuid[email] = uuid
 
-
-    print "Profiles loaded: %i" % profiles_count
-    print "Profiles error: %i" % profiles_error
 
 if __name__ == '__main__':
 
@@ -574,22 +646,32 @@ if __name__ == '__main__':
     opener = urllib2.build_opener(urllib2.HTTPHandler)
 
     # Add profiles to sortinghat
-    email2org = {}
-    email2bot = {}
+    email2uuid = {}
+    emailNOuuid = set()
+    uuid2orgs = {}
+    uuid2bot = {}
+    domain2org = {}
     sortinghat_to_es()
 
     # First we need all projects
-    projects = get_projects()
+    repositories = get_repositories()
+    repos_projects = get_repositories_from_projects()
 
-    total = len(projects)
-    current_prj = 1
+    total = len(repositories)
+    current_repo = 1
 
     # Create the mapping for storing the events
     create_events_map()
 
-    for project in projects:
-        # if project != "openstack/cinder": continue
-        logging.info("Processing project:" + project + " " +
-                     str(current_prj) + "/" + str(total))
-        project_reviews_to_es(project)
-        current_prj += 1
+    for repository in repositories:
+        if repository not in repos_projects:
+            logging.info("Not a project repository: " + repository)
+            current_repo += 1
+            continue
+        # if repository != "openstack/cinder": continue
+        logging.info("Processing repository:" + repository + " " +
+                     str(current_repo) + "/" + str(total))
+        project_reviews_to_es(repository)
+        current_repo += 1
+
+    logging.info("Emails without uuid: %i" % len(emailNOuuid))
