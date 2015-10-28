@@ -137,6 +137,7 @@ def getRichPull(pull):
     rich_pull['created_at'] = pull['created_at']
     rich_pull['updated_at'] = pull['updated_at']
     rich_pull['closed_at'] = pull['closed_at']
+    rich_pull['url'] = pull['html_url']
 
     return rich_pull
 
