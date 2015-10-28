@@ -134,11 +134,14 @@ def getRichPull(pull):
         rich_pull['assignee_org'] = None
     rich_pull['title'] = pull['title']
     rich_pull['state'] = pull['state']
+    rich_pull['created_at'] = pull['created_at']
+    rich_pull['updated_at'] = pull['updated_at']
+    rich_pull['closed_at'] = pull['closed_at']
 
     return rich_pull
 
 
-def users2ES(pulls):
+def usersToES(pulls):
 
     elasticsearch_type = "pullrequests_users"
 
@@ -146,7 +149,7 @@ def users2ES(pulls):
 
         # First upload the raw pullrequest data to ES
         data_json = json.dumps(users[login])
-        url = elasticsearch_url + "/"+elasticsearch_index
+        url = elasticsearch_url + "/"+elasticsearch_index_github
         url += "/"+elasticsearch_type
         url += "/"+str(users[login]["id"])
         requests.put(url, data = data_json)
@@ -157,7 +160,7 @@ def usersFromES():
 
     elasticsearch_type = "pullrequests_users"
 
-    url = elasticsearch_url + "/"+elasticsearch_index
+    url = elasticsearch_url + "/"+elasticsearch_index_github
     url += "/"+elasticsearch_type
     url += "/_search"
     print url
@@ -177,15 +180,14 @@ def getLastDateFromES():
 
 def pullrequets2ES(pulls):
 
-    elasticsearch_type_raw = "pullrequests_raw"
     elasticsearch_type = "pullrequests"
 
     for pull in pulls:
 
         # First upload the raw pullrequest data to ES
         data_json = json.dumps(pull)
-        url = elasticsearch_url + "/"+elasticsearch_index
-        url += "/"+elasticsearch_type_raw
+        url = elasticsearch_url + "/"+elasticsearch_index_raw
+        url += "/"+elasticsearch_type
         url += "/"+str(pull["id"])
         requests.put(url, data = data_json)
 
@@ -202,8 +204,14 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     logging.getLogger("requests").setLevel(logging.WARNING)
 
+    github_owner = "elastic"
+    github_repo = "kibana"
+
     elasticsearch_url = "http://localhost:9200"
-    elasticsearch_index = "github"
+    elasticsearch_index_github = "github"
+    elasticsearch_index = elasticsearch_index_github + \
+        "_%s_%s" % (github_owner, github_repo)
+    elasticsearch_index_raw = elasticsearch_index+"_raw"
 
     users = usersFromES()  #  cache from ES
     last_update_date = getLastDateFromES()
@@ -215,9 +223,7 @@ if __name__ == '__main__':
     last_page = None
     github_api = "https://api.github.com"
     github_api_repos = github_api + "/repos"
-    owner = "elastic"
-    repo = "kibana"
-    url_repo = github_api_repos + "/" + owner +"/" + repo
+    url_repo = github_api_repos + "/" + github_owner +"/" + github_repo
     url_pulls = url_repo + "/pulls"
     url = url_pulls +"?per_page=" + str(github_per_page)
     url += "&page="+str(page)
@@ -255,6 +261,6 @@ if __name__ == '__main__':
         page += 1
 
     # cache users in ES
-    users2ES(users)
+    usersToES(users)
 
     logging.info("Total Pull Requests " + str(prs_count))
