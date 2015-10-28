@@ -224,7 +224,7 @@ if __name__ == '__main__':
     url += "&state=all"  # open and close pull requests
     url += "&sort=updated"  # sort by last updated
     url += "&direction=asc"  # first older pull request
-    auth_token = "78c68964e02de777a98ef0f7df5498f08fe41b6d"
+    auth_token = ""
 
     url_next = url
     prs_count = 0
