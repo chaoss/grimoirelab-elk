@@ -23,6 +23,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 # TODO: Just a playing script yet.
+#     - Use the _bulk API from ES to improve indexing
 
 from datetime import datetime
 import json
@@ -49,26 +50,165 @@ def getTimeToCloseDays(pull):
 
     return review_time
 
+def getGithubUser(login):
+
+    if login is None:
+        return None
+
+    url = github_api + "/users/" + login
+
+    r = requests.get(url, verify=False,
+                     headers={'Authorization':'token ' + auth_token})
+    user = r.json()
+
+    users[login] = user
+
+    # Get the public organizations also
+    url += "/orgs"
+    r = requests.get(url, verify=False,
+                     headers={'Authorization':'token ' + auth_token})
+    orgs = r.json()
+
+    users[login]['orgs'] = orgs
+
+    return user
 
 
-def pullrequets2es(pulls):
-    elasticsearch_url = "http://localhost:9200"
-    elasticsearch_index = "github"
+def getUserEmail(login):
+    email = None
+
+    if login not in users:
+        user = getGithubUser(login)
+        if 'email' in user:
+            email = user['email']
+
+    return email
+
+
+def getUserOrg(login):
+    company = None
+
+    if login not in users:
+        user = getGithubUser(login)
+        if 'company' in user:
+            company = user['company']
+
+    if company is None:
+        company = ''
+        # Return the list of orgs
+        for org in users[login]['orgs']:
+            company += org['login'] +";;"
+        company = company[:-2]
+
+    return company
+
+def getUserName(login):
+    name = None
+
+    if login not in users:
+        user = getGithubUser(login)
+        if 'name' in user:
+            name = user['name']
+
+    return name
+
+
+def getRichPull(pull):
+    rich_pull = {}
+    rich_pull['id'] = pull['id']
+    rich_pull['time_to_close_days'] = getTimeToCloseDays(pull)
+
+    rich_pull['user_login'] = pull['user']['login']
+    rich_pull['user_name'] = getUserName(rich_pull['user_login'])
+    rich_pull['user_email'] = getUserEmail(rich_pull['user_login'])
+    rich_pull['user_org'] = getUserOrg(rich_pull['user_login'])
+    if pull['assignee'] is not None:
+        rich_pull['assignee_login'] = pull['assignee']['login']
+        rich_pull['assignee_name'] = getUserName(rich_pull['assignee_login'])
+        rich_pull['assignee_email'] = getUserEmail(rich_pull['assignee_login'])
+        rich_pull['assignee_org'] = getUserOrg(rich_pull['assignee_login'])
+    else:
+        rich_pull['assignee_name'] = None
+        rich_pull['assignee_login'] = None
+        rich_pull['assignee_email'] = None
+        rich_pull['assignee_org'] = None
+    rich_pull['title'] = pull['title']
+    rich_pull['state'] = pull['state']
+
+    return rich_pull
+
+
+def users2ES(pulls):
+
+    elasticsearch_type = "pullrequests_users"
+
+    for login in users:
+
+        # First upload the raw pullrequest data to ES
+        data_json = json.dumps(users[login])
+        url = elasticsearch_url + "/"+elasticsearch_index
+        url += "/"+elasticsearch_type
+        url += "/"+str(users[login]["id"])
+        requests.put(url, data = data_json)
+
+def usersFromES():
+
+    users_es = {}
+
+    elasticsearch_type = "pullrequests_users"
+
+    url = elasticsearch_url + "/"+elasticsearch_index
+    url += "/"+elasticsearch_type
+    url += "/_search"
+    print url
+    r = requests.get(url)
+    users_raw = r.json()
+    if 'hits' in users_raw:
+        for hit in users_raw['hits']['hits']:
+            user = hit['_source']
+            users_es[user['login']] = user
+
+    return users_es
+
+def getLastDateFromES():
+    # Not yet implemented
+    # https://developer.github.com/v3/#conditional-requests
+    return None
+
+def pullrequets2ES(pulls):
+
+    elasticsearch_type_raw = "pullrequests_raw"
     elasticsearch_type = "pullrequests"
 
     for pull in pulls:
 
-        pull['time_to_close_days'] =  getTimeToCloseDays(pull)
-
+        # First upload the raw pullrequest data to ES
         data_json = json.dumps(pull)
         url = elasticsearch_url + "/"+elasticsearch_index
-        url += "/"+elasticsearch_type
+        url += "/"+elasticsearch_type_raw
         url += "/"+str(pull["id"])
+        requests.put(url, data = data_json)
+
+        # The processed pull including user data and time_to_close
+        rich_pull = getRichPull(pull)
+        data_json = json.dumps(rich_pull)
+        url = elasticsearch_url + "/"+elasticsearch_index
+        url += "/"+elasticsearch_type
+        url += "/"+str(rich_pull["id"])
         requests.put(url, data = data_json)
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.getLogger("requests").setLevel(logging.WARNING)
+
+    elasticsearch_url = "http://localhost:9200"
+    elasticsearch_index = "github"
+
+    users = usersFromES()  #  cache from ES
+    last_update_date = getLastDateFromES()
+
+    # We just need to add new pullrequests
 
     github_per_page = 20  # 100 in other items. 20 for pull requests
     page = 1
@@ -84,7 +224,7 @@ if __name__ == '__main__':
     url += "&state=all"  # open and close pull requests
     url += "&sort=updated"  # sort by last updated
     url += "&direction=asc"  # first older pull request
-    auth_token = "GITHUB_AUTH_TOKEN_HERE"
+    auth_token = "78c68964e02de777a98ef0f7df5498f08fe41b6d"
 
     url_next = url
     prs_count = 0
@@ -94,7 +234,7 @@ if __name__ == '__main__':
         r = requests.get(url_next, verify=False,
                          headers={'Authorization':'token ' + auth_token})
         pulls = r.json()
-        pullrequets2es(pulls)
+        pullrequets2ES(pulls)
 
         logging.info(r.headers['X-RateLimit-Remaining'])
 
@@ -107,11 +247,14 @@ if __name__ == '__main__':
 
         logging.info("Page: %i/%s" % (page, last_page))
 
-        pullrequets2es(pulls)
+        pullrequets2ES(pulls)
 
         for pull in pulls:
             prs_count += 1
 
         page += 1
+
+    # cache users in ES
+    users2ES(users)
 
     logging.info("Total Pull Requests " + str(prs_count))
