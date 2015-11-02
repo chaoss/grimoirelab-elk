@@ -138,6 +138,13 @@ def getRichPull(pull):
     rich_pull['updated_at'] = pull['updated_at']
     rich_pull['closed_at'] = pull['closed_at']
     rich_pull['url'] = pull['html_url']
+    labels = ''
+    if 'labels' in pull:
+        for label in pull['labels']:
+            labels += label['name']+";;"
+    if labels != '':
+        labels[:-2]
+    rich_pull['labels'] = labels
 
     return rich_pull
 
@@ -174,16 +181,44 @@ def usersFromES():
 
     return users_es
 
-def getLastDateFromES():
-    # Not yet implemented
-    # https://developer.github.com/v3/#conditional-requests
-    return None
+def getLastUpdateFromES(_type):
 
-def pullrequets2ES(pulls):
+    last_update = None
 
-    elasticsearch_type = "pullrequests"
+    url = elasticsearch_url + "/" + elasticsearch_index_raw
+    url += "/"+ _type +  "/_search"
+
+    data_json = """
+    {
+        "aggs": {
+            "1": {
+              "max": {
+                "field": "updated_at"
+              }
+            }
+        }
+    }
+    """
+
+    res = requests.post(url, data = data_json)
+    res_json = res.json()
+
+    if 'aggregations' in res_json:
+        last_update = res_json["aggregations"]["1"]["value_as_string"]
+
+    return last_update
+
+
+def pullrequets2ES(pulls, _type):
+
+    elasticsearch_type = _type
+    count = 0
 
     for pull in pulls:
+
+        if not 'head' in pull.keys() and not 'pull_request' in pull.keys():
+            # And issue that it is not a PR
+            continue
 
         # First upload the raw pullrequest data to ES
         data_json = json.dumps(pull)
@@ -200,48 +235,24 @@ def pullrequets2ES(pulls):
         url += "/"+str(rich_pull["id"])
         requests.put(url, data = data_json)
 
+        count += 1
 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-    logging.getLogger("requests").setLevel(logging.WARNING)
+    return count
 
-    github_owner = "elastic"
-    github_repo = "kibana"
-
-    elasticsearch_url = "http://localhost:9200"
-    elasticsearch_index_github = "github"
-    elasticsearch_index = elasticsearch_index_github + \
-        "_%s_%s" % (github_owner, github_repo)
-    elasticsearch_index_raw = elasticsearch_index+"_raw"
-
-    users = usersFromES()  #  cache from ES
-    last_update_date = getLastDateFromES()
-
-    # We just need to add new pullrequests
-
-    github_per_page = 20  # 100 in other items. 20 for pull requests
-    page = 1
-    last_page = None
-    github_api = "https://api.github.com"
-    github_api_repos = github_api + "/repos"
-    url_repo = github_api_repos + "/" + github_owner +"/" + github_repo
-    url_pulls = url_repo + "/pulls"
-    url = url_pulls +"?per_page=" + str(github_per_page)
-    url += "&page="+str(page)
-    url += "&state=all"  # open and close pull requests
-    url += "&sort=updated"  # sort by last updated
-    url += "&direction=asc"  # first older pull request
-    auth_token = ""
-
+def getPullRequests(url):
     url_next = url
     prs_count = 0
+    last_page = None
+    page = 1
+
+    url_next += "&page="+str(page)
 
     while url_next:
-        logging.info("Get pulls requests from " + url_next)
+        logging.info("Get issues pulls requests from " + url_next)
         r = requests.get(url_next, verify=False,
                          headers={'Authorization':'token ' + auth_token})
         pulls = r.json()
-        pullrequets2ES(pulls)
+        prs_count += pullrequets2ES(pulls, "pullrequests")
 
         logging.info(r.headers['X-RateLimit-Remaining'])
 
@@ -254,14 +265,86 @@ if __name__ == '__main__':
 
         logging.info("Page: %i/%s" % (page, last_page))
 
-        pullrequets2ES(pulls)
+        page += 1
 
-        for pull in pulls:
-            prs_count += 1
+    return prs_count
+
+def getIssuesPullRequests(url):
+    _type = "issues_pullrequests"
+    prs_count = 0
+    last_page = page = 1
+    last_update = getLastUpdateFromES(_type)
+    if last_update is not None:
+        logging.info("Getting issues since: " + last_update)
+        url += "&since="+last_update
+    url_next = url
+
+    while url_next:
+        logging.info("Get issues pulls requests from " + url_next)
+        r = requests.get(url_next, verify=False,
+                         headers={'Authorization':'token ' + auth_token})
+        pulls = r.json()
+
+        prs_count += pullrequets2ES(pulls, _type)
+
+        logging.info(r.headers['X-RateLimit-Remaining'])
+
+        url_next = None
+        if 'next' in r.links:
+            url_next = r.links['next']['url']  # Loving requests :)
+
+        if last_page == 1:
+            if 'last' in r.links:
+                last_page = r.links['last']['url'].split('&page=')[1].split('&')[0]
+
+        logging.info("Page: %i/%s" % (page, last_page))
 
         page += 1
+
+    return prs_count
+
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.getLogger("requests").setLevel(logging.WARNING)
+
+    github_owner = "elastic"
+    # github_repo = "logstash"
+    # github_repo = "kibana"
+    github_repo = "filebeat"
+
+
+    elasticsearch_url = "http://localhost:9200"
+    elasticsearch_index_github = "github"
+    elasticsearch_index = elasticsearch_index_github + \
+        "_%s_%s" % (github_owner, github_repo)
+    elasticsearch_index_raw = elasticsearch_index+"_raw"
+
+    users = usersFromES()  #  cache from ES
+
+    # We just need to add new pullrequests
+
+    github_per_page = 20  # 100 in other items. 20 for pull requests
+    github_api = "https://api.github.com"
+    github_api_repos = github_api + "/repos"
+    url_repo = github_api_repos + "/" + github_owner +"/" + github_repo
+
+    url_pulls = url_repo + "/pulls"
+    url_issues = url_repo + "/issues"
+
+    url_params = "?per_page=" + str(github_per_page)
+    url_params += "&state=all"  # open and close pull requests
+    url_params += "&sort=updated"  # sort by last updated
+    url_params += "&direction=asc"  # first older pull request
+
+    auth_token = "0d31ecbdf2239ab5dbcc2f2d3170b878fbd98338"
+
+    # prs_count = getPullRequests(url_pulls+url_params)
+    issues_prs_count = getIssuesPullRequests(url_issues+url_params)
+
 
     # cache users in ES
     usersToES(users)
 
-    logging.info("Total Pull Requests " + str(prs_count))
+    # logging.info("Total Pull Requests " + str(prs_count))
+    logging.info("Total Issues Pull Requests " + str(issues_prs_count))
