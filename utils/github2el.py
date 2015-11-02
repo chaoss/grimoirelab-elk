@@ -337,7 +337,7 @@ if __name__ == '__main__':
     url_params += "&sort=updated"  # sort by last updated
     url_params += "&direction=asc"  # first older pull request
 
-    auth_token = "0d31ecbdf2239ab5dbcc2f2d3170b878fbd98338"
+    auth_token = ""
 
     # prs_count = getPullRequests(url_pulls+url_params)
     issues_prs_count = getIssuesPullRequests(url_issues+url_params)
