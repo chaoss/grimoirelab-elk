@@ -25,11 +25,30 @@
 # TODO: Just a playing script yet.
 #     - Use the _bulk API from ES to improve indexing
 
+import argparse
 from datetime import datetime
 import json
 import logging
 import requests
 
+
+def parse_args ():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-o", "--owner", required = True,
+                        help = "github owner")
+    parser.add_argument("-r", "--repository", required = True,
+                        help = "github repository")
+    parser.add_argument("-t", "--token", required = True,
+                        help = "github access token")
+    parser.add_argument("-e", "--elasticsearch_host",  default = "127.0.0.1",
+                        help = "Host with elasticsearch" + \
+                        "(default: 127.0.0.1)")
+    parser.add_argument("--elasticsearch_port",  default = "9200",
+                        help = "elasticsearch port " + \
+                        "(default: 9200)")
+
+    args = parser.parse_args()
+    return args
 
 def getTimeToCloseDays(pull):
     review_time = None
@@ -319,13 +338,14 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     logging.getLogger("requests").setLevel(logging.WARNING)
 
-    github_owner = "elastic"
-    # github_repo = "logstash"
-    # github_repo = "kibana"
-    github_repo = "filebeat"
+    args = parse_args()
 
+    github_owner = args.owner
+    github_repo = args.repository
+    auth_token = args.token
 
-    elasticsearch_url = "http://localhost:9200"
+    elasticsearch_url = "http://"
+    elasticsearch_url += args.elasticsearch_host + ":" + args.elasticsearch_port
     elasticsearch_index_github = "github"
     elasticsearch_index = elasticsearch_index_github + \
         "_%s_%s" % (github_owner, github_repo)
@@ -348,11 +368,8 @@ if __name__ == '__main__':
     url_params += "&sort=updated"  # sort by last updated
     url_params += "&direction=asc"  # first older pull request
 
-    auth_token = ""
-
     # prs_count = getPullRequests(url_pulls+url_params)
     issues_prs_count = getIssuesPullRequests(url_issues+url_params)
-
 
     # cache users in ES
     usersToES(users)
