@@ -151,7 +151,7 @@ def getRichPull(pull):
 
 def usersToES(pulls):
 
-    elasticsearch_type = "pullrequests_users"
+    elasticsearch_type = "users"  # github global users
 
     for login in users:
 
@@ -165,19 +165,30 @@ def usersToES(pulls):
 def usersFromES():
 
     users_es = {}
+    res_size = 100  # best size?
+    _from = 0
 
-    elasticsearch_type = "pullrequests_users"
+    elasticsearch_type = "users"
 
     url = elasticsearch_url + "/"+elasticsearch_index_github
     url += "/"+elasticsearch_type
-    url += "/_search"
+    url += "/_search" + "?" + "size=%i" % res_size
     print url
     r = requests.get(url)
     users_raw = r.json()
-    if 'hits' in users_raw:
+
+    if 'hits' not in users_raw:
+        logging.info("No github user data in ES")
+        return
+
+    while len(users_raw['hits']['hits']) > 0:
         for hit in users_raw['hits']['hits']:
             user = hit['_source']
             users_es[user['login']] = user
+        _from += res_size
+        r = requests.get(url+"&from=%i" % _from)
+        users_raw = r.json()
+
 
     return users_es
 
