@@ -50,6 +50,33 @@ def parse_args ():
     args = parser.parse_args()
     return args
 
+def getGeoPoint(location):
+    geo_point = None
+
+    if location in geolocations:
+        geo_point = geolocations[location]
+
+    else:
+        url = 'https://maps.googleapis.com/maps/api/geocode/json'
+        params = {'sensor': 'false', 'address': location}
+        r = requests.get(url, params=params)
+
+        try:
+            geo_code = r.json()['results'][0]['geometry']['location']
+        except:
+            logging.info("Can't find geocode for " + location)
+
+        if location:
+            geo_point = {
+                "lat": geo_code['lat'],
+                "lon": geo_code['lng']
+            }
+            geolocations[location] = geo_point
+
+
+    return geo_point
+
+
 def getTimeToCloseDays(pull):
     review_time = None
 
@@ -98,8 +125,10 @@ def getUserEmail(login):
 
     if login not in users:
         user = getGithubUser(login)
-        if 'email' in user:
-            email = user['email']
+    else: user = users[login]
+
+    if 'email' in user:
+        email = user['email']
 
     return email
 
@@ -109,8 +138,10 @@ def getUserOrg(login):
 
     if login not in users:
         user = getGithubUser(login)
-        if 'company' in user:
-            company = user['company']
+    else: user = users[login]
+
+    if 'company' in user:
+        company = user['company']
 
     if company is None:
         company = ''
@@ -126,10 +157,36 @@ def getUserName(login):
 
     if login not in users:
         user = getGithubUser(login)
-        if 'name' in user:
-            name = user['name']
+    else: user = users[login]
+
+    if 'name' in user:
+        name = user['name']
 
     return name
+
+def getUserLocation(login):
+    location = None
+
+    if login not in users:
+        user = getGithubUser(login)
+    else: user = users[login]
+
+    if 'location' in user:
+        location = user['location']
+
+    return location
+
+def getUserGeoLocation(login):
+
+    geo_point = None
+
+    location = getUserLocation(login)
+
+    if location is not None:
+        geo_point = getGeoPoint(location)
+
+    return geo_point
+
 
 
 def getRichPull(pull):
@@ -141,16 +198,22 @@ def getRichPull(pull):
     rich_pull['user_name'] = getUserName(rich_pull['user_login'])
     rich_pull['user_email'] = getUserEmail(rich_pull['user_login'])
     rich_pull['user_org'] = getUserOrg(rich_pull['user_login'])
+    rich_pull['user_location'] = getUserLocation(rich_pull['user_login'])
+    rich_pull['user_geolocation'] = getUserGeoLocation(rich_pull['user_login'])
     if pull['assignee'] is not None:
         rich_pull['assignee_login'] = pull['assignee']['login']
         rich_pull['assignee_name'] = getUserName(rich_pull['assignee_login'])
         rich_pull['assignee_email'] = getUserEmail(rich_pull['assignee_login'])
         rich_pull['assignee_org'] = getUserOrg(rich_pull['assignee_login'])
+        rich_pull['assignee_location'] = getUserLocation(rich_pull['assignee_login'])
+        rich_pull['assignee_geolocation'] = getUserGeoLocation(rich_pull['assignee_login'])
     else:
         rich_pull['assignee_name'] = None
         rich_pull['assignee_login'] = None
         rich_pull['assignee_email'] = None
         rich_pull['assignee_org'] = None
+        rich_pull['assignee_location'] = None
+        rich_pull['assignee_geolocation'] = None
     rich_pull['title'] = pull['title']
     rich_pull['state'] = pull['state']
     rich_pull['created_at'] = pull['created_at']
@@ -168,6 +231,56 @@ def getRichPull(pull):
     return rich_pull
 
 
+def getCacheFromES(_type, _key):
+    """ Get cache data for items of _type using _key as the cache dict key """
+
+    cache = {}
+    res_size = 100  # best size?
+    _from = 0
+
+    elasticsearch_type = _type
+
+    url = elasticsearch_url + "/"+elasticsearch_index_github
+    url += "/"+elasticsearch_type
+    url += "/_search" + "?" + "size=%i" % res_size
+    r = requests.get(url)
+    type_items = r.json()
+
+    if 'hits' not in type_items:
+        logging.info("No github %s data in ES" % (_type))
+
+    else:
+        while len(type_items['hits']['hits']) > 0:
+            for hit in type_items['hits']['hits']:
+                item = hit['_source']
+                cache[item[_key]] = item
+            _from += res_size
+            r = requests.get(url+"&from=%i" % _from)
+            type_items = r.json()
+
+    return cache
+
+
+def geoLocationsFromES():
+
+    return getCacheFromES("geolocations", "location")
+
+def geoLocationsToES(pulls):
+
+    elasticsearch_type = "geolocations"
+
+    for loc in geolocations:
+        geopoint = geolocations[loc]
+        location = geopoint.copy()
+        location["location"] = loc
+        # First upload the raw pullrequest data to ES
+        data_json = json.dumps(location)
+        url = elasticsearch_url + "/"+elasticsearch_index_github
+        url += "/"+elasticsearch_type
+        url += "/"+str("%s-%s" % (location["lat"], location["lon"]))
+        requests.put(url, data = data_json)
+
+
 def usersToES(pulls):
 
     elasticsearch_type = "users"  # github global users
@@ -183,33 +296,7 @@ def usersToES(pulls):
 
 def usersFromES():
 
-    users_es = {}
-    res_size = 100  # best size?
-    _from = 0
-
-    elasticsearch_type = "users"
-
-    url = elasticsearch_url + "/"+elasticsearch_index_github
-    url += "/"+elasticsearch_type
-    url += "/_search" + "?" + "size=%i" % res_size
-    print url
-    r = requests.get(url)
-    users_raw = r.json()
-
-    if 'hits' not in users_raw:
-        logging.info("No github user data in ES")
-        return
-
-    while len(users_raw['hits']['hits']) > 0:
-        for hit in users_raw['hits']['hits']:
-            user = hit['_source']
-            users_es[user['login']] = user
-        _from += res_size
-        r = requests.get(url+"&from=%i" % _from)
-        users_raw = r.json()
-
-
-    return users_es
+    return getCacheFromES("users", "login")
 
 def getLastUpdateFromES(_type):
 
@@ -249,6 +336,8 @@ def pullrequets2ES(pulls, _type):
         if not 'head' in pull.keys() and not 'pull_request' in pull.keys():
             # And issue that it is not a PR
             continue
+
+        # print pull['updated_at']
 
         # First upload the raw pullrequest data to ES
         data_json = json.dumps(pull)
@@ -304,6 +393,7 @@ def getIssuesPullRequests(url):
     prs_count = 0
     last_page = page = 1
     last_update = getLastUpdateFromES(_type)
+    last_update = None  # broken order in github API
     if last_update is not None:
         logging.info("Getting issues since: " + last_update)
         url += "&since="+last_update
@@ -351,9 +441,8 @@ if __name__ == '__main__':
         "_%s_%s" % (github_owner, github_repo)
     elasticsearch_index_raw = elasticsearch_index+"_raw"
 
-    users = usersFromES()  #  cache from ES
-
-    # We just need to add new pullrequests
+    users = usersFromES()
+    geolocations = geoLocationsFromES()
 
     github_per_page = 20  # 100 in other items. 20 for pull requests
     github_api = "https://api.github.com"
@@ -371,8 +460,8 @@ if __name__ == '__main__':
     # prs_count = getPullRequests(url_pulls+url_params)
     issues_prs_count = getIssuesPullRequests(url_issues+url_params)
 
-    # cache users in ES
-    usersToES(users)
+    usersToES(users)  # cache users in ES
+    geoLocationsToES(geolocations)
 
     # logging.info("Total Pull Requests " + str(prs_count))
     logging.info("Total Issues Pull Requests " + str(issues_prs_count))
