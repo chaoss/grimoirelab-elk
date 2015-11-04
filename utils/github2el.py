@@ -46,12 +46,15 @@ def parse_args ():
     parser.add_argument("--elasticsearch_port",  default = "9200",
                         help = "elasticsearch port " + \
                         "(default: 9200)")
+    parser.add_argument("--delete",  action = 'store_true',
+                        help = "delete repository data in ES")
+
 
     args = parser.parse_args()
     return args
 
 def getGeoPoint(location):
-    geo_point = None
+    geo_point = geo_code = None
 
     if location in geolocations:
         geo_point = geolocations[location]
@@ -66,7 +69,7 @@ def getGeoPoint(location):
         except:
             logging.info("Can't find geocode for " + location)
 
-        if location:
+        if geo_code:
             geo_point = {
                 "lat": geo_code['lat'],
                 "lon": geo_code['lng']
@@ -185,6 +188,9 @@ def getUserGeoLocation(login):
     if location is not None:
         geo_point = getGeoPoint(location)
 
+    if geo_point and 'location' in geo_point:
+        del geo_point['location']  # convert to ES geo_point format
+
     return geo_point
 
 
@@ -265,7 +271,7 @@ def geoLocationsFromES():
 
     return getCacheFromES("geolocations", "location")
 
-def geoLocationsToES(pulls):
+def geoLocationsToES(geolocations):
 
     elasticsearch_type = "geolocations"
 
@@ -277,11 +283,12 @@ def geoLocationsToES(pulls):
         data_json = json.dumps(location)
         url = elasticsearch_url + "/"+elasticsearch_index_github
         url += "/"+elasticsearch_type
-        url += "/"+str("%s-%s" % (location["lat"], location["lon"]))
+        safe_loc = loc.encode('ascii', 'ignore')
+        url += "/"+str("%s-%s-%s" % (location["lat"], location["lon"], safe_loc))
         requests.put(url, data = data_json)
 
 
-def usersToES(pulls):
+def usersToES(users):
 
     elasticsearch_type = "users"  # github global users
 
@@ -321,12 +328,53 @@ def getLastUpdateFromES(_type):
     res_json = res.json()
 
     if 'aggregations' in res_json:
-        last_update = res_json["aggregations"]["1"]["value_as_string"]
+        if "value_as_string" in res_json["aggregations"]["1"]:
+            last_update = res_json["aggregations"]["1"]["value_as_string"]
 
     return last_update
 
 
+def create_geopoints_map(_type):
+    """ geopoints type is not created in dynamic mapping """
+    geo_map = """
+        {
+            "properties": {
+               "assignee_geolocation": {
+                   "type": "geo_point"
+               },
+               "user_geolocation": {
+                   "type": "geo_point"
+               }
+            }
+        }
+    """
+    elasticsearch_type = _type
+    url = elasticsearch_url + "/"+elasticsearch_index
+    url_type = url + "/" + elasticsearch_type
+    url_map = url_type+"/_mapping"
+    requests.put(url_map, data=geo_map)
+
+def initES():
+
+    _types = ['pullrequests','issues_pullrequests']
+
+    # Remove and create indexes. Create mappings.
+    url_raw = elasticsearch_url + "/"+elasticsearch_index_raw
+    url = elasticsearch_url + "/"+elasticsearch_index
+
+    requests.delete(url_raw)
+    requests.delete(url)
+
+    requests.post(url_raw)
+    requests.post(url)
+
+    for _type in _types:
+        create_geopoints_map(_type)
+
+
 def pullrequets2ES(pulls, _type):
+
+    create_geopoints_map(_type)
 
     elasticsearch_type = _type
     count = 0
@@ -441,6 +489,7 @@ if __name__ == '__main__':
         "_%s_%s" % (github_owner, github_repo)
     elasticsearch_index_raw = elasticsearch_index+"_raw"
 
+    initES()  # until we have incremental support, always from scratch
     users = usersFromES()
     geolocations = geoLocationsFromES()
 
