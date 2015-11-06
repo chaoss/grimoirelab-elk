@@ -261,7 +261,7 @@ def getIssues(url):
 
         issue_processed = {}
 
-        fields = ['reporter', 'assigned_to', 'status', 'resolution']
+        fields = ['reporter', 'assigned_to', 'bug_status', 'resolution']
         fields += ['creation_ts', 'delta_ts', 'product', 'component']
         fields += ['bug_id','short_desc','priority']
         fields += ['version']
