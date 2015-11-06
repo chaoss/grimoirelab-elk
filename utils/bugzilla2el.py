@@ -31,8 +31,8 @@ import logging
 import requests
 from dateutil import parser
 import urlparse
-# import xml.sax.handler
 from xml.etree import ElementTree
+from BeautifulSoup import BeautifulSoup, Comment as BFComment
 
 
 def parse_args ():
@@ -148,6 +148,20 @@ def initES():
     requests.post(url)
 
 
+def changesHTML2ES(changes_html, issue_id):
+    """ Store in ES the HTML for each issue changes """
+
+    elasticsearch_type = "changes_raw"
+
+    html = {"html":changes_html}
+    data_json = json.dumps(html)
+
+    url = elasticsearch_url + "/"+elasticsearch_index
+    url += "/"+elasticsearch_type
+    url += "/"+str(issue_id)
+    requests.put(url, data = data_json)
+
+
 def issuesXML2ES(issues_xml):
     """ Store in ES the XML for each issue """
 
@@ -166,7 +180,6 @@ def issuesXML2ES(issues_xml):
         url += "/"+elasticsearch_type
         url += "/"+str(_id)
         requests.put(url, data = data_json)
-
 
 
 def issues2ES(issues):
@@ -195,6 +208,105 @@ def getDomain(url):
                               newpath)
     return domain
 
+class SoupHtmlParser():
+    """
+    Parses HTML to get 5 different fields from a table
+    """
+
+    field_map = {}
+    status_map = {}
+    resolution_map = {}
+
+    def __init__(self, html, idBug):
+        self.html = html
+        self.idBug = idBug
+        self.field_map = {'Status': u'status', 'Resolution': u'resolution'}
+
+    def sanityze_change(self, field, old_value, new_value):
+        field = self.field_map.get(field, field)
+        old_value = old_value.strip()
+        new_value = new_value.strip()
+        if field == 'status':
+            old_value = self.status_map.get(old_value, old_value)
+            new_value = self.status_map.get(new_value, new_value)
+        elif field == 'resolution':
+            old_value = self.resolution_map.get(old_value, old_value)
+            new_value = self.resolution_map.get(new_value, new_value)
+
+        return field, old_value, new_value
+
+    def remove_comments(self, soup):
+        cmts = soup.findAll(text=lambda text: isinstance(text, BFComment))
+        [comment.extract() for comment in cmts]
+
+    def _to_datetime_with_secs(self, str_date):
+        """
+        Returns datetime object from string
+        """
+        return parser.parse(str_date).replace(tzinfo=None)
+
+    def parse_changes(self):
+        soup = BeautifulSoup(self.html)
+        self.remove_comments(soup)
+        remove_tags = ['a', 'span', 'i']
+        changes = []
+        tables = soup.findAll('table')
+
+        # We look for the first table with 5 cols
+        table = None
+        for table in tables:
+            if len(table.tr.findAll('th', recursive=False)) == 5:
+                try:
+                    for i in table.findAll(remove_tags):
+                        i.replaceWith(i.text)
+                except:
+                    logging.error("error removing HTML tags")
+                break
+
+        if table is None:
+            return changes
+
+        rows = list(table.findAll('tr'))
+        for row in rows[1:]:
+            cols = list(row.findAll('td'))
+            if len(cols) == 5:
+                person_email = cols[0].contents[0].strip()
+                person_email = unicode(person_email.replace('&#64;', '@'))
+                date = self._to_datetime_with_secs(cols[1].contents[0].strip())
+                date_str = date.isoformat()
+                # when the field contains an Attachment, the list has more
+                #than a field. For example:
+                #
+                # [u'\n', u'Attachment #12723', u'\n              Flag\n            ']
+                #
+                if len(cols[2].contents) > 1:
+                    aux_c = unicode(" ".join(cols[2].contents))
+                    field = unicode(aux_c.replace("\n", "").strip())
+                else:
+                    field = unicode(cols[2].contents[0].replace("\n", "").strip())
+                removed = unicode(cols[3].contents[0].strip())
+                added = unicode(cols[4].contents[0].strip())
+            else:
+                # same as above with the Attachment example
+                if len(cols[0].contents) > 1:
+                    aux_c = unicode(" ".join(cols[0].contents))
+                    field = aux_c.replace("\n", "").strip()
+                else:
+                    field = cols[0].contents[0].strip()
+                removed = cols[1].contents[0].strip()
+                added = cols[2].contents[0].strip()
+
+            field, removed, added = self.sanityze_change(field, removed, added)
+            change = {"person_email":person_email,
+                      "field": field,
+                      "removed": removed,
+                      "added": added,
+                      "date": date_str
+                      }
+            changes.append(change)
+
+        return changes
+
 
 def getIssues(url):
 
@@ -222,6 +334,8 @@ def getIssues(url):
 
     def retrieve_issues_ids(url):
         logging.info("Getting issues list ...")
+
+        # return ['963423','954188']
 
         url = get_issues_list_url(url, bugzilla_version)
 
@@ -254,7 +368,22 @@ def getIssues(url):
 
         if field.tag == "reporter" or field.tag == "assigned_to":
             if 'name' in field.attrib:
-                issue[tag + "_name"] = field.attrib['name'] 
+                issue[tag + "_name"] = field.attrib['name']
+
+    def getChanges(base_url, issue_id):
+        activity_url = base_url + "show_activity.cgi?id=" + issue_id
+        logging.info("Getting changes for issue %s from %s"
+                 % (issue_id, activity_url))
+
+        data = requests.get(activity_url).content
+
+        changesHTML2ES(data, issue_id)
+
+        parser = SoupHtmlParser(data, issue_id)
+        changes = parser.parse_changes()
+
+        return changes
+
 
     def getIssueProccesed(bug_xml_tree):
         """ Return a dict with selected fields """
@@ -296,6 +425,10 @@ def getIssues(url):
 
         fix_review_dates(issue_processed)
 
+        # Time to gather changes for this issue
+        issue_processed['changes'] = \
+            getChanges(getDomain(url), issue_processed['id'])
+
         return issue_processed
 
 
@@ -322,7 +455,6 @@ def getIssues(url):
 
             issuesXML2ES(tree)
 
-
             for bug in tree:
                 issues.append(getIssueProccesed(bug))
 
@@ -331,7 +463,6 @@ def getIssues(url):
             issues_processed += issues
 
         return issues_processed
-
 
 
     _type = "issues"
@@ -377,16 +508,9 @@ if __name__ == '__main__':
     elasticsearch_index_raw = elasticsearch_index+"_raw"
 
     initES()  # until we have incremental support, always from scratch
-    # users = usersFromES()
-    # geolocations = geoLocationsFromES()
 
     issues_per_query = 200  # number of tickets per query
 
-    # prs_count = getPullRequests(url_pulls+url_params)
     issues_prs_count = getIssues(args.url)
 
-    # usersToES(users)  # cache users in ES
-    # geoLocationsToES(geolocations)
-
-    # logging.info("Total Pull Requests " + str(prs_count))
     logging.info("Total Issues Pull Requests " + str(issues_prs_count))
