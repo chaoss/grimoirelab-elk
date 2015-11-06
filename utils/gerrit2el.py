@@ -218,6 +218,21 @@ def get_isbot(uuid):
 
     return bot
 
+def get_isbot_by_username(username):
+    """ Get if a username is a bot  """
+
+    # TODO: Using username as key is fragile. It is not unique.
+    # For example, jenkins could be the name of a non bot user
+
+    bot = 0 # Default username is not a bot
+    try:
+        bot = username2bot[username]
+    except:
+        # logging.info("Can't find org for " + email)
+        pass
+
+    return bot
+
 
 def create_events_map():
     elasticsearch_type = "reviews_events"
@@ -393,7 +408,13 @@ def fetch_events(review):
                     bulk_json_ap += '"approval_email":null,'
                     bulk_json_ap += '"approval_uuid":null,'
                     bulk_json_ap += '"approval_organization":null,'
-                    bulk_json_ap += '"approval_bot":null,'
+                    if 'username' in app['by']:
+                        # Try to find if it is a bot with the username
+                        bulk_json_ap += '"approval_bot":"%s",' % \
+                            get_isbot_by_username(app['by']['username'])
+                    else:
+                        bulk_json_ap += '"approval_bot":null,'
+
                 if 'username' in app['by']:
                     bulk_json_ap += '"approval_username":"%s",' % app['by']['username']
                 else:
@@ -593,7 +614,7 @@ def sortinghat_to_es():
 
     # First using the email in profile table from sorting hat
     sql = """
-        SELECT p.uuid, email, is_bot
+        SELECT p.uuid, email, is_bot, username
         FROM profiles p
         WHERE email is not NULL
         """
@@ -603,9 +624,11 @@ def sortinghat_to_es():
         uuid = profile[0]
         email = profile[1]
         is_bot = profile[2]
+        username = profile[3]
 
         email2uuid[email] = uuid
         uuid2bot[uuid] = is_bot
+        username2bot[username] = is_bot
 
     # Now using directly the grimoirelib gerrit identities
     sql = """
@@ -645,11 +668,12 @@ if __name__ == '__main__':
     # Feed the reviews items in EL
     opener = urllib2.build_opener(urllib2.HTTPHandler)
 
-    # Add profiles to sortinghat
+    # Profiles information from sortinghat
     email2uuid = {}
     emailNOuuid = set()
     uuid2orgs = {}
     uuid2bot = {}
+    username2bot = {}
     domain2org = {}
     sortinghat_to_es()
 

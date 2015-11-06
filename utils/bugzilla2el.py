@@ -198,6 +198,15 @@ def getDomain(url):
 
 def getIssues(url):
 
+    def fix_review_dates(issue):
+        """ Convert dates so ES detect them """
+
+        for date_field in ['created_on','updated_on']:
+            if date_field in issue.keys():
+                date_ts = parser.parse(issue[date_field])
+                issue[date_field] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
+
+
     def get_issues_list_url(base_url, version):
         if '?' in base_url:
             url = base_url + '&'
@@ -213,8 +222,6 @@ def getIssues(url):
 
     def retrieve_issues_ids(url):
         logging.info("Getting issues list ...")
-
-        # return ['963423','954188']
 
         url = get_issues_list_url(url, bugzilla_version)
 
@@ -286,6 +293,8 @@ def getIssues(url):
                                     issue_processed['updated_on'])
         issue_processed['url'] = getDomain(url) + "show_bug.cgi?id=" + \
             issue_processed['id']
+
+        fix_review_dates(issue_processed)
 
         return issue_processed
 
