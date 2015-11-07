@@ -200,17 +200,9 @@ def get_elastic_index():
 
 
 def init_es():
-
-    _types = ['issues']
-
-    # Remove and create indexes. Create mappings.
-    url_raw = get_elastic_index_raw()
+    # Remove and create indexes (not for raw). Create mappings.
     url = get_elastic_index()
-
-    requests.delete(url_raw)
     requests.delete(url)
-
-    requests.post(url_raw)
     requests.post(url)
 
 
@@ -245,27 +237,43 @@ def get_last_update_from_es(_type):
     return last_update
 
 
-def changesHTML2ES(changes_html, issue_id):
+def cache_get_changes(issue_id):
+    elasticsearch_type = "changes"
+
+    url = get_elastic_index_raw()
+    url += "/"+elasticsearch_type
+    url += "/"+str(issue_id)
+
+    r = requests.get(url)
+
+    if r.status_code == 404:  # Not found
+        changes = None
+    else:
+        changes = r.json()['_source']['html']
+
+    return changes
+
+
+def changes_raw_to_es(changes_html, issue_id):
     """ Store in ES the HTML for each issue changes """
 
-    elasticsearch_type = "changes_raw"
+    elasticsearch_type = "changes"
 
-    changes_html = changes_html.decode('utf-8')
     html = {"html": changes_html}
     data_json = json.dumps(html)
 
-    url = get_elastic_index()
+    url = get_elastic_index_raw()
     url += "/"+elasticsearch_type
     url += "/"+str(issue_id)
     requests.put(url, data=data_json)
 
 
-def issuesXML2ES(issues_xml):
+def issues_raw_to_es(issues_xml):
     """ Store in ES the XML for each issue """
 
     # TODO: Use _bulk API
 
-    elasticsearch_type = "issues_raw"
+    elasticsearch_type = "issues"
 
     for bug in issues_xml:
         _id = bug.findall('bug_id')[0].text
@@ -276,13 +284,13 @@ def issuesXML2ES(issues_xml):
         xml_string = xml_string.decode('utf-8')
         xml = {"xml": xml_string}
         data_json = json.dumps(xml)
-        url = get_elastic_index()
+        url = get_elastic_index_raw()
         url += "/"+elasticsearch_type
         url += "/"+str(_id)
         requests.put(url, data=data_json)
 
 
-def issues2ES(issues):
+def issues_to_es(issues):
 
     # TODO: use bulk API
 
@@ -371,16 +379,24 @@ def get_issues(url):
             if 'name' in field.attrib:
                 issue[tag + "_name"] = field.attrib['name']
 
-    def get_changes(base_url, issue_id):
-        activity_url = base_url + "show_activity.cgi?id=" + issue_id
-        logging.info("Getting changes for issue %s from %s" %
-                     (issue_id, activity_url))
+    def get_changes(issue_id):
+        base_url = get_domain(args.url)
 
-        data = requests.get(activity_url).content
+        # Try to get changes from cache
+        changes_html = cache_get_changes(issue_id)
+        if changes_html:
+            logging.info("Cache changes for %s found" % issue_id)
+        else:
+            activity_url = base_url + "show_activity.cgi?id=" + issue_id
+            logging.info("Getting changes for issue %s from %s" %
+                         (issue_id, activity_url))
 
-        changesHTML2ES(data, issue_id)
+            changes_html = requests.get(activity_url).content
+            changes_html = changes_html.decode('utf-8')
 
-        parser = BugzillaChangesHTMLParser(data, issue_id)
+            changes_raw_to_es(changes_html, issue_id)
+
+        parser = BugzillaChangesHTMLParser(changes_html, issue_id)
         changes = parser.parse_changes()
 
         return changes
@@ -427,13 +443,14 @@ def get_issues(url):
 
         # Time to gather changes for this issue
         issue_processed['changes'] = \
-            get_changes(get_domain(url), issue_processed['id'])
+            get_changes(issue_processed['id'])
 
         return issue_processed
 
-    def retrieve_issues(ids, base_url):
+    def retrieve_issues(ids):
 
         issues_processed = []  # Issues JSON ready to inserted in ES
+        base_url = get_domain(args.url)
 
         # We want to use pop() to get the oldest first so we must reverse the
         # order
@@ -452,12 +469,12 @@ def get_issues(url):
 
             tree = ElementTree.fromstring(issues_raw.content)
 
-            issuesXML2ES(tree)
+            issues_raw_to_es(tree)
 
             for bug in tree:
                 issues.append(get_issue_proccesed(bug))
 
-            issues2ES(issues)
+            issues_to_es(issues)
 
             issues_processed += issues
 
@@ -472,8 +489,7 @@ def get_issues(url):
 
     logging.info("Total issues to be gathered %i" % len(ids))
 
-    base_url = get_domain(url)
-    issues_processed = retrieve_issues(ids, base_url)
+    issues_processed = retrieve_issues(ids)
 
     logging.info("Total issues gathered %i" % len(issues_processed))
 
@@ -511,6 +527,4 @@ if __name__ == '__main__':
 
     issues_per_query = 200  # number of tickets per query
 
-    issues_prs_count = get_issues(args.url)
-
-    logging.info("Total Issues Pull Requests " + str(issues_prs_count))
+    get_issues(args.url)
