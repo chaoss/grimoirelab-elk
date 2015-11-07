@@ -30,7 +30,7 @@ import json
 import logging
 import requests
 from dateutil import parser
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 from xml.etree import ElementTree
 from bs4 import BeautifulSoup, Comment as BFComment
 
@@ -98,7 +98,7 @@ class BugzillaChangesHTMLParser():
             cols = list(row.findAll('td'))
             if len(cols) == 5:
                 changed_by = cols[0].contents[0].strip()
-                changed_by = unicode(changed_by.replace('&#64;', '@'))
+                changed_by = changed_by.replace('&#64;', '@')
                 date = self._to_datetime_with_secs(cols[1].contents[0].strip())
                 date_str = date.isoformat()
                 # when the field contains an Attachment, the list has more
@@ -107,17 +107,16 @@ class BugzillaChangesHTMLParser():
                 # [u'\n', u'Attachment #12723', u'\n              Flag\n     ']
                 #
                 if len(cols[2].contents) > 1:
-                    aux_c = unicode(" ".join(cols[2].contents))
-                    field = unicode(aux_c.replace("\n", "").strip())
+                    aux_c = " ".join(cols[2].contents)
+                    field = aux_c.replace("\n", "").strip()
                 else:
-                    field = unicode(cols[2].contents[0].
-                                    replace("\n", "").strip())
-                removed = unicode(cols[3].contents[0].strip())
-                added = unicode(cols[4].contents[0].strip())
+                    field = cols[2].contents[0].replace("\n", "").strip()
+                removed = cols[3].contents[0].strip()
+                added = cols[4].contents[0].strip()
             else:
                 # same as above with the Attachment example
                 if len(cols[0].contents) > 1:
-                    aux_c = unicode(" ".join(cols[0].contents))
+                    aux_c = " ".join(cols[0].contents)
                     field = aux_c.replace("\n", "").strip()
                 else:
                     field = cols[0].contents[0].strip()
@@ -251,6 +250,7 @@ def changesHTML2ES(changes_html, issue_id):
 
     elasticsearch_type = "changes_raw"
 
+    changes_html = changes_html.decode('utf-8')
     html = {"html": changes_html}
     data_json = json.dumps(html)
 
@@ -270,7 +270,11 @@ def issuesXML2ES(issues_xml):
     for bug in issues_xml:
         _id = bug.findall('bug_id')[0].text
         # TODO.: detect XML enconding and use it
-        xml = {"xml": ElementTree.tostring(bug, encoding="us-ascii")}
+        # xml = {"xml": ElementTree.tostring(bug, encoding="us-ascii")}
+        xml_string = ElementTree.tostring(bug, encoding="utf-8")
+        # xml_string is of type b'' byte stream in Python3
+        xml_string = xml_string.decode('utf-8')
+        xml = {"xml": xml_string}
         data_json = json.dumps(xml)
         url = get_elastic_index()
         url += "/"+elasticsearch_type
@@ -293,7 +297,7 @@ def issues2ES(issues):
 
 
 def get_domain(url):
-    result = urlparse.urlparse(url)
+    result = urlparse(url)
 
     if url.find("show_bug.cgi") > 0:
         pos = result.path.find('show_bug.cgi')
@@ -301,8 +305,7 @@ def get_domain(url):
         pos = result.path.find('buglist.cgi')
 
     newpath = result.path[0:pos]
-    domain = urlparse.urljoin(result.scheme + '://' + result.netloc + '/',
-                              newpath)
+    domain = urljoin(result.scheme + '://' + result.netloc + '/', newpath)
     return domain
 
 
@@ -331,13 +334,15 @@ def get_issues(url):
     def retrieve_issues_ids(url):
         logging.info("Getting issues list ...")
 
-        # return ['963423','954188']
+        # return ['963423', '954188']
 
         url = get_issues_list_url(url, bugzilla_version)
 
         r = requests.get(url)
 
-        csv = r.content.split('\n')[1:]
+        content = str(r.content, 'UTF-8')
+
+        csv = content.split('\n')[1:]
         ids = []
         for line in csv:
             # 0: bug_id, 7: changeddate
