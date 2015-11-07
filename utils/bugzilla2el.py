@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # Bugzilla tickets for Elastic Search
@@ -30,9 +30,9 @@ import json
 import logging
 import requests
 from dateutil import parser
-import urlparse
+from urllib.parse import urlparse
 from xml.etree import ElementTree
-from BeautifulSoup import BeautifulSoup, Comment as BFComment
+from bs4 import BeautifulSoup, Comment as BFComment
 
 
 class BugzillaChangesHTMLParser():
@@ -190,13 +190,38 @@ def get_time_to_last_update_days(created_at_txt, updated_at_txt):
     return update_time
 
 
+def get_elastic_index_raw():
+
+    return elasticsearch_url + "/" + elasticsearch_index_raw
+
+
+def get_elastic_index():
+
+    return elasticsearch_url + "/"+elasticsearch_index
+
+
+def init_es():
+
+    _types = ['issues']
+
+    # Remove and create indexes. Create mappings.
+    url_raw = get_elastic_index_raw()
+    url = get_elastic_index()
+
+    requests.delete(url_raw)
+    requests.delete(url)
+
+    requests.post(url_raw)
+    requests.post(url)
+
+
 def get_last_update_from_es(_type):
 
     return None
 
     last_update = None
 
-    url = elasticsearch_url + "/" + elasticsearch_index_raw
+    url = get_elastic_index_raw()
     url += "/" + _type + "/_search"
 
     data_json = """
@@ -221,21 +246,6 @@ def get_last_update_from_es(_type):
     return last_update
 
 
-def init_es():
-
-    _types = ['issues']
-
-    # Remove and create indexes. Create mappings.
-    url_raw = elasticsearch_url + "/"+elasticsearch_index_raw
-    url = elasticsearch_url + "/"+elasticsearch_index
-
-    requests.delete(url_raw)
-    requests.delete(url)
-
-    requests.post(url_raw)
-    requests.post(url)
-
-
 def changesHTML2ES(changes_html, issue_id):
     """ Store in ES the HTML for each issue changes """
 
@@ -244,7 +254,7 @@ def changesHTML2ES(changes_html, issue_id):
     html = {"html": changes_html}
     data_json = json.dumps(html)
 
-    url = elasticsearch_url + "/" + elasticsearch_index
+    url = get_elastic_index()
     url += "/"+elasticsearch_type
     url += "/"+str(issue_id)
     requests.put(url, data=data_json)
@@ -258,13 +268,11 @@ def issuesXML2ES(issues_xml):
     elasticsearch_type = "issues_raw"
 
     for bug in issues_xml:
-
         _id = bug.findall('bug_id')[0].text
         # TODO.: detect XML enconding and use it
         xml = {"xml": ElementTree.tostring(bug, encoding="us-ascii")}
         data_json = json.dumps(xml)
-
-        url = elasticsearch_url + "/" + elasticsearch_index
+        url = get_elastic_index()
         url += "/"+elasticsearch_type
         url += "/"+str(_id)
         requests.put(url, data=data_json)
@@ -278,7 +286,7 @@ def issues2ES(issues):
 
     for issue in issues:
         data_json = json.dumps(issue)
-        url = elasticsearch_url + "/"+elasticsearch_index
+        url = get_elastic_index()
         url += "/"+elasticsearch_type
         url += "/"+str(issue["id"])
         requests.put(url, data=data_json)
