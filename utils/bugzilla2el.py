@@ -211,11 +211,11 @@ def init_es():
 
 def get_last_update_from_es(_type):
 
-    return None
-
     last_update = None
 
-    url = get_elastic_index_raw()
+    field = "changeddate"
+
+    url = get_elastic_index()
     url += "/" + _type + "/_search"
 
     data_json = """
@@ -223,12 +223,12 @@ def get_last_update_from_es(_type):
         "aggs": {
             "1": {
               "max": {
-                "field": "updated_at"
+                "field": "%s"
               }
             }
         }
     }
-    """
+    """ % (field)
 
     res = requests.post(url, data=data_json)
     res_json = res.json()
@@ -236,6 +236,8 @@ def get_last_update_from_es(_type):
     if 'aggregations' in res_json:
         if "value_as_string" in res_json["aggregations"]["1"]:
             last_update = res_json["aggregations"]["1"]["value_as_string"]
+            last_update = parser.parse(last_update).replace(tzinfo=None)
+            last_update = last_update.isoformat(" ")
 
     return last_update
 
@@ -393,6 +395,7 @@ def get_issues(url):
                 from_date_str = from_date.isoformat(" ")
             except:
                 logging.error("Error in list from date: %s" %(from_date_str))
+                raise
 
         if '?' in base_url:
             url = base_url + '&'
@@ -578,9 +581,12 @@ def get_issues(url):
 
     logging.info("Getting issues from Bugzilla")
 
-    from_date = None
+    last_update = get_last_update_from_es("issues_list")
 
-    ids = retrieve_issues_ids(url, from_date)
+    if last_update is not None:
+        logging.info("Incremental analysis: %s" % (last_update))
+
+    ids = retrieve_issues_ids(url, last_update)
     total_issues = 0
 
     while ids:
@@ -595,8 +601,8 @@ def get_issues(url):
 
         total_issues += len(ids)
 
-        from_date = ids[len(ids)-1][1]
-        ids = retrieve_issues_ids(url, from_date)
+        last_update = ids[len(ids)-1][1]
+        ids = retrieve_issues_ids(url, last_update)
 
     logging.info("Total issues gathered %i" % total_issues)
 
@@ -631,7 +637,8 @@ if __name__ == '__main__':
         "_%s" % (get_bugzilla_index(args.url))
     elasticsearch_index_raw = elasticsearch_index+"_raw"
 
-    init_es()  # until we have incremental support, always from scratch
+    if args.delete:
+        init_es()
 
     issues_per_query = 200  # number of tickets per query
 
