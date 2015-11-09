@@ -599,15 +599,13 @@ def get_issues(url):
     while ids:
         logging.info("Issues to get in this iteration %i" % len(ids))
 
-        issues_processed = len(ids)
-
         if args.detail in ['issue', 'change']:
             issues_processed = retrieve_issues(ids)
-
             logging.info("Issues received in this iteration %i" %
                          len(issues_processed))
-
-        total_issues += len(issues_processed)
+            total_issues += len(issues_processed)
+        else:
+            total_issues += len(ids)
 
         if len(ids) > 0:
             last_update = ids[len(ids)-1][1]
