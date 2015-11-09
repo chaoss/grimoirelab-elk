@@ -35,6 +35,7 @@ from urllib.parse import urlparse, urljoin
 from xml.etree import ElementTree
 from bs4 import BeautifulSoup, Comment as BFComment
 
+
 class BugzillaChangesHTMLParser():
     """
     Parses HTML to get 5 different fields from a table
@@ -156,7 +157,6 @@ def parse_args():
     parser.add_argument("--detail",  default="change",
                         help="list, issue or change (default) detail")
 
-
     args = parser.parse_args()
     return args
 
@@ -258,6 +258,7 @@ def cache_get_changes(issue_id):
 
     return changes
 
+
 def issues_list_raw_to_es(list_csv, last_date):
     """ Store in ES the CSV with the issues listing """
 
@@ -321,12 +322,13 @@ def issues_to_es(issues):
         url += "/"+str(issue["id"])
         requests.put(url, data=data_json)
 
+
 def get_issue_from_list_line(line):
 
     fields = ["bug_id", "product", "component", "assigned_to", "bug_status"]
     fields += ["resolution", "short_desc", "changeddate"]
 
-    line = line.replace(',","','","')  # if a field ends with ," remove the ,
+    line = line.replace(',","', '","')  # if a field ends with ," remove the ,
 
     data_raw = line.split(',"')
     data = {}  # fields values
@@ -391,10 +393,10 @@ def get_issues(url):
 
         if from_date_str is not None:
             try:
-                from_date = parser.parse(from_date_str) + timedelta(0,1)
+                from_date = parser.parse(from_date_str) + timedelta(0, 1)
                 from_date_str = from_date.isoformat(" ")
             except:
-                logging.error("Error in list from date: %s" %(from_date_str))
+                logging.error("Error in list from date: %s" % (from_date_str))
                 raise
 
         if '?' in base_url:
@@ -438,7 +440,7 @@ def get_issues(url):
 
         csv = content.split('\n')[1:]
 
-        issues_list_to_es (csv)
+        issues_list_to_es(csv)
 
         ids = []
         for line in csv:
@@ -589,8 +591,7 @@ def get_issues(url):
     while ids:
         logging.info("Issues to get in this iteration %i" % len(ids))
 
-
-        if args.detail in ['issue','change']:
+        if args.detail in ['issue', 'change']:
             issues_processed = retrieve_issues(ids)
 
             logging.info("Issues received in this iteration %i" %
@@ -604,7 +605,6 @@ def get_issues(url):
     logging.info("Total issues gathered %i" % total_issues)
 
 
-
 def get_bugzilla_index(url):
     """ Return bugzilla ES index name from url """
 
@@ -613,7 +613,8 @@ def get_bugzilla_index(url):
     if 'product' in url:
         _index += "-" + url.split('product=')[1]
 
-    return _index.replace("/","_").lower()  # ES index names must be lower case
+    # ES index names must be lower case
+    return _index.replace("/", "_").lower()
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
