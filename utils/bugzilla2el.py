@@ -213,7 +213,10 @@ def get_last_update_from_es(_type):
 
     last_update = None
 
-    field = "changeddate"
+    if _type == "list":
+        field = "changeddate"
+    else:
+        field = "updated_on"
 
     url = get_elastic_index()
     url += "/" + _type + "/_search"
@@ -580,7 +583,12 @@ def get_issues(url):
 
     logging.info("Getting issues from Bugzilla")
 
-    last_update = get_last_update_from_es("issues_list")
+    if args.detail == "list":
+        # If working in list detail just use data from issues_list
+        last_update = get_last_update_from_es("issues_list")
+    else:
+        # Issues and changes are in the same index
+        last_update = get_last_update_from_es("issues")
 
     if last_update is not None:
         logging.info("Incremental analysis: %s" % (last_update))
@@ -591,16 +599,19 @@ def get_issues(url):
     while ids:
         logging.info("Issues to get in this iteration %i" % len(ids))
 
+        issues_processed = len(ids)
+
         if args.detail in ['issue', 'change']:
             issues_processed = retrieve_issues(ids)
 
             logging.info("Issues received in this iteration %i" %
                          len(issues_processed))
 
-        total_issues += len(ids)
+        total_issues += len(issues_processed)
 
-        last_update = ids[len(ids)-1][1]
-        ids = retrieve_issues_ids(url, last_update)
+        if len(ids) > 0:
+            last_update = ids[len(ids)-1][1]
+            ids = retrieve_issues_ids(url, last_update)
 
     logging.info("Total issues gathered %i" % total_issues)
 
