@@ -30,10 +30,10 @@ import json
 import logging
 import requests
 from dateutil import parser
+from datetime import timedelta
 from urllib.parse import urlparse, urljoin
 from xml.etree import ElementTree
 from bs4 import BeautifulSoup, Comment as BFComment
-
 
 class BugzillaChangesHTMLParser():
     """
@@ -253,6 +253,19 @@ def cache_get_changes(issue_id):
 
     return changes
 
+def issues_list_raw_to_es(list_csv, last_date):
+    """ Store in ES the CSV with the issues listing """
+
+    elasticsearch_type = "issues_list"
+
+    csv = {"csv": list_csv}
+    data_json = json.dumps(csv)
+
+    url = get_elastic_index_raw()
+    url += "/"+elasticsearch_type
+    url += "/"+str(last_date)
+    requests.put(url, data=data_json)
+
 
 def changes_raw_to_es(changes_html, issue_id):
     """ Store in ES the HTML for each issue changes """
@@ -327,7 +340,17 @@ def get_issues(url):
                 date_ts = parser.parse(issue[date_field])
                 issue[date_field] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
-    def get_issues_list_url(base_url, version):
+    def get_issues_list_url(base_url, version, from_date_str=None):
+        # from_date should be increased in 1s to not include last issue
+
+        if from_date_str is not None:
+            print (from_date_str)
+            try:
+                from_date = parser.parse(from_date_str) + timedelta(0,1)
+                from_date_str = from_date.isoformat(" ")
+            except:
+                logging.error("Error in list from date: %s" %(from_date_str))
+
         if '?' in base_url:
             url = base_url + '&'
         else:
@@ -335,37 +358,62 @@ def get_issues(url):
 
         if ((version == "3.2.3") or (version == "3.2.2")):
             url = url + "order=Last+Changed&ctype=csv"
+            if from_date_str:
+                """
+                Firefox ITS (3.2.3) replaces %20 with %2520 that causes
+                Bicho to crash
+                """
+                day = from_date_str[:from_date_str.index(' ')]
+            else:
+                day = '1970-01-01'
+            url = url + "&chfieldfrom=" + day
         else:
             url = url + "order=changeddate&ctype=csv"
+            if from_date_str:
+                day = from_date_str.replace(' ', '%20')
+            else:
+                day = '1970-01-01'
+            url = url + "&chfieldfrom=" + day
+
         return url
 
-    def retrieve_issues_ids(url):
+    def retrieve_issues_ids(url, from_date):
         logging.info("Getting issues list ...")
 
         # return ['963423', '954188']
 
-        url = get_issues_list_url(url, bugzilla_version)
+        url = get_issues_list_url(url, bugzilla_version, from_date)
+
+        logging.info("List url %s" % (url))
 
         r = requests.get(url)
 
         content = str(r.content, 'UTF-8')
 
         csv = content.split('\n')[1:]
+
         ids = []
         for line in csv:
             # 0: bug_id, 7: changeddate
             values = line.split(',')
             issue_id = values[0]
-            # change_ts = values[7].strip('"')
+            change_ts = values[len(values)-1].strip('"')
+            if 'exception' in change_ts:
+                print (line)
 
-            ids.append(issue_id)
+            ids.append([issue_id, change_ts])
+
+        if len(ids) > 0:
+            last_date = ids[len(ids)-1][1]
+            issues_list_raw_to_es(csv, last_date)
 
         return ids
 
     def get_issues_info_url(base_url, ids):
         url = base_url + "show_bug.cgi?"
 
-        for issue_id in ids:
+        for issue in ids:
+            issue_id = issue[0]
             url += "id=" + issue_id + "&"
 
         url += "ctype=xml"
@@ -385,7 +433,8 @@ def get_issues(url):
         # Try to get changes from cache
         changes_html = cache_get_changes(issue_id)
         if changes_html:
-            logging.info("Cache changes for %s found" % issue_id)
+            pass
+            # logging.info("Cache changes for %s found" % issue_id)
         else:
             activity_url = base_url + "show_activity.cgi?id=" + issue_id
             logging.info("Getting changes for issue %s from %s" %
@@ -484,14 +533,25 @@ def get_issues(url):
 
     logging.info("Getting issues from Bugzilla")
 
-    # TODO: not all issues processed. Need to iterate.
-    ids = retrieve_issues_ids(url)
+    from_date = None
+    ids = retrieve_issues_ids(url, from_date)
+    total_issues = 0
 
-    logging.info("Total issues to be gathered %i" % len(ids))
+    while ids:
+        logging.info("Issues to get in this iteration %i" % len(ids))
 
-    issues_processed = retrieve_issues(ids)
+        issues_processed = retrieve_issues(ids)
 
-    logging.info("Total issues gathered %i" % len(issues_processed))
+        logging.info("Issues received in this iteration %i" %
+                     len(issues_processed))
+
+        total_issues += len(issues_processed)
+
+        from_date = ids[len(ids)-1][1]
+        ids = retrieve_issues_ids(url, from_date)
+
+    logging.info("Total issues gathered %i" % total_issues)
+
 
 
 def get_bugzilla_index(url):
@@ -502,7 +562,7 @@ def get_bugzilla_index(url):
     if 'product' in url:
         _index += "-" + url.split('product=')[1]
 
-    return _index.lower()  # ES index names must be lower case
+    return _index.replace("/","_").lower()  # ES index names must be lower case
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
