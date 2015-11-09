@@ -201,19 +201,46 @@ def get_elastic_index():
 
     return elasticsearch_url + "/"+elasticsearch_index
 
+def create_issues_list_mapping():
+    elasticsearch_type = "issues_list"
+    url = elasticsearch_url + "/"+elasticsearch_index
+    url_type = url + "/" + elasticsearch_type
+
+    issues_list_map = """
+    {
+        "properties": {
+           "product": {
+              "type": "string",
+              "index":"not_analyzed"
+           },
+           "component": {
+              "type": "string",
+              "index":"not_analyzed"
+           },
+           "assigned_to": {
+              "type": "string",
+              "index":"not_analyzed"
+           }
+        }
+    }
+    """
+    url_map = url_type+"/_mapping"
+    requests.put(url_map, data=issues_list_map)
+
 
 def init_es():
     # Remove and create indexes (not for raw). Create mappings.
     url = get_elastic_index()
     requests.delete(url)
     requests.post(url)
+    create_issues_list_mapping()
 
 
 def get_last_update_from_es(_type):
 
     last_update = None
 
-    if _type == "list":
+    if _type == "issues_list":
         field = "changeddate"
     else:
         field = "updated_on"
