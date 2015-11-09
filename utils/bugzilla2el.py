@@ -446,9 +446,6 @@ def get_issues(url):
             values = line.split(',')
             issue_id = values[0]
             change_ts = values[len(values)-1].strip('"')
-            if 'exception' in change_ts:
-                print (line)
-
             ids.append([issue_id, change_ts])
 
         if len(ids) > 0:
