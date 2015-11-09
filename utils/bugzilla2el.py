@@ -153,6 +153,9 @@ def parse_args():
                         "(default: 9200)")
     parser.add_argument("--delete",  action='store_true',
                         help="delete repository data in ES")
+    parser.add_argument("--detail",  default="change",
+                        help="list, issue or change (default) detail")
+
 
     args = parser.parse_args()
     return args
@@ -316,6 +319,47 @@ def issues_to_es(issues):
         url += "/"+str(issue["id"])
         requests.put(url, data=data_json)
 
+def get_issue_from_list_line(line):
+
+    fields = ["bug_id", "product", "component", "assigned_to", "bug_status"]
+    fields += ["resolution", "short_desc", "changeddate"]
+
+    line = line.replace(',","','","')  # if a field ends with ," remove the ,
+
+    data_raw = line.split(',"')
+    data = {}  # fields values
+
+    try:
+        i = 0
+        for item in data_raw:
+            if item[-1:] == '"':  # remove last item if "
+                item = item[:-1]
+            data[fields[i]] = item
+            if fields[i] in ['changeddate']:
+                data[fields[i]] = parser.parse(item).isoformat()
+
+            i += 1
+    except:
+        logging.error("Error parsing CSV line")
+        logging.error(line)
+        logging.error(data_raw)
+
+    return data
+
+
+def issues_list_to_es(csv):
+    # TODO: use bulk API
+
+    elasticsearch_type = "issues_list"
+
+    for line in csv:
+        issue_fron_list = get_issue_from_list_line(line)
+        data_json = json.dumps(issue_fron_list)
+        url = get_elastic_index()
+        url += "/"+elasticsearch_type
+        url += "/"+str(issue_fron_list["bug_id"])
+        requests.put(url, data=data_json)
+
 
 def get_domain(url):
     result = urlparse(url)
@@ -344,7 +388,6 @@ def get_issues(url):
         # from_date should be increased in 1s to not include last issue
 
         if from_date_str is not None:
-            print (from_date_str)
             try:
                 from_date = parser.parse(from_date_str) + timedelta(0,1)
                 from_date_str = from_date.isoformat(" ")
@@ -391,6 +434,8 @@ def get_issues(url):
         content = str(r.content, 'UTF-8')
 
         csv = content.split('\n')[1:]
+
+        issues_list_to_es (csv)
 
         ids = []
         for line in csv:
@@ -534,18 +579,21 @@ def get_issues(url):
     logging.info("Getting issues from Bugzilla")
 
     from_date = None
+
     ids = retrieve_issues_ids(url, from_date)
     total_issues = 0
 
     while ids:
         logging.info("Issues to get in this iteration %i" % len(ids))
 
-        issues_processed = retrieve_issues(ids)
 
-        logging.info("Issues received in this iteration %i" %
-                     len(issues_processed))
+        if args.detail in ['issue','change']:
+            issues_processed = retrieve_issues(ids)
 
-        total_issues += len(issues_processed)
+            logging.info("Issues received in this iteration %i" %
+                         len(issues_processed))
+
+        total_issues += len(ids)
 
         from_date = ids[len(ids)-1][1]
         ids = retrieve_issues_ids(url, from_date)
