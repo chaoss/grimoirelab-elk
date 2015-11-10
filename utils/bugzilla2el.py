@@ -589,6 +589,10 @@ def get_issues(url):
         """ Get the time needed to analyze a day in the project and multiply
         for the number of days in the project """
 
+        if last_update_date == prj_first_date:
+            logging.error("Data error: first date and last update the same.")
+            return None
+
         proj_total_days = (prj_last_date - prj_first_date).total_seconds() / (60*60*24)
 
         app_spend_time_sec = (datetime.now() - app_init).total_seconds()
@@ -682,7 +686,7 @@ def get_issues(url):
 
             eta = get_eta(parser.parse(last_update), prj_first_date,
                           prj_last_date)
-            print ("ETA: %.2f min" % eta)
+            if eta: print ("ETA: %.2f min" % eta)
 
             ids = retrieve_issues_ids(url, last_update)
 
