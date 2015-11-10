@@ -30,7 +30,7 @@ import json
 import logging
 import requests
 from dateutil import parser
-from datetime import timedelta
+from datetime import datetime, timedelta
 from urllib.parse import urlparse, urljoin
 from xml.etree import ElementTree
 from bs4 import BeautifulSoup, Comment as BFComment
@@ -587,6 +587,7 @@ def get_issues(url):
 
     def retrieve_issues(ids):
 
+        total = len(ids)
         issues_processed = []  # Issues JSON ready to inserted in ES
         base_url = get_domain(args.url)
 
@@ -600,10 +601,9 @@ def get_issues(url):
                 query_issues.append(ids.pop())
 
             # Retrieving main bug information
+            task_init = datetime.now()
             url = get_issues_info_url(base_url, query_issues)
-            logging.info("Getting %i issues data" % (issues_per_query))
             issues_raw = requests.get(url)
-            logging.info("Processing issues data")
 
             tree = ElementTree.fromstring(issues_raw.content)
 
@@ -615,6 +615,13 @@ def get_issues(url):
             issues_to_es(issues)
 
             issues_processed += issues
+
+            task_time = (datetime.now() - task_init).total_seconds()
+            eta_time = task_time/len(issues) * (total-len(issues_processed))
+            eta_min = eta_time / 60.0
+
+            logging.info("Completed %i/%i (ETA: %.2f min)" \
+                         % (len(issues_processed), total, eta_min))
 
         return issues_processed
 
@@ -665,6 +672,7 @@ def get_bugzilla_index(url):
     return _index.replace("/", "_").lower()
 
 if __name__ == '__main__':
+    app_init = datetime.now()
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     logging.getLogger("requests").setLevel(logging.WARNING)
 
@@ -688,3 +696,7 @@ if __name__ == '__main__':
     issues_per_query = 200  # number of tickets per query
 
     get_issues(args.url)
+
+    total_time_min = (datetime.now()-app_init).total_seconds()/60
+
+    logging.info("Finished in %.2f min" % (total_time_min))
