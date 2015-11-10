@@ -225,14 +225,26 @@ def create_issues_list_mapping():
     }
     """
     url_map = url_type+"/_mapping"
-    requests.put(url_map, data=issues_list_map)
+    r = requests.put(url_map, data=issues_list_map)
+
+    if r.status_code != 200:
+        logging.error("Error creating ES mappings %s" % (r.text))
 
 
 def init_es():
     # Remove and create indexes (not for raw). Create mappings.
     url = get_elastic_index()
-    requests.delete(url)
-    requests.post(url)
+
+    if requests.get(url).status_code != 200:
+        # Index does no exists
+        requests.post(url)
+        logging.info("Created index " + url)
+    else:
+        if args.delete:
+            requests.delete(url)
+            requests.post(url)
+            logging.info("Deleted and created index " + url)
+
     create_issues_list_mapping()
 
 
@@ -671,8 +683,7 @@ if __name__ == '__main__':
         "_%s" % (get_bugzilla_index(args.url))
     elasticsearch_index_raw = elasticsearch_index+"_raw"
 
-    if args.delete:
-        init_es()
+    init_es()
 
     issues_per_query = 200  # number of tickets per query
 
