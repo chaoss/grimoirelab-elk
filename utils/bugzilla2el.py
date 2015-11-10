@@ -585,6 +585,25 @@ def get_issues(url):
 
         return issue_processed
 
+    def get_eta(last_update_date, prj_first_date, prj_last_date):
+        """ Get the time needed to analyze a day in the project and multiply
+        for the number of days in the project """
+
+        proj_total_days = (prj_last_date - prj_first_date).total_seconds() / (60*60*24)
+
+        app_spend_time_sec = (datetime.now() - app_init).total_seconds()
+        prj_seconds_done = (last_update_date-prj_first_date).total_seconds()
+        prj_days_done = prj_seconds_done / (60*60*24)
+
+        # Number of seconds needed to analyze a project day
+        app_sec_per_proj_day = app_spend_time_sec/prj_days_done
+
+        prj_pending_days = proj_total_days - prj_days_done
+        pending_eta_min = (app_sec_per_proj_day * prj_pending_days)/60
+
+        return pending_eta_min
+
+
     def retrieve_issues(ids):
 
         total = len(ids)
@@ -620,7 +639,7 @@ def get_issues(url):
             eta_time = task_time/len(issues) * (total-len(issues_processed))
             eta_min = eta_time / 60.0
 
-            logging.info("Completed %i/%i (ETA: %.2f min)" \
+            logging.info("Completed %i/%i (ETA iteration: %.2f min)" \
                          % (len(issues_processed), total, eta_min))
 
         return issues_processed
@@ -640,7 +659,11 @@ def get_issues(url):
         logging.info("Incremental analysis: %s" % (last_update))
 
     ids = retrieve_issues_ids(url, last_update)
+    prj_first_date = parser.parse(ids[0][1])
+    prj_last_date = app_init
     total_issues = 0
+
+
 
     while ids:
         logging.info("Issues to get in this iteration %i" % len(ids))
@@ -653,8 +676,14 @@ def get_issues(url):
         else:
             total_issues += len(ids)
 
+
         if len(ids) > 0:
             last_update = ids[len(ids)-1][1]
+
+            eta = get_eta(parser.parse(last_update), prj_first_date,
+                          prj_last_date)
+            print ("ETA: %.2f min" % eta)
+
             ids = retrieve_issues_ids(url, last_update)
 
     logging.info("Total issues gathered %i" % total_issues)
