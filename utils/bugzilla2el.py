@@ -728,7 +728,7 @@ class Bugzilla(object):
         logging.info("Total issues gathered %i" % total_issues)
 
 
-    def get_index(self, url):
+    def get_elastic_index_name(self, url):
         """ Return bugzilla ES index name from url """
 
         _index = self._get_domain()[:-1].split('://')[1]
@@ -748,7 +748,7 @@ if __name__ == '__main__':
 
     bugzilla = Bugzilla(args.url, args.nissues)
 
-    es_index_bugzilla = "bugzilla_" + bugzilla.get_index(args.url)
+    es_index_bugzilla = "bugzilla_" + bugzilla.get_elastic_index_name(args.url)
     es_mappings = bugzilla.get_elastic_mappings()
     es = ElasticSearch(args.elastic_host,
                        args.elastic_port,
