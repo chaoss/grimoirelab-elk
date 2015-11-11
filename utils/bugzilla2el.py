@@ -663,7 +663,8 @@ def get_issues(url):
         logging.info("Incremental analysis: %s" % (last_update))
 
     ids = retrieve_issues_ids(url, last_update)
-    prj_first_date = parser.parse(ids[0][1])
+    if len(ids)>0:
+        prj_first_date = parser.parse(ids[0][1])
     prj_last_date = app_init
     total_issues = 0
 
