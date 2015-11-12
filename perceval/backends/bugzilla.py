@@ -22,7 +22,8 @@
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
-# Bugzilla backend for Perseval
+
+'''Bugzilla backend for Perseval'''
 
 import argparse
 from datetime import datetime, timedelta
@@ -43,33 +44,46 @@ class Bugzilla(Backend):
 
     _name = "bugzilla"  # to be used for human interaction
 
-    def __init__(self, url, nissues, detail):
+    def __init__(self, url, nissues, detail, history = True, cache = False):
 
         '''
             :url: repository url, incuding bugzilla URL and opt product param
             :nissues: number of issues to get per query
             :detail: list, issue or changes details
+            :history: Use data history and update incrementally
+            :cache: use cache
         '''
 
         self.url = url
         self.bugzilla_version = self._get_version()
         self.nissues = nissues
         self.detail = detail
-        self.elastic = None
         self.issues = []  # All issues gathered from XML data
         self.issues_from_csv = []  # All issues gathered from CSV data
         self.name = "bugzilla"
-        self.use_cache = False  # Use cache data
-        self.use_past_data = False  # Use cache data
+        self.cache = {}  # cache for CSV, XML and HTML data
+        self.use_cache = cache
+        self.use_history = history
 
         # Create storage dir if it not exists
         dump_dir = self._get_storage_dir()
         if not os.path.isdir(dump_dir):
             os.makedirs(dump_dir)
 
-        if self.use_past_data:
-            self._restore()
+        if self.use_history:
+            self._restore()  # Load history
+
+            if self.use_cache:
+                try:
+                    self._load_cache()
+                    logging.debug("Cache loaded correctly")
+                except:
+                    # If any error loading the cache, clean it
+                    self._clean_cache()
         else:
+            if self.use_cache:
+                logging.warning("Can't use cache without history.")
+            self.use_cache = False
             self._clean_cache()
 
     def _restore(self):
@@ -136,11 +150,6 @@ class Bugzilla(Backend):
         return _index.replace("/", "_").lower()
 
 
-    def set_elastic(self, es):
-
-        self.elastic = es
-
-
     def _get_version(self):
 
         info_url = self._get_domain() + "show_bug.cgi?id=&ctype=xml"
@@ -168,24 +177,22 @@ class Bugzilla(Backend):
 
         return last_update
 
+    def _load_cache(self):
+        ''' Load all cache files in memory '''
 
-    def _cache_get_changes(self, issue_id):
-        ''' Get from ES the HTML with the issue changes '''
+        fname = os.path.join(self._get_storage_dir(),
+                             "cache_issues_list_csv.json")
+        with open(fname,"r") as f:
+            self.cache['issues_list'] = json.loads(f.read())
 
-        elastic_type = "changes"
+        fname = os.path.join(self._get_storage_dir(), "cache_issues_xml.json")
+        with open(fname,"r") as f:
+            self.cache['issues'] = json.loads(f.read())
 
-        url = self.elastic.index_raw_url
-        url += "/"+elastic_type
-        url += "/"+str(issue_id)
+        fname = os.path.join(self._get_storage_dir(), "cache_changes_html.json")
+        with open(fname,"r") as f:
+            self.cache['changes'] = json.loads(f.read())
 
-        r = requests.get(url)
-
-        if r.status_code == 404:  # Not found
-            changes = None
-        else:
-            changes = r.json()['_source']['html']
-
-        return changes
 
     def _clean_cache(self):
         cache_files = ["cache_issues_list_csv.json", "cache_issues_xml.json",
@@ -195,6 +202,12 @@ class Bugzilla(Backend):
             fname = os.path.join(self._get_storage_dir(), name)
             with open(fname,"w") as f:
                 f.write("[]")  # Empty array = empty cache
+
+        cache_keys = ['issues_list', 'issues', 'changes']
+
+        for _id in cache_keys:
+            self.cache[_id] = []
+
 
 
     def _close_cache(self):
@@ -209,6 +222,17 @@ class Bugzilla(Backend):
             self._remove_last_char_from_file(fname)
             with open(fname,"a") as f:
                 f.write("]")
+
+    def _cache_get_changes(self, issue_id):
+        ''' Get issue_id changes HTML from cache '''
+
+        changes = None
+
+        for item in self.cache['changes']:
+            if item['issue_id'] == issue_id:
+                changes = item['html']
+
+        return changes
 
 
     def _clean_status(self):
@@ -476,12 +500,11 @@ class Bugzilla(Backend):
 
             # Try to get changes from cache
             changes_html = self._cache_get_changes(issue_id)
-            if False and changes_html:
-                pass
-                # logging.info("Cache changes for %s found" % issue_id)
+            if changes_html:
+                logging.debug("Cache changes for %s found" % issue_id)
             else:
                 activity_url = base_url + "show_activity.cgi?id=" + issue_id
-                logging.info("Getting changes for issue %s from %s" %
+                logging.debug("Getting changes for issue %s from %s" %
                              (issue_id, activity_url))
 
                 changes_html = requests.get(activity_url).content
@@ -552,7 +575,7 @@ class Bugzilla(Backend):
 
         last_update = self._get_last_update_date()
 
-        # last_update = "2015-11-01"
+        # last_update = "2015-11-10"
 
         if last_update is not None:
             logging.info("Incremental analysis: %s" % (last_update))
