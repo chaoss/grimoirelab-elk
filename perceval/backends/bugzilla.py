@@ -493,11 +493,14 @@ class Bugzilla(Backend):
         def get_changes_html(issue_id):
             base_url = self._get_domain()
 
+            changes_html = None
             # Try to get changes from cache
-            changes_html = self._cache_get_changes(issue_id)
-            if changes_html:
-                logging.debug("Cache changes for %s found" % issue_id)
-            else:
+            if self.use_cache:
+                changes_html = self._cache_get_changes(issue_id)
+                if changes_html:
+                    logging.debug("Cache changes for %s found" % issue_id)
+
+            if not changes_html:
                 activity_url = base_url + "show_activity.cgi?id=" + issue_id
                 logging.debug("Getting changes for issue %s from %s" %
                              (issue_id, activity_url))
