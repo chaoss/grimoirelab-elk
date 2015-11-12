@@ -146,8 +146,13 @@ class BugzillaElastic(object):
             u = urlparse(self.bugzilla.url)
             return u.scheme+"//"+u.netloc
 
-        # Add extra JSON fields used in Kibana
+        # Fix dates
+        date_ts = parser.parse(issue['creation_ts'])
+        issue['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
+        date_ts = parser.parse(issue['delta_ts'])
+        issue['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
+        # Add extra JSON fields used in Kibana
         issue['number_of_comments'] = 0
         issue['time_to_last_update_days'] = None
         issue['url'] = None
