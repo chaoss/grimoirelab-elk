@@ -196,13 +196,35 @@ class Bugzilla(Backend):
             with open(fname,"w") as f:
                 f.write("[]")  # Empty array = empty cache
 
-    def clean_status(self):
+
+    def _close_cache(self):
+        ''' Remove last , in arrays in JSON files '''
+        cache_files = ["cache_issues_list_csv.json", "cache_issues_xml.json",
+                       "cache_changes_html.json"]
+
+        for name in cache_files:
+            fname = os.path.join(self._get_storage_dir(), name)
+            # Remove ,] and add ]
+            self._remove_last_char_from_file(fname)
+            self._remove_last_char_from_file(fname)
+            with open(fname,"a") as f:
+                f.write("]")
+
+
+    def _clean_status(self):
         ''' Remove all status from previous downloads of the data source '''
 
         filelist = [ f for f in os.listdir(self._get_storage_dir())
                     if f.endswith(".json") ]
         for f in filelist:
             os.unlink(f)
+
+
+    def _remove_last_char_from_file(self, fname):
+        ''' Remove last char from a file '''
+        with open(fname, 'rb+') as f:
+            f.seek(-1, os.SEEK_END)
+            f.truncate()
 
 
     def _issues_list_raw_to_cache(self, list_csv, last_date):
@@ -235,12 +257,6 @@ class Bugzilla(Backend):
             cache.write("]")  # close the JSON array
 
 
-    def _remove_last_char_from_file(self, cache_file):
-        ''' Remove last char from a file '''
-        with open(cache_file, 'rb+') as f:
-            f.seek(-1, os.SEEK_END)
-            f.truncate()
-
     def _issues_raw_to_cache(self, issues_xml):
         ''' Append to issues xml JSON cache issues in issues_xml '''
 
@@ -259,8 +275,6 @@ class Bugzilla(Backend):
                 data_json = json.dumps(xml)
                 cache.write(data_json)
                 cache.write(",")  # array of issues delimiter
-        self._remove_last_char_from_file(cache_file)  # Last , removed
-        with open(cache_file, "a") as cache:
             cache.write("]")  # close the JSON array
 
 
@@ -538,7 +552,7 @@ class Bugzilla(Backend):
 
         last_update = self._get_last_update_date()
 
-        # last_update = "2015-11-11"
+        # last_update = "2015-11-01"
 
         if last_update is not None:
             logging.info("Incremental analysis: %s" % (last_update))
@@ -573,6 +587,8 @@ class Bugzilla(Backend):
                 if eta: print ("ETA: %.2f min" % eta)
 
                 ids = _retrieve_issues_ids(self.url, last_update)
+
+        self._close_cache()
 
         logging.info("Total issues gathered %i" % total_issues)
 
