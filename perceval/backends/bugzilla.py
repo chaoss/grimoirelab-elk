@@ -356,8 +356,6 @@ class Bugzilla(Backend):
             issue = {}
             issue['long_desc'] = []
 
-            date_fields = ['creation_ts','delta_ts']
-
             for field in bug_xml_tree:
                 if field.tag == 'long_desc':
                     new_desc = {}
@@ -367,9 +365,6 @@ class Bugzilla(Backend):
                 else:
                     tag = field.tag
                     issue[tag] = field.text
-                    if tag in date_fields:
-                        date_ts = parser.parse(issue[tag])
-                        issue[tag] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
                     add_attributes(issue, field, tag)
 
