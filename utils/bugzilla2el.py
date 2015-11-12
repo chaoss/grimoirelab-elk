@@ -55,7 +55,7 @@ def parse_args():
                         help="delete repository data in ES")
     parser.add_argument("--detail",  default="change",
                         help="list, issue or change (default) detail")
-    parser.add_argument("--nissues",  default="200",
+    parser.add_argument("--nissues",  default=200, type=int,
                         help="Number of XML issues to get per query")
 
 
@@ -67,8 +67,8 @@ def parse_args():
 ##
 
 def get_eta(last_update_date, prj_first_date, prj_last_date):
-    """ Get the time needed to analyze a day in the project and multiply
-    for the number of days in the project """
+    ''' Get the time needed to analyze a day in the project and multiply
+    for the number of days in the project '''
 
     if last_update_date == prj_first_date:
         logging.error("Data error: first date and last update the same.")
@@ -89,7 +89,7 @@ def get_eta(last_update_date, prj_first_date, prj_last_date):
     return pending_eta_min
 
 def get_time_diff_days(start_txt, end_txt):
-    """ Number of days between two days  """
+    ''' Number of days between two days  '''
 
     start = parser.parse(end_txt)
     end = parser.parse(start_txt)
@@ -105,7 +105,7 @@ def get_time_diff_days(start_txt, end_txt):
 class ElasticSearch(object):
 
     def __init__(self, host, port, index, mappings, clean = False):
-        """ clean: remove already exiting index """
+        ''' clean: remove already exiting index '''
 
         self.url = "http://" + host + ":" + port
         self.index = index
@@ -129,12 +129,12 @@ class ElasticSearch(object):
     def create_mapping(self, mappings):
 
         for mapping in mappings:
-            _type = mapping['type']
+            _type = mapping
             url = self.index_url
             url_type = url + "/" + _type
 
             url_map = url_type+"/_mapping"
-            r = requests.put(url_map, data=mapping["value"])
+            r = requests.put(url_map, data=mappings[mapping])
 
             if r.status_code != 200:
                 logging.error("Error creating ES mappings %s" % (r.text))
@@ -146,7 +146,7 @@ class ElasticSearch(object):
         url = self.index_url
         url += "/" + _type + "/_search"
 
-        data_json = """
+        data_json = '''
         {
             "aggs": {
                 "1": {
@@ -156,7 +156,7 @@ class ElasticSearch(object):
                 }
             }
         }
-        """ % (field)
+        ''' % (field)
 
         res = requests.post(url, data=data_json)
         res_json = res.json()
@@ -171,9 +171,9 @@ class ElasticSearch(object):
 
 
 class BugzillaChangesHTMLParser():
-    """
+    '''
     Parses HTML to get 5 different fields from a table
-    """
+    '''
 
     field_map = {}
     status_map = {}
@@ -202,9 +202,9 @@ class BugzillaChangesHTMLParser():
         [comment.extract() for comment in cmts]
 
     def _to_datetime_with_secs(self, str_date):
-        """
+        '''
         Returns datetime object from string
-        """
+        '''
         return parser.parse(str_date).replace(tzinfo=None)
 
     def parse_changes(self):
@@ -271,47 +271,27 @@ class BugzillaChangesHTMLParser():
 
 class Bugzilla(object):
 
-    def __init__(self, url, nissues):
+    def __init__(self, url, nissues, detail):
 
-        """
+        '''
             :url: repository url, incuding bugzilla URL and opt product param
             :nissues: number of issues to get per query
-        """
+            :detail: list, issue or changes details
+        '''
 
         self.url = url
         self.bugzilla_version = self._get_version()
         self.nissues = nissues
+        self.detail = detail
         self.elastic = None
         self.elastic_mappings = {}
+        self.issues = []
+        self.issues_from_csv = []
 
 
     def set_elastic(self, es):
 
         self.elastic = es
-
-    def get_elastic_mappings(self):
-        """ Specific mappings needed for ES """
-
-        mapping = """
-        {
-            "properties": {
-               "product": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "component": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "assigned_to": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               }
-            }
-        }
-        """
-
-        self.elastic_mappings['issues_list'] = mapping
 
 
     def _get_version(self):
@@ -325,20 +305,23 @@ class Bugzilla(object):
         self.bugzilla_version = tree.attrib['version']
 
 
-    def _get_last_update_from_es(self, _type):
+    def _get_last_update_date(self):
+        ''' Find in JSON storage the last update date '''
 
-        if _type == "issues_list":
-            field = "changeddate"
+        last_update = None
+
+        if self.detail == "list":
+            # Search in CSV fields (changeddate)
+            pass
         else:
-            field = "updated_on"
-
-        last_update = self.elastic.get_last_date(_type, field)
+            # Search in XML issue fields (delta_ts)
+            pass
 
         return last_update
 
 
     def _cache_get_changes(self, issue_id):
-        """ Get from ES the HTML with the issue changes """
+        ''' Get from ES the HTML with the issue changes '''
 
         elastic_type = "changes"
 
@@ -357,7 +340,7 @@ class Bugzilla(object):
 
 
     def _issues_list_raw_to_es(self, list_csv, last_date):
-        """ Store in ES the CSV with the issues listing """
+        ''' Store in ES the CSV with the issues listing '''
 
         elastic_type = "issues_list"
 
@@ -371,7 +354,7 @@ class Bugzilla(object):
 
 
     def _changes_raw_to_es(self, changes_html, issue_id):
-        """ Store in ES the HTML for each issue changes """
+        ''' Store in ES the HTML for each issue changes '''
 
         elastic_type = "changes"
 
@@ -385,7 +368,7 @@ class Bugzilla(object):
 
 
     def _issues_raw_to_es(self, issues_xml):
-        """ Store in ES the XML for each issue """
+        ''' Store in ES the XML for each issue '''
 
         # TODO: Use _bulk API
 
@@ -406,23 +389,17 @@ class Bugzilla(object):
             requests.put(url, data=data_json)
 
 
-    def _issues_to_es(self, issues):
 
-        # TODO: use bulk API
+    def get_issue_json(self,
+                       csv_line = None,
+                       issue_xml = None,
+                       changes_html = None):
+        ''' Create a JSON with all data for an issue. Depending on the detail
+            the issue will have more information '''
 
-        elastic_type = "issues"
+        issue = {}
 
-        for issue in issues:
-            data_json = json.dumps(issue)
-            url = self.elastic.index_url
-            url += "/"+elastic_type
-            url += "/"+str(issue["id"])
-            requests.put(url, data=data_json)
-
-
-    def _issues_list_to_es(self, csv):
-
-        def get_issue_from_list_line(line):
+        def get_issue_from_csv_line(line):
 
             fields = ["bug_id", "product", "component", "assigned_to",
                       "bug_status"]
@@ -451,20 +428,65 @@ class Bugzilla(object):
             return data
 
 
-        # TODO: use bulk API
-        elastic_type = "issues_list"
+        def add_attributes(issue, field, tag):
+            ''' Specific logic for using data in XML attributes '''
 
-        for line in csv:
-            issue_fron_list = get_issue_from_list_line(line)
-            data_json = json.dumps(issue_fron_list)
-            url = self.elastic.index_url
-            url += "/"+elastic_type
-            url += "/"+str(issue_fron_list["bug_id"])
-            requests.put(url, data=data_json)
+            if field.tag == "reporter" or field.tag == "assigned_to":
+                if 'name' in field.attrib:
+                    issue[tag + "_name"] = field.attrib['name']
+
+
+        def get_issue_from_xml(bug_xml_tree):
+
+            # Bug XML is key=value except long_desc items with XML
+            # https://bugzilla.redhat.com/show_bug.cgi?id=300&ctype=xml
+
+            issue = {}
+            issue['long_desc'] = []
+
+            date_fields = ['creation_ts','delta_ts']
+
+            for field in bug_xml_tree:
+                if field.tag == 'long_desc':
+                    new_desc = {}
+                    for dfield in field:
+                        new_desc[dfield.tag] = dfield.text
+                    issue[field.tag].append(new_desc)
+                else:
+                    tag = field.tag
+                    issue[tag] = field.text
+                    if tag in date_fields:
+                        date_ts = parser.parse(issue[tag])
+                        issue[tag] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
+
+                    add_attributes(issue, field, tag)
+
+            return issue
+
+        def get_changes_from_html(issue_id, html):
+
+            parser = BugzillaChangesHTMLParser(changes_html, issue_id)
+            changes = parser.parse_changes()
+
+            return changes
+
+
+        if csv_line:
+            issue = get_issue_from_csv_line(csv_line)
+
+        if issue_xml:
+            # If we have the XML, replace CSV info
+            issue = get_issue_from_xml(issue_xml)
+
+            if changes_html:
+                issue['changes'] = get_changes_from_html(issue['bug_id'],
+                                                         changes_html)
+
+        return issue
 
 
     def _get_domain(self):
-        """ TODO: Old code to be removed once refactored """
+        ''' TODO: Old code to be removed once refactored '''
 
         result = urlparse(self.url)
 
@@ -479,14 +501,6 @@ class Bugzilla(object):
 
 
     def fetch(self):
-
-        def fix_review_dates(issue):
-            """ Convert dates so ES detect them """
-
-            for date_field in ['created_on', 'updated_on']:
-                if date_field in issue.keys():
-                    date_ts = parser.parse(issue[date_field])
-                    issue[date_field] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
         def get_issues_list_url(base_url, version, from_date_str=None):
             # from_date should be increased in 1s to not include last issue
@@ -507,10 +521,10 @@ class Bugzilla(object):
             if (version == "3.2.3") or (version == "3.2.2"):
                 url = url + "order=Last+Changed&ctype=csv"
                 if from_date_str:
-                    """
+                    '''
                     Firefox ITS (3.2.3) replaces %20 with %2520 that causes
                     Bicho to crash
-                    """
+                    '''
                     day = from_date_str[:from_date_str.index(' ')]
                 else:
                     day = '1970-01-01'
@@ -540,7 +554,9 @@ class Bugzilla(object):
 
             csv = content.split('\n')[1:]
 
-            self._issues_list_to_es(csv)
+            for line in csv:
+                issue = self.get_issue_json(csv_line = line)
+                self.issues_from_csv.append(issue)
 
             ids = []
             for line in csv:
@@ -567,14 +583,7 @@ class Bugzilla(object):
             url += "&excludefield=attachmentdata"
             return url
 
-        def add_attributes(issue, field, tag):
-            """ Specific logic for using data in XML attributes """
-
-            if field.tag == "reporter" or field.tag == "assigned_to":
-                if 'name' in field.attrib:
-                    issue[tag + "_name"] = field.attrib['name']
-
-        def get_changes(issue_id):
+        def get_changes_html(issue_id):
             base_url = self._get_domain()
 
             # Try to get changes from cache
@@ -592,54 +601,18 @@ class Bugzilla(object):
 
                 self._changes_raw_to_es(changes_html, issue_id)
 
-            parser = BugzillaChangesHTMLParser(changes_html, issue_id)
-            changes = parser.parse_changes()
-
-            return changes
+            return changes_html
 
         def get_issue_proccesed(bug_xml_tree):
-            """ Return a dict with selected fields """
-
-            issue_processed = {}
-
-            fields = ['reporter', 'assigned_to', 'bug_status', 'resolution']
-            fields += ['creation_ts', 'delta_ts', 'product', 'component']
-            fields += ['bug_id', 'short_desc', 'priority']
-            fields += ['version']
-
-            fields_rename = {"delta_ts": "updated_on",
-                             "creation_ts": "created_on",
-                             "bug_id": "id",
-                             "reporter": "submitted_by"}
-
-            # Extra fields: enriched issue
-            issue_processed['number_of_comments'] = 0
-            issue_processed['time_to_last_update_days'] = None
-            issue_processed['url'] = None
-
-            for field in bug_xml_tree:
-                if field.tag in fields:
-                    tag = field.tag
-                    if tag in fields_rename:
-                        tag = fields_rename[tag]
-                    issue_processed[tag] = field.text
-
-                    add_attributes(issue_processed, field, tag)
-
-                if field.tag == "long_desc":
-                    issue_processed['number_of_comments'] += 1
-
-            issue_processed['time_to_last_update_days'] = \
-                get_time_diff_days(issue_processed['created_on'],
-                                             issue_processed['updated_on'])
-            issue_processed['url'] = self._get_domain(self.url) + "show_bug.cgi?id=" + \
-                issue_processed['id']
-
-            fix_review_dates(issue_processed)
+            ''' Return a dict with selected fields '''
 
             # Time to gather changes for this issue
-            issue_processed['changes'] = \
-                get_changes(issue_processed['id'])
+            issue_id = bug_xml_tree.findall('bug_id')[0].text
+            changes_html = get_changes_html(issue_id)
+
+
+            issue_processed = self.get_issue_json(issue_xml = bug_xml_tree,
+                                                  changes_html = changes_html)
 
             return issue_processed
 
@@ -671,8 +644,6 @@ class Bugzilla(object):
                 for bug in tree:
                     issues.append(get_issue_proccesed(bug))
 
-                self._issues_to_es(issues)
-
                 issues_processed += issues
 
                 task_time = (datetime.now() - task_init).total_seconds()
@@ -688,12 +659,9 @@ class Bugzilla(object):
 
         logging.info("Getting issues from Bugzilla")
 
-        if args.detail == "list":
-            # If working in list detail just use data from issues_list
-            last_update = self._get_last_update_from_es("issues_list")
-        else:
-            # Issues and changes are in the same index
-            last_update = self._get_last_update_from_es("issues")
+        last_update = self._get_last_update_date()
+
+        # last_update = "2015-11-11"
 
         if last_update is not None:
             logging.info("Incremental analysis: %s" % (last_update))
@@ -707,14 +675,17 @@ class Bugzilla(object):
         while ids:
             logging.info("Issues to get in this iteration %i" % len(ids))
 
-            if args.detail in ['issue', 'change']:
+            if self.detail in ['issue', 'change']:
                 issues_processed = _retrieve_issues(ids)
                 logging.info("Issues received in this iteration %i" %
                              len(issues_processed))
                 total_issues += len(issues_processed)
+                self.issues += issues_processed
+
             else:
                 total_issues += len(ids)
 
+            # TODO: dump issues JSON to file now to protect for future fails
 
             if len(ids) > 0:
                 last_update = ids[len(ids)-1][1]
@@ -727,17 +698,123 @@ class Bugzilla(object):
 
         logging.info("Total issues gathered %i" % total_issues)
 
+        return self  # iterator
 
-    def get_elastic_index_name(self, url):
-        """ Return bugzilla ES index name from url """
+
+    def get_id(self):
+        ''' Return bugzilla unique identifier '''
 
         _index = self._get_domain()[:-1].split('://')[1]
 
-        if 'product' in url:
-            _index += "-" + url.split('product=')[1]
+        if 'product' in self.url:
+            _index += "-" + self.url.split('product=')[1]
 
         # ES index names must be lower case
         return _index.replace("/", "_").lower()
+
+    # Iterator
+    def __iter__(self):
+
+        self.iter = 0
+        return self
+
+    def __next__(self):
+
+        if self.detail == "list":
+            if self.iter == len(self.issues_from_csv):
+                raise StopIteration
+            item = self.issues_from_csv[self.iter]
+        else:
+            if self.iter == len(self.issues):
+                raise StopIteration
+            item = self.issues[self.iter]
+
+        self.iter += 1
+
+        return item
+
+class BugzillaElastic(object):
+
+    def __init__(self, bugzilla, elastic):
+        self.bugzilla = bugzilla
+        self.elastic = elastic
+
+    def enrich_issue(self, issue):
+
+        def get_bugzilla_url():
+            u = urlparse(self.bugzilla.url)
+            return u.scheme+"//"+u.netloc
+
+        # Add extra JSON fields used in Kibana
+
+        issue['number_of_comments'] = 0
+        issue['time_to_last_update_days'] = None
+        issue['url'] = None
+
+        issue['number_of_comments'] = len(issue['long_desc'])
+        issue['url'] = get_bugzilla_url() + "show_bug.cgi?id=" + issue['bug_id']
+        issue['time_to_last_update_days'] = \
+            get_time_diff_days(issue['creation_ts'], issue['delta_ts'])
+
+        return issue
+
+    def issues_list_to_es(self):
+
+        # TODO: use bulk API
+        elastic_type = "issues_list"
+
+        # In this client, we will publish all data in Elastic Search
+        for issue in bugzilla.fetch():
+            data_json = json.dumps(issue)
+            url = self.elastic.index_url
+            url += "/"+elastic_type
+            url += "/"+str(issue["bug_id"])
+            print (url)
+            requests.put(url, data=data_json)
+
+    def issues_to_es(self):
+
+        # TODO: use bulk API
+
+        elastic_type = "issues"
+
+        for issue in bugzilla.fetch():
+            self.enrich_issue(issue)
+            data_json = json.dumps(issue)
+            url = self.elastic.index_url
+            url += "/"+elastic_type
+            url += "/"+str(issue["bug_id"])
+            requests.put(url, data=data_json)
+
+    @classmethod
+    def get_elastic_mappings(cls):
+        ''' Specific mappings needed for ES '''
+
+        elastic_mappings = {}
+
+        mapping = '''
+        {
+            "properties": {
+               "product": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "component": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "assigned_to": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               }
+            }
+        }
+        '''
+
+        elastic_mappings['issues_list'] = mapping
+
+        return elastic_mappings
+
 
 if __name__ == '__main__':
     app_init = datetime.now()
@@ -746,16 +823,22 @@ if __name__ == '__main__':
 
     args = parse_args()
 
-    bugzilla = Bugzilla(args.url, args.nissues)
+    bugzilla = Bugzilla(args.url, args.nissues, args.detail)
 
-    es_index_bugzilla = "bugzilla_" + bugzilla.get_elastic_index_name(args.url)
-    es_mappings = bugzilla.get_elastic_mappings()
-    es = ElasticSearch(args.elastic_host,
-                       args.elastic_port,
-                       es_index_bugzilla, es_mappings, args.delete)
-    bugzilla.set_elastic(es)
+    es_index_bugzilla = "bugzilla_" + bugzilla.get_id()
+    es_mappings = BugzillaElastic.get_elastic_mappings()
+    elastic = ElasticSearch(args.elastic_host,
+                            args.elastic_port,
+                            es_index_bugzilla, es_mappings, args.delete)
+    bugzilla.set_elastic(elastic)
 
-    bugzilla.fetch()
+    ebugzilla = BugzillaElastic(bugzilla, elastic)
+
+    if args.detail == "list":
+        ebugzilla.issues_list_to_es()
+    else:
+        ebugzilla.issues_to_es()
+
 
     total_time_min = (datetime.now()-app_init).total_seconds()/60
 
