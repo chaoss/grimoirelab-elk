@@ -51,12 +51,14 @@ def parse_args():
     parser.add_argument("--elastic_port",  default="9200",
                         help="elastic search port " +
                         "(default: 9200)")
-    parser.add_argument("--delete",  action='store_true',
-                        help="delete repository data in ES")
+    parser.add_argument("--no_history",  action='store_true',
+                        help="don't use history for repository")
     parser.add_argument("--detail",  default="change",
                         help="list, issue or change (default) detail")
     parser.add_argument("--nissues",  default=200, type=int,
                         help="Number of XML issues to get per query")
+    parser.add_argument("--cache",  action='store_true',
+                        help="Use perseval cache")
 
 
     args = parser.parse_args()
@@ -216,26 +218,30 @@ class BugzillaElastic(object):
 
 if __name__ == '__main__':
     app_init = datetime.now()
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+    # logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
     logging.getLogger("requests").setLevel(logging.WARNING)
 
     args = parse_args()
 
-    bugzilla = Bugzilla(args.url, args.nissues, args.detail)
+    bugzilla = Bugzilla(args.url, args.nissues, args.detail,
+                        not args.no_history, args.cache)
 
     es_index_bugzilla = "bugzilla_" + bugzilla.get_id()
     es_mappings = BugzillaElastic.get_elastic_mappings()
     elastic = ElasticSearch(args.elastic_host,
                             args.elastic_port,
-                            es_index_bugzilla, es_mappings, args.delete)
-    bugzilla.set_elastic(elastic)
+                            es_index_bugzilla, es_mappings, args.no_history)
 
     ebugzilla = BugzillaElastic(bugzilla, elastic)
 
-    if args.detail == "list":
-        ebugzilla.issues_list_to_es()
-    else:
-        ebugzilla.issues_to_es()
+    bugzilla.fetch()
+
+    if False:
+        if args.detail == "list":
+            ebugzilla.issues_list_to_es()
+        else:
+            ebugzilla.issues_to_es()
 
 
     total_time_min = (datetime.now()-app_init).total_seconds()/60
