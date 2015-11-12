@@ -25,117 +25,19 @@
 # Bugzilla backend for Perseval
 
 import argparse
+from datetime import datetime, timedelta
 import json
 import logging
-import requests
-from dateutil import parser
-from datetime import datetime, timedelta
+from os import path, makedirs
 from urllib.parse import urlparse, urljoin
 from xml.etree import ElementTree
+
+import requests
+from dateutil import parser
 from bs4 import BeautifulSoup, Comment as BFComment
 
 from perceval.backends.backend import Backend
 from perceval.utils import get_eta
-
-
-class BugzillaChangesHTMLParser():
-    '''
-    Parses HTML to get 5 different fields from a table
-    '''
-
-    field_map = {}
-    status_map = {}
-    resolution_map = {}
-
-    def __init__(self, html, idBug):
-        self.html = html
-        self.idBug = idBug
-        self.field_map = {'Status': u'status', 'Resolution': u'resolution'}
-
-    def sanityze_change(self, field, old_value, new_value):
-        field = self.field_map.get(field, field)
-        old_value = old_value.strip()
-        new_value = new_value.strip()
-        if field == 'status':
-            old_value = self.status_map.get(old_value, old_value)
-            new_value = self.status_map.get(new_value, new_value)
-        elif field == 'resolution':
-            old_value = self.resolution_map.get(old_value, old_value)
-            new_value = self.resolution_map.get(new_value, new_value)
-
-        return field, old_value, new_value
-
-    def remove_comments(self, soup):
-        cmts = soup.findAll(text=lambda text: isinstance(text, BFComment))
-        [comment.extract() for comment in cmts]
-
-    def _to_datetime_with_secs(self, str_date):
-        '''
-        Returns datetime object from string
-        '''
-        return parser.parse(str_date).replace(tzinfo=None)
-
-    def parse_changes(self):
-        soup = BeautifulSoup(self.html)
-        self.remove_comments(soup)
-        remove_tags = ['a', 'span', 'i']
-        changes = []
-        tables = soup.findAll('table')
-
-        # We look for the first table with 5 cols
-        table = None
-        for table in tables:
-            if len(table.tr.findAll('th', recursive=False)) == 5:
-                try:
-                    for i in table.findAll(remove_tags):
-                        i.replaceWith(i.text)
-                except:
-                    logging.error("error removing HTML tags")
-                break
-
-        if table is None:
-            return changes
-
-        rows = list(table.findAll('tr'))
-        for row in rows[1:]:
-            cols = list(row.findAll('td'))
-            if len(cols) == 5:
-                changed_by = cols[0].contents[0].strip()
-                changed_by = changed_by.replace('&#64;', '@')
-                date = self._to_datetime_with_secs(cols[1].contents[0].strip())
-                date_str = date.isoformat()
-                # when the field contains an Attachment, the list has more
-                # than a field. For example:
-                #
-                # [u'\n', u'Attachment #12723', u'\n              Flag\n     ']
-                #
-                if len(cols[2].contents) > 1:
-                    aux_c = " ".join(cols[2].contents)
-                    field = aux_c.replace("\n", "").strip()
-                else:
-                    field = cols[2].contents[0].replace("\n", "").strip()
-                removed = cols[3].contents[0].strip()
-                added = cols[4].contents[0].strip()
-            else:
-                # same as above with the Attachment example
-                if len(cols[0].contents) > 1:
-                    aux_c = " ".join(cols[0].contents)
-                    field = aux_c.replace("\n", "").strip()
-                else:
-                    field = cols[0].contents[0].strip()
-                removed = cols[1].contents[0].strip()
-                added = cols[2].contents[0].strip()
-
-            field, removed, added = self.sanityze_change(field, removed, added)
-            change = {"changed_by": changed_by,
-                      "field": field,
-                      "removed": removed,
-                      "added": added,
-                      "date": date_str
-                      }
-            changes.append(change)
-
-        return changes
 
 class Bugzilla(Backend):
 
@@ -158,7 +60,57 @@ class Bugzilla(Backend):
         self.issues_from_csv = []  # All issues gathered from CSV data
         self._name = "bugzilla"
 
-    def get_name(self):
+        # Try to load JSON data already downloaded
+        self._restore()
+
+    def _restore(self):
+        '''Restore JSON full data from storage '''
+
+        restore_dir = self._get_storage_dir()
+
+        if path.isdir(restore_dir):
+            try:
+                logging.debug("Restoring data from %s" % restore_dir)
+                if self.detail == "list":
+                    restore_file = path.join(restore_dir, "issues_list.json")
+                    if path.isfile(restore_file):
+                        with open(restore_file) as f:
+                            data = f.read()
+                            self.issues_from_csv = json.loads(data)
+                else:
+                    restore_file = path.join(restore_dir, "issues.json")
+                    if path.isfile(restore_file):
+                        with open(restore_file) as f:
+                            data = f.read()
+                            self.issues = json.loads(data)
+                logging.debug("Restore completed")
+            except ValueError:
+                logging.warning("Restore failed. Wrong dump files in: %s" %
+                                restore_file)
+
+
+    def _dump(self):
+        ''' Dump JSON full data to storage '''
+
+        dump_dir = self._get_storage_dir()
+
+        if not path.isdir(dump_dir):
+            makedirs(dump_dir)
+
+        logging.debug("Dumping data to  %s" % dump_dir)
+        if self.detail == "list":
+            dump_file = path.join(dump_dir, "issues_list.json")
+            with open(dump_file, "w") as f:
+                f.write(json.dumps(self.issues_from_csv))
+        else:
+            dump_file = path.join(dump_dir, "issues.json")
+            with open(dump_file, "w") as f:
+                f.write(json.dumps(self.issues))
+
+        logging.debug("Dump completed")
+
+
+    def _get_name(self):
 
         return self._name
 
@@ -197,11 +149,13 @@ class Bugzilla(Backend):
         last_update = None
 
         if self.detail == "list":
-            # Search in CSV fields (changeddate)
-            pass
+            if len(self.issues_from_csv) > 0:
+                last_update = self.issues_from_csv[-1]['changeddate']
+                # Format date so it can be used as URL param in bugzilla
+                last_update = last_update.replace("T", " ")
         else:
-            # Search in XML issue fields (delta_ts)
-            pass
+            if len(self.issues) > 0:
+                last_update = self.issues[-1]['delta_ts']
 
         return last_update
 
@@ -276,7 +230,7 @@ class Bugzilla(Backend):
 
 
 
-    def get_issue_json(self,
+    def _get_issue_json(self,
                        csv_line = None,
                        issue_xml = None,
                        changes_html = None):
@@ -441,7 +395,7 @@ class Bugzilla(Backend):
             csv = content.split('\n')[1:]
 
             for line in csv:
-                issue = self.get_issue_json(csv_line = line)
+                issue = self._get_issue_json(csv_line = line)
                 self.issues_from_csv.append(issue)
 
             ids = []
@@ -449,11 +403,11 @@ class Bugzilla(Backend):
                 # 0: bug_id, 7: changeddate
                 values = line.split(',')
                 issue_id = values[0]
-                change_ts = values[len(values)-1].strip('"')
+                change_ts = values[-1].strip('"')
                 ids.append([issue_id, change_ts])
 
             if len(ids) > 0:
-                last_date = ids[len(ids)-1][1]
+                last_date = ids[-1][1]
                 self._issues_list_raw_to_es(csv, last_date)
 
             return ids
@@ -497,8 +451,8 @@ class Bugzilla(Backend):
             changes_html = get_changes_html(issue_id)
 
 
-            issue_processed = self.get_issue_json(issue_xml = bug_xml_tree,
-                                                  changes_html = changes_html)
+            issue_processed = self._get_issue_json(issue_xml = bug_xml_tree,
+                                                   changes_html = changes_html)
 
             return issue_processed
 
@@ -529,6 +483,9 @@ class Bugzilla(Backend):
 
                 for bug in tree:
                     issues.append(get_issue_proccesed(bug))
+
+                # Each time we receive data from bugzilla server dump iy
+                self._dump()
 
                 issues_processed += issues
 
@@ -571,10 +528,11 @@ class Bugzilla(Backend):
             else:
                 total_issues += len(ids)
 
-            # TODO: dump issues JSON to file now to protect for future fails
+            # Dump issues JSON to file now to protect for future fails
+            self._dump()
 
             if len(ids) > 0:
-                last_update = ids[len(ids)-1][1]
+                last_update = ids[-1][1]
 
                 eta = get_eta(parser.parse(last_update), prj_first_date,
                               prj_last_date)
@@ -607,3 +565,104 @@ class Bugzilla(Backend):
         self.iter += 1
 
         return item
+
+
+class BugzillaChangesHTMLParser(object):
+    '''
+    Parses HTML to get 5 different fields from a table
+    '''
+
+    field_map = {}
+    status_map = {}
+    resolution_map = {}
+
+    def __init__(self, html, idBug):
+        self.html = html
+        self.idBug = idBug
+        self.field_map = {'Status': u'status', 'Resolution': u'resolution'}
+
+    def sanityze_change(self, field, old_value, new_value):
+        field = self.field_map.get(field, field)
+        old_value = old_value.strip()
+        new_value = new_value.strip()
+        if field == 'status':
+            old_value = self.status_map.get(old_value, old_value)
+            new_value = self.status_map.get(new_value, new_value)
+        elif field == 'resolution':
+            old_value = self.resolution_map.get(old_value, old_value)
+            new_value = self.resolution_map.get(new_value, new_value)
+
+        return field, old_value, new_value
+
+    def remove_comments(self, soup):
+        cmts = soup.findAll(text=lambda text: isinstance(text, BFComment))
+        [comment.extract() for comment in cmts]
+
+    def _to_datetime_with_secs(self, str_date):
+        '''
+        Returns datetime object from string
+        '''
+        return parser.parse(str_date).replace(tzinfo=None)
+
+    def parse_changes(self):
+        soup = BeautifulSoup(self.html)
+        self.remove_comments(soup)
+        remove_tags = ['a', 'span', 'i']
+        changes = []
+        tables = soup.findAll('table')
+
+        # We look for the first table with 5 cols
+        table = None
+        for table in tables:
+            if len(table.tr.findAll('th', recursive=False)) == 5:
+                try:
+                    for i in table.findAll(remove_tags):
+                        i.replaceWith(i.text)
+                except:
+                    logging.error("error removing HTML tags")
+                break
+
+        if table is None:
+            return changes
+
+        rows = list(table.findAll('tr'))
+        for row in rows[1:]:
+            cols = list(row.findAll('td'))
+            if len(cols) == 5:
+                changed_by = cols[0].contents[0].strip()
+                changed_by = changed_by.replace('&#64;', '@')
+                date = self._to_datetime_with_secs(cols[1].contents[0].strip())
+                date_str = date.isoformat()
+                # when the field contains an Attachment, the list has more
+                # than a field. For example:
+                #
+                # [u'\n', u'Attachment #12723', u'\n              Flag\n     ']
+                #
+                if len(cols[2].contents) > 1:
+                    aux_c = " ".join(cols[2].contents)
+                    field = aux_c.replace("\n", "").strip()
+                else:
+                    field = cols[2].contents[0].replace("\n", "").strip()
+                removed = cols[3].contents[0].strip()
+                added = cols[4].contents[0].strip()
+            else:
+                # same as above with the Attachment example
+                if len(cols[0].contents) > 1:
+                    aux_c = " ".join(cols[0].contents)
+                    field = aux_c.replace("\n", "").strip()
+                else:
+                    field = cols[0].contents[0].strip()
+                removed = cols[1].contents[0].strip()
+                added = cols[2].contents[0].strip()
+
+            field, removed, added = self.sanityze_change(field, removed, added)
+            change = {"changed_by": changed_by,
+                      "field": field,
+                      "removed": removed,
+                      "added": added,
+                      "date": date_str
+                      }
+            changes.append(change)
+
+        return changes
+

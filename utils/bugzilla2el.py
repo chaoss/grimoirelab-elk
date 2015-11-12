@@ -232,8 +232,6 @@ if __name__ == '__main__':
 
     ebugzilla = BugzillaElastic(bugzilla, elastic)
 
-    print (bugzilla.get_storage_dir())
-
     if args.detail == "list":
         ebugzilla.issues_list_to_es()
     else:

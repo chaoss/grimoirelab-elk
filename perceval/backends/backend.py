@@ -35,21 +35,21 @@ class Backend(object):
         raise NotImplementedError
 
 
-    def get_name(self):
-        ''' Human name for the backend class '''
-        self.get_name()
-
-
     def get_id(self):
         '''Unique identifier for a backend instance '''
         raise NotImplementedError
 
 
-    def get_storage_dir(self):
+    def _get_name(self):
+        ''' Human name for the backend class '''
+        self.get_name()
+
+
+    def _get_storage_dir(self):
 
         home = expanduser("~")
         '''Get directory in which to store backend data'''
-        _dir = join(home, ".perceval", self.get_name(), self.get_id())
+        _dir = join(home, ".perceval", self._get_name(), self.get_id())
 
         return _dir
 
