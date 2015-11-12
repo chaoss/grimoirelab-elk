@@ -30,7 +30,7 @@ import logging
 import requests
 from dateutil import parser
 from datetime import datetime
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse
 
 from perceval.backends.bugzilla import Bugzilla
 from perceval.utils import get_time_diff_days
@@ -235,13 +235,11 @@ if __name__ == '__main__':
 
     ebugzilla = BugzillaElastic(bugzilla, elastic)
 
-    bugzilla.fetch()
 
-    if False:
-        if args.detail == "list":
-            ebugzilla.issues_list_to_es()
-        else:
-            ebugzilla.issues_to_es()
+    if args.detail == "list":
+        ebugzilla.issues_list_to_es()
+    else:
+        ebugzilla.issues_to_es()
 
 
     total_time_min = (datetime.now()-app_init).total_seconds()/60
