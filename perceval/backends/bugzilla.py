@@ -592,7 +592,8 @@ class Bugzilla(Backend):
         total_issues = 0
 
         while ids:
-            logging.info("Issues to get in this iteration %i" % len(ids))
+            logging.info("Issues to get in this iteration %i in %i packs"
+                         % (len(ids), self.nissues))
 
             if self.detail in ['issue', 'change']:
                 issues_processed = _retrieve_issues(ids)
