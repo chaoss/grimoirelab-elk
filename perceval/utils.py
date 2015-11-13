@@ -27,6 +27,7 @@
 import logging
 from datetime import datetime
 from dateutil import parser
+from os import SEEK_END
 
 def get_eta(last_update_date, prj_first_date, prj_last_date):
     ''' Get the time needed to analyze a day in the project and multiply
@@ -62,5 +63,14 @@ def get_time_diff_days(start_txt, end_txt):
     diff_days = float('%.2f' % diff_days)
 
     return diff_days
+
+def remove_last_char_from_file(fname):
+    ''' Remove last char from a file '''
+    with open(fname, 'rb+') as f:
+        f.seek(-1, SEEK_END)
+        f.truncate()
+
+
+
 
 

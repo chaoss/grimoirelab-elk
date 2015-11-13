@@ -104,4 +104,37 @@ class ElasticSearch(object):
 
         return last_date
 
+    def getGitHubCache(self, _type, _key):
+        """ Get cache data for items of _type using _key as the cache dict key """
+
+        cache = {}
+        res_size = 100  # best size?
+        _from = 0
+
+        index_github = "github"
+
+        elasticsearch_type = _type
+
+        url = self.url + "/"+index_github
+        url += "/"+elasticsearch_type
+        url += "/_search" + "?" + "size=%i" % res_size
+        r = requests.get(url)
+        type_items = r.json()
+
+        if 'hits' not in type_items:
+            logging.info("No github %s data in ES" % (_type))
+
+        else:
+            while len(type_items['hits']['hits']) > 0:
+                for hit in type_items['hits']['hits']:
+                    item = hit['_source']
+                    cache[item[_key]] = item
+                _from += res_size
+                r = requests.get(url+"&from=%i" % _from)
+                type_items = r.json()
+    
+        return cache
+
+
+
 

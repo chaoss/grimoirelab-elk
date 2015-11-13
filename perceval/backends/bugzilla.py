@@ -38,7 +38,7 @@ from dateutil import parser
 from bs4 import BeautifulSoup, Comment as BFComment
 
 from perceval.backends.backend import Backend
-from perceval.utils import get_eta
+from perceval.utils import get_eta, remove_last_char_from_file
 
 class Bugzilla(Backend):
 
@@ -121,9 +121,6 @@ class Bugzilla(Backend):
         ''' Dump JSON full data to storage '''
 
         dump_dir = self._get_storage_dir()
-
-        if not os.path.isdir(dump_dir):
-            os.makedirs(dump_dir)
 
         logging.debug("Dumping data to  %s" % dump_dir)
         if self.detail == "list":
@@ -223,8 +220,8 @@ class Bugzilla(Backend):
         for name in cache_files:
             fname = os.path.join(self._get_storage_dir(), name)
             # Remove ,] and add ]
-            self._remove_last_char_from_file(fname)
-            self._remove_last_char_from_file(fname)
+            remove_last_char_from_file(fname)
+            remove_last_char_from_file(fname)
             with open(fname,"a") as f:
                 f.write("]")
 
@@ -249,19 +246,12 @@ class Bugzilla(Backend):
             os.unlink(f)
 
 
-    def _remove_last_char_from_file(self, fname):
-        ''' Remove last char from a file '''
-        with open(fname, 'rb+') as f:
-            f.seek(-1, os.SEEK_END)
-            f.truncate()
-
-
     def _issues_list_raw_to_cache(self, list_csv, last_date):
         ''' Append to issues list CSV JSON cache list_csv '''
 
         cache_file = os.path.join(self._get_storage_dir(),
-                              "cache_issues_list_csv.json")
-        self._remove_last_char_from_file(cache_file)
+                                  "cache_issues_list_csv.json")
+        self.remove_last_char_from_file(cache_file)
         with open(cache_file, "a") as cache:
             csv = {"last_update": str(last_date), "csv": list_csv}
             data_json = json.dumps(csv)
@@ -276,7 +266,7 @@ class Bugzilla(Backend):
         cache_file = os.path.join(self._get_storage_dir(),
                               "cache_changes_html.json")
 
-        self._remove_last_char_from_file(cache_file)  # Last ] removed
+        self.remove_last_char_from_file(cache_file)  # Last ] removed
 
         with open(cache_file, "a") as cache:
             html = {"issue_id": issue_id, "html": changes_html}
@@ -291,7 +281,7 @@ class Bugzilla(Backend):
 
         cache_file = os.path.join(self._get_storage_dir(),
                               "cache_issues_xml.json")
-        self._remove_last_char_from_file(cache_file)  # Last ] removed
+        self.remove_last_char_from_file(cache_file)  # Last ] removed
         with open(cache_file, "a") as cache:
             for bug in issues_xml:
                 issue_id = bug.findall('bug_id')[0].text
