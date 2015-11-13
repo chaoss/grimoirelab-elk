@@ -34,7 +34,53 @@ class GitHubElastic(object):
     def __init__(self, elastic, github):
         self.elastic = elastic
         self.github = github
+        self.index_github = "github"
         self.geolocations = self.geoLocationsFromES()
+
+
+    def getGeoPoint(self, location):
+        geo_point = geo_code = None
+
+        if location is None:
+            return geo_point
+
+        if location in self.geolocations:
+            geo_point = self.geolocations[location]
+
+        else:
+            url = 'https://maps.googleapis.com/maps/api/geocode/json'
+            params = {'sensor': 'false', 'address': location}
+            r = requests.get(url, params=params)
+
+            try:
+                print (location)
+                r_json = r.json()
+                geo_code = r_json['results'][0]['geometry']['location']
+            except:
+                logging.info("Can't find geocode for " + location)
+
+            if geo_code:
+                geo_point = {
+                    "lat": geo_code['lat'],
+                    "lon": geo_code['lng']
+                }
+                self.geolocations[location] = geo_point
+
+
+        return geo_point
+
+
+    def _getGeoLocation(self, location):
+
+        geo_point = None
+
+        if location is not None:
+            geo_point = self._getGeoPoint(location)
+
+        if geo_point and 'location' in geo_point:
+            del geo_point['location']  # convert to ES geo_point format
+
+        return geo_point
 
 
     def geoLocationsFromES(self):
@@ -58,13 +104,14 @@ class GitHubElastic(object):
             requests.put(url, data = data_json)
 
 
-    def usersToES(self, users):
+    def usersToES(self):
 
         elasticsearch_type = "users"  # github global users
 
+        users = self.github.users
+
         for login in users:
 
-            # First upload the raw pullrequest data to ES
             data_json = json.dumps(users[login])
             url = self.elastic.url + "/"+self.index_github
             url += "/"+elasticsearch_type
@@ -74,32 +121,6 @@ class GitHubElastic(object):
     def usersFromES(self):
 
         return self.elastic.getGitHubCache("users", "login")
-
-    def getGeoPoint(self, location):
-        geo_point = geo_code = None
-
-        if location in self.geolocations:
-            geo_point = self.geolocations[location]
-
-        else:
-            url = 'https://maps.googleapis.com/maps/api/geocode/json'
-            params = {'sensor': 'false', 'address': location}
-            r = requests.get(url, params=params)
-
-            try:
-                geo_code = r.json()['results'][0]['geometry']['location']
-            except:
-                logging.info("Can't find geocode for " + location)
-
-            if geo_code:
-                geo_point = {
-                    "lat": geo_code['lat'],
-                    "lon": geo_code['lng']
-                }
-                self.geolocations[location] = geo_point
-
-
-        return geo_point
 
 
     @classmethod
@@ -143,16 +164,17 @@ class GitHubElastic(object):
         rich_pull['user_email'] = user.email
         rich_pull['user_org'] = user.org
         rich_pull['user_location'] = user.location
-        rich_pull['user_geolocation'] = user.geolocation
+        rich_pull['user_geolocation'] = self.getGeoPoint(user.location)
         if pull['assignee'] is not None:
             assignee_login = pull['assignee']['login']
-            assignee = self.github.users[user_login]
+            assignee = GitHubUser(self.github.users[assignee_login])
             rich_pull['assignee_login'] = assignee_login
             rich_pull['assignee_name'] = assignee.name
             rich_pull['assignee_email'] = assignee.email
             rich_pull['assignee_org'] = assignee.org
             rich_pull['assignee_location'] = assignee.location
-            rich_pull['assignee_geolocation'] = assignee.geolocation
+            rich_pull['assignee_geolocation'] = \
+                self.getGeoPoint(assignee.location)
         else:
             rich_pull['assignee_name'] = None
             rich_pull['assignee_login'] = None
@@ -177,7 +199,14 @@ class GitHubElastic(object):
         return rich_pull
 
 
-    def pullrequets2ES(self, pulls, _type):
+    def pullrequests2ES(self, pulls, _type = "issues_pullrequests"):
+
+        logging.debug("Updating Github users in Elastic")
+        self.usersToES()  # update users in Elastic
+        logging.debug("Updating geolocations in Elastic")
+        self.geoLocationsToES() # Update geolocations in Elastic
+
+        logging.debug("Sending rich pulls items to Elastic")
 
         elasticsearch_type = _type
         count = 0
@@ -213,7 +242,6 @@ class GitHubUser(object):
         self.org = self._getOrg()
         self.name = user['name']
         self.location = user['location']
-        self.geolocation = self._getGeoLocation(self.location)
 
 
     def _getOrg(self):
@@ -226,20 +254,7 @@ class GitHubUser(object):
             company = ''
             # Return the list of orgs
             for org in self.orgs:
-                company += org[self.login] +";;"
+                company += org['login'] +";;"
             company = company[:-2]
 
         return company
-
-
-    def _getGeoLocation(self):
-
-        geo_point = None
-
-        if self.location is not None:
-            geo_point = self.getGeoPoint(self.location)
-
-        if geo_point and 'location' in geo_point:
-            del geo_point['location']  # convert to ES geo_point format
-
-        return geo_point

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # GitHub Pull Requests loader for Elastic Search
@@ -74,11 +74,7 @@ if __name__ == '__main__':
         logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     logging.getLogger("requests").setLevel(logging.WARNING)
 
-    github_owner = args.owner
-    github_repo = args.repository
-    auth_token = args.token
-
-    es_index_github = "github_%s_%s" % (github_owner, github_repo)
+    es_index_github = "github_%s_%s" % (args.owner, args.repository)
     es_mappings = GitHubElastic.get_elastic_mappings()
 
     github = GitHub(args.owner, args.repository, args.token, args.cache,
@@ -96,15 +92,13 @@ if __name__ == '__main__':
     egithub = GitHubElastic(elastic, github)
     GitHub.users = egithub.usersFromES()
 
-    # prs_count = getPullRequests(url_pulls+url_params)
-    issues_prs_count = 0
+    issues_prs_count = 1
+    pulls = []
     for pr in github.fetch():
+        pulls.append(pr)
         issues_prs_count += 1
-        print (pr)
 
-
-    GitHubElastic.usersToES(GitHub.users)  # cache users in ES
-    GitHubElastic.geoLocationsToES()
+    egithub.pullrequests2ES(pulls)
 
     # logging.info("Total Pull Requests " + str(prs_count))
     logging.info("Total Issues Pull Requests " + str(issues_prs_count))
