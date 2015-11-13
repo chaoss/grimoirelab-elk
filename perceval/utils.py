@@ -54,6 +54,9 @@ def get_eta(last_update_date, prj_first_date, prj_last_date):
 def get_time_diff_days(start_txt, end_txt):
     ''' Number of days between two days  '''
 
+    if start_txt is None or end_txt is None:
+        return None
+
     start = parser.parse(end_txt)
     end = parser.parse(start_txt)
 
@@ -69,6 +72,7 @@ def remove_last_char_from_file(fname):
     with open(fname, 'rb+') as f:
         f.seek(-1, SEEK_END)
         f.truncate()
+
 
 
 
