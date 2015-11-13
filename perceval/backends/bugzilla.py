@@ -70,12 +70,13 @@ class Bugzilla(Backend):
         if not os.path.isdir(dump_dir):
             os.makedirs(dump_dir)
 
+        if self.use_cache:
+            # Don't use history data. Will be generated from cache.
+            self.use_history = False
+
         if self.use_history:
             self._restore()  # Load history
 
-            if self.use_cache:
-                logging.warning("When using history, cache is disabled.")
-                self.use_cache = False
         else:
             if self.use_cache:
                 logging.warning("Getting all data from cache.")
