@@ -229,9 +229,11 @@ if __name__ == '__main__':
 
     app_init = datetime.now()
 
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     if args.debug:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
+        logging.debug("Debug mode activated")
+    else:
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     logging.getLogger("requests").setLevel(logging.WARNING)
 
 
