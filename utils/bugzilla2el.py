@@ -59,6 +59,8 @@ def parse_args():
                         help="Number of XML issues to get per query")
     parser.add_argument("--cache",  action='store_true',
                         help="Use perseval cache")
+    parser.add_argument("--debug",  action='store_true',
+                        help="Increase logging to debug")
 
 
     args = parser.parse_args()
@@ -222,12 +224,17 @@ class BugzillaElastic(object):
 
 
 if __name__ == '__main__':
-    app_init = datetime.now()
-    # logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
-    logging.getLogger("requests").setLevel(logging.WARNING)
 
     args = parse_args()
+
+    app_init = datetime.now()
+
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
+    logging.getLogger("requests").setLevel(logging.WARNING)
+
+
 
     bugzilla = Bugzilla(args.url, args.nissues, args.detail,
                         not args.no_history, args.cache)
