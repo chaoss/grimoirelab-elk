@@ -38,14 +38,15 @@ class GitHub(Backend):
     _name = "github"
     users = {}
 
-    def __init__(self, owner, repository, auth_token, 
-                 cache = False, history = False):
+    def __init__(self, owner, repository, auth_token,
+                 use_cache = False, history = False):
+
         self.owner = owner
         self.repository = repository
         self.auth_token = auth_token
         self.pull_requests = []  # All pull requests from github repo
         self.cache = {}  # cache for pull requests
-        self.use_cache = cache
+        self.use_cache = use_cache
         self.use_history = history
         self.url = self._get_url()
 
@@ -64,12 +65,12 @@ class GitHub(Backend):
 
         else:
             if self.use_cache:
-                logging.warning("Getting all data from cache.")
+                logging.info("Getting all data from cache")
                 try:
                     self._load_cache()
-                    logging.debug("Cache loaded correctly")
                 except:
                     # If any error loading the cache, clean it
+                    logging.debug("Cache corrupted")
                     self.use_cache = False
                     self._clean_cache()
             else:
@@ -142,6 +143,14 @@ class GitHub(Backend):
 
         return _id.lower()
 
+    def _load_cache(self):
+        ''' Load all cache files in memory '''
+
+        fname = os.path.join(self._get_storage_dir(),
+                             "cache_pull_requests.json")
+        with open(fname,"r") as f:
+            self.cache['pull_requests'] = json.loads(f.read())
+
 
     def _clean_cache(self):
         cache_files = ["cache_pull_requests.json"]
@@ -149,7 +158,7 @@ class GitHub(Backend):
         for name in cache_files:
             fname = os.path.join(self._get_storage_dir(), name)
             with open(fname,"w") as f:
-                f.write("[]")  # Empty array = empty cache
+                f.write("[")
 
         cache_keys = ['pull_requests']
 
@@ -157,15 +166,11 @@ class GitHub(Backend):
             self.cache[_id] = []
 
     def _close_cache(self):
-        ''' Remove last , in arrays in JSON files '''
-        cache_files = ["cache_pull_requests.json"]
+        cache_file = os.path.join(self._get_storage_dir(),
+                                  "cache_pull_requests.json")
 
-        for name in cache_files:
-            fname = os.path.join(self._get_storage_dir(), name)
-            # Remove ,] and add ]
-            remove_last_char_from_file(fname)
-            remove_last_char_from_file(fname)
-            with open(fname,"a") as f:
+        remove_last_char_from_file(cache_file)
+        with open(cache_file,"a") as f:
                 f.write("]")
 
 
@@ -180,7 +185,6 @@ class GitHub(Backend):
 
         cache_file = os.path.join(self._get_storage_dir(),
                                   "cache_pull_requests.json")
-        remove_last_char_from_file(cache_file)
 
         checked_prs = []
 
@@ -192,11 +196,12 @@ class GitHub(Backend):
                 checked_prs.append(pull)
 
         with open(cache_file, "a") as cache:
-            data_json = json.dumps(checked_prs)
-            cache.write(data_json)
-            cache.write(",")  # array of issues delimiter
-            cache.write("]")  # close the JSON array
 
+            data_json = json.dumps(checked_prs)
+            data_json = data_json[1:-1]  # remove []
+            data_json += "," # join between arrays
+            # We need to add the array to an already existing array
+            cache.write(data_json)
 
 
     def getUser(self, url, login):
@@ -258,40 +263,43 @@ class GitHub(Backend):
 
     def getIssuesPullRequests(self):
         _type = "issues_pullrequests"
-        prs_count = 0
         last_page = page = 1
-        # last_update = self.getLastUpdateFromES(_type)
-        last_update = None  # broken order in github API
-        if last_update is not None:
-            logging.info("Getting issues since: " + last_update)
-            self.url += "&since="+last_update
-        url_next = self.url
 
-        while url_next:
-            logging.info("Get issues pulls requests from " + url_next)
-            r = requests.get(url_next, verify=False,
-                             headers={'Authorization':'token ' + self.auth_token})
-            pulls = r.json()
-            self.pull_requests += pulls
-            self._dump()
-            self._pull_requests_to_cache(pulls)
-            prs_count += len(pulls)
+        if self.use_cache:
+            self.pull_requests =  self.cache['pull_requests']
 
-            logging.info(r.headers['X-RateLimit-Remaining'])
+        else:
+            # last_update = self.getLastUpdateFromES(_type)
+            last_update = None  # broken order in github API
+            if last_update is not None:
+                logging.info("Getting issues since: " + last_update)
+                self.url += "&since="+last_update
+            url_next = self.url
 
-            url_next = None
-            if 'next' in r.links:
-                url_next = r.links['next']['url']  # Loving requests :)
+            while url_next:
+                logging.info("Get issues pulls requests from " + url_next)
+                r = requests.get(url_next, verify=False,
+                                 headers={'Authorization':'token ' + self.auth_token})
+                pulls = r.json()
+                self.pull_requests += pulls
+                self._dump()
+                self._pull_requests_to_cache(pulls)
 
-            if last_page == 1:
-                if 'last' in r.links:
-                    last_page = r.links['last']['url'].split('&page=')[1].split('&')[0]
+                logging.info(r.headers['X-RateLimit-Remaining'])
 
-            logging.info("Page: %i/%s" % (page, last_page))
+                url_next = None
+                if 'next' in r.links:
+                    url_next = r.links['next']['url']  # Loving requests :)
 
-            page += 1
+                if last_page == 1:
+                    if 'last' in r.links:
+                        last_page = r.links['last']['url'].split('&page=')[1].split('&')[0]
 
-        self._close_cache()
+                logging.info("Page: %i/%s" % (page, last_page))
+
+                page += 1
+
+            self._close_cache()
 
         return self
 
