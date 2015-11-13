@@ -64,10 +64,15 @@ def parse_args ():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-    logging.getLogger("requests").setLevel(logging.WARNING)
 
     args = parse_args()
+
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
+        logging.debug("Debug mode activated")
+    else:
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.getLogger("requests").setLevel(logging.WARNING)
 
     github_owner = args.owner
     github_repo = args.repository
@@ -76,7 +81,8 @@ if __name__ == '__main__':
     es_index_github = "github_%s_%s" % (github_owner, github_repo)
     es_mappings = GitHubElastic.get_elastic_mappings()
 
-    github = GitHub(args.owner, args.repository, args.token)
+    github = GitHub(args.owner, args.repository, args.token, args.cache,
+                    args.no_history)
 
     try:
         elastic = ElasticSearch(args.elastic_host,
