@@ -25,15 +25,15 @@
 # Bugzilla backend for Perseval
 
 import argparse
-import json
-import logging
-import requests
-from dateutil import parser
 from datetime import datetime
-from urllib.parse import urlparse
+import logging
+from os import sys
+
+from grimoire.elk.elastic import ElasticSearch
+from grimoire.elk.elastic import ElasticConnectException
+from grimoire.elk.bugzilla import BugzillaElastic
 
 from perceval.backends.bugzilla import Bugzilla
-from perceval.utils import get_time_diff_days
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -67,162 +67,6 @@ def parse_args():
     return args
 
 
-class ElasticSearch(object):
-
-    def __init__(self, host, port, index, mappings, clean = False):
-        ''' clean: remove already exiting index '''
-
-        self.url = "http://" + host + ":" + port
-        self.index = index
-        self.index_raw = index+"_raw"
-        self.index_url = self.url+"/"+self.index
-        self.index_raw_url = self.url+"/"+self.index_raw
-
-        if requests.get(self.index_url).status_code != 200:
-            # Index does no exists
-            requests.post(self.index_url)
-            logging.info("Created index " + self.index_url)
-        else:
-            if clean:
-                requests.delete(self.index_url)
-                requests.post(self.index_url)
-                logging.info("Deleted and created index " + self.index_url)
-        if mappings:
-            self.create_mapping(mappings)
-
-
-    def create_mapping(self, mappings):
-
-        for mapping in mappings:
-            _type = mapping
-            url = self.index_url
-            url_type = url + "/" + _type
-
-            url_map = url_type+"/_mapping"
-            r = requests.put(url_map, data=mappings[mapping])
-
-            if r.status_code != 200:
-                logging.error("Error creating ES mappings %s" % (r.text))
-
-    def get_last_date(self, _type, field):
-
-        last_date = None
-
-        url = self.index_url
-        url += "/" + _type + "/_search"
-
-        data_json = '''
-        {
-            "aggs": {
-                "1": {
-                  "max": {
-                    "field": "%s"
-                  }
-                }
-            }
-        }
-        ''' % (field)
-
-        res = requests.post(url, data=data_json)
-        res_json = res.json()
-
-        if 'aggregations' in res_json:
-            if "value_as_string" in res_json["aggregations"]["1"]:
-                last_date = res_json["aggregations"]["1"]["value_as_string"]
-                last_date = parser.parse(last_date).replace(tzinfo=None)
-                last_date = last_date.isoformat(" ")
-
-        return last_date
-
-
-
-class BugzillaElastic(object):
-
-    def __init__(self, bugzilla, elastic):
-        self.bugzilla = bugzilla
-        self.elastic = elastic
-
-    def enrich_issue(self, issue):
-
-        def get_bugzilla_url():
-            u = urlparse(self.bugzilla.url)
-            return u.scheme+"//"+u.netloc
-
-        # Fix dates
-        date_ts = parser.parse(issue['creation_ts'])
-        issue['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
-        date_ts = parser.parse(issue['delta_ts'])
-        issue['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
-
-        # Add extra JSON fields used in Kibana
-        issue['number_of_comments'] = 0
-        issue['time_to_last_update_days'] = None
-        issue['url'] = None
-
-        issue['number_of_comments'] = len(issue['long_desc'])
-        issue['url'] = get_bugzilla_url() + "show_bug.cgi?id=" + issue['bug_id']
-        issue['time_to_last_update_days'] = \
-            get_time_diff_days(issue['creation_ts'], issue['delta_ts'])
-
-        return issue
-
-    def issues_list_to_es(self):
-
-        # TODO: use bulk API
-        elastic_type = "issues_list"
-
-        # In this client, we will publish all data in Elastic Search
-        for issue in bugzilla.fetch():
-            data_json = json.dumps(issue)
-            url = self.elastic.index_url
-            url += "/"+elastic_type
-            url += "/"+str(issue["bug_id"])
-            requests.put(url, data=data_json)
-
-    def issues_to_es(self):
-
-        # TODO: use bulk API
-
-        elastic_type = "issues"
-
-        for issue in bugzilla.fetch():
-            self.enrich_issue(issue)
-            data_json = json.dumps(issue)
-            url = self.elastic.index_url
-            url += "/"+elastic_type
-            url += "/"+str(issue["bug_id"])
-            requests.put(url, data=data_json)
-
-    @classmethod
-    def get_elastic_mappings(cls):
-        ''' Specific mappings needed for ES '''
-
-        elastic_mappings = {}
-
-        mapping = '''
-        {
-            "properties": {
-               "product": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "component": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "assigned_to": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               }
-            }
-        }
-        '''
-
-        elastic_mappings['issues_list'] = mapping
-
-        return elastic_mappings
-
-
 if __name__ == '__main__':
 
     args = parse_args()
@@ -243,9 +87,14 @@ if __name__ == '__main__':
 
     es_index_bugzilla = "bugzilla_" + bugzilla.get_id()
     es_mappings = BugzillaElastic.get_elastic_mappings()
-    elastic = ElasticSearch(args.elastic_host,
-                            args.elastic_port,
-                            es_index_bugzilla, es_mappings, args.no_history)
+
+    try:
+        elastic = ElasticSearch(args.elastic_host,
+                                args.elastic_port,
+                                es_index_bugzilla, es_mappings, args.no_history)
+    except ElasticConnectException:
+        logging.error("Can't connect to Elastic Search. Is it running?")
+        sys.exit(1)
 
     ebugzilla = BugzillaElastic(bugzilla, elastic)
 
