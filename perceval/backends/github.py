@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# Bugzilla tickets for Elastic Search
+# GitHub Pull Requests for Elastic Search
 #
 # Copyright (C) 2015 Bitergia
 #
@@ -186,18 +186,9 @@ class GitHub(Backend):
         cache_file = os.path.join(self._get_storage_dir(),
                                   "cache_pull_requests.json")
 
-        checked_prs = []
-
-        for pull in pull_requests:
-            if not 'head' in pull.keys() and not 'pull_request' in pull.keys():
-                # And issue that it is not a PR
-                continue
-            else: 
-                checked_prs.append(pull)
-
         with open(cache_file, "a") as cache:
 
-            data_json = json.dumps(checked_prs)
+            data_json = json.dumps(pull_requests)
             data_json = data_json[1:-1]  # remove []
             data_json += "," # join between arrays
             # We need to add the array to an already existing array
@@ -261,6 +252,19 @@ class GitHub(Backend):
 
         return self
 
+    def _find_pull_requests(self, issues):
+
+        pulls = []
+
+        for issue in issues:
+            if not 'head' in issue.keys() and not 'pull_request' in issue.keys():
+            # An issue that it is not a PR
+                continue
+            pulls.append(issue)
+
+        return pulls
+
+
     def getIssuesPullRequests(self):
         _type = "issues_pullrequests"
         last_page = page = 1
@@ -280,7 +284,10 @@ class GitHub(Backend):
                 logging.info("Get issues pulls requests from " + url_next)
                 r = requests.get(url_next, verify=False,
                                  headers={'Authorization':'token ' + self.auth_token})
-                pulls = r.json()
+                issues = r.json()
+
+                pulls = self._find_pull_requests(issues)
+
                 self.pull_requests += pulls
                 self._dump()
                 self._pull_requests_to_cache(pulls)
@@ -313,7 +320,7 @@ class GitHub(Backend):
 
         if self.iter == len(self.pull_requests):
             raise StopIteration
-        item = self.issues[self.pull_requests]
+        item = self.pull_requests[self.iter]
 
         self.iter += 1
 
