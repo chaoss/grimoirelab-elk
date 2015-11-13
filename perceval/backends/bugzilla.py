@@ -74,17 +74,21 @@ class Bugzilla(Backend):
             self._restore()  # Load history
 
             if self.use_cache:
+                logging.warning("When using history, cache is disabled.")
+                self.use_cache = False
+        else:
+            if self.use_cache:
+                logging.warning("Getting all data from cache.")
                 try:
                     self._load_cache()
                     logging.debug("Cache loaded correctly")
                 except:
                     # If any error loading the cache, clean it
+                    self.use_cache = False
                     self._clean_cache()
-        else:
-            if self.use_cache:
-                logging.warning("Can't use cache without history.")
-            self.use_cache = False
-            self._clean_cache()
+            else:
+                self._clean_cache()  # Cache will be refreshed
+
 
     def _restore(self):
         '''Restore JSON full data from storage '''
@@ -475,7 +479,8 @@ class Bugzilla(Backend):
 
             if len(ids) > 0:
                 last_date = ids[-1][1]
-                self._issues_list_raw_to_cache(csv, last_date)
+                if not self.use_cache:
+                    self._issues_list_raw_to_cache(csv, last_date)
 
             return ids
 
@@ -508,7 +513,8 @@ class Bugzilla(Backend):
                 changes_html = requests.get(activity_url).content
                 changes_html = changes_html.decode('utf-8')
 
-                self._changes_raw_to_cache(changes_html, issue_id)
+                if not self.use_cache:
+                    self._changes_raw_to_cache(changes_html, issue_id)
 
             return changes_html
 
@@ -548,7 +554,8 @@ class Bugzilla(Backend):
 
                 tree = ElementTree.fromstring(issues_raw.content)
 
-                self._issues_raw_to_cache(tree)
+                if not self.use_cache:
+                    self._issues_raw_to_cache(tree)
 
                 for bug in tree:
                     issues.append(get_issue_proccesed(bug))
@@ -573,7 +580,7 @@ class Bugzilla(Backend):
 
         last_update = self._get_last_update_date()
 
-        # last_update = "2015-11-10"
+        # last_update = "2015-11-01"
 
         if last_update is not None:
             logging.info("Incremental analysis: %s" % (last_update))
