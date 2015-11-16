@@ -23,8 +23,10 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-'''GitHub backend for Gerrit'''
+'''Gerrit backend for Gerrit'''
 
+
+from datetime import datetime
 import json
 import logging
 import os
@@ -57,7 +59,7 @@ class Gerrit(Backend):
         self.gerrit_cmd += " gerrit "
 
         # self.max_reviews = 50000  # around 2 GB of RAM
-        self.max_reviews = 1000
+        self.max_reviews = 1000 * 50
 
 
         # Create storage dir if it not exists
@@ -343,9 +345,19 @@ class Gerrit(Backend):
 
         for project in projects:
             # if repository != "openstack/cinder": continue
-            logging.info("Processing repository:" + project + " " +
-                         str(current_repo) + "/" + str(total))
+            task_init = datetime.now()
+
             self.reviews += self._get_project_reviews(project)
+
+            task_time = (datetime.now() - task_init).total_seconds()
+            eta_time = task_time * (total-current_repo)
+            eta_min = eta_time / 60.0
+
+            logging.info("Completed %s %i/%i (ETA: %.2f min)" \
+                             % (project, current_repo, total, eta_min))
+
+
+
 
             if len(self.reviews) >= self.max_reviews:
                 # 5 GB RAM memory usage
