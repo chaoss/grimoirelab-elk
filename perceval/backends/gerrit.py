@@ -30,6 +30,7 @@ import logging
 import os
 import re
 import subprocess
+import traceback
 from perceval.utils import get_eta, remove_last_char_from_file
 
 from perceval.backends.backend import Backend
@@ -47,7 +48,7 @@ class Gerrit(Backend):
         self.nreviews = nreviews
         self.reviews = []  # All reviews from gerrit
         self.projects = []  # All projects from gerrit
-        self.cache = {}  # cache for pull requests
+        self.cache = {}  # cache projects listing
         self.use_cache = use_cache
         self.use_history = history
         self.url = repository
@@ -55,6 +56,8 @@ class Gerrit(Backend):
         self.gerrit_cmd  = "ssh -p 29418 %s@%s" % (user, repository)
         self.gerrit_cmd += " gerrit "
 
+        # self.max_reviews = 50000  # around 2 GB of RAM
+        self.max_reviews = 1000
 
 
         # Create storage dir if it not exists
@@ -76,6 +79,7 @@ class Gerrit(Backend):
                     self._load_cache()
                 except:
                     # If any error loading the cache, clean it
+                    traceback.print_exc(file=os.sys.stdout)
                     logging.debug("Cache corrupted")
                     self.use_cache = False
                     self._clean_cache()
@@ -132,27 +136,63 @@ class Gerrit(Backend):
         ''' Load all cache files in memory '''
 
         fname = os.path.join(self._get_storage_dir(),
-                             "cache_reviews.json")
+                             "cache_projects.json")
         with open(fname,"r") as f:
-            self.cache['pull_requests'] = json.loads(f.read())
+            self.cache['projects'] = json.loads(f.read())
+
+
+        return  # Having all cache in memory does not scale
+
+        self.cache['reviews'] = {}
+
+        for project in self.cache['projects']:
+            pname = project.replace("/","_")
+            fname = os.path.join(self._get_storage_dir(),
+                                 'cache_'+ pname +"-reviews.json")
+            if not os.path.exists(fname):
+                logging.debug("Cache incomplete. Not found: %s" % (fname))
+                continue
+
+            with open(fname,"r") as f:
+                self.cache['reviews'][pname] = json.loads(f.read())
+
+    def _load_cache_project(self, project):
+
+        reviews = None
+
+        pname = project.replace("/","_")
+        fname = os.path.join(self._get_storage_dir(),
+                             'cache_'+ pname +"-reviews.json")
+
+        if not os.path.exists(fname):
+            logging.debug("Cache incomplete. Not found: %s" % (fname))
+        else:
+            with open(fname,"r") as f:
+                logging.debug("Loaded from cache: %s" % (project))
+                reviews = json.loads(f.read())
+
+        return reviews
 
 
     def _clean_cache(self):
-        cache_files = ["cache_reviews.json"]
+        cache_files = ["cache_projects.json"]
 
         for name in cache_files:
             fname = os.path.join(self._get_storage_dir(), name)
             with open(fname,"w") as f:
-                f.write("[")
+                if name == "cache_projects.json":  # Just one array
+                    f.write("")
+                else:
+                    f.write("[")
 
-        cache_keys = ['reviews']
+        cache_keys = ['projects']
 
         for _id in cache_keys:
             self.cache[_id] = []
 
     def _close_cache(self):
         cache_file = os.path.join(self._get_storage_dir(),
-                                  "cache_pull_requests.json")
+                                  "cache_reviews.json")
 
         remove_last_char_from_file(cache_file)
         with open(cache_file,"a") as f:
@@ -162,28 +202,23 @@ class Gerrit(Backend):
         ''' Append to projects JSON cache '''
 
         cache_file = os.path.join(self._get_storage_dir(),
-                                  "projects.json")
+                                  "cache_projects.json")
 
-        with open(cache_file, "a") as cache:
-
+        with open(cache_file, "w") as cache:  # Complete list always
             data_json = json.dumps(projects)
-            data_json = data_json[1:-1]  # remove []
-            data_json += "," # join between arrays
-            # We need to add the array to an already existing array
             cache.write(data_json)
+
 
     def _project_reviews_to_cache(self, project, reviews):
         ''' Append to reviews JSON cache '''
 
+        project = project.replace("/","_")
+
         cache_file = os.path.join(self._get_storage_dir(),
-                                  "%s-reviews.json" % (project))
+                                  "cache_%s-reviews.json" % (project))
 
-        with open(cache_file, "a") as cache:
-
+        with open(cache_file, "w") as cache:
             data_json = json.dumps(reviews)
-            data_json = data_json[1:-1]  # remove []
-            data_json += "," # join between arrays
-            # We need to add the array to an already existing array
             cache.write(data_json)
 
     def _get_version(self):
@@ -212,15 +247,21 @@ class Gerrit(Backend):
         """ Get all projects in gerrit """
 
         logging.debug("Getting list of gerrit projects")
-        gerrit_cmd_projects = self.gerrit_cmd + "ls-projects "
-        projects_raw = subprocess.check_output(gerrit_cmd_projects, shell = True)
+
+        if self.use_cache:
+            projects = self.cache['projects']
+        else:
+            gerrit_cmd_projects = self.gerrit_cmd + "ls-projects "
+            projects_raw = subprocess.check_output(gerrit_cmd_projects, shell = True)
+
+
+            projects_raw = str(projects_raw, 'UTF-8')
+            projects = projects_raw.split("\n")
+            projects.pop() # Remove last empty line
+
+            self._projects_to_cache(projects)
+
         logging.debug("Done")
-
-        projects_raw = str(projects_raw, 'UTF-8')
-        projects = projects_raw.split("\n")
-        projects.pop() # Remove last empty line
-
-        self._projects_to_cache(projects)
 
 
         return projects
@@ -228,6 +269,13 @@ class Gerrit(Backend):
 
     def _get_project_reviews(self, project):
         """ Get all reviews for a project """
+
+        if self.use_cache:
+            # reviews = self.cache['reviews'][pname]
+            reviews = self._load_cache_project(project)
+
+            if reviews:
+                return reviews
 
         gerrit_version = self._get_version()
         last_item = None
@@ -266,18 +314,24 @@ class Gerrit(Backend):
                         last_item += 1
                     else:
                         last_item = entry['sortKey']
-                    print(entry)
                 elif 'rowCount' in entry.keys():
                     # logging.info("CONTINUE FROM: " + str(last_item))
                     number_results = entry['rowCount']
 
 
-        raise
-        self._project_reviews_to_cache(self, project, reviews)
+            self._project_reviews_to_cache(project, reviews)
 
         logging.info("Total reviews: %i" % len(reviews))
 
         return reviews
+
+    def _memory_usage(self):
+        # return the memory usage in MB
+        import psutil
+        process = psutil.Process(os.getpid())
+        mem = process.get_memory_info()[0] / float(2 ** 20)
+        return mem
+
 
     def get_reviews(self):
         # First we need all projects
@@ -291,17 +345,17 @@ class Gerrit(Backend):
             # if repository != "openstack/cinder": continue
             logging.info("Processing repository:" + project + " " +
                          str(current_repo) + "/" + str(total))
-            self._get_project_reviews(project)
+            self.reviews += self._get_project_reviews(project)
+
+            if len(self.reviews) >= self.max_reviews:
+                # 5 GB RAM memory usage
+                logging.error("Max reviews reached: %i " % (self.max_reviews))
+                break
+
+            logging.debug ("Total reviews in memory: %i" % (len(self.reviews)))
+            logging.debug ("Total memory: %i MB" % (self._memory_usage()))
+
             current_repo += 1
 
-
-
-
-
-
-
-
-
-
-
+        return self.reviews
 

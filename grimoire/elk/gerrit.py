@@ -23,10 +23,12 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from datetime import time, datetime
+from datetime import datetime
 import json
-import requests
 import logging
+import requests
+import time
+
 
 from grimoire.elk.sortinghat import SortingHat
 from grimoire.elk.projects import GrimoireLibProjects
@@ -71,43 +73,24 @@ class GerritElastic(object):
         elasticsearch_type = "reviews"
         grimoirelib_projects = self.grimoirelib_projects.get_projects()
 
+        logging.info("Uploading reviews to Elastic Search: %s" %
+                     (self.elastic.index_url))
+
         for item in self.gerrit.get_reviews():
-            if item['project'] not in grimoirelib_projects:
+            if False and item['project'] not in grimoirelib_projects:
                 logging.info("Not a project repository: " + item['project'])
                 continue
 
             self._fix_review_dates(item)
 
             data_json = json.dumps(item)
-            url = self.elastic.url_index
+            url = self.elastic.index_url
             url += "/"+elasticsearch_type
             url += "/"+str(item["id"])
             requests.put(url, data=data_json)
 
             self.fetch_events(item)
 
-    def project_reviews_to_es(self, project):
-
-        reviews = self.gerrit.reviews[project]
-        grimoirelib_projects = self.grimoirelib_projects.get_projects()
-
-
-        elasticsearch_type = "reviews"
-
-        for item in reviews:
-            if item['project'] not in grimoirelib_projects:
-                logging.info("Not a project repository: " + item['project'])
-                continue
-
-            self._fix_review_dates(item)
-
-            data_json = json.dumps(item)
-            url = self.elastic.url_index
-            url += "/"+elasticsearch_type
-            url += "/"+str(item["id"])
-            requests.put(url, data=data_json)
-
-            self.fetch_events(item)
 
     @classmethod
     def get_elastic_mappings(cls):

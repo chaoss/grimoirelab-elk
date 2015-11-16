@@ -128,7 +128,7 @@ class SortingHat(object):
         try:
             uuid = self.email2uuid[email]
         except:
-            self.emailNOuuid.add(email)
+            self.emailNOuuid.append(email)
             pass
 
         return uuid
