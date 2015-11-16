@@ -42,7 +42,7 @@ class Backend(object):
 
     def _get_name(self):
         ''' Human name for the backend class '''
-        self.get_name()
+        raise NotImplementedError
 
 
     def _get_storage_dir(self):
