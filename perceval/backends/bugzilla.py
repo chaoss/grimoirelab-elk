@@ -60,7 +60,6 @@ class Bugzilla(Backend):
         self.detail = detail
         self.issues = []  # All issues gathered from XML data
         self.issues_from_csv = []  # All issues gathered from CSV data
-        self.name = "bugzilla"
         self.cache = {}  # cache for CSV, XML and HTML data
         self.use_cache = cache
         self.use_history = history
@@ -137,7 +136,7 @@ class Bugzilla(Backend):
 
     def _get_name(self):
 
-        return self.name
+        return Bugzilla._name
 
 
     def get_id(self):
