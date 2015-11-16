@@ -42,7 +42,7 @@ def parse_args():
     parser.add_argument("-u", "--url", required=True,
                         help="Bugzilla url")
     parser.add_argument("-e", "--elastic_host",  default="127.0.0.1",
-                        help="Host with elastic search" +
+                        help="Host with elastic search " +
                         "(default: 127.0.0.1)")
     parser.add_argument("--elastic_port",  default="9200",
                         help="elastic search port " +
@@ -83,10 +83,10 @@ if __name__ == '__main__':
     logging.getLogger("requests").setLevel(logging.WARNING)
 
 
-    gerrit = Gerrit(args.user, args.url, args.nreviews, args.use_cache, 
-                    args.history)
+    gerrit = Gerrit(args.user, args.url, args.nreviews, args.cache,
+                    not args.no_history)
 
-    es_index_gerrit = "gerrit" + gerrit.get_id()
+    es_index_gerrit = gerrit.get_id()
     es_mappings = GerritElastic.get_elastic_mappings()
 
     try:
@@ -98,7 +98,9 @@ if __name__ == '__main__':
         sys.exit(1)
 
 
-    egerrit = GerritElastic(gerrit, elastic)
+    egerrit = GerritElastic(gerrit, elastic, args.sortinghat_db,
+                            args.projects_grimoirelib_db,
+                            args.gerrit_grimoirelib_db)
     egerrit.reviews_to_es()
 
     total_time_min = (datetime.now()-app_init).total_seconds()/60

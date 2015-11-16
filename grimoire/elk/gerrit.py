@@ -33,12 +33,12 @@ from grimoire.elk.projects import GrimoireLibProjects
 
 class GerritElastic(object):
 
-    def __init__(self, gerrit, elastic, sortingnat_db, gerrit_grimoirelib_db,
-                 projects_grimoirelib_db):
+    def __init__(self, gerrit, elastic, sortingnat_db, projects_grimoirelib_db,
+                 gerrit_grimoirelib_db):
         self.gerrit = gerrit
         self.elastic = elastic
         self.sortinghat = SortingHat (sortingnat_db, gerrit_grimoirelib_db)
-        self.grimoirelib_projects = GrimoireLibProjects(projects_grimoirelib_db)
+        self.grimoirelib_projects = GrimoireLibProjects(projects_grimoirelib_db, gerrit.get_url())
 
     def _fix_review_dates(self, item):
         ''' Convert dates so ES detect them '''
@@ -109,7 +109,8 @@ class GerritElastic(object):
 
             self.fetch_events(item)
 
-    def get_elastic_mappings(self):
+    @classmethod
+    def get_elastic_mappings(cls):
 
         elastic_mappings = {}
         _type = "reviews_events"

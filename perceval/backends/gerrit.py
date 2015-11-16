@@ -37,6 +37,8 @@ from perceval.backends.backend import Backend
 
 class Gerrit(Backend):
 
+    _name = "gerrit"
+
     def __init__(self, user, repository, nreviews,
                  use_cache = False, history = False):
 
@@ -48,7 +50,7 @@ class Gerrit(Backend):
         self.cache = {}  # cache for pull requests
         self.use_cache = use_cache
         self.use_history = history
-        self.url = self._get_url()
+        self.url = repository
 
         self.gerrit_cmd  = "ssh -p 29418 %s@%s" % (user, repository)
         self.gerrit_cmd += " gerrit "
@@ -81,6 +83,51 @@ class Gerrit(Backend):
                 self._clean_cache()  # Cache will be refreshed
 
 
+    def _get_name(self):
+
+        return Gerrit._name
+
+    def get_id(self):
+        ''' Return gerrit unique identifier '''
+
+        return self._get_name() + "_" + self.url
+
+    def get_url(self):
+
+        return self.url
+
+    def _restore(self):
+        '''Restore JSON full data from storage '''
+
+        restore_dir = self._get_storage_dir()
+
+        if os.path.isdir(restore_dir):
+            try:
+                logging.debug("Restoring data from %s" % restore_dir)
+                restore_file = os.path.join(restore_dir, "reviews.json")
+                if os.path.isfile(restore_file):
+                    with open(restore_file) as f:
+                        data = f.read()
+                        self.issues = json.loads(data)
+                logging.debug("Restore completed")
+            except ValueError:
+                logging.warning("Restore failed. Wrong dump files in: %s" %
+                                restore_file)
+
+
+    def _dump(self):
+        ''' Dump JSON full data to storage '''
+
+        dump_dir = self._get_storage_dir()
+
+        logging.debug("Dumping data to  %s" % dump_dir)
+        dump_file = os.path.join(dump_dir, "reviews.json")
+        with open(dump_file, "w") as f:
+            f.write(json.dumps(self.issues))
+
+        logging.debug("Dump completed")
+
+
     def _load_cache(self):
         ''' Load all cache files in memory '''
 
@@ -111,7 +158,7 @@ class Gerrit(Backend):
         with open(cache_file,"a") as f:
                 f.write("]")
 
-    def _projects_to_cache(self, pull_requests):
+    def _projects_to_cache(self, projects):
         ''' Append to projects JSON cache '''
 
         cache_file = os.path.join(self._get_storage_dir(),
@@ -119,7 +166,7 @@ class Gerrit(Backend):
 
         with open(cache_file, "a") as cache:
 
-            data_json = json.dumps(pull_requests)
+            data_json = json.dumps(projects)
             data_json = data_json[1:-1]  # remove []
             data_json += "," # join between arrays
             # We need to add the array to an already existing array
@@ -143,6 +190,7 @@ class Gerrit(Backend):
         gerrit_cmd_prj = self.gerrit_cmd + " version "
 
         raw_data = subprocess.check_output(gerrit_cmd_prj, shell = True)
+        raw_data = str(raw_data, "UTF-8")
 
         # output: gerrit version 2.10-rc1-988-g333a9dd
         m = re.match("gerrit version (\d+)\.(\d+).*", raw_data)
@@ -163,13 +211,17 @@ class Gerrit(Backend):
     def _get_projects(self):
         """ Get all projects in gerrit """
 
+        logging.debug("Getting list of gerrit projects")
         gerrit_cmd_projects = self.gerrit_cmd + "ls-projects "
-        repos = subprocess.check_output(gerrit_cmd_projects, shell = True)
+        projects_raw = subprocess.check_output(gerrit_cmd_projects, shell = True)
+        logging.debug("Done")
 
-        self._projects_to_cache(repos)
-
-        projects = repos.split("\n")
+        projects_raw = str(projects_raw, 'UTF-8')
+        projects = projects_raw.split("\n")
         projects.pop() # Remove last empty line
+
+        self._projects_to_cache(projects)
+
 
         return projects
 
@@ -177,7 +229,7 @@ class Gerrit(Backend):
     def _get_project_reviews(self, project):
         """ Get all reviews for a project """
 
-        gerrit_version = self.get_version()
+        gerrit_version = self._get_version()
         last_item = None
         if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
             last_item = 0
@@ -201,6 +253,7 @@ class Gerrit(Backend):
                     cmd += " resume_sortkey:" + last_item
 
             raw_data = subprocess.check_output(cmd, shell = True)
+            raw_data = str(raw_data, "UTF-8")
             tickets_raw = "[" + raw_data.replace("\n", ",") + "]"
             tickets_raw = tickets_raw.replace(",]", "]")
 
@@ -213,10 +266,13 @@ class Gerrit(Backend):
                         last_item += 1
                     else:
                         last_item = entry['sortKey']
+                    print(entry)
                 elif 'rowCount' in entry.keys():
                     # logging.info("CONTINUE FROM: " + str(last_item))
                     number_results = entry['rowCount']
 
+
+        raise
         self._project_reviews_to_cache(self, project, reviews)
 
         logging.info("Total reviews: %i" % len(reviews))
@@ -235,6 +291,7 @@ class Gerrit(Backend):
             # if repository != "openstack/cinder": continue
             logging.info("Processing repository:" + project + " " +
                          str(current_repo) + "/" + str(total))
+            self._get_project_reviews(project)
             current_repo += 1
 
 
