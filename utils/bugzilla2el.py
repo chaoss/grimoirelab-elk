@@ -22,7 +22,6 @@
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
-# Bugzilla backend for Perseval
 
 import argparse
 from datetime import datetime
