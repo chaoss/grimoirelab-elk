@@ -23,7 +23,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-
+from datetime import datetime
 from dateutil import parser
 import logging
 import requests
@@ -74,15 +74,30 @@ class ElasticSearch(object):
             if r.status_code != 200:
                 logging.error("Error creating ES mappings %s" % (r.text))
 
-    def get_last_date(self, _type, field):
+
+    def get_last_date(self, _type, field, _filter = None):
+        '''
+            :_type: type in which to search the data
+            :field: field with the data
+            :_filter: additional filter to find the date
+        '''
 
         last_date = None
 
         url = self.index_url
         url += "/" + _type + "/_search"
 
-        data_json = '''
-        {
+        if _filter:
+            data_query = '''
+                "query" : {
+                    "term" : { "%s" : "%s"  }
+                 },
+            ''' % (_filter['name'], _filter['value'])
+
+        else:
+            data_query = ''
+
+        data_agg = '''
             "aggs": {
                 "1": {
                   "max": {
@@ -90,8 +105,11 @@ class ElasticSearch(object):
                   }
                 }
             }
-        }
         ''' % (field)
+
+        data_json = '''
+        { %s  %s
+        } ''' % (data_query, data_agg)
 
         res = requests.post(url, data=data_json)
         res_json = res.json()
@@ -101,6 +119,11 @@ class ElasticSearch(object):
                 last_date = res_json["aggregations"]["1"]["value_as_string"]
                 last_date = parser.parse(last_date).replace(tzinfo=None)
                 last_date = last_date.isoformat(" ")
+            else:
+                last_date = res_json["aggregations"]["1"]["value"]
+                if last_date:
+                    last_date = datetime.fromtimestamp(last_date)
+                    last_date = last_date.isoformat(" ")
 
         return last_date
 
