@@ -25,6 +25,7 @@
 
 from dateutil import parser
 import json
+import logging
 import requests
 from urllib.parse import urlparse
 
@@ -80,13 +81,18 @@ class BugzillaElastic(object):
 
         elastic_type = "issues"
 
+        bulk_json = ""
         for issue in self.bugzilla.fetch():
             self.enrich_issue(issue)
             data_json = json.dumps(issue)
-            url = self.elastic.index_url
-            url += "/"+elastic_type
-            url += "/"+str(issue["bug_id"])
-            requests.put(url, data=data_json)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (issue["bug_id"])
+            bulk_json += data_json +"\n"  # Bulk document
+
+        logging.debug("Adding issues to ES")
+
+        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
+        requests.put(url, data=bulk_json)
+
 
     @classmethod
     def get_elastic_mappings(cls):
