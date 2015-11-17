@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
 
     bugzilla = Bugzilla(args.url, args.nissues, args.detail,
-                        not args.no_history, args.cache)
+                        not args.no_incremental, args.cache)
 
     es_index_bugzilla = "bugzilla_" + bugzilla.get_id()
     es_mappings = BugzillaElastic.get_elastic_mappings()
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     try:
         elastic = ElasticSearch(args.elastic_host,
                                 args.elastic_port,
-                                es_index_bugzilla, es_mappings, args.no_history)
+                                es_index_bugzilla, es_mappings, args.no_incremental)
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)

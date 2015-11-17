@@ -87,7 +87,7 @@ class GitHub(Backend):
         return url
 
 
-    def _restore(self):
+    def _restore_state(self):
         '''Restore JSON full data from storage '''
 
         restore_dir = self._get_storage_dir()
@@ -106,7 +106,7 @@ class GitHub(Backend):
                                 restore_file)
 
 
-    def _dump(self):
+    def _dump_state(self):
         ''' Dump JSON full data to storage '''
 
         dump_dir = self._get_storage_dir()
@@ -244,7 +244,7 @@ class GitHub(Backend):
                 pulls = self._find_pull_requests(issues)
 
                 self.pull_requests += pulls
-                self._dump()
+                self._dump_state()
                 self._pull_requests_to_cache(pulls)
 
                 logging.info(r.headers['X-RateLimit-Remaining'])

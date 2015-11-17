@@ -53,12 +53,12 @@ if __name__ == '__main__':
     es_mappings = GitHubElastic.get_elastic_mappings()
 
     github = GitHub(args.owner, args.repository, args.token, args.cache,
-                    args.no_history)
+                    args.no_incremental)
 
     try:
         elastic = ElasticSearch(args.elastic_host,
                                 args.elastic_port,
-                                es_index_github, es_mappings, args.no_history)
+                                es_index_github, es_mappings, args.no_incremental)
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)

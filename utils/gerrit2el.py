@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
 
     gerrit = Gerrit(args.user, args.url, args.nreviews, args.cache,
-                    not args.no_history)
+                    not args.no_incremental)
 
     es_index_gerrit = gerrit.get_id()
     es_mappings = GerritElastic.get_elastic_mappings()
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     try:
         elastic = ElasticSearch(args.elastic_host,
                                 args.elastic_port,
-                                es_index_gerrit, es_mappings, args.no_history)
+                                es_index_gerrit, es_mappings, args.no_incremental)
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)

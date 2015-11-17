@@ -70,7 +70,7 @@ class Gerrit(Backend):
 
 
     def __init__(self, user, repository, nreviews,
-                 use_cache = False, history = False):
+                 use_cache = False, incremental = True):
 
         self.gerrit_user = user
         self.project = repository
@@ -78,8 +78,6 @@ class Gerrit(Backend):
         self.reviews = []  # All reviews from gerrit
         self.projects = []  # All projects from gerrit
         self.cache = {}  # cache projects listing
-        self.use_cache = use_cache
-        self.use_history = history
         self.url = repository
         self.elastic = None  # used for dump and restore
 
@@ -89,7 +87,7 @@ class Gerrit(Backend):
         # self.max_reviews = 50000  # around 2 GB of RAM
         self.max_reviews = 1000 * 50
 
-        super(Gerrit, self).__init__(use_cache, history)
+        super(Gerrit, self).__init__(use_cache, incremental)
 
 
     def _get_name(self):
@@ -109,7 +107,7 @@ class Gerrit(Backend):
 
         self.elastic = elastic
 
-    def _restore(self):
+    def _restore_state(self):
         '''Restore JSON full data from storage (ES) '''
 
         # See last_date to start from last gerrit state
@@ -117,10 +115,10 @@ class Gerrit(Backend):
         pass  # It is done when getting reviews
 
 
-    def _dump(self):
+    def _dump_state(self):
         ''' Dump JSON full data to storage (ES)'''
 
-        # See _reviews_history_to_es
+        # See _reviews_state_to_es
 
         pass
 
@@ -215,15 +213,15 @@ class Gerrit(Backend):
             cache.write(data_json)
 
 
-    def _reviews_history_to_es(self, reviews):
+    def _reviews_state_to_es(self, reviews):
         ''' Append reviews JSON to ES (gerrit state) '''
 
         if len(reviews) == 0:
             return
 
-        elasticsearch_type = "reviews_history"
+        elasticsearch_type = "reviews_state"
 
-        logging.debug("Adding %i reviews history to ES" % (len(reviews)))
+        logging.debug("Adding %i reviews state to ES" % (len(reviews)))
 
         bulk_json = ""
         for item in reviews:
@@ -339,7 +337,7 @@ class Gerrit(Backend):
 
             for entry in tickets:
 
-                if self.use_history and last_update:
+                if self.incremental and last_update:
                     if 'project' in entry.keys():
                         entry_lastUpdated = \
                             datetime.fromtimestamp(entry['lastUpdated'])
@@ -362,15 +360,15 @@ class Gerrit(Backend):
                     number_results = entry['rowCount']
 
             # Raw cache and all JSON are the same in gerrit
-        if not self.use_history:
+        if not self.incremental:
             if project:
                 self._project_reviews_to_cache(project, reviews)
-        self._reviews_history_to_es(reviews)
+        self._reviews_state_to_es(reviews)
 
-        if self.use_history:
+        if self.incremental:
             logging.info("Total new reviews: %i" % len(reviews))
         else:
-            logging.info("Total new reviews: %i" % len(reviews))
+            logging.info("Total reviews: %i" % len(reviews))
 
         return reviews
 
@@ -390,7 +388,7 @@ class Gerrit(Backend):
             _filter['name'] = 'project'
             _filter['value'] = project
 
-        return self.elastic.get_last_date("reviews_history", "lastUpdated",
+        return self.elastic.get_last_date("reviews_state", "lastUpdated",
                                           _filter)
 
 

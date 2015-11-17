@@ -69,13 +69,13 @@ class Bugzilla(Backend):
         Backend.add_params(cmdline_parser)
 
 
-    def __init__(self, url, nissues, detail, history = True, cache = False):
+    def __init__(self, url, nissues, detail, incremental = True, cache = False):
 
         '''
             :url: repository url, incuding bugzilla URL and opt product param
             :nissues: number of issues to get per query
             :detail: list, issue or changes details
-            :history: Use data history and update incrementally
+            :incremental: Use data last state and update incrementally
             :cache: use cache
         '''
 
@@ -86,13 +86,11 @@ class Bugzilla(Backend):
         self.issues = []  # All issues gathered from XML data
         self.issues_from_csv = []  # All issues gathered from CSV data
         self.cache = {}  # cache for CSV, XML and HTML data
-        self.use_cache = cache
-        self.use_history = history
 
-        super(Bugzilla, self).__init__(cache, history)
+        super(Bugzilla, self).__init__(cache, incremental)
 
 
-    def _restore(self):
+    def _restore_state(self):
         '''Restore JSON full data from storage '''
 
         restore_dir = self._get_storage_dir()
@@ -118,7 +116,7 @@ class Bugzilla(Backend):
                                 restore_file)
 
 
-    def _dump(self):
+    def _dump_state(self):
         ''' Dump JSON full data to storage '''
 
         dump_dir = self._get_storage_dir()
@@ -238,8 +236,8 @@ class Bugzilla(Backend):
         return changes
 
 
-    def _clean_status(self):
-        ''' Remove all status from previous downloads of the data source '''
+    def _clean_state(self):
+        ''' Remove last state from previous downloads of the data source '''
 
         filelist = [ f for f in os.listdir(self._get_storage_dir())
                     if f.endswith(".json") ]
@@ -553,7 +551,7 @@ class Bugzilla(Backend):
                     issues.append(get_issue_proccesed(bug))
 
                 # Each time we receive data from bugzilla server dump iy
-                self._dump()
+                self._dump_state()
 
                 issues_processed += issues
 
@@ -598,7 +596,7 @@ class Bugzilla(Backend):
                 total_issues += len(ids)
 
             # Dump issues JSON to file now to protect for future fails
-            self._dump()
+            self._dump_state()
 
             if len(ids) > 0:
                 last_update = ids[-1][1]

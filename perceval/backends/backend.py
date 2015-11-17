@@ -51,20 +51,20 @@ class Backend(object):
 
         parser = cmdline_parser
 
-        parser.add_argument("--no_history",  action='store_true',
-                            help="don't use history for repository")
+        parser.add_argument("--no_incremental",  action='store_true',
+                            help="don't use last state for data source")
         parser.add_argument("--cache",  action='store_true',
-                            help="Use perseval cache")
+                            help="Use cache")
         parser.add_argument("--debug",  action='store_true',
                             help="Increase logging to debug")
 
 
 
-    def __init__(self, use_cache = False, history = False):
+    def __init__(self, use_cache = False, incremental = True):
 
         self.cache = {}  # cache projects listing
         self.use_cache = use_cache
-        self.use_history = history
+        self.incremental = incremental
 
         # Create storage dir if it not exists
         dump_dir = self._get_storage_dir()
@@ -73,10 +73,10 @@ class Backend(object):
 
         if self.use_cache:
             # Don't use history data. Will be generated from cache.
-            self.use_history = False
+            self.incremental = False
 
-        if self.use_history:
-            self._restore()  # Load history
+        if self.incremental:
+            self._restore_state()  # Load last state
 
         else:
             if self.use_cache:
@@ -102,10 +102,10 @@ class Backend(object):
         self.use_cache = False
 
 
-    def _restore(self):
-        ''' Restore data source status from last execution '''
-        logging.info("History restore not implemented. History disabled.")
-        self.use_history = False
+    def _restore_state(self):
+        ''' Restore data source state from last execution '''
+        logging.info("State restore not implemented. Incremental disabled.")
+        self.incremental = False
 
 
     def _get_name(self):
