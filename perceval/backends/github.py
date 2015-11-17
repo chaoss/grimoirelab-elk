@@ -57,18 +57,16 @@ class GitHub(Backend):
 
 
     def __init__(self, owner, repository, auth_token,
-                 use_cache = False, history = False):
+                 use_cache = False, incremental = True):
 
         self.owner = owner
         self.repository = repository
         self.auth_token = auth_token
         self.pull_requests = []  # All pull requests from github repo
         self.cache = {}  # cache for pull requests
-        self.use_cache = use_cache
-        self.use_history = history
         self.url = self._get_url()
 
-        super(GitHub, self).__init__(use_cache, history)
+        super(GitHub, self).__init__(use_cache, incremental)
 
     def _get_url(self):
         github_per_page = 30  # 100 in other items. 20 for pull requests. 30 issues
@@ -84,7 +82,6 @@ class GitHub(Backend):
         url_params += "&sort=updated"  # sort by last updated
         url_params += "&direction=asc"  # first older pull request
 
-        # prs_count = getPullRequests(url_pulls+url_params)
         url = url_issues + url_params
 
         return url
@@ -209,42 +206,6 @@ class GitHub(Backend):
 
             GitHub.users[self.login]['orgs'] = orgs
 
-
-    def getPullRequests(self, url):
-        url_next = url
-        prs_count = 0
-        last_page = None
-        page = 1
-
-        url_next += "&page="+str(page)
-
-        while url_next:
-            logging.info("Get issues pulls requests from " + url_next)
-            r = requests.get(url_next, verify=False,
-                             headers={'Authorization':'token ' +
-                                      self.auth_token})
-            pulls = r.json()
-            self.pull_requests += pulls
-            self._dump()
-            self._pull_requests_to_cache (pulls)
-            prs_count += len(pulls)
-
-            logging.info(r.headers['X-RateLimit-Remaining'])
-
-            url_next = None
-            if 'next' in r.links:
-                url_next = r.links['next']['url']  # Loving requests :)
-
-            if not last_page:
-                last_page = r.links['last']['url'].split('&page=')[1].split('&')[0]
-
-            logging.info("Page: %i/%s" % (page, last_page))
-
-            page += 1
-
-        self._close_cache()
-
-        return self
 
     def _find_pull_requests(self, issues):
 
