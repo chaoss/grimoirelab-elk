@@ -181,6 +181,10 @@ class Bugzilla(Backend):
     def _load_cache(self):
         ''' Load all cache files in memory '''
 
+        pass  # Now the cache is loaded one issue at a time
+
+        return
+
         fname = os.path.join(self._get_storage_dir(),
                              "cache_issues_list_csv.json")
         with open(fname,"r") as f:
@@ -196,25 +200,22 @@ class Bugzilla(Backend):
 
 
     def _clean_cache(self):
-        cache_files = ["cache_issues_list_csv.json", "cache_issues_xml.json",
-                       "cache_changes_html.json"]
+        filelist = [ f for f in os.listdir(self._get_storage_dir()) if
+                    f.startswith("cache_issue_") ]
+        for f in filelist:
+            os.remove(os.path.join(self._get_storage_dir(), f))
+
+        cache_files = ["cache_issues_list_csv.json"]
 
         for name in cache_files:
             fname = os.path.join(self._get_storage_dir(), name)
             with open(fname,"w") as f:
-                f.write("[]")  # Empty array = empty cache
-
-        cache_keys = ['issues_list', 'issues', 'changes']
-
-        for _id in cache_keys:
-            self.cache[_id] = []
-
+                    f.write("[")
 
 
     def _close_cache(self):
         ''' Remove last , in arrays in JSON files '''
-        cache_files = ["cache_issues_list_csv.json", "cache_issues_xml.json",
-                       "cache_changes_html.json"]
+        cache_files = ["cache_issues_list_csv.json"]
 
         for name in cache_files:
             fname = os.path.join(self._get_storage_dir(), name)
@@ -259,47 +260,31 @@ class Bugzilla(Backend):
             cache.write("]")  # close the JSON array
 
 
-    def _changes_raw_to_cache(self, changes_html, issue_id):
-        ''' Append to changes HTML JSON cache changes_html '''
+    def _issue_raw_to_cache (self, issue_xml, change_html):
+        ''' Create a cache file per item '''
 
+        bug = issue_xml
+
+        issue_id = bug.findall('bug_id')[0].text
+        # TODO.: detect XML enconding and use it
+        # xml = {"xml": ElementTree.tostring(bug, encoding="us-ascii")}
+        xml_string = ElementTree.tostring(bug, encoding="utf-8")
+        # xml_string is of type b'' byte stream in Python3
+        xml_string = xml_string.decode('utf-8')
+        issue = {"issue_id": issue_id,
+                 "xml": xml_string,
+                 "html": change_html}
+        data_json = json.dumps(issue)
         cache_file = os.path.join(self._get_storage_dir(),
-                              "cache_changes_html.json")
-
-        remove_last_char_from_file(cache_file)  # Last ] removed
-
-        with open(cache_file, "a") as cache:
-            html = {"issue_id": issue_id, "html": changes_html}
-            data_json = json.dumps(html)
+                      "cache_issue_%s.json" % (issue_id))
+        with open(cache_file, "w") as cache:
             cache.write(data_json)
-            cache.write(",")  # array of changes delimiter
-            cache.write("]")  # close the JSON array
-
-
-    def _issues_raw_to_cache(self, issues_xml):
-        ''' Append to issues xml JSON cache issues in issues_xml '''
-
-        cache_file = os.path.join(self._get_storage_dir(),
-                              "cache_issues_xml.json")
-        remove_last_char_from_file(cache_file)  # Last ] removed
-        with open(cache_file, "a") as cache:
-            for bug in issues_xml:
-                issue_id = bug.findall('bug_id')[0].text
-                # TODO.: detect XML enconding and use it
-                # xml = {"xml": ElementTree.tostring(bug, encoding="us-ascii")}
-                xml_string = ElementTree.tostring(bug, encoding="utf-8")
-                # xml_string is of type b'' byte stream in Python3
-                xml_string = xml_string.decode('utf-8')
-                xml = {"issue_id": issue_id, "xml": xml_string}
-                data_json = json.dumps(xml)
-                cache.write(data_json)
-                cache.write(",")  # array of issues delimiter
-            cache.write("]")  # close the JSON array
 
 
     def _get_issue_json(self,
-                       csv_line = None,
-                       issue_xml = None,
-                       changes_html = None):
+                        csv_line = None,
+                        issue_xml = None,
+                        changes_html = None):
         ''' Create a JSON with all data for an issue. Depending on the detail
             the issue will have more information '''
 
@@ -376,6 +361,10 @@ class Bugzilla(Backend):
             issue = get_issue_from_csv_line(csv_line)
 
         if issue_xml:
+
+            if not self.use_cache:
+                self._issue_raw_to_cache(issue_xml, changes_html)
+
             # If we have the XML, replace CSV info
             issue = get_issue_from_xml(issue_xml)
 
@@ -503,9 +492,6 @@ class Bugzilla(Backend):
                 changes_html = requests.get(activity_url).content
                 changes_html = changes_html.decode('utf-8')
 
-                if not self.use_cache:
-                    self._changes_raw_to_cache(changes_html, issue_id)
-
             return changes_html
 
         def get_issue_proccesed(bug_xml_tree):
@@ -544,11 +530,9 @@ class Bugzilla(Backend):
 
                 tree = ElementTree.fromstring(issues_raw.content)
 
-                if not self.use_cache:
-                    self._issues_raw_to_cache(tree)
-
                 for bug in tree:
                     issues.append(get_issue_proccesed(bug))
+
 
                 # Each time we receive data from bugzilla server dump iy
                 self._dump_state()
@@ -564,9 +548,30 @@ class Bugzilla(Backend):
 
             return issues_processed
 
+        def get_issues_from_cache():
+            logging.info("Reading issues from cache")
+            # Just read all issues cache files
+            filelist = [ f for f in os.listdir(self._get_storage_dir()) if
+                        f.startswith("cache_issue_") ]
+            logging.debug("Total issues in cache: %i" % (len(filelist)))
+            for f in filelist:
+                fname = os.path.join(self._get_storage_dir(), f)
+                with open(fname,"r") as f:
+                    issue = json.loads(f.read())
+                    xml = ElementTree.fromstring(issue['xml'])
+                    html = issue['html']
+                    csv = None
+                    issue_processed = self._get_issue_json(csv, xml, html)
+                    self.issues.append(issue_processed)
+            return self
+
+
         _type = "issues"
 
         logging.info("Getting issues from Bugzilla")
+
+        if self.use_cache:
+            return get_issues_from_cache()
 
         last_update = self._get_last_update_date()
 
