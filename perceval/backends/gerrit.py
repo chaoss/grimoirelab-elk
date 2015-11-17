@@ -34,8 +34,6 @@ import os
 import re
 import requests
 import subprocess
-import time
-import traceback
 from perceval.utils import get_eta, remove_last_char_from_file
 
 from perceval.backends.backend import Backend
@@ -44,6 +42,32 @@ from perceval.backends.backend import Backend
 class Gerrit(Backend):
 
     _name = "gerrit"
+
+    @classmethod
+    def add_params(cls, cmdline_parser):
+        parser = cmdline_parser
+
+        parser.add_argument("--user",
+                            help="Gerrit ssh user")
+        parser.add_argument("-u", "--url", required=True,
+                            help="Gerrit url")
+        parser.add_argument("-e", "--elastic_host",  default="127.0.0.1",
+                            help="Host with elastic search " +
+                            "(default: 127.0.0.1)")
+        parser.add_argument("--elastic_port",  default="9200",
+                            help="elastic search port " +
+                            "(default: 9200)")
+        parser.add_argument("--nreviews",  default=500, type=int,
+                            help="Number of reviews per ssh query")
+        parser.add_argument("--sortinghat_db",  required=True,
+                            help="Sorting Hat database")
+        parser.add_argument("--gerrit_grimoirelib_db",  required=True,
+                            help="GrimoireLib gerrit database")
+        parser.add_argument("--projects_grimoirelib_db",  required=True,
+                            help="GrimoireLib projects database")
+
+        Backend.add_params(cmdline_parser)
+
 
     def __init__(self, user, repository, nreviews,
                  use_cache = False, history = False):
@@ -65,32 +89,7 @@ class Gerrit(Backend):
         # self.max_reviews = 50000  # around 2 GB of RAM
         self.max_reviews = 1000 * 50
 
-
-        # Create storage dir if it not exists
-        dump_dir = self._get_storage_dir()
-        if not os.path.isdir(dump_dir):
-            os.makedirs(dump_dir)
-
-        if self.use_cache:
-            # Don't use history data. Will be generated from cache.
-            self.use_history = False
-
-        if self.use_history:
-            self._restore()  # Load history
-
-        else:
-            if self.use_cache:
-                logging.info("Getting all data from cache")
-                try:
-                    self._load_cache()
-                except:
-                    # If any error loading the cache, clean it
-                    traceback.print_exc(file=os.sys.stdout)
-                    logging.debug("Cache corrupted")
-                    self.use_cache = False
-                    self._clean_cache()
-            else:
-                self._clean_cache()  # Cache will be refreshed
+        super(Gerrit, self).__init__(use_cache, history)
 
 
     def _get_name(self):

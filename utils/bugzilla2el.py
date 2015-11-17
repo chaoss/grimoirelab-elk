@@ -34,41 +34,12 @@ from grimoire.elk.bugzilla import BugzillaElastic
 
 from perceval.backends.bugzilla import Bugzilla
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--user",
-                        help="Bugzilla user")
-    parser.add_argument("--password",
-                        help="Bugzilla user password")
-    parser.add_argument("-d", "--delay", default="1",
-                        help="delay between requests in seconds (1s default)")
-    parser.add_argument("-u", "--url", required=True,
-                        help="Bugzilla url")
-    parser.add_argument("-e", "--elastic_host",  default="127.0.0.1",
-                        help="Host with elastic search" +
-                        "(default: 127.0.0.1)")
-    parser.add_argument("--elastic_port",  default="9200",
-                        help="elastic search port " +
-                        "(default: 9200)")
-    parser.add_argument("--no_history",  action='store_true',
-                        help="don't use history for repository")
-    parser.add_argument("--detail",  default="change",
-                        help="list, issue or change (default) detail")
-    parser.add_argument("--nissues",  default=200, type=int,
-                        help="Number of XML issues to get per query")
-    parser.add_argument("--cache",  action='store_true',
-                        help="Use perseval cache")
-    parser.add_argument("--debug",  action='store_true',
-                        help="Increase logging to debug")
-
-
-    args = parser.parse_args()
-    return args
-
 
 if __name__ == '__main__':
 
-    args = parse_args()
+    parser = argparse.ArgumentParser()
+    Bugzilla.add_params(parser)
+    args = parser.parse_args()
 
     app_init = datetime.now()
 

@@ -44,6 +44,31 @@ class Bugzilla(Backend):
 
     _name = "bugzilla"  # to be used for human interaction
 
+    @classmethod
+    def add_params(cls, cmdline_parser):
+        parser = cmdline_parser
+        parser.add_argument("--user",
+                            help="Bugzilla user")
+        parser.add_argument("--password",
+                            help="Bugzilla user password")
+        parser.add_argument("-d", "--delay", default="1",
+                            help="delay between requests in seconds (1s default)")
+        parser.add_argument("-u", "--url", required=True,
+                            help="Bugzilla url")
+        parser.add_argument("-e", "--elastic_host",  default="127.0.0.1",
+                            help="Host with elastic search" +
+                            "(default: 127.0.0.1)")
+        parser.add_argument("--elastic_port",  default="9200",
+                            help="elastic search port " +
+                            "(default: 9200)")
+        parser.add_argument("--detail",  default="change",
+                            help="list, issue or change (default) detail")
+        parser.add_argument("--nissues",  default=200, type=int,
+                            help="Number of XML issues to get per query")
+
+        Backend.add_params(cmdline_parser)
+
+
     def __init__(self, url, nissues, detail, history = True, cache = False):
 
         '''
@@ -64,30 +89,7 @@ class Bugzilla(Backend):
         self.use_cache = cache
         self.use_history = history
 
-        # Create storage dir if it not exists
-        dump_dir = self._get_storage_dir()
-        if not os.path.isdir(dump_dir):
-            os.makedirs(dump_dir)
-
-        if self.use_cache:
-            # Don't use history data. Will be generated from cache.
-            self.use_history = False
-
-        if self.use_history:
-            self._restore()  # Load history
-
-        else:
-            if self.use_cache:
-                logging.warning("Getting all data from cache.")
-                try:
-                    self._load_cache()
-                    logging.debug("Cache loaded correctly")
-                except:
-                    # If any error loading the cache, clean it
-                    self.use_cache = False
-                    self._clean_cache()
-            else:
-                self._clean_cache()  # Cache will be refreshed
+        super(Bugzilla, self).__init__(cache, history)
 
 
     def _restore(self):

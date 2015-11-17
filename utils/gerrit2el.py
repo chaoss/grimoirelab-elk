@@ -34,42 +34,13 @@ from grimoire.elk.gerrit import GerritElastic
 
 from perceval.backends.gerrit import Gerrit
 
-
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--user",
-                        help="Gerrit ssh user")
-    parser.add_argument("-u", "--url", required=True,
-                        help="Bugzilla url")
-    parser.add_argument("-e", "--elastic_host",  default="127.0.0.1",
-                        help="Host with elastic search " +
-                        "(default: 127.0.0.1)")
-    parser.add_argument("--elastic_port",  default="9200",
-                        help="elastic search port " +
-                        "(default: 9200)")
-    parser.add_argument("--no_history",  action='store_true',
-                        help="don't use history for repository")
-    parser.add_argument("--nreviews",  default=500, type=int,
-                        help="Number of reviews per ssh query")
-    parser.add_argument("--cache",  action='store_true',
-                        help="Use perseval cache")
-    parser.add_argument("--debug",  action='store_true',
-                        help="Increase logging to debug")
-    parser.add_argument("--sortinghat_db",  required=True,
-                        help="Sorting Hat database")
-    parser.add_argument("--gerrit_grimoirelib_db",  required=True,
-                        help="GrimoireLib gerrit database")
-    parser.add_argument("--projects_grimoirelib_db",  required=True,
-                        help="GrimoireLib projects database")
-
-
-    args = parser.parse_args()
-    return args
-
-
 if __name__ == '__main__':
 
-    args = parse_args()
+    parser = argparse.ArgumentParser()
+
+    Gerrit.add_params(parser)
+
+    args = parser.parse_args()
 
     app_init = datetime.now()
 

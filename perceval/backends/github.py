@@ -38,6 +38,24 @@ class GitHub(Backend):
     _name = "github"
     users = {}
 
+    @classmethod
+    def add_params(cls, cmdline_parser):
+        parser = cmdline_parser
+
+        parser.add_argument("-o", "--owner", required = True,
+                            help = "github owner")
+        parser.add_argument("-r", "--repository", required = True,
+                            help = "github repository")
+        parser.add_argument("-t", "--token", required = True,
+                            help = "github access token")
+        parser.add_argument("-e", "--elastic_host",  default = "127.0.0.1",
+                            help = "Host with Elastic Search" + \
+                            "(default: 127.0.0.1)")
+        parser.add_argument("--elastic_port",  default = "9200",
+                            help = "Elastic Search port " + \
+                            "(default: 9200)")
+
+
     def __init__(self, owner, repository, auth_token,
                  use_cache = False, history = False):
 
@@ -50,31 +68,7 @@ class GitHub(Backend):
         self.use_history = history
         self.url = self._get_url()
 
-
-        # Create storage dir if it not exists
-        dump_dir = self._get_storage_dir()
-        if not os.path.isdir(dump_dir):
-            os.makedirs(dump_dir)
-
-        if self.use_cache:
-            # Don't use history data. Will be generated from cache.
-            self.use_history = False
-
-        if self.use_history:
-            self._restore()  # Load history
-
-        else:
-            if self.use_cache:
-                logging.info("Getting all data from cache")
-                try:
-                    self._load_cache()
-                except:
-                    # If any error loading the cache, clean it
-                    logging.debug("Cache corrupted")
-                    self.use_cache = False
-                    self._clean_cache()
-            else:
-                self._clean_cache()  # Cache will be refreshed
+        super(GitHub, self).__init__(use_cache, history)
 
     def _get_url(self):
         github_per_page = 30  # 100 in other items. 20 for pull requests. 30 issues

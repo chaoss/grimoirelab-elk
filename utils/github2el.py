@@ -26,46 +26,21 @@
 #     - Use the _bulk API from ES to improve indexing
 
 import argparse
-from datetime import datetime
 import logging
 from os import sys
-import requests
+
 
 from grimoire.elk.elastic import ElasticSearch, ElasticConnectException
 from grimoire.elk.github import GitHubElastic
 from perceval.backends.github import GitHub
 
 
-def parse_args ():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-o", "--owner", required = True,
-                        help = "github owner")
-    parser.add_argument("-r", "--repository", required = True,
-                        help = "github repository")
-    parser.add_argument("-t", "--token", required = True,
-                        help = "github access token")
-    parser.add_argument("-e", "--elastic_host",  default = "127.0.0.1",
-                        help = "Host with Elastic Search" + \
-                        "(default: 127.0.0.1)")
-    parser.add_argument("--elastic_port",  default = "9200",
-                        help = "Elastic Search port " + \
-                        "(default: 9200)")
-    parser.add_argument("--no_history",  action='store_true',
-                        help="don't use history for repository")
-    parser.add_argument("--cache",  action='store_true',
-                        help="Use perseval cache")
-    parser.add_argument("--debug",  action='store_true',
-                        help="Increase logging to debug")
-
-
-
-    args = parser.parse_args()
-    return args
-
 
 if __name__ == '__main__':
 
-    args = parse_args()
+    parser = argparse.ArgumentParser()
+    GitHub.add_params(parser)
+    args = parser.parse_args()
 
     if args.debug:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
