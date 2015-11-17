@@ -250,7 +250,7 @@ class Bugzilla(Backend):
 
         cache_file = os.path.join(self._get_storage_dir(),
                                   "cache_issues_list_csv.json")
-        self.remove_last_char_from_file(cache_file)
+        remove_last_char_from_file(cache_file)
         with open(cache_file, "a") as cache:
             csv = {"last_update": str(last_date), "csv": list_csv}
             data_json = json.dumps(csv)
@@ -265,7 +265,7 @@ class Bugzilla(Backend):
         cache_file = os.path.join(self._get_storage_dir(),
                               "cache_changes_html.json")
 
-        self.remove_last_char_from_file(cache_file)  # Last ] removed
+        remove_last_char_from_file(cache_file)  # Last ] removed
 
         with open(cache_file, "a") as cache:
             html = {"issue_id": issue_id, "html": changes_html}
@@ -280,7 +280,7 @@ class Bugzilla(Backend):
 
         cache_file = os.path.join(self._get_storage_dir(),
                               "cache_issues_xml.json")
-        self.remove_last_char_from_file(cache_file)  # Last ] removed
+        remove_last_char_from_file(cache_file)  # Last ] removed
         with open(cache_file, "a") as cache:
             for bug in issues_xml:
                 issue_id = bug.findall('bug_id')[0].text
