@@ -25,6 +25,7 @@
 
 '''GitHub backend for Perseval'''
 
+from datetime import datetime
 import json
 import logging
 import os
@@ -48,6 +49,9 @@ class GitHub(Backend):
                             help = "github repository")
         parser.add_argument("-t", "--token", required = True,
                             help = "github access token")
+
+        Backend.add_params(cmdline_parser)
+
 
 
     def __init__(self, owner, repository, auth_token,
@@ -84,32 +88,13 @@ class GitHub(Backend):
     def _restore_state(self):
         '''Restore JSON full data from storage '''
 
-        restore_dir = self._get_storage_dir()
-
-        if os.path.isdir(restore_dir):
-            try:
-                logging.debug("Restoring data from %s" % restore_dir)
-                restore_file = os.path.join(restore_dir, "pull_requests.json")
-                if os.path.isfile(restore_file):
-                    with open(restore_file) as f:
-                        data = f.read()
-                        self.issues = json.loads(data)
-                logging.debug("Restore completed")
-            except ValueError:
-                logging.warning("Restore failed. Wrong dump files in: %s" %
-                                restore_file)
+        pass  # Last state now stored in ES
 
 
     def _dump_state(self):
         ''' Dump JSON full data to storage '''
 
-        dump_dir = self._get_storage_dir()
-
-        logging.debug("Dumping data to  %s" % dump_dir)
-        dump_file = os.path.join(dump_dir, "pull_requests.json")
-        with open(dump_file, "w") as f:
-            f.write(json.dumps(self.pull_requests))
-        logging.debug("Dump completed")
+        pass  # Last state dumped to ES
 
 
     def fetch(self):
@@ -226,14 +211,21 @@ class GitHub(Backend):
             self.pull_requests =  self.cache['pull_requests']
 
         else:
-            # last_update = self.getLastUpdateFromES(_type)
-            last_update = None  # broken order in github API
+            last_update = self.getLastUpdateFromES(_type)
             if last_update is not None:
-                logging.info("Getting issues since: " + last_update)
-                self.url += "&since="+last_update
+
+                logging.info("Github issues API broken for incremental analysis")
+                self.incremental = False
+
+                if self.incremental:
+                    logging.info("Getting issues since: " + last_update)
+                    self.url += "&since="+last_update
+
             url_next = self.url
 
             while url_next:
+                task_init = datetime.now()
+
                 logging.info("Get issues pulls requests from " + url_next)
                 r = requests.get(url_next, verify=False,
                                  headers={'Authorization':'token ' + self.auth_token})
@@ -242,10 +234,11 @@ class GitHub(Backend):
                 pulls = self._find_pull_requests(issues)
 
                 self.pull_requests += pulls
-                self._dump_state()
+                self._items_state_to_es(pulls)
                 self._pull_requests_to_cache(pulls)
 
-                logging.info(r.headers['X-RateLimit-Remaining'])
+                logging.debug("Rate limit: %s" %
+                              (r.headers['X-RateLimit-Remaining']))
 
                 url_next = None
                 if 'next' in r.links:
@@ -254,8 +247,16 @@ class GitHub(Backend):
                 if last_page == 1:
                     if 'last' in r.links:
                         last_page = r.links['last']['url'].split('&page=')[1].split('&')[0]
+                        last_page = int(last_page)
 
-                logging.info("Page: %i/%s" % (page, last_page))
+                logging.info("Page: %i/%i" % (page, last_page))
+
+                task_time = (datetime.now() - task_init).total_seconds()
+                eta_time = task_time * (last_page - page )
+                eta_min = eta_time / 60.0
+
+                logging.info("Completed %i/%i (ETA: %.2f min)" \
+                             % (page, last_page, eta_min))
 
                 page += 1
 

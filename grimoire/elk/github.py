@@ -157,14 +157,28 @@ class GitHubElastic(object):
             get_time_diff_days(pull['created_at'], pull['closed_at'])
 
         user_login = pull['user']['login']
-        user = GitHubUser(self.github.users[user_login])
+
+        if user_login in self.github.users:
+            user = GitHubUser(self.github.users[user_login])
+        else:
+            logging.debug("User login %s not found in github users" % (user_login))
+            user = None
 
         rich_pull['user_login'] = user_login
-        rich_pull['user_name'] = user.name
-        rich_pull['user_email'] = user.email
-        rich_pull['user_org'] = user.org
-        rich_pull['user_location'] = user.location
-        rich_pull['user_geolocation'] = self.getGeoPoint(user.location)
+
+        if user is not None:
+            rich_pull['user_name'] = user.name
+            rich_pull['user_email'] = user.email
+            rich_pull['user_org'] = user.org
+            rich_pull['user_location'] = user.location
+            rich_pull['user_geolocation'] = self.getGeoPoint(user.location)
+        else:
+            rich_pull['user_name'] = None
+            rich_pull['user_email'] = None
+            rich_pull['user_org'] = None
+            rich_pull['user_location'] = None
+            rich_pull['user_geolocation'] = None
+
         if pull['assignee'] is not None:
             assignee_login = pull['assignee']['login']
             assignee = GitHubUser(self.github.users[assignee_login])
@@ -182,6 +196,7 @@ class GitHubElastic(object):
             rich_pull['assignee_org'] = None
             rich_pull['assignee_location'] = None
             rich_pull['assignee_geolocation'] = None
+
         rich_pull['title'] = pull['title']
         rich_pull['state'] = pull['state']
         rich_pull['created_at'] = pull['created_at']
