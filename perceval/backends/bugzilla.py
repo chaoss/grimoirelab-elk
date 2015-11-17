@@ -55,12 +55,6 @@ class Bugzilla(Backend):
                             help="delay between requests in seconds (1s default)")
         parser.add_argument("-u", "--url", required=True,
                             help="Bugzilla url")
-        parser.add_argument("-e", "--elastic_host",  default="127.0.0.1",
-                            help="Host with elastic search" +
-                            "(default: 127.0.0.1)")
-        parser.add_argument("--elastic_port",  default="9200",
-                            help="elastic search port " +
-                            "(default: 9200)")
         parser.add_argument("--detail",  default="change",
                             help="list, issue or change (default) detail")
         parser.add_argument("--nissues",  default=200, type=int,
@@ -93,45 +87,13 @@ class Bugzilla(Backend):
     def _restore_state(self):
         '''Restore JSON full data from storage '''
 
-        restore_dir = self._get_storage_dir()
-
-        if os.path.isdir(restore_dir):
-            try:
-                logging.debug("Restoring data from %s" % restore_dir)
-                if self.detail == "list":
-                    restore_file = os.path.join(restore_dir, "issues_list.json")
-                    if os.path.isfile(restore_file):
-                        with open(restore_file) as f:
-                            data = f.read()
-                            self.issues_from_csv = json.loads(data)
-                else:
-                    restore_file = os.path.join(restore_dir, "issues.json")
-                    if os.path.isfile(restore_file):
-                        with open(restore_file) as f:
-                            data = f.read()
-                            self.issues = json.loads(data)
-                logging.debug("Restore completed")
-            except ValueError:
-                logging.warning("Restore failed. Wrong dump files in: %s" %
-                                restore_file)
+        pass  # Last state now stored in ES
 
 
     def _dump_state(self):
         ''' Dump JSON full data to storage '''
 
-        dump_dir = self._get_storage_dir()
-
-        logging.debug("Dumping data to  %s" % dump_dir)
-        if self.detail == "list":
-            dump_file = os.path.join(dump_dir, "issues_list.json")
-            with open(dump_file, "w") as f:
-                f.write(json.dumps(self.issues_from_csv))
-        else:
-            dump_file = os.path.join(dump_dir, "issues.json")
-            with open(dump_file, "w") as f:
-                f.write(json.dumps(self.issues))
-
-        logging.debug("Dump completed")
+        pass  # Last state dumped to ES
 
 
     def _get_name(self):
@@ -168,13 +130,11 @@ class Bugzilla(Backend):
         last_update = None
 
         if self.detail == "list":
-            if len(self.issues_from_csv) > 0:
-                last_update = self.issues_from_csv[-1]['changeddate']
-                # Format date so it can be used as URL param in bugzilla
-                last_update = last_update.replace("T", " ")
+            last_update = self.elastic.get_last_date("state", "changeddate_date")
+            # Format date so it can be used as URL param in bugzilla
+            last_update = last_update.replace("T", " ")
         else:
-            if len(self.issues) > 0:
-                last_update = self.issues[-1]['delta_ts']
+            last_update = self.elastic.get_last_date("state", "delta_ts_date")
 
         return last_update
 
@@ -259,7 +219,6 @@ class Bugzilla(Backend):
             cache.write(",")  # array of issues delimiter
             cache.write("]")  # close the JSON array
 
-
     def _issue_raw_to_cache (self, issue_xml, change_html):
         ''' Create a cache file per item '''
 
@@ -279,6 +238,12 @@ class Bugzilla(Backend):
                       "cache_issue_%s.json" % (issue_id))
         with open(cache_file, "w") as cache:
             cache.write(data_json)
+
+
+
+    def _get_field_unique_id(self):
+        return "bug_id"
+
 
 
     def _get_issue_json(self,
@@ -307,8 +272,9 @@ class Bugzilla(Backend):
                     if item[-1:] == '"':  # remove last item if "
                         item = item[:-1]
                     data[fields[i]] = item
+                    # We need this date in Elastic format for incremental
                     if fields[i] in ['changeddate']:
-                        data[fields[i]] = parser.parse(item).isoformat()
+                        data[fields[i]+"_date"] = parser.parse(item).isoformat()
 
                     i += 1
             except:
@@ -344,6 +310,9 @@ class Bugzilla(Backend):
                 else:
                     tag = field.tag
                     issue[tag] = field.text
+                    # We need this date in Elastic format for incremental
+                    if tag in ['delta_ts']:
+                        issue[tag+"_date"] = parser.parse(field.text).isoformat()
 
                     add_attributes(issue, field, tag)
 
@@ -499,7 +468,9 @@ class Bugzilla(Backend):
 
             # Time to gather changes for this issue
             issue_id = bug_xml_tree.findall('bug_id')[0].text
-            changes_html = get_changes_html(issue_id)
+            changes_html = None
+            if self.detail == "change":
+                changes_html = get_changes_html(issue_id)
 
 
             issue_processed = self._get_issue_json(issue_xml = bug_xml_tree,
@@ -535,7 +506,8 @@ class Bugzilla(Backend):
 
 
                 # Each time we receive data from bugzilla server dump iy
-                self._dump_state()
+                # self._dump_state()
+                self._items_state_to_es(issues)
 
                 issues_processed += issues
 

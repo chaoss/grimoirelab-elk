@@ -26,9 +26,11 @@
 
 ''' Backend define the API to be supported in Perceval data sources backends '''
 
+import json
 import logging
 import os
 from os.path import expanduser, join
+import requests
 import traceback
 
 class Backend(object):
@@ -42,6 +44,12 @@ class Backend(object):
     def get_id(self):
         '''Unique identifier for a backend instance '''
         raise NotImplementedError
+
+
+    def set_elastic(self, elastic):
+        ''' Elastic used to store last data source state '''
+        self.elastic = elastic
+
 
     # Internal class implementation
 
@@ -57,7 +65,12 @@ class Backend(object):
                             help="Use cache")
         parser.add_argument("--debug",  action='store_true',
                             help="Increase logging to debug")
-
+        parser.add_argument("-e", "--elastic_host",  default="127.0.0.1",
+                            help="Host with elastic search" +
+                            "(default: 127.0.0.1)")
+        parser.add_argument("--elastic_port",  default="9200",
+                            help="elastic search port " +
+                            "(default: 9200)")
 
 
     def __init__(self, use_cache = False, incremental = True):
@@ -91,6 +104,35 @@ class Backend(object):
                     self._clean_cache()
             else:
                 self._clean_cache()  # Cache will be refreshed
+
+
+    def _get_field_unique_id(self):
+        ''' Field with the unique id for the JSON items '''
+        raise NotImplementedError
+
+
+    def _items_state_to_es(self, json_items):
+        ''' Append items JSON to ES (data source state) '''
+
+        if len(json_items) == 0:
+            return
+
+        field_id = self._get_field_unique_id()
+
+        elasticsearch_type = "state"
+        url = self.elastic.index_url+'/'+elasticsearch_type+'/_bulk'
+
+        logging.debug("Adding %i items (%s state) to %s" % (len(json_items),
+                                                            self._get_name(),
+                                                            url))
+
+        bulk_json = ""
+        for item in json_items:
+            data_json = json.dumps(item)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
+            bulk_json += data_json +"\n"  # Bulk document
+
+        requests.put(url, data=bulk_json)
 
     def _load_cache(self):
         logging.info("Cache loading not implemented. Cache disabled.")

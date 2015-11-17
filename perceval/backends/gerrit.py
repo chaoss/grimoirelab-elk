@@ -51,12 +51,6 @@ class Gerrit(Backend):
                             help="Gerrit ssh user")
         parser.add_argument("-u", "--url", required=True,
                             help="Gerrit url")
-        parser.add_argument("-e", "--elastic_host",  default="127.0.0.1",
-                            help="Host with elastic search " +
-                            "(default: 127.0.0.1)")
-        parser.add_argument("--elastic_port",  default="9200",
-                            help="elastic search port " +
-                            "(default: 9200)")
         parser.add_argument("--nreviews",  default=500, type=int,
                             help="Number of reviews per ssh query")
         parser.add_argument("--sortinghat_db",  required=True,
@@ -102,10 +96,6 @@ class Gerrit(Backend):
     def get_url(self):
 
         return self.url
-
-    def set_elastic(self, elastic):
-
-        self.elastic = elastic
 
     def _restore_state(self):
         '''Restore JSON full data from storage (ES) '''
@@ -213,25 +203,6 @@ class Gerrit(Backend):
             cache.write(data_json)
 
 
-    def _reviews_state_to_es(self, reviews):
-        ''' Append reviews JSON to ES (gerrit state) '''
-
-        if len(reviews) == 0:
-            return
-
-        elasticsearch_type = "reviews_state"
-
-        logging.debug("Adding %i reviews state to ES" % (len(reviews)))
-
-        bulk_json = ""
-        for item in reviews:
-            data_json = json.dumps(item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item["id"])
-            bulk_json += data_json +"\n"  # Bulk document
-
-        url = self.elastic.index_url+'/'+elasticsearch_type+'/_bulk'
-        requests.put(url, data=bulk_json)
-
 
     def _get_version(self):
         gerrit_cmd_prj = self.gerrit_cmd + " version "
@@ -278,6 +249,8 @@ class Gerrit(Backend):
 
         return projects
 
+    def _get_field_unique_id(self):
+        return "id"
 
     def _get_server_reviews(self, project = None):
         """ Get all reviews for all or for a project """
@@ -363,7 +336,7 @@ class Gerrit(Backend):
         if not self.incremental:
             if project:
                 self._project_reviews_to_cache(project, reviews)
-        self._reviews_state_to_es(reviews)
+        self._items_state_to_es(reviews)
 
         if self.incremental:
             logging.info("Total new reviews: %i" % len(reviews))

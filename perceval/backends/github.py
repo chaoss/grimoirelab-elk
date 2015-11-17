@@ -48,12 +48,6 @@ class GitHub(Backend):
                             help = "github repository")
         parser.add_argument("-t", "--token", required = True,
                             help = "github access token")
-        parser.add_argument("-e", "--elastic_host",  default = "127.0.0.1",
-                            help = "Host with Elastic Search" + \
-                            "(default: 127.0.0.1)")
-        parser.add_argument("--elastic_port",  default = "9200",
-                            help = "Elastic Search port " + \
-                            "(default: 9200)")
 
 
     def __init__(self, owner, repository, auth_token,
@@ -133,6 +127,10 @@ class GitHub(Backend):
         _id = "_%s_%s" % (self.owner, self.repository)
 
         return _id.lower()
+
+    def _get_field_unique_id(self):
+        return "id"
+
 
     def _load_cache(self):
         ''' Load all cache files in memory '''

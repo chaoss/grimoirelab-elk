@@ -100,6 +100,7 @@ class BugzillaElastic(object):
 
         elastic_mappings = {}
 
+        _type = "issues_list"
         mapping = '''
         {
             "properties": {
@@ -119,6 +120,6 @@ class BugzillaElastic(object):
         }
         '''
 
-        elastic_mappings['issues_list'] = mapping
+        elastic_mappings[_type] = mapping
 
         return elastic_mappings

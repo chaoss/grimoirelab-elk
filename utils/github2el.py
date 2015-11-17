@@ -63,7 +63,7 @@ if __name__ == '__main__':
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
 
-
+    github.set_elastic(elastic)
     egithub = GitHubElastic(elastic, github)
     GitHub.users = egithub.usersFromES()
 

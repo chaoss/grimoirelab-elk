@@ -66,6 +66,7 @@ if __name__ == '__main__':
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
 
+    bugzilla.set_elastic(elastic)
     ebugzilla = BugzillaElastic(bugzilla, elastic)
 
 

@@ -145,7 +145,7 @@ class GerritElastic(object):
 
         elastic_mappings[_type] = reviews_events_map
 
-        _type = "reviews_history"
+        _type = "state"
         mapping = '''
         {
             "properties": {
