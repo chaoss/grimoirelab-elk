@@ -95,6 +95,8 @@ if __name__ == '__main__':
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
 
+    gerrit.set_elastic(elastic)
+
 
     egerrit = GerritElastic(gerrit, elastic, args.sortinghat_db,
                             args.projects_grimoirelib_db,

@@ -27,11 +27,14 @@
 
 
 from datetime import datetime
+from dateutil import parser
 import json
 import logging
 import os
 import re
+import requests
 import subprocess
+import time
 import traceback
 from perceval.utils import get_eta, remove_last_char_from_file
 
@@ -54,6 +57,7 @@ class Gerrit(Backend):
         self.use_cache = use_cache
         self.use_history = history
         self.url = repository
+        self.elastic = None  # used for dump and restore
 
         self.gerrit_cmd  = "ssh -p 29418 %s@%s" % (user, repository)
         self.gerrit_cmd += " gerrit "
@@ -102,36 +106,24 @@ class Gerrit(Backend):
 
         return self.url
 
+    def set_elastic(self, elastic):
+
+        self.elastic = elastic
+
     def _restore(self):
-        '''Restore JSON full data from storage '''
+        '''Restore JSON full data from storage (ES) '''
 
-        restore_dir = self._get_storage_dir()
+        # See last_date to start from last gerrit state
 
-        if os.path.isdir(restore_dir):
-            try:
-                logging.debug("Restoring data from %s" % restore_dir)
-                restore_file = os.path.join(restore_dir, "reviews.json")
-                if os.path.isfile(restore_file):
-                    with open(restore_file) as f:
-                        data = f.read()
-                        self.issues = json.loads(data)
-                logging.debug("Restore completed")
-            except ValueError:
-                logging.warning("Restore failed. Wrong dump files in: %s" %
-                                restore_file)
+        pass  # It is done when getting reviews
 
 
     def _dump(self):
-        ''' Dump JSON full data to storage '''
+        ''' Dump JSON full data to storage (ES)'''
 
-        dump_dir = self._get_storage_dir()
+        # See _project_reviews_to_es
 
-        logging.debug("Dumping data to  %s" % dump_dir)
-        dump_file = os.path.join(dump_dir, "reviews.json")
-        with open(dump_file, "w") as f:
-            f.write(json.dumps(self.issues))
-
-        logging.debug("Dump completed")
+        pass
 
 
     def _load_cache(self):
@@ -223,6 +215,25 @@ class Gerrit(Backend):
             data_json = json.dumps(reviews)
             cache.write(data_json)
 
+
+    def _project_reviews_to_es(self, project, reviews):
+        ''' Append to reviews JSON to ES (gerrit state) '''
+
+        if len(reviews) == 0:
+            return
+
+        elasticsearch_type = "reviews_history"
+
+        bulk_json = ""
+        for item in reviews:
+            data_json = json.dumps(item)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item["id"])
+            bulk_json += data_json +"\n"  # Bulk document
+
+        url = self.elastic.index_url+'/'+elasticsearch_type+'/_bulk'
+        r = requests.put(url, data=bulk_json)
+
+
     def _get_version(self):
         gerrit_cmd_prj = self.gerrit_cmd + " version "
 
@@ -272,12 +283,18 @@ class Gerrit(Backend):
     def _get_project_reviews(self, project):
         """ Get all reviews for a project """
 
+        logging.info("Getting reviews for: %s" % (project))
+
         if self.use_cache:
             # reviews = self.cache['reviews'][pname]
             reviews = self._load_cache_project(project)
 
             if reviews:
                 return reviews
+
+        last_update = self._get_last_date(project)
+
+        logging.debug("Last update: %s" % (last_update))
 
         gerrit_version = self._get_version()
         last_item = None
@@ -287,13 +304,16 @@ class Gerrit(Backend):
         gerrit_cmd_prj = self.gerrit_cmd + " query project:"+project+" "
         gerrit_cmd_prj += "limit:" + str(self.nreviews)
         gerrit_cmd_prj += " --all-approvals --comments --format=JSON"
+        logging.debug(gerrit_cmd_prj)
 
         number_results = self.nreviews
 
         reviews = []
+        more_updates = True
 
-        while (number_results == self.nreviews or
-               number_results == self.nreviews + 1):  # wikimedia gerrit returns limit+1
+        while (number_results == self.nreviews + 1 or # wikimedia gerrit returns limit+1
+               number_results == self.nreviews) and \
+               more_updates:
 
             cmd = gerrit_cmd_prj
             if last_item is not None:
@@ -310,6 +330,16 @@ class Gerrit(Backend):
             tickets = json.loads(tickets_raw)
 
             for entry in tickets:
+
+                if self.use_history and last_update:
+                    if 'project' in entry.keys():
+                        entry_lastUpdated = \
+                            datetime.fromtimestamp(entry['lastUpdated'])
+                        if entry_lastUpdated <= parser.parse(last_update):
+                            logging.debug("No more updates for %s" % (project))
+                            more_updates = False
+                            break
+
                 if 'project' in entry.keys():
                     reviews.append(entry)
                     if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
@@ -320,10 +350,15 @@ class Gerrit(Backend):
                     # logging.info("CONTINUE FROM: " + str(last_item))
                     number_results = entry['rowCount']
 
+            # Raw cache and all JSON are the same in gerrit
+            if not self.use_history:
+                self._project_reviews_to_cache(project, reviews)
+            self._project_reviews_to_es(project, reviews)
 
-            self._project_reviews_to_cache(project, reviews)
-
-        logging.info("Total reviews: %i" % len(reviews))
+        if self.use_history:
+            logging.info("Total new reviews: %i" % len(reviews))
+        else:
+            logging.info("Total new reviews: %i" % len(reviews))
 
         return reviews
 
@@ -334,6 +369,15 @@ class Gerrit(Backend):
         mem = process.get_memory_info()[0] / float(2 ** 20)
         return mem
 
+    def _get_last_date(self, project):
+
+        _filter = {}
+        _filter['name'] = 'project'
+        _filter['value'] = project
+
+        return self.elastic.get_last_date("reviews_history", "lastUpdated",
+                                          _filter)
+
 
     def get_reviews(self):
         # First we need all projects
@@ -341,7 +385,6 @@ class Gerrit(Backend):
 
         total = len(projects)
         current_repo = 1
-
 
         for project in projects:
             # if repository != "openstack/cinder": continue
@@ -353,7 +396,7 @@ class Gerrit(Backend):
             eta_time = task_time * (total-current_repo)
             eta_min = eta_time / 60.0
 
-            logging.info("Completed %s %i/%i (ETA: %.2f min)" \
+            logging.info("Completed %s %i/%i (ETA: %.2f min)\n" \
                              % (project, current_repo, total, eta_min))
 
 

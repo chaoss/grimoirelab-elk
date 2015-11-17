@@ -71,15 +71,12 @@ class GerritElastic(object):
     def reviews_to_es (self):
 
         elasticsearch_type = "reviews"
-        grimoirelib_projects = self.grimoirelib_projects.get_projects()
 
         logging.info("Uploading reviews to Elastic Search: %s" %
                      (self.elastic.index_url))
 
         for item in self.gerrit.get_reviews():
-            if False and item['project'] not in grimoirelib_projects:
-                logging.info("Not a project repository: " + item['project'])
-                continue
+            logging.info("Uploading review")
 
             self._fix_review_dates(item)
 
@@ -89,6 +86,7 @@ class GerritElastic(object):
             url += "/"+str(item["id"])
             requests.put(url, data=data_json)
 
+            logging.info("Uploading review changes")
             self.fetch_events(item)
 
 
@@ -146,6 +144,20 @@ class GerritElastic(object):
         """
 
         elastic_mappings[_type] = reviews_events_map
+
+        _type = "reviews_history"
+        mapping = '''
+        {
+            "properties": {
+               "project": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               }
+            }
+        }
+        '''
+
+        elastic_mappings[_type] = mapping
 
         return elastic_mappings
 
