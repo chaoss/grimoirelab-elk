@@ -121,7 +121,7 @@ class Gerrit(Backend):
     def _dump(self):
         ''' Dump JSON full data to storage (ES)'''
 
-        # See _project_reviews_to_es
+        # See _reviews_history_to_es
 
         pass
 
@@ -216,13 +216,15 @@ class Gerrit(Backend):
             cache.write(data_json)
 
 
-    def _project_reviews_to_es(self, project, reviews):
-        ''' Append to reviews JSON to ES (gerrit state) '''
+    def _reviews_history_to_es(self, reviews):
+        ''' Append reviews JSON to ES (gerrit state) '''
 
         if len(reviews) == 0:
             return
 
         elasticsearch_type = "reviews_history"
+
+        logging.debug("Adding %i reviews history to ES" % (len(reviews)))
 
         bulk_json = ""
         for item in reviews:
@@ -231,7 +233,7 @@ class Gerrit(Backend):
             bulk_json += data_json +"\n"  # Bulk document
 
         url = self.elastic.index_url+'/'+elasticsearch_type+'/_bulk'
-        r = requests.put(url, data=bulk_json)
+        requests.put(url, data=bulk_json)
 
 
     def _get_version(self):
@@ -280,14 +282,19 @@ class Gerrit(Backend):
         return projects
 
 
-    def _get_project_reviews(self, project):
-        """ Get all reviews for a project """
+    def _get_server_reviews(self, project = None):
+        """ Get all reviews for all or for a project """
 
-        logging.info("Getting reviews for: %s" % (project))
+        if project:
+            logging.info("Getting reviews for: %s" % (project))
+        else:
+            logging.info("Getting all reviews")
 
         if self.use_cache:
-            # reviews = self.cache['reviews'][pname]
-            reviews = self._load_cache_project(project)
+            if project:
+                reviews = self._load_cache_project(project)
+            else:
+                logging.warn("Can't use cache for all repository reviews")
 
             if reviews:
                 return reviews
@@ -301,7 +308,9 @@ class Gerrit(Backend):
         if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
             last_item = 0
 
-        gerrit_cmd_prj = self.gerrit_cmd + " query project:"+project+" "
+        gerrit_cmd_prj = self.gerrit_cmd + " query "
+        if project:
+            gerrit_cmd_prj +="project:"+project+" "
         gerrit_cmd_prj += "limit:" + str(self.nreviews)
         gerrit_cmd_prj += " --all-approvals --comments --format=JSON"
         logging.debug(gerrit_cmd_prj)
@@ -336,7 +345,10 @@ class Gerrit(Backend):
                         entry_lastUpdated = \
                             datetime.fromtimestamp(entry['lastUpdated'])
                         if entry_lastUpdated <= parser.parse(last_update):
-                            logging.debug("No more updates for %s" % (project))
+                            if project:
+                                logging.debug("No more updates for %s" % (project))
+                            else:
+                                logging.debug("No more updates for %s" % (self.url))
                             more_updates = False
                             break
 
@@ -351,9 +363,10 @@ class Gerrit(Backend):
                     number_results = entry['rowCount']
 
             # Raw cache and all JSON are the same in gerrit
-            if not self.use_history:
+        if not self.use_history:
+            if project:
                 self._project_reviews_to_cache(project, reviews)
-            self._project_reviews_to_es(project, reviews)
+        self._reviews_history_to_es(reviews)
 
         if self.use_history:
             logging.info("Total new reviews: %i" % len(reviews))
@@ -369,11 +382,14 @@ class Gerrit(Backend):
         mem = process.get_memory_info()[0] / float(2 ** 20)
         return mem
 
-    def _get_last_date(self, project):
+    def _get_last_date(self, project = None):
 
-        _filter = {}
-        _filter['name'] = 'project'
-        _filter['value'] = project
+        _filter = None
+
+        if project:
+            _filter = {}
+            _filter['name'] = 'project'
+            _filter['value'] = project
 
         return self.elastic.get_last_date("reviews_history", "lastUpdated",
                                           _filter)
@@ -390,7 +406,7 @@ class Gerrit(Backend):
             # if repository != "openstack/cinder": continue
             task_init = datetime.now()
 
-            self.reviews += self._get_project_reviews(project)
+            self.reviews += self._get_server_reviews(project)
 
             task_time = (datetime.now() - task_init).total_seconds()
             eta_time = task_time * (total-current_repo)
@@ -414,3 +430,18 @@ class Gerrit(Backend):
 
         return self.reviews
 
+    def _get_reviews_all(self):
+        """ Get all reviews from the repository  """
+
+        logging.error("Experimental feature for internal use.")
+
+        return []
+
+        task_init = datetime.now()
+        self.reviews = self._get_server_reviews()
+        task_time = (datetime.now() - task_init).total_seconds()
+
+        logging.info("Completed in %.2f min\n" % (task_time))
+
+
+        return self.reviews
