@@ -38,10 +38,10 @@ class CacheItems(object):
 
     def clean(self):
         logging.debug("Cleaning cache")
-        filelist = [ f for f in os.listdir(self._get_storage_dir()) if
-                    f.startswith("cache_issue_") ]
+        filelist = [ f for f in os.listdir(self.cache_dir) if
+                    f.startswith("cache_item_") ]
         for f in filelist:
-            os.remove(os.path.join(self._get_storage_dir(), f))
+            os.remove(os.path.join(self.cache_dir, f))
 
 
     def item_to_cache(self, item):
