@@ -77,21 +77,29 @@ class BugzillaElastic(object):
 
     def issues_to_es(self):
 
-        # TODO: use bulk API
-
         elastic_type = "issues"
 
+        max_items = self.elastic.max_items_bulk
+        current = 0
         bulk_json = ""
+
+        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
+
+        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+
         for issue in self.bugzilla.fetch():
+            if current >= max_items:
+                requests.put(url, data=bulk_json)
+                bulk_json = ""
+                current = 0
             self.enrich_issue(issue)
             data_json = json.dumps(issue)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (issue["bug_id"])
             bulk_json += data_json +"\n"  # Bulk document
-
-        logging.debug("Adding issues to ES")
-
-        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
+            current += 1
         requests.put(url, data=bulk_json)
+
+        logging.debug("Adding issues to ES Done")
 
 
     @classmethod

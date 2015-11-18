@@ -88,35 +88,59 @@ class GitHubElastic(object):
         return self.elastic.getGitHubCache("geolocations", "location")
 
     def geoLocationsToES(self):
+        max_items = self.elastic.max_items_bulk
+        current = 0
+        bulk_json = ""
 
-        elasticsearch_type = "geolocations"
+        elastic_type = "geolocations"
+        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
+
+        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+
 
         for loc in self.geolocations:
+            if current >= max_items:
+                requests.put(url, data=bulk_json)
+                bulk_json = ""
+                current = 0
+
             geopoint = self.geolocations[loc]
             location = geopoint.copy()
             location["location"] = loc
             # First upload the raw pullrequest data to ES
             data_json = json.dumps(location)
-            url = self.elastic.url + "/"+self.index_github
-            url += "/"+elasticsearch_type
             safe_loc = loc.encode('ascii', 'ignore')
-            url += "/"+str("%s-%s-%s" % (location["lat"], location["lon"], safe_loc))
-            requests.put(url, data = data_json)
+            geo_id = str("%s-%s-%s" % (location["lat"], location["lon"], safe_loc))
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (geo_id)
+            bulk_json += data_json +"\n"  # Bulk document
+            current += 1
+        requests.put(url, data = bulk_json)
 
+        logging.debug("Adding issues to ES Done")
 
     def usersToES(self):
+        max_items = self.elastic.max_items_bulk
+        current = 0
+        bulk_json = ""
 
-        elasticsearch_type = "users"  # github global users
+        elastic_type = "users"  # github global users
+        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
+
+        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
         users = self.github.users
 
         for login in users:
-
+            if current >= max_items:
+                requests.put(url, data=bulk_json)
+                bulk_json = ""
+                current = 0
             data_json = json.dumps(users[login])
-            url = self.elastic.url + "/"+self.index_github
-            url += "/"+elasticsearch_type
-            url += "/"+str(users[login]["id"])
-            requests.put(url, data = data_json)
+            user_id = str(users[login]["id"])
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (user_id)
+            bulk_json += data_json +"\n"  # Bulk document
+            current += 1
+        requests.put(url, data = bulk_json)
 
     def usersFromES(self):
 
@@ -221,26 +245,31 @@ class GitHubElastic(object):
         logging.debug("Updating geolocations in Elastic")
         self.geoLocationsToES() # Update geolocations in Elastic
 
-        logging.debug("Sending rich pulls items to Elastic")
+        max_items = self.elastic.max_items_bulk
+        current = 0
+        bulk_json = ""
 
-        elasticsearch_type = _type
-        count = 0
+        elastic_type = _type
+        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
+
+        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
         for pull in pulls:
-
             if not 'head' in pull.keys() and not 'pull_request' in pull.keys():
                 # And issue that it is not a PR
                 continue
 
-            # The processed pull including user data and time_to_close
+            if current >= max_items:
+                requests.put(url, data=bulk_json)
+                bulk_json = ""
+                current = 0
             rich_pull = self.getRichPull(pull)
             data_json = json.dumps(rich_pull)
-            url = self.elastic.index_url
-            url += "/"+elasticsearch_type
-            url += "/"+str(rich_pull["id"])
-            requests.put(url, data = data_json)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_pull["id"])
+            bulk_json += data_json +"\n"  # Bulk document
+            current += 1
+        requests.put(url, data = bulk_json)
 
-            count += 1
 
 class GitHubUser(object):
     ''' Helper class to manage data from a Github user '''

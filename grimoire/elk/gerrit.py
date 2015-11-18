@@ -70,26 +70,11 @@ class GerritElastic(object):
 
     def reviews_to_es (self):
 
-        elasticsearch_type = "reviews"
+        field_id = self.gerrit.get_field_unique_id()
 
-        logging.info("Uploading reviews to Elastic Search: %s" %
-                     (self.elastic.index_url))
+        es_type = "reviews"
 
-        bulk_json = ""
-        url = self.elastic.index_url+'/'+elasticsearch_type+'/_bulk'
-
-
-        for item in self.gerrit.get_reviews():
-            self._fix_review_dates(item)
-
-            data_json = json.dumps(item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item['id'])
-            bulk_json += data_json +"\n"  # Bulk document
-
-            self.fetch_events(item)
-
-        requests.put(url, data=bulk_json)
-
+        self.elastic.bulk_upload(es_type, self.gerrit.get_reviews(), field_id)
 
 
     @classmethod

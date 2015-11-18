@@ -25,6 +25,7 @@
 
 from datetime import datetime
 from dateutil import parser
+import json
 import logging
 import requests
 
@@ -42,6 +43,7 @@ class ElasticSearch(object):
         self.index_raw = index+"_raw"
         self.index_url = self.url+"/"+self.index
         self.index_raw_url = self.url+"/"+self.index_raw
+        self.max_items_bulk = 500
 
         try:
             r = requests.get(self.index_url)
@@ -59,6 +61,30 @@ class ElasticSearch(object):
                 logging.info("Deleted and created index " + self.index_url)
         if mappings:
             self.create_mapping(mappings)
+
+
+    def bulk_upload(self, es_type, items, field_id):
+        ''' Upload in controlled packs items to ES using bulk API '''
+
+        max_items = self.max_items_bulk
+        current = 0
+        bulk_json = ""
+
+        url = self.index_url+'/'+es_type+'/_bulk'
+
+        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+
+        for item in items:
+            if current >= max_items:
+                requests.put(url, data=bulk_json)
+                bulk_json = ""
+                current = 0
+            data_json = json.dumps(item)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
+            bulk_json += data_json +"\n"  # Bulk document
+            current += 1
+        requests.put(url, data=bulk_json)
+
 
 
     def create_mapping(self, mappings):
