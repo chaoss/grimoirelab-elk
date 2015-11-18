@@ -117,11 +117,6 @@ class GitHub(Backend):
         return "id"
 
 
-    def _load_cache(self):
-
-        pass  # Now the cache is loaded one issue at a time
-
-
     def _clean_cache(self):
         filelist = [ f for f in os.listdir(self._get_storage_dir()) if
                     f.startswith("cache_pull_request_") ]

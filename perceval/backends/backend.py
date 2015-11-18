@@ -33,6 +33,9 @@ from os.path import expanduser, join
 import requests
 import traceback
 
+from perceval.cache import CacheItems
+
+
 class Backend(object):
 
     # Public Perceval backend API 
@@ -75,7 +78,8 @@ class Backend(object):
 
     def __init__(self, use_cache = False, incremental = True):
 
-        self.cache = {}  # cache projects listing
+        self.cache = CacheItems(self._get_storage_dir(), 
+                                self._get_field_unique_id())
         self.use_cache = use_cache
         self.incremental = incremental
 
@@ -92,18 +96,8 @@ class Backend(object):
             self._restore_state()  # Load last state
 
         else:
-            if self.use_cache:
-                logging.info("Getting all data from cache")
-                try:
-                    self._load_cache()
-                except:
-                    # If any error loading the cache, clean it
-                    traceback.print_exc(file=os.sys.stdout)
-                    logging.debug("Cache corrupted")
-                    self.use_cache = False
-                    self._clean_cache()
-            else:
-                self._clean_cache()  # Cache will be refreshed
+            if not self.use_cache:
+                self.cache.clean()  # Cache will be refreshed
 
 
     def _get_field_unique_id(self):
@@ -133,15 +127,6 @@ class Backend(object):
             bulk_json += data_json +"\n"  # Bulk document
 
         requests.put(url, data=bulk_json)
-
-    def _load_cache(self):
-        logging.info("Cache loading not implemented. Cache disabled.")
-        self.use_cache = False
-
-
-    def _clean_cache(self):
-        logging.info("Cache cleaning not implemented. Cache disabled.")
-        self.use_cache = False
 
 
     def _restore_state(self):

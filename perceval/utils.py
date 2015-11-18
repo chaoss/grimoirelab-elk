@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# Perceval Backend base class 
+# Perceval utils library 
 #
 # Copyright (C) 2015 Bitergia
 #

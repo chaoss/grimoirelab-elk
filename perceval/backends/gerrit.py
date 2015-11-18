@@ -79,8 +79,7 @@ class Gerrit(Backend):
         self.gerrit_cmd += " gerrit "
 
         # self.max_reviews = 50000  # around 2 GB of RAM
-        self.max_reviews = 1000 * 50
-        self.max_reviews = 1000 * 10
+        self.max_reviews = 1000 * 100
 
         super(Gerrit, self).__init__(use_cache, incremental)
 
@@ -114,11 +113,6 @@ class Gerrit(Backend):
         pass
 
 
-    def _load_cache(self):
-        ''' Load all cache files in memory '''
-
-        pass # Now the cache is loaded one issue at a time
-
 
     def _clean_cache(self):
 
@@ -126,16 +120,6 @@ class Gerrit(Backend):
                     f.startswith("cache_issue_") ]
         for f in filelist:
             os.remove(os.path.join(self._get_storage_dir(), f))
-
-        cache_files = ["cache_projects.json"]
-
-        for name in cache_files:
-            fname = os.path.join(self._get_storage_dir(), name)
-            with open(fname,"w") as f:
-                if name == "cache_projects.json":  # Just one array
-                    f.write("")
-                else:
-                    f.write("[")
 
 
     def _close_cache(self):
