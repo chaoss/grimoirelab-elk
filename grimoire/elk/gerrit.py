@@ -75,19 +75,21 @@ class GerritElastic(object):
         logging.info("Uploading reviews to Elastic Search: %s" %
                      (self.elastic.index_url))
 
-        for item in self.gerrit.get_reviews():
-            logging.info("Uploading review")
+        bulk_json = ""
+        url = self.elastic.index_url+'/'+elasticsearch_type+'/_bulk'
 
+
+        for item in self.gerrit.get_reviews():
             self._fix_review_dates(item)
 
             data_json = json.dumps(item)
-            url = self.elastic.index_url
-            url += "/"+elasticsearch_type
-            url += "/"+str(item["id"])
-            requests.put(url, data=data_json)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item['id'])
+            bulk_json += data_json +"\n"  # Bulk document
 
-            logging.info("Uploading review changes")
             self.fetch_events(item)
+
+        requests.put(url, data=bulk_json)
+
 
 
     @classmethod
