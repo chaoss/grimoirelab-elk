@@ -61,7 +61,6 @@ class GitHub(Backend):
         self.repository = repository
         self.auth_token = auth_token
         self.pull_requests = []  # All pull requests from github repo
-        self.cache = {}  # cache for pull requests
         self.url = self._get_url()
 
         super(GitHub, self).__init__(use_cache, incremental)
@@ -117,17 +116,6 @@ class GitHub(Backend):
         return "id"
 
 
-    def _clean_cache(self):
-        filelist = [ f for f in os.listdir(self._get_storage_dir()) if
-                    f.startswith("cache_pull_request_") ]
-        for f in filelist:
-            os.remove(os.path.join(self._get_storage_dir(), f))
-
-    def _close_cache(self):
-
-        pass  # nothing is needed in github
-
-
     def getLastUpdateFromES(self, _type):
 
         last_update = self.elastic.get_last_date(_type, 'updated_at')
@@ -167,38 +155,13 @@ class GitHub(Backend):
 
         return pulls
 
-    def _pull_requests_to_cache(self, pull_requests):
-        ''' Update pull requests cache files  '''
-
-        for pull in pull_requests:
-
-            data_json = json.dumps(pull)
-            cache_file = os.path.join(self._get_storage_dir(),
-                          "cache_pull_request_%s.json" % (pull['id']))
-
-            with open(cache_file, "w") as cache:
-                cache.write(data_json)
-
-
-    def _get_pull_requests_from_cache(self):
-        logging.info("Reading issues from cache")
-        # Just read all issues cache files
-        filelist = [ f for f in os.listdir(self._get_storage_dir()) if
-                    f.startswith("cache_pull_request_") ]
-        logging.debug("Total pull requests in cache: %i" % (len(filelist)))
-        for f in filelist:
-            fname = os.path.join(self._get_storage_dir(), f)
-            with open(fname,"r") as f:
-                issue = json.loads(f.read())
-                self.pull_requests.append(issue)
-        logging.info("Cache read completed")
-        return self
-
 
     def getIssuesPullRequests(self):
 
         if self.use_cache:
-            return self._get_pull_requests_from_cache()
+            for item in self.cache.items_from_cache():
+                self.pull_requests.append(item)
+            return self
 
         _type = "issues_pullrequests"
         last_page = page = 1
@@ -227,7 +190,7 @@ class GitHub(Backend):
 
             self.pull_requests += pulls
             self._items_state_to_es(pulls)
-            self._pull_requests_to_cache(pulls)
+            self.cache.items_to_cache(pulls)
 
             logging.debug("Rate limit: %s" %
                           (r.headers['X-RateLimit-Remaining']))
@@ -251,8 +214,6 @@ class GitHub(Backend):
                          % (page, last_page, eta_min))
 
             page += 1
-
-        self._close_cache()
 
         return self
 
