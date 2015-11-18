@@ -84,9 +84,9 @@ class Backend(object):
         self.incremental = incremental
 
         # Create storage dir if it not exists
-        dump_dir = self._get_storage_dir()
-        if not os.path.isdir(dump_dir):
-            os.makedirs(dump_dir)
+        storage_dir = self._get_storage_dir()
+        if not os.path.isdir(storage_dir):
+            os.makedirs(storage_dir)
 
         if self.use_cache:
             # Don't use history data. Will be generated from cache.

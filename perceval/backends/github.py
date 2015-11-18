@@ -90,12 +90,6 @@ class GitHub(Backend):
         pass  # Last state now stored in ES
 
 
-    def _dump_state(self):
-        ''' Dump JSON full data to storage '''
-
-        pass  # Last state dumped to ES
-
-
     def fetch(self):
         ''' Returns an iterator for the data gathered '''
 

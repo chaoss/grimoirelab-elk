@@ -88,12 +88,6 @@ class Bugzilla(Backend):
         pass  # Last state now stored in ES
 
 
-    def _dump_state(self):
-        ''' Dump JSON full data to storage '''
-
-        pass  # Last state dumped to ES
-
-
     def _get_name(self):
 
         return Bugzilla._name
@@ -429,7 +423,6 @@ class Bugzilla(Backend):
 
 
                 # Each time we receive data from bugzilla server dump it
-                # self._dump_state()
                 self._items_state_to_es(issues)
 
                 issues_processed += issues

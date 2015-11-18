@@ -108,14 +108,6 @@ class Gerrit(Backend):
         pass  # It is done when getting reviews
 
 
-    def _dump_state(self):
-        ''' Dump JSON full data to storage (ES)'''
-
-        # See _reviews_state_to_es
-
-        pass
-
-
     def _get_version(self):
         gerrit_cmd_prj = self.gerrit_cmd + " version "
 
