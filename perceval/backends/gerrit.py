@@ -32,9 +32,8 @@ import json
 import logging
 import os
 import re
-import requests
 import subprocess
-from perceval.utils import get_eta, remove_last_char_from_file
+from perceval.utils import get_eta
 
 from perceval.backends.backend import Backend
 
@@ -71,7 +70,6 @@ class Gerrit(Backend):
         self.nreviews = nreviews
         self.reviews = []  # All reviews from gerrit
         self.projects = []  # All projects from gerrit
-        self.cache = {}  # cache projects listing
         self.url = repository
         self.elastic = None  # used for dump and restore
 
@@ -93,6 +91,11 @@ class Gerrit(Backend):
 
         return self._get_name() + "_" + self.url
 
+
+    def _get_field_unique_id(self):
+        return "id"
+
+
     def get_url(self):
 
         return self.url
@@ -111,49 +114,6 @@ class Gerrit(Backend):
         # See _reviews_state_to_es
 
         pass
-
-
-
-    def _clean_cache(self):
-
-        filelist = [ f for f in os.listdir(self._get_storage_dir()) if
-                    f.startswith("cache_issue_") ]
-        for f in filelist:
-            os.remove(os.path.join(self._get_storage_dir(), f))
-
-
-    def _close_cache(self):
-
-        pass  # not needed in gerrit
-
-
-    def _reviews_to_cache(self, reviews):
-        ''' Update pull requests cache files  '''
-
-        for review in reviews:
-
-            data_json = json.dumps(review)
-            cache_file = os.path.join(self._get_storage_dir(),
-                          "cache_review_%s.json" % (review['id']))
-
-            with open(cache_file, "w") as cache:
-                cache.write(data_json)
-
-
-    def _get_reviews_from_cache(self):
-        logging.info("Reading reviews from cache")
-        # Just read all issues cache files
-        filelist = [ f for f in os.listdir(self._get_storage_dir()) if
-                    f.startswith("cache_review_") ]
-        logging.debug("Total reviews in cache: %i" % (len(filelist)))
-        for f in filelist:
-            fname = os.path.join(self._get_storage_dir(), f)
-            with open(fname,"r") as f:
-                review = json.loads(f.read())
-                self.reviews.append(review)
-        logging.info("Cache read completed")
-
-        return self
 
 
     def _get_version(self):
@@ -183,24 +143,18 @@ class Gerrit(Backend):
 
         logging.debug("Getting list of gerrit projects")
 
-        if self.use_cache:
-            projects = self.cache['projects']
-        else:
-            gerrit_cmd_projects = self.gerrit_cmd + "ls-projects "
-            projects_raw = subprocess.check_output(gerrit_cmd_projects, shell = True)
+        gerrit_cmd_projects = self.gerrit_cmd + "ls-projects "
+        projects_raw = subprocess.check_output(gerrit_cmd_projects, shell = True)
 
 
-            projects_raw = str(projects_raw, 'UTF-8')
-            projects = projects_raw.split("\n")
-            projects.pop() # Remove last empty line
+        projects_raw = str(projects_raw, 'UTF-8')
+        projects = projects_raw.split("\n")
+        projects.pop() # Remove last empty line
 
         logging.debug("Done")
 
 
         return projects
-
-    def _get_field_unique_id(self):
-        return "id"
 
     def _get_server_reviews(self, project = None):
         """ Get all reviews for all or for a project """
@@ -274,7 +228,7 @@ class Gerrit(Backend):
                     number_results = entry['rowCount']
 
 
-        self._reviews_to_cache(reviews)
+        self.cache.items_to_cache(reviews)
         self._items_state_to_es(reviews)
 
         if self.incremental:
@@ -307,8 +261,11 @@ class Gerrit(Backend):
     def get_reviews(self):
 
         if self.use_cache:
-            self._get_reviews_from_cache()
+            for item in self.cache.items_from_cache():
+                review = item
+                self.reviews.append(review)
             return self.reviews
+
 
         # First we need all projects
         projects = self._get_projects()
