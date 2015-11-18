@@ -79,7 +79,7 @@ class Backend(object):
     def __init__(self, use_cache = False, incremental = True):
 
         self.cache = CacheItems(self._get_storage_dir(), 
-                                self._get_field_unique_id())
+                                self.get_field_unique_id())
         self.use_cache = use_cache
         self.incremental = incremental
 
@@ -100,7 +100,7 @@ class Backend(object):
                 self.cache.clean()  # Cache will be refreshed
 
 
-    def _get_field_unique_id(self):
+    def get_field_unique_id(self):
         ''' Field with the unique id for the JSON items '''
         raise NotImplementedError
 
@@ -111,23 +111,11 @@ class Backend(object):
         if len(json_items) == 0:
             return
 
-        field_id = self._get_field_unique_id()
+        field_id = self.get_field_unique_id()
 
-        elasticsearch_type = "state"
-        url = self.elastic.index_url+'/'+elasticsearch_type+'/_bulk'
+        es_type = "state"
 
-        logging.debug("Adding %i items (%s state) to %s" % (len(json_items),
-                                                            self._get_name(),
-                                                            url))
-
-        bulk_json = ""
-        for item in json_items:
-            data_json = json.dumps(item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
-            bulk_json += data_json +"\n"  # Bulk document
-
-        requests.put(url, data=bulk_json)
-
+        self.elastic.bulk_upload(es_type, json_items, field_id)
 
     def _restore_state(self):
         ''' Restore data source state from last execution '''

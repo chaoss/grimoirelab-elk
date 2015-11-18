@@ -112,7 +112,7 @@ class GitHub(Backend):
 
         return _id.lower()
 
-    def _get_field_unique_id(self):
+    def get_field_unique_id(self):
         return "id"
 
 

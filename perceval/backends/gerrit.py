@@ -92,7 +92,7 @@ class Gerrit(Backend):
         return self._get_name() + "_" + self.url
 
 
-    def _get_field_unique_id(self):
+    def get_field_unique_id(self):
         return "id"
 
 
