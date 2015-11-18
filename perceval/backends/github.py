@@ -202,63 +202,62 @@ class GitHub(Backend):
 
     def getIssuesPullRequests(self):
 
-        _type = "issues_pullrequests"
-        last_page = page = 1
-
         if self.use_cache:
             return self._get_pull_requests_from_cache()
 
-        else:
-            last_update = self.getLastUpdateFromES(_type)
-            if last_update is not None:
+        _type = "issues_pullrequests"
+        last_page = page = 1
 
-                logging.info("Github issues API broken for incremental analysis")
-                self.incremental = False
+        last_update = self.getLastUpdateFromES(_type)
+        if last_update is not None:
 
-                if self.incremental:
-                    logging.info("Getting issues since: " + last_update)
-                    self.url += "&since="+last_update
+            logging.info("Github issues API broken for incremental analysis")
+            self.incremental = False
 
-            url_next = self.url
+            if self.incremental:
+                logging.info("Getting issues since: " + last_update)
+                self.url += "&since="+last_update
 
-            while url_next:
-                task_init = datetime.now()
+        url_next = self.url
 
-                logging.info("Get issues pulls requests from " + url_next)
-                r = requests.get(url_next, verify=False,
-                                 headers={'Authorization':'token ' + self.auth_token})
-                issues = r.json()
+        while url_next:
+            task_init = datetime.now()
 
-                pulls = self._find_pull_requests(issues)
+            logging.info("Get issues pulls requests from " + url_next)
+            r = requests.get(url_next, verify=False,
+                             headers={'Authorization':'token ' + self.auth_token})
+            issues = r.json()
 
-                self.pull_requests += pulls
-                self._items_state_to_es(pulls)
-                self._pull_requests_to_cache(pulls)
+            pulls = self._find_pull_requests(issues)
 
-                logging.debug("Rate limit: %s" %
-                              (r.headers['X-RateLimit-Remaining']))
+            self.pull_requests += pulls
+            self._items_state_to_es(pulls)
+            self._pull_requests_to_cache(pulls)
 
-                url_next = None
-                if 'next' in r.links:
-                    url_next = r.links['next']['url']  # Loving requests :)
+            logging.debug("Rate limit: %s" %
+                          (r.headers['X-RateLimit-Remaining']))
 
-                if last_page == 1:
-                    if 'last' in r.links:
-                        last_page = r.links['last']['url'].split('&page=')[1].split('&')[0]
-                        last_page = int(last_page)
+            url_next = None
+            if 'next' in r.links:
+                url_next = r.links['next']['url']  # Loving requests :)
 
-                logging.info("Page: %i/%i" % (page, last_page))
+            if last_page == 1:
+                if 'last' in r.links:
+                    last_page = r.links['last']['url'].split('&page=')[1].split('&')[0]
+                    last_page = int(last_page)
 
-                task_time = (datetime.now() - task_init).total_seconds()
-                eta_time = task_time * (last_page - page )
-                eta_min = eta_time / 60.0
+            logging.info("Page: %i/%i" % (page, last_page))
 
-                logging.info("Completed %i/%i (ETA: %.2f min)" \
-                             % (page, last_page, eta_min))
+            task_time = (datetime.now() - task_init).total_seconds()
+            eta_time = task_time * (last_page - page )
+            eta_min = eta_time / 60.0
 
-                page += 1
+            logging.info("Completed %i/%i (ETA: %.2f min)" \
+                         % (page, last_page, eta_min))
 
-            self._close_cache()
+            page += 1
+
+        self._close_cache()
 
         return self
 
