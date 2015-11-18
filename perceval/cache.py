@@ -77,6 +77,6 @@ class CacheItems(object):
                 self.cache.append(item)
 
         task_time = (datetime.now() - task_init).total_seconds()
-        logging.debug("Cache read in %.2f min" % (task_time))
+        logging.debug("Cache read in %.2f secs" % (task_time))
 
         return self.cache
