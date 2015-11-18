@@ -342,8 +342,28 @@ class Bugzilla(Backend):
         domain = urljoin(result.scheme + '://' + result.netloc + '/', newpath)
         return domain
 
+    def _get_issues_from_cache(self):
+        logging.info("Reading issues from cache")
+        # Just read all issues cache files
+        filelist = [ f for f in os.listdir(self._get_storage_dir()) if
+                    f.startswith("cache_issue_") ]
+        logging.debug("Total issues in cache: %i" % (len(filelist)))
+        for f in filelist:
+            fname = os.path.join(self._get_storage_dir(), f)
+            with open(fname,"r") as f:
+                issue = json.loads(f.read())
+                xml = ElementTree.fromstring(issue['xml'])
+                html = issue['html']
+                csv = None
+                issue_processed = self._get_issue_json(csv, xml, html)
+                self.issues.append(issue_processed)
+        return self
+
 
     def fetch(self):
+
+        if self.use_cache:
+            return self._get_issues_from_cache()
 
         def get_issues_list_url(base_url, version, from_date_str=None):
             # from_date should be increased in 1s to not include last issue
@@ -504,30 +524,9 @@ class Bugzilla(Backend):
 
             return issues_processed
 
-        def get_issues_from_cache():
-            logging.info("Reading issues from cache")
-            # Just read all issues cache files
-            filelist = [ f for f in os.listdir(self._get_storage_dir()) if
-                        f.startswith("cache_issue_") ]
-            logging.debug("Total issues in cache: %i" % (len(filelist)))
-            for f in filelist:
-                fname = os.path.join(self._get_storage_dir(), f)
-                with open(fname,"r") as f:
-                    issue = json.loads(f.read())
-                    xml = ElementTree.fromstring(issue['xml'])
-                    html = issue['html']
-                    csv = None
-                    issue_processed = self._get_issue_json(csv, xml, html)
-                    self.issues.append(issue_processed)
-            return self
-
-
         _type = "issues"
 
         logging.info("Getting issues from Bugzilla")
-
-        if self.use_cache:
-            return get_issues_from_cache()
 
         last_update = self._get_last_update_date()
 
