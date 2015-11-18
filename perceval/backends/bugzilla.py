@@ -139,24 +139,8 @@ class Bugzilla(Backend):
         return last_update
 
     def _load_cache(self):
-        ''' Load all cache files in memory '''
 
         pass  # Now the cache is loaded one issue at a time
-
-        return
-
-        fname = os.path.join(self._get_storage_dir(),
-                             "cache_issues_list_csv.json")
-        with open(fname,"r") as f:
-            self.cache['issues_list'] = json.loads(f.read())
-
-        fname = os.path.join(self._get_storage_dir(), "cache_issues_xml.json")
-        with open(fname,"r") as f:
-            self.cache['issues'] = json.loads(f.read())
-
-        fname = os.path.join(self._get_storage_dir(), "cache_changes_html.json")
-        with open(fname,"r") as f:
-            self.cache['changes'] = json.loads(f.read())
 
 
     def _clean_cache(self):

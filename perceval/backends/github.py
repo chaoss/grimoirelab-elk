@@ -118,34 +118,19 @@ class GitHub(Backend):
 
 
     def _load_cache(self):
-        ''' Load all cache files in memory '''
 
-        fname = os.path.join(self._get_storage_dir(),
-                             "cache_pull_requests.json")
-        with open(fname,"r") as f:
-            self.cache['pull_requests'] = json.loads(f.read())
+        pass  # Now the cache is loaded one issue at a time
 
 
     def _clean_cache(self):
-        cache_files = ["cache_pull_requests.json"]
-
-        for name in cache_files:
-            fname = os.path.join(self._get_storage_dir(), name)
-            with open(fname,"w") as f:
-                f.write("[")
-
-        cache_keys = ['pull_requests']
-
-        for _id in cache_keys:
-            self.cache[_id] = []
+        filelist = [ f for f in os.listdir(self._get_storage_dir()) if
+                    f.startswith("cache_pull_request_") ]
+        for f in filelist:
+            os.remove(os.path.join(self._get_storage_dir(), f))
 
     def _close_cache(self):
-        cache_file = os.path.join(self._get_storage_dir(),
-                                  "cache_pull_requests.json")
 
-        remove_last_char_from_file(cache_file)
-        with open(cache_file,"a") as f:
-                f.write("]")
+        pass  # nothing is needed in github
 
 
     def getLastUpdateFromES(self, _type):
@@ -153,21 +138,6 @@ class GitHub(Backend):
         last_update = self.elastic.get_last_date(_type, 'updated_at')
 
         return last_update
-
-    def _pull_requests_to_cache(self, pull_requests):
-        ''' Append to pull request JSON cache '''
-
-        cache_file = os.path.join(self._get_storage_dir(),
-                                  "cache_pull_requests.json")
-
-        with open(cache_file, "a") as cache:
-
-            data_json = json.dumps(pull_requests)
-            data_json = data_json[1:-1]  # remove []
-            data_json += "," # join between arrays
-            # We need to add the array to an already existing array
-            cache.write(data_json)
-
 
     def getUser(self, url, login):
 
@@ -202,13 +172,41 @@ class GitHub(Backend):
 
         return pulls
 
+    def _pull_requests_to_cache(self, pull_requests):
+        ''' Update pull requests cache files  '''
+
+        for pull in pull_requests:
+
+            data_json = json.dumps(pull)
+            cache_file = os.path.join(self._get_storage_dir(),
+                          "cache_pull_request_%s.json" % (pull['id']))
+
+            with open(cache_file, "w") as cache:
+                cache.write(data_json)
+
+
+    def _get_pull_requests_from_cache(self):
+        logging.info("Reading issues from cache")
+        # Just read all issues cache files
+        filelist = [ f for f in os.listdir(self._get_storage_dir()) if
+                    f.startswith("cache_pull_request_") ]
+        logging.debug("Total pull requests in cache: %i" % (len(filelist)))
+        for f in filelist:
+            fname = os.path.join(self._get_storage_dir(), f)
+            with open(fname,"r") as f:
+                issue = json.loads(f.read())
+                self.pull_requests.append(issue)
+        logging.info("Cache read completed")
+        return self
+
 
     def getIssuesPullRequests(self):
+
         _type = "issues_pullrequests"
         last_page = page = 1
 
         if self.use_cache:
-            self.pull_requests =  self.cache['pull_requests']
+            return self._get_pull_requests_from_cache()
 
         else:
             last_update = self.getLastUpdateFromES(_type)
