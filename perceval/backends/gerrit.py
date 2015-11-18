@@ -262,10 +262,8 @@ class Gerrit(Backend):
 
         if self.use_cache:
             for item in self.cache.items_from_cache():
-                review = item
-                self.reviews.append(review)
+                self.reviews.append(item)
             return self.reviews
-
 
         # First we need all projects
         projects = self._get_projects()
