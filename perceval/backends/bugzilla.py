@@ -147,21 +147,21 @@ class Bugzilla(Backend):
             os.unlink(f)
 
 
-    def _get_field_unique_id(self):
+    def get_field_unique_id(self):
         return "bug_id"
 
 
     def _issue_to_cache_item(self, issue_xml, changes_html):
         bug = issue_xml
-        issue_id = bug.findall('bug_id')[0].text
+        bug_id = bug.findall('bug_id')[0].text
         # TODO.: detect XML enconding and use it
         # xml = {"xml": ElementTree.tostring(bug, encoding="us-ascii")}
         xml_string = ElementTree.tostring(bug, encoding="utf-8")
         # xml_string is of type b'' byte stream in Python3
         xml_string = xml_string.decode('utf-8')
-        item = {"issue_id": issue_id,
-                 "xml": xml_string,
-                 "html": changes_html}
+        item = {"bug_id": bug_id,
+                "xml": xml_string,
+                "html": changes_html}
         return item
 
 
