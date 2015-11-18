@@ -72,7 +72,9 @@ if __name__ == '__main__':
     egerrit = GerritElastic(gerrit, elastic, args.sortinghat_db,
                             args.projects_grimoirelib_db,
                             args.gerrit_grimoirelib_db)
-    egerrit.reviews_to_es()
+
+    for review in gerrit.fetch():
+        egerrit.fetch_events(review)
 
     total_time_min = (datetime.now()-app_init).total_seconds()/60
 

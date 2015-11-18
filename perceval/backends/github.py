@@ -60,7 +60,6 @@ class GitHub(Backend):
         self.owner = owner
         self.repository = repository
         self.auth_token = auth_token
-        self.pull_requests = []  # All pull requests from github repo
         self.url = self._get_url()
 
         super(GitHub, self).__init__(use_cache, incremental)
@@ -83,17 +82,6 @@ class GitHub(Backend):
 
         return url
 
-
-    def _restore_state(self):
-        '''Restore JSON full data from storage '''
-
-        pass  # Last state now stored in ES
-
-
-    def fetch(self):
-        ''' Returns an iterator for the data gathered '''
-
-        return self.getIssuesPullRequests()
 
     def _get_name(self):
 
@@ -150,12 +138,14 @@ class GitHub(Backend):
         return pulls
 
 
-    def getIssuesPullRequests(self):
+    def fetch(self):
+        ''' Returns an iterator for the data gathered '''
 
         if self.use_cache:
+            items_cache = []
             for item in self.cache.items_from_cache():
-                self.pull_requests.append(item)
-            self._items_to_es(self.pull_requests)
+                items_cache.append(item)
+            self._items_to_es(items_cache)
             return self
 
         _type = "issues_pullrequests"
@@ -183,7 +173,6 @@ class GitHub(Backend):
 
             pulls = self._find_pull_requests(issues)
 
-            self.pull_requests += pulls
             self._items_to_es(pulls)
             self.cache.items_to_cache(pulls)
 
@@ -211,20 +200,4 @@ class GitHub(Backend):
             page += 1
 
         return self
-
-    # Iterator
-    def __iter__(self):
-
-        self.iter = 0
-        return self
-
-    def __next__(self):
-
-        if self.iter == len(self.pull_requests):
-            raise StopIteration
-        item = self.pull_requests[self.iter]
-
-        self.iter += 1
-
-        return item
 

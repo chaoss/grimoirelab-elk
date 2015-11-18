@@ -38,6 +38,7 @@ class CacheItems(object):
 
     def clean(self):
         logging.debug("Cleaning cache")
+        # TODO: move current cache to cache_recover
         filelist = [ f for f in os.listdir(self.cache_dir) if
                     f.startswith("cache_item_") ]
         for f in filelist:

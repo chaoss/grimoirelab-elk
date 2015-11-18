@@ -68,16 +68,12 @@ class Gerrit(Backend):
         self.gerrit_user = user
         self.project = repository
         self.nreviews = nreviews
-        self.reviews = []  # All reviews from gerrit
         self.projects = []  # All projects from gerrit
         self.url = repository
-        self.elastic = None  # used for dump and restore
+        self.elastic = None
 
         self.gerrit_cmd  = "ssh -p 29418 %s@%s" % (user, repository)
         self.gerrit_cmd += " gerrit "
-
-        # self.max_reviews = 50000  # around 2 GB of RAM
-        self.max_reviews = 1000 * 100
 
         super(Gerrit, self).__init__(use_cache, incremental)
 
@@ -99,13 +95,6 @@ class Gerrit(Backend):
     def get_url(self):
 
         return self.url
-
-    def _restore_state(self):
-        '''Restore JSON full data from storage (ES) '''
-
-        # See last_date to start from last gerrit state
-
-        pass  # It is done when getting reviews
 
 
     def _get_version(self):
@@ -230,13 +219,6 @@ class Gerrit(Backend):
 
         return reviews
 
-    def _memory_usage(self):
-        # return the memory usage in MB
-        import psutil
-        process = psutil.Process(os.getpid())
-        mem = process.get_memory_info()[0] / float(2 ** 20)
-        return mem
-
     def _get_last_date(self, project = None):
 
         _filter = None
@@ -250,13 +232,14 @@ class Gerrit(Backend):
                                           _filter)
 
 
-    def get_reviews(self):
+    def fetch(self):
 
         if self.use_cache:
+            reviews_cache = []
             for item in self.cache.items_from_cache():
-                self.reviews.append(item)
-            self._items_to_es(self.reviews)
-            return self.reviews
+                reviews_cache.append(item)
+            self._items_to_es(reviews_cache)
+            return self
 
         # First we need all projects
         projects = self._get_projects()
@@ -268,7 +251,8 @@ class Gerrit(Backend):
             # if repository != "openstack/cinder": continue
             task_init = datetime.now()
 
-            self.reviews += self._get_server_reviews(project)
+            reviews_prj = self._get_server_reviews(project)
+            self._items_to_es(reviews_prj)
 
             task_time = (datetime.now() - task_init).total_seconds()
             eta_time = task_time * (total-current_repo)
@@ -277,18 +261,9 @@ class Gerrit(Backend):
             logging.info("Completed %s %i/%i (ETA: %.2f min)\n" \
                              % (project, current_repo, total, eta_min))
 
-
-            if len(self.reviews) >= self.max_reviews:
-                # 5 GB RAM memory usage
-                logging.error("Max reviews reached: %i " % (self.max_reviews))
-                break
-
-            logging.debug ("Total reviews in memory: %i" % (len(self.reviews)))
-            logging.debug ("Total memory: %i MB" % (self._memory_usage()))
-
             current_repo += 1
 
-        return self.reviews
+        return self
 
     def _get_reviews_all(self):
         """ Get all reviews from the repository  """

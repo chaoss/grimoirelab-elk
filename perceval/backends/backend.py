@@ -92,11 +92,8 @@ class Backend(object):
             # Don't use history data. Will be generated from cache.
             self.incremental = False
 
-        if self.incremental:
-            self._restore_state()  # Load last state
-
         else:
-            if not self.use_cache:
+            if not self.incremental:
                 self.cache.clean()  # Cache will be refreshed
 
 
@@ -119,12 +116,6 @@ class Backend(object):
         es_type = "state"
 
         self.elastic.bulk_upload(es_type, json_items, field_id)
-
-
-    def _restore_state(self):
-        ''' Restore data source state from last execution '''
-        logging.info("State restore not implemented. Incremental disabled.")
-        self.incremental = False
 
 
     def _get_name(self):

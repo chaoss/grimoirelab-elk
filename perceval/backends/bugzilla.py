@@ -80,12 +80,6 @@ class Bugzilla(Backend):
         super(Bugzilla, self).__init__(use_cache, incremental)
 
 
-    def _restore_state(self):
-        '''Restore JSON full data from storage '''
-
-        pass  # Last state now stored in ES
-
-
     def _get_name(self):
 
         return Bugzilla._name
@@ -481,7 +475,6 @@ class Bugzilla(Backend):
         logging.info("Total issues gathered %i" % total_issues)
 
         return self  # iterator
-
 
 
 class BugzillaChangesHTMLParser(object):

@@ -263,6 +263,7 @@ class GitHubElastic(object):
                 requests.put(url, data=bulk_json)
                 bulk_json = ""
                 current = 0
+
             rich_pull = self.getRichPull(pull)
             data_json = json.dumps(rich_pull)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_pull["id"])

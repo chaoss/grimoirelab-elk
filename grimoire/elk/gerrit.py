@@ -68,14 +68,6 @@ class GerritElastic(object):
                 comment['timestamp'] = time.strftime('%Y-%m-%dT%H:%M:%S',
                                                      time.localtime(cdate_ts))
 
-    def reviews_to_es (self):
-
-        field_id = self.gerrit.get_field_unique_id()
-
-        es_type = "reviews"
-
-        self.elastic.bulk_upload(es_type, self.gerrit.get_reviews(), field_id)
-
 
     @classmethod
     def get_elastic_mappings(cls):
