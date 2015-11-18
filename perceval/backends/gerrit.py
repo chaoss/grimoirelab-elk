@@ -221,7 +221,7 @@ class Gerrit(Backend):
 
 
         self.cache.items_to_cache(reviews)
-        self._items_state_to_es(reviews)
+        self._items_to_es(reviews)
 
         if self.incremental:
             logging.info("Total new reviews: %i" % len(reviews))
@@ -255,6 +255,7 @@ class Gerrit(Backend):
         if self.use_cache:
             for item in self.cache.items_from_cache():
                 self.reviews.append(item)
+            self._items_to_es(self.reviews)
             return self.reviews
 
         # First we need all projects

@@ -83,8 +83,8 @@ class ElasticSearch(object):
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
-        requests.put(url, data=bulk_json)
 
+        requests.put(url, data=bulk_json)
 
 
     def create_mapping(self, mappings):

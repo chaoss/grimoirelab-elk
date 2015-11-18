@@ -155,6 +155,7 @@ class GitHub(Backend):
         if self.use_cache:
             for item in self.cache.items_from_cache():
                 self.pull_requests.append(item)
+            self._items_to_es(self.pull_requests)
             return self
 
         _type = "issues_pullrequests"
@@ -183,7 +184,7 @@ class GitHub(Backend):
             pulls = self._find_pull_requests(issues)
 
             self.pull_requests += pulls
-            self._items_state_to_es(pulls)
+            self._items_to_es(pulls)
             self.cache.items_to_cache(pulls)
 
             logging.debug("Rate limit: %s" %

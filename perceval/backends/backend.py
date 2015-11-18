@@ -105,8 +105,11 @@ class Backend(object):
         raise NotImplementedError
 
 
-    def _items_state_to_es(self, json_items):
+    def _items_to_es(self, json_items):
         ''' Append items JSON to ES (data source state) '''
+
+        logging.debug("Adding items to state for %s (%i items)" %
+                      (self._get_name(), len(json_items)))
 
         if len(json_items) == 0:
             return
@@ -116,6 +119,7 @@ class Backend(object):
         es_type = "state"
 
         self.elastic.bulk_upload(es_type, json_items, field_id)
+
 
     def _restore_state(self):
         ''' Restore data source state from last execution '''
@@ -135,4 +139,43 @@ class Backend(object):
         _dir = join(home, ".perceval", self._get_name(), self.get_id())
 
         return _dir
+
+
+    # Iterator
+
+    def _get_elastic_items(self):
+
+        elastic_type = "state"
+        url = self.elastic.index_url + "/" + elastic_type
+        url += "/_search?from=%i&size=%i" % (self.elastic_from,
+                                            self.elastic_page)
+
+        r = requests.get(url)
+
+        items = []
+
+        for hit in r.json()["hits"]["hits"]:
+            items.append(hit['_source'])
+
+        return items
+
+    def __iter__(self):
+
+        self.elastic_from = 0
+        self.elastic_page = 100
+        self.iter_items = self._get_elastic_items()
+
+        return self
+
+    def __next__(self):
+
+        if len(self.iter_items) > 0:
+            return self.iter_items.pop()
+        else:
+            self.elastic_from += self.elastic_page
+            self.iter_items = self._get_elastic_items()
+            if len(self.iter_items) > 0:
+                return self.__next__()
+            else:
+                raise StopIteration
 

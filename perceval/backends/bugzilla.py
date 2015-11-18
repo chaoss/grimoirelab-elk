@@ -76,8 +76,6 @@ class Bugzilla(Backend):
         self.bugzilla_version = self._get_version()
         self.nissues = nissues
         self.detail = detail
-        self.issues = []  # All issues gathered from XML data
-        self.issues_from_csv = []  # All issues gathered from CSV data
 
         super(Bugzilla, self).__init__(use_cache, incremental)
 
@@ -286,9 +284,12 @@ class Bugzilla(Backend):
     def fetch(self):
 
         if self.use_cache:
+            issues_cache = []
             for item in self.cache.items_from_cache():
                 issue = self._cache_item_to_issue(item)
-                self.issues.append(issue)
+                issues_cache.append(issue)
+            self._items_to_es(issues_cache)
+
             return self
 
         def get_issues_list_url(base_url, version, from_date_str=None):
@@ -343,9 +344,12 @@ class Bugzilla(Backend):
 
             csv = content.split('\n')[1:]
 
-            for line in csv:
-                issue = self._get_issue_json(csv_line = line)
-                self.issues_from_csv.append(issue)
+            if self.detail == "lines":
+                issues = []
+                for line in csv:
+                    issue = self._get_issue_json(csv_line = line)
+                    issues.append(issue)
+                self.issues_to_es(issues)
 
             ids = []
             for line in csv:
@@ -423,7 +427,7 @@ class Bugzilla(Backend):
 
 
                 # Each time we receive data from bugzilla server dump it
-                self._items_state_to_es(issues)
+                self._items_to_es(issues)
 
                 issues_processed += issues
 
@@ -433,8 +437,8 @@ class Bugzilla(Backend):
 
                 logging.info("Completed %i/%i (ETA iteration: %.2f min)" \
                              % (len(issues_processed), total, eta_min))
-
             return issues_processed
+
 
         _type = "issues"
 
@@ -462,8 +466,6 @@ class Bugzilla(Backend):
                 logging.info("Issues received in this iteration %i" %
                              len(issues_processed))
                 total_issues += len(issues_processed)
-                self.issues += issues_processed
-
             else:
                 total_issues += len(ids)
 
@@ -480,27 +482,6 @@ class Bugzilla(Backend):
 
         return self  # iterator
 
-
-    # Iterator
-    def __iter__(self):
-
-        self.iter = 0
-        return self
-
-    def __next__(self):
-
-        if self.detail == "list":
-            if self.iter == len(self.issues_from_csv):
-                raise StopIteration
-            item = self.issues_from_csv[self.iter]
-        else:
-            if self.iter == len(self.issues):
-                raise StopIteration
-            item = self.issues[self.iter]
-
-        self.iter += 1
-
-        return item
 
 
 class BugzillaChangesHTMLParser(object):
