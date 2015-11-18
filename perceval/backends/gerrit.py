@@ -80,6 +80,7 @@ class Gerrit(Backend):
 
         # self.max_reviews = 50000  # around 2 GB of RAM
         self.max_reviews = 1000 * 50
+        self.max_reviews = 1000 * 10
 
         super(Gerrit, self).__init__(use_cache, incremental)
 
@@ -116,46 +117,16 @@ class Gerrit(Backend):
     def _load_cache(self):
         ''' Load all cache files in memory '''
 
-        fname = os.path.join(self._get_storage_dir(),
-                             "cache_projects.json")
-        with open(fname,"r") as f:
-            self.cache['projects'] = json.loads(f.read())
-
-
-        return  # Having all cache in memory does not scale
-
-        self.cache['reviews'] = {}
-
-        for project in self.cache['projects']:
-            pname = project.replace("/","_")
-            fname = os.path.join(self._get_storage_dir(),
-                                 'cache_'+ pname +"-reviews.json")
-            if not os.path.exists(fname):
-                logging.debug("Cache incomplete. Not found: %s" % (fname))
-                continue
-
-            with open(fname,"r") as f:
-                self.cache['reviews'][pname] = json.loads(f.read())
-
-    def _load_cache_project(self, project):
-
-        reviews = None
-
-        pname = project.replace("/","_")
-        fname = os.path.join(self._get_storage_dir(),
-                             'cache_'+ pname +"-reviews.json")
-
-        if not os.path.exists(fname):
-            logging.debug("Cache incomplete. Not found: %s" % (fname))
-        else:
-            with open(fname,"r") as f:
-                logging.debug("Loaded from cache: %s" % (project))
-                reviews = json.loads(f.read())
-
-        return reviews
+        pass # Now the cache is loaded one issue at a time
 
 
     def _clean_cache(self):
+
+        filelist = [ f for f in os.listdir(self._get_storage_dir()) if
+                    f.startswith("cache_issue_") ]
+        for f in filelist:
+            os.remove(os.path.join(self._get_storage_dir(), f))
+
         cache_files = ["cache_projects.json"]
 
         for name in cache_files:
@@ -166,42 +137,39 @@ class Gerrit(Backend):
                 else:
                     f.write("[")
 
-        cache_keys = ['projects']
-
-        for _id in cache_keys:
-            self.cache[_id] = []
 
     def _close_cache(self):
-        cache_file = os.path.join(self._get_storage_dir(),
-                                  "cache_reviews.json")
 
-        remove_last_char_from_file(cache_file)
-        with open(cache_file,"a") as f:
-                f.write("]")
-
-    def _projects_to_cache(self, projects):
-        ''' Append to projects JSON cache '''
-
-        cache_file = os.path.join(self._get_storage_dir(),
-                                  "cache_projects.json")
-
-        with open(cache_file, "w") as cache:  # Complete list always
-            data_json = json.dumps(projects)
-            cache.write(data_json)
+        pass  # not needed in gerrit
 
 
-    def _project_reviews_to_cache(self, project, reviews):
-        ''' Append to reviews JSON cache '''
+    def _reviews_to_cache(self, reviews):
+        ''' Update pull requests cache files  '''
 
-        project = project.replace("/","_")
+        for review in reviews:
 
-        cache_file = os.path.join(self._get_storage_dir(),
-                                  "cache_%s-reviews.json" % (project))
+            data_json = json.dumps(review)
+            cache_file = os.path.join(self._get_storage_dir(),
+                          "cache_review_%s.json" % (review['id']))
 
-        with open(cache_file, "w") as cache:
-            data_json = json.dumps(reviews)
-            cache.write(data_json)
+            with open(cache_file, "w") as cache:
+                cache.write(data_json)
 
+
+    def _get_reviews_from_cache(self):
+        logging.info("Reading reviews from cache")
+        # Just read all issues cache files
+        filelist = [ f for f in os.listdir(self._get_storage_dir()) if
+                    f.startswith("cache_review_") ]
+        logging.debug("Total reviews in cache: %i" % (len(filelist)))
+        for f in filelist:
+            fname = os.path.join(self._get_storage_dir(), f)
+            with open(fname,"r") as f:
+                review = json.loads(f.read())
+                self.reviews.append(review)
+        logging.info("Cache read completed")
+
+        return self
 
 
     def _get_version(self):
@@ -242,8 +210,6 @@ class Gerrit(Backend):
             projects = projects_raw.split("\n")
             projects.pop() # Remove last empty line
 
-            self._projects_to_cache(projects)
-
         logging.debug("Done")
 
 
@@ -259,15 +225,6 @@ class Gerrit(Backend):
             logging.info("Getting reviews for: %s" % (project))
         else:
             logging.info("Getting all reviews")
-
-        if self.use_cache:
-            if project:
-                reviews = self._load_cache_project(project)
-            else:
-                logging.warn("Can't use cache for all repository reviews")
-
-            if reviews:
-                return reviews
 
         last_update = self._get_last_date(project)
 
@@ -332,10 +289,8 @@ class Gerrit(Backend):
                     # logging.info("CONTINUE FROM: " + str(last_item))
                     number_results = entry['rowCount']
 
-            # Raw cache and all JSON are the same in gerrit
-        if not self.incremental:
-            if project:
-                self._project_reviews_to_cache(project, reviews)
+
+        self._reviews_to_cache(reviews)
         self._items_state_to_es(reviews)
 
         if self.incremental:
@@ -366,6 +321,11 @@ class Gerrit(Backend):
 
 
     def get_reviews(self):
+
+        if self.use_cache:
+            self._get_reviews_from_cache()
+            return self.reviews
+
         # First we need all projects
         projects = self._get_projects()
 
@@ -384,8 +344,6 @@ class Gerrit(Backend):
 
             logging.info("Completed %s %i/%i (ETA: %.2f min)\n" \
                              % (project, current_repo, total, eta_min))
-
-
 
 
             if len(self.reviews) >= self.max_reviews:
