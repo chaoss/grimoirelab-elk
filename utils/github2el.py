@@ -53,7 +53,7 @@ if __name__ == '__main__':
     es_mappings = GitHubElastic.get_elastic_mappings()
 
     github = GitHub(args.owner, args.repository, args.token, args.cache,
-                    args.no_incremental)
+                    not args.no_incremental)
 
     try:
         elastic = ElasticSearch(args.elastic_host,
