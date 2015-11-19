@@ -57,8 +57,8 @@ def get_time_diff_days(start_txt, end_txt):
     if start_txt is None or end_txt is None:
         return None
 
-    start = parser.parse(end_txt)
-    end = parser.parse(start_txt)
+    start = parser.parse(start_txt)
+    end = parser.parse(end_txt)
 
     seconds_day = float(60*60*24)
     diff_days = \
