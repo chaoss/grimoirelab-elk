@@ -116,7 +116,8 @@ class Bugzilla(Backend):
         if self.detail == "list":
             last_update = self.elastic.get_last_date("changeddate_date")
             # Format date so it can be used as URL param in bugzilla
-            last_update = last_update.replace("T", " ")
+            if last_update is not None:
+                last_update = last_update.replace("T", " ")
         else:
             last_update = self.elastic.get_last_date("delta_ts_date")
 
@@ -124,38 +125,42 @@ class Bugzilla(Backend):
 
 
 
-    def _clean_state(self):
-        ''' Remove last state from previous downloads of the data source '''
-
-        filelist = [ f for f in os.listdir(self._get_storage_dir())
-                    if f.endswith(".json") ]
-        for f in filelist:
-            os.unlink(f)
-
-
     def get_field_unique_id(self):
         return "bug_id"
 
 
-    def _issue_to_cache_item(self, issue_xml, changes_html):
-        bug = issue_xml
-        bug_id = bug.findall('bug_id')[0].text
-        # TODO.: detect XML enconding and use it
-        # xml = {"xml": ElementTree.tostring(bug, encoding="us-ascii")}
-        xml_string = ElementTree.tostring(bug, encoding="utf-8")
-        # xml_string is of type b'' byte stream in Python3
-        xml_string = xml_string.decode('utf-8')
-        item = {"bug_id": bug_id,
-                "xml": xml_string,
-                "html": changes_html}
+    def _issue_to_cache_item(self, csv_line = None,
+                             issue_xml = None, changes_html = None):
+
+        if self.detail == "list":
+            bug_id = csv_line.split(",")[0]
+            item = {"bug_id": bug_id,
+                    "csv": csv_line}
+        else:
+            bug = issue_xml
+            bug_id = bug.findall('bug_id')[0].text
+            # TODO.: detect XML enconding and use it
+            # xml = {"xml": ElementTree.tostring(bug, encoding="us-ascii")}
+            xml_string = ElementTree.tostring(bug, encoding="utf-8")
+            # xml_string is of type b'' byte stream in Python3
+            xml_string = xml_string.decode('utf-8')
+            item = {"bug_id": bug_id,
+                    "xml": xml_string,
+                    "html": changes_html}
         return item
 
 
     def _cache_item_to_issue(self, item):
-        xml = ElementTree.fromstring(item['xml'])
-        html = item['html']
-        csv = None
-        issue = self._get_issue_json(csv, xml, html)
+
+        issue = None
+
+        if self.detail == "list":
+            issue = self._get_issue_json(item['csv'], None, None)
+        else:
+            xml = ElementTree.fromstring(item['xml'])
+            html = item['html']
+            csv = None
+            issue = self._get_issue_json(csv, xml, html)
 
         return issue
 
@@ -244,10 +249,14 @@ class Bugzilla(Backend):
         if csv_line:
             issue = get_issue_from_csv_line(csv_line)
 
+            if not self.use_cache:
+                item = self._issue_to_cache_item(csv_line)
+                self.cache.item_to_cache(item)
+
         if issue_xml:
 
             if not self.use_cache:
-                item = self._issue_to_cache_item(issue_xml, changes_html)
+                item = self._issue_to_cache_item(None, issue_xml, changes_html)
                 self.cache.item_to_cache(item)
 
             # If we have the XML, replace CSV info
@@ -338,12 +347,12 @@ class Bugzilla(Backend):
 
             csv = content.split('\n')[1:]
 
-            if self.detail == "lines":
+            if self.detail == "list":
                 issues = []
                 for line in csv:
                     issue = self._get_issue_json(csv_line = line)
                     issues.append(issue)
-                self.issues_to_es(issues)
+                self._items_to_es(issues)
 
             ids = []
             for line in csv:
