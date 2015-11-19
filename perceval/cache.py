@@ -52,7 +52,7 @@ class CacheItems(object):
     def recover(self):
         logging.debug("Restore recover cache")
         shutil.rmtree(self.cache_dir)
-        os.rename(self.cache_recover_dir, self.cache_dir)
+        shutil.copytree(self.cache_recover_dir, self.cache_dir)
 
 
     def item_to_cache(self, item):
