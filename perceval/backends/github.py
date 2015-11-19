@@ -98,9 +98,9 @@ class GitHub(Backend):
         return "id"
 
 
-    def getLastUpdateFromES(self, _type):
+    def get_last_update_from_es(self):
 
-        last_update = self.elastic.get_last_date(_type, 'updated_at')
+        last_update = self.elastic.get_last_date('updated_at')
 
         return last_update
 
@@ -148,10 +148,9 @@ class GitHub(Backend):
             self._items_to_es(items_cache)
             return self
 
-        _type = "issues_pullrequests"
         last_page = page = 1
 
-        last_update = self.getLastUpdateFromES(_type)
+        last_update = self.get_last_update_from_es()
         if last_update is not None:
 
             logging.info("Github issues API broken for incremental analysis")

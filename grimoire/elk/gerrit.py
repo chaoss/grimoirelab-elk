@@ -69,13 +69,9 @@ class GerritElastic(object):
                                                      time.localtime(cdate_ts))
 
 
-    @classmethod
-    def get_elastic_mappings(cls):
+    def get_elastic_mapping(self):
 
-        elastic_mappings = {}
-        _type = "reviews_events"
-
-        reviews_events_map = """
+        mapping = """
         {
             "properties": {
                "approval_email": {
@@ -122,23 +118,8 @@ class GerritElastic(object):
         }
         """
 
-        elastic_mappings[_type] = reviews_events_map
+        return {"items":mapping}
 
-        _type = "state"
-        mapping = '''
-        {
-            "properties": {
-               "project": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               }
-            }
-        }
-        '''
-
-        elastic_mappings[_type] = mapping
-
-        return elastic_mappings
 
 
     def fetch_events(self, review):

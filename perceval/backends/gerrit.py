@@ -92,6 +92,22 @@ class Gerrit(Backend):
         return "id"
 
 
+    def get_elastic_mappings(self):
+
+        mapping = '''
+        {
+            "properties": {
+               "project": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               }
+            }
+        }
+        '''
+
+        return {"items":mapping}
+
+
     def get_url(self):
 
         return self.url

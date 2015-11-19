@@ -31,10 +31,15 @@ from perceval.utils import get_time_diff_days
 
 class GitHubElastic(object):
 
-    def __init__(self, elastic, github):
-        self.elastic = elastic
+    def __init__(self, github):
+        self.elastic = None
         self.github = github
         self.index_github = "github"
+        self.location_not_found = []  # location not found in map api
+
+
+    def set_elastic(self, elastic):
+        self.elastic = elastic
         self.geolocations = self.geo_locations_from_es()
 
 
@@ -51,17 +56,23 @@ class GitHubElastic(object):
                     "lon": geo_location['lon']
             }
 
+        elif location in self.location_not_found:
+            # Don't call the API.
+            pass
+
         else:
             url = 'https://maps.googleapis.com/maps/api/geocode/json'
             params = {'sensor': 'false', 'address': location}
             r = requests.get(url, params=params)
 
             try:
-                print (location)
+                logging.debug("Using Maps API to find %s" % (location))
                 r_json = r.json()
                 geo_code = r_json['results'][0]['geometry']['location']
             except:
-                logging.info("Can't find geocode for " + location)
+                if location not in self.location_not_found:
+                    logging.debug("Can't find geocode for " + location)
+                    self.location_not_found.append(location)
 
             if geo_code:
                 geo_point = {
@@ -74,19 +85,47 @@ class GitHubElastic(object):
         return geo_point
 
 
+    def get_github_cache(self, kind, _key):
+        """ Get cache data for items of _type using _key as the cache dict key """
+
+        cache = {}
+        res_size = 100  # best size?
+        _from = 0
+
+        index_github = "github/" + kind
+
+        url = self.elastic.url + "/"+index_github
+        url += "/_search" + "?" + "size=%i" % res_size
+        r = requests.get(url)
+        type_items = r.json()
+
+        if 'hits' not in type_items:
+            logging.info("No github %s data in ES" % (kind))
+
+        else:
+            while len(type_items['hits']['hits']) > 0:
+                for hit in type_items['hits']['hits']:
+                    item = hit['_source']
+                    cache[item[_key]] = item
+                _from += res_size
+                r = requests.get(url+"&from=%i" % _from)
+                type_items = r.json()
+
+        return cache
+
+
     def geo_locations_from_es(self):
 
-        return self.elastic.getGitHubCache("geolocations", "location")
+        return self.get_github_cache("geolocations", "location")
 
     def geo_locations_to_es(self):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
 
-        elastic_type = "geolocations"
-        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
+        url = self.elastic.url + "/github/geolocations/_bulk"
 
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+        logging.debug("Adding geoloc to %s (in %i packs)" % (url, max_items))
 
 
         for loc in self.geolocations:
@@ -110,15 +149,14 @@ class GitHubElastic(object):
 
         requests.put(url, data = bulk_json)
 
-        logging.debug("Adding items to ES Done")
+        logging.debug("Adding geoloc to ES Done")
 
     def users_to_es(self):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
 
-        elastic_type = "users"  # github global users
-        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
+        url = self.elastic.url + "/github/users/_bulk"
 
         logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
@@ -138,17 +176,11 @@ class GitHubElastic(object):
 
     def users_from_es(self):
 
-        return self.elastic.getGitHubCache("users", "login")
+        return self.get_github_cache("users", "login")
 
 
-    @classmethod
-    def get_elastic_mappings(cls):
+    def get_elastic_mappings(self):
         """ geopoints type is not created in dynamic mapping """
-
-        elastic_mappings = {}
-
-        _types = ['pullrequests','issues_pullrequests']
-
 
         mapping = """
             {
@@ -163,10 +195,8 @@ class GitHubElastic(object):
             }
         """
 
-        for _type in _types:
-            elastic_mappings[_type] = mapping
+        return {"items":mapping}
 
-        return elastic_mappings
 
     def get_rich_pull(self, pull):
         rich_pull = {}
@@ -197,17 +227,27 @@ class GitHubElastic(object):
             rich_pull['user_location'] = None
             rich_pull['user_geolocation'] = None
 
+
+        assignee = None
+
         if pull['assignee'] is not None:
+
             assignee_login = pull['assignee']['login']
-            assignee = GitHubUser(self.github.users[assignee_login])
-            rich_pull['assignee_login'] = assignee_login
-            rich_pull['assignee_name'] = assignee.name
-            rich_pull['assignee_email'] = assignee.email
-            rich_pull['assignee_org'] = assignee.org
-            rich_pull['assignee_location'] = assignee.location
-            rich_pull['assignee_geolocation'] = \
-                self.get_geo_point(assignee.location)
-        else:
+
+            if assignee_login in self.github.users:
+                user = GitHubUser(self.github.users[assignee_login])
+                assignee = GitHubUser(self.github.users[assignee_login])
+                rich_pull['assignee_login'] = assignee_login
+                rich_pull['assignee_name'] = assignee.name
+                rich_pull['assignee_email'] = assignee.email
+                rich_pull['assignee_org'] = assignee.org
+                rich_pull['assignee_location'] = assignee.location
+                rich_pull['assignee_geolocation'] = \
+                    self.get_geo_point(assignee.location)
+            else:
+                logging.debug("Assignee login %s not found in github users" % (assignee_login))
+
+        if not assignee:
             rich_pull['assignee_name'] = None
             rich_pull['assignee_login'] = None
             rich_pull['assignee_email'] = None
@@ -232,7 +272,8 @@ class GitHubElastic(object):
         return rich_pull
 
 
-    def pullrequests_to_es(self, pulls, _type = "issues_pullrequests"):
+
+    def pullrequests_to_es(self, pulls):
 
         logging.debug("Updating Github users in Elastic")
         self.users_to_es()  # update users in Elastic
@@ -243,8 +284,7 @@ class GitHubElastic(object):
         current = 0
         bulk_json = ""
 
-        elastic_type = _type
-        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
+        url = self.elastic.index_url+'/items/_bulk'
 
         logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
 

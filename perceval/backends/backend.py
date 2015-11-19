@@ -101,6 +101,10 @@ class Backend(object):
         ''' Field with the unique id for the JSON items '''
         raise NotImplementedError
 
+    def get_elastic_mappings(self):
+        ''' Specific mappings for the State in ES '''
+        pass
+
 
     def _items_to_es(self, json_items):
         ''' Append items JSON to ES (data source state) '''
@@ -113,9 +117,7 @@ class Backend(object):
 
         field_id = self.get_field_unique_id()
 
-        es_type = "state"
-
-        self.elastic.bulk_upload(es_type, json_items, field_id)
+        self.elastic.bulk_upload(json_items, field_id)
 
 
     def _get_name(self):
@@ -136,8 +138,7 @@ class Backend(object):
 
     def _get_elastic_items(self):
 
-        elastic_type = "state"
-        url = self.elastic.index_url + "/" + elastic_type
+        url = self.elastic.index_url
         url += "/_search?from=%i&size=%i" % (self.elastic_from,
                                             self.elastic_page)
 

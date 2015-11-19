@@ -41,9 +41,7 @@ class ElasticSearch(object):
 
         self.url = "http://" + host + ":" + port
         self.index = index
-        self.index_raw = index+"_raw"
         self.index_url = self.url+"/"+self.index
-        self.index_raw_url = self.url+"/"+self.index_raw
         self.max_items_bulk = 500
 
         try:
@@ -61,10 +59,10 @@ class ElasticSearch(object):
                 requests.post(self.index_url)
                 logging.info("Deleted and created index " + self.index_url)
         if mappings:
-            self.create_mapping(mappings)
+            self.create_mappings(mappings)
 
 
-    def bulk_upload(self, es_type, items, field_id):
+    def bulk_upload(self, items, field_id):
         ''' Upload in controlled packs items to ES using bulk API '''
 
         max_items = self.max_items_bulk
@@ -73,10 +71,10 @@ class ElasticSearch(object):
         total_search = 0  # total items found with search
         bulk_json = ""
 
-        url = self.index_url+'/'+es_type+'/_bulk'
+        url = self.index_url+'/items/_bulk'
 
         logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-        r = requests.get(self.index_url+'/'+es_type+'/_search?size=1')
+        r = requests.get(self.index_url+'/_search?size=1')
         total = r.json()['hits']['total']  # Already existing items
 
         for item in items:
@@ -94,29 +92,28 @@ class ElasticSearch(object):
 
         # Wait until in searches all items are returned
         total += new_items
+        search_start = datetime.now()
         while total_search != total:
             time.sleep(0.1)
-            r = requests.get(self.index_url+'/'+es_type+'/_search?size=1')
+            r = requests.get(self.index_url+'/_search?size=1')
             total_search = r.json()['hits']['total']
+            if (datetime.now()-search_start).total_seconds() > 10:
+                logging.warning("Bulk data does not appear after 10s")
+                raise
 
 
-    def create_mapping(self, mappings):
+    def create_mappings(self, mappings):
 
-        for mapping in mappings:
-            _type = mapping
-            url = self.index_url
-            url_type = url + "/" + _type
-
-            url_map = url_type+"/_mapping"
-            r = requests.put(url_map, data=mappings[mapping])
+        for _type in mappings:
+            url_map = self.index_url + "/"+_type+"/_mapping"
+            r = requests.put(url_map, data=mappings[_type])
 
             if r.status_code != 200:
                 logging.error("Error creating ES mappings %s" % (r.text))
 
 
-    def get_last_date(self, _type, field, _filter = None):
+    def get_last_date(self, field, _filter = None):
         '''
-            :_type: type in which to search the data
             :field: field with the data
             :_filter: additional filter to find the date
         '''
@@ -124,7 +121,7 @@ class ElasticSearch(object):
         last_date = None
 
         url = self.index_url
-        url += "/" + _type + "/_search"
+        url += "/_search"
 
         if _filter:
             data_query = '''
@@ -165,38 +162,6 @@ class ElasticSearch(object):
                     last_date = last_date.isoformat(" ")
 
         return last_date
-
-    def getGitHubCache(self, _type, _key):
-        """ Get cache data for items of _type using _key as the cache dict key """
-
-        cache = {}
-        res_size = 100  # best size?
-        _from = 0
-
-        index_github = "github"
-
-        elasticsearch_type = _type
-
-        url = self.url + "/"+index_github
-        url += "/"+elasticsearch_type
-        url += "/_search" + "?" + "size=%i" % res_size
-        r = requests.get(url)
-        type_items = r.json()
-
-        if 'hits' not in type_items:
-            logging.info("No github %s data in ES" % (_type))
-
-        else:
-            while len(type_items['hits']['hits']) > 0:
-                for hit in type_items['hits']['hits']:
-                    item = hit['_source']
-                    cache[item[_key]] = item
-                _from += res_size
-                r = requests.get(url+"&from=%i" % _from)
-                type_items = r.json()
-    
-        return cache
-
 
 
 

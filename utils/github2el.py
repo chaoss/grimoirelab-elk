@@ -22,8 +22,6 @@
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
-# TODO: Just a playing script yet.
-#     - Use the _bulk API from ES to improve indexing
 
 import argparse
 import logging
@@ -50,21 +48,34 @@ if __name__ == '__main__':
     logging.getLogger("requests").setLevel(logging.WARNING)
 
     es_index_github = "github_%s_%s" % (args.owner, args.repository)
-    es_mappings = GitHubElastic.get_elastic_mappings()
 
     github = GitHub(args.owner, args.repository, args.token, args.cache,
                     not args.no_incremental)
 
+    egithub = GitHubElastic(github)
+
+    clean = args.no_incremental
+
+    if args.cache:
+        clean = True
+
     try:
-        elastic = ElasticSearch(args.elastic_host,
-                                args.elastic_port,
-                                es_index_github, es_mappings, args.no_incremental)
+        state_index = es_index_github+"_state"
+        elastic_state = ElasticSearch(args.elastic_host, args.elastic_port,
+                                      state_index, github.get_elastic_mappings(),
+                                      clean)
+
+        elastic = ElasticSearch(args.elastic_host, args.elastic_port,
+                                es_index_github, egithub.get_elastic_mappings(),
+                                clean)
+
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
 
-    github.set_elastic(elastic)
-    egithub = GitHubElastic(elastic, github)
+    github.set_elastic(elastic_state)
+    egithub.set_elastic(elastic)
+
     GitHub.users = egithub.users_from_es()
 
     issues_prs_count = 1

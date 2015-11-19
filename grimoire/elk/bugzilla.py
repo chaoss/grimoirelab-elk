@@ -102,13 +102,9 @@ class BugzillaElastic(object):
         logging.debug("Adding issues to ES Done")
 
 
-    @classmethod
-    def get_elastic_mappings(cls):
+    def get_elastic_mapping(self):
         ''' Specific mappings needed for ES '''
 
-        elastic_mappings = {}
-
-        _type = "issues_list"
         mapping = '''
         {
             "properties": {
@@ -128,6 +124,4 @@ class BugzillaElastic(object):
         }
         '''
 
-        elastic_mappings[_type] = mapping
-
-        return elastic_mappings
+        return {"items":mapping}
