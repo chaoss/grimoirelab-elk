@@ -69,11 +69,16 @@ if __name__ == '__main__':
 
     issues_prs_count = 1
     pulls = []
-    for pr in github.fetch():
-        pulls.append(pr)
-        issues_prs_count += 1
 
-    egithub.pullrequests2ES(pulls)
+    try:
+        for pr in github.fetch():
+            pulls.append(pr)
+            issues_prs_count += 1
 
-    # logging.info("Total Pull Requests " + str(prs_count))
-    logging.info("Total Issues Pull Requests " + str(issues_prs_count))
+        # logging.info("Total Pull Requests " + str(prs_count))
+        logging.info("Total Issues Pull Requests " + str(issues_prs_count))
+    except KeyboardInterrupt:
+        logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
+        logging.debug("Recovering cache")
+        github.cache.recover()
+        sys.exit(0)

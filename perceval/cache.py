@@ -26,23 +26,33 @@
 from datetime import datetime
 import json
 import logging
-import os
+import os, shutil
 
 class CacheItems(object):
 
     def __init__(self, cache_dir, field_id):
         self.cache_dir = cache_dir
+        self.cache_recover_dir = self.cache_dir+"_recover"
         self.field_id = field_id
         self.cache = []
-        pass
+
+        if not os.path.isdir(cache_dir):
+            os.makedirs(cache_dir)
 
     def clean(self):
         logging.debug("Cleaning cache")
-        # TODO: move current cache to cache_recover
-        filelist = [ f for f in os.listdir(self.cache_dir) if
-                    f.startswith("cache_item_") ]
-        for f in filelist:
-            os.remove(os.path.join(self.cache_dir, f))
+
+        # Backup current one to return to it if needed
+        if os.path.isdir(self.cache_recover_dir):
+            shutil.rmtree(self.cache_recover_dir)
+        os.rename(self.cache_dir, self.cache_recover_dir)
+        os.makedirs(self.cache_dir)
+
+
+    def recover(self):
+        logging.debug("Restore recover cache")
+        shutil.rmtree(self.cache_dir)
+        os.rename(self.cache_recover_dir, self.cache_dir)
 
 
     def item_to_cache(self, item):
