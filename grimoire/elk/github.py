@@ -35,10 +35,10 @@ class GitHubElastic(object):
         self.elastic = elastic
         self.github = github
         self.index_github = "github"
-        self.geolocations = self.geoLocationsFromES()
+        self.geolocations = self.geo_locations_from_es()
 
 
-    def getGeoPoint(self, location):
+    def get_geo_point(self, location):
         geo_point = geo_code = None
 
         if location is None:
@@ -74,24 +74,11 @@ class GitHubElastic(object):
         return geo_point
 
 
-    def _getGeoLocation(self, location):
-
-        geo_point = None
-
-        if location is not None:
-            geo_point = self._getGeoPoint(location)
-
-        if geo_point and 'location' in geo_point:
-            del geo_point['location']  # convert to ES geo_point format
-
-        return geo_point
-
-
-    def geoLocationsFromES(self):
+    def geo_locations_from_es(self):
 
         return self.elastic.getGitHubCache("geolocations", "location")
 
-    def geoLocationsToES(self):
+    def geo_locations_to_es(self):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
@@ -125,7 +112,7 @@ class GitHubElastic(object):
 
         logging.debug("Adding items to ES Done")
 
-    def usersToES(self):
+    def users_to_es(self):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
@@ -149,7 +136,7 @@ class GitHubElastic(object):
             current += 1
         requests.put(url, data = bulk_json)
 
-    def usersFromES(self):
+    def users_from_es(self):
 
         return self.elastic.getGitHubCache("users", "login")
 
@@ -181,7 +168,7 @@ class GitHubElastic(object):
 
         return elastic_mappings
 
-    def getRichPull(self, pull):
+    def get_rich_pull(self, pull):
         rich_pull = {}
         rich_pull['id'] = pull['id']
         rich_pull['time_to_close_days'] = \
@@ -202,7 +189,7 @@ class GitHubElastic(object):
             rich_pull['user_email'] = user.email
             rich_pull['user_org'] = user.org
             rich_pull['user_location'] = user.location
-            rich_pull['user_geolocation'] = self.getGeoPoint(user.location)
+            rich_pull['user_geolocation'] = self.get_geo_point(user.location)
         else:
             rich_pull['user_name'] = None
             rich_pull['user_email'] = None
@@ -219,7 +206,7 @@ class GitHubElastic(object):
             rich_pull['assignee_org'] = assignee.org
             rich_pull['assignee_location'] = assignee.location
             rich_pull['assignee_geolocation'] = \
-                self.getGeoPoint(assignee.location)
+                self.get_geo_point(assignee.location)
         else:
             rich_pull['assignee_name'] = None
             rich_pull['assignee_login'] = None
@@ -245,12 +232,12 @@ class GitHubElastic(object):
         return rich_pull
 
 
-    def pullrequests2ES(self, pulls, _type = "issues_pullrequests"):
+    def pullrequests_to_es(self, pulls, _type = "issues_pullrequests"):
 
         logging.debug("Updating Github users in Elastic")
-        self.usersToES()  # update users in Elastic
+        self.users_to_es()  # update users in Elastic
         logging.debug("Updating geolocations in Elastic")
-        self.geoLocationsToES() # Update geolocations in Elastic
+        self.geo_locations_to_es() # Update geolocations in Elastic
 
         max_items = self.elastic.max_items_bulk
         current = 0
@@ -271,7 +258,7 @@ class GitHubElastic(object):
                 bulk_json = ""
                 current = 0
 
-            rich_pull = self.getRichPull(pull)
+            rich_pull = self.get_rich_pull(pull)
             data_json = json.dumps(rich_pull)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_pull["id"])
             bulk_json += data_json +"\n"  # Bulk document

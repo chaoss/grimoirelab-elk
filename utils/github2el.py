@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     github.set_elastic(elastic)
     egithub = GitHubElastic(elastic, github)
-    GitHub.users = egithub.usersFromES()
+    GitHub.users = egithub.users_from_es()
 
     issues_prs_count = 1
     pulls = []
@@ -74,6 +74,8 @@ if __name__ == '__main__':
         for pr in github.fetch():
             pulls.append(pr)
             issues_prs_count += 1
+
+        egithub.pullrequests_to_es(pulls)
 
         # logging.info("Total Pull Requests " + str(prs_count))
         logging.info("Total Issues Pull Requests " + str(issues_prs_count))
