@@ -244,8 +244,7 @@ class Gerrit(Backend):
             _filter['name'] = 'project'
             _filter['value'] = project
 
-        return self.elastic.get_last_date("reviews_state", "lastUpdated",
-                                          _filter)
+        return self.elastic.get_last_date("lastUpdated", _filter)
 
 
     def fetch(self):

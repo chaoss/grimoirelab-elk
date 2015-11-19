@@ -34,8 +34,11 @@ from perceval.utils import get_time_diff_days
 
 class BugzillaElastic(object):
 
-    def __init__(self, bugzilla, elastic):
+    def __init__(self, bugzilla):
         self.bugzilla = bugzilla
+        self.elastic = None
+
+    def set_elastic(self, elastic):
         self.elastic = elastic
 
     def enrich_issue(self, issue):
@@ -102,7 +105,7 @@ class BugzillaElastic(object):
         logging.debug("Adding issues to ES Done")
 
 
-    def get_elastic_mapping(self):
+    def get_elastic_mappings(self):
         ''' Specific mappings needed for ES '''
 
         mapping = '''

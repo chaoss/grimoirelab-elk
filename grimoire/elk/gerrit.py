@@ -69,7 +69,7 @@ class GerritElastic(object):
                                                      time.localtime(cdate_ts))
 
 
-    def get_elastic_mapping(self):
+    def get_elastic_mappings(self):
 
         mapping = """
         {

@@ -51,24 +51,34 @@ if __name__ == '__main__':
     logging.getLogger("requests").setLevel(logging.WARNING)
 
 
-
     bugzilla = Bugzilla(args.url, args.nissues, args.detail,
                         not args.no_incremental, args.cache)
+    ebugzilla = BugzillaElastic(bugzilla)
 
     es_index_bugzilla = "bugzilla_" + bugzilla.get_id()
-    es_mappings = BugzillaElastic.get_elastic_mappings()
+
+    clean = args.no_incremental
+
+    if args.cache:
+        clean = True
+
 
     try:
-        elastic = ElasticSearch(args.elastic_host,
-                                args.elastic_port,
-                                es_index_bugzilla, es_mappings, args.no_incremental)
+        state_index = es_index_bugzilla+"_state"
+        elastic_state = ElasticSearch(args.elastic_host, args.elastic_port,
+                                      state_index, bugzilla.get_elastic_mappings(),
+                                      clean)
+
+        elastic = ElasticSearch(args.elastic_host, args.elastic_port,
+                                es_index_bugzilla, ebugzilla.get_elastic_mappings(),
+                                clean)
+
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
 
     bugzilla.set_elastic(elastic)
-    ebugzilla = BugzillaElastic(bugzilla, elastic)
-
+    ebugzilla.set_elastic(elastic)
 
     if args.detail == "list":
         ebugzilla.issues_list_to_es()

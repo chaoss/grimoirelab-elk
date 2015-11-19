@@ -114,11 +114,11 @@ class Bugzilla(Backend):
         last_update = None
 
         if self.detail == "list":
-            last_update = self.elastic.get_last_date("state", "changeddate_date")
+            last_update = self.elastic.get_last_date("changeddate_date")
             # Format date so it can be used as URL param in bugzilla
             last_update = last_update.replace("T", " ")
         else:
-            last_update = self.elastic.get_last_date("state", "delta_ts_date")
+            last_update = self.elastic.get_last_date("delta_ts_date")
 
         return last_update
 
