@@ -78,8 +78,8 @@ class Backend(object):
 
     def __init__(self, use_cache = False, incremental = True):
 
-        self.cache = CacheItems(self._get_storage_dir(), 
-                                self.get_field_unique_id())
+        cache_dir = os.path.join(self._get_storage_dir(),"cache")
+        self.cache = CacheItems(cache_dir, self.get_field_unique_id())
         self.use_cache = use_cache
         self.incremental = incremental
 
