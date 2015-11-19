@@ -28,6 +28,7 @@ from dateutil import parser
 import json
 import logging
 import requests
+import time
 
 class ElasticConnectException(Exception):
     message = "Can't connect to ElasticSearch"
@@ -68,6 +69,8 @@ class ElasticSearch(object):
 
         max_items = self.max_items_bulk
         current = 0
+        total = 0  # total items added with bulk
+        total_search = 0  # total items found with search
         bulk_json = ""
 
         url = self.index_url+'/'+es_type+'/_bulk'
@@ -78,13 +81,20 @@ class ElasticSearch(object):
             if current >= max_items:
                 requests.put(url, data=bulk_json)
                 bulk_json = ""
+                total += current
                 current = 0
             data_json = json.dumps(item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
-
         requests.put(url, data=bulk_json)
+        total += current
+
+        # Wait until in searches all items are returned
+        while total_search != total:
+            time.sleep(0.1)
+            r = requests.get(self.index_url+'/'+es_type+'/_search?size=1')
+            total_search = r.json()['hits']['total']
 
 
     def create_mapping(self, mappings):
