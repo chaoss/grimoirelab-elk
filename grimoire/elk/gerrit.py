@@ -144,6 +144,8 @@ class GerritElastic(object):
     def fetch_events(self, review):
         """ Fetch in ES patches and comments (events) as documents """
 
+        self._fix_review_dates(review)
+
         bulk_json = ""  # Bulk JSON to be feeded in ES
 
         # Review fields included in all events
