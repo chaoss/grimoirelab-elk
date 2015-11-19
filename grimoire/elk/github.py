@@ -45,7 +45,11 @@ class GitHubElastic(object):
             return geo_point
 
         if location in self.geolocations:
-            geo_point = self.geolocations[location]
+            geo_location = self.geolocations[location]
+            geo_point = {
+                    "lat": geo_location['lat'],
+                    "lon": geo_location['lon']
+            }
 
         else:
             url = 'https://maps.googleapis.com/maps/api/geocode/json'
@@ -109,14 +113,17 @@ class GitHubElastic(object):
             location["location"] = loc
             # First upload the raw pullrequest data to ES
             data_json = json.dumps(location)
-            safe_loc = loc.encode('ascii', 'ignore')
-            geo_id = str("%s-%s-%s" % (location["lat"], location["lon"], safe_loc))
+            # Don't include in URL non ascii codes
+            safe_loc = str(loc.encode('ascii', 'ignore'),'ascii')
+            geo_id = str("%s-%s-%s" % (location["lat"], location["lon"],
+                                       safe_loc))
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (geo_id)
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
+
         requests.put(url, data = bulk_json)
 
-        logging.debug("Adding issues to ES Done")
+        logging.debug("Adding items to ES Done")
 
     def usersToES(self):
         max_items = self.elastic.max_items_bulk
