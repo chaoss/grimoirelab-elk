@@ -98,7 +98,6 @@ class ElasticSearch(object):
             time.sleep(0.1)
             r = requests.get(self.index_url+'/'+es_type+'/_search?size=1')
             total_search = r.json()['hits']['total']
-            logging.debug("%i %i" % (total, total_search))
 
 
     def create_mapping(self, mappings):
