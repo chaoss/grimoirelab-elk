@@ -56,7 +56,7 @@ class Gerrit(Backend):
                             help="Sorting Hat database")
         parser.add_argument("--gerrit_grimoirelib_db",  required=True,
                             help="GrimoireLib gerrit database")
-        parser.add_argument("--projects_grimoirelib_db",  required=True,
+        parser.add_argument("--projects_grimoirelib_db",
                             help="GrimoireLib projects database")
 
         Backend.add_params(cmdline_parser)
@@ -118,10 +118,12 @@ class Gerrit(Backend):
         if self.version:
             return self.version
 
-        gerrit_cmd_prj = self.gerrit_cmd + " version "
+        cmd = self.gerrit_cmd + " version "
 
-        raw_data = subprocess.check_output(gerrit_cmd_prj, shell = True)
+        logging.debug("Getting version: %s" % (cmd))
+        raw_data = subprocess.check_output(cmd, shell = True)
         raw_data = str(raw_data, "UTF-8")
+        logging.debug("Gerrit version: %s" % (raw_data))
 
         # output: gerrit version 2.10-rc1-988-g333a9dd
         m = re.match("gerrit version (\d+)\.(\d+).*", raw_data)
@@ -166,8 +168,8 @@ class Gerrit(Backend):
             gerrit_cmd_prj +="project:"+project+" "
         gerrit_cmd_prj += "limit:" + str(self.nreviews)
 
-        if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
-            gerrit_cmd_prj += " '(status:open OR status:close)' "
+        # This does not work for Wikimedia 2.8.1 version
+        gerrit_cmd_prj += " '(status:open OR status:closed)' "
 
         gerrit_cmd_prj += " --all-approvals --comments --format=JSON"
 

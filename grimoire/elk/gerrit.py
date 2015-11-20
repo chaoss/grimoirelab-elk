@@ -40,7 +40,9 @@ class GerritElastic(object):
         self.gerrit = gerrit
         self.elastic = None
         self.sortinghat = SortingHat (sortingnat_db, gerrit_grimoirelib_db)
-        self.grimoirelib_projects = GrimoireLibProjects(projects_grimoirelib_db, gerrit.get_url())
+        self.grimoirelib_projects = None
+        if projects_grimoirelib_db:
+            self.grimoirelib_projects = GrimoireLibProjects(projects_grimoirelib_db, gerrit.get_url())
 
     def set_elastic(self, elastic):
         self.elastic = elastic
