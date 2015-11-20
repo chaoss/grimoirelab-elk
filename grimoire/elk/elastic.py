@@ -114,8 +114,8 @@ class ElasticSearch(object):
             if (datetime.now()-search_start).total_seconds() > self.wait_bulk_seconds:
                 logging.warning("Bulk data does not appear as NEW after %is" % (self.wait_bulk_seconds))
                 logging.debug("%i item updates" % (total-total_search))
-                if not incremental:
-                    raise
+                # if not incremental:
+                #    raise
                 break
 
 
