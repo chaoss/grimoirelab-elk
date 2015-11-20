@@ -34,7 +34,7 @@ def get_eta(last_update_date, prj_first_date, prj_last_date):
     for the number of days in the project '''
 
     if last_update_date == prj_first_date:
-        logging.error("Data error: first date and last update the same.")
+        logging.warning("First date and last update the same.")
         return None
 
     proj_total_days = (prj_last_date - prj_first_date).total_seconds() / (60*60*24)

@@ -98,9 +98,13 @@ class GitHub(Backend):
         return "id"
 
 
+    def get_field_date(self):
+        return "updated_at"
+
+
     def get_last_update_from_es(self):
 
-        last_update = self.elastic.get_last_date('updated_at')
+        last_update = self.elastic.get_last_date(self.get_field_date())
 
         return last_update
 

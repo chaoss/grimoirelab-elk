@@ -84,19 +84,20 @@ class BugzillaElastic(object):
             if current >= max_items:
                 task_init = time()
                 requests.put(url, data=bulk_json)
-                bulk_time = time()-task_init
                 bulk_json = ""
                 total += current
                 current = 0
-                logging.debug("bulk packet sent (%.2f sec prev, %i total)"
-                              % (bulk_time, total))
+                logging.debug("bulk packet sent (%.2f sec, %i total)"
+                              % (time()-task_init, total))
             data_json = json.dumps(issue)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (issue["bug_id"])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
+        task_init = time()
+        total += current
         requests.put(url, data=bulk_json)
-        logging.debug("bulk packet sent (%.2f sec prev, %i total)"
-                      % (bulk_time, total))
+        logging.debug("bulk packet sent (%.2f sec, %i total)"
+                      % (time()-task_init, total))
 
 
     def issues_to_es(self):

@@ -235,6 +235,10 @@ class Gerrit(Backend):
 
         return reviews
 
+    def get_field_date(self):
+        return "lastUpdated"
+
+
     def _get_last_date(self, project = None):
 
         _filter = None
@@ -244,7 +248,7 @@ class Gerrit(Backend):
             _filter['name'] = 'project'
             _filter['value'] = project
 
-        return self.elastic.get_last_date("lastUpdated", _filter)
+        return self.elastic.get_last_date(self.get_field_date(), _filter)
 
 
     def fetch(self):

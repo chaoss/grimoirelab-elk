@@ -107,22 +107,24 @@ class Bugzilla(Backend):
 
         self.bugzilla_version = tree.attrib['version']
 
+    def get_field_date(self):
+        field = None
+        if self.detail == "list":
+            field = 'changeddate_date'
+        else:
+            field = 'delta_ts_date'
+
+        return field
 
     def _get_last_update_date(self):
         ''' Find in JSON storage the last update date '''
 
-        last_update = None
-
-        if self.detail == "list":
-            last_update = self.elastic.get_last_date("changeddate_date")
+        last_update = self.elastic.get_last_date(self.get_field_date())
             # Format date so it can be used as URL param in bugzilla
-            if last_update is not None:
-                last_update = last_update.replace("T", " ")
-        else:
-            last_update = self.elastic.get_last_date("delta_ts_date")
+        if last_update is not None:
+            last_update = last_update.replace("T", " ")
 
         return last_update
-
 
 
     def get_field_unique_id(self):

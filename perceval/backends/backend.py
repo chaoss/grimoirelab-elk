@@ -101,6 +101,10 @@ class Backend(object):
         ''' Field with the unique id for the JSON items '''
         raise NotImplementedError
 
+    def get_field_date(self):
+        ''' Field with the date in the JSON items '''
+        raise NotImplementedError
+
     def get_elastic_mappings(self):
         ''' Specific mappings for the State in ES '''
         pass
@@ -109,11 +113,11 @@ class Backend(object):
     def _items_to_es(self, json_items):
         ''' Append items JSON to ES (data source state) '''
 
-        logging.info("Adding items to state for %s (%i items)" %
-                      (self._get_name(), len(json_items)))
-
         if len(json_items) == 0:
             return
+
+        logging.info("Adding items to state for %s (%i items)" %
+                      (self._get_name(), len(json_items)))
 
         field_id = self.get_field_unique_id()
 
@@ -140,9 +144,32 @@ class Backend(object):
 
         url = self.elastic.index_url
         url += "/_search?from=%i&size=%i" % (self.elastic_from,
-                                            self.elastic_page)
+                                             self.elastic_page)
 
-        r = requests.get(url)
+        if self.incremental:
+            date_field = self.get_field_date()
+            last_date = self.elastic.get_last_date(date_field)
+            last_date = last_date.replace(" ","T")  # elastic format
+
+
+            filter_ = '''
+            {
+                "query": {
+                    "bool": {
+                        "must": [
+                            {"range":
+                                {"%s": {"gte": "%s"}}
+                            }
+                        ]
+                    }
+                }
+            }
+            ''' % (date_field, last_date)
+
+            r = requests.post(url, data = filter_)
+
+        else:
+            r = requests.get(url)
 
         items = []
 

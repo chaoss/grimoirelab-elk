@@ -82,6 +82,7 @@ class ElasticSearch(object):
         r = requests.get(self.index_url+'/_search?size=1')
         total = r.json()['hits']['total']  # Already existing items
 
+
         for item in items:
             if current >= max_items:
                 task_init = time()
@@ -89,12 +90,13 @@ class ElasticSearch(object):
                 bulk_json = ""
                 new_items += current
                 current = 0
-                logging.debug("bulk packet sent (%.2f sec prev, %i total)"
+                logging.debug("bulk packet sent (%.2f sec, %i total)"
                               % (time()-task_init, new_items))
             data_json = json.dumps(item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
+        task_init = time()
         requests.put(url, data=bulk_json)
         new_items += current
         logging.debug("bulk packet sent (%.2f sec prev, %i total)"
