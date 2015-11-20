@@ -23,6 +23,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+from time import time
 from dateutil import parser
 import json
 import logging
@@ -67,16 +68,36 @@ class BugzillaElastic(object):
 
     def issues_list_to_es(self):
 
-        # TODO: use bulk API
         elastic_type = "issues_list"
+
+        max_items = self.elastic.max_items_bulk
+        current = 0
+        total = 0
+        bulk_json = ""
+
+        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
+
+        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
         # In this client, we will publish all data in Elastic Search
         for issue in self.bugzilla.fetch():
+            if current >= max_items:
+                task_init = time()
+                requests.put(url, data=bulk_json)
+                bulk_time = time()-task_init
+                bulk_json = ""
+                total += current
+                current = 0
+                logging.debug("bulk packet sent (%.2f sec prev, %i total)"
+                              % (bulk_time, total))
             data_json = json.dumps(issue)
-            url = self.elastic.index_url
-            url += "/"+elastic_type
-            url += "/"+str(issue["bug_id"])
-            requests.put(url, data=data_json)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (issue["bug_id"])
+            bulk_json += data_json +"\n"  # Bulk document
+            current += 1
+        requests.put(url, data=bulk_json)
+        logging.debug("bulk packet sent (%.2f sec prev, %i total)"
+                      % (bulk_time, total))
+
 
     def issues_to_es(self):
 

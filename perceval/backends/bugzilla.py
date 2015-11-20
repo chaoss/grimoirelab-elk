@@ -155,6 +155,9 @@ class Bugzilla(Backend):
         issue = None
 
         if self.detail == "list":
+            if 'csv' not in item:
+                logging.error("Cache is not of list detail")
+                raise
             issue = self._get_issue_json(item['csv'], None, None)
         else:
             xml = ElementTree.fromstring(item['xml'])

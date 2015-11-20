@@ -28,7 +28,7 @@ from dateutil import parser
 import json
 import logging
 import requests
-import time
+from time import time, sleep
 
 class ElasticConnectException(Exception):
     message = "Can't connect to ElasticSearch"
@@ -43,6 +43,7 @@ class ElasticSearch(object):
         self.index = index
         self.index_url = self.url+"/"+self.index
         self.max_items_bulk = 500
+        self.wait_bulk_seconds = 2  # time to wait to complete a bulk operation
 
         try:
             r = requests.get(self.index_url)
@@ -62,8 +63,12 @@ class ElasticSearch(object):
             self.create_mappings(mappings)
 
 
-    def bulk_upload(self, items, field_id):
-        ''' Upload in controlled packs items to ES using bulk API '''
+    def bulk_upload_sync(self, items, field_id, incremental = False):
+        ''' Upload in controlled packs items to ES using bulk API
+            and wait until the items appears in searches '''
+
+        # After a bulk upload the searches are not refreshed real time
+        # This method waits until the upload is visible in searches
 
         max_items = self.max_items_bulk
         current = 0
@@ -79,27 +84,37 @@ class ElasticSearch(object):
 
         for item in items:
             if current >= max_items:
+                task_init = time()
                 requests.put(url, data=bulk_json)
                 bulk_json = ""
                 new_items += current
                 current = 0
+                logging.debug("bulk packet sent (%.2f sec prev, %i total)"
+                              % (time()-task_init, new_items))
             data_json = json.dumps(item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         requests.put(url, data=bulk_json)
         new_items += current
+        logging.debug("bulk packet sent (%.2f sec prev, %i total)"
+                      % (time()-task_init, new_items))
 
         # Wait until in searches all items are returned
+        # In incremental update, some items are updates not additions so
+        # this check will fail. Exist ok in the timeout for this case.
         total += new_items
         search_start = datetime.now()
         while total_search != total:
-            time.sleep(0.1)
+            sleep(0.1)
             r = requests.get(self.index_url+'/_search?size=1')
             total_search = r.json()['hits']['total']
-            if (datetime.now()-search_start).total_seconds() > 10:
-                logging.warning("Bulk data does not appear after 10s")
-                raise
+            if (datetime.now()-search_start).total_seconds() > self.wait_bulk_seconds:
+                logging.warning("Bulk data does not appear as NEW after %is" % (self.wait_bulk_seconds))
+                logging.debug("%i item updates" % (total-total_search))
+                if not incremental:
+                    raise
+                break
 
 
     def create_mappings(self, mappings):

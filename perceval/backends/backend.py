@@ -109,7 +109,7 @@ class Backend(object):
     def _items_to_es(self, json_items):
         ''' Append items JSON to ES (data source state) '''
 
-        logging.debug("Adding items to state for %s (%i items)" %
+        logging.info("Adding items to state for %s (%i items)" %
                       (self._get_name(), len(json_items)))
 
         if len(json_items) == 0:
@@ -117,7 +117,7 @@ class Backend(object):
 
         field_id = self.get_field_unique_id()
 
-        self.elastic.bulk_upload(json_items, field_id)
+        self.elastic.bulk_upload_sync(json_items, field_id, self.incremental)
 
 
     def _get_name(self):
