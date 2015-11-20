@@ -30,9 +30,9 @@ from datetime import datetime
 from dateutil import parser
 import json
 import logging
-import os
 import re
 import subprocess
+from time import time
 from perceval.utils import get_eta
 
 from perceval.backends.backend import Backend
@@ -68,9 +68,9 @@ class Gerrit(Backend):
         self.gerrit_user = user
         self.project = repository
         self.nreviews = nreviews
-        self.projects = []  # All projects from gerrit
         self.url = repository
         self.elastic = None
+        self.version = None  # gerrit version
 
         self.gerrit_cmd  = "ssh -p 29418 %s@%s" % (user, repository)
         self.gerrit_cmd += " gerrit "
@@ -114,6 +114,10 @@ class Gerrit(Backend):
 
 
     def _get_version(self):
+
+        if self.version:
+            return self.version
+
         gerrit_cmd_prj = self.gerrit_cmd + " version "
 
         raw_data = subprocess.check_output(gerrit_cmd_prj, shell = True)
@@ -132,26 +136,9 @@ class Gerrit(Backend):
             raise Exception("Invalid gerrit version %s " %
                             (raw_data))
 
-        return [mayor, minor]
+        self.version = [mayor, minor]
+        return  self.version
 
-
-    def _get_projects(self):
-        """ Get all projects in gerrit """
-
-        logging.debug("Getting list of gerrit projects")
-
-        gerrit_cmd_projects = self.gerrit_cmd + "ls-projects "
-        projects_raw = subprocess.check_output(gerrit_cmd_projects, shell = True)
-
-
-        projects_raw = str(projects_raw, 'UTF-8')
-        projects = projects_raw.split("\n")
-        projects.pop() # Remove last empty line
-
-        logging.debug("Done")
-
-
-        return projects
 
     def _get_server_reviews(self, project = None):
         """ Get all reviews for all or for a project """
@@ -161,11 +148,15 @@ class Gerrit(Backend):
         else:
             logging.info("Getting all reviews")
 
-        last_update = self._get_last_date(project)
+        if project:
+            last_update = self._get_last_date(project)
+        else:
+            last_update = self._get_last_date()
 
         logging.debug("Last update: %s" % (last_update))
 
         gerrit_version = self._get_version()
+
         last_item = None
         if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
             last_item = 0
@@ -174,8 +165,11 @@ class Gerrit(Backend):
         if project:
             gerrit_cmd_prj +="project:"+project+" "
         gerrit_cmd_prj += "limit:" + str(self.nreviews)
+
+        if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
+            gerrit_cmd_prj += " '(status:open OR status:close)' "
+
         gerrit_cmd_prj += " --all-approvals --comments --format=JSON"
-        logging.debug(gerrit_cmd_prj)
 
         number_results = self.nreviews
 
@@ -186,6 +180,7 @@ class Gerrit(Backend):
                number_results == self.nreviews) and \
                more_updates:
 
+            reviews_loop = []
             cmd = gerrit_cmd_prj
             if last_item is not None:
                 if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
@@ -193,6 +188,8 @@ class Gerrit(Backend):
                 else:
                     cmd += " resume_sortkey:" + last_item
 
+            logging.debug(cmd)
+            task_init = time()
             raw_data = subprocess.check_output(cmd, shell = True)
             raw_data = str(raw_data, "UTF-8")
             tickets_raw = "[" + raw_data.replace("\n", ",") + "]"
@@ -201,7 +198,6 @@ class Gerrit(Backend):
             tickets = json.loads(tickets_raw)
 
             for entry in tickets:
-
                 if self.incremental and last_update:
                     if 'project' in entry.keys():
                         entry_lastUpdated = \
@@ -215,7 +211,9 @@ class Gerrit(Backend):
                             break
 
                 if 'project' in entry.keys():
-                    reviews.append(entry)
+                    entry['lastUpdated_date'] = \
+                        datetime.fromtimestamp(entry['lastUpdated']).isoformat()
+                    reviews_loop.append(entry)
                     if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
                         last_item += 1
                     else:
@@ -224,9 +222,13 @@ class Gerrit(Backend):
                     # logging.info("CONTINUE FROM: " + str(last_item))
                     number_results = entry['rowCount']
 
+            logging.info("Received %i reviews in %.2fs" % (len(reviews_loop),
+                                                           time()-task_init))
+            self.cache.items_to_cache(reviews_loop)
+            self._items_to_es(reviews_loop)
 
-        self.cache.items_to_cache(reviews)
-        self._items_to_es(reviews)
+            reviews += reviews_loop
+
 
         if self.incremental:
             logging.info("Total new reviews: %i" % len(reviews))
@@ -236,7 +238,7 @@ class Gerrit(Backend):
         return reviews
 
     def get_field_date(self):
-        return "lastUpdated"
+        return "lastUpdated_date"
 
 
     def _get_last_date(self, project = None):
@@ -260,29 +262,17 @@ class Gerrit(Backend):
             self._items_to_es(reviews_cache)
             return self
 
-        # First we need all projects
-        projects = self._get_projects()
 
-        total = len(projects)
-        current_repo = 1
+        # if repository != "openstack/cinder": continue
+        task_init = time()
 
-        for project in projects:
-            # if repository != "openstack/cinder": continue
-            task_init = datetime.now()
+        self._get_server_reviews()
 
-            reviews_prj = self._get_server_reviews(project)
-            self._items_to_es(reviews_prj)
-
-            task_time = (datetime.now() - task_init).total_seconds()
-            eta_time = task_time * (total-current_repo)
-            eta_min = eta_time / 60.0
-
-            logging.info("Completed %s %i/%i (ETA: %.2f min)\n" \
-                             % (project, current_repo, total, eta_min))
-
-            current_repo += 1
+        gerrit_time_sec = (time()-task_init)/60
+        logging.info("Fetch completed %.2f" % (gerrit_time_sec))
 
         return self
+
 
     def _get_reviews_all(self):
         """ Get all reviews from the repository  """

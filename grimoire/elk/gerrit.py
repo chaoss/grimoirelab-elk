@@ -35,12 +35,15 @@ from grimoire.elk.projects import GrimoireLibProjects
 
 class GerritElastic(object):
 
-    def __init__(self, gerrit, elastic, sortingnat_db, projects_grimoirelib_db,
+    def __init__(self, gerrit, sortingnat_db, projects_grimoirelib_db,
                  gerrit_grimoirelib_db):
         self.gerrit = gerrit
-        self.elastic = elastic
+        self.elastic = None
         self.sortinghat = SortingHat (sortingnat_db, gerrit_grimoirelib_db)
         self.grimoirelib_projects = GrimoireLibProjects(projects_grimoirelib_db, gerrit.get_url())
+
+    def set_elastic(self, elastic):
+        self.elastic = elastic
 
     def _fix_review_dates(self, item):
         ''' Convert dates so ES detect them '''

@@ -55,23 +55,37 @@ if __name__ == '__main__':
     gerrit = Gerrit(args.user, args.url, args.nreviews, args.cache,
                     not args.no_incremental)
 
+    egerrit = GerritElastic(gerrit, args.sortinghat_db,
+                            args.projects_grimoirelib_db,
+                            args.gerrit_grimoirelib_db)
+
+
+
     es_index_gerrit = gerrit.get_id()
-    es_mappings = GerritElastic.get_elastic_mappings()
+
+    clean = args.no_incremental
+
+    if args.cache:
+        clean = True
 
     try:
-        elastic = ElasticSearch(args.elastic_host,
-                                args.elastic_port,
-                                es_index_gerrit, es_mappings, args.no_incremental)
+        state_index = es_index_gerrit+"_state"
+        elastic_state = ElasticSearch(args.elastic_host, args.elastic_port,
+                                      state_index, gerrit.get_elastic_mappings(),
+                                      clean)
+
+        elastic = ElasticSearch(args.elastic_host, args.elastic_port,
+                                es_index_gerrit, egerrit.get_elastic_mappings(),
+                                clean)
+
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
 
-    gerrit.set_elastic(elastic)
 
+    gerrit.set_elastic(elastic_state)
+    egerrit.set_elastic(elastic)
 
-    egerrit = GerritElastic(gerrit, elastic, args.sortinghat_db,
-                            args.projects_grimoirelib_db,
-                            args.gerrit_grimoirelib_db)
 
     for review in gerrit.fetch():
         egerrit.fetch_events(review)
