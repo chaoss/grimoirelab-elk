@@ -126,9 +126,7 @@ class GerritElastic(object):
         return {"items":mapping}
 
 
-
-    def fetch_events(self, review):
-        """ Fetch in ES patches and comments (events) as documents """
+    def review_events(self, review):
 
         self._fix_review_dates(review)
 
@@ -253,6 +251,21 @@ class GerritElastic(object):
 
                     app_count += 1
 
+        return bulk_json
+
+
+    def fetch_events(self, review):
+        """ Fetch in ES patches and comments (events) as documents """
+
+        bulk_json = self.review_events(review)
         url = self.elastic.index_url+'/reviews_events/_bulk'
-        requests.put(url, data=bulk_json)
+
+        try:
+            requests.put(url, data=bulk_json)
+        except UnicodeEncodeError:
+            # Why is requests encoding the POST data as ascii?
+            logging.error("Unicode error for events in review: " + review['id'])
+            safe_json = str(bulk_json.encode('ascii', 'ignore'),'ascii')
+            requests.put(url, data=safe_json)
+            # Continue with execution.
 

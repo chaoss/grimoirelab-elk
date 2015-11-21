@@ -91,3 +91,24 @@ class CacheItems(object):
         logging.debug("Cache read in %.2f secs" % (task_time))
 
         return self.cache
+
+    def __iter__(self):
+
+        # We will iterate over all cache files
+        self.iter_list = [ f for f in os.listdir(self.cache_dir) if
+                          f.startswith("cache_item_") ]
+
+        logging.debug("Created Cache Iter for %i cache items" % (len(self.iter_list)))
+
+        return self
+
+    def __next__(self):
+
+        if len(self.iter_list) > 0:
+            fname = os.path.join(self.cache_dir, self.iter_list.pop())
+            with open(fname,"r") as f:
+                item = json.loads(f.read())
+            return item
+        else:
+            raise StopIteration
+

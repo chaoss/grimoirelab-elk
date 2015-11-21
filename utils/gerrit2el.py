@@ -87,6 +87,7 @@ if __name__ == '__main__':
     egerrit.set_elastic(elastic)
 
 
+    logging.info("Adding enrichment data to %s" % (egerrit.elastic.index_url))
     for review in gerrit.fetch():
         egerrit.fetch_events(review)
 

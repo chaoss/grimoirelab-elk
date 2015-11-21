@@ -292,12 +292,13 @@ class Bugzilla(Backend):
     def fetch(self):
 
         if self.use_cache:
-            issues_cache = []
-            for item in self.cache.items_from_cache():
-                issue = self._cache_item_to_issue(item)
-                issues_cache.append(issue)
-            self._items_to_es(issues_cache)
-
+            cache_items = []
+            for item in self.cache:
+                if len(cache_items) >= self.elastic.max_items_bulk:
+                    self._items_to_es(cache_items)
+                    cache_items = []
+                cache_items.append(item)
+            self._items_to_es(cache_items)
             return self
 
         def get_issues_list_url(base_url, version, from_date_str=None):

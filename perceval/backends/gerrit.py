@@ -258,10 +258,13 @@ class Gerrit(Backend):
     def fetch(self):
 
         if self.use_cache:
-            reviews_cache = []
-            for item in self.cache.items_from_cache():
-                reviews_cache.append(item)
-            self._items_to_es(reviews_cache)
+            cache_items = []
+            for item in self.cache:
+                if len(cache_items) >= self.elastic.max_items_bulk:
+                    self._items_to_es(cache_items)
+                    cache_items = []
+                cache_items.append(item)
+            self._items_to_es(cache_items)
             return self
 
 

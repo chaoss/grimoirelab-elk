@@ -146,6 +146,17 @@ class GitHub(Backend):
         ''' Returns an iterator for the data gathered '''
 
         if self.use_cache:
+            cache_items = []
+            for item in self.cache:
+                if len(cache_items) >= self.elastic.max_items_bulk:
+                    self._items_to_es(cache_items)
+                    cache_items = []
+                cache_items.append(item)
+            self._items_to_es(cache_items)
+            return self
+
+
+        if self.use_cache:
             items_cache = []
             for item in self.cache.items_from_cache():
                 items_cache.append(item)
