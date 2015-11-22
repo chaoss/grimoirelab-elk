@@ -23,7 +23,7 @@ RUN apt-get update && \
         tree ccze \
         psmisc \
         python python3 pep8 \
-        python-requests \
+        python3-requests python3-dateutil \
         make \
         unzip wget sudo \
         && \
