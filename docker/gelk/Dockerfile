@@ -10,7 +10,7 @@ ENV DEPLOY_USER_DIR /home/${DEPLOY_USER}
 ENV SCRIPTS_DIR ${DEPLOY_USER_DIR}/scripts
 
 # Initial user
-RUN useradd bitergia --create-home
+RUN useradd bitergia --create-home --shell /bin/bash
 
 # Helper scripts
 RUN mkdir ${DEPLOY_USER_DIR}/scripts
@@ -25,10 +25,14 @@ RUN apt-get update && \
         python python3 pep8 \
         python-requests \
         make \
-        unzip wget \
+        unzip wget sudo \
         && \
     apt-get clean && \
     find /var/lib/apt/lists -type f -delete
+
+# RUN adduser ${DEPLOY_USER} sudo
+
+RUN echo "${DEPLOY_USER}    ALL=NOPASSWD: ALL" >> /etc/sudoers
 
 USER ${DEPLOY_USER}
 WORKDIR ${DEPLOY_USER_DIR}
