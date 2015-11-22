@@ -18,3 +18,5 @@ kibana:
 
 gelk:
     image: bitergia/gelk
+    links:
+        - elasticsearch
