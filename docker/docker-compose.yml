@@ -1,15 +1,14 @@
 elasticsearch:
-    image: elasticsearch
-    ports:
-        - 9200:9200
-
-elasticsearch2:
     image: elasticsearch:2
+    command: elasticsearch -Des.network.bind_host=0.0.0.0
     ports:
         - 9200:9200
+        - 9300:9300
+    # volumes:
+    #     - ${PWD}/esdata:/usr/share/elasticsearch/data
 
 kibana:
-    image: kibana
+    image: kibana:4.2
     links:
         - elasticsearch
     ports:
