@@ -45,7 +45,7 @@ if __name__ == '__main__':
         logging.debug("Debug mode activated")
     else:
         logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-    logging.getLogger("requests").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
 
     es_index_github = "github_%s_%s" % (args.owner, args.repository)
 

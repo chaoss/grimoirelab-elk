@@ -48,7 +48,7 @@ if __name__ == '__main__':
         logging.debug("Debug mode activated")
     else:
         logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-    logging.getLogger("requests").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
     bugzilla = Bugzilla(args.url, args.nissues, args.detail,

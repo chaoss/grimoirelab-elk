@@ -49,7 +49,7 @@ if __name__ == '__main__':
         logging.debug("Debug mode activated")
     else:
         logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-    logging.getLogger("requests").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
     gerrit = Gerrit(args.user, args.url, args.nreviews, args.cache,
