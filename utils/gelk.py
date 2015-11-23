@@ -35,6 +35,12 @@ from grimoire.elk.bugzilla import BugzillaElastic
 from grimoire.elk.gerrit import GerritElastic
 from grimoire.elk.github import GitHubElastic
 
+from grimoire.ocean.bugzilla import BugzillaOcean
+from grimoire.ocean.gerrit import GerritOcean
+from grimoire.ocean.github import GitHubOcean
+from grimoire.ocean.elastic import ElasticOcean
+
+
 from perceval.backends.bugzilla import Bugzilla
 from perceval.backends.github import GitHub
 from perceval.backends.gerrit import Gerrit
@@ -42,10 +48,13 @@ from perceval.backends.gerrit import Gerrit
 if __name__ == '__main__':
 
     backends = [Bugzilla, GitHub, Gerrit]  # Registry
+    backends_ocean = [GitHubOcean]  # Registry
 
     parser = argparse.ArgumentParser()
+    ElasticOcean.add_params(parser)
 
-    subparsers = parser.add_subparsers(dest='backend', help='perceval backend')
+    subparsers = parser.add_subparsers(dest='backend',
+                                       help='perceval backend')
 
     for backend in backends:
         name = backend.get_name()
@@ -56,7 +65,13 @@ if __name__ == '__main__':
 
     app_init = datetime.now()
 
-    if args.debug:
+    backend_name = args.backend
+
+    if not backend_name:
+        parser.print_help()
+        sys.exit(0)
+
+    if 'debug' in args and args.debug:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
         logging.debug("Debug mode activated")
     else:
@@ -64,24 +79,26 @@ if __name__ == '__main__':
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
 
-    backend_name = args.backend
 
     if backend_name == "bugzilla":
-        backend = Bugzilla(args.url, args.nissues, args.detail,
-                            not args.no_incremental, args.cache)
-        ebackend = BugzillaElastic(backend)
+        backend = Bugzilla(args.url, args.nissues, args.detail, args.cache)
+        enrich_backend = BugzillaElastic(backend)
+        ocean_backend = BugzillaOcean(backend, args.cache, not args.no_incremental)
     elif backend_name == "github":
-        backend = GitHub(args.owner, args.repository, args.token, args.cache,
-                        not args.no_incremental)
-        ebackend = GitHubElastic(backend)
-    elif backend_name == "gerrit":
-        backend = Gerrit(args.user, args.url, args.nreviews, args.cache,
-                        not args.no_incremental)
-        ebackend = GerritElastic(backend, args.sortinghat_db,
-                                args.projects_grimoirelib_db,
-                                args.gerrit_grimoirelib_db)
+        backend = GitHub(args.owner, args.repository, args.token, args.cache)
+        # Ocean enrich
+        enrich_backend = GitHubElastic(backend)
+        # Ocean
+        ocean_backend = GitHubOcean(backend, args.cache, not args.no_incremental)
 
-    es_index = backend.get_name() + backend.get_id()
+    elif backend_name == "gerrit":
+        backend = Gerrit(args.user, args.url, args.nreviews, args.cache)
+        enrich_backend = GerritElastic(backend, args.sortinghat_db,
+                                       args.projects_grimoirelib_db,
+                                       args.gerrit_grimoirelib_db)
+        ocean_backend = GerritOcean(backend, args.cache, not args.no_incremental)
+
+    es_index = backend.get_name() + "_" + backend.get_id()
 
     clean = args.no_incremental
 
@@ -90,47 +107,61 @@ if __name__ == '__main__':
 
 
     try:
+        # Ocean
         state_index = es_index+"_state"
         elastic_state = ElasticSearch(args.elastic_host, args.elastic_port,
-                                      state_index, backend.get_elastic_mappings(),
+                                      state_index,
+                                      ocean_backend.get_elastic_mappings(),
                                       clean)
 
+        # Enriched ocean
         elastic = ElasticSearch(args.elastic_host, args.elastic_port,
-                                es_index, ebackend.get_elastic_mappings(),
+                                es_index,
+                                enrich_backend.get_elastic_mappings(),
                                 clean)
 
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
 
-    backend.set_elastic(elastic_state)
-    ebackend.set_elastic(elastic)
+    ocean_backend.set_elastic(elastic_state)
+    enrich_backend.set_elastic(elastic)
 
     try:
+        # First feed the item in Ocean to use it later
+        ocean_backend.feed()
+
 
         if backend_name == "bugzilla":
             if args.detail == "list":
-                ebackend.issues_list_to_es()
+                enrich_backend.issues_list_to_es(ocean_backend)
             else:
-                ebackend.issues_to_es()
+                enrich_backend.issues_to_es(ocean_backend)
+
         elif backend_name == "github":
-            GitHub.users = ebackend.users_from_es()
+            GitHub.users = enrich_backend.users_from_es()
 
             issues_prs_count = 1
             pulls = []
 
-            for pr in backend.fetch():
+            # Now use the items in Ocean iterator
+            for pr in ocean_backend:
+                if len(pulls) >= elastic.max_items_bulk:
+                    enrich_backend.pullrequests_to_es(pulls)
+                    pulls = []
                 pulls.append(pr)
                 issues_prs_count += 1
+            enrich_backend.pullrequests_to_es(pulls)
 
-            ebackend.pullrequests_to_es(pulls)
             # logging.info("Total Pull Requests " + str(prs_count))
             logging.info("Total Issues Pull Requests " + str(issues_prs_count))
 
         elif backend_name == "gerrit":
-            logging.info("Adding enrichment data to %s" % (ebackend.elastic.index_url))
-            for review in backend.fetch():
-                ebackend.fetch_events(review)
+            logging.info("Adding data to %s" % (ocean_backend.elastic.index_url))
+            logging.info("Adding enrichment data to %s" % (enrich_backend.elastic.index_url))
+
+            for review in ocean_backend:
+                enrich_backend.fetch_events(review)
 
 
     except KeyboardInterrupt:

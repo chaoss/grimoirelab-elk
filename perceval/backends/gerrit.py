@@ -38,6 +38,7 @@ from perceval.utils import get_eta
 from perceval.backends.backend import Backend
 
 
+
 class Gerrit(Backend):
 
     name = "gerrit"
@@ -59,23 +60,19 @@ class Gerrit(Backend):
         parser.add_argument("--projects_grimoirelib_db",
                             help="GrimoireLib projects database")
 
-        Backend.add_params(cmdline_parser)
 
-
-    def __init__(self, user, repository, nreviews,
-                 use_cache = False, incremental = True):
+    def __init__(self, user, repository, nreviews, use_cache = False):
 
         self.gerrit_user = user
-        self.project = repository
+        self.project = None
         self.nreviews = nreviews
         self.url = repository
-        self.elastic = None
         self.version = None  # gerrit version
 
         self.gerrit_cmd  = "ssh -p 29418 %s@%s" % (user, repository)
         self.gerrit_cmd += " gerrit "
 
-        super(Gerrit, self).__init__(use_cache, incremental)
+        super(Gerrit, self).__init__(use_cache)
 
 
     def get_id(self):
@@ -86,22 +83,6 @@ class Gerrit(Backend):
 
     def get_field_unique_id(self):
         return "id"
-
-
-    def get_elastic_mappings(self):
-
-        mapping = '''
-        {
-            "properties": {
-               "project": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               }
-            }
-        }
-        '''
-
-        return {"items":mapping}
 
 
     def get_url(self):
@@ -137,156 +118,96 @@ class Gerrit(Backend):
         self.version = [mayor, minor]
         return  self.version
 
+    def _get_gerrit_cmd(self):
 
-    def _get_server_reviews(self, project = None):
+        cmd = self.gerrit_cmd + " query "
+        if self.project:
+            cmd +="project:"+self.project+" "
+        cmd += "limit:" + str(self.nreviews)
+
+        # This does not work for Wikimedia 2.8.1 version
+        cmd += " '(status:open OR status:closed)' "
+
+        cmd += " --all-approvals --comments --format=JSON"
+
+        self.number_results = self.nreviews
+
+        return cmd 
+
+    def _get_items(self):
         """ Get all reviews for all or for a project """
 
-        if project:
-            logging.info("Getting reviews for: %s" % (project))
-        else:
-            logging.info("Getting all reviews")
-
-        if project:
-            last_update = self._get_last_date(project)
-        else:
-            last_update = self._get_last_date()
-
-        logging.debug("Last update: %s" % (last_update))
+        reviews = []
+        self.more_updates = True
 
         gerrit_version = self._get_version()
 
-        last_item = None
-        if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
-            last_item = 0
+        cmd = self._get_gerrit_cmd()
 
-        gerrit_cmd_prj = self.gerrit_cmd + " query "
-        if project:
-            gerrit_cmd_prj +="project:"+project+" "
-        gerrit_cmd_prj += "limit:" + str(self.nreviews)
+        if self.last_item is not None:
+            if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
+                cmd += " --start=" + str(self.last_item)
+            else:
+                cmd += " resume_sortkey:" + self.last_item
 
-        # This does not work for Wikimedia 2.8.1 version
-        gerrit_cmd_prj += " '(status:open OR status:closed)' "
+        logging.debug(cmd)
+        task_init = time()
+        raw_data = subprocess.check_output(cmd, shell = True)
+        raw_data = str(raw_data, "UTF-8")
+        tickets_raw = "[" + raw_data.replace("\n", ",") + "]"
+        tickets_raw = tickets_raw.replace(",]", "]")
 
-        gerrit_cmd_prj += " --all-approvals --comments --format=JSON"
+        tickets = json.loads(tickets_raw)
 
-        number_results = self.nreviews
-
-        reviews = []
-        more_updates = True
-
-        while (number_results == self.nreviews + 1 or # wikimedia gerrit returns limit+1
-               number_results == self.nreviews) and \
-               more_updates:
-
-            reviews_loop = []
-            cmd = gerrit_cmd_prj
-            if last_item is not None:
-                if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
-                    cmd += " --start=" + str(last_item)
-                else:
-                    cmd += " resume_sortkey:" + last_item
-
-            logging.debug(cmd)
-            task_init = time()
-            raw_data = subprocess.check_output(cmd, shell = True)
-            raw_data = str(raw_data, "UTF-8")
-            tickets_raw = "[" + raw_data.replace("\n", ",") + "]"
-            tickets_raw = tickets_raw.replace(",]", "]")
-
-            tickets = json.loads(tickets_raw)
-
-            for entry in tickets:
-                if self.incremental and last_update:
-                    if 'project' in entry.keys():
-                        entry_lastUpdated = \
-                            datetime.fromtimestamp(entry['lastUpdated'])
-                        if entry_lastUpdated <= parser.parse(last_update):
-                            if project:
-                                logging.debug("No more updates for %s" % (project))
-                            else:
-                                logging.debug("No more updates for %s" % (self.url))
-                            more_updates = False
-                            break
-
+        for entry in tickets:
+            if self.start:
                 if 'project' in entry.keys():
-                    entry['lastUpdated_date'] = \
-                        datetime.fromtimestamp(entry['lastUpdated']).isoformat()
-                    reviews_loop.append(entry)
-                    if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
-                        last_item += 1
-                    else:
-                        last_item = entry['sortKey']
-                elif 'rowCount' in entry.keys():
-                    # logging.info("CONTINUE FROM: " + str(last_item))
-                    number_results = entry['rowCount']
+                    entry_lastUpdated = \
+                        datetime.fromtimestamp(entry['lastUpdated'])
+                    if entry_lastUpdated <= parser.parse(self.start):
+                        logging.debug("No more updates for %s" % (self.url))
+                        self.more_updates = False
+                        break
 
-            logging.info("Received %i reviews in %.2fs" % (len(reviews_loop),
-                                                           time()-task_init))
-            self.cache.items_to_cache(reviews_loop)
-            self._items_to_es(reviews_loop)
+            if 'project' in entry.keys():
+                entry['lastUpdated_date'] = \
+                    datetime.fromtimestamp(entry['lastUpdated']).isoformat()
+                reviews.append(entry)
+                if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
+                    self.last_item += 1
+                else:
+                    self.last_item = entry['sortKey']
+            elif 'rowCount' in entry.keys():
+                # logging.info("CONTINUE FROM: " + str(last_item))
+                self.number_results = entry['rowCount']
 
-            reviews += reviews_loop
-
-
-        if self.incremental:
-            logging.info("Total new reviews: %i" % len(reviews))
-        else:
-            logging.info("Total reviews: %i" % len(reviews))
+        logging.info("Received %i reviews in %.2fs" % (len(reviews),
+                                                       time()-task_init))
+        self.cache.items_to_cache(reviews)
 
         return reviews
 
-    def get_field_date(self):
-        return "lastUpdated_date"
+    def __iter__(self):
+        self.last_item = None
 
+        gerrit_version = self._get_version()
 
-    def _get_last_date(self, project = None):
+        if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
+            self.last_item = 0
 
-        _filter = None
-
-        if project:
-            _filter = {}
-            _filter['name'] = 'project'
-            _filter['value'] = project
-
-        return self.elastic.get_last_date(self.get_field_date(), _filter)
-
-
-    def fetch(self):
-
-        if self.use_cache:
-            cache_items = []
-            for item in self.cache:
-                if len(cache_items) >= self.elastic.max_items_bulk:
-                    self._items_to_es(cache_items)
-                    cache_items = []
-                cache_items.append(item)
-            self._items_to_es(cache_items)
-            return self
-
-
-        # if repository != "openstack/cinder": continue
-        task_init = time()
-
-        self._get_server_reviews()
-
-        gerrit_time_sec = (time()-task_init)/60
-        logging.info("Fetch completed %.2f" % (gerrit_time_sec))
+        self.items_pool = self._get_items()
 
         return self
 
+    def __next__(self):
+        if len(self.items_pool) == 0:
+            # wikimedia gerrit returns limit+1
+            if (self.number_results == self.nreviews + 1 or
+                self.number_results == self.nreviews) and \
+                self.more_updates:
+                    self.items_pool = self._get_items()
+            else:
+                raise StopIteration
 
-    def _get_reviews_all(self):
-        """ Get all reviews from the repository  """
+        return self.items_pool.pop()
 
-        logging.error("Experimental feature for internal use.")
-
-        return []
-
-        task_init = datetime.now()
-        self.reviews = self._get_server_reviews()
-        task_time = (datetime.now() - task_init).total_seconds()
-
-        logging.info("Completed in %.2f min\n" % (task_time))
-
-
-        return self.reviews

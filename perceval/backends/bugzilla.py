@@ -27,7 +27,6 @@
 
 from datetime import datetime, timedelta
 import logging
-import os
 from urllib.parse import urlparse, urljoin
 from xml.etree import ElementTree
 
@@ -37,6 +36,7 @@ from bs4 import BeautifulSoup, Comment as BFComment
 
 from perceval.backends.backend import Backend
 from perceval.utils import get_eta
+
 
 class Bugzilla(Backend):
 
@@ -58,17 +58,13 @@ class Bugzilla(Backend):
         parser.add_argument("--nissues",  default=200, type=int,
                             help="Number of XML issues to get per query")
 
-        Backend.add_params(cmdline_parser)
 
-
-    def __init__(self, url, nissues, detail, incremental = True, 
-                 use_cache = False):
+    def __init__(self, url, nissues, detail, use_cache = False):
 
         '''
             :url: repository url, incuding bugzilla URL and opt product param
             :nissues: number of issues to get per query
             :detail: list, issue or changes details
-            :incremental: Use data last state and update incrementally
             :use_cache: use cache
         '''
 
@@ -77,7 +73,7 @@ class Bugzilla(Backend):
         self.nissues = nissues
         self.detail = detail
 
-        super(Bugzilla, self).__init__(use_cache, incremental)
+        super(Bugzilla, self).__init__(use_cache)
 
 
     def get_id(self):
@@ -101,26 +97,6 @@ class Bugzilla(Backend):
         tree = ElementTree.fromstring(r.content)
 
         self.bugzilla_version = tree.attrib['version']
-
-    def get_field_date(self):
-        field = None
-        if self.detail == "list":
-            field = 'changeddate_date'
-        else:
-            field = 'delta_ts_date'
-
-        return field
-
-    def _get_last_update_date(self):
-        ''' Find in JSON storage the last update date '''
-
-        last_update = self.elastic.get_last_date(self.get_field_date())
-            # Format date so it can be used as URL param in bugzilla
-        if last_update is not None:
-            last_update = last_update.replace("T", " ")
-
-        return last_update
-
 
     def get_field_unique_id(self):
         return "bug_id"
@@ -284,19 +260,9 @@ class Bugzilla(Backend):
         return domain
 
 
-    def fetch(self):
+    def _get_items_ids(self, url, from_date):
 
-        if self.use_cache:
-            cache_items = []
-            for item in self.cache:
-                if len(cache_items) >= self.elastic.max_items_bulk:
-                    self._items_to_es(cache_items)
-                    cache_items = []
-                cache_items.append(item)
-            self._items_to_es(cache_items)
-            return self
-
-        def get_issues_list_url(base_url, version, from_date_str=None):
+        def get_issues_ids_url(base_url, version, from_date_str=None):
             # from_date should be increased in 1s to not include last issue
 
             if from_date_str is not None:
@@ -333,37 +299,58 @@ class Bugzilla(Backend):
 
             return url
 
-        def _retrieve_issues_ids(url, from_date):
-            logging.info("Getting issues list ...")
+        logging.info("Getting issues list ...")
 
-            # return ['963423', '954188']
+        # return ['963423', '954188']
 
-            url = get_issues_list_url(url, self._get_version(), from_date)
+        url = get_issues_ids_url(url, self._get_version(), from_date)
 
-            logging.info("List url %s" % (url))
+        logging.info("List url %s" % (url))
 
-            r = requests.get(url)
+        r = requests.get(url)
 
-            content = str(r.content, 'UTF-8')
+        content = str(r.content, 'UTF-8')
 
-            csv = content.split('\n')[1:]
+        self.csv = content.split('\n')[1:]
 
-            if self.detail == "list":
-                issues = []
-                for line in csv:
-                    issue = self._get_issue_json(csv_line = line)
-                    issues.append(issue)
-                self._items_to_es(issues)
+        ids = []
+        for line in self.csv:
+            # 0: bug_id, 7: changeddate
+            values = line.split(',')
+            issue_id = values[0]
+            change_ts = values[-1].strip('"')
+            ids.append([issue_id, change_ts])
 
-            ids = []
-            for line in csv:
-                # 0: bug_id, 7: changeddate
-                values = line.split(',')
-                issue_id = values[0]
-                change_ts = values[-1].strip('"')
-                ids.append([issue_id, change_ts])
+        return ids
 
-            return ids
+    def _get_changes_html(self, issue_id):
+        base_url = self._get_domain()
+
+        activity_url = base_url + "show_activity.cgi?id=" + issue_id
+        logging.debug("Getting changes for issue %s from %s" %
+                     (issue_id, activity_url))
+
+        changes_html = requests.get(activity_url).content
+        changes_html = changes_html.decode('utf-8')
+
+        return changes_html
+
+    def _get_item(self, bug_xml_tree):
+        ''' Return a dict with selected fields '''
+
+        # Time to gather changes for this issue
+        issue_id = bug_xml_tree.findall('bug_id')[0].text
+        changes_html = None
+        if self.detail == "change":
+            changes_html = self._get_changes_html(issue_id)
+
+        issue_processed = self._get_issue_json(issue_xml = bug_xml_tree,
+                                               changes_html = changes_html)
+
+        return issue_processed
+
+
+    def _get_items(self, ids):
 
         def get_issues_info_url(base_url, ids):
             url = base_url + "show_bug.cgi?"
@@ -376,115 +363,74 @@ class Bugzilla(Backend):
             url += "&excludefield=attachmentdata"
             return url
 
-        def get_changes_html(issue_id):
-            base_url = self._get_domain()
-
-            activity_url = base_url + "show_activity.cgi?id=" + issue_id
-            logging.debug("Getting changes for issue %s from %s" %
-                         (issue_id, activity_url))
-
-            changes_html = requests.get(activity_url).content
-            changes_html = changes_html.decode('utf-8')
-
-            return changes_html
-
-        def get_issue_proccesed(bug_xml_tree):
-            ''' Return a dict with selected fields '''
-
-            # Time to gather changes for this issue
-            issue_id = bug_xml_tree.findall('bug_id')[0].text
-            changes_html = None
-            if self.detail == "change":
-                changes_html = get_changes_html(issue_id)
+        if self.detail == "list":
+            issues = []
+            for line in self.csv:
+                issue = self._get_issue_json(csv_line = line)
+                issues.append(issue)
+            self.ids = []
+            return issues
 
 
-            issue_processed = self._get_issue_json(issue_xml = bug_xml_tree,
-                                                   changes_html = changes_html)
+        total = len(ids)
+        issues_processed = []  # Issues JSON ready to inserted in ES
+        base_url = self._get_domain()
 
-            return issue_processed
-
-
-        def _retrieve_issues(ids):
-
-            total = len(ids)
-            issues_processed = []  # Issues JSON ready to inserted in ES
-            base_url = self._get_domain()
-
-            # We want to use pop() to get the oldest first so we must reverse the
-            # order
-            ids.reverse()
-            while ids:
-                query_issues = []
-                issues = []
-                while len(query_issues) < self.nissues and ids:
-                    query_issues.append(ids.pop())
-
-                # Retrieving main bug information
-                task_init = datetime.now()
-                url = get_issues_info_url(base_url, query_issues)
-                issues_raw = requests.get(url)
-
-                tree = ElementTree.fromstring(issues_raw.content)
-
-                for bug in tree:
-                    issues.append(get_issue_proccesed(bug))
-
-
-                # Each time we receive data from bugzilla server dump it
-                self._items_to_es(issues)
-
-                issues_processed += issues
-
-                task_time = (datetime.now() - task_init).total_seconds()
-                eta_time = task_time/len(issues) * (total-len(issues_processed))
-                eta_min = eta_time / 60.0
-
-                logging.info("Completed %i/%i (ETA iteration: %.2f min)" \
-                             % (len(issues_processed), total, eta_min))
-            return issues_processed
-
-
-        _type = "issues"
-
-        logging.info("Getting issues from Bugzilla")
-
-        last_update = self._get_last_update_date()
-
-        # last_update = "2015-11-01"
-
-        if last_update is not None:
-            logging.info("Incremental analysis: %s" % (last_update))
-
-        ids = _retrieve_issues_ids(self.url, last_update)
-        if len(ids) > 0:
-            prj_first_date = parser.parse(ids[0][1])
-        prj_last_date = datetime.now()
-        total_issues = 0
-
+        # We want to use pop() to get the oldest first so we must reverse the
+        # order
+        ids.reverse()
         while ids:
-            logging.info("Issues to get in this iteration %i in %i packs"
-                         % (len(ids), self.nissues))
+            query_issues = []
+            issues = []
+            while len(query_issues) < self.nissues and ids:
+                query_issues.append(ids.pop())
 
-            if self.detail in ['issue', 'change']:
-                issues_processed = _retrieve_issues(ids)
-                logging.info("Issues received in this iteration %i" %
-                             len(issues_processed))
-                total_issues += len(issues_processed)
+            # Retrieving main bug information
+            task_init = datetime.now()
+            url = get_issues_info_url(base_url, query_issues)
+            issues_raw = requests.get(url)
+
+            tree = ElementTree.fromstring(issues_raw.content)
+
+            for bug in tree:
+                issues.append(self.get_item(bug))
+
+
+            # Each time we receive data from bugzilla server dump it
+            self._items_to_es(issues)
+
+            issues_processed += issues
+
+            task_time = (datetime.now() - task_init).total_seconds()
+            eta_time = task_time/len(issues) * (total-len(issues_processed))
+            eta_min = eta_time / 60.0
+
+            logging.info("Completed %i/%i (ETA iteration: %.2f min)" \
+                         % (len(issues_processed), total, eta_min))
+        return issues_processed
+
+
+
+    def __iter__(self):
+        self.ids = self._get_items_ids(self.url, self.start)
+        if len(self.ids) > 0:
+            self.prj_first_date = parser.parse(self.ids[0][1])
+        self.prj_last_date = datetime.now()
+        self.total_issues = 0
+
+        self.items_pool  = self._get_items(self.ids)
+
+        return self
+
+    def __next__(self):
+        if len(self.items_pool) == 0:
+            if len(self.ids) > 0 :
+                self.items_pool = self._get_items(self.ids)
             else:
-                total_issues += len(ids)
+                raise StopIteration
 
-            if len(ids) > 0:
-                last_update = ids[-1][1]
+        return self.items_pool.pop()
 
-                eta = get_eta(parser.parse(last_update), prj_first_date,
-                              prj_last_date)
-                if eta: print ("ETA: %.2f min" % eta)
-
-                ids = _retrieve_issues_ids(self.url, last_update)
-
-        logging.info("Total issues gathered %i" % total_issues)
-
-        return self  # iterator
 
 
 class BugzillaChangesHTMLParser(object):

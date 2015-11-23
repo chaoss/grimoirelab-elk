@@ -66,7 +66,7 @@ class BugzillaElastic(object):
 
         return issue
 
-    def issues_list_to_es(self):
+    def issues_list_to_es(self, ocean):
 
         elastic_type = "issues_list"
 
@@ -80,7 +80,7 @@ class BugzillaElastic(object):
         logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
         # In this client, we will publish all data in Elastic Search
-        for issue in self.bugzilla.fetch():
+        for issue in ocean:
             if current >= max_items:
                 task_init = time()
                 requests.put(url, data=bulk_json)
@@ -100,7 +100,7 @@ class BugzillaElastic(object):
                       % (time()-task_init, total))
 
 
-    def issues_to_es(self):
+    def issues_to_es(self, ocean):
 
         elastic_type = "issues"
 
@@ -112,7 +112,7 @@ class BugzillaElastic(object):
 
         logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
-        for issue in self.bugzilla.fetch():
+        for issue in ocean:
             if current >= max_items:
                 requests.put(url, data=bulk_json)
                 bulk_json = ""
