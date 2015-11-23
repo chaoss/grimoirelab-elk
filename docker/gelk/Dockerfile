@@ -23,14 +23,16 @@ RUN apt-get update && \
         tree ccze \
         psmisc \
         python python3 pep8 \
-        python3-requests python3-dateutil \
-        make \
-        unzip wget sudo \
+        python3-requests python3-dateutil python3-bs4 \
+        python3-pip python3-dev \
+        gcc make libmysqlclient-dev \
+        unzip wget sudo vim ssh \
         && \
     apt-get clean && \
     find /var/lib/apt/lists -type f -delete
 
-# RUN adduser ${DEPLOY_USER} sudo
+# Not available as package in Debian 8 python3-myssqldb
+RUN pip3 install mysqlclient
 
 RUN echo "${DEPLOY_USER}    ALL=NOPASSWD: ALL" >> /etc/sudoers
 

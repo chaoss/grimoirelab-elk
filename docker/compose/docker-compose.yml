@@ -20,3 +20,5 @@ gelk:
     image: bitergia/gelk
     links:
         - elasticsearch
+    volumes:
+        - ~/devel/GrimoireELK:/home/bitergia/GrimoireELK
