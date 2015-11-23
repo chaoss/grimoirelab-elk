@@ -40,7 +40,7 @@ from perceval.utils import get_eta
 
 class Bugzilla(Backend):
 
-    _name = "bugzilla"  # to be used for human interaction
+    name = "bugzilla"  # to be used for human interaction
 
     @classmethod
     def add_params(cls, cmdline_parser):
@@ -78,11 +78,6 @@ class Bugzilla(Backend):
         self.detail = detail
 
         super(Bugzilla, self).__init__(use_cache, incremental)
-
-
-    def _get_name(self):
-
-        return Bugzilla._name
 
 
     def get_id(self):

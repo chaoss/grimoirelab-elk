@@ -117,23 +117,26 @@ class Backend(object):
             return
 
         logging.info("Adding items to state for %s (%i items)" %
-                      (self._get_name(), len(json_items)))
+                      (self.get_name(), len(json_items)))
 
         field_id = self.get_field_unique_id()
 
         self.elastic.bulk_upload_sync(json_items, field_id, self.incremental)
 
 
-    def _get_name(self):
+    @classmethod
+    def get_name(cls):
         ''' Human name for the backend class '''
-        raise NotImplementedError
+
+        return cls.name
+
 
 
     def _get_storage_dir(self):
 
         home = expanduser("~")
         '''Get directory in which to store backend data'''
-        _dir = join(home, ".perceval", self._get_name(), self.get_id())
+        _dir = join(home, ".perceval", self.get_name(), self.get_id())
 
         return _dir
 

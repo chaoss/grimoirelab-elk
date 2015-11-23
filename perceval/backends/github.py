@@ -36,7 +36,7 @@ from perceval.utils import get_eta, remove_last_char_from_file
 
 class GitHub(Backend):
 
-    _name = "github"
+    name = "github"
     users = {}
 
     @classmethod
@@ -81,11 +81,6 @@ class GitHub(Backend):
         url = url_issues + url_params
 
         return url
-
-
-    def _get_name(self):
-
-        return GitHub._name
 
 
     def get_id(self):

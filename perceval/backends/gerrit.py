@@ -40,7 +40,7 @@ from perceval.backends.backend import Backend
 
 class Gerrit(Backend):
 
-    _name = "gerrit"
+    name = "gerrit"
 
     @classmethod
     def add_params(cls, cmdline_parser):
@@ -78,14 +78,10 @@ class Gerrit(Backend):
         super(Gerrit, self).__init__(use_cache, incremental)
 
 
-    def _get_name(self):
-
-        return Gerrit._name
-
     def get_id(self):
         ''' Return gerrit unique identifier '''
 
-        return self._get_name() + "_" + self.url
+        return self.url
 
 
     def get_field_unique_id(self):
