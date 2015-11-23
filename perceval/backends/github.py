@@ -64,7 +64,6 @@ class GitHub(Backend):
         github_api_repos = github_api + "/repos"
         url_repo = github_api_repos + "/" + self.owner +"/" + self.repository
 
-        url_pulls = url_repo + "/pulls"
         url_issues = url_repo + "/issues"
 
         url_params = "?per_page=" + str(github_per_page)
@@ -85,19 +84,6 @@ class GitHub(Backend):
 
     def get_field_unique_id(self):
         return "id"
-
-
-    def _find_pull_requests(self, issues):
-
-        pulls = []
-
-        for issue in issues:
-            if not 'head' in issue.keys() and not 'pull_request' in issue.keys():
-            # An issue that it is not a PR
-                continue
-            pulls.append(issue)
-
-        return pulls
 
 
     def _get_items(self):
