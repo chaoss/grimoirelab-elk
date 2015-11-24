@@ -49,18 +49,14 @@ class GerritEnrich(Enrich):
 
     def __init__(self, gerrit, sortinghat_db = None,
                  projects_grimoirelib_db = None,
-                 gerrit_grimoirelib_db = None, 
-                 args = None):
+                 gerrit_grimoirelib_db = None):
         self.gerrit = gerrit
         self.elastic = None
-        if args:
-            sortinghat_db = args.sortinghat_db
-            gerrit_grimoirelib_db = args.gerrit_grimoirelib_db
-            gerrit_grimoirelib_db = args.projects_grimoirelib_db
         self.sortinghat = SortingHat (sortinghat_db, gerrit_grimoirelib_db)
         self.grimoirelib_projects = None
         if projects_grimoirelib_db:
-            self.grimoirelib_projects = GrimoireLibProjects(projects_grimoirelib_db, gerrit.get_url())
+            self.grimoirelib_projects = \
+                GrimoireLibProjects(projects_grimoirelib_db, gerrit.get_url())
 
     def set_elastic(self, elastic):
         self.elastic = elastic

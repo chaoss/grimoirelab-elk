@@ -38,7 +38,7 @@ from perceval.utils import get_time_diff_days
 
 class BugzillaEnrich(Enrich):
 
-    def __init__(self, bugzilla, args = None):
+    def __init__(self, bugzilla):
         self.bugzilla = bugzilla
         self.elastic = None
 

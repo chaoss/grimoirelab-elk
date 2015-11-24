@@ -56,19 +56,13 @@ class Gerrit(Backend):
 
 
     def __init__(self, user = None, url = None, nreviews = None, 
-                 use_cache = False, args = None):
+                 use_cache = False):
 
 
-        if not args:
-            self.gerrit_user = user
-            self.nreviews = nreviews
-            self.url = url
-            use_cache = use_cache
-        else:
-            self.gerrit_user = args.user
-            self.nreviews = args.nreviews
-            self.url = args.url
-            use_cache = args.cache
+        self.gerrit_user = user
+        self.nreviews = nreviews
+        self.url = url
+        use_cache = use_cache
 
         self.project = None
         self.version = None

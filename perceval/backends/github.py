@@ -49,18 +49,12 @@ class GitHub(Backend):
 
 
 
-    def __init__(self, owner = None, repository = None, auth_token = None, 
-                 use_cache = False, args = None):
+    def __init__(self, owner = None, repository = None, auth_token = None,
+                 use_cache = False):
 
-        if not args:
-            self.owner = owner
-            self.repository = repository
-            self.auth_token = auth_token
-        else:
-            self.owner = args.owner
-            self.repository = args.repository
-            self.auth_token = args.token
-            use_cache = args.cache
+        self.owner = owner
+        self.repository = repository
+        self.auth_token = auth_token
 
         self.url = self._get_url()
         super(GitHub, self).__init__(use_cache)
