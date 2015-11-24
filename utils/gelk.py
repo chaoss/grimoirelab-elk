@@ -31,9 +31,9 @@ from os import sys
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.elk.elastic import ElasticConnectException
 
-from grimoire.elk.bugzilla import BugzillaElastic
-from grimoire.elk.gerrit import GerritElastic
-from grimoire.elk.github import GitHubElastic
+from grimoire.elk.bugzilla import BugzillaEnrich
+from grimoire.elk.gerrit import GerritEnrich
+from grimoire.elk.github import GitHubEnrich
 
 from grimoire.ocean.bugzilla import BugzillaOcean
 from grimoire.ocean.gerrit import GerritOcean
@@ -45,10 +45,22 @@ from perceval.backends.bugzilla import Bugzilla
 from perceval.backends.github import GitHub
 from perceval.backends.gerrit import Gerrit
 
+def get_connector_from_name(name, connectors):
+    found = None
+
+    for connector in connectors:
+        backend = connector[0]
+        if backend.get_name() == name:
+            found = connector
+
+    return found
+
+
 if __name__ == '__main__':
 
-    backends = [Bugzilla, GitHub, Gerrit]  # Registry
-    backends_ocean = [GitHubOcean]  # Registry
+    connectors = [[Bugzilla, BugzillaOcean, BugzillaEnrich],
+                  [GitHub, GitHubOcean, GitHubEnrich],
+                  [Gerrit, GerritOcean, GerritEnrich]]  # Will come from Registry
 
     parser = argparse.ArgumentParser()
     ElasticOcean.add_params(parser)
@@ -56,10 +68,12 @@ if __name__ == '__main__':
     subparsers = parser.add_subparsers(dest='backend',
                                        help='perceval backend')
 
-    for backend in backends:
-        name = backend.get_name()
+    for connector in connectors:
+        name = connector[0].get_name()
         subparser = subparsers.add_parser(name, help='gelk %s -h' % name)
-        backend.add_params(subparser)
+        # We need params for feed and for enrich
+        connector[0].add_params(subparser)
+        connector[2].add_params(subparser)
 
     args = parser.parse_args()
 
@@ -79,24 +93,10 @@ if __name__ == '__main__':
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
 
-
-    if backend_name == "bugzilla":
-        backend = Bugzilla(args.url, args.nissues, args.detail, args.cache)
-        enrich_backend = BugzillaElastic(backend)
-        ocean_backend = BugzillaOcean(backend, args.cache, not args.no_incremental)
-    elif backend_name == "github":
-        backend = GitHub(args.owner, args.repository, args.token, args.cache)
-        # Ocean enrich
-        enrich_backend = GitHubElastic(backend)
-        # Ocean
-        ocean_backend = GitHubOcean(backend, args.cache, not args.no_incremental)
-
-    elif backend_name == "gerrit":
-        backend = Gerrit(args.user, args.url, args.nreviews, args.cache)
-        enrich_backend = GerritElastic(backend, args.sortinghat_db,
-                                       args.projects_grimoirelib_db,
-                                       args.gerrit_grimoirelib_db)
-        ocean_backend = GerritOcean(backend, args.cache, not args.no_incremental)
+    connector = get_connector_from_name(backend_name, connectors)
+    backend = connector[0](args = args)
+    ocean_backend = connector[1](backend)
+    enrich_backend = connector[2](backend, args = args)
 
     es_index = backend.get_name() + "_" + backend.get_id()
 
@@ -129,39 +129,29 @@ if __name__ == '__main__':
 
     try:
         # First feed the item in Ocean to use it later
+        logging.info("Adding data to %s" % (ocean_backend.elastic.index_url))
         ocean_backend.feed()
 
-
-        if backend_name == "bugzilla":
-            if args.detail == "list":
-                enrich_backend.issues_list_to_es(ocean_backend)
-            else:
-                enrich_backend.issues_to_es(ocean_backend)
-
-        elif backend_name == "github":
+        if backend_name == "github":
             GitHub.users = enrich_backend.users_from_es()
 
-            issues_prs_count = 1
-            pulls = []
+        logging.info("Adding enrichment data to %s" % 
+                     (enrich_backend.elastic.index_url))
 
-            # Now use the items in Ocean iterator
-            for pr in ocean_backend:
-                if len(pulls) >= elastic.max_items_bulk:
-                    enrich_backend.pullrequests_to_es(pulls)
-                    pulls = []
-                pulls.append(pr)
-                issues_prs_count += 1
-            enrich_backend.pullrequests_to_es(pulls)
 
-            # logging.info("Total Pull Requests " + str(prs_count))
-            logging.info("Total Issues Pull Requests " + str(issues_prs_count))
+        items = []
+        items_count = 1
 
-        elif backend_name == "gerrit":
-            logging.info("Adding data to %s" % (ocean_backend.elastic.index_url))
-            logging.info("Adding enrichment data to %s" % (enrich_backend.elastic.index_url))
+        for item in ocean_backend:
+            if len(items) >= elastic.max_items_bulk:
+                enrich_backend.enrich_items(items)
+                items = []
+            items.append(item)
+            items_count += 1
+        enrich_backend.enrich_items(items)
 
-            for review in ocean_backend:
-                enrich_backend.fetch_events(review)
+        logging.info("Total items enriched %i " %  items_count)
+
 
 
     except KeyboardInterrupt:

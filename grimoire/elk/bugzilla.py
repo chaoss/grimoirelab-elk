@@ -30,12 +30,15 @@ import logging
 import requests
 from urllib.parse import urlparse
 
+from grimoire.elk.enrich import Enrich
+
+
 from perceval.utils import get_time_diff_days
 
 
-class BugzillaElastic(object):
+class BugzillaEnrich(Enrich):
 
-    def __init__(self, bugzilla):
+    def __init__(self, bugzilla, args = None):
         self.bugzilla = bugzilla
         self.elastic = None
 
@@ -66,7 +69,14 @@ class BugzillaElastic(object):
 
         return issue
 
-    def issues_list_to_es(self, ocean):
+    def enrich_items(self, items):
+        if self.bugzilla.detail == "list":
+            self.issues_list_to_es(items)
+        else:
+            self.issues_to_es(self, items)
+
+
+    def issues_list_to_es(self, items):
 
         elastic_type = "issues_list"
 
@@ -80,7 +90,7 @@ class BugzillaElastic(object):
         logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
         # In this client, we will publish all data in Elastic Search
-        for issue in ocean:
+        for issue in items:
             if current >= max_items:
                 task_init = time()
                 requests.put(url, data=bulk_json)
@@ -100,7 +110,7 @@ class BugzillaElastic(object):
                       % (time()-task_init, total))
 
 
-    def issues_to_es(self, ocean):
+    def issues_to_es(self, items):
 
         elastic_type = "issues"
 
@@ -112,7 +122,7 @@ class BugzillaElastic(object):
 
         logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
-        for issue in ocean:
+        for issue in items:
             if current >= max_items:
                 requests.put(url, data=bulk_json)
                 bulk_json = ""

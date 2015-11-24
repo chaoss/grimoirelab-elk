@@ -59,20 +59,28 @@ class Bugzilla(Backend):
                             help="Number of XML issues to get per query")
 
 
-    def __init__(self, url, nissues, detail, use_cache = False):
+    def __init__(self, url = None, nissues = None, detail = "list", 
+                 use_cache = False, args = None):
 
         '''
+            :args: command line params to be used
             :url: repository url, incuding bugzilla URL and opt product param
             :nissues: number of issues to get per query
             :detail: list, issue or changes details
             :use_cache: use cache
         '''
+        if not args:
+            self.url = url
+            self.bugzilla_version = self._get_version()
+            self.nissues = nissues
+            self.detail = detail
+        else:
+            self.url = args.url
+            self.nissues = args.nissues
+            self.detail = args.detail
+            self.use_cache = args.cache
 
-        self.url = url
         self.bugzilla_version = self._get_version()
-        self.nissues = nissues
-        self.detail = detail
-
         super(Bugzilla, self).__init__(use_cache)
 
 

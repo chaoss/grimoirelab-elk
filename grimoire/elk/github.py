@@ -28,10 +28,12 @@ import logging
 import requests
 from perceval.utils import get_time_diff_days
 
+from grimoire.elk.enrich import Enrich
 
-class GitHubElastic(object):
 
-    def __init__(self, github):
+class GitHubEnrich(Enrich):
+
+    def __init__(self, github, args = None):
         self.elastic = None
         self.github = github
         self.index_github = "github"
@@ -273,7 +275,7 @@ class GitHubElastic(object):
 
 
 
-    def pullrequests_to_es(self, pulls):
+    def enrich_items(self, pulls):
 
         logging.debug("Updating Github users in Elastic")
         self.users_to_es()  # update users in Elastic

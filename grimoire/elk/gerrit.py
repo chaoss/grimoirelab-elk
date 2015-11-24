@@ -24,22 +24,40 @@
 #
 
 from datetime import datetime
-import json
 import logging
 import requests
 import time
 
 
+from grimoire.elk.enrich import Enrich
 from grimoire.elk.sortinghat import SortingHat
 from grimoire.elk.projects import GrimoireLibProjects
 
-class GerritElastic(object):
+class GerritEnrich(Enrich):
 
-    def __init__(self, gerrit, sortingnat_db, projects_grimoirelib_db,
-                 gerrit_grimoirelib_db):
+    @classmethod
+    def add_params(cls, cmdline_parser):
+        parser = cmdline_parser
+
+        parser.add_argument("--sortinghat_db",  required=True,
+                            help="Sorting Hat database")
+        parser.add_argument("--gerrit_grimoirelib_db",  required=True,
+                            help="GrimoireLib gerrit database")
+        parser.add_argument("--projects_grimoirelib_db",
+                            help="GrimoireLib projects database")
+
+
+    def __init__(self, gerrit, sortinghat_db = None,
+                 projects_grimoirelib_db = None,
+                 gerrit_grimoirelib_db = None, 
+                 args = None):
         self.gerrit = gerrit
         self.elastic = None
-        self.sortinghat = SortingHat (sortingnat_db, gerrit_grimoirelib_db)
+        if args:
+            sortinghat_db = args.sortinghat_db
+            gerrit_grimoirelib_db = args.gerrit_grimoirelib_db
+            gerrit_grimoirelib_db = args.projects_grimoirelib_db
+        self.sortinghat = SortingHat (sortinghat_db, gerrit_grimoirelib_db)
         self.grimoirelib_projects = None
         if projects_grimoirelib_db:
             self.grimoirelib_projects = GrimoireLibProjects(projects_grimoirelib_db, gerrit.get_url())
@@ -254,18 +272,20 @@ class GerritElastic(object):
         return bulk_json
 
 
-    def fetch_events(self, review):
+    def enrich_items(self, items):
         """ Fetch in ES patches and comments (events) as documents """
 
-        bulk_json = self.review_events(review)
-        url = self.elastic.index_url+'/reviews_events/_bulk'
+        for review in items:
 
-        try:
-            requests.put(url, data=bulk_json)
-        except UnicodeEncodeError:
-            # Why is requests encoding the POST data as ascii?
-            logging.error("Unicode error for events in review: " + review['id'])
-            safe_json = str(bulk_json.encode('ascii', 'ignore'),'ascii')
-            requests.put(url, data=safe_json)
-            # Continue with execution.
+            bulk_json = self.review_events(review)
+            url = self.elastic.index_url+'/reviews_events/_bulk'
+
+            try:
+                requests.put(url, data=bulk_json)
+            except UnicodeEncodeError:
+                # Why is requests encoding the POST data as ascii?
+                logging.error("Unicode error for events in review: " + review['id'])
+                safe_json = str(bulk_json.encode('ascii', 'ignore'),'ascii')
+                requests.put(url, data=safe_json)
+                # Continue with execution.
 

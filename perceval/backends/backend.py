@@ -68,6 +68,7 @@ class Backend(object):
 
         home = expanduser("~")
         '''Get directory in which to store backend data'''
+
         _dir = join(home, ".perceval", self.get_name(), self.get_id())
 
         return _dir

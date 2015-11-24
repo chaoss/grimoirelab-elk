@@ -53,23 +53,26 @@ class Gerrit(Backend):
                             help="Gerrit url")
         parser.add_argument("--nreviews",  default=500, type=int,
                             help="Number of reviews per ssh query")
-        parser.add_argument("--sortinghat_db",  required=True,
-                            help="Sorting Hat database")
-        parser.add_argument("--gerrit_grimoirelib_db",  required=True,
-                            help="GrimoireLib gerrit database")
-        parser.add_argument("--projects_grimoirelib_db",
-                            help="GrimoireLib projects database")
 
 
-    def __init__(self, user, repository, nreviews, use_cache = False):
+    def __init__(self, user = None, url = None, nreviews = None, 
+                 use_cache = False, args = None):
 
-        self.gerrit_user = user
+
+        if not args:
+            self.gerrit_user = user
+            self.nreviews = nreviews
+            self.url = url
+            use_cache = use_cache
+        else:
+            self.gerrit_user = args.user
+            self.nreviews = args.nreviews
+            self.url = args.url
+            use_cache = args.cache
+
         self.project = None
-        self.nreviews = nreviews
-        self.url = repository
-        self.version = None  # gerrit version
-
-        self.gerrit_cmd  = "ssh -p 29418 %s@%s" % (user, repository)
+        self.version = None
+        self.gerrit_cmd  = "ssh -p 29418 %s@%s" % (self.gerrit_user, self.url)
         self.gerrit_cmd += " gerrit "
 
         super(Gerrit, self).__init__(use_cache)
