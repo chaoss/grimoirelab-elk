@@ -1,0 +1,26 @@
+elasticsearch:
+    image: elasticsearch:2
+    command: elasticsearch -Des.network.bind_host=0.0.0.0
+    # volumes:
+    #     - ${PWD}/esdata:/usr/share/elasticsearch/data
+
+kibana:
+    image: kibana:4.2
+    links:
+        - elasticsearch
+    # Elastic is not visible outside containers, no need to use auth here
+    environment:
+        - ELASTICSEARCH_URL=http://elasticsearch:9200
+
+nginx:
+    image: nginx
+    links:
+        - elasticsearch
+        - kibana
+    ports:
+        - 8000:8000
+        - 9000:9000
+    volumes:
+        - ~/devel/GrimoireELK/docker/compose-auth/nginx.conf:/etc/nginx/nginx.conf:ro
+        - ~/devel/GrimoireELK/docker/compose-auth/es-password:/etc/nginx/es-password:ro
+        - ~/devel/GrimoireELK/docker/compose-auth/kibana-password:/etc/nginx/kibana-password:ro
