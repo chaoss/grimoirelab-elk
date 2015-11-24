@@ -1,6 +1,5 @@
 elasticsearch:
     image: elasticsearch:2
-    command: elasticsearch -Des.network.bind_host=0.0.0.0
     # volumes:
     #     - ${PWD}/esdata:/usr/share/elasticsearch/data
 
