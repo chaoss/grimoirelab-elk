@@ -65,11 +65,17 @@ class ElasticOcean(object):
                             "(default: 9200)")
 
 
-    def __init__(self, perceval_backend, use_cache = False, incremental = True):
+    def __init__(self, perceval_backend, use_cache = False, 
+                 incremental = True, args = None):
 
-        self.use_cache = use_cache
-        self.incremental = incremental
         self.perceval_backend = perceval_backend
+
+        if not args:
+            self.use_cache = use_cache
+            self.incremental = incremental
+        else:
+            self.use_cache = args.cache
+            self.incremental = not args.no_incremental
 
         if self.use_cache:
             # Don't use history data. Will be generated from cache.
