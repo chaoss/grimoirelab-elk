@@ -52,12 +52,64 @@ def get_connector_from_name(name, connectors):
 
     return found
 
-if __name__ == '__main__':
+def get_elastic(args, es_index, ocean_backend):
+    clean = args.no_incremental
 
-    connectors = [[Bugzilla, BugzillaOcean],
-                  [GitHub, GitHubOcean],
-                  [Gerrit, GerritOcean]]  # Will come from Registry
+    if args.cache:
+        clean = True
 
+    try:
+        ocean_index = es_index+"_ocean"
+        elastic_ocean = ElasticSearch(args.elastic_host, args.elastic_port,
+                                      ocean_index,
+                                      ocean_backend.get_elastic_mappings(),
+                                      clean)
+
+    except ElasticConnectException:
+        logging.error("Can't connect to Elastic Search. Is it running?")
+        sys.exit(1)
+
+    return elastic_ocean
+
+
+def feed_backends(args, connectors):
+    ''' Update Ocean for all existing backends '''
+
+    logging.info("Updating all Ocean")
+
+def feed_backend(args, connectors):
+    ''' Feed Ocean with backend data '''
+
+    backend_name = args.backend
+    connector = get_connector_from_name(backend_name, connectors)
+    if not connector:
+        logging.error("Cant find %s backend" % (backend_name))
+        sys.exit(1)
+    backend = connector[0](**vars(args))
+    ocean_backend = connector[1](backend, **vars(args))
+
+    logging.info("Feeding Ocean from %s" % (backend.get_name()))
+
+    es_index = backend.get_name() + "_" + backend.get_id()
+    elastic_ocean = get_elastic(args, es_index, ocean_backend)
+    ocean_backend.set_elastic(elastic_ocean)
+
+    ocean_backend.feed()
+
+    logging.info("Done")
+
+def config_logging(args):
+
+    if 'debug' in args and args.debug:
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
+        logging.debug("Debug mode activated")
+    else:
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("requests").setLevel(logging.WARNING)
+
+def get_params(connectors):
+    ''' Get params definition from ElasticOcean and from all the backends '''
     parser = argparse.ArgumentParser()
     ElasticOcean.add_params(parser)
 
@@ -72,54 +124,26 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    return args
+
+
+if __name__ == '__main__':
+
     app_init = datetime.now()
 
-    backend_name = args.backend
+    connectors = [[Bugzilla, BugzillaOcean],
+                  [GitHub, GitHubOcean],
+                  [Gerrit, GerritOcean]]  # Will come from Registry
 
-    if not backend_name:
-        parser.print_help()
-        sys.exit(0)
+    args = get_params(connectors)
 
-    if 'debug' in args and args.debug:
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
-        logging.debug("Debug mode activated")
-    else:
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
-    logging.getLogger("requests").setLevel(logging.WARNING)
-
-    connector = get_connector_from_name(backend_name, connectors)
-    backend = connector[0](**vars(args))
-    ocean_backend = connector[1](backend, **vars(args))
-
-    es_index = backend.get_name() + "_" + backend.get_id()
-
-    clean = args.no_incremental
-
-    if args.cache:
-        clean = True
+    config_logging(args)
 
     try:
-        # Ocean
-        state_index = es_index+"_state"
-        elastic_state = ElasticSearch(args.elastic_host, args.elastic_port,
-                                      state_index,
-                                      ocean_backend.get_elastic_mappings(),
-                                      clean)
-
-    except ElasticConnectException:
-        logging.error("Can't connect to Elastic Search. Is it running?")
-        sys.exit(1)
-
-    ocean_backend.set_elastic(elastic_state)
-
-    try:
-        logging.info("Feeding Ocean from %s" % (backend.get_name()))
-
-        ocean_backend.feed()
-
-        logging.info("Done")
-
+        if args.backend:
+            feed_backend(args, connectors)
+        else:
+            feed_backends(args, connectors)
 
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
