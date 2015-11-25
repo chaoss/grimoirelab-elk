@@ -73,7 +73,7 @@ def get_elastic(clean, es_index, ocean_backend = None):
     return elastic_ocean
 
 
-def feed_backends(connectors, clean):
+def feed_backends(connectors, clean, debug):
     ''' Update Ocean for all existing backends '''
 
     logging.info("Updating all Ocean")
@@ -83,6 +83,7 @@ def feed_backends(connectors, clean):
     for repo in ConfOcean.get_repos():
         params = repo['params']
         params['no_incremental'] = True  # Always try incremental
+        params['debug'] = debug  # Use for all debug level defined in p2o
 
         feed_backend(params, connectors, clean)
 
@@ -90,30 +91,52 @@ def feed_backends(connectors, clean):
 def feed_backend(params, connectors, clean):
     ''' Feed Ocean with backend data '''
 
+    backend = None
     backend_name = params['backend']
+    repo = {}    # repository data to be stored in conf
+    repo['params'] = params
+    es_index = None
+
     connector = get_connector_from_name(backend_name, connectors)
     if not connector:
         logging.error("Cant find %s backend" % (backend_name))
         sys.exit(1)
-    backend = connector[0](**params)
-    ocean_backend = connector[1](backend, **params)
 
-    logging.info("Feeding Ocean from %s" % (backend.get_name()))
+    try:
+        backend = connector[0](**params)
+        ocean_backend = connector[1](backend, **params)
 
-    es_index = backend.get_name() + "_" + backend.get_id()
-    elastic_ocean = get_elastic(clean, es_index, ocean_backend)
-    ocean_backend.set_elastic(elastic_ocean)
+        logging.info("Feeding Ocean from %s (%s)" % (backend.get_name(),
+                                                     backend.get_id()))
 
-    ConfOcean.set_elastic(elastic_ocean)
+        es_index = backend.get_name() + "_" + backend.get_id()
+        elastic_ocean = get_elastic(clean, es_index, ocean_backend)
+        ocean_backend.set_elastic(elastic_ocean)
 
-    ocean_backend.feed()
+        ConfOcean.set_elastic(elastic_ocean)
 
-    repo = {}
-    repo['params'] = params
+        ocean_backend.feed()
+    except Exception as ex:
+        if backend:
+            logging.error("Error feeding ocean from %s (%s): %s" %
+                          (backend.get_name(), backend.get_id()), ex)
+        else:
+            logging.error("Error feeding ocean %s" % ex)
 
-    ConfOcean.add_repo(es_index, repo)
+        repo['success'] = False
+        repo['error'] = ex
+    else:
+        repo['success'] = True
 
-    logging.info("Done")
+    repo['repo_update'] = datetime.now().isoformat()
+
+    if es_index:
+        ConfOcean.add_repo(es_index, repo)
+    else:
+        logging.debug("Repository not added to Ocean because errors.")
+        logging.debug(params)
+
+    logging.info("Done %s " % (backend_name))
 
 def config_logging(debug):
 
@@ -143,21 +166,23 @@ def get_params(connectors):
 
     return args
 
+def get_connectors():
+
+    return [[Bugzilla, BugzillaOcean],
+            [GitHub, GitHubOcean],
+            [Gerrit, GerritOcean]]  # Will come from Registry
 
 if __name__ == '__main__':
 
     app_init = datetime.now()
 
-    connectors = [[Bugzilla, BugzillaOcean],
-                  [GitHub, GitHubOcean],
-                  [Gerrit, GerritOcean]]  # Will come from Registry
+    connectors = get_connectors() 
 
     args = get_params(connectors)
 
     config_logging(args.debug)
 
     clean = args.no_incremental
-
     if args.cache:
         clean = True
 
@@ -165,7 +190,7 @@ if __name__ == '__main__':
         if args.backend:
             feed_backend(vars(args), connectors, clean)
         else:
-            feed_backends(connectors, clean)
+            feed_backends(connectors, clean, args.debug)
 
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
