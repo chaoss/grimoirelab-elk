@@ -1,0 +1,68 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+#
+# Ocean Configuration Manager
+#
+# Copyright (C) 2015 Bitergia
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# Authors:
+#   Alvaro del Castillo San Felix <acs@bitergia.com>
+#
+
+'''Ocean Configuration Manager (singleton) '''
+
+from datetime import datetime
+import json
+import logging
+import requests
+
+class ConfOcean(object):
+
+    conf_index = "/conf"
+    conf_repos = conf_index+"/repos"
+    elastic = None
+
+    @classmethod
+    def set_elastic(cls, elastic):
+        cls.elastic = elastic
+
+        # Check conf index
+        url = elastic.url + "/" + cls.conf_index
+        r = requests.get(url)
+        if r.status_code != 200:
+            requests.post(url)
+            logging.info("Creating OceanConf index " + url)
+
+
+    @classmethod
+    def add_repo(cls, repo_id, repo):
+        ''' Add a new perceval repository with its arguments '''
+
+        if cls.elastic is None:
+            logging.error("Can't add repo to conf. Ocean elastic is not configured")
+            return
+
+        repo['update'] = datetime.now().isoformat()
+
+        url = cls.elastic.url + "/" + cls.conf_repos + "/" + repo_id
+
+        logging.debug("Addding repo to Ocean %s %s" % (url, repo))
+
+        requests.post(url, data = json.dumps(repo))
+
+
+

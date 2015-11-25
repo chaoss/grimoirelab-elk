@@ -36,6 +36,7 @@ from grimoire.ocean.bugzilla import BugzillaOcean
 from grimoire.ocean.gerrit import GerritOcean
 from grimoire.ocean.github import GitHubOcean
 from grimoire.ocean.elastic import ElasticOcean
+from grimoire.ocean.conf import ConfOcean
 
 # Connectors for Perceval
 from perceval.backends.bugzilla import Bugzilla
@@ -94,7 +95,11 @@ def feed_backend(args, connectors):
     elastic_ocean = get_elastic(args, es_index, ocean_backend)
     ocean_backend.set_elastic(elastic_ocean)
 
+    ConfOcean.set_elastic(elastic_ocean)
+
     ocean_backend.feed()
+
+    ConfOcean.add_repo(es_index, vars(args))
 
     logging.info("Done")
 
