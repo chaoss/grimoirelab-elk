@@ -27,6 +27,7 @@ import argparse
 from datetime import datetime
 import logging
 from os import sys
+import traceback
 
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.elk.elastic import ElasticConnectException
@@ -53,18 +54,17 @@ def get_connector_from_name(name, connectors):
 
     return found
 
-def get_elastic(args, es_index, ocean_backend):
-    clean = args.no_incremental
+def get_elastic(clean, es_index, ocean_backend = None):
 
-    if args.cache:
-        clean = True
+    mapping = None
+
+    if ocean_backend:
+        mapping = ocean_backend.get_elastic_mappings()
 
     try:
-        ocean_index = es_index+"_ocean"
+        ocean_index = es_index
         elastic_ocean = ElasticSearch(args.elastic_host, args.elastic_port,
-                                      ocean_index,
-                                      ocean_backend.get_elastic_mappings(),
-                                      clean)
+                                      ocean_index, mapping, clean)
 
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
@@ -73,39 +73,51 @@ def get_elastic(args, es_index, ocean_backend):
     return elastic_ocean
 
 
-def feed_backends(args, connectors):
+def feed_backends(connectors, clean):
     ''' Update Ocean for all existing backends '''
 
     logging.info("Updating all Ocean")
+    elastic = get_elastic(clean, ConfOcean.get_index())
+    ConfOcean.set_elastic(elastic)
 
-def feed_backend(args, connectors):
+    for repo in ConfOcean.get_repos():
+        params = repo['params']
+        params['no_incremental'] = True  # Always try incremental
+
+        feed_backend(params, connectors, clean)
+
+
+def feed_backend(params, connectors, clean):
     ''' Feed Ocean with backend data '''
 
-    backend_name = args.backend
+    backend_name = params['backend']
     connector = get_connector_from_name(backend_name, connectors)
     if not connector:
         logging.error("Cant find %s backend" % (backend_name))
         sys.exit(1)
-    backend = connector[0](**vars(args))
-    ocean_backend = connector[1](backend, **vars(args))
+    backend = connector[0](**params)
+    ocean_backend = connector[1](backend, **params)
 
     logging.info("Feeding Ocean from %s" % (backend.get_name()))
 
     es_index = backend.get_name() + "_" + backend.get_id()
-    elastic_ocean = get_elastic(args, es_index, ocean_backend)
+    elastic_ocean = get_elastic(clean, es_index, ocean_backend)
     ocean_backend.set_elastic(elastic_ocean)
 
     ConfOcean.set_elastic(elastic_ocean)
 
     ocean_backend.feed()
 
-    ConfOcean.add_repo(es_index, vars(args))
+    repo = {}
+    repo['params'] = params
+
+    ConfOcean.add_repo(es_index, repo)
 
     logging.info("Done")
 
-def config_logging(args):
+def config_logging(debug):
 
-    if 'debug' in args and args.debug:
+    if debug:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
         logging.debug("Debug mode activated")
     else:
@@ -142,13 +154,18 @@ if __name__ == '__main__':
 
     args = get_params(connectors)
 
-    config_logging(args)
+    config_logging(args.debug)
+
+    clean = args.no_incremental
+
+    if args.cache:
+        clean = True
 
     try:
         if args.backend:
-            feed_backend(args, connectors)
+            feed_backend(vars(args), connectors, clean)
         else:
-            feed_backends(args, connectors)
+            feed_backends(connectors, clean)
 
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
