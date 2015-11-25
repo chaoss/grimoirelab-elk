@@ -56,20 +56,20 @@ class Gerrit(Backend):
 
 
     def __init__(self, user = None, url = None, nreviews = None, 
-                 use_cache = False, **nouse):
+                 cache = False, **nouse):
 
 
         self.gerrit_user = user
         self.nreviews = nreviews
         self.url = url
-        use_cache = use_cache
+        cache = cache
 
         self.project = None
         self.version = None
         self.gerrit_cmd  = "ssh -p 29418 %s@%s" % (self.gerrit_user, self.url)
         self.gerrit_cmd += " gerrit "
 
-        super(Gerrit, self).__init__(use_cache)
+        super(Gerrit, self).__init__(cache)
 
 
     def get_id(self):
@@ -180,7 +180,7 @@ class Gerrit(Backend):
 
         logging.info("Received %i reviews in %.2fs" % (len(reviews),
                                                        time()-task_init))
-        self.cache.items_to_cache(reviews)
+        self.cache_items.items_to_cache(reviews)
 
         return reviews
 

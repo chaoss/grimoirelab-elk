@@ -65,16 +65,16 @@ class ElasticOcean(object):
                             "(default: 9200)")
 
 
-    def __init__(self, perceval_backend, use_cache = False,
+    def __init__(self, perceval_backend, cache = False,
                  incremental = True, **nouse):
 
         self.perceval_backend = perceval_backend
 
 
-        self.use_cache = use_cache
+        self.cache = cache
         self.incremental = incremental
 
-        if self.use_cache:
+        if self.cache:
             # Don't use history data. Will be generated from cache.
             self.incremental = False
 
@@ -117,17 +117,21 @@ class ElasticOcean(object):
         task_init = datetime.now()
 
         items = []  # to feed item in packs
+        drop = 0
         for item in self.perceval_backend.fetch(last_update):
             if len(items) >= self.elastic.max_items_bulk:
                 self._items_to_es(items)
                 items = []
             if not self.drop_item(item):
                 items.append(item)
+            else:
+                drop +=1
         self._items_to_es(items)
 
 
         total_time_min = (datetime.now()-task_init).total_seconds()/60
 
+        logging.debug("Dropped %i items using drop_item filter" % (drop))
         logging.info("Finished in %.2f min" % (total_time_min))
 
         return self
@@ -139,7 +143,7 @@ class ElasticOcean(object):
         if len(json_items) == 0:
             return
 
-        logging.info("Adding items to state for %s (%i items)" %
+        logging.info("Adding items to Ocean for %s (%i items)" %
                       (self.perceval_backend.get_name(), len(json_items)))
 
         field_id = self.perceval_backend.get_field_unique_id()

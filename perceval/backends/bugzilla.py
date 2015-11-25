@@ -60,13 +60,13 @@ class Bugzilla(Backend):
 
 
     def __init__(self, url = None, nissues = None, detail = "list", 
-                 use_cache = False, **nouse):
+                 cache = False, **nouse):
 
         '''
             :url: repository url, incuding bugzilla URL and opt product param
             :nissues: number of issues to get per query
             :detail: list, issue or changes details
-            :use_cache: use cache
+            :cache: use cache
         '''
 
         self.url = url
@@ -75,7 +75,7 @@ class Bugzilla(Backend):
         self.detail = detail
 
         self.bugzilla_version = self._get_version()
-        super(Bugzilla, self).__init__(use_cache)
+        super(Bugzilla, self).__init__(cache)
 
 
     def get_id(self):
@@ -227,15 +227,15 @@ class Bugzilla(Backend):
         if csv_line:
             issue = get_issue_from_csv_line(csv_line)
 
-            if not self.use_cache:
+            if not self.cache:
                 item = self._issue_to_cache_item(csv_line)
-                self.cache.item_to_cache(item)
+                self.cache_items.item_to_cache(item)
 
         if issue_xml:
 
-            if not self.use_cache:
+            if not self.cache:
                 item = self._issue_to_cache_item(None, issue_xml, changes_html)
-                self.cache.item_to_cache(item)
+                self.cache_items.item_to_cache(item)
 
             # If we have the XML, replace CSV info
             issue = get_issue_from_xml(issue_xml)

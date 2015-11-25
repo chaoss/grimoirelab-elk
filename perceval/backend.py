@@ -44,11 +44,11 @@ class Backend(object):
         return cls.name
 
 
-    def __init__(self, use_cache = False):
+    def __init__(self, cache = False):
 
-        self.use_cache = use_cache
+        self.cache = cache
         cache_dir = os.path.join(self._get_storage_dir(),"cache")
-        self.cache = CacheItems(cache_dir, self.get_field_unique_id())
+        self.cache_items = CacheItems(cache_dir, self.get_field_unique_id())
 
         # Create storage dir if it not exists
         storage_dir = self._get_storage_dir()
@@ -73,19 +73,20 @@ class Backend(object):
 
         return _dir
 
-    def fetch(self, start = None, end = None, use_cache = False,
+    def fetch(self, start = None, end = None, cache = False,
               project = None):
         ''' Returns an iterator for feeding data '''
 
         iter_ = self
 
-        if self.use_cache:
+        if self.cache:
             # If cache, work directly with the cache iterator
-            iter_ = self.cache
+            logging.info("Using cache")
+            iter_ = self.cache_items
         else:
             self.start = start
             self.end = end
-            self.use_cache = use_cache
+            self.cache = cache
             self.project = project
 
         return iter_

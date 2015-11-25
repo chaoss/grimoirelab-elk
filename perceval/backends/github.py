@@ -50,14 +50,14 @@ class GitHub(Backend):
 
 
     def __init__(self, owner = None, repository = None, token = None,
-                 use_cache = False, **nouse):
+                 cache = False, **nouse):
 
         self.owner = owner
         self.repository = repository
         self.auth_token = token
 
         self.url = self._get_url()
-        super(GitHub, self).__init__(use_cache)
+        super(GitHub, self).__init__(cache)
 
     def _get_url(self):
         github_per_page = 30  # 100 in other items. 20 for pull requests. 30 issues
@@ -94,7 +94,7 @@ class GitHub(Backend):
         r = requests.get(self.url_next, verify=False,
                          headers={'Authorization':'token ' + self.auth_token})
         issues = r.json()
-        self.cache.items_to_cache(issues)
+        self.cache_items.items_to_cache(issues)
 
         logging.debug("Rate limit: %s" %
                       (r.headers['X-RateLimit-Remaining']))
