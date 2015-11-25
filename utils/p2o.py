@@ -89,8 +89,8 @@ if __name__ == '__main__':
     logging.getLogger("requests").setLevel(logging.WARNING)
 
     connector = get_connector_from_name(backend_name, connectors)
-    backend = connector[0](args = args)
-    ocean_backend = connector[1](backend, args = args)
+    backend = connector[0](**vars(args))
+    ocean_backend = connector[1](backend, **vars(args))
 
     es_index = backend.get_name() + "_" + backend.get_id()
 
