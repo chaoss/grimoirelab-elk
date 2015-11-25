@@ -79,7 +79,7 @@ class GitHub(Backend):
 
     def get_id(self):
 
-        _id = "_%s_%s" % (self.owner, self.repository)
+        _id = "%s_%s" % (self.owner, self.repository)
 
         return _id.lower()
 
@@ -90,7 +90,7 @@ class GitHub(Backend):
     def _get_items(self):
         ''' Return the real item in iterations '''
 
-        logging.info("Get issues pulls requests from " + self.url_next)
+        logging.debug("Get issues pulls requests from " + self.url_next)
         r = requests.get(self.url_next, verify=False,
                          headers={'Authorization':'token ' + self.auth_token})
         issues = r.json()
@@ -108,7 +108,7 @@ class GitHub(Backend):
                 self.last_page = r.links['last']['url'].split('&page=')[1].split('&')[0]
                 self.last_page = int(self.last_page)
 
-        logging.info("Page: %i/%i" % (self.page, self.last_page))
+        logging.debug("Page: %i/%i" % (self.page, self.last_page))
 
         self.page += 1
 

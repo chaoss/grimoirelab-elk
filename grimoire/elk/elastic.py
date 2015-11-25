@@ -36,7 +36,7 @@ class ElasticConnectException(Exception):
 
 class ElasticSearch(object):
 
-    def __init__(self, host, port, index, mappings, clean = False):
+    def __init__(self, host, port, index, mappings = None, clean = False):
         ''' clean: remove already exiting index '''
 
         self.url = "http://" + host + ":" + port
@@ -112,7 +112,7 @@ class ElasticSearch(object):
             r = requests.get(self.index_url+'/_search?size=1')
             total_search = r.json()['hits']['total']
             if (datetime.now()-search_start).total_seconds() > self.wait_bulk_seconds:
-                logging.warning("Bulk data does not appear as NEW after %is" % (self.wait_bulk_seconds))
+                logging.debug("Bulk data does not appear as NEW after %is" % (self.wait_bulk_seconds))
                 logging.debug("%i item updates" % (total-total_search))
                 # if not incremental:
                 #    raise
