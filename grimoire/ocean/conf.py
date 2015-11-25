@@ -37,6 +37,10 @@ class ConfOcean(object):
     elastic = None
 
     @classmethod
+    def get_index(cls):
+        return cls.conf_index
+
+    @classmethod
     def set_elastic(cls, elastic):
         cls.elastic = elastic
 
@@ -56,13 +60,33 @@ class ConfOcean(object):
             logging.error("Can't add repo to conf. Ocean elastic is not configured")
             return
 
-        repo['update'] = datetime.now().isoformat()
+        repo['repo_update'] = datetime.now().isoformat()
 
         url = cls.elastic.url + "/" + cls.conf_repos + "/" + repo_id
 
         logging.debug("Addding repo to Ocean %s %s" % (url, repo))
 
         requests.post(url, data = json.dumps(repo))
+
+    @classmethod
+    def get_repos(cls):
+        ''' Add a new perceval repository with its arguments '''
+
+        repos = []
+
+        if cls.elastic is None:
+            logging.error("Can't get repos. Ocean elastic is not configured")
+            return
+
+        url = cls.elastic.url + "/" + cls.conf_repos + "/_search"
+
+        r = requests.get(url)
+
+        repos_raw = r.json()['hits']['hits']  # Already existing items
+
+        [ repos.append(rep['_source']) for rep in repos_raw ]
+
+        return repos
 
 
 
