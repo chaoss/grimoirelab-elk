@@ -66,7 +66,7 @@ class ElasticOcean(object):
 
 
     def __init__(self, perceval_backend, use_cache = False,
-                 incremental = True):
+                 incremental = True, **nouse):
 
         self.perceval_backend = perceval_backend
 

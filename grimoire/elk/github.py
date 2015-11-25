@@ -33,7 +33,7 @@ from grimoire.elk.enrich import Enrich
 
 class GitHubEnrich(Enrich):
 
-    def __init__(self, github):
+    def __init__(self, github, **nouse):
         self.elastic = None
         self.github = github
         self.index_github = "github"

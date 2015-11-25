@@ -56,7 +56,7 @@ class Gerrit(Backend):
 
 
     def __init__(self, user = None, url = None, nreviews = None, 
-                 use_cache = False):
+                 use_cache = False, **nouse):
 
 
         self.gerrit_user = user

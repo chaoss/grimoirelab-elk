@@ -49,7 +49,7 @@ class GerritEnrich(Enrich):
 
     def __init__(self, gerrit, sortinghat_db = None,
                  projects_grimoirelib_db = None,
-                 gerrit_grimoirelib_db = None):
+                 gerrit_grimoirelib_db = None, **nouse):
         self.gerrit = gerrit
         self.elastic = None
         self.sortinghat = SortingHat (sortinghat_db, gerrit_grimoirelib_db)

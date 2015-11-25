@@ -60,7 +60,7 @@ class Bugzilla(Backend):
 
 
     def __init__(self, url = None, nissues = None, detail = "list", 
-                 use_cache = False):
+                 use_cache = False, **nouse):
 
         '''
             :url: repository url, incuding bugzilla URL and opt product param

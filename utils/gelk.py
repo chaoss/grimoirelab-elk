@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
     connector = get_connector_from_name(backend_name, connectors)
     backend = connector[0](**args)
-    ocean_backend = connector[1](backend)
+    ocean_backend = connector[1](backend, **args)
     enrich_backend = connector[2](backend, **args)
 
     es_index = backend.get_name() + "_" + backend.get_id()
