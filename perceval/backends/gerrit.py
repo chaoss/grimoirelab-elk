@@ -35,7 +35,7 @@ import subprocess
 from time import time
 from perceval.utils import get_eta
 
-from perceval.backends.backend import Backend
+from perceval.backend import Backend
 
 
 

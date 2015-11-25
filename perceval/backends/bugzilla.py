@@ -34,7 +34,7 @@ import requests
 from dateutil import parser
 from bs4 import BeautifulSoup, Comment as BFComment
 
-from perceval.backends.backend import Backend
+from perceval.backend import Backend
 from perceval.utils import get_eta
 
 

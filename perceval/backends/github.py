@@ -29,7 +29,7 @@
 import logging
 import requests
 
-from perceval.backends.backend import Backend
+from perceval.backend import Backend
 
 class GitHub(Backend):
 
