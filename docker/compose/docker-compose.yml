@@ -8,7 +8,7 @@ elasticsearch:
     #     - ${PWD}/esdata:/usr/share/elasticsearch/data
 
 kibana:
-    image: kibana:4.2
+    image: kibana:4
     links:
         - elasticsearch
     ports:
