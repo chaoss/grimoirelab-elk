@@ -27,7 +27,7 @@ import argparse
 from datetime import datetime
 import logging
 from os import sys
-import traceback
+from time import time, sleep
 
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.elk.elastic import ElasticConnectException
@@ -162,6 +162,11 @@ def get_params(connectors):
         subparser = subparsers.add_parser(name, help='p2o %s -h' % name)
         backend.add_params(subparser)
 
+    # And now a specific param to do the update until process termination
+    parser.add_argument("--loop",  action='store_true',
+                        help="loop the ocean update until process termination")
+
+
     args = parser.parse_args()
 
     return args
@@ -171,6 +176,21 @@ def get_connectors():
     return [[Bugzilla, BugzillaOcean],
             [GitHub, GitHubOcean],
             [Gerrit, GerritOcean]]  # Will come from Registry
+
+def loop_update(min_update_time, connectors, clean, debug):
+
+    while True:
+        ustart = time()
+
+        feed_backends(connectors, clean, debug)
+
+        update_time = int(time()-ustart)
+        update_sleep = min_update_time - update_time
+        logging.info("Ocean update time: %i minutes" % (update_time/60))
+        if update_sleep > 0:
+            logging.debug("Waiting for updating %i seconds " % (update_sleep))
+            sleep(update_sleep)
+
 
 if __name__ == '__main__':
 
@@ -190,7 +210,12 @@ if __name__ == '__main__':
         if args.backend:
             feed_backend(vars(args), connectors, clean)
         else:
-            feed_backends(connectors, clean, args.debug)
+            if args.loop:
+                # minimal update duration to avoid too much frequency in secs
+                min_update_time = 60
+                loop_update(min_update_time, connectors, clean, args.debug)
+            else:
+                feed_backends(connectors, clean, args.debug)
 
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
