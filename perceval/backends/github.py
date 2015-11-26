@@ -87,8 +87,38 @@ class GitHub(Backend):
         return "id"
 
 
+    def fetch_generator(self):
+        self.last_page = self.page = 1
+        self.url_next = self.url
+
+        issues = self._get_items()
+
+        while issues:
+            issue = issues.pop(0)
+            yield issue
+
+            if not issues:
+                issues = self._get_items()
+
+
+    def fetch(self, start = None, end = None, cache = False,
+              project = None):
+        ''' Returns an iterator for feeding data '''
+
+        if self.cache:
+            # If cache, work directly with the cache iterator
+            logging.info("Using cache")
+            return self.cache_items
+        else:
+            return self.fetch_generator()
+
+
+
     def _get_items(self):
         ''' Return the real item in iterations '''
+
+        if not self.url_next:
+            return
 
         logging.debug("Get issues pulls requests from " + self.url_next)
         r = requests.get(self.url_next, verify=False,
@@ -113,21 +143,3 @@ class GitHub(Backend):
         self.page += 1
 
         return issues
-
-    def __iter__(self):
-        self.last_page = self.page = 1
-        self.url_next = self.url
-
-        self.items_pool = self._get_items()
-
-        return self
-
-    def __next__(self):
-        if len(self.items_pool) == 0:
-            if self.url_next:
-                self.items_pool = self._get_items()
-            else:
-                raise StopIteration
-
-        return self.items_pool.pop()
-
