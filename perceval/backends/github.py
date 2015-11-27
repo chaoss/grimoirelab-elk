@@ -54,10 +54,12 @@ class GitHub(Backend):
 
         self.owner = owner
         self.repository = repository
+        self.auth_token = token
+        self.last_page = self.page = 1  # pagination in items downloading
 
         super(GitHub, self).__init__(cache)
 
-        self.client = GitHubClient(owner, repository, token)
+        self.client = GitHubClient(owner, repository)
 
     def get_id(self):
 
@@ -69,9 +71,9 @@ class GitHub(Backend):
         return "id"
 
 
-    def fetch_live(self):
+    def fetch_live(self, startdate):
 
-        issues = self.client.get_issues()
+        issues = self.get_issues(startdate)
         self.cache_items.items_to_cache(issues)
 
         while issues:
@@ -82,7 +84,7 @@ class GitHub(Backend):
                 issues = self.client.get_issues()
 
 
-    def fetch(self, start = None, end = None, cache = False,
+    def fetch(self, startdate = None, enddate = None, cache = False,
               project = None):
         ''' Returns an iterator for feeding data '''
 
@@ -91,43 +93,18 @@ class GitHub(Backend):
             logging.info("Using cache")
             return self.cache_items
         else:
-            return self.fetch_live()
+            return self.fetch_live(startdate)
 
+    def get_issues(self, start = None):
+        ''' Return the items from github API in iterations '''
 
-class GitHubClient:
+        if self.page == 1:
+            self.url_next = self.client.get_issues_url(start)
 
-    def __init__(self, owner, repository, token):
-        self.owner = owner
-        self.repository = repository
-        self.auth_token = token
-        self.url_next = self._get_issues_url()  # Initial URL for getting items
-        self.last_page = self.page = 1  # pagination in items downloading
-
-    def _get_url(self):
-        github_api = "https://api.github.com"
-        github_api_repos = github_api + "/repos"
-        url_repo = github_api_repos + "/" + self.owner +"/" + self.repository
-        return url_repo
-
-    def _get_issues_url(self):
-        github_per_page = 30  # 100 in other items. 20 for pull requests. 30 issues
-
-        url_issues = self._get_url() + "/issues"
-
-        url_params = "?per_page=" + str(github_per_page)
-        url_params += "&state=all"  # open and close pull requests
-        url_params += "&sort=updated"  # sort by last updated
-        url_params += "&direction=asc"  # first older pull request
-
-        url = url_issues + url_params
-
-        return url
-
-    def get_issues(self):
-        ''' Return the real item in iterations '''
-
-        if not self.url_next:
-            return
+        else:
+            if not self.url_next:
+                self.page = 1
+                return
 
         logging.debug("Get GitHub issues from " + self.url_next)
         r = requests.get(self.url_next, verify=False,
@@ -151,3 +128,33 @@ class GitHubClient:
         self.page += 1
 
         return issues
+
+
+class GitHubClient:
+
+    def __init__(self, owner, repository):
+        self.owner = owner
+        self.repository = repository
+
+    def _get_url(self):
+        github_api = "https://api.github.com"
+        github_api_repos = github_api + "/repos"
+        url_repo = github_api_repos + "/" + self.owner +"/" + self.repository
+        return url_repo
+
+    def get_issues_url(self, startdate = None):
+        github_per_page = 30  # 100 in other items. 20 for pull requests. 30 issues
+
+        url_issues = self._get_url() + "/issues"
+
+        url_params = "?per_page=" + str(github_per_page)
+        url_params += "&state=all"  # open and close pull requests
+        url_params += "&sort=updated"  # sort by last updated
+        url_params += "&direction=asc"  # first older pull request
+        if startdate:
+            url_params += "&since=" + startdate
+
+
+        url = url_issues + url_params
+
+        return url

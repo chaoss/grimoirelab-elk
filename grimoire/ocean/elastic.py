@@ -109,11 +109,6 @@ class ElasticOcean(object):
 
         logging.info("Incremental from: %s" % (last_update))
 
-        if self.perceval_backend.get_name() == "github": 
-            if last_update is not None:
-                logging.info("Github issues API broken for incremental analysis")
-                last_update = None
-
         task_init = datetime.now()
 
         items = []  # to feed item in packs
