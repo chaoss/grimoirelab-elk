@@ -81,7 +81,7 @@ class GitHub(Backend):
             yield issue
 
             if not issues:
-                issues = self.client.get_issues()
+                issues = self.get_issues()
 
 
     def fetch(self, startdate = None, enddate = None, cache = False,
