@@ -58,16 +58,13 @@ class Gerrit(Backend):
     def __init__(self, user = None, url = None, nreviews = None, 
                  cache = False, **nouse):
 
-
-        self.gerrit_user = user
+        self.repository = url
         self.nreviews = nreviews
-        self.url = url
-        cache = cache
+        self.client = GerritClient(self.repository, user, nreviews)
 
-        self.project = None
-        self.version = None
-        self.gerrit_cmd  = "ssh -p 29418 %s@%s" % (self.gerrit_user, self.url)
-        self.gerrit_cmd += " gerrit "
+        self.last_item = None  # Start item for next iteration
+        self.more_updates = True  # To check if reviews are updates
+        self.number_results = self.nreviews  # To control if there are more items
 
         super(Gerrit, self).__init__(cache)
 
@@ -75,17 +72,93 @@ class Gerrit(Backend):
     def get_id(self):
         ''' Return gerrit unique identifier '''
 
-        return self.url
+        return self.repository
 
 
     def get_field_unique_id(self):
         return "id"
 
 
+    def fetch_live(self, startdate):
+
+        reviews = self.get_reviews(startdate)
+        self.cache_items.items_to_cache(reviews)
+
+        while reviews:
+            issue = reviews.pop(0)
+            yield issue
+
+            if not reviews:
+                reviews = self.get_reviews(startdate)
+
+
+    def fetch(self, start = None, end = None, cache = False,
+              project = None):
+        ''' Returns an iterator for feeding data '''
+
+        if self.cache:
+            # If cache, work directly with the cache iterator
+            logging.info("Using cache")
+            return self.cache_items
+        else:
+            return self.fetch_live(start)
+
+
     def get_url(self):
 
         return self.url
 
+    def get_reviews(self, startdate = None):
+        """ Get all reviews from repository """
+
+        reviews = []
+
+        if self.number_results < self.nreviews or not self.more_updates:
+            # No more reviews after last iteration
+            return reviews
+
+        task_init = time()
+        raw_data = self.client.get_items(self.last_item)
+        raw_data = str(raw_data, "UTF-8")
+        tickets_raw = "[" + raw_data.replace("\n", ",") + "]"
+        tickets_raw = tickets_raw.replace(",]", "]")
+
+        tickets = json.loads(tickets_raw)
+
+        for entry in tickets:
+            if 'project' in entry.keys():
+                entry_lastUpdated =  datetime.fromtimestamp(entry['lastUpdated'])
+                entry['lastUpdated_date'] = entry_lastUpdated.isoformat()
+
+                if startdate: # Incremental mode
+                    if entry_lastUpdated <= parser.parse(startdate):
+                        logging.debug("No more updates for %s" % (self.repository))
+                        self.more_updates = False
+                        break
+
+                reviews.append(entry)
+
+                self.last_item = self.client.get_next_item(self.last_item,
+                                                           entry)
+            elif 'rowCount' in entry.keys():
+                # logging.info("CONTINUE FROM: " + str(last_item))
+                self.number_results = entry['rowCount']
+
+        logging.info("Received %i reviews in %.2fs" % (len(reviews),
+                                                       time()-task_init))
+        return reviews
+
+
+class GerritClient():
+
+    def __init__(self, repository, user, nreviews):
+        self.gerrit_user = user
+        self.nreviews = nreviews
+        self.repository = repository
+        self.project = None
+        self.version = None
+        self.gerrit_cmd  = "ssh -p 29418 %s@%s" % (self.gerrit_user, self.repository)
+        self.gerrit_cmd += " gerrit "
 
     def _get_version(self):
 
@@ -115,7 +188,7 @@ class Gerrit(Backend):
         self.version = [mayor, minor]
         return  self.version
 
-    def _get_gerrit_cmd(self):
+    def _get_gerrit_cmd(self, last_item):
 
         cmd = self.gerrit_cmd + " query "
         if self.project:
@@ -127,84 +200,39 @@ class Gerrit(Backend):
 
         cmd += " --all-approvals --comments --format=JSON"
 
-        self.number_results = self.nreviews
-
-        return cmd 
-
-    def _get_items(self):
-        """ Get all reviews for all or for a project """
-
-        reviews = []
-        self.more_updates = True
-
         gerrit_version = self._get_version()
 
-        cmd = self._get_gerrit_cmd()
-
-        if self.last_item is not None:
+        if last_item is not None:
             if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
                 cmd += " --start=" + str(self.last_item)
             else:
                 cmd += " resume_sortkey:" + self.last_item
 
+        return cmd
+
+    def get_items(self, last_item):
+        cmd = self._get_gerrit_cmd(last_item)
+
         logging.debug(cmd)
-        task_init = time()
         raw_data = subprocess.check_output(cmd, shell = True)
-        raw_data = str(raw_data, "UTF-8")
-        tickets_raw = "[" + raw_data.replace("\n", ",") + "]"
-        tickets_raw = tickets_raw.replace(",]", "]")
 
-        tickets = json.loads(tickets_raw)
+        return raw_data
 
-        for entry in tickets:
-            if self.start:
-                if 'project' in entry.keys():
-                    entry_lastUpdated = \
-                        datetime.fromtimestamp(entry['lastUpdated'])
-                    if entry_lastUpdated <= parser.parse(self.start):
-                        logging.debug("No more updates for %s" % (self.url))
-                        self.more_updates = False
-                        break
 
-            if 'project' in entry.keys():
-                entry['lastUpdated_date'] = \
-                    datetime.fromtimestamp(entry['lastUpdated']).isoformat()
-                reviews.append(entry)
-                if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
-                    self.last_item += 1
-                else:
-                    self.last_item = entry['sortKey']
-            elif 'rowCount' in entry.keys():
-                # logging.info("CONTINUE FROM: " + str(last_item))
-                self.number_results = entry['rowCount']
+    def get_next_item(self, last_item, entry):
 
-        logging.info("Received %i reviews in %.2fs" % (len(reviews),
-                                                       time()-task_init))
-        self.cache_items.items_to_cache(reviews)
-
-        return reviews
-
-    def __iter__(self):
-        self.last_item = None
+        next_item = None
 
         gerrit_version = self._get_version()
 
         if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
-            self.last_item = 0
-
-        self.items_pool = self._get_items()
-
-        return self
-
-    def __next__(self):
-        if len(self.items_pool) == 0:
-            # wikimedia gerrit returns limit+1
-            if (self.number_results == self.nreviews + 1 or
-                self.number_results == self.nreviews) and \
-                self.more_updates:
-                    self.items_pool = self._get_items()
+            if last_item is None:
+                next_item = 0
+            self.last_item += 1
+        else:
+            if last_item is None:
+                next_item = None
             else:
-                raise StopIteration
+                next_item = entry['sortKey']
 
-        return self.items_pool.pop()
-
+        return next_item
