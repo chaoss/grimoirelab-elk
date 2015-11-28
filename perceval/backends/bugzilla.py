@@ -415,6 +415,7 @@ class Bugzilla(Backend):
 
     def __iter__(self):
         self.ids = self._get_items_ids(self.url, self.start)
+        self.last_item_date = None
         if len(self.ids) > 0:
             self.prj_first_date = parser.parse(self.ids[0][1])
             self.last_item_date = self.ids[-1][1]
@@ -430,10 +431,13 @@ class Bugzilla(Backend):
             if len(self.ids) > 0 :
                 self.items_pool = self._get_items(self.ids)
             else:
-                self.ids = self._get_items_ids(self.url, self.last_item_date)
-                if len(self.ids) > 0 :
-                    self.last_item_date = self.ids[-1][1]
-                    self.items_pool = self._get_items(self.ids)
+                if self.last_item_date:
+                    self.ids = self._get_items_ids(self.url, self.last_item_date)
+                    if len(self.ids) > 0 :
+                        self.last_item_date = self.ids[-1][1]
+                        self.items_pool = self._get_items(self.ids)
+                    else:
+                        raise StopIteration
                 else:
                     raise StopIteration
 
