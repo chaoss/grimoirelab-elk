@@ -417,6 +417,7 @@ class Bugzilla(Backend):
         self.ids = self._get_items_ids(self.url, self.start)
         if len(self.ids) > 0:
             self.prj_first_date = parser.parse(self.ids[0][1])
+            self.last_item_date = self.ids[-1][1]
         self.prj_last_date = datetime.now()
         self.total_issues = 0
 
@@ -429,7 +430,12 @@ class Bugzilla(Backend):
             if len(self.ids) > 0 :
                 self.items_pool = self._get_items(self.ids)
             else:
-                raise StopIteration
+                self.ids = self._get_items_ids(self.url, self.last_item_date)
+                if len(self.ids) > 0 :
+                    self.last_item_date = self.ids[-1][1]
+                    self.items_pool = self._get_items(self.ids)
+                else:
+                    raise StopIteration
 
         return self.items_pool.pop()
 
