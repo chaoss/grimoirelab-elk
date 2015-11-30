@@ -109,13 +109,13 @@ if __name__ == '__main__':
     try:
         # Ocean
         state_index = es_index+"_state"
-        elastic_state = ElasticSearch(args.elastic_host, args.elastic_port,
+        elastic_state = ElasticSearch(args.elastic_url,
                                       state_index,
                                       ocean_backend.get_elastic_mappings(),
                                       clean)
 
         # Enriched ocean
-        elastic = ElasticSearch(args.elastic_host, args.elastic_port,
+        elastic = ElasticSearch(args.elastic_url,
                                 es_index,
                                 enrich_backend.get_elastic_mappings(),
                                 clean)

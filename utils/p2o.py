@@ -63,7 +63,7 @@ def get_elastic(clean, es_index, ocean_backend = None):
 
     try:
         ocean_index = es_index
-        elastic_ocean = ElasticSearch(args.elastic_host, args.elastic_port,
+        elastic_ocean = ElasticSearch(args.elastic_url,
                                       ocean_index, mapping, clean)
 
     except ElasticConnectException:

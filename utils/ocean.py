@@ -37,8 +37,7 @@ def get_elastic():
 
     try:
         ocean_index = ConfOcean.get_index()
-        elastic_ocean = ElasticSearch(args.elastic_host, args.elastic_port,
-                                      ocean_index)
+        elastic_ocean = ElasticSearch(args.elastic_url, ocean_index)
 
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")

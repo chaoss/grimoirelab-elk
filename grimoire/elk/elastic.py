@@ -36,10 +36,10 @@ class ElasticConnectException(Exception):
 
 class ElasticSearch(object):
 
-    def __init__(self, host, port, index, mappings = None, clean = False):
-        ''' clean: remove already exiting index '''
+    def __init__(self, url, index, mappings = None, clean = False):
+        ''' clean: remove already existing index '''
 
-        self.url = "http://" + host + ":" + port
+        self.url = url
         self.index = index
         self.index_url = self.url+"/"+self.index
         self.max_items_bulk = 500

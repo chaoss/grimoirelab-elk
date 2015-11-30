@@ -57,12 +57,9 @@ class ElasticOcean(object):
                             help="Use cache")
         parser.add_argument("--debug",  action='store_true',
                             help="Increase logging to debug")
-        parser.add_argument("-e", "--elastic_host",  default="127.0.0.1",
+        parser.add_argument("-e", "--elastic_url",  default="http://127.0.0.1:9200",
                             help="Host with elastic search" +
-                            "(default: 127.0.0.1)")
-        parser.add_argument("--elastic_port",  default="9200",
-                            help="elastic search port " +
-                            "(default: 9200)")
+                            "(default: http://127.0.0.1:9200)")
 
 
     def __init__(self, perceval_backend, cache = False,
