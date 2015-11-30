@@ -29,7 +29,7 @@ import logging
 import requests
 import sys
 
-from grimoire.elk.elastic import ElasticSearch, ElasticConnectException
+from grimoire.elk.elastic import ElasticSearch, ElasticConnectException, ElasticWriteException
 from grimoire.ocean.elastic import ElasticOcean
 from grimoire.ocean.conf import ConfOcean
 
@@ -42,6 +42,11 @@ def get_elastic():
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
+
+    except ElasticWriteException:
+        logging.error("Can't write to Elastic Search.")
+        sys.exit(1)
+
 
     return elastic_ocean
 

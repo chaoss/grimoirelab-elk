@@ -33,6 +33,9 @@ from time import time, sleep
 class ElasticConnectException(Exception):
     message = "Can't connect to ElasticSearch"
 
+class ElasticWriteException(Exception):
+    message = "Can't write to ElasticSearch"
+
 
 class ElasticSearch(object):
 
@@ -52,8 +55,13 @@ class ElasticSearch(object):
 
         if r.status_code != 200:
             # Index does no exists
-            requests.post(self.index_url)
-            logging.info("Created index " + self.index_url)
+            r = requests.post(self.index_url)
+            if r.status_code != 200:
+                logging.info("Can't create index %s (%s)" %
+                             (self.index_url, r.status_code))
+                raise ElasticWriteException()
+            else:
+                logging.info("Created index " + self.index_url)
         else:
             if clean:
                 requests.delete(self.index_url)
