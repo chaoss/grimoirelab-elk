@@ -23,54 +23,17 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import argparse
 from datetime import datetime
 import json
 import logging
 from os import sys
 import requests
 
-from grimoire.elk.elastic import ElasticSearch
-from grimoire.elk.elastic import ElasticConnectException
-
-# Connectors for Ocean
-from grimoire.ocean.bugzilla import BugzillaOcean
-from grimoire.ocean.gerrit import GerritOcean
-from grimoire.ocean.github import GitHubOcean
-from grimoire.ocean.elastic import ElasticOcean
 from grimoire.ocean.conf import ConfOcean
+ 
 
-# Connectors for Perceval
-from perceval.backends.bugzilla import Bugzilla
-from perceval.backends.github import GitHub
-from perceval.backends.gerrit import Gerrit
-
-def get_connector_from_name(name, connectors):
-    found = None
-
-    for connector in connectors:
-        backend = connector[0]
-        if backend.get_name() == name:
-            found = connector
-
-    return found
-
-def get_elastic(url, es_index, clean = None, ocean_backend = None):
-
-    mapping = None
-
-    if ocean_backend:
-        mapping = ocean_backend.get_elastic_mappings()
-
-    try:
-        ocean_index = es_index
-        elastic_ocean = ElasticSearch(url, ocean_index, mapping, clean)
-
-    except ElasticConnectException:
-        logging.error("Can't connect to Elastic Search. Is it running?")
-        sys.exit(1)
-
-    return elastic_ocean
+from grimoire.utils import get_connector_from_name, get_connectors, get_elastic
+from grimoire.utils import get_params, config_logging
 
 
 def feed_backend(url, params, connectors, clean):
@@ -123,47 +86,15 @@ def feed_backend(url, params, connectors, clean):
 
     logging.info("Done %s " % (backend_name))
 
-def config_logging(debug):
 
-    if debug:
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
-        logging.debug("Debug mode activated")
-    else:
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
-    logging.getLogger("requests").setLevel(logging.WARNING)
+def create_items(params, connectors, kind):
+    ''' Create an item if it does not exists yet '''
 
-def get_params(connectors):
-    ''' Get params definition from ElasticOcean and from all the backends '''
-    parser = argparse.ArgumentParser()
-    ElasticOcean.add_params(parser)
+    kinds = ['index-pattern','dashboard','visualization']
 
-    subparsers = parser.add_subparsers(dest='backend',
-                                       help='perceval backend')
-
-    for connector in connectors:
-        backend = connector[0]
-        name = backend.get_name()
-        subparser = subparsers.add_parser(name, help='p2o %s -h' % name)
-        backend.add_params(subparser)
-
-    # And now a specific param to do the update until process termination
-    parser.add_argument("--loop",  action='store_true',
-                        help="loop the ocean update until process termination")
-
-
-    args = parser.parse_args()
-
-    return args
-
-def get_connectors():
-
-    return [[Bugzilla, BugzillaOcean],
-            [GitHub, GitHubOcean],
-            [Gerrit, GerritOcean]]  # Will come from Registry
-
-def create_index_pattern(params, connectors):
-    logging.debug("Generating index pattern")
+    if kind not in kinds:
+        logging.error("Can not get template for %s" % (kind))
+        raise
 
     backend_name = params['backend']
     url = params['elastic_url']
@@ -176,48 +107,99 @@ def create_index_pattern(params, connectors):
 
     backend = connector[0](**params)
     ds = backend.get_name()
-    ds_id = ds+"_"+backend.get_id()
-    # ds_id = ds+"_"+"elastic_kibana"
+    item_id = ds+"_"+backend.get_id()
 
     # Get the index pattern template
     es_index = "/.kibana"
     elastic = get_elastic(url, es_index)
 
 
-    index_template = elastic.index_url+"/index-pattern"
-    index_template_search = index_template+"/_search"
+    item_template_url = elastic.index_url+"/"+kind
+    item_template_url_search = item_template_url+"/_search"
+
 
     query = '''
         {"query": {"prefix": {"_id": {"value": "%s_" }}}}
     ''' % (ds)
 
-    r = requests.post(index_template_search, data = query)
+    r = requests.post(item_template_url_search, data = query)
 
-    index_pattern_template =r.json()['hits']['hits']
+    item_templates =r.json()['hits']['hits']
 
-    if len(index_pattern_template) == 0:
-        logging.error("Can not find template for data source: %s" % (ds))
-        sys.exit(0)
+    if len(item_templates) == 0:
+        logging.error("Can not find template/s for data source: %s" % (ds))
+        print (item_template_url_search, query)
+        raise
 
-    # All index pattern can be used as template. Use the first one.
-    index_pattern = index_pattern_template[0]["_source"]
-    index_pattern['title'] = ds_id
+    if kind in ['index-pattern','dashboard']:
+        # All items can be used as template. Use the first one.
+        item = item_templates[0]["_source"]
 
-    # fields = json.loads(index_pattern['fields'])
-    # import pprint
-    # pprint.pprint(fields)
-    # raise
+        if kind == 'index-pattern':
+            item['title'] = item_id
+        elif kind == 'dashboard':
+            item['title'] = item_id
+            # Update visualizations
+            panels = json.loads(item['panelsJSON'])
+            new_panels = []
+            for panel in panels:
+                if panel['type'] == 'visualization':
+                    vid = panel['id'].split("_")[-1]
+                    panel['id'] = item_id+"_"+vid
+                new_panels.append(panel)
+            item['panelsJSON'] = json.dumps(new_panels)
 
-    url = index_template+"/"+ds_id
+        url = item_template_url+"/"+item_id
 
-    r = requests.post(url, data = json.dumps(index_pattern))
+        r = requests.post(url, data = json.dumps(item))
+
+    else:
+        all_visualizations = item_templates
+
+        visualizations = []
+        dash_template = None
+        # Get all vis from the same dash
+        # Visualizations templates must use as id dashboard_<name>
+        for vis in all_visualizations:
+            dash = vis['_id'].rsplit("_",1)[0]
+            if not dash_template:
+                dash_template = dash
+            if dash == dash_template:
+                visualizations.append(vis)
+
+        logging.info("Total template vis found: %i" % (len(visualizations)))
+
+        # Time to add all visualizations for new dashboard
+        for vis in visualizations:
+            vis_data = vis['_source']
+            vis_name = vis['_id'].split("_")[-1]
+            vis_id = item_id + "_" + vis_name
+            vis_data['title'] = vis_id
+            vis_meta = json.loads(vis_data['kibanaSavedObjectMeta']['searchSourceJSON'])
+            vis_meta['index'] = item_id
+            vis_data['kibanaSavedObjectMeta']['searchSourceJSON'] = json.dumps(vis_meta)
+
+            url = item_template_url+"/"+vis_id
+
+            r = requests.post(url, data = json.dumps(vis_data))
 
 
-def create_dashboard(args):
+def create_index_pattern(params, connectors):
+    logging.debug("Generating index pattern")
+
+    create_items(params, connectors, 'index-pattern')
+
+
+def create_dashboard(params, connectors):
     logging.debug("Generating dashboard")
 
-def create_visualizations(args):
+    create_items(params, connectors, 'dashboard')
+
+
+def create_visualizations(params, connectors):
     logging.debug("Generating visualization")
+
+    create_items(params, connectors, 'visualization')
 
 
 
@@ -240,8 +222,8 @@ if __name__ == '__main__':
         # Time to create Kibana dashbnoard
         logging.info("Generating Kibana dashboard")
         create_index_pattern(vars(args), connectors)
-        create_dashboard(args)
-        create_visualizations(args)
+        create_visualizations(vars(args), connectors)
+        create_dashboard(vars(args), connectors)
 
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")

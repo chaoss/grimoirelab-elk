@@ -23,61 +23,24 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import argparse
+
 from datetime import datetime
 import logging
 from os import sys
 from time import time, sleep
 
-from grimoire.elk.elastic import ElasticSearch
-from grimoire.elk.elastic import ElasticConnectException
 
-# Connectors for Ocean
-from grimoire.ocean.bugzilla import BugzillaOcean
-from grimoire.ocean.gerrit import GerritOcean
-from grimoire.ocean.github import GitHubOcean
-from grimoire.ocean.elastic import ElasticOcean
 from grimoire.ocean.conf import ConfOcean
 
-# Connectors for Perceval
-from perceval.backends.bugzilla import Bugzilla
-from perceval.backends.github import GitHub
-from perceval.backends.gerrit import Gerrit
-
-def get_connector_from_name(name, connectors):
-    found = None
-
-    for connector in connectors:
-        backend = connector[0]
-        if backend.get_name() == name:
-            found = connector
-
-    return found
-
-def get_elastic(clean, es_index, ocean_backend = None):
-
-    mapping = None
-
-    if ocean_backend:
-        mapping = ocean_backend.get_elastic_mappings()
-
-    try:
-        ocean_index = es_index
-        elastic_ocean = ElasticSearch(args.elastic_url,
-                                      ocean_index, mapping, clean)
-
-    except ElasticConnectException:
-        logging.error("Can't connect to Elastic Search. Is it running?")
-        sys.exit(1)
-
-    return elastic_ocean
+from grimoire.utils import get_connector_from_name, get_connectors, get_elastic
+from grimoire.utils import get_params, config_logging
 
 
-def feed_backends(connectors, clean, debug):
+def feed_backends(url, connectors, clean, debug):
     ''' Update Ocean for all existing backends '''
 
     logging.info("Updating all Ocean")
-    elastic = get_elastic(clean, ConfOcean.get_index())
+    elastic = get_elastic(url, ConfOcean.get_index(), clean)
     ConfOcean.set_elastic(elastic)
 
     for repo in ConfOcean.get_repos():
@@ -85,10 +48,10 @@ def feed_backends(connectors, clean, debug):
         params['no_incremental'] = True  # Always try incremental
         params['debug'] = debug  # Use for all debug level defined in p2o
 
-        feed_backend(params, connectors, clean)
+        feed_backend(url, params, connectors, clean)
 
 
-def feed_backend(params, connectors, clean):
+def feed_backend(url, params, connectors, clean):
     ''' Feed Ocean with backend data '''
 
     backend = None
@@ -110,7 +73,8 @@ def feed_backend(params, connectors, clean):
                                                      backend.get_id()))
 
         es_index = backend.get_name() + "_" + backend.get_id()
-        elastic_ocean = get_elastic(clean, es_index, ocean_backend)
+        elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
+
         ocean_backend.set_elastic(elastic_ocean)
 
         ConfOcean.set_elastic(elastic_ocean)
@@ -138,51 +102,13 @@ def feed_backend(params, connectors, clean):
 
     logging.info("Done %s " % (backend_name))
 
-def config_logging(debug):
 
-    if debug:
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
-        logging.debug("Debug mode activated")
-    else:
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
-    logging.getLogger("requests").setLevel(logging.WARNING)
-
-def get_params(connectors):
-    ''' Get params definition from ElasticOcean and from all the backends '''
-    parser = argparse.ArgumentParser()
-    ElasticOcean.add_params(parser)
-
-    subparsers = parser.add_subparsers(dest='backend',
-                                       help='perceval backend')
-
-    for connector in connectors:
-        backend = connector[0]
-        name = backend.get_name()
-        subparser = subparsers.add_parser(name, help='p2o %s -h' % name)
-        backend.add_params(subparser)
-
-    # And now a specific param to do the update until process termination
-    parser.add_argument("--loop",  action='store_true',
-                        help="loop the ocean update until process termination")
-
-
-    args = parser.parse_args()
-
-    return args
-
-def get_connectors():
-
-    return [[Bugzilla, BugzillaOcean],
-            [GitHub, GitHubOcean],
-            [Gerrit, GerritOcean]]  # Will come from Registry
-
-def loop_update(min_update_time, connectors, clean, debug):
+def loop_update(min_update_time, url, connectors, clean, debug):
 
     while True:
         ustart = time()
 
-        feed_backends(connectors, clean, debug)
+        feed_backends(url, connectors, clean, debug)
 
         update_time = int(time()-ustart)
         update_sleep = min_update_time - update_time
@@ -202,18 +128,20 @@ if __name__ == '__main__':
 
     config_logging(args.debug)
 
+    url = args.elastic_url
+
     clean = args.no_incremental
     if args.cache:
         clean = True
 
     try:
         if args.backend:
-            feed_backend(vars(args), connectors, clean)
+            feed_backend(url, vars(args), connectors, clean)
         else:
             if args.loop:
                 # minimal update duration to avoid too much frequency in secs
                 min_update_time = 60
-                loop_update(min_update_time, connectors, clean, args.debug)
+                loop_update(min_update_time, url, connectors, clean, args.debug)
             else:
                 feed_backends(connectors, clean, args.debug)
 
