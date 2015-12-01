@@ -90,7 +90,7 @@ def feed_backend(url, params, connectors, clean):
 def create_items(params, connectors, kind):
     ''' Create an item if it does not exists yet '''
 
-    kinds = ['index-pattern','dashboard','visualization']
+    kinds = ['index-pattern','dashboard']
 
     if kind not in kinds:
         logging.error("Can not get template for %s" % (kind))
@@ -137,51 +137,57 @@ def create_items(params, connectors, kind):
 
         if kind == 'index-pattern':
             item['title'] = item_id
+            url = item_template_url+"/"+item_id
+            r = requests.post(url, data = json.dumps(item))
+
         elif kind == 'dashboard':
+
+            dash_vis_ids = []
+
             item['title'] = item_id
             # Update visualizations
             panels = json.loads(item['panelsJSON'])
             new_panels = []
             for panel in panels:
                 if panel['type'] == 'visualization':
+                    dash_vis_ids.append(panel['id'])
                     vid = panel['id'].split("_")[-1]
                     panel['id'] = item_id+"_"+vid
                 new_panels.append(panel)
             item['panelsJSON'] = json.dumps(new_panels)
 
-        url = item_template_url+"/"+item_id
+            url = item_template_url+"/"+item_id
+            r = requests.post(url, data = json.dumps(item))
 
-        r = requests.post(url, data = json.dumps(item))
+            # Time to add visualizations
+            kind = 'visualization'
+            item_template_url = elastic.index_url+"/"+kind
+            item_template_url_search = item_template_url+"/_search"
 
-    else:
-        all_visualizations = item_templates
+            r = requests.get(item_template_url_search)
 
-        visualizations = []
-        dash_template = None
-        # Get all vis from the same dash
-        # Visualizations templates must use as id dashboard_<name>
-        for vis in all_visualizations:
-            dash = vis['_id'].rsplit("_",1)[0]
-            if not dash_template:
-                dash_template = dash
-            if dash == dash_template:
-                visualizations.append(vis)
+            all_visualizations =r.json()['hits']['hits']
 
-        logging.info("Total template vis found: %i" % (len(visualizations)))
+            visualizations = []
+            for vis in all_visualizations:
+                if vis['_id'] in dash_vis_ids:
+                    visualizations.append(vis)
 
-        # Time to add all visualizations for new dashboard
-        for vis in visualizations:
-            vis_data = vis['_source']
-            vis_name = vis['_id'].split("_")[-1]
-            vis_id = item_id + "_" + vis_name
-            vis_data['title'] = vis_id
-            vis_meta = json.loads(vis_data['kibanaSavedObjectMeta']['searchSourceJSON'])
-            vis_meta['index'] = item_id
-            vis_data['kibanaSavedObjectMeta']['searchSourceJSON'] = json.dumps(vis_meta)
+            logging.info("Total template vis found: %i" % (len(visualizations)))
 
-            url = item_template_url+"/"+vis_id
+            # Time to add all visualizations for new dashboard
+            for vis in visualizations:
+                vis_data = vis['_source']
+                vis_name = vis['_id'].split("_")[-1]
+                vis_id = item_id + "_" + vis_name
+                vis_data['title'] = vis_id
+                vis_meta = json.loads(vis_data['kibanaSavedObjectMeta']['searchSourceJSON'])
+                vis_meta['index'] = item_id
+                vis_data['kibanaSavedObjectMeta']['searchSourceJSON'] = json.dumps(vis_meta)
 
-            r = requests.post(url, data = json.dumps(vis_data))
+                url = item_template_url+"/"+vis_id
+
+                r = requests.post(url, data = json.dumps(vis_data))
 
 
 def create_index_pattern(params, connectors):
@@ -191,16 +197,10 @@ def create_index_pattern(params, connectors):
 
 
 def create_dashboard(params, connectors):
+    ''' Create the dashboard and its visualizations '''
     logging.debug("Generating dashboard")
 
     create_items(params, connectors, 'dashboard')
-
-
-def create_visualizations(params, connectors):
-    logging.debug("Generating visualization")
-
-    create_items(params, connectors, 'visualization')
-
 
 
 if __name__ == '__main__':
@@ -222,7 +222,6 @@ if __name__ == '__main__':
         # Time to create Kibana dashbnoard
         logging.info("Generating Kibana dashboard")
         create_index_pattern(vars(args), connectors)
-        create_visualizations(vars(args), connectors)
         create_dashboard(vars(args), connectors)
 
     except KeyboardInterrupt:
