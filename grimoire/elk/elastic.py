@@ -45,7 +45,7 @@ class ElasticSearch(object):
         self.url = url
         self.index = index
         self.index_url = self.url+"/"+self.index
-        self.max_items_bulk = 500
+        self.max_items_bulk = 100
         self.wait_bulk_seconds = 2  # time to wait to complete a bulk operation
 
         try:
