@@ -40,7 +40,7 @@ RUN sed -i "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g" /etc/locale.gen && \
 # Not available as package in Debian 8 python3-myssqldb
 RUN pip3 install mysqlclient
 # rq tasks queue
-RUN pip3 install rq
+RUN pip3 install rq && pip3 install rq-dashboard
 
 RUN echo "${DEPLOY_USER}    ALL=NOPASSWD: ALL" >> /etc/sudoers
 
@@ -51,4 +51,4 @@ WORKDIR ${DEPLOY_USER_DIR}
 RUN git clone https://github.com/acs/GrimoireELK
 
 ENV container docker
-CMD sudo service redis-server start && sudo tail -f /var/log/redis/*
+CMD rq-dashboard & sudo service redis-server start && sudo tail -f /var/log/redis/*
