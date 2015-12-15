@@ -28,10 +28,15 @@ import logging
 from os import sys
 from time import time, sleep
 
+from grimoire.arthur import feed_backend
+
 from grimoire.ocean.conf import ConfOcean
 
-from grimoire.utils import get_connector_from_name, get_connectors, get_elastic
+from grimoire.utils import get_connectors, get_elastic
 from grimoire.utils import get_params, config_logging
+
+from redis import Redis
+from rq import Queue
 
 
 def feed_backends(url, connectors, clean, debug = False):
@@ -41,64 +46,17 @@ def feed_backends(url, connectors, clean, debug = False):
     elastic = get_elastic(url, ConfOcean.get_index(), clean)
     ConfOcean.set_elastic(elastic)
 
+    q = Queue(connection=Redis(), async=async_)
+
     for repo in ConfOcean.get_repos():
         params = repo['params']
         params['no_incremental'] = True  # Always try incremental
         params['debug'] = debug  # Use for all debug level defined in p2o
 
-        feed_backend(url, params, connectors, clean)
-
-
-def feed_backend(url, params, connectors, clean):
-    ''' Feed Ocean with backend data '''
-
-    backend = None
-    backend_name = params['backend']
-    repo = {}    # repository data to be stored in conf
-    repo['params'] = params
-    es_index = None
-
-    connector = get_connector_from_name(backend_name, connectors)
-    if not connector:
-        logging.error("Cant find %s backend" % (backend_name))
-        sys.exit(1)
-
-    try:
-        backend = connector[0](**params)
-        ocean_backend = connector[1](backend, **params)
-
-        logging.info("Feeding Ocean from %s (%s)" % (backend.get_name(),
-                                                     backend.get_id()))
-
-        es_index = backend.get_name() + "_" + backend.get_id()
-        elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
-
-        ocean_backend.set_elastic(elastic_ocean)
-
-        ConfOcean.set_elastic(elastic_ocean)
-
-        ocean_backend.feed()
-    except Exception as ex:
-        if backend:
-            logging.error("Error feeding ocean from %s (%s): %s" %
-                          (backend.get_name(), backend.get_id()), ex)
-        else:
-            logging.error("Error feeding ocean %s" % ex)
-
-        repo['success'] = False
-        repo['error'] = ex
-    else:
-        repo['success'] = True
-
-    repo['repo_update'] = datetime.now().isoformat()
-
-    if es_index:
-        ConfOcean.add_repo(es_index, repo)
-    else:
-        logging.debug("Repository not added to Ocean because errors.")
-        logging.debug(params)
-
-    logging.info("Done %s " % (backend_name))
+        result = q.enqueue(
+             feed_backend, url, params, connectors, clean)
+        logging.info("Queued job")
+        logging.info(result)
 
 
 def loop_update(min_update_time, url, connectors, clean, debug):
@@ -124,6 +82,8 @@ if __name__ == '__main__':
 
     args = get_params(connectors)
 
+    async_ = False  # Use RQ or not
+
     config_logging(args.debug)
 
     url = args.elastic_url
@@ -134,7 +94,12 @@ if __name__ == '__main__':
 
     try:
         if args.backend:
-            feed_backend(url, vars(args), connectors, clean)
+            q = Queue(connection=Redis(), async=async_)
+            result = q.enqueue(feed_backend, url, vars(args), connectors, clean)
+            logging.info("Queued job")
+            logging.info(result)
+
+            # feed_backend(url, vars(args), connectors, clean)
         else:
             if args.loop:
                 # minimal update duration to avoid too much frequency in secs
