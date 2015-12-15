@@ -25,6 +25,7 @@ RUN apt-get update && \
         python python3 pep8 \
         python3-requests python3-dateutil python3-bs4 \
         python3-pip python3-dev \
+        python3-redis redis-server \
         gcc make libmysqlclient-dev \
         unzip wget sudo vim ssh \
         && \
@@ -43,4 +44,4 @@ WORKDIR ${DEPLOY_USER_DIR}
 RUN git clone https://github.com/acs/GrimoireELK
 
 ENV container docker
-CMD ["/sbin/init"]
+CMD sudo service redis-server start && sudo tail -f /var/log/redis/*
