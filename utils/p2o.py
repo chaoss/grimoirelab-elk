@@ -23,12 +23,10 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-
 from datetime import datetime
 import logging
 from os import sys
 from time import time, sleep
-
 
 from grimoire.ocean.conf import ConfOcean
 
@@ -36,7 +34,7 @@ from grimoire.utils import get_connector_from_name, get_connectors, get_elastic
 from grimoire.utils import get_params, config_logging
 
 
-def feed_backends(url, connectors, clean, debug):
+def feed_backends(url, connectors, clean, debug = False):
     ''' Update Ocean for all existing backends '''
 
     logging.info("Updating all Ocean")
@@ -143,7 +141,7 @@ if __name__ == '__main__':
                 min_update_time = 60
                 loop_update(min_update_time, url, connectors, clean, args.debug)
             else:
-                feed_backends(connectors, clean, args.debug)
+                feed_backends(url, connectors, clean, args.debug)
 
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
