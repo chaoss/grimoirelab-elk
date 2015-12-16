@@ -31,17 +31,18 @@ RUN apt-get update && \
     apt-get clean && \
     find /var/lib/apt/lists -type f -delete
 
-# Configuring and UTF-8 local needed by rqworker
-RUN sed -i "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g" /etc/locale.gen && \
-    locale-gen "en_US.UTF-8" && update-locale && \
-    echo "export LANG=en_US.utf8" >> ${DEPLOY_USER_DIR}/.bashrc
-
 # Not available as package in Debian 8 python3-myssqldb
 RUN pip3 install mysqlclient
 # rq tasks queue
 RUN pip3 install rq && pip3 install rq-dashboard
 
 RUN echo "${DEPLOY_USER}    ALL=NOPASSWD: ALL" >> /etc/sudoers
+
+# Configuring and UTF-8 local needed by rqworker
+RUN sed -i "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g" /etc/locale.gen && \
+    locale-gen "en_US.UTF-8" && update-locale && \
+    echo "export LANG=en_US.utf8" >> ${DEPLOY_USER_DIR}/.bashrc && \
+    echo "alias rqworkerr='rqworker -u http://redis'" >> ${DEPLOY_USER_DIR}/.bashrc
 
 USER ${DEPLOY_USER}
 WORKDIR ${DEPLOY_USER_DIR}
