@@ -24,8 +24,7 @@ RUN apt-get update && \
         psmisc \
         python python3 pep8 \
         python3-requests python3-dateutil python3-bs4 \
-        python3-pip python3-dev \
-        python3-redis redis-server \
+        python3-pip python3-dev python3-redis \
         gcc make libmysqlclient-dev \
         unzip wget sudo vim ssh \
         && \
@@ -50,5 +49,5 @@ WORKDIR ${DEPLOY_USER_DIR}
 # get Scout repository
 RUN git clone https://github.com/acs/GrimoireELK
 
-ENV container docker
-CMD rq-dashboard & sudo service redis-server start && sudo tail -f /var/log/redis/*
+# ENV container docker
+CMD rq-dashboard -H redis > /tmp/rq-dashboard.log 2>&1
