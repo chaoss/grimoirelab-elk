@@ -7,6 +7,7 @@ GELK_DIR=/home/bitergia/GrimoireELK
 cd $GELK_DIR/utils
 
 LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 create > /tmp/worker-create.log &
+LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 create > /tmp/worker-create1.log &
 LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 update > /tmp/worker-update.log &
 
 rq-dashboard -H redis > /tmp/rq-dashboard.log 2>&1
