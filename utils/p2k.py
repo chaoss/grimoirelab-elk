@@ -207,9 +207,7 @@ if __name__ == '__main__':
 
     app_init = datetime.now()
 
-    connectors = get_connectors() 
-
-    args = get_params(connectors)
+    args = get_params()
 
     config_logging(args.debug)
 

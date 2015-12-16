@@ -32,14 +32,14 @@ from grimoire.arthur import feed_backend
 
 from grimoire.ocean.conf import ConfOcean
 
-from grimoire.utils import get_connectors, get_elastic
+from grimoire.utils import get_elastic
 from grimoire.utils import get_params, config_logging
 
 from redis import Redis
 from rq import Queue
 
 
-def feed_backends(url, connectors, clean, debug = False, redis = None):
+def feed_backends(url, clean, debug = False, redis = None):
     ''' Update Ocean for all existing backends '''
 
     logging.info("Updating all Ocean")
@@ -53,18 +53,17 @@ def feed_backends(url, connectors, clean, debug = False, redis = None):
         params['no_incremental'] = True  # Always try incremental
         params['debug'] = debug  # Use for all debug level defined in p2o
 
-        result = q.enqueue(
-             feed_backend, url, params, connectors, clean)
+        result = q.enqueue(feed_backend, url, params, clean)
         logging.info("Queued job")
         logging.info(result)
 
 
-def loop_update(min_update_time, url, connectors, clean, debug, redis):
+def loop_update(min_update_time, url, clean, debug, redis):
 
     while True:
         ustart = time()
 
-        feed_backends(url, connectors, clean, debug, redis)
+        feed_backends(url, clean, debug, redis)
 
         update_time = int(time()-ustart)
         update_sleep = min_update_time - update_time
@@ -78,9 +77,7 @@ if __name__ == '__main__':
 
     app_init = datetime.now()
 
-    connectors = get_connectors() 
-
-    args = get_params(connectors)
+    args = get_params()
 
     async_ = True  # Use RQ or not
 
@@ -95,19 +92,19 @@ if __name__ == '__main__':
     try:
         if args.backend:
             q = Queue('create', connection=Redis(args.redis), async=async_)
-            result = q.enqueue(feed_backend, url, vars(args), connectors, clean)
+            result = q.enqueue(feed_backend, url, vars(args), clean)
             logging.info("Queued job")
             logging.info(result)
 
-            # feed_backend(url, vars(args), connectors, clean)
+            # feed_backend(url, vars(args), clean)
         else:
             if args.loop:
                 # minimal update duration to avoid too much frequency in secs
                 min_update_time = 60
-                loop_update(min_update_time, url, connectors, clean, args.debug,
+                loop_update(min_update_time, url, clean, args.debug,
                             args.redis)
             else:
-                feed_backends(url, connectors, clean, args.debug, args.redis)
+                feed_backends(url, clean, args.debug, args.redis)
 
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
