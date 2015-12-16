@@ -102,12 +102,9 @@ def get_params(connectors):
     # And now a specific param to do the update until process termination
     parser.add_argument("--loop",  action='store_true',
                         help="loop the ocean update until process termination")
-
+    parser.add_argument("--redis",  default="redis",
+                        help="url for the redis server")
 
     args = parser.parse_args()
 
     return args
-
-
-
-    
