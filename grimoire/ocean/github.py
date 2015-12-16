@@ -37,6 +37,14 @@ class GitHubOcean(ElasticOcean):
     def get_field_date(self):
         return "updated_at"
 
+    def get_identities(self, item):
+        ''' Return the identities from an item '''
+        identities = []
+
+        identities.append(item['user'])
+        identities.append(item['assignee'])
+
+        return identities
 
     def getUser(self, url, login):
         if login not in GitHub.users:
