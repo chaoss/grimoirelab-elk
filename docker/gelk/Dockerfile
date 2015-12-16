@@ -42,7 +42,7 @@ RUN echo "${DEPLOY_USER}    ALL=NOPASSWD: ALL" >> /etc/sudoers
 # 10 days for timeout in our workerts
 RUN sed -i "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g" /etc/locale.gen && \
     locale-gen "en_US.UTF-8" && update-locale && \
-    echo "export LANG=en_US.utf8" >> ${DEPLOY_USER_DIR}/.bashrc && \
+    echo "export LANG='en_US.utf8'" >> ${DEPLOY_USER_DIR}/.bashrc && \
     echo "alias rqworker-arthur='rqworker -u http://redis --worker-ttl 864000'" >> ${DEPLOY_USER_DIR}/.bashrc
 
 USER ${DEPLOY_USER}
@@ -51,5 +51,6 @@ WORKDIR ${DEPLOY_USER_DIR}
 # get Scout repository
 RUN git clone https://github.com/acs/GrimoireELK
 
-# ENV container docker
-CMD rq-dashboard -H redis > /tmp/rq-dashboard.log 2>&1
+ADD init-gelk ${DEPLOY_USER_DIR}/
+
+CMD ${DEPLOY_USER_DIR}/init-gelk
