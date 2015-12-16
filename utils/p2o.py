@@ -46,7 +46,7 @@ def feed_backends(url, connectors, clean, debug = False, redis = None):
     elastic = get_elastic(url, ConfOcean.get_index(), clean)
     ConfOcean.set_elastic(elastic)
 
-    q = Queue(connection=Redis(redis), async=async_)
+    q = Queue('update', connection=Redis(redis), async=async_)
 
     for repo in ConfOcean.get_repos():
         params = repo['params']
@@ -59,12 +59,12 @@ def feed_backends(url, connectors, clean, debug = False, redis = None):
         logging.info(result)
 
 
-def loop_update(min_update_time, url, connectors, clean, debug):
+def loop_update(min_update_time, url, connectors, clean, debug, redis):
 
     while True:
         ustart = time()
 
-        feed_backends(url, connectors, clean, debug)
+        feed_backends(url, connectors, clean, debug, redis)
 
         update_time = int(time()-ustart)
         update_sleep = min_update_time - update_time
@@ -88,15 +88,13 @@ if __name__ == '__main__':
 
     url = args.elastic_url
 
-    redis = args.redis
-
     clean = args.no_incremental
     if args.cache:
         clean = True
 
     try:
         if args.backend:
-            q = Queue(connection=Redis(redis), async=async_)
+            q = Queue('create', connection=Redis(args.redis), async=async_)
             result = q.enqueue(feed_backend, url, vars(args), connectors, clean)
             logging.info("Queued job")
             logging.info(result)
@@ -106,9 +104,10 @@ if __name__ == '__main__':
             if args.loop:
                 # minimal update duration to avoid too much frequency in secs
                 min_update_time = 60
-                loop_update(min_update_time, url, connectors, clean, args.debug)
+                loop_update(min_update_time, url, connectors, clean, args.debug,
+                            args.redis)
             else:
-                feed_backends(url, connectors, clean, args.debug)
+                feed_backends(url, connectors, clean, args.debug, args.redis)
 
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
