@@ -42,8 +42,9 @@ from perceval.backends.gerrit import Gerrit
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.elk.elastic import ElasticConnectException
 
-def get_connector_from_name(name, connectors):
+def get_connector_from_name(name):
     found = None
+    connectors = get_connectors()
 
     for connector in connectors:
         backend = connector[0]
@@ -85,8 +86,8 @@ def config_logging(debug):
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
 
-def get_params(connectors):
-    ''' Get params definition from ElasticOcean and from all the backends '''
+def get_params_parser():
+    connectors = get_connectors()
     parser = argparse.ArgumentParser()
     ElasticOcean.add_params(parser)
 
@@ -105,6 +106,12 @@ def get_params(connectors):
     parser.add_argument("--redis",  default="redis",
                         help="url for the redis server")
 
+    return parser
+
+def get_params():
+    ''' Get params definition from ElasticOcean and from all the backends '''
+
+    parser = get_params_parser()
     args = parser.parse_args()
 
     return args
