@@ -1,0 +1,20 @@
+redis:
+    image: redis
+
+elasticsearch:
+    image: elasticsearch:2
+    command: elasticsearch -Des.network.bind_host=0.0.0.0
+    ports:
+        - 9200:9200
+        - 9300:9300
+
+gelk:
+    image: bitergia/gelk
+    links:
+        - elasticsearch
+        - redis
+    ports:
+        - 6379:6379
+        - 9181:9181
+    volumes:
+        - ~/devel/GrimoireELK:/home/bitergia/GrimoireELK
