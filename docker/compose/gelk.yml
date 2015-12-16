@@ -14,7 +14,6 @@ gelk:
         - elasticsearch
         - redis
     ports:
-        - 6379:6379
         - 9181:9181
     volumes:
         - ~/devel/GrimoireELK:/home/bitergia/GrimoireELK
