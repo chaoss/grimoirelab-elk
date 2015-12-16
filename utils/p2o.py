@@ -39,14 +39,14 @@ from redis import Redis
 from rq import Queue
 
 
-def feed_backends(url, connectors, clean, debug = False):
+def feed_backends(url, connectors, clean, debug = False, redis = None):
     ''' Update Ocean for all existing backends '''
 
     logging.info("Updating all Ocean")
     elastic = get_elastic(url, ConfOcean.get_index(), clean)
     ConfOcean.set_elastic(elastic)
 
-    q = Queue(connection=Redis(), async=async_)
+    q = Queue(connection=Redis(redis), async=async_)
 
     for repo in ConfOcean.get_repos():
         params = repo['params']
@@ -82,11 +82,13 @@ if __name__ == '__main__':
 
     args = get_params(connectors)
 
-    async_ = False  # Use RQ or not
+    async_ = True  # Use RQ or not
 
     config_logging(args.debug)
 
     url = args.elastic_url
+
+    redis = args.redis
 
     clean = args.no_incremental
     if args.cache:
@@ -94,7 +96,7 @@ if __name__ == '__main__':
 
     try:
         if args.backend:
-            q = Queue(connection=Redis(), async=async_)
+            q = Queue(connection=Redis(redis), async=async_)
             result = q.enqueue(feed_backend, url, vars(args), connectors, clean)
             logging.info("Queued job")
             logging.info(result)
