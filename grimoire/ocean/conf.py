@@ -100,11 +100,11 @@ class ConfOcean(object):
 
         url = cls.elastic.url + "/" + cls.conf_repos + "/_search"
 
-        r = requests.get(url)
+        r = requests.get(url).json()
 
-        repos_raw = r.json()['hits']['hits']  # Already existing items
-
-        [ repos_ids.append(rep['_id']) for rep in repos_raw ]
+        if 'hits' in r:
+            repos_raw = r['hits']['hits']  # Already existing items
+            [ repos_ids.append(rep['_id']) for rep in repos_raw ]
 
         return repos_ids
 
