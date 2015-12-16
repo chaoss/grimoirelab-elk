@@ -26,7 +26,7 @@ RUN apt-get update && \
         python3-requests python3-dateutil python3-bs4 \
         python3-pip python3-dev python3-redis \
         gcc make libmysqlclient-dev \
-        unzip wget sudo vim ssh \
+        unzip curl wget sudo vim ssh \
         && \
     apt-get clean && \
     find /var/lib/apt/lists -type f -delete
