@@ -32,7 +32,7 @@ from grimoire.ocean.conf import ConfOcean
 from grimoire.utils import get_elastic
 from grimoire.utils import get_connector_from_name
 
-def feed_backend(url, params, connectors, clean):
+def feed_backend(url, params, clean):
     ''' Feed Ocean with backend data '''
 
     backend = None
@@ -41,7 +41,7 @@ def feed_backend(url, params, connectors, clean):
     repo['params'] = params
     es_index = None
 
-    connector = get_connector_from_name(backend_name, connectors)
+    connector = get_connector_from_name(backend_name)
     if not connector:
         logging.error("Cant find %s backend" % (backend_name))
         sys.exit(1)
