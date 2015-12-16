@@ -33,11 +33,14 @@ import requests
 
 class ElasticOcean(object):
 
-    # Public Perceval backend API 
+    # Public Ocean backend API
     def fetch(self):
         ''' Returns an iterator for the ocean feeder  '''
         raise NotImplementedError
 
+    def get_identities(self, item):
+        ''' Return the identities from an item '''
+        raise NotImplementedError
 
 
     def set_elastic(self, elastic):
@@ -71,13 +74,16 @@ class ElasticOcean(object):
         self.cache = cache
         self.incremental = incremental
 
-        if self.cache:
-            # Don't use history data. Will be generated from cache.
-            self.incremental = False
+        if self.perceval_backend:
+            # The OceanBackend could be used without perceval
 
-        else:
-            if not self.incremental:
-                self.perceval_backend.cache.clean()  # Cache will be refreshed
+            if self.cache:
+                # Don't use history data. Will be generated from cache.
+                self.incremental = False
+
+            else:
+                if not self.incremental:
+                    self.perceval_backend.cache.clean()  # Cache will be refreshed
 
 
     def get_field_date(self):
