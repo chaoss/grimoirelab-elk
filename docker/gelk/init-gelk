@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script starts arthur's RQ workers and the dashboard 
+# This script starts arthur's RQ workers and the dashboard and the initial SH db 
 
 GELK_DIR=/home/bitergia/GrimoireELK
 
@@ -9,5 +9,7 @@ cd $GELK_DIR/utils
 LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 create > /tmp/worker-create.log &
 LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 create > /tmp/worker-create1.log &
 LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 update > /tmp/worker-update.log &
+
+(sleep 10 && mysqladmin -u root create ocean_sh -h mariadb) &
 
 rq-dashboard -H redis > /tmp/rq-dashboard.log 2>&1
