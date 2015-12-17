@@ -27,13 +27,18 @@ import argparse
 from datetime import datetime
 import logging
 import requests
-import sys
 
-from grimoire.elk.elastic import ElasticSearch, ElasticConnectException, ElasticWriteException
+
 from grimoire.ocean.elastic import ElasticOcean
 from grimoire.ocean.conf import ConfOcean
-
 from grimoire.utils import get_elastic, config_logging, get_connector_from_name
+
+from sortinghat import api
+from sortinghat.db.database import Database
+from sortinghat.db.model import UniqueIdentity, Identity, Profile,\
+    Organization, Domain, Country, Enrollment, MatchingBlacklist
+from sortinghat.exceptions import AlreadyExistsError, NotFoundError
+from sortinghat.matcher import create_identity_matcher
 
 def get_params():
     ''' Get params definition from ElasticOcean '''
@@ -68,8 +73,17 @@ def get_identities(obackend):
                 unique_identities.append(identity)
     return unique_identities
 
-def add_identities(identities):
+def add_identities(identities, backend):
     logging.info("Adding the identities to SortingHat")
+
+    db = Database("root", "", "ocean_sh", "mariadb")
+
+    for identity in identities:
+        try:
+            res = api.add_identity(db, backend, identity['email'],
+                                   identity['name'], identity['username'])
+        except AlreadyExistsError:
+            pass
 
 
 if __name__ == '__main__':
@@ -94,7 +108,7 @@ if __name__ == '__main__':
         obackend.set_elastic(get_elastic(args.elastic_url, args.index))
 
         identities = get_identities(obackend)
-        add_identities(identities)
+        add_identities(identities, backend_name)
 
         # Add the identities to Sorting Hat
 

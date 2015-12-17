@@ -41,8 +41,18 @@ class GitHubOcean(ElasticOcean):
         ''' Return the identities from an item '''
         identities = []
 
-        identities.append(item['user'])
-        identities.append(item['assignee'])
+        if item['user']:
+            identities.append({
+                               "name":item['user']['login'],
+                               "email":item['user']['login'],
+                               "username":item['user']['login']
+                               })
+        if item['assignee']:
+            identities.append({
+                               "name":item['assignee']['login'],
+                               "email":item['assignee']['login'],
+                               "username":item['assignee']['login']
+                               })
 
         return identities
 
