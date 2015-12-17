@@ -59,7 +59,7 @@ class GitHub(Backend):
 
         super(GitHub, self).__init__(cache)
 
-        self.client = GitHubClient(owner, repository)
+        self.client = GitHubClient(owner, repository, token)
 
     def get_id(self):
 
@@ -131,14 +131,15 @@ class GitHub(Backend):
 
 
 class GitHubClient:
+    __github_api = "https://api.github.com"
 
-    def __init__(self, owner, repository):
+    def __init__(self, owner, repository, token):
         self.owner = owner
         self.repository = repository
+        self.auth_token = token
 
     def _get_url(self):
-        github_api = "https://api.github.com"
-        github_api_repos = github_api + "/repos"
+        github_api_repos = GitHubClient.__github_api + "/repos"
         url_repo = github_api_repos + "/" + self.owner +"/" + self.repository
         return url_repo
 
@@ -158,3 +159,24 @@ class GitHubClient:
         url = url_issues + url_params
 
         return url
+
+    def get_user(self, login):
+        url_user = GitHubClient.__github_api + "/users/" + login
+
+        logging.info("Getting info for %s" % (url_user))
+        r = requests.get(url_user, verify=False,
+                         headers={'Authorization':'token ' + self.auth_token})
+        user = r.json()
+
+        return user
+
+    def get_user_orgs(self, login):
+        # Get the public organizations also
+
+        url = GitHubClient.__github_api + "/users/" + login+"/orgs"
+        r = requests.get(url, verify=False,
+                         headers={'Authorization':'token ' + self.auth_token})
+        orgs = r.json()
+
+        return orgs
+
