@@ -27,12 +27,20 @@
 
 import requests
 
-from perceval.backends.github import GitHub
 from grimoire.ocean.elastic import ElasticOcean
 
 class GitHubOcean(ElasticOcean):
 
-    users = {}
+    users = {}  # cache with GitHub users
+
+    def __init__(self, perceval_backend, cache = False,
+                 incremental = True, **nouse):
+        # Read user data from cache in ES and call parent __init__
+        if len(GitHubOcean.users.keys()) == 0:
+            # If the cache is not loaded yet, load it
+            GitHubOcean.users = {}
+        super(GitHubOcean, self).__init__(perceval_backend, cache,
+                                          incremental, **nouse)
 
     def get_field_date(self):
         return "updated_at"
@@ -41,39 +49,27 @@ class GitHubOcean(ElasticOcean):
         ''' Return the identities from an item '''
         identities = []
 
-        if item['user']:
-            identities.append({
-                               "name":item['user']['login'],
-                               "email":item['user']['login'],
-                               "username":item['user']['login']
-                               })
-        if item['assignee']:
-            identities.append({
-                               "name":item['assignee']['login'],
-                               "email":item['assignee']['login'],
-                               "username":item['assignee']['login']
-                               })
-
+        for identity in ['user', 'assignee']:
+            if item[identity]:
+                user = self.get_user(item[identity]['login'])
+                identities.append({
+                                   "name":user['name'],
+                                   "email":user['email'],
+                                   "username":user['login'],
+                                   "id":user['id'],
+                                   "location":user['location'],
+                                   "company":user['company'],
+                                   "orgs": user['orgs']
+                                   })
         return identities
 
-    def getUser(self, url, login):
-        if login not in GitHub.users:
-
-            url = url + "/users/" + self.login
-
-            r = requests.get(url, verify=False,
-                             headers={'Authorization':'token ' + self.auth_token})
-            user = r.json()
-
-            GitHub.users[self.login] = user
-
-            # Get the public organizations also
-            url += "/orgs"
-            r = requests.get(url, verify=False,
-                             headers={'Authorization':'token ' + self.auth_token})
-            orgs = r.json()
-
-            GitHub.users[self.login]['orgs'] = orgs
+    def get_user(self, login):
+        if login not in GitHubOcean.users:
+            user = self.perceval_backend.client.get_user(login)
+            GitHubOcean.users[login] = user
+            orgs = self.perceval_backend.client.get_user_orgs(login)
+            GitHubOcean.users[login]['orgs'] = orgs
+        return GitHubOcean.users[login]
 
     def drop_item(self, item):
         ''' Drop items not to be inserted in Elastic '''
@@ -81,5 +77,3 @@ class GitHubOcean(ElasticOcean):
         if not 'head' in item.keys() and not 'pull_request' in item.keys():
             drop = True
         return drop
-
-
