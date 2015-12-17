@@ -24,7 +24,7 @@ RUN apt-get update && \
         psmisc \
         python python3 pep8 \
         python3-requests python3-dateutil python3-bs4 \
-        python3-pip python3-dev python3-redis \
+        python3-pip python3-dev python3-redis python3-sqlalchemy \
         gcc make libmysqlclient-dev \
         unzip curl wget sudo vim ssh \
         && \
@@ -48,7 +48,11 @@ RUN sed -i "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g" /etc/locale.gen && \
 USER ${DEPLOY_USER}
 WORKDIR ${DEPLOY_USER_DIR}
 
-# get Scout repository
+# get SortingHat repository
+RUN git clone https://github.com/MetricsGrimoire/sortinghat.git && \
+    cd sortinghat && sudo python3 setup.py install
+
+# get GrimoireELK repository
 RUN git clone https://github.com/acs/GrimoireELK
 
 ADD init-gelk ${DEPLOY_USER_DIR}/
