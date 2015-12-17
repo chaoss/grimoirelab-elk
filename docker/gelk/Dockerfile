@@ -55,6 +55,9 @@ RUN git clone https://github.com/MetricsGrimoire/sortinghat.git && \
 # get GrimoireELK repository
 RUN git clone https://github.com/acs/GrimoireELK
 
+# get Perceval repository
+RUN git clone https://github.com/grimoirelab/perceval.git
+
 ADD init-gelk ${DEPLOY_USER_DIR}/
 
 CMD ${DEPLOY_USER_DIR}/init-gelk

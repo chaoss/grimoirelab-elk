@@ -47,8 +47,6 @@ gelk:
     #     - 9181:9181
     expose:
         - "9181"
-    environment:
-        - RQ_DASHBOARD_USER=bitergia
-        - RQ_DASHBOARD_PASSWORD=bitergia
     volumes:
         - ~/devel/GrimoireELK:/home/bitergia/GrimoireELK
+        - ~/devel/perceval-1:/home/bitergia/perceval
