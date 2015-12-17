@@ -53,15 +53,16 @@ def get_params():
 
     return args
 
-def get_index_backend(url, index):
-    logging.info("Get backend for index: %s" % (index))
+def get_perceval_params(url, index):
+    logging.info("Get perceval params for index: %s" % (index))
     elastic = get_elastic(url, ConfOcean.get_index())
     ConfOcean.set_elastic(elastic)
 
     r = requests.get(elastic.index_url+"/repos/"+index)
-    backend = r.json()['_source']['params']['backend']
 
-    return backend
+    params = r.json()['_source']['params']
+
+    return params
 
 def get_identities(obackend):
     identities = []
@@ -80,10 +81,24 @@ def add_identities(identities, backend):
 
     for identity in identities:
         try:
-            res = api.add_identity(db, backend, identity['email'],
+            uuid = api.add_identity(db, backend, identity['email'],
                                    identity['name'], identity['username'])
-        except AlreadyExistsError:
-            pass
+        except AlreadyExistsError as ex:
+            uuid = ex.uuid
+
+        logging.info("SH %s %s " % (identity['name'], uuid))
+
+        if identity['company']:
+            try:
+                api.add_organization(db, identity['company'])
+            except AlreadyExistsError:
+                pass
+
+            api.add_enrollment(db, uuid, identity['company'],
+                               datetime(1900, 1, 1),
+                               datetime(2100, 1, 1))
+
+
 
 
 if __name__ == '__main__':
@@ -99,12 +114,16 @@ if __name__ == '__main__':
         pass
     else:
         logging.info("Extracting identities from: %s" % (args.index))
-        backend_name = get_index_backend(args.elastic_url, args.index)
-
-        obackend_class = get_connector_from_name(backend_name)[1]
+        perceval_params = get_perceval_params(args.elastic_url, args.index)
+        backend_name = perceval_params['backend']
+        connector = get_connector_from_name(backend_name)
+        perceval_backend_class = connector[0]
+        ocean_backend_class = connector[1]
         perceval_backend = None  # Don't use perceval
 
-        obackend =  obackend_class(perceval_backend, incremental=False)
+        perceval_backend = perceval_backend_class(**perceval_params)
+
+        obackend =  ocean_backend_class(perceval_backend, incremental=False)
         obackend.set_elastic(get_elastic(args.elastic_url, args.index))
 
         identities = get_identities(obackend)
