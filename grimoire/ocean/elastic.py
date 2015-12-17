@@ -69,21 +69,8 @@ class ElasticOcean(object):
                  incremental = True, **nouse):
 
         self.perceval_backend = perceval_backend
-
-
         self.cache = cache
         self.incremental = incremental
-
-        if self.perceval_backend:
-            # The OceanBackend could be used without perceval
-
-            if self.cache:
-                # Don't use history data. Will be generated from cache.
-                self.incremental = False
-
-            else:
-                if not self.incremental:
-                    self.perceval_backend.cache.clean()  # Cache will be refreshed
 
 
     def get_field_date(self):
