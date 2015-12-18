@@ -64,7 +64,7 @@ def feed_backend(url, params, clean):
     except Exception as ex:
         if backend:
             logging.error("Error feeding ocean from %s (%s): %s" %
-                          (backend.get_name(), backend.get_id()), ex)
+                          (backend.get_name(), backend.get_id(), ex))
         else:
             logging.error("Error feeding ocean %s" % ex)
 
