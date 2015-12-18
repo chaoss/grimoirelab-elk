@@ -32,6 +32,45 @@ class GerritOcean(ElasticOcean):
     def get_field_date(self):
         return "lastUpdated_date"
 
+    def get_identities(self, item):
+        ''' Return the identities from an item '''
+
+        def add_identity(identities, user):
+            identity = {}
+            for field in ['name', 'email', 'username']:
+                identity[field] = None
+            if 'name' in user: identity['name'] = user['name']
+            if 'email' in user: identity['email'] = user['email']
+            if 'username' in user: identity['username'] = user['username']
+            identities.append(identity)
+
+        identities = []
+
+        # Changeset owner
+        user = item['owner']
+        add_identity(identities, user)
+
+        # Patchset uploader and author
+        if 'patchSets' in item:
+            for patchset in item['patchSets']:
+                user = patchset['uploader']
+                add_identity(identities, user)
+                user = patchset['author']
+                add_identity(identities, user)
+                if 'approvals' in patchset:
+                    # Approvals by
+                    for approval in patchset['approvals']:
+                        user = approval['by']
+                        add_identity(identities, user)
+        # Comments reviewers
+        if 'comments' in item:
+            for comment in item['comments']:
+                user = comment['reviewer']
+                add_identity(identities, user)
+
+        return identities
+
+
     def get_elastic_mappings(self):
 
         mapping = '''
@@ -46,6 +85,21 @@ class GerritOcean(ElasticOcean):
         '''
 
         return {"items":mapping}
+
+    def get_id(self):
+        ''' Return gerrit unique identifier '''
+        return self.repository
+
+    def get_field_unique_id(self):
+        return "id"
+
+
+# We need to enrich data with it
+#         entry_lastUpdated = \
+#             datetime.fromtimestamp(entry['lastUpdated'])
+#         entry['lastUpdated_date'] = entry_lastUpdated.isoformat()
+
+    
 
 
 
