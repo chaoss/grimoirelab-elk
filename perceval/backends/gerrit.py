@@ -204,9 +204,9 @@ class GerritClient():
 
         if last_item is not None:
             if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
-                cmd += " --start=" + str(self.last_item)
+                cmd += " --start=" + str(last_item)
             else:
-                cmd += " resume_sortkey:" + self.last_item
+                cmd += " resume_sortkey:" + last_item
 
         return cmd
 
@@ -228,7 +228,9 @@ class GerritClient():
         if gerrit_version[0] == 2 and gerrit_version[1] >= 9:
             if last_item is None:
                 next_item = 0
-            self.last_item += 1
+            else:
+                next_item = last_item+1
+
         else:
             if last_item is None:
                 next_item = None
