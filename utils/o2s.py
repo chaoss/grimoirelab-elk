@@ -88,7 +88,7 @@ def add_identities(identities, backend):
 
         logging.info("SH %s %s " % (identity['name'], uuid))
 
-        if identity['company']:
+        if 'company' in identity:
             try:
                 api.add_organization(db, identity['company'])
             except AlreadyExistsError:
