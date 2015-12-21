@@ -79,12 +79,32 @@ def add_identities(identities, backend):
 
     db = Database("root", "", "ocean_sh", "mariadb")
 
+    total = 0
+
+    matching = 'email-name';
+
+    blacklist = api.blacklist(db)
+    matcher = create_identity_matcher(matching, blacklist)
+
     for identity in identities:
         try:
             uuid = api.add_identity(db, backend, identity['email'],
                                    identity['name'], identity['username'])
+            total += 1
+            # Time to  merge
+            matches = api.match_identities(db, uuid, matcher)
+
+            if len(matches) > 1:
+                u = api.unique_identities(db, uuid)[0]
+                for m in matches:
+                    if m.uuid == uuid:
+                        continue
+                    api.merge_unique_identities(db, u.uuid, m.uuid)
+                    u = api.unique_identities(db, m.uuid)[0]
+
         except AlreadyExistsError as ex:
             uuid = ex.uuid
+
 
         logging.info("SH %s %s " % (identity['name'], uuid))
 
@@ -98,7 +118,7 @@ def add_identities(identities, backend):
                                datetime(1900, 1, 1),
                                datetime(2100, 1, 1))
 
-
+    logging.info("Total NEW identities: %i" % (total))
 
 
 if __name__ == '__main__':
