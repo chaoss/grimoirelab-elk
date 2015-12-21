@@ -395,11 +395,11 @@ class Bugzilla(Backend):
             tree = ElementTree.fromstring(issues_raw.content)
 
             for bug in tree:
-                issues.append(self.get_item(bug))
+                issues.append(self._get_item(bug))
 
 
             # Each time we receive data from bugzilla server dump it
-            self._items_to_es(issues)
+            # self._items_to_es(issues)
 
             issues_processed += issues
 
