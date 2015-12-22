@@ -26,6 +26,8 @@ elasticsearch:
     ports:
         - 9200:9200
         - 9300:9300
+    volumes:
+        - /home/acs/Docker/data/elasticsearch/:/usr/share/elasticsearch/data
 
 nginx:
     image: nginx
