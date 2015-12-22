@@ -35,12 +35,19 @@ from grimoire.elk.enrich import Enrich
 
 from perceval.utils import get_time_diff_days
 
+import sortinghat.utils as utils
+from sortinghat.db.database import Database
+from sortinghat import api
+from sortinghat.exceptions import NotFoundError
+
 
 class BugzillaEnrich(Enrich):
 
     def __init__(self, bugzilla, **nouse):
         self.bugzilla = bugzilla
         self.elastic = None
+        self.sh_db = Database("root", "", "ocean_sh", "mariadb")
+
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -51,13 +58,31 @@ class BugzillaEnrich(Enrich):
             u = urlparse(self.bugzilla.url)
             return u.scheme+"//"+u.netloc
 
+        def get_uuid(identity):
+            iden = {}
+            for field in ['email', 'name', 'username']:
+                iden[field] = None
+                if field in identity:
+                    iden[field] = identity[field]
+            uuid = utils.uuid(self.bugzilla.get_name(), iden['email'],
+                              iden['name'], iden['username'])
+
+            try:
+                u = api.unique_identities(self.sh_db, uuid)[0]
+                uuid = u.uuid
+            except NotFoundError:
+                logging.error("Identity found in Sorting Hat which is not unique")
+                logging.error("%s %s" % (identity, uuid))
+                uuid = None
+            return uuid
+
         # Fix dates
         date_ts = parser.parse(issue['creation_ts'])
         issue['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
         date_ts = parser.parse(issue['delta_ts'])
         issue['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
-        # Add extra JSON fields used in Kibana
+        # Add extra JSON fields used in Kibana (enriched fields)
         issue['number_of_comments'] = 0
         issue['time_to_last_update_days'] = None
         issue['url'] = None
@@ -67,13 +92,28 @@ class BugzillaEnrich(Enrich):
         issue['time_to_last_update_days'] = \
             get_time_diff_days(issue['creation_ts'], issue['delta_ts'])
 
+        # Sorting Hat integration: reporter and assigned_to uuids
+        identity = {}
+        if 'assigned_to' in issue:
+            identity['username'] = issue['assigned_to']
+            if 'assigned_to_name' in issue:
+                identity['name'] = issue['assigned_to_name']
+            issue['assignet_to_uuid'] = get_uuid(identity)
+        identity = {}
+        if 'reporter' in issue:
+            identity['username'] = issue['reporter']
+            if 'reporter_name' in issue:
+                identity['name'] = issue['reporter_name']
+            issue['reporter_uuid'] = get_uuid(identity)
+
         return issue
+
 
     def enrich_items(self, items):
         if self.bugzilla.detail == "list":
             self.issues_list_to_es(items)
         else:
-            self.issues_to_es(self, items)
+            self.issues_to_es(items)
 
 
     def issues_list_to_es(self, items):
