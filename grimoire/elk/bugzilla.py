@@ -38,7 +38,7 @@ from perceval.utils import get_time_diff_days
 import sortinghat.utils as utils
 from sortinghat.db.database import Database
 from sortinghat import api
-from sortinghat.exceptions import NotFoundError
+from sortinghat.exceptions import AlreadyExistsError, NotFoundError
 
 
 class BugzillaEnrich(Enrich):
@@ -64,10 +64,16 @@ class BugzillaEnrich(Enrich):
                 iden[field] = None
                 if field in identity:
                     iden[field] = identity[field]
-            uuid = utils.uuid(self.bugzilla.get_name(), iden['email'],
-                              iden['name'], iden['username'])
+            id = utils.uuid(self.bugzilla.get_name(), iden['email'],
+                            iden['name'], iden['username'])
 
             try:
+                # Find the uuid for a given id. A bit hacky in SH yet
+                api.add_identity(self.sh_db, self.bugzilla.get_name(),
+                                 iden['email'], iden['name'],
+                                 iden['username'])
+            except AlreadyExistsError as ex:
+                uuid = ex.uuid
                 u = api.unique_identities(self.sh_db, uuid)[0]
                 uuid = u.uuid
             except NotFoundError:
