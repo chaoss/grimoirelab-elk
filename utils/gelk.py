@@ -94,9 +94,9 @@ if __name__ == '__main__':
     logging.getLogger("requests").setLevel(logging.WARNING)
 
     connector = get_connector_from_name(backend_name, connectors)
-    backend = connector[0](**args)
-    ocean_backend = connector[1](backend, **args)
-    enrich_backend = connector[2](backend, **args)
+    backend = connector[0](**vars(args))
+    ocean_backend = connector[1](backend, **vars(args))
+    enrich_backend = connector[2](backend, **vars(args))
 
     es_index = backend.get_name() + "_" + backend.get_id()
 
@@ -108,15 +108,15 @@ if __name__ == '__main__':
 
     try:
         # Ocean
-        state_index = es_index+"_state"
         elastic_state = ElasticSearch(args.elastic_url,
-                                      state_index,
+                                      es_index,
                                       ocean_backend.get_elastic_mappings(),
                                       clean)
 
         # Enriched ocean
+        enrich_index = es_index+"_enrich"
         elastic = ElasticSearch(args.elastic_url,
-                                es_index,
+                                enrich_index,
                                 enrich_backend.get_elastic_mappings(),
                                 clean)
 
