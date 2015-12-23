@@ -23,8 +23,18 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import logging
+
+from sortinghat.db.database import Database
+from sortinghat import api
+from sortinghat.exceptions import AlreadyExistsError, NotFoundError
+
+logger = logging.getLogger(__name__)
 
 class Enrich(object):
+
+    def __init__(self):
+        self.sh_db = Database("root", "", "ocean_sh", "mariadb")
 
     @classmethod
     def add_params(cls, cmdline_parser):
@@ -39,3 +49,28 @@ class Enrich(object):
     def get_elastic_mappings(self):
         ''' Mappings for enriched indexes '''
         pass
+
+    def get_uuid(self, identity, backend_name):
+        """ Return the Sorting Hat uuid for an identity """
+        iden = {}
+        uuid = None
+
+        for field in ['email', 'name', 'username']:
+            iden[field] = None
+            if field in identity:
+                iden[field] = identity[field]
+
+        try:
+            # Find the uuid for a given id. A bit hacky in SH yet
+            api.add_identity(self.sh_db, backend_name,
+                             iden['email'], iden['name'],
+                             iden['username'])
+        except AlreadyExistsError as ex:
+            uuid = ex.uuid
+            u = api.unique_identities(self.sh_db, uuid)[0]
+            uuid = u.uuid
+        except NotFoundError:
+            logger.error("Identity found in Sorting Hat which is not unique")
+            logger.error("%s %s" % (identity, uuid))
+            uuid = None
+        return uuid
