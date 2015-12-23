@@ -34,12 +34,12 @@ from grimoire.elk.elastic import ElasticConnectException
 from grimoire.elk.bugzilla import BugzillaEnrich
 from grimoire.elk.gerrit import GerritEnrich
 from grimoire.elk.github import GitHubEnrich
+from grimoire.elk.sortinghat import SortingHat
 
 from grimoire.ocean.bugzilla import BugzillaOcean
 from grimoire.ocean.gerrit import GerritOcean
 from grimoire.ocean.github import GitHubOcean
 from grimoire.ocean.elastic import ElasticOcean
-
 
 from perceval.backends.bugzilla import Bugzilla
 from perceval.backends.github import GitHub
@@ -135,23 +135,35 @@ if __name__ == '__main__':
         if backend_name == "github":
             GitHub.users = enrich_backend.users_from_es()
 
-        logging.info("Adding enrichment data to %s" % 
+        logging.info("Adding enrichment data to %s" %
                      (enrich_backend.elastic.index_url))
 
 
         items = []
-        items_count = 1
+        new_identities = []
+        items_count = 0
 
         for item in ocean_backend:
+            # print("%s %s" % (item['url'], item['lastUpdated_date']))
             if len(items) >= elastic.max_items_bulk:
                 enrich_backend.enrich_items(items)
                 items = []
             items.append(item)
+            # Get identities from new items to be added to SortingHat
+            identities = ocean_backend.get_identities(item)
+            for identity in identities:
+                if identity not in new_identities:
+                    new_identities.append(identity)
             items_count += 1
         enrich_backend.enrich_items(items)
 
         logging.info("Total items enriched %i " %  items_count)
 
+        logging.info("Total new identities to be checked %i" % len(new_identities))
+
+        merged_identities = SortingHat.add_identities(new_identities, backend_name)
+
+        # Redo enrich for items with new merged identities
 
 
     except KeyboardInterrupt:
