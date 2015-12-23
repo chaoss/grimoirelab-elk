@@ -71,6 +71,7 @@ class ElasticOcean(object):
         self.perceval_backend = perceval_backend
         self.cache = cache
         self.incremental = incremental
+        self.last_update = None  # Last update in ocean items index
 
 
     def get_field_date(self):
@@ -91,11 +92,16 @@ class ElasticOcean(object):
         ''' Drop items not to be inserted in Elastic '''
         return False
 
+    def add_item(self, item):
+        """ Add a new item to the Ocean and upload identities to SH and enrich it """
+
 
     def feed(self):
         ''' Feed data in Elastic '''
 
-        last_update = self.get_last_update_from_es()
+        self.last_update = self.get_last_update_from_es()
+        last_update = self.last_update
+        # last_update = '2014-12-10 11:26:01'
 
         logging.info("Incremental from: %s" % (last_update))
 
@@ -104,6 +110,7 @@ class ElasticOcean(object):
         items = []  # to feed item in packs
         drop = 0
         for item in self.perceval_backend.fetch(last_update):
+            # print("%s %s" % (item['url'], item['lastUpdated_date']))
             if len(items) >= self.elastic.max_items_bulk:
                 self._items_to_es(items)
                 items = []
@@ -144,9 +151,8 @@ class ElasticOcean(object):
 
         if self.incremental:
             date_field = self.get_field_date()
-            last_date = self.elastic.get_last_date(date_field)
+            last_date = self.last_update
             last_date = last_date.replace(" ","T")  # elastic format
-
 
             filter_ = '''
             {

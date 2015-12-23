@@ -32,41 +32,44 @@ class GerritOcean(ElasticOcean):
     def get_field_date(self):
         return "lastUpdated_date"
 
+    @classmethod
+    def get_sh_identity(cls, user):
+        identity = {}
+        for field in ['name', 'email', 'username']:
+            identity[field] = None
+        if 'name' in user: identity['name'] = user['name']
+        if 'email' in user: identity['email'] = user['email']
+        if 'username' in user: identity['username'] = user['username']
+        return identity
+
+
     def get_identities(self, item):
         ''' Return the identities from an item '''
-
-        def add_identity(identities, user):
-            identity = {}
-            for field in ['name', 'email', 'username']:
-                identity[field] = None
-            if 'name' in user: identity['name'] = user['name']
-            if 'email' in user: identity['email'] = user['email']
-            if 'username' in user: identity['username'] = user['username']
-            identities.append(identity)
 
         identities = []
 
         # Changeset owner
         user = item['owner']
-        add_identity(identities, user)
+        identities.append(self.get_sh_identity(user))
 
         # Patchset uploader and author
         if 'patchSets' in item:
             for patchset in item['patchSets']:
                 user = patchset['uploader']
-                add_identity(identities, user)
+                identities.append(self.get_sh_identity(user))
                 user = patchset['author']
-                add_identity(identities, user)
+                identities.append(self.get_sh_identity(user))
+                identities.append(self.get_sh_identity(user))
                 if 'approvals' in patchset:
                     # Approvals by
                     for approval in patchset['approvals']:
                         user = approval['by']
-                        add_identity(identities, user)
+                        identities.append(self.get_sh_identity(user))
         # Comments reviewers
         if 'comments' in item:
             for comment in item['comments']:
                 user = comment['reviewer']
-                add_identity(identities, user)
+                identities.append(self.get_sh_identity(user))
 
         return identities
 

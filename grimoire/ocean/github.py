@@ -25,8 +25,6 @@
 
 '''GitHub Ocean feeder'''
 
-import requests
-
 from grimoire.ocean.elastic import ElasticOcean
 
 class GitHubOcean(ElasticOcean):
@@ -42,6 +40,16 @@ class GitHubOcean(ElasticOcean):
         super(GitHubOcean, self).__init__(perceval_backend, cache,
                                           incremental, **nouse)
 
+    def get_id(self):
+
+        _id = "%s_%s" % (self.owner, self.repository)
+
+        return _id.lower()
+
+    def get_field_unique_id(self):
+        return "id"
+
+
     def get_field_date(self):
         return "updated_at"
 
@@ -51,25 +59,19 @@ class GitHubOcean(ElasticOcean):
 
         for identity in ['user', 'assignee']:
             if item[identity]:
-                user = self.get_user(item[identity]['login'])
-                identities.append({
-                                   "name":user['name'],
-                                   "email":user['email'],
-                                   "username":user['login'],
-                                   "id":user['id'],
-                                   "location":user['location'],
-                                   "company":user['company'],
-                                   "orgs": user['orgs']
-                                   })
+                user = self.get_sh_identity(item[identity]['login'])
+                identities.append(user)
         return identities
 
-    def get_user(self, login):
+    def get_sh_identity(self, login):
         if login not in GitHubOcean.users:
             user = self.perceval_backend.client.get_user(login)
             GitHubOcean.users[login] = user
             orgs = self.perceval_backend.client.get_user_orgs(login)
             GitHubOcean.users[login]['orgs'] = orgs
-        return GitHubOcean.users[login]
+        identity = GitHubOcean.users[login]
+        identity['username'] = identity['login']
+        return identity
 
     def drop_item(self, item):
         ''' Drop items not to be inserted in Elastic '''
