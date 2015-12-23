@@ -31,23 +31,17 @@ import requests
 from urllib.parse import urlparse
 
 from grimoire.elk.enrich import Enrich
-
+from grimoire.ocean.bugzilla import BugzillaOcean
 
 from perceval.utils import get_time_diff_days
-
-import sortinghat.utils as utils
-from sortinghat.db.database import Database
-from sortinghat import api
-from sortinghat.exceptions import AlreadyExistsError, NotFoundError
 
 
 class BugzillaEnrich(Enrich):
 
     def __init__(self, bugzilla, **nouse):
+        super().__init__()
         self.bugzilla = bugzilla
         self.elastic = None
-        self.sh_db = Database("root", "", "ocean_sh", "mariadb")
-
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -57,30 +51,6 @@ class BugzillaEnrich(Enrich):
         def get_bugzilla_url():
             u = urlparse(self.bugzilla.url)
             return u.scheme+"//"+u.netloc
-
-        def get_uuid(identity):
-            iden = {}
-            for field in ['email', 'name', 'username']:
-                iden[field] = None
-                if field in identity:
-                    iden[field] = identity[field]
-            id = utils.uuid(self.bugzilla.get_name(), iden['email'],
-                            iden['name'], iden['username'])
-
-            try:
-                # Find the uuid for a given id. A bit hacky in SH yet
-                api.add_identity(self.sh_db, self.bugzilla.get_name(),
-                                 iden['email'], iden['name'],
-                                 iden['username'])
-            except AlreadyExistsError as ex:
-                uuid = ex.uuid
-                u = api.unique_identities(self.sh_db, uuid)[0]
-                uuid = u.uuid
-            except NotFoundError:
-                logging.error("Identity found in Sorting Hat which is not unique")
-                logging.error("%s %s" % (identity, uuid))
-                uuid = None
-            return uuid
 
         # Fix dates
         date_ts = parser.parse(issue['creation_ts'])
@@ -99,18 +69,18 @@ class BugzillaEnrich(Enrich):
             get_time_diff_days(issue['creation_ts'], issue['delta_ts'])
 
         # Sorting Hat integration: reporter and assigned_to uuids
-        identity = {}
         if 'assigned_to' in issue:
-            identity['username'] = issue['assigned_to']
-            if 'assigned_to_name' in issue:
-                identity['name'] = issue['assigned_to_name']
-            issue['assignet_to_uuid'] = get_uuid(identity)
-        identity = {}
+            if 'assigned_to_name' not in issue:
+                issue['assigned_to_name'] = None
+            identity = BugzillaOcean.get_sh_identity({'assigned_to_name': issue['assigned_to_name'],
+                                                      'assigned_to':issue['assigned_to']})
+            issue['assignet_to_uuid'] = self.get_uuid(identity, self.bugzilla.get_name())
         if 'reporter' in issue:
-            identity['username'] = issue['reporter']
-            if 'reporter_name' in issue:
-                identity['name'] = issue['reporter_name']
-            issue['reporter_uuid'] = get_uuid(identity)
+            if 'reporter_name' not in issue:
+                issue['reporter_name'] = None
+            identity = BugzillaOcean.get_sh_identity({'reporter_name': issue['reporter_name'],
+                                                      'reporter':issue['reporter']})
+            issue['reporter_uuid'] = self.get_uuid(identity, self.bugzilla.get_name())
 
         return issue
 
