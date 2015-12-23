@@ -26,177 +26,69 @@
 from datetime import datetime
 import logging
 
-from grimoire.elk.database import Database
+from sortinghat import api
+from sortinghat.db.database import Database
+from sortinghat.db.model import UniqueIdentity
+from sortinghat.exceptions import AlreadyExistsError, NotFoundError
+from sortinghat.matcher import create_identity_matcher
+
+logger = logging.getLogger(__name__)
 
 class SortingHat(object):
 
-    def __init__(self, sortinghat_db, gerrit_grimoirelib_db):
-        # sortinghat_db = "acs_sortinghat_mediawiki_5879"
-        # sortinghat_db = "amartin_sortinghat_openstack_sh"
-        # gerrit_grimoirelib_db = "amartin_bicho_gerrit_openstack_sh"
+    @classmethod
+    def add_identities(cls, identities, backend):
+        """ Load identities list from backend in Sorting Hat """
 
-        self.sortinghat_db = sortinghat_db
-        self.gerrit_grimoirelib_db = gerrit_grimoirelib_db
+        logger.info("Adding the identities to SortingHat")
 
-        self.domain2org = {}
-        self.uuid2orgs = {}
-        self.email2uuid = {}
-        self.uuid2bot = {}
-        self.username2bot = {}
-        self.emailNOuuid = []
+        db = Database("root", "", "ocean_sh", "mariadb")
 
+        total = 0
 
-    def sortinghat_to_es(self):
-        """ Load all identities data in SH in memory """
+        matching = 'email-name';
 
-        logging.info("Loading Sorting Hat identities")
+        merged_identities = []  # old identities merged into new ones
+        blacklist = api.blacklist(db)
+        matcher = create_identity_matcher(matching, blacklist)
 
-        db = Database (user = "root", passwd = "",
-                       host = "localhost", port = 3306,
-                       scrdb = None, shdb = self.sortinghat_db, prjdb = None)
-
-        # Create the domain to orgs mapping
-        sql = """
-            SELECT domain, name
-            FROM domains_organizations do
-            JOIN organizations o ON o.id = do.organization_id;
-        """
-        domain2org_raw = db.execute(sql)
-        for item in domain2org_raw:
-            domain = item[0]
-            org = item[1]
-            self.domain2org[domain] = org
-
-        # Create the uuids to orgs dict
-        sql = """
-            SELECT uuid, name, start, end
-            FROM enrollments e
-            JOIN organizations o ON e.organization_id = o.id
-        """
-
-        uuid2orgs_raw = db.execute(sql)
-
-        for enrollment in uuid2orgs_raw:
-            uuid = enrollment[0]
-            org_name = enrollment[1]
-            start = enrollment[2]
-            end = enrollment[3]
-            if uuid not in self.uuid2orgs: 
-                self.uuid2orgs[uuid] = []
-            self.uuid2orgs[uuid].append({"name":org_name,
-                                         "start":start,
-                                         "end":end})
-
-        # First using the email in profile table from sorting hat
-        sql = """
-            SELECT p.uuid, email, is_bot, username
-            FROM profiles p
-            WHERE email is not NULL
-            """
-        profiles = db.execute(sql)
-
-        for profile in profiles:
-            uuid = profile[0]
-            email = profile[1]
-            is_bot = profile[2]
-            username = profile[3]
-
-            self.email2uuid[email] = uuid
-            self.uuid2bot[uuid] = is_bot
-            self.username2bot[username] = is_bot
-
-        # Now using directly the grimoirelib gerrit identities
-        sql = """
-            SELECT uuid, email
-            FROM %s.people p
-            JOIN %s.people_uidentities pup ON p.id = pup.people_id
-            """ % (self.gerrit_grimoirelib_db, self.gerrit_grimoirelib_db)
-
-        profiles = db.execute(sql)
-
-        for profile in profiles:
-            uuid = profile[0]
-            email = profile[1]
-
-            self.email2uuid[email] = uuid
-
-    def get_uuid(self, email):
-        """ Get in the most efficient way the uuid (people unique identifier)
-            for an email """
-
-        uuid = None
-        try:
-            uuid = self.email2uuid[email]
-        except:
-            self.emailNOuuid.append(email)
-            pass
-
-        return uuid
-
-
-    def get_org(self, uuid, action_date_str):
-        """ Get in the most efficient way the organization for
-            uuid in the date when an action was done  """
-
-        org_found = "Unknown"
-        action_date = datetime.strptime(action_date_str, "%Y-%m-%dT%H:%M:%S")
-
-        try:
-            orgs = self.uuid2orgs[uuid]
-            # Take the org active in action_date
-            for org in orgs:
-                if org['start'] < action_date and org['end'] >= action_date:
-                    org_found = org['name']
-                    break
-        except:
-            # logging.info("Can't find org for " + email)
-            pass
-
-        return org_found
-
-    def get_org_by_email(self, email, action_date_str):
-        """ Get in the most efficient way the organization for
-            email in the date when an action was done  """
-
-        org_found = self.get_org(self.get_uuid(email), action_date_str)
-
-        if org_found == "Unknown":
-            # Try to get the org from the email domain
+        for identity in identities:
             try:
-                domain = email.split('@')[1]
-                org_found = self.domain2org[domain]
-            except:
-                pass # domain not found
+                uuid = api.add_identity(db, backend, identity['email'],
+                                        identity['name'], identity['username'])
 
-        return org_found
+                logger.info("New sortinghat identity %s %s %s" % (uuid, identity['name'], identity['email']))
 
+                total += 1
+                # Time to  merge
+                matches = api.match_identities(db, uuid, matcher)
 
-    def get_isbot(self, uuid):
-        """ Get if an uuid is a bot  """
+                if len(matches) > 1:
+                    u = api.unique_identities(db, uuid)[0]
+                    for m in matches:
+                        if m.uuid == uuid:
+                            continue
+                        api.merge_unique_identities(db, u.uuid, m.uuid)
+                        uuid = m.uuid
+                        u = api.unique_identities(db, uuid, backend)
+                        # Include all identities related to this uuid
+                        merged_identities += u.identities
 
-        bot = 0 # Default uuid is not a bot
-        try:
-            bot = self.uuid2bot[uuid]
-        except:
-            # logging.info("Can't find org for " + email)
-            pass
-
-        return bot
-
-    def get_isbot_by_username(self, username):
-        """ Get if a username is a bot  """
-
-        # TODO: Using username as key is fragile. It is not unique.
-        # For example, jenkins could be the name of a non bot user
-
-        bot = 0 # Default username is not a bot
-        try:
-            bot = self.username2bot[username]
-        except:
-            # logging.info("Can't find org for " + email)
-            pass
-
-        return bot
+            except AlreadyExistsError as ex:
+                uuid = ex.uuid
 
 
+            if 'company' in identity:
+                try:
+                    api.add_organization(db, identity['company'])
+                except AlreadyExistsError:
+                    pass
 
+                api.add_enrollment(db, uuid, identity['company'],
+                                   datetime(1900, 1, 1),
+                                   datetime(2100, 1, 1))
+
+        logger.info("Total NEW identities: %i" % (total))
+        logger.info("Total NEW identities merged: %i" % (len(merged_identities)))
+
+        return merged_identities

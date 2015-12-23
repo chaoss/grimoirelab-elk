@@ -33,12 +33,8 @@ from grimoire.ocean.elastic import ElasticOcean
 from grimoire.ocean.conf import ConfOcean
 from grimoire.utils import get_elastic, config_logging, get_connector_from_name
 
-from sortinghat import api
-from sortinghat.db.database import Database
-from sortinghat.db.model import UniqueIdentity, Identity, Profile,\
-    Organization, Domain, Country, Enrollment, MatchingBlacklist
-from sortinghat.exceptions import AlreadyExistsError, NotFoundError
-from sortinghat.matcher import create_identity_matcher
+from grimoire.elk.sortinghat import SortingHat
+
 
 def get_params():
     ''' Get params definition from ElasticOcean '''
@@ -65,6 +61,7 @@ def get_perceval_params(url, index):
     return params
 
 def get_identities(obackend):
+    """ Get identities from items in ocean backend and remove duplicates """
     identities = []
     unique_identities = []
     for item in obackend:
@@ -73,52 +70,6 @@ def get_identities(obackend):
             if identity not in unique_identities:
                 unique_identities.append(identity)
     return unique_identities
-
-def add_identities(identities, backend):
-    logging.info("Adding the identities to SortingHat")
-
-    db = Database("root", "", "ocean_sh", "mariadb")
-
-    total = 0
-
-    matching = 'email-name';
-
-    blacklist = api.blacklist(db)
-    matcher = create_identity_matcher(matching, blacklist)
-
-    for identity in identities:
-        try:
-            uuid = api.add_identity(db, backend, identity['email'],
-                                   identity['name'], identity['username'])
-            total += 1
-            # Time to  merge
-            matches = api.match_identities(db, uuid, matcher)
-
-            if len(matches) > 1:
-                u = api.unique_identities(db, uuid)[0]
-                for m in matches:
-                    if m.uuid == uuid:
-                        continue
-                    api.merge_unique_identities(db, u.uuid, m.uuid)
-                    u = api.unique_identities(db, m.uuid)[0]
-
-        except AlreadyExistsError as ex:
-            uuid = ex.uuid
-
-
-        logging.info("SH %s %s " % (identity['name'], uuid))
-
-        if 'company' in identity:
-            try:
-                api.add_organization(db, identity['company'])
-            except AlreadyExistsError:
-                pass
-
-            api.add_enrollment(db, uuid, identity['company'],
-                               datetime(1900, 1, 1),
-                               datetime(2100, 1, 1))
-
-    logging.info("Total NEW identities: %i" % (total))
 
 
 if __name__ == '__main__':
@@ -147,7 +98,7 @@ if __name__ == '__main__':
         obackend.set_elastic(get_elastic(args.elastic_url, args.index))
 
         identities = get_identities(obackend)
-        add_identities(identities, backend_name)
+        SortingHat.add_identities(identities, backend_name)
 
         # Add the identities to Sorting Hat
 
