@@ -30,33 +30,15 @@ import time
 
 
 from grimoire.elk.enrich import Enrich
-from grimoire.elk.sortinghat import SortingHat
-from grimoire.elk.projects import GrimoireLibProjects
+from grimoire.ocean.gerrit import GerritOcean
+
 
 class GerritEnrich(Enrich):
 
-    @classmethod
-    def add_params(cls, cmdline_parser):
-        parser = cmdline_parser
-
-        parser.add_argument("--sortinghat_db",  required=True,
-                            help="Sorting Hat database")
-        parser.add_argument("--gerrit_grimoirelib_db",  required=True,
-                            help="GrimoireLib gerrit database")
-        parser.add_argument("--projects_grimoirelib_db",
-                            help="GrimoireLib projects database")
-
-
-    def __init__(self, gerrit, sortinghat_db = None,
-                 projects_grimoirelib_db = None,
-                 gerrit_grimoirelib_db = None, **nouse):
+    def __init__(self, gerrit, **nouse):
+        super().__init__()
         self.gerrit = gerrit
         self.elastic = None
-        self.sortinghat = SortingHat (sortinghat_db, gerrit_grimoirelib_db)
-        self.grimoirelib_projects = None
-        if projects_grimoirelib_db:
-            self.grimoirelib_projects = \
-                GrimoireLibProjects(projects_grimoirelib_db, gerrit.get_url())
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -150,17 +132,13 @@ class GerritEnrich(Enrich):
         bulk_json_review  = '"review_id":"%s",' % review['id']
         bulk_json_review += '"review_createdOn":"%s",' % review['createdOn']
         if 'owner' in review and 'email' in review['owner']:
+            identity = GerritOcean.get_sh_identity(review['owner'])
+            ruuid = self.get_uuid(identity, self.gerrit.get_name())
             remail = review['owner']['email']
-            ruuid = self.sortinghat.get_uuid(remail)
             bulk_json_review += '"review_email":"%s",' % remail
             bulk_json_review += '"review_uuid":"%s",' % ruuid
-            bulk_json_review += '"review_organization":"%s",' % \
-                self.sortinghat.get_org_by_email(remail, review['createdOn'])
-            bulk_json_review += '"review_bot":"%s",' % self.sortinghat.get_isbot(ruuid)
         else:
             bulk_json_review += '"review_email":null,'
-            bulk_json_review += '"review_organization":null,'
-            bulk_json_review += '"review_bot":null,'
             bulk_json_review += '"review_uuid":null,'
         bulk_json_review += '"review_status":"%s",' % review['status']
         bulk_json_review += '"review_project":"%s",' % review['project']
@@ -176,18 +154,14 @@ class GerritEnrich(Enrich):
             bulk_json_patch  = '"patchSet_id":"%s",' % patch['number']
             bulk_json_patch += '"patchSet_createdOn":"%s",' % patch['createdOn']
             if 'author' in patch and 'email' in patch['author']:
+                identity = GerritOcean.get_sh_identity(patch['author'])
+                puuid = self.get_uuid(identity, self.gerrit.get_name())
                 pemail = patch['author']['email']
-                puuid = self.sortinghat.get_uuid(pemail)
                 bulk_json_patch += '"patchSet_email":"%s",' % pemail
                 bulk_json_patch += '"patchSet_uuid":"%s",' % puuid
-                bulk_json_patch += '"patchSet_organization":"%s",' % \
-                    self.sortinghat.get_org_by_email(pemail, patch['createdOn'])
-                bulk_json_patch += '"patchSet_bot":"%s"' % self.sortinghat.get_isbot(puuid)
             else:
                 bulk_json_patch += '"patchSet_email":null,'
                 bulk_json_patch += '"patchSet_uuid":null,'
-                bulk_json_patch += '"patchSet_organization":null,'
-                bulk_json_patch += '"patchSet_bot":null'
 
             app_count = 0  # Approval counter for unique id
             if 'approvals' not in patch:
@@ -195,8 +169,6 @@ class GerritEnrich(Enrich):
                 bulk_json_ap += '"approval_value":null,'
                 bulk_json_ap += '"approval_email":null,'
                 bulk_json_ap += '"approval_uuid":null,'
-                bulk_json_ap += '"approval_organization":null,'
-                bulk_json_ap += '"approval_bot":null'
 
                 bulk_json_event = '{%s,%s,%s}' % (bulk_json_review,
                                                   bulk_json_patch, bulk_json_ap)
@@ -211,24 +183,14 @@ class GerritEnrich(Enrich):
                     bulk_json_ap += '"approval_value":%i,' % int(app['value'])
                     bulk_json_ap += '"approval_grantedOn":"%s",' % app['grantedOn']
                     if 'email' in app['by']:
+                        identity = GerritOcean.get_sh_identity(app['by'])
+                        auuid = self.get_uuid(identity, self.gerrit.get_name())
                         aemail = app['by']['email']
-                        auuid = self.sortinghat.get_uuid(aemail)
                         bulk_json_ap += '"approval_email":"%s",' % aemail
                         bulk_json_ap += '"approval_uuid":"%s",' % auuid
-                        bulk_json_ap += '"approval_organization":"%s",' % \
-                            self.sortinghat.get_org_by_email(aemail, app['grantedOn'])
-                        bulk_json_ap += '"approval_bot":"%s",' % self.sortinghat.get_isbot(auuid)
                     else:
                         bulk_json_ap += '"approval_email":null,'
                         bulk_json_ap += '"approval_uuid":null,'
-                        bulk_json_ap += '"approval_organization":null,'
-                        if 'username' in app['by']:
-                            # Try to find if it is a bot with the username
-                            bulk_json_ap += '"approval_bot":"%s",' % \
-                                self.sortinghat.get_isbot_by_username(app['by']['username'])
-                        else:
-                            bulk_json_ap += '"approval_bot":null,'
-
                     if 'username' in app['by']:
                         bulk_json_ap += '"approval_username":"%s",' % app['by']['username']
                     else:
