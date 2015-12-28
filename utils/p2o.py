@@ -45,7 +45,7 @@ def get_params():
     parser = get_params_parser()
 
     parser.add_argument("--enrich",  action='store_true',
-                        default = "False",  help="Enrich items")
+                        help="Enrich items")
     args = parser.parse_args()
 
     return args
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     args = get_params()
 
-    async_ = False  # Use RQ or not
+    async_ = True  # Use RQ or not
 
     config_logging(args.debug)
 
@@ -110,8 +110,12 @@ if __name__ == '__main__':
 
             if args.enrich:
                 q = Queue('enrich', connection=Redis(args.redis), async=async_)
-                result = q.enqueue(enrich_backend, url, vars(args), clean)
-                # depends_on=task_feed)
+                if async_:
+                    # Task enrich after feed
+                    result = q.enqueue(enrich_backend, url, vars(args), clean,
+                                       depends_on=task_feed)
+                else:
+                    result = q.enqueue(enrich_backend, url, vars(args), clean)
                 logging.info("Queued enrich_backend job")
                 logging.info(result)
 
