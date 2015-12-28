@@ -44,6 +44,8 @@ class GitHubEnrich(Enrich):
         self.elastic = elastic
         self.geolocations = self.geo_locations_from_es()
 
+    def get_field_date(self):
+        return "updated_at"
 
     def get_geo_point(self, location):
         geo_point = geo_code = None

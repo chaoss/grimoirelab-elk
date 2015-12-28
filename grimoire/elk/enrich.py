@@ -46,6 +46,16 @@ class Enrich(object):
     def enrich_items(self, items):
         raise NotImplementedError
 
+    def get_field_date(self):
+        ''' Field with the date in the JSON enriched items '''
+        raise NotImplementedError
+
+    def get_last_update_from_es(self, _filter = None):
+
+        last_update = self.elastic.get_last_date(self.get_field_date(), _filter)
+
+        return last_update
+
     def get_elastic_mappings(self):
         ''' Mappings for enriched indexes '''
         pass

@@ -103,15 +103,24 @@ def enrich_backend(url, params, clean):
 
     try:
         backend = connector[0](**params)
-        ocean_backend = connector[1](backend, **params)
-        enrich_backend = connector[2](backend, **params)
 
         ocean_index = backend.get_name() + "_" + backend.get_id()
         enrich_index = ocean_index+"_enrich"
-        elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
-        ocean_backend.set_elastic(elastic_ocean)
+
+
+        enrich_backend = connector[2](backend, **params)
         elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
         enrich_backend.set_elastic(elastic_enrich)
+
+        # We need to enrich from just updated items since last enrichment
+        last_enrich = enrich_backend.get_last_update_from_es()
+
+        logging.debug ("Last enrichment: %s" % (last_enrich))
+
+        ocean_backend = connector[1](backend, from_date=last_enrich, **params)
+        clean = False  # Don't remove ocean index when enrich
+        elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
+        ocean_backend.set_elastic(elastic_ocean)
 
 #         if backend_name == "github":
 #             GitHub.users = enrich_backend.users_from_es()

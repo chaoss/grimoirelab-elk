@@ -66,12 +66,13 @@ class ElasticOcean(object):
 
 
     def __init__(self, perceval_backend, cache = False,
-                 incremental = True, **nouse):
+                 incremental = True, from_date = None, **nouse):
 
         self.perceval_backend = perceval_backend
         self.cache = cache
         self.incremental = incremental
-        self.last_update = None  # Last update in ocean items index
+        self.last_update = None  # Last update in ocean items index for feed
+        self.from_date = from_date  # fetch from_date
 
 
     def get_field_date(self):
@@ -97,11 +98,11 @@ class ElasticOcean(object):
 
 
     def feed(self):
-        ''' Feed data in Elastic '''
+        ''' Feed data in Elastic from Perceval '''
 
         self.last_update = self.get_last_update_from_es()
         last_update = self.last_update
-        # last_update = '2014-12-10 11:26:01'
+        # last_update = '2015-12-28 18:02:00'
 
         logging.info("Incremental from: %s" % (last_update))
 
@@ -149,14 +150,9 @@ class ElasticOcean(object):
         url += "/_search?from=%i&size=%i" % (self.elastic_from,
                                              self.elastic_page)
 
-        if self.incremental:
+        if self.from_date:
             date_field = self.get_field_date()
-            if self.last_update is None:
-                last_date = self.get_last_update_from_es()
-            else:
-                # Enrich from last_date before last feeding
-                last_date = self.last_update
-            last_date = last_date.replace(" ","T")  # elastic format
+            from_date = self.from_date.replace(" ","T")  # elastic format
 
             filter_ = '''
             {
@@ -170,7 +166,7 @@ class ElasticOcean(object):
                     }
                 }
             }
-            ''' % (date_field, last_date)
+            ''' % (date_field, from_date)
 
             r = requests.post(url, data = filter_)
 

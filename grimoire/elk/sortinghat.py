@@ -78,7 +78,7 @@ class SortingHat(object):
                 uuid = ex.uuid
 
 
-            if 'company' in identity:
+            if 'company' in identity and identity['company'] is not None:
                 try:
                     api.add_organization(db, identity['company'])
                 except AlreadyExistsError:

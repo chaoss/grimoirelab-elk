@@ -43,6 +43,9 @@ class GerritEnrich(Enrich):
     def set_elastic(self, elastic):
         self.elastic = elastic
 
+    def get_field_date(self):
+        return "approval_grantedOn"
+
     def _fix_review_dates(self, item):
         ''' Convert dates so ES detect them '''
 
@@ -158,10 +161,10 @@ class GerritEnrich(Enrich):
                 puuid = self.get_uuid(identity, self.gerrit.get_name())
                 pemail = patch['author']['email']
                 bulk_json_patch += '"patchSet_email":"%s",' % pemail
-                bulk_json_patch += '"patchSet_uuid":"%s",' % puuid
+                bulk_json_patch += '"patchSet_uuid":"%s"' % puuid
             else:
                 bulk_json_patch += '"patchSet_email":null,'
-                bulk_json_patch += '"patchSet_uuid":null,'
+                bulk_json_patch += '"patchSet_uuid":null'
 
             app_count = 0  # Approval counter for unique id
             if 'approvals' not in patch:

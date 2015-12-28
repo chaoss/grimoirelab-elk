@@ -46,6 +46,9 @@ class BugzillaEnrich(Enrich):
     def set_elastic(self, elastic):
         self.elastic = elastic
 
+    def get_field_date(self):
+        return "delta_ts"
+
     def enrich_issue(self, issue):
 
         def get_bugzilla_url():
