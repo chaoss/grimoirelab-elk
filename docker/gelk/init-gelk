@@ -9,6 +9,7 @@ cd $GELK_DIR/utils
 LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 create > /tmp/worker-create.log &
 LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 create > /tmp/worker-create1.log &
 LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 update > /tmp/worker-update.log &
+LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 enrich > /tmp/worker-enrich.log &
 
 (sleep 10 && mysqladmin -u root create ocean_sh -h mariadb) &
 
