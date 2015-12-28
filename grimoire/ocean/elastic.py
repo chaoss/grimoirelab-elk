@@ -151,7 +151,11 @@ class ElasticOcean(object):
 
         if self.incremental:
             date_field = self.get_field_date()
-            last_date = self.last_update
+            if self.last_update is None:
+                last_date = self.get_last_update_from_es()
+            else:
+                # Enrich from last_date before last feeding
+                last_date = self.last_update
             last_date = last_date.replace(" ","T")  # elastic format
 
             filter_ = '''

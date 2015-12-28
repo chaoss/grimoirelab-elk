@@ -28,15 +28,27 @@ import logging
 from os import sys
 from time import time, sleep
 
-from grimoire.arthur import feed_backend
+from grimoire.arthur import feed_backend, enrich_backend
 
 from grimoire.ocean.conf import ConfOcean
 
 from grimoire.utils import get_elastic
-from grimoire.utils import get_params, config_logging
+from grimoire.utils import get_params_parser, config_logging
 
 from redis import Redis
 from rq import Queue
+
+
+def get_params():
+    ''' Get params definition from ElasticOcean and from all the backends '''
+
+    parser = get_params_parser()
+
+    parser.add_argument("--enrich",  action='store_true',
+                        default = "False",  help="Enrich items")
+    args = parser.parse_args()
+
+    return args
 
 
 def feed_backends(url, clean, debug = False, redis = None):
@@ -79,7 +91,7 @@ if __name__ == '__main__':
 
     args = get_params()
 
-    async_ = True  # Use RQ or not
+    async_ = False  # Use RQ or not
 
     config_logging(args.debug)
 
@@ -92,11 +104,17 @@ if __name__ == '__main__':
     try:
         if args.backend:
             q = Queue('create', connection=Redis(args.redis), async=async_)
-            result = q.enqueue(feed_backend, url, vars(args), clean)
-            logging.info("Queued job")
-            logging.info(result)
+            task_feed = q.enqueue(feed_backend, url, vars(args), clean)
+            logging.info("Queued feed_backend job")
+            logging.info(task_feed)
 
-            # feed_backend(url, vars(args), clean)
+            if args.enrich:
+                q = Queue('enrich', connection=Redis(args.redis), async=async_)
+                result = q.enqueue(enrich_backend, url, vars(args), clean)
+                # depends_on=task_feed)
+                logging.info("Queued enrich_backend job")
+                logging.info(result)
+
         else:
             if args.loop:
                 # minimal update duration to avoid too much frequency in secs

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# Grimoire Arthur lib
+# Grimoire Arthur lib.
 #
 # Copyright (C) 2015 Bitergia
 #
@@ -27,10 +27,13 @@ from datetime import datetime
 import logging
 import sys
 
-from grimoire.ocean.conf import ConfOcean
 
+from grimoire.elk.sortinghat import SortingHat
+from grimoire.ocean.conf import ConfOcean
 from grimoire.utils import get_elastic
 from grimoire.utils import get_connector_from_name
+import traceback
+
 
 def feed_backend(url, params, clean):
     ''' Feed Ocean with backend data '''
@@ -80,5 +83,75 @@ def feed_backend(url, params, clean):
     else:
         logging.debug("Repository not added to Ocean because errors.")
         logging.debug(params)
+
+    logging.info("Done %s " % (backend_name))
+
+
+def enrich_backend(url, params, clean):
+    ''' Enrich Ocean index '''
+
+    backend = None
+    backend_name = params['backend']
+    repo = {}    # repository data to be stored in conf
+    repo['params'] = params
+    enrich_index = None
+
+    connector = get_connector_from_name(backend_name)
+    if not connector:
+        logging.error("Can't find %s backend" % (backend_name))
+        sys.exit(1)
+
+    try:
+        backend = connector[0](**params)
+        ocean_backend = connector[1](backend, **params)
+        enrich_backend = connector[2](backend, **params)
+
+        ocean_index = backend.get_name() + "_" + backend.get_id()
+        enrich_index = ocean_index+"_enrich"
+        elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
+        ocean_backend.set_elastic(elastic_ocean)
+        elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
+        enrich_backend.set_elastic(elastic_enrich)
+
+#         if backend_name == "github":
+#             GitHub.users = enrich_backend.users_from_es()
+
+        logging.info("Adding enrichment data to %s" %
+                     (enrich_backend.elastic.index_url))
+
+
+        items = []
+        new_identities = []
+        items_count = 0
+
+        for item in ocean_backend:
+            # print("%s %s" % (item['url'], item['lastUpdated_date']))
+            if len(items) >= enrich_backend.elastic.max_items_bulk:
+                enrich_backend.enrich_items(items)
+                items = []
+            items.append(item)
+            # Get identities from new items to be added to SortingHat
+            identities = ocean_backend.get_identities(item)
+            for identity in identities:
+                if identity not in new_identities:
+                    new_identities.append(identity)
+            items_count += 1
+        enrich_backend.enrich_items(items)
+
+        logging.info("Total items enriched %i " %  items_count)
+
+        logging.info("Total new identities to be checked %i" % len(new_identities))
+
+        merged_identities = SortingHat.add_identities(new_identities, backend_name)
+
+        # Redo enrich for items with new merged identities
+
+    except Exception as ex:
+        traceback.print_exc()
+        if backend:
+            logging.error("Error enriching ocean from %s (%s): %s" %
+                          (backend.get_name(), backend.get_id(), ex))
+        else:
+            logging.error("Error enriching ocean %s" % ex)
 
     logging.info("Done %s " % (backend_name))

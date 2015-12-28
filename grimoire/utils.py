@@ -34,6 +34,12 @@ from grimoire.ocean.bugzilla import BugzillaOcean
 from grimoire.ocean.gerrit import GerritOcean
 from grimoire.ocean.github import GitHubOcean
 
+# Connectors for EnrichOcean
+from grimoire.elk.bugzilla import BugzillaEnrich
+from grimoire.elk.gerrit import GerritEnrich
+from grimoire.elk.github import GitHubEnrich
+
+
 # Connectors for Perceval
 from perceval.backends.bugzilla import Bugzilla
 from perceval.backends.github import GitHub
@@ -55,9 +61,9 @@ def get_connector_from_name(name):
 
 def get_connectors():
 
-    return [[Bugzilla, BugzillaOcean],
-            [GitHub, GitHubOcean],
-            [Gerrit, GerritOcean]]  # Will come from Registry
+    return [[Bugzilla, BugzillaOcean, BugzillaEnrich],
+            [GitHub, GitHubOcean, GitHubEnrich],
+            [Gerrit, GerritOcean, GerritEnrich]]  # Will come from Registry
 
 def get_elastic(url, es_index, clean = None, ocean_backend = None):
 
