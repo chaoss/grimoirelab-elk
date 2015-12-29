@@ -171,7 +171,7 @@ class GerritEnrich(Enrich):
                 bulk_json_ap  = '"approval_type":null,'
                 bulk_json_ap += '"approval_value":null,'
                 bulk_json_ap += '"approval_email":null,'
-                bulk_json_ap += '"approval_uuid":null,'
+                bulk_json_ap += '"approval_uuid":null'
 
                 bulk_json_event = '{%s,%s,%s}' % (bulk_json_review,
                                                   bulk_json_patch, bulk_json_ap)
