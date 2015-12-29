@@ -27,7 +27,7 @@ elasticsearch:
         - 9200:9200
         - 9300:9300
     volumes:
-        - /home/acs/Docker/data/elasticsearch/:/usr/share/elasticsearch/data
+        - ~/Docker/data/elasticsearch/:/usr/share/elasticsearch/data
 
 nginx:
     image: nginx
@@ -51,4 +51,4 @@ gelk:
         - "9181"
     volumes:
         - ~/devel/GrimoireELK:/home/bitergia/GrimoireELK
-        - ~/devel/perceval-1:/home/bitergia/perceval
+        - ~/devel/perceval:/home/bitergia/perceval
