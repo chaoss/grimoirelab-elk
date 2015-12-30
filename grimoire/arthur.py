@@ -25,6 +25,7 @@
 
 from datetime import datetime
 import logging
+import requests
 import sys
 
 
@@ -34,9 +35,8 @@ from grimoire.utils import get_elastic
 from grimoire.utils import get_connector_from_name
 import traceback
 
-
 def feed_backend(url, params, clean):
-    ''' Feed Ocean with backend data '''
+    """ Feed Ocean with backend data """
 
     backend = None
     backend_name = params['backend']
@@ -87,8 +87,86 @@ def feed_backend(url, params, clean):
     logging.info("Done %s " % (backend_name))
 
 
+def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
+    """ Get all items that include uuid """
+
+    logging.debug("Getting items for merged uuid %s "  % (uuid))
+
+    uuid_fields = enrich_backend.get_fields_uuid()
+
+    terms = ""  # all terms with uuids in the enriched item
+
+    for field in uuid_fields:
+        terms += """
+         {"term": {
+           "%s": {
+              "value": "%s"
+           }
+         }}
+         """ % (field, uuid)
+        terms += ","
+
+    terms = terms[:-1]  # remove last , for last item
+
+    query = """
+    {"query": { "bool": { "should": [%s] }}}
+    """ % (terms)
+
+    url_search = enrich_backend.elastic.index_url+"/_search"
+    url_search +="?size=1000"  # TODO get all items
+
+    r = requests.post(url_search, data=query)
+
+    eitems = r.json()['hits']['hits']
+
+    eitems_ids = []
+
+    for eitem in eitems:
+        eitems_ids.append(eitem["_id"])
+
+    # Time to get the items
+    logging.debug ("Items to be renriched for merged uuids: %s" % (",".join(eitems_ids)))
+
+    url_mget = ocean_backend.elastic.index_url+"/_mget"
+
+    items_ids_query = ""
+
+    for item_id in eitems_ids:
+        items_ids_query += '{"_id" : "%s"}' % (item_id)
+        items_ids_query += ","
+    items_ids_query = items_ids_query[:-1]  # remove last , for last item
+
+    query = '{"docs" : [%s]}' % (items_ids_query)
+    r = requests.post(url_mget, data=query)
+
+    res_items = r.json()['docs']
+
+    items = []
+    for res_item in res_items:
+        if res_item['found']:
+            items.append(res_item["_source"])
+
+    return items
+
+
 def enrich_backend(url, params, clean):
-    ''' Enrich Ocean index '''
+    """ Enrich Ocean index (including SH) """
+
+    def enrich_items(items, enrich_backend):
+        total = 0
+
+        eitems = []
+
+        for item in items:
+            # print("%s %s" % (item['url'], item['lastUpdated_date']))
+            if len(eitems) >= enrich_backend.elastic.max_items_bulk:
+                enrich_backend.enrich_items(items)
+                eitems = []
+            eitems.append(item)
+            total += 1
+        enrich_backend.enrich_items(eitems)
+
+        return total
 
     backend = None
     backend_name = params['backend']
@@ -129,31 +207,32 @@ def enrich_backend(url, params, clean):
                      (enrich_backend.elastic.index_url))
 
 
-        items = []
         new_identities = []
-        items_count = 0
-
+        # First we add all new identities to SH
         for item in ocean_backend:
-            # print("%s %s" % (item['url'], item['lastUpdated_date']))
-            if len(items) >= enrich_backend.elastic.max_items_bulk:
-                enrich_backend.enrich_items(items)
-                items = []
-            items.append(item)
             # Get identities from new items to be added to SortingHat
             identities = ocean_backend.get_identities(item)
             for identity in identities:
                 if identity not in new_identities:
                     new_identities.append(identity)
-            items_count += 1
-        enrich_backend.enrich_items(items)
-
-        logging.info("Total items enriched %i " %  items_count)
 
         logging.info("Total new identities to be checked %i" % len(new_identities))
 
         merged_identities = SortingHat.add_identities(new_identities, backend_name)
-
         # Redo enrich for items with new merged identities
+        renrich_items = []
+        merged_identities = ['39d8f14ce4c8af3960905f96427ccbca29de3020']
+        for mid in merged_identities:
+            renrich_items += get_items_from_uuid(mid, enrich_backend, ocean_backend)
+
+        # Enrich items with merged identities
+        enrich_count_merged = enrich_items(renrich_items, enrich_backend)
+        # Enrichment for the new items once SH update is finished
+        enrich_count = enrich_items(ocean_backend, enrich_backend)
+
+        logging.info("Total items enriched %i " %  enrich_count)
+        logging.info("Total items enriched for merged identities %i " %  enrich_count_merged)
+
 
     except Exception as ex:
         traceback.print_exc()
