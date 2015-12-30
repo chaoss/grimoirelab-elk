@@ -47,6 +47,9 @@ class GitHubEnrich(Enrich):
     def get_field_date(self):
         return "updated_at"
 
+    def get_fields_uuid(self):
+        return ["assignee_uuid", "user_uuid"]
+
     def get_geo_point(self, location):
         geo_point = geo_code = None
 

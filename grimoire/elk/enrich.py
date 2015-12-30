@@ -50,6 +50,10 @@ class Enrich(object):
         ''' Field with the date in the JSON enriched items '''
         raise NotImplementedError
 
+    def get_fields_uuid(self):
+        ''' Fields with unique identities in the JSON enriched items '''
+        raise NotImplementedError
+
     def get_last_update_from_es(self, _filter = None):
 
         last_update = self.elastic.get_last_date(self.get_field_date(), _filter)

@@ -49,6 +49,9 @@ class BugzillaEnrich(Enrich):
     def get_field_date(self):
         return "delta_ts"
 
+    def get_fields_uuid(self):
+        return ["assigned_to_uuid", "reporter_uuid"]
+
     def enrich_issue(self, issue):
 
         def get_bugzilla_url():

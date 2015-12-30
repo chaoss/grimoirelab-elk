@@ -46,6 +46,9 @@ class GerritEnrich(Enrich):
     def get_field_date(self):
         return "approval_grantedOn"
 
+    def get_fields_uuid(self):
+        return ["review_uuid", "patchSet_uuid", "approval_uuid"]
+
     def _fix_review_dates(self, item):
         ''' Convert dates so ES detect them '''
 
