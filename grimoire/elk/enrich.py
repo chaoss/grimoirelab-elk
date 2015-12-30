@@ -47,12 +47,18 @@ class Enrich(object):
         raise NotImplementedError
 
     def get_field_date(self):
-        ''' Field with the date in the JSON enriched items '''
+        """ Field with the date in the JSON enriched items """
         raise NotImplementedError
 
     def get_fields_uuid(self):
-        ''' Fields with unique identities in the JSON enriched items '''
+        """ Fields with unique identities in the JSON enriched items """
         raise NotImplementedError
+
+    def get_item_id(self, eitem):
+        """ Return the item_id linked to this enriched eitem """
+
+        # If possible, enriched_item and item will have the same id
+        return eitem["_id"]
 
     def get_last_update_from_es(self, _filter = None):
 
@@ -61,7 +67,7 @@ class Enrich(object):
         return last_update
 
     def get_elastic_mappings(self):
-        ''' Mappings for enriched indexes '''
+        """ Mappings for enriched indexes """
         pass
 
     def get_uuid(self, identity, backend_name):

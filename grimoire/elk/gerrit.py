@@ -49,6 +49,12 @@ class GerritEnrich(Enrich):
     def get_fields_uuid(self):
         return ["review_uuid", "patchSet_uuid", "approval_uuid"]
 
+    def get_item_id(self, eitem):
+        """ Return the item_id linked to this enriched eitem """
+
+        # The eitem _id includes also the patch.
+        return eitem["_source"]["review_id"]
+
     def _fix_review_dates(self, item):
         ''' Convert dates so ES detect them '''
 

@@ -119,19 +119,26 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
 
     eitems = r.json()['hits']['hits']
 
-    eitems_ids = []
+    if len(eitems) == 0:
+        logging.warning("No enriched items found for uuid: %s " % (uuid))
+        return []
+
+    items_ids = []
 
     for eitem in eitems:
-        eitems_ids.append(eitem["_id"])
+        item_id = enrich_backend.get_item_id(eitem)
+        # For one item several eitems could be generated
+        if item_id not in items_ids:
+            items_ids.append(item_id)
 
     # Time to get the items
-    logging.debug ("Items to be renriched for merged uuids: %s" % (",".join(eitems_ids)))
+    logging.debug ("Items to be renriched for merged uuids: %s" % (",".join(items_ids)))
 
     url_mget = ocean_backend.elastic.index_url+"/_mget"
 
     items_ids_query = ""
 
-    for item_id in eitems_ids:
+    for item_id in items_ids:
         items_ids_query += '{"_id" : "%s"}' % (item_id)
         items_ids_query += ","
     items_ids_query = items_ids_query[:-1]  # remove last , for last item
@@ -221,7 +228,7 @@ def enrich_backend(url, params, clean):
         merged_identities = SortingHat.add_identities(new_identities, backend_name)
         # Redo enrich for items with new merged identities
         renrich_items = []
-        merged_identities = ['39d8f14ce4c8af3960905f96427ccbca29de3020']
+        merged_identities = ['7e0bcf6ff46848403eaffa29ef46109f386fa24b']
         for mid in merged_identities:
             renrich_items += get_items_from_uuid(mid, enrich_backend, ocean_backend)
 

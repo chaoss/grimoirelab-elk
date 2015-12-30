@@ -70,7 +70,7 @@ class SortingHat(object):
                             continue
                         api.merge_unique_identities(db, u.uuid, m.uuid)
                         uuid = m.uuid
-                        u = api.unique_identities(db, uuid, backend)
+                        u = api.unique_identities(db, uuid, backend)[0]
                         # Include all identities related to this uuid
                         merged_identities += u.identities
 
