@@ -77,7 +77,7 @@ class BugzillaEnrich(Enrich):
                 issue['assigned_to_name'] = None
             identity = BugzillaOcean.get_sh_identity({'assigned_to_name': issue['assigned_to_name'],
                                                       'assigned_to':issue['assigned_to']})
-            issue['assignet_to_uuid'] = self.get_uuid(identity, self.bugzilla.get_name())
+            issue['assigned_to_uuid'] = self.get_uuid(identity, self.bugzilla.get_name())
         if 'reporter' in issue:
             if 'reporter_name' not in issue:
                 issue['reporter_name'] = None
