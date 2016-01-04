@@ -29,52 +29,6 @@ from grimoire.ocean.elastic import ElasticOcean
 
 class BugzillaOcean(ElasticOcean):
 
-    @classmethod
-    def get_sh_identity(cls, user):
-        """ Return a Sorting Hat identity using bugzilla user data """
-        identity = {}
-        for field in ['name', 'email', 'username']:
-            identity[field] = None
-        if 'name' in user: identity['name'] = user['name']
-        if 'email' in user: identity['email'] = user['email']
-        if 'username' in user: identity['username'] = user['username']
-        if 'assigned_to_name' in user:
-                identity['name'] = user['assigned_to_name']
-                identity['username'] = user['assigned_to']
-        elif 'assigned_to' in user: identity['username'] = user['assigned_to']
-        if 'changed_by' in user: identity['name'] = user['changed_by']
-        if 'who' in user: identity['username'] = user['who']
-        if 'reporter' in user:
-                identity['name'] = user['reporter_name']
-                identity['username'] = user['reporter']
-        return identity
-
-
-    def get_identities(self, item):
-        ''' Return the identities from an item '''
-
-        identities = []
-
-        if 'changes' in item:
-            for change in item['changes']:
-                identities.append(self.get_sh_identity(change))
-        if 'long_desc' in item:
-            for comment in item['long_desc']:
-                identities.append(self.get_sh_identity(comment))
-        if 'assigned_to_name' in item:
-            identities.append(self.get_sh_identity({'assigned_to_name': item['assigned_to_name'],
-                                                    'assigned_to':item['assigned_to']}))
-        elif 'assigned_to' in item:
-            identities.append(self.get_sh_identity({'assigned_to': item['assigned_to']}))
-        if 'reporter_name' in item:
-            identities.append(self.get_sh_identity({'reporter_name': item['reporter_name'],
-                                                    'reporter':item['reporter']}))
-        elif 'reporter' in item:
-            identities.append(self.get_sh_identity({'reporter':item['reporter']}))
-
-        return identities
-
-
     def get_field_date(self):
         field = None
         if self.perceval_backend.detail == "list":

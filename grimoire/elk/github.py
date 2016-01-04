@@ -35,20 +35,44 @@ class GitHubEnrich(Enrich):
 
     def __init__(self, github, **nouse):
         self.elastic = None
-        self.github = github
+        self.perceval_backend = github
         self.index_github = "github"
+        self.users = {}  # cache users
+        self.location = {}  # cache users location
         self.location_not_found = []  # location not found in map api
-
 
     def set_elastic(self, elastic):
         self.elastic = elastic
+        # Recover cache data from Elastic
         self.geolocations = self.geo_locations_from_es()
+        self.users = self.users_from_es() 
 
     def get_field_date(self):
         return "updated_at"
 
     def get_fields_uuid(self):
         return ["assignee_uuid", "user_uuid"]
+
+    def get_identities(self, item):
+        """ Return the identities from an item """
+        identities = []
+
+        for identity in ['user', 'assignee']:
+            if item[identity]:
+                user = self.get_sh_identity(item[identity]['login'])
+                identities.append(user)
+        return identities
+
+    def get_sh_identity(self, login):
+        if login not in self.users:
+            user = self.perceval_backend.client.get_user(login)
+            self.users[login] = user
+            orgs = self.perceval_backend.client.get_user_orgs(login)
+            self.users[login]['orgs'] = orgs
+        identity = self.users[login]
+        identity['username'] = identity['login']
+        return identity
+
 
     def get_geo_point(self, location):
         geo_point = geo_code = None
@@ -122,7 +146,6 @@ class GitHubEnrich(Enrich):
 
 
     def geo_locations_from_es(self):
-
         return self.get_github_cache("geolocations", "location")
 
     def geo_locations_to_es(self):
@@ -158,7 +181,12 @@ class GitHubEnrich(Enrich):
 
         logging.debug("Adding geoloc to ES Done")
 
+    def users_from_es(self):
+        return self.get_github_cache("users", "login")
+
     def users_to_es(self):
+        """ Add GitHub users cache to Ocean """
+
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
@@ -167,7 +195,7 @@ class GitHubEnrich(Enrich):
 
         logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
-        users = self.github.users
+        users = self.users
 
         for login in users:
             if current >= max_items:
@@ -180,10 +208,6 @@ class GitHubEnrich(Enrich):
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         requests.put(url, data = bulk_json)
-
-    def users_from_es(self):
-
-        return self.get_github_cache("users", "login")
 
 
     def get_elastic_mappings(self):
@@ -213,10 +237,10 @@ class GitHubEnrich(Enrich):
 
         user_login = pull['user']['login']
 
-        if user_login in self.github.users:
-            user = GitHubUser(self.github.users[user_login])
+        if user_login in self.users:
+            user = GitHubUser(self.users[user_login])
         else:
-            logging.debug("User login %s not found in github users" % (user_login))
+            logging.debug("User login %s not found in GitHub users" % (user_login))
             user = None
 
         rich_pull['user_login'] = user_login
@@ -241,9 +265,9 @@ class GitHubEnrich(Enrich):
 
             assignee_login = pull['assignee']['login']
 
-            if assignee_login in self.github.users:
-                user = GitHubUser(self.github.users[assignee_login])
-                assignee = GitHubUser(self.github.users[assignee_login])
+            if assignee_login in self.users:
+                user = GitHubUser(self.users[assignee_login])
+                assignee = GitHubUser(self.users[assignee_login])
                 rich_pull['assignee_login'] = assignee_login
                 rich_pull['assignee_name'] = assignee.name
                 rich_pull['assignee_email'] = assignee.email
@@ -252,7 +276,7 @@ class GitHubEnrich(Enrich):
                 rich_pull['assignee_geolocation'] = \
                     self.get_geo_point(assignee.location)
             else:
-                logging.debug("Assignee login %s not found in github users" % (assignee_login))
+                logging.debug("Assignee login %s not found in GitHub users" % (assignee_login))
 
         if not assignee:
             rich_pull['assignee_name'] = None
@@ -281,11 +305,9 @@ class GitHubEnrich(Enrich):
 
 
     def enrich_items(self, pulls):
-
-        logging.debug("Updating Github users in Elastic")
-        self.users_to_es()  # update users in Elastic
-        logging.debug("Updating geolocations in Elastic")
-        self.geo_locations_to_es() # Update geolocations in Elastic
+        # User info filled in sortinghat pre enrichment
+        logging.debug("Updating GitHub users in Elastic")
+        self.users_to_es()
 
         max_items = self.elastic.max_items_bulk
         current = 0
@@ -312,9 +334,12 @@ class GitHubEnrich(Enrich):
             current += 1
         requests.put(url, data = bulk_json)
 
+        logging.debug("Updating GitHub users geolocations in Elastic")
+        self.geo_locations_to_es() # Update geolocations in Elastic
+
 
 class GitHubUser(object):
-    ''' Helper class to manage data from a Github user '''
+    """ Helper class to manage data from a Github user """
 
     users = {}  # cache with users from github
 

@@ -23,7 +23,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-'''Ocean feeder for Elastic from  Perseval data'''
+"""Ocean feeder for Elastic from  Perseval data"""
 
 
 from datetime import datetime
@@ -35,22 +35,17 @@ class ElasticOcean(object):
 
     # Public Ocean backend API
     def fetch(self):
-        ''' Returns an iterator for the ocean feeder  '''
+        """ Returns an iterator for the ocean feeder  """
         raise NotImplementedError
-
-    def get_identities(self, item):
-        ''' Return the identities from an item '''
-        raise NotImplementedError
-
 
     def set_elastic(self, elastic):
-        ''' Elastic used to store last data source state '''
+        """ Elastic used to store last data source state """
         self.elastic = elastic
 
 
     @classmethod
     def add_params(cls, cmdline_parser):
-        ''' Shared params in all backends '''
+        """ Shared params in all backends """
 
         parser = cmdline_parser
 
@@ -76,11 +71,11 @@ class ElasticOcean(object):
 
 
     def get_field_date(self):
-        ''' Field with the date in the JSON items '''
+        """ Field with the date in the JSON items """
         raise NotImplementedError
 
     def get_elastic_mappings(self):
-        ''' Specific mappings for the State in ES '''
+        """ Specific mappings for the State in ES """
         pass
 
     def get_last_update_from_es(self, _filter = None):
@@ -90,15 +85,11 @@ class ElasticOcean(object):
         return last_update
 
     def drop_item(self, item):
-        ''' Drop items not to be inserted in Elastic '''
+        """ Drop items not to be inserted in Elastic """
         return False
 
-    def add_item(self, item):
-        """ Add a new item to the Ocean and upload identities to SH and enrich it """
-
-
     def feed(self):
-        ''' Feed data in Elastic from Perceval '''
+        """ Feed data in Elastic from Perceval """
 
         self.last_update = self.get_last_update_from_es()
         last_update = self.last_update
@@ -131,7 +122,7 @@ class ElasticOcean(object):
 
 
     def _items_to_es(self, json_items):
-        ''' Append items JSON to ES (data source state) '''
+        """ Append items JSON to ES (data source state) """
 
         if len(json_items) == 0:
             return
@@ -154,7 +145,7 @@ class ElasticOcean(object):
             date_field = self.get_field_date()
             from_date = self.from_date.replace(" ","T")  # elastic format
 
-            filter_ = '''
+            filter_ = """
             {
                 "query": {
                     "bool": {
@@ -166,7 +157,7 @@ class ElasticOcean(object):
                     }
                 }
             }
-            ''' % (date_field, from_date)
+            """ % (date_field, from_date)
 
             r = requests.post(url, data = filter_)
 

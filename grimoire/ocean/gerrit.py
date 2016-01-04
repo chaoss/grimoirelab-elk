@@ -32,48 +32,6 @@ class GerritOcean(ElasticOcean):
     def get_field_date(self):
         return "lastUpdated_date"
 
-    @classmethod
-    def get_sh_identity(cls, user):
-        identity = {}
-        for field in ['name', 'email', 'username']:
-            identity[field] = None
-        if 'name' in user: identity['name'] = user['name']
-        if 'email' in user: identity['email'] = user['email']
-        if 'username' in user: identity['username'] = user['username']
-        return identity
-
-
-    def get_identities(self, item):
-        ''' Return the identities from an item '''
-
-        identities = []
-
-        # Changeset owner
-        user = item['owner']
-        identities.append(self.get_sh_identity(user))
-
-        # Patchset uploader and author
-        if 'patchSets' in item:
-            for patchset in item['patchSets']:
-                user = patchset['uploader']
-                identities.append(self.get_sh_identity(user))
-                user = patchset['author']
-                identities.append(self.get_sh_identity(user))
-                identities.append(self.get_sh_identity(user))
-                if 'approvals' in patchset:
-                    # Approvals by
-                    for approval in patchset['approvals']:
-                        user = approval['by']
-                        identities.append(self.get_sh_identity(user))
-        # Comments reviewers
-        if 'comments' in item:
-            for comment in item['comments']:
-                user = comment['reviewer']
-                identities.append(self.get_sh_identity(user))
-
-        return identities
-
-
     def get_elastic_mappings(self):
 
         mapping = '''

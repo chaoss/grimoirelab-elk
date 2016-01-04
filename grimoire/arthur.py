@@ -46,7 +46,7 @@ def feed_backend(url, params, clean):
 
     connector = get_connector_from_name(backend_name)
     if not connector:
-        logging.error("Cant find %s backend" % (backend_name))
+        logging.error("Can't find %s backend" % (backend_name))
         sys.exit(1)
 
     try:
@@ -64,10 +64,12 @@ def feed_backend(url, params, clean):
         ConfOcean.set_elastic(elastic_ocean)
 
         ocean_backend.feed()
+
     except Exception as ex:
         if backend:
             logging.error("Error feeding ocean from %s (%s): %s" %
                           (backend.get_name(), backend.get_id(), ex))
+            traceback.print_exc()
         else:
             logging.error("Error feeding ocean %s" % ex)
 
@@ -207,18 +209,14 @@ def enrich_backend(url, params, clean):
         elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
 
-#         if backend_name == "github":
-#             GitHub.users = enrich_backend.users_from_es()
-
         logging.info("Adding enrichment data to %s" %
                      (enrich_backend.elastic.index_url))
-
 
         new_identities = []
         # First we add all new identities to SH
         for item in ocean_backend:
             # Get identities from new items to be added to SortingHat
-            identities = ocean_backend.get_identities(item)
+            identities = enrich_backend.get_identities(item)
             for identity in identities:
                 if identity not in new_identities:
                     new_identities.append(identity)
@@ -226,9 +224,11 @@ def enrich_backend(url, params, clean):
         logging.info("Total new identities to be checked %i" % len(new_identities))
 
         merged_identities = SortingHat.add_identities(new_identities, backend_name)
+
         # Redo enrich for items with new merged identities
         renrich_items = []
-        merged_identities = ['7e0bcf6ff46848403eaffa29ef46109f386fa24b']
+        # For testing
+        # merged_identities = ['7e0bcf6ff46848403eaffa29ef46109f386fa24b']
         for mid in merged_identities:
             renrich_items += get_items_from_uuid(mid, enrich_backend, ocean_backend)
 

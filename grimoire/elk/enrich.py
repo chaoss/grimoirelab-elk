@@ -54,6 +54,10 @@ class Enrich(object):
         """ Fields with unique identities in the JSON enriched items """
         raise NotImplementedError
 
+    def get_identities(self, item):
+        """ Return the identities from an item """
+        raise NotImplementedError
+
     def get_item_id(self, eitem):
         """ Return the item_id linked to this enriched eitem """
 

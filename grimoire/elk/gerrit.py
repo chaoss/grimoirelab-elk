@@ -30,14 +30,12 @@ import time
 
 
 from grimoire.elk.enrich import Enrich
-from grimoire.ocean.gerrit import GerritOcean
-
 
 class GerritEnrich(Enrich):
 
     def __init__(self, gerrit, **nouse):
         super().__init__()
-        self.gerrit = gerrit
+        self.perceval_backend = gerrit
         self.elastic = None
 
     def set_elastic(self, elastic):
@@ -48,6 +46,47 @@ class GerritEnrich(Enrich):
 
     def get_fields_uuid(self):
         return ["review_uuid", "patchSet_uuid", "approval_uuid"]
+
+    @classmethod
+    def get_sh_identity(cls, user):
+        identity = {}
+        for field in ['name', 'email', 'username']:
+            identity[field] = None
+        if 'name' in user: identity['name'] = user['name']
+        if 'email' in user: identity['email'] = user['email']
+        if 'username' in user: identity['username'] = user['username']
+        return identity
+
+
+    def get_identities(self, item):
+        ''' Return the identities from an item '''
+
+        identities = []
+
+        # Changeset owner
+        user = item['owner']
+        identities.append(self.get_sh_identity(user))
+
+        # Patchset uploader and author
+        if 'patchSets' in item:
+            for patchset in item['patchSets']:
+                user = patchset['uploader']
+                identities.append(self.get_sh_identity(user))
+                user = patchset['author']
+                identities.append(self.get_sh_identity(user))
+                identities.append(self.get_sh_identity(user))
+                if 'approvals' in patchset:
+                    # Approvals by
+                    for approval in patchset['approvals']:
+                        user = approval['by']
+                        identities.append(self.get_sh_identity(user))
+        # Comments reviewers
+        if 'comments' in item:
+            for comment in item['comments']:
+                user = comment['reviewer']
+                identities.append(self.get_sh_identity(user))
+
+        return identities
 
     def get_item_id(self, eitem):
         """ Return the item_id linked to this enriched eitem """
@@ -144,8 +183,8 @@ class GerritEnrich(Enrich):
         bulk_json_review  = '"review_id":"%s",' % review['id']
         bulk_json_review += '"review_createdOn":"%s",' % review['createdOn']
         if 'owner' in review and 'email' in review['owner']:
-            identity = GerritOcean.get_sh_identity(review['owner'])
-            ruuid = self.get_uuid(identity, self.gerrit.get_name())
+            identity = GerritEnrich.get_sh_identity(review['owner'])
+            ruuid = self.get_uuid(identity, self.perceval_backend.get_name())
             remail = review['owner']['email']
             bulk_json_review += '"review_email":"%s",' % remail
             bulk_json_review += '"review_uuid":"%s",' % ruuid
@@ -166,8 +205,8 @@ class GerritEnrich(Enrich):
             bulk_json_patch  = '"patchSet_id":"%s",' % patch['number']
             bulk_json_patch += '"patchSet_createdOn":"%s",' % patch['createdOn']
             if 'author' in patch and 'email' in patch['author']:
-                identity = GerritOcean.get_sh_identity(patch['author'])
-                puuid = self.get_uuid(identity, self.gerrit.get_name())
+                identity = GerritEnrich.get_sh_identity(patch['author'])
+                puuid = self.get_uuid(identity, self.perceval_backend.get_name())
                 pemail = patch['author']['email']
                 bulk_json_patch += '"patchSet_email":"%s",' % pemail
                 bulk_json_patch += '"patchSet_uuid":"%s"' % puuid
@@ -195,8 +234,8 @@ class GerritEnrich(Enrich):
                     bulk_json_ap += '"approval_value":%i,' % int(app['value'])
                     bulk_json_ap += '"approval_grantedOn":"%s",' % app['grantedOn']
                     if 'email' in app['by']:
-                        identity = GerritOcean.get_sh_identity(app['by'])
-                        auuid = self.get_uuid(identity, self.gerrit.get_name())
+                        identity = GerritEnrich.get_sh_identity(app['by'])
+                        auuid = self.get_uuid(identity, self.perceval_backend.get_name())
                         aemail = app['by']['email']
                         bulk_json_ap += '"approval_email":"%s",' % aemail
                         bulk_json_ap += '"approval_uuid":"%s",' % auuid
