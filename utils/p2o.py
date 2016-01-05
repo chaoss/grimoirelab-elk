@@ -33,7 +33,7 @@ from grimoire.arthur import feed_backend, enrich_backend
 from grimoire.ocean.conf import ConfOcean
 
 from grimoire.utils import get_elastic
-from grimoire.utils import get_params_parser, config_logging
+from grimoire.utils import get_params_parser, config_logging, get_connectors
 
 from redis import Redis
 from rq import Queue
@@ -44,8 +44,6 @@ def get_params():
 
     parser = get_params_parser()
 
-    parser.add_argument("--enrich",  action='store_true',
-                        help="Enrich items")
     args = parser.parse_args()
 
     return args
@@ -61,13 +59,10 @@ def feed_backends(url, clean, debug = False, redis = None):
     q = Queue('update', connection=Redis(redis), async=async_)
 
     for repo in ConfOcean.get_repos():
-        params = repo['params']
-        params['no_incremental'] = True  # Always try incremental
-        params['debug'] = debug  # Use for all debug level defined in p2o
-
-        result = q.enqueue(feed_backend, url, params, clean)
+        task_feed = q.enqueue(feed_backend, url, clean,
+                              repo['backend_name'], repo['backend_params'])
         logging.info("Queued job")
-        logging.info(result)
+        logging.info(task_feed)
 
 
 def loop_update(min_update_time, url, clean, debug, redis):
@@ -91,7 +86,7 @@ if __name__ == '__main__':
 
     args = get_params()
 
-    async_ = True  # Use RQ or not
+    async_ = False  # Use RQ or not
 
     config_logging(args.debug)
 
@@ -102,9 +97,15 @@ if __name__ == '__main__':
         clean = True
 
     try:
-        if args.backend:
+        if args.loop:
+            # minimal update duration to avoid too much frequency in secs
+            min_update_time = 60
+            loop_update(min_update_time, url, clean, args.debug,
+                        args.redis)
+        elif args.backend:
             q = Queue('create', connection=Redis(args.redis), async=async_)
-            task_feed = q.enqueue(feed_backend, url, vars(args), clean)
+            task_feed = q.enqueue(feed_backend, url, clean,
+                                  args.backend, args.backend_args)
             logging.info("Queued feed_backend job")
             logging.info(task_feed)
 
@@ -112,21 +113,17 @@ if __name__ == '__main__':
                 q = Queue('enrich', connection=Redis(args.redis), async=async_)
                 if async_:
                     # Task enrich after feed
-                    result = q.enqueue(enrich_backend, url, vars(args), clean,
+                    result = q.enqueue(enrich_backend, url, clean,
+                                       args.backend, args.backend_args,
                                        depends_on=task_feed)
                 else:
-                    result = q.enqueue(enrich_backend, url, vars(args), clean)
+                    result = q.enqueue(enrich_backend, url, clean,
+                                       args.backend, args.backend_args)
                 logging.info("Queued enrich_backend job")
                 logging.info(result)
 
         else:
-            if args.loop:
-                # minimal update duration to avoid too much frequency in secs
-                min_update_time = 60
-                loop_update(min_update_time, url, clean, args.debug,
-                            args.redis)
-            else:
-                feed_backends(url, clean, args.debug, args.redis)
+            feed_backends(url, clean, args.debug, args.redis)
 
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")

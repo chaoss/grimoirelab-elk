@@ -31,13 +31,17 @@ class BugzillaOcean(ElasticOcean):
 
     def get_field_date(self):
         field = None
-        if self.perceval_backend.detail == "list":
-            field = 'changeddate_date'
-        else:
-            field = 'delta_ts_date'
+# TODO: readd when detail is supported in bugzilla backend
+#         if self.perceval_backend.detail == "list":
+#             field = 'changeddate_date'
+#         else:
+#             field = 'delta_ts_date'
 
+        field = 'delta_ts_date'
         return field
 
+    def get_field_unique_id(self):
+        return "bug_id"
 
     def get_last_update_from_es(self):
         ''' Find in JSON storage the last update date '''

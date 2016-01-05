@@ -30,14 +30,13 @@ import logging
 import requests
 from urllib.parse import urlparse
 
-from grimoire.elk.enrich import Enrich
+from .enrich import Enrich
 
-from perceval.utils import get_time_diff_days
-
+from .utils import get_time_diff_days
 
 class BugzillaEnrich(Enrich):
 
-    def __init__(self, bugzilla, **nouse):
+    def __init__(self, bugzilla):
         super().__init__()
         self.perceval_backend = bugzilla
         self.elastic = None
@@ -54,21 +53,30 @@ class BugzillaEnrich(Enrich):
     @classmethod
     def get_sh_identity(cls, user):
         """ Return a Sorting Hat identity using bugzilla user data """
+
+        def fill_list_identity(identity, user_list_data):
+            """ Fill identity with user data in first item in list """
+            identity['username'] = user_list_data[0]['__text__']
+            if 'name' in user_list_data[0]:
+                identity['name'] = user_list_data[0]['name']
+
         identity = {}
         for field in ['name', 'email', 'username']:
+            # Basic fields in Sorting Hat
             identity[field] = None
-        if 'name' in user: identity['name'] = user['name']
-        if 'email' in user: identity['email'] = user['email']
-        if 'username' in user: identity['username'] = user['username']
-        if 'assigned_to_name' in user:
-                identity['name'] = user['assigned_to_name']
-                identity['username'] = user['assigned_to']
-        elif 'assigned_to' in user: identity['username'] = user['assigned_to']
-        if 'changed_by' in user: identity['name'] = user['changed_by']
-        if 'who' in user: identity['username'] = user['who']
         if 'reporter' in user:
-                identity['name'] = user['reporter_name']
-                identity['username'] = user['reporter']
+            fill_list_identity(identity, user['reporter'])
+        if 'assigned_to' in user:
+            fill_list_identity(identity, user['assigned_to'])
+        if 'who' in user:
+            fill_list_identity(identity, user['who'])
+        if 'Who' in user:
+            identity['username'] = user['Who']
+        if 'qa_contact' in user:
+            fill_list_identity(identity, user['qa_contact'])
+        if 'changed_by' in user: 
+            identity['name'] = user['changed_by']
+
         return identity
 
 
@@ -77,22 +85,22 @@ class BugzillaEnrich(Enrich):
 
         identities = []
 
-        if 'changes' in item:
-            for change in item['changes']:
-                identities.append(self.get_sh_identity(change))
+        if 'activity' in item:
+            for event in item['activity']:
+                identities.append(self.get_sh_identity(event))
         if 'long_desc' in item:
             for comment in item['long_desc']:
                 identities.append(self.get_sh_identity(comment))
-        if 'assigned_to_name' in item:
-            identities.append(self.get_sh_identity({'assigned_to_name': item['assigned_to_name'],
-                                                    'assigned_to':item['assigned_to']}))
         elif 'assigned_to' in item:
-            identities.append(self.get_sh_identity({'assigned_to': item['assigned_to']}))
-        if 'reporter_name' in item:
-            identities.append(self.get_sh_identity({'reporter_name': item['reporter_name'],
-                                                    'reporter':item['reporter']}))
+            identities.append(self.get_sh_identity({'assigned_to':
+                                                    item['assigned_to']}))
         elif 'reporter' in item:
-            identities.append(self.get_sh_identity({'reporter':item['reporter']}))
+            identities.append(self.get_sh_identity({'reporter':
+                                                    item['reporter']}))
+        elif 'qa_contact' in item:
+            identities.append(self.get_sh_identity({'qa_contact':
+                                                    item['qa_contact']}))
+
 
         return identities
 
@@ -103,9 +111,9 @@ class BugzillaEnrich(Enrich):
             return u.scheme+"//"+u.netloc
 
         # Fix dates
-        date_ts = parser.parse(issue['creation_ts'])
+        date_ts = parser.parse(issue['creation_ts'][0]['__text__'])
         issue['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
-        date_ts = parser.parse(issue['delta_ts'])
+        date_ts = parser.parse(issue['delta_ts'][0]['__text__'])
         issue['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
         # Add extra JSON fields used in Kibana (enriched fields)
@@ -114,32 +122,27 @@ class BugzillaEnrich(Enrich):
         issue['url'] = None
 
         issue['number_of_comments'] = len(issue['long_desc'])
-        issue['url'] = get_bugzilla_url() + "show_bug.cgi?id=" + issue['bug_id']
+        issue['url'] = get_bugzilla_url() + "show_bug.cgi?id=" + issue['bug_id'][0]['__text__']
         issue['time_to_last_update_days'] = \
             get_time_diff_days(issue['creation_ts'], issue['delta_ts'])
 
         # Sorting Hat integration: reporter and assigned_to uuids
         if 'assigned_to' in issue:
-            if 'assigned_to_name' not in issue:
-                issue['assigned_to_name'] = None
-            identity = BugzillaEnrich.get_sh_identity({'assigned_to_name': issue['assigned_to_name'],
-                                                      'assigned_to':issue['assigned_to']})
-            issue['assigned_to_uuid'] = self.get_uuid(identity, self.perceval_backend.get_name())
+            identity = BugzillaEnrich.get_sh_identity({'assigned_to':issue['assigned_to']})
+            issue['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
         if 'reporter' in issue:
-            if 'reporter_name' not in issue:
-                issue['reporter_name'] = None
-            identity = BugzillaEnrich.get_sh_identity({'reporter_name': issue['reporter_name'],
-                                                      'reporter':issue['reporter']})
-            issue['reporter_uuid'] = self.get_uuid(identity, self.perceval_backend.get_name())
+            identity = BugzillaEnrich.get_sh_identity({'reporter':issue['reporter']})
+            issue['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
 
         return issue
 
 
     def enrich_items(self, items):
-        if self.perceval_backend.detail == "list":
-            self.issues_list_to_es(items)
-        else:
-            self.issues_to_es(items)
+#         if self.perceval_backend.detail == "list":
+#             self.issues_list_to_es(items)
+#         else:
+#             self.issues_to_es(items)
+        self.issues_to_es(items)
 
 
     def issues_list_to_es(self, items):

@@ -30,8 +30,7 @@ class GitHubOcean(ElasticOcean):
 
     def __init__(self, perceval_backend, cache = False,
                  incremental = True, **nouse):
-        super(GitHubOcean, self).__init__(perceval_backend, cache,
-                                          incremental, **nouse)
+        super(GitHubOcean, self).__init__(perceval_backend)
 
     def get_id(self):
 

@@ -33,9 +33,8 @@ from grimoire.elk.enrich import Enrich
 
 class GerritEnrich(Enrich):
 
-    def __init__(self, gerrit, **nouse):
+    def __init__(self, gerrit):
         super().__init__()
-        self.perceval_backend = gerrit
         self.elastic = None
 
     def set_elastic(self, elastic):
@@ -184,7 +183,7 @@ class GerritEnrich(Enrich):
         bulk_json_review += '"review_createdOn":"%s",' % review['createdOn']
         if 'owner' in review and 'email' in review['owner']:
             identity = GerritEnrich.get_sh_identity(review['owner'])
-            ruuid = self.get_uuid(identity, self.perceval_backend.get_name())
+            ruuid = self.get_uuid(identity, self.get_connector_name())
             remail = review['owner']['email']
             bulk_json_review += '"review_email":"%s",' % remail
             bulk_json_review += '"review_uuid":"%s",' % ruuid
@@ -206,7 +205,7 @@ class GerritEnrich(Enrich):
             bulk_json_patch += '"patchSet_createdOn":"%s",' % patch['createdOn']
             if 'author' in patch and 'email' in patch['author']:
                 identity = GerritEnrich.get_sh_identity(patch['author'])
-                puuid = self.get_uuid(identity, self.perceval_backend.get_name())
+                puuid = self.get_uuid(identity, self.get_connector_name())
                 pemail = patch['author']['email']
                 bulk_json_patch += '"patchSet_email":"%s",' % pemail
                 bulk_json_patch += '"patchSet_uuid":"%s"' % puuid
@@ -235,7 +234,7 @@ class GerritEnrich(Enrich):
                     bulk_json_ap += '"approval_grantedOn":"%s",' % app['grantedOn']
                     if 'email' in app['by']:
                         identity = GerritEnrich.get_sh_identity(app['by'])
-                        auuid = self.get_uuid(identity, self.perceval_backend.get_name())
+                        auuid = self.get_uuid(identity, self.get_connector_name())
                         aemail = app['by']['email']
                         bulk_json_ap += '"approval_email":"%s",' % aemail
                         bulk_json_ap += '"approval_uuid":"%s",' % auuid

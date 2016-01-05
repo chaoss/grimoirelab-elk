@@ -71,9 +71,8 @@ if __name__ == '__main__':
     for connector in connectors:
         name = connector[0].get_name()
         subparser = subparsers.add_parser(name, help='gelk %s -h' % name)
-        # We need params for feed and for enrich
+        # We need params for feed
         connector[0].add_params(subparser)
-        connector[2].add_params(subparser)
 
     args = parser.parse_args()
 

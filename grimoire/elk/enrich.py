@@ -36,15 +36,16 @@ class Enrich(object):
     def __init__(self):
         self.sh_db = Database("root", "", "ocean_sh", "mariadb")
 
-    @classmethod
-    def add_params(cls, cmdline_parser):
-        pass
-
     def set_elastic(self, elastic):
         self.elastic = elastic
 
     def enrich_items(self, items):
         raise NotImplementedError
+
+    def get_connector_name(self):
+        """ Find the name for the current connector """
+        from ..utils import get_connector_name
+        return get_connector_name(type(self))
 
     def get_field_date(self):
         """ Field with the date in the JSON enriched items """

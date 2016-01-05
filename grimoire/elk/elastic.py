@@ -71,7 +71,7 @@ class ElasticSearch(object):
             self.create_mappings(mappings)
 
 
-    def bulk_upload_sync(self, items, field_id, incremental = False):
+    def bulk_upload_sync(self, items, field_id):
         ''' Upload in controlled packs items to ES using bulk API
             and wait until the items appears in searches '''
 
@@ -122,8 +122,6 @@ class ElasticSearch(object):
             if (datetime.now()-search_start).total_seconds() > self.wait_bulk_seconds:
                 logging.debug("Bulk data does not appear as NEW after %is" % (self.wait_bulk_seconds))
                 logging.debug("%i item updates" % (total-total_search))
-                # if not incremental:
-                #    raise
                 break
 
 

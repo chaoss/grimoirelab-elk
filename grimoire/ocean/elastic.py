@@ -33,45 +33,33 @@ import requests
 
 class ElasticOcean(object):
 
-    # Public Ocean backend API
-    def fetch(self):
-        """ Returns an iterator for the ocean feeder  """
-        raise NotImplementedError
-
-    def set_elastic(self, elastic):
-        """ Elastic used to store last data source state """
-        self.elastic = elastic
-
-
     @classmethod
     def add_params(cls, cmdline_parser):
         """ Shared params in all backends """
 
         parser = cmdline_parser
 
-        parser.add_argument("--no_incremental",  action='store_true',
-                            help="don't use last state for data source")
-        parser.add_argument("--cache",  action='store_true',
-                            help="Use cache")
-        parser.add_argument("--debug",  action='store_true',
-                            help="Increase logging to debug")
         parser.add_argument("-e", "--elastic_url",  default="http://127.0.0.1:9200",
                             help="Host with elastic search" +
                             "(default: http://127.0.0.1:9200)")
 
 
-    def __init__(self, perceval_backend, cache = False,
-                 incremental = True, from_date = None, **nouse):
+    def __init__(self, perceval_backend, from_date = None, **nouse):
 
         self.perceval_backend = perceval_backend
-        self.cache = cache
-        self.incremental = incremental
         self.last_update = None  # Last update in ocean items index for feed
         self.from_date = from_date  # fetch from_date
 
+    def set_elastic(self, elastic):
+        """ Elastic used to store last data source state """
+        self.elastic = elastic
 
     def get_field_date(self):
         """ Field with the date in the JSON items """
+        raise NotImplementedError
+
+    def get_field_unique_id(self):
+        """ Field with unique identifier in an item  """
         raise NotImplementedError
 
     def get_elastic_mappings(self):
@@ -88,12 +76,15 @@ class ElasticOcean(object):
         """ Drop items not to be inserted in Elastic """
         return False
 
-    def feed(self):
+    def feed(self, from_date = None):
         """ Feed data in Elastic from Perceval """
 
         self.last_update = self.get_last_update_from_es()
         last_update = self.last_update
         # last_update = '2015-12-28 18:02:00'
+        if from_date:
+            # Forced from command line
+            last_update = from_date
 
         logging.info("Incremental from: %s" % (last_update))
 
@@ -128,11 +119,11 @@ class ElasticOcean(object):
             return
 
         logging.info("Adding items to Ocean for %s (%i items)" %
-                      (self.perceval_backend.get_name(), len(json_items)))
+                      (self, len(json_items)))
 
-        field_id = self.perceval_backend.get_field_unique_id()
+        field_id = self.get_field_unique_id()
 
-        self.elastic.bulk_upload_sync(json_items, field_id, self.incremental)
+        self.elastic.bulk_upload_sync(json_items, field_id)
 
     # Iterator
     def _get_elastic_items(self):

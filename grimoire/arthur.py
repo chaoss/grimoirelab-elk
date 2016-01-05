@@ -32,43 +32,46 @@ import sys
 from grimoire.elk.sortinghat import SortingHat
 from grimoire.ocean.conf import ConfOcean
 from grimoire.utils import get_elastic
-from grimoire.utils import get_connector_from_name
+from grimoire.utils import get_connectors
 import traceback
 
-def feed_backend(url, params, clean):
+def feed_backend(url, clean, backend_name, backend_params):
     """ Feed Ocean with backend data """
 
     backend = None
-    backend_name = params['backend']
     repo = {}    # repository data to be stored in conf
-    repo['params'] = params
+    repo['backend_name'] = backend_name
+    repo['backend_params'] = backend_params
     es_index = None
 
-    connector = get_connector_from_name(backend_name)
-    if not connector:
-        logging.error("Can't find %s backend" % (backend_name))
-        sys.exit(1)
+
+    if backend_name not in get_connectors():
+        raise RuntimeError("Unknown backend %s" % backend_name)
+    connector = get_connectors()[backend_name]
+    klass = connector[3]  # BackendCmd for the connector
 
     try:
-        backend = connector[0](**params)
-        ocean_backend = connector[1](backend, **params)
+        backend_cmd = klass(*backend_params)
 
-        logging.info("Feeding Ocean from %s (%s)" % (backend.get_name(),
-                                                     backend.get_id()))
+        backend = backend_cmd.backend
+        ocean_backend = connector[1](backend)
 
-        es_index = backend.get_name() + "_" + backend.get_id()
+        logging.info("Feeding Ocean from %s (%s)" % (backend_name,
+                                                     backend.unique_id))
+
+        es_index = backend_name + "_" + backend.unique_id
         elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
 
         ocean_backend.set_elastic(elastic_ocean)
 
         ConfOcean.set_elastic(elastic_ocean)
 
-        ocean_backend.feed()
+        ocean_backend.feed(backend_cmd.from_date)
 
     except Exception as ex:
         if backend:
             logging.error("Error feeding ocean from %s (%s): %s" %
-                          (backend.get_name(), backend.get_id(), ex))
+                          (backend_name, backend.unique_id, ex))
             traceback.print_exc()
         else:
             logging.error("Error feeding ocean %s" % ex)
@@ -84,7 +87,7 @@ def feed_backend(url, params, clean):
         ConfOcean.add_repo(es_index, repo)
     else:
         logging.debug("Repository not added to Ocean because errors.")
-        logging.debug(params)
+        logging.debug(backend_params)
 
     logging.info("Done %s " % (backend_name))
 
@@ -158,7 +161,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     return items
 
 
-def enrich_backend(url, params, clean):
+def enrich_backend(url, clean, backend_name, backend_params):
     """ Enrich Ocean index (including SH) """
 
     def enrich_items(items, enrich_backend):
@@ -178,24 +181,23 @@ def enrich_backend(url, params, clean):
         return total
 
     backend = None
-    backend_name = params['backend']
-    repo = {}    # repository data to be stored in conf
-    repo['params'] = params
     enrich_index = None
 
-    connector = get_connector_from_name(backend_name)
-    if not connector:
-        logging.error("Can't find %s backend" % (backend_name))
-        sys.exit(1)
+    if backend_name not in get_connectors():
+        raise RuntimeError("Unknown backend %s" % backend_name)
+    connector = get_connectors()[backend_name]
+    klass = connector[3]  # BackendCmd for the connector
 
     try:
-        backend = connector[0](**params)
+        backend_cmd = klass(*backend_params)
 
-        ocean_index = backend.get_name() + "_" + backend.get_id()
+        backend = backend_cmd.backend
+
+        ocean_index = backend_name + "_" + backend.unique_id
         enrich_index = ocean_index+"_enrich"
 
 
-        enrich_backend = connector[2](backend, **params)
+        enrich_backend = connector[2](backend)
         elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
         enrich_backend.set_elastic(elastic_enrich)
 
@@ -204,7 +206,7 @@ def enrich_backend(url, params, clean):
 
         logging.debug ("Last enrichment: %s" % (last_enrich))
 
-        ocean_backend = connector[1](backend, from_date=last_enrich, **params)
+        ocean_backend = connector[1](backend, from_date=last_enrich)
         clean = False  # Don't remove ocean index when enrich
         elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
@@ -245,7 +247,7 @@ def enrich_backend(url, params, clean):
         traceback.print_exc()
         if backend:
             logging.error("Error enriching ocean from %s (%s): %s" %
-                          (backend.get_name(), backend.get_id(), ex))
+                          (backend_name, backend.unique_id, ex))
         else:
             logging.error("Error enriching ocean %s" % ex)
 

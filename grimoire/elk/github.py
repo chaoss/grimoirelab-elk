@@ -26,14 +26,14 @@
 import json
 import logging
 import requests
-from perceval.utils import get_time_diff_days
+from .utils import get_time_diff_days
 
 from grimoire.elk.enrich import Enrich
 
 
 class GitHubEnrich(Enrich):
 
-    def __init__(self, github, **nouse):
+    def __init__(self, github):
         self.elastic = None
         self.perceval_backend = github
         self.index_github = "github"

@@ -32,7 +32,7 @@ import requests
 from grimoire.ocean.conf import ConfOcean
  
 
-from grimoire.utils import get_connector_from_name, get_connectors, get_elastic
+from grimoire.utils import get_connector_from_name, get_elastic
 from grimoire.utils import get_params, config_logging
 
 

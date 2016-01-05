@@ -24,6 +24,7 @@
 #
 
 import argparse
+from dateutil import parser
 import logging
 import sys
 
@@ -41,9 +42,9 @@ from grimoire.elk.github import GitHubEnrich
 
 
 # Connectors for Perceval
-from perceval.backends.bugzilla import Bugzilla
-from perceval.backends.github import GitHub
-from perceval.backends.gerrit import Gerrit
+from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
+from perceval.backends.github import GitHub, GitHubCommand
+from perceval.backends.gerrit import Gerrit, GerritCommand
 
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.elk.elastic import ElasticConnectException
@@ -52,18 +53,27 @@ def get_connector_from_name(name):
     found = None
     connectors = get_connectors()
 
-    for connector in connectors:
-        backend = connector[0]
-        if backend.get_name() == name:
-            found = connector
+    for cname in connectors:
+        if cname == name: 
+            found = connectors[cname]
 
+    return found
+
+def get_connector_name(cls):
+    found = None
+    connectors = get_connectors()
+
+    for cname in connectors:
+        for con in connectors[cname]:
+            if cls == con:
+                found = cname
     return found
 
 def get_connectors():
 
-    return [[Bugzilla, BugzillaOcean, BugzillaEnrich],
-            [GitHub, GitHubOcean, GitHubEnrich],
-            [Gerrit, GerritOcean, GerritEnrich]]  # Will come from Registry
+    return {"bugzilla":[Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
+            "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
+            "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand]}  # Will come from Registry
 
 def get_elastic(url, es_index, clean = None, ocean_backend = None):
 
@@ -92,7 +102,51 @@ def config_logging(debug):
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
 
+ARTHUR_USAGE_MSG = ''
+ARTHUR_DESC_MSG = ''
+ARTHUR_EPILOG_MSG = ''
+
 def get_params_parser():
+    """Parse command line arguments"""
+
+    parser = argparse.ArgumentParser(usage=ARTHUR_USAGE_MSG,
+                                     description=ARTHUR_DESC_MSG,
+                                     epilog=ARTHUR_EPILOG_MSG,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     add_help=False)
+
+    ElasticOcean.add_params(parser)
+
+    parser.add_argument('-h', '--help', action='help',
+                       help=argparse.SUPPRESS)
+    parser.add_argument('-g', '--debug', dest='debug',
+                        action='store_true',
+                        help=argparse.SUPPRESS)
+
+    parser.add_argument("--no_incremental",  action='store_true',
+                        help="don't use last state for data source")
+    parser.add_argument("--cache",  action='store_true',
+                        help="Use cache")
+
+    parser.add_argument("--loop",  action='store_true',
+                        help="loop the ocean update until process termination")
+    parser.add_argument("--redis",  default="redis",
+                        help="url for the redis server")
+    parser.add_argument("--enrich",  action='store_true',
+                        help="Enrich items")
+
+    parser.add_argument('backend', help=argparse.SUPPRESS)
+    parser.add_argument('backend_args', nargs=argparse.REMAINDER,
+                        help=argparse.SUPPRESS)
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
+    return parser
+
+
+def get_params_parser_old():
     connectors = get_connectors()
     parser = argparse.ArgumentParser()
     ElasticOcean.add_params(parser)
@@ -100,11 +154,15 @@ def get_params_parser():
     subparsers = parser.add_subparsers(dest='backend',
                                        help='perceval backend')
 
-    for connector in connectors:
-        backend = connector[0]
-        name = backend.get_name()
+    for cname in connectors:
+        backend_cmd = connectors[cname][3]
+        print(backend_cmd)
+        name = cname
         subparser = subparsers.add_parser(name, help='p2o %s -h' % name)
-        backend.add_params(subparser)
+        # backend.add_params(subparser)
+        sparser = backend_cmd.create_argument_parser()
+        print(sparser)
+        raise
 
     # And now a specific param to do the update until process termination
     parser.add_argument("--loop",  action='store_true',
@@ -121,3 +179,19 @@ def get_params():
     args = parser.parse_args()
 
     return args
+
+def get_time_diff_days(start_txt, end_txt):
+    ''' Number of days between two days  '''
+
+    if start_txt is None or end_txt is None:
+        return None
+
+    start = parser.parse(start_txt)
+    end = parser.parse(end_txt)
+
+    seconds_day = float(60*60*24)
+    diff_days = \
+        (end-start).total_seconds() / seconds_day
+    diff_days = float('%.2f' % diff_days)
+
+    return diff_days

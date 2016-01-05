@@ -81,12 +81,11 @@ class SortingHat(object):
             if 'company' in identity and identity['company'] is not None:
                 try:
                     api.add_organization(db, identity['company'])
+                    api.add_enrollment(db, uuid, identity['company'],
+                                       datetime(1900, 1, 1),
+                                       datetime(2100, 1, 1))
                 except AlreadyExistsError:
                     pass
-
-                api.add_enrollment(db, uuid, identity['company'],
-                                   datetime(1900, 1, 1),
-                                   datetime(2100, 1, 1))
 
         logger.info("Total NEW identities: %i" % (total))
         logger.info("Total NEW identities merged: %i" % (len(merged_identities)))
