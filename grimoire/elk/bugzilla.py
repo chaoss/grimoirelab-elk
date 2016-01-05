@@ -121,7 +121,8 @@ class BugzillaEnrich(Enrich):
         issue['time_to_last_update_days'] = None
         issue['url'] = None
 
-        issue['number_of_comments'] = len(issue['long_desc'])
+        if 'long_desc' in issue:
+            issue['number_of_comments'] = len(issue['long_desc'])
         issue['url'] = get_bugzilla_url() + "show_bug.cgi?id=" + issue['bug_id'][0]['__text__']
         issue['time_to_last_update_days'] = \
             get_time_diff_days(issue['creation_ts'], issue['delta_ts'])
