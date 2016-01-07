@@ -32,12 +32,6 @@ class GitHubOcean(ElasticOcean):
                  incremental = True, **nouse):
         super(GitHubOcean, self).__init__(perceval_backend)
 
-    def get_id(self):
-
-        _id = "%s_%s" % (self.owner, self.repository)
-
-        return _id.lower()
-
     def get_field_unique_id(self):
         return "id"
 
