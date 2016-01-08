@@ -93,7 +93,7 @@ if __name__ == '__main__':
     url = args.elastic_url
 
     clean = args.no_incremental
-    if args.cache:
+    if args.fetch_cache:
         clean = True
 
     try:
@@ -103,13 +103,14 @@ if __name__ == '__main__':
             loop_update(min_update_time, url, clean, args.debug,
                         args.redis)
         elif args.backend:
-            q = Queue('create', connection=Redis(args.redis), async=async_)
-            task_feed = q.enqueue(feed_backend, url, clean,
-                                  args.backend, args.backend_args)
-            logging.info("Queued feed_backend job")
-            logging.info(task_feed)
+            if not args.enrich_only:
+                q = Queue('create', connection=Redis(args.redis), async=async_)
+                task_feed = q.enqueue(feed_backend, url, clean, args.fetch_cache,
+                                      args.backend, args.backend_args)
+                logging.info("Queued feed_backend job")
+                logging.info(task_feed)
 
-            if args.enrich:
+            if args.enrich or args.enrich_only:
                 q = Queue('enrich', connection=Redis(args.redis), async=async_)
                 if async_:
                     # Task enrich after feed

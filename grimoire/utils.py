@@ -130,16 +130,17 @@ def get_params_parser():
 
     parser.add_argument("--no_incremental",  action='store_true',
                         help="don't use last state for data source")
-    parser.add_argument("--cache",  action='store_true',
-                        help="Use cache")
+    parser.add_argument("--fetch_cache",  action='store_true',
+                        help="Use cache for item retrieval")
 
     parser.add_argument("--loop",  action='store_true',
                         help="loop the ocean update until process termination")
     parser.add_argument("--redis",  default="redis",
                         help="url for the redis server")
     parser.add_argument("--enrich",  action='store_true',
-                        help="Enrich items")
-
+                        help="Enrich items after retrieving")
+    parser.add_argument("--enrich_only",  action='store_true',
+                        help="Only enrich items")
     parser.add_argument('backend', help=argparse.SUPPRESS)
     parser.add_argument('backend_args', nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)
