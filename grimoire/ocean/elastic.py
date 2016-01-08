@@ -44,11 +44,12 @@ class ElasticOcean(object):
                             "(default: http://127.0.0.1:9200)")
 
 
-    def __init__(self, perceval_backend, from_date = None, **nouse):
+    def __init__(self, perceval_backend, from_date = None, fetch_cache = False):
 
         self.perceval_backend = perceval_backend
         self.last_update = None  # Last update in ocean items index for feed
         self.from_date = from_date  # fetch from_date
+        self.fetch_cache = fetch_cache  # fetch from cache
 
     def set_elastic(self, elastic):
         """ Elastic used to store last data source state """
@@ -90,18 +91,25 @@ class ElasticOcean(object):
 
         task_init = datetime.now()
 
-        items = []  # to feed item in packs
+        items_pack = []  # to feed item in packs
         drop = 0
-        for item in self.perceval_backend.fetch(last_update):
+        if self.fetch_cache:
+            items = self.perceval_backend.fetch_from_cache()
+        else:
+            if self.from_date:
+                items = self.perceval_backend.fetch(from_date=self.from_date)
+            else:
+                items = self.perceval_backend.fetch()
+        for item in items:
             # print("%s %s" % (item['url'], item['lastUpdated_date']))
-            if len(items) >= self.elastic.max_items_bulk:
-                self._items_to_es(items)
-                items = []
+            if len(items_pack) >= self.elastic.max_items_bulk:
+                self._items_to_es(items_pack)
+                items_pack = []
             if not self.drop_item(item):
-                items.append(item)
+                items_pack.append(item)
             else:
                 drop +=1
-        self._items_to_es(items)
+        self._items_to_es(items_pack)
 
 
         total_time_min = (datetime.now()-task_init).total_seconds()/60
@@ -129,10 +137,17 @@ class ElasticOcean(object):
     def _get_elastic_items(self):
 
         url = self.elastic.index_url
-        url += "/_search?from=%i&size=%i" % (self.elastic_from,
-                                             self.elastic_page)
+        # 1 minute to process the results of size items
+        max_process_items_pack_time = "1m"  # 1 minute
+        url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
+                                               self.elastic_page)
+        if self.elastic_scroll_id:
+            url = self.elastic.url
+            url += "/_search/scroll?scroll=%s&scroll_id=%s" % (max_process_items_pack_time,
+                                                               self.elastic_scroll_id)
 
-        if self.from_date:
+        if self.from_date and not self.elastic_scroll_id:
+            # The filter in scroll api should be added the first query
             date_field = self.get_field_date()
             from_date = self.from_date.replace(" ","T")  # elastic format
 
@@ -156,8 +171,14 @@ class ElasticOcean(object):
             r = requests.get(url)
 
         items = []
+        rjson = r.json()
 
-        for hit in r.json()["hits"]["hits"]:
+        if "_scroll_id" in rjson:
+            self.elastic_scroll_id = rjson["_scroll_id"]
+        else:
+            self.elastic_scroll_id = None
+
+        for hit in rjson["hits"]["hits"]:
             items.append(hit['_source'])
 
         return items
@@ -165,8 +186,8 @@ class ElasticOcean(object):
 
     def __iter__(self):
 
-        self.elastic_from = 0
-        self.elastic_page = 100
+        self.elastic_scroll_id = None
+        self.elastic_page = 500
         self.iter_items = self._get_elastic_items()
 
         return self
@@ -176,8 +197,8 @@ class ElasticOcean(object):
         if len(self.iter_items) > 0:
             return self.iter_items.pop()
         else:
-            self.elastic_from += self.elastic_page
-            self.iter_items = self._get_elastic_items()
+            if self.elastic_scroll_id:
+                self.iter_items = self._get_elastic_items()
             if len(self.iter_items) > 0:
                 return self.__next__()
             else:
