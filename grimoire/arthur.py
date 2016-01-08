@@ -26,7 +26,6 @@
 from datetime import datetime
 import logging
 import requests
-import sys
 
 
 from grimoire.elk.sortinghat import SortingHat
@@ -35,7 +34,7 @@ from grimoire.utils import get_elastic
 from grimoire.utils import get_connectors
 import traceback
 
-def feed_backend(url, clean, backend_name, backend_params):
+def feed_backend(url, clean, fetch_cache, backend_name, backend_params):
     """ Feed Ocean with backend data """
 
     backend = None
@@ -54,7 +53,7 @@ def feed_backend(url, clean, backend_name, backend_params):
         backend_cmd = klass(*backend_params)
 
         backend = backend_cmd.backend
-        ocean_backend = connector[1](backend)
+        ocean_backend = connector[1](backend, fetch_cache = fetch_cache)
 
         logging.info("Feeding Ocean from %s (%s)" % (backend_name,
                                                      backend.unique_id))
@@ -95,7 +94,7 @@ def feed_backend(url, clean, backend_name, backend_params):
 def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     """ Get all items that include uuid """
 
-    logging.debug("Getting items for merged uuid %s "  % (uuid))
+    # logging.debug("Getting items for merged uuid %s "  % (uuid))
 
     uuid_fields = enrich_backend.get_fields_uuid()
 
@@ -125,7 +124,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     eitems = r.json()['hits']['hits']
 
     if len(eitems) == 0:
-        logging.warning("No enriched items found for uuid: %s " % (uuid))
+        # logging.warning("No enriched items found for uuid: %s " % (uuid))
         return []
 
     items_ids = []
@@ -215,13 +214,19 @@ def enrich_backend(url, clean, backend_name, backend_params):
                      (enrich_backend.elastic.index_url))
 
         new_identities = []
+        item_count = 0
         # First we add all new identities to SH
         for item in ocean_backend:
+            item_count += 1
             # Get identities from new items to be added to SortingHat
             identities = enrich_backend.get_identities(item)
             for identity in identities:
                 if identity not in new_identities:
                     new_identities.append(identity)
+            if item_count % 1000 == 0:
+                logging.debug("Processed %i items identities (%i identities)" \
+                               % (item_count, len(new_identities)))
+        logging.debug("TOTAL ITEMS: %i" % (item_count))
 
         logging.info("Total new identities to be checked %i" % len(new_identities))
 
