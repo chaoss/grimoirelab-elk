@@ -25,7 +25,6 @@
 
 '''Ocean Configuration Manager (singleton) '''
 
-from datetime import datetime
 import json
 import logging
 import requests
