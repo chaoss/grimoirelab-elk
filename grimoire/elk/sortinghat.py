@@ -29,7 +29,7 @@ import logging
 from sortinghat import api
 from sortinghat.db.database import Database
 from sortinghat.db.model import UniqueIdentity
-from sortinghat.exceptions import AlreadyExistsError, NotFoundError
+from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
 from sortinghat.matcher import create_identity_matcher
 
 logger = logging.getLogger(__name__)
@@ -45,6 +45,7 @@ class SortingHat(object):
         db = Database("root", "", "ocean_sh", "mariadb")
 
         total = 0
+        lidentities = len(identities)
 
         matching = 'email-name';
 
@@ -57,7 +58,8 @@ class SortingHat(object):
                 uuid = api.add_identity(db, backend, identity['email'],
                                         identity['name'], identity['username'])
 
-                logger.info("New sortinghat identity %s %s %s" % (uuid, identity['name'], identity['email']))
+                logger.info("New sortinghat identity %s %s %s (%i/%i)" % \
+                            (uuid, identity['name'], identity['email'], total, lidentities))
 
                 total += 1
                 # Time to  merge
@@ -66,16 +68,22 @@ class SortingHat(object):
                 if len(matches) > 1:
                     u = api.unique_identities(db, uuid)[0]
                     for m in matches:
+                        # First add the old uuid to the list of changed by merge uuids
+                        merged_identities.append(m.uuid)
                         if m.uuid == uuid:
                             continue
-                        api.merge_unique_identities(db, u.uuid, m.uuid)
-                        uuid = m.uuid
-                        u = api.unique_identities(db, uuid, backend)[0]
+                        # Merge matched identity into added identity
+                        api.merge_unique_identities(db, m.uuid, u.uuid)
+                        # uuid = m.uuid
+                        # u = api.unique_identities(db, uuid, backend)[0]
                         # Include all identities related to this uuid
-                        merged_identities += u.identities
+                        # merged_identities.append(m.uuid)
 
             except AlreadyExistsError as ex:
                 uuid = ex.uuid
+            except WrappedValueError as ex:
+                logging.warning("Trying to add a None identity. Ignoring it.")
+                continue
 
 
             if 'company' in identity and identity['company'] is not None:
