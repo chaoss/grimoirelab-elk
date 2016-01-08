@@ -71,9 +71,9 @@ class GerritEnrich(Enrich):
             for patchset in item['patchSets']:
                 user = patchset['uploader']
                 identities.append(self.get_sh_identity(user))
-                user = patchset['author']
-                identities.append(self.get_sh_identity(user))
-                identities.append(self.get_sh_identity(user))
+                if 'author' in patchset:
+                    user = patchset['author']
+                    identities.append(self.get_sh_identity(user))
                 if 'approvals' in patchset:
                     # Approvals by
                     for approval in patchset['approvals']:
