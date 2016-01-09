@@ -27,7 +27,6 @@ from datetime import datetime
 import logging
 
 from sortinghat import api
-from sortinghat.db.database import Database
 from sortinghat.db.model import UniqueIdentity
 from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
 from sortinghat.matcher import create_identity_matcher
@@ -37,12 +36,10 @@ logger = logging.getLogger(__name__)
 class SortingHat(object):
 
     @classmethod
-    def add_identities(cls, identities, backend):
+    def add_identities(cls, db, identities, backend):
         """ Load identities list from backend in Sorting Hat """
 
         logger.info("Adding the identities to SortingHat")
-
-        db = Database("root", "", "ocean_sh", "mariadb")
 
         total = 0
         lidentities = len(identities)
@@ -69,7 +66,8 @@ class SortingHat(object):
                     u = api.unique_identities(db, uuid)[0]
                     for m in matches:
                         # First add the old uuid to the list of changed by merge uuids
-                        merged_identities.append(m.uuid)
+                        if m.uuid not in merged_identities:
+                            merged_identities.append(m.uuid)
                         if m.uuid == uuid:
                             continue
                         # Merge matched identity into added identity

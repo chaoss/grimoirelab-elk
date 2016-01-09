@@ -283,17 +283,31 @@ class GerritEnrich(Enrich):
     def enrich_items(self, items):
         """ Fetch in ES patches and comments (events) as documents """
 
-        for review in items:
-
-            bulk_json = self.review_events(review)
-            url = self.elastic.index_url+'/reviews_events/_bulk'
-
+        def send_bulk_json(bulk_json, current):
+            url_bulk = self.elastic.index_url+'/reviews_events/_bulk'
             try:
-                requests.put(url, data=bulk_json)
+                task_init = time.time()
+                requests.put(url_bulk, data=bulk_json)
+                logging.debug("bulk packet sent (%.2f sec, %i items)"
+                              % (time.time()-task_init, current))
             except UnicodeEncodeError:
                 # Why is requests encoding the POST data as ascii?
                 logging.error("Unicode error for events in review: " + review['id'])
                 safe_json = str(bulk_json.encode('ascii', 'ignore'),'ascii')
-                requests.put(url, data=safe_json)
+                requests.put(url_bulk, data=safe_json)
                 # Continue with execution.
 
+        bulk_json = ""  # json data added in bulk operations
+        total = 0
+        current = 0
+
+        for review in items:
+            if current >= self.elastic.max_items_bulk:
+                send_bulk_json(bulk_json, current)
+                total += current
+                current = 0
+                bulk_json = ""
+            data_json = self.review_events(review)
+            bulk_json += data_json +"\n"  # Bulk document
+            current += 1
+        send_bulk_json(bulk_json, current)
