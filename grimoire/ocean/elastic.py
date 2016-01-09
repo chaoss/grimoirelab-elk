@@ -68,7 +68,6 @@ class ElasticOcean(object):
         pass
 
     def get_last_update_from_es(self, _filter = None):
-
         last_update = self.elastic.get_last_date(self.get_field_date(), _filter)
 
         return last_update
@@ -76,6 +75,10 @@ class ElasticOcean(object):
     def drop_item(self, item):
         """ Drop items not to be inserted in Elastic """
         return False
+
+    def add_update_date(self, item):
+        """ Add and update date field if needed """
+        pass
 
     def feed(self, from_date = None):
         """ Feed data in Elastic from Perceval """
@@ -102,6 +105,8 @@ class ElasticOcean(object):
                 items = self.perceval_backend.fetch()
         for item in items:
             # print("%s %s" % (item['url'], item['lastUpdated_date']))
+            # Add date field for incremental analysis if needed
+            self.add_update_date(item)
             if len(items_pack) >= self.elastic.max_items_bulk:
                 self._items_to_es(items_pack)
                 items_pack = []
@@ -138,7 +143,8 @@ class ElasticOcean(object):
 
         url = self.elastic.index_url
         # 1 minute to process the results of size items
-        max_process_items_pack_time = "1m"  # 1 minute
+        # In gerrit enrich with 500 items per page we need >1 min
+        max_process_items_pack_time = "3m"  # 3 minutes
         url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
                                                self.elastic_page)
         if self.elastic_scroll_id:
@@ -168,6 +174,7 @@ class ElasticOcean(object):
             r = requests.post(url, data = filter_)
 
         else:
+            print (url)
             r = requests.get(url)
 
         items = []

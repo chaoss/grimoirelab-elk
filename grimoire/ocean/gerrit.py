@@ -25,6 +25,8 @@
 
 '''Gerrit Ocean feeder'''
 
+from datetime import datetime
+
 from grimoire.ocean.elastic import ElasticOcean
 
 class GerritOcean(ElasticOcean):
@@ -54,13 +56,7 @@ class GerritOcean(ElasticOcean):
     def get_field_unique_id(self):
         return "id"
 
-
-# We need to enrich data with it
-#         entry_lastUpdated = \
-#             datetime.fromtimestamp(entry['lastUpdated'])
-#         entry['lastUpdated_date'] = entry_lastUpdated.isoformat()
-
-    
-
-
-
+    def add_update_date(self, item):
+        entry_lastUpdated = \
+            datetime.fromtimestamp(item['lastUpdated'])
+        item['lastUpdated_date'] = entry_lastUpdated.isoformat()
