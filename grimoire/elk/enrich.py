@@ -27,7 +27,7 @@ import logging
 
 from sortinghat.db.database import Database
 from sortinghat import api
-from sortinghat.exceptions import AlreadyExistsError, NotFoundError
+from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
 
 logger = logging.getLogger(__name__)
 
@@ -94,6 +94,10 @@ class Enrich(object):
             uuid = ex.uuid
             u = api.unique_identities(self.sh_db, uuid)[0]
             uuid = u.uuid
+        except WrappedValueError:
+            logger.error("None Identity found")
+            logger.error("%s %s" % (identity, uuid))
+            uuid = None
         except NotFoundError:
             logger.error("Identity found in Sorting Hat which is not unique")
             logger.error("%s %s" % (identity, uuid))
