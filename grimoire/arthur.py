@@ -24,6 +24,7 @@
 #
 
 from datetime import datetime
+from dateutil import parser
 import logging
 import requests
 
@@ -65,7 +66,11 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params):
 
         ConfOcean.set_elastic(elastic_ocean)
 
-        ocean_backend.feed(backend_cmd.from_date)
+        if backend_cmd.from_date ==  parser.parse("1970-01-01").replace(tzinfo=None):
+            # Don't use the default value
+            ocean_backend.feed()
+        else:
+            ocean_backend.feed(backend_cmd.from_date)
 
     except Exception as ex:
         if backend:
@@ -251,6 +256,7 @@ def enrich_backend(url, clean, backend_name, backend_params):
                      (enrich_backend.elastic.index_url))
 
         enrich_count_merged = 0
+
 
         enrich_count_merged = enrich_sortinghat(backend_name,
                                                 ocean_backend, enrich_backend)
