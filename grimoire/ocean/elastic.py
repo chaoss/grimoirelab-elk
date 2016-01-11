@@ -27,6 +27,7 @@
 
 
 from datetime import datetime
+from dateutil import parser
 import logging
 import requests
 
@@ -87,7 +88,7 @@ class ElasticOcean(object):
         last_update = self.last_update
         # last_update = '2015-12-28 18:02:00'
         if from_date:
-            # Forced from command line
+            # Forced from backend command line.
             last_update = from_date
 
         logging.info("Incremental from: %s" % (last_update))
@@ -99,8 +100,9 @@ class ElasticOcean(object):
         if self.fetch_cache:
             items = self.perceval_backend.fetch_from_cache()
         else:
-            if self.from_date:
-                items = self.perceval_backend.fetch(from_date=self.from_date)
+            if last_update:
+                last_date = parser.parse(last_update)
+                items = self.perceval_backend.fetch(from_date=last_date)
             else:
                 items = self.perceval_backend.fetch()
         for item in items:
@@ -174,7 +176,6 @@ class ElasticOcean(object):
             r = requests.post(url, data = filter_)
 
         else:
-            print (url)
             r = requests.get(url)
 
         items = []
