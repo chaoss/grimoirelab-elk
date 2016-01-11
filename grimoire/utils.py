@@ -152,32 +152,6 @@ def get_params_parser():
     return parser
 
 
-def get_params_parser_old():
-    connectors = get_connectors()
-    parser = argparse.ArgumentParser()
-    ElasticOcean.add_params(parser)
-
-    subparsers = parser.add_subparsers(dest='backend',
-                                       help='perceval backend')
-
-    for cname in connectors:
-        backend_cmd = connectors[cname][3]
-        print(backend_cmd)
-        name = cname
-        subparser = subparsers.add_parser(name, help='p2o %s -h' % name)
-        # backend.add_params(subparser)
-        sparser = backend_cmd.create_argument_parser()
-        print(sparser)
-        raise
-
-    # And now a specific param to do the update until process termination
-    parser.add_argument("--loop",  action='store_true',
-                        help="loop the ocean update until process termination")
-    parser.add_argument("--redis",  default="redis",
-                        help="url for the redis server")
-
-    return parser
-
 def get_params():
     ''' Get params definition from ElasticOcean and from all the backends '''
 
