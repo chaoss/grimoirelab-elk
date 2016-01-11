@@ -24,6 +24,7 @@
 #
 
 from datetime import datetime
+import json
 import logging
 import requests
 import time
@@ -36,6 +37,7 @@ class GerritEnrich(Enrich):
     def __init__(self, gerrit):
         super().__init__()
         self.elastic = None
+        self.type_name = "review"  # type inside the index to store items enriched
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -125,6 +127,13 @@ class GerritEnrich(Enrich):
         mapping = """
         {
             "properties": {
+               "name": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "timeopen": {
+                  "type": "double"
+               },
                "approval_email": {
                   "type": "string",
                   "index":"not_analyzed"
@@ -170,6 +179,52 @@ class GerritEnrich(Enrich):
         """
 
         return {"items":mapping}
+
+
+    def review_item(self, review):
+        # TODO: bot
+
+        self._fix_review_dates(review)
+
+        eitem = {}  # Item enriched
+
+        # Fields that are the same in item and eitem
+        copy_fields = ["status", "branch", "project", "url"]
+        for f in copy_fields:
+            eitem[f] = review[f]
+        # Fields which names are translated
+        map_fields = {"subject": "summary",
+                      "id": "githash",
+                      "createdOn": "opened",
+                      "lastUpdated_date": "closed"
+                      }
+        for fn in map_fields:
+            eitem[map_fields[fn]] = review[fn]
+        if 'name' in review['owner']:
+            eitem["name"] = review['owner']['name']
+        else:
+            eitem["name"] = None
+        # New fields generated for enrichment
+        identity = GerritEnrich.get_sh_identity(review['owner'])
+        ruuid = self.get_uuid(identity, self.get_connector_name())
+        eitem["uuid"] = ruuid
+        eitem["bot"] = 0  # Not supported yet
+        eitem["patchsets"] = len(review["patchSets"])
+
+        # Time to add the time diffs
+        createdOn_date = \
+            datetime.strptime(review['createdOn'], "%Y-%m-%dT%H:%M:%S")
+        updatedOn_date = \
+            datetime.strptime(review['lastUpdated_date'], "%Y-%m-%dT%H:%M:%S")
+        seconds_day = float(60*60*24)
+        timeopen = \
+            (updatedOn_date-createdOn_date).total_seconds() / seconds_day
+        eitem["timeopen"] =  '%.2f' % timeopen
+
+        bulk_json = '{"index" : {"_id" : "%s" } }\n' % (eitem["githash"])  # Bulk operation
+        bulk_json += json.dumps(eitem)+"\n"
+
+        return bulk_json
 
 
     def review_events(self, review):
@@ -284,7 +339,7 @@ class GerritEnrich(Enrich):
         """ Fetch in ES patches and comments (events) as documents """
 
         def send_bulk_json(bulk_json, current):
-            url_bulk = self.elastic.index_url+'/reviews_events/_bulk'
+            url_bulk = self.elastic.index_url+'/'+self.type_name+'/_bulk'
             try:
                 task_init = time.time()
                 requests.put(url_bulk, data=bulk_json)
@@ -307,7 +362,8 @@ class GerritEnrich(Enrich):
                 total += current
                 current = 0
                 bulk_json = ""
-            data_json = self.review_events(review)
+            # data_json = self.review_events(review)
+            data_json = self.review_item(review)
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         send_bulk_json(bulk_json, current)
