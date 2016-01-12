@@ -24,7 +24,6 @@
 #
 
 import argparse
-from datetime import datetime
 import json
 import logging
 from os import sys
@@ -140,6 +139,7 @@ def create_search(elastic_url, dashboard, index_pattern):
     new_search_source = json.dumps(new_search_source)
     search_json['kibanaSavedObjectMeta']['searchSourceJSON'] = new_search_source
 
+    search_json['title'] += " " + index_pattern
     new_search_id = search_id+"__"+index_pattern
 
     url = elastic.index_url+"/search/"+new_search_id
@@ -231,6 +231,62 @@ def create_dashboard(elastic_url, dashboard, enrich_index):
     """ Create a new dashboard using dashboard as template 
         and reading the data from enriched_index """
 
+    def new_panels(elastic, panels, search_id):
+        """ Create the new panels and their vis for the dashboard from the
+            panels in the template dashboard """
+
+        dash_vis_ids = []
+        new_panels = []
+        for panel in panels:
+            if panel['type'] in ['visualization', 'search']:
+                if panel['type'] == 'visualization':
+                    dash_vis_ids.append(panel['id'])
+                panel['id'] += "__"+enrich_index
+                if panel['type'] == 'search':
+                    panel['id'] = search_id
+            new_panels.append(panel)
+
+        create_vis(elastic, dash_vis_ids, search_id)
+
+
+        return new_panels
+
+    def create_vis(elastic, dash_vis_ids, search_id):
+        """ Create new visualizations for the dashboard """
+
+        # Create visualizations for the new dashboard
+        item_template_url = elastic.index_url+"/visualization"
+        # Hack: Get all vis if they are <10000. Use scroll API to get all.
+        # Better: use mget to get all vis in dash_vis_ids
+        item_template_url_search = item_template_url+"/_search?size=10000"
+        r = requests.get(item_template_url_search)
+        all_visualizations =r.json()['hits']['hits']
+
+        visualizations = []
+        for vis in all_visualizations:
+            if vis['_id'] in dash_vis_ids:
+                visualizations.append(vis)
+
+        logging.info("Total template vis found: %i" % (len(visualizations)))
+
+        for vis in visualizations:
+            vis_data = vis['_source']
+            vis_name = vis['_id'].split("_")[-1]
+            vis_id = vis_name+"__"+enrich_index
+            vis_data['title'] = vis_id
+            vis_meta = json.loads(vis_data['kibanaSavedObjectMeta']['searchSourceJSON'])
+            vis_meta['index'] = enrich_index
+            vis_data['kibanaSavedObjectMeta']['searchSourceJSON'] = json.dumps(vis_meta)
+            if "savedSearchId" in vis_data:
+                vis_data["savedSearchId"] = search_id
+
+            url = item_template_url+"/"+vis_id
+
+            r = requests.post(url, data = json.dumps(vis_data))
+            logging.debug("Created new vis %s" % (url))
+
+
+
     # First create always the index pattern as data source
     index_pattern = create_index_pattern(elastic_url, dashboard, enrich_index)
     # If search is used create a new search with the new index_pàttern
@@ -239,82 +295,27 @@ def create_dashboard(elastic_url, dashboard, enrich_index):
     es_index = "/.kibana"
     elastic = get_elastic(elastic_url, es_index)
 
-    # Create the new dashboard
+    # Create the new dashboard from the template
     dash_data = get_dashboard_json(elastic, dashboard)
-
-    dash_vis_ids = []
-
     dash_data['title'] = enrich_index
-    # Update visualizations
+    # Load template panels to create the new ones with their new vis
     panels = json.loads(dash_data['panelsJSON'])
-    new_panels = []
-    for panel in panels:
-        if panel['type'] == 'visualization':
-            dash_vis_ids.append(panel['id'])
-            vid = panel['id'].split("_")[-1]
-            panel['id'] = vid+"__"+enrich_index
-        new_panels.append(panel)
-    dash_data['panelsJSON'] = json.dumps(new_panels)
-
+    dash_data['panelsJSON'] = json.dumps(new_panels(elastic, panels, search_id))
     url = elastic.index_url+"/dashboard/"+dashboard+"__"+enrich_index
-    r = requests.post(url, data = json.dumps(dash_data))
-
-
-    # Create visualizations for the new dashboard
-    item_template_url = elastic.index_url+"/visualization"
-    # Hack: Get all vis if they are <10000. Use scroll API to get all.
-    # Better: use mget to get all vis in dash_vis_ids
-    item_template_url_search = item_template_url+"/_search?size=10000"
-
-    r = requests.get(item_template_url_search)
-
-    all_visualizations =r.json()['hits']['hits']
-
-    visualizations = []
-    for vis in all_visualizations:
-        if vis['_id'] in dash_vis_ids:
-            visualizations.append(vis)
-
-    logging.info("Total template vis found: %i" % (len(visualizations)))
-
-    # Time to add all visualizations for new dashboard
-    for vis in visualizations:
-        vis_data = vis['_source']
-        vis_name = vis['_id'].split("_")[-1]
-        vis_id = vis_name+"__"+enrich_index
-        vis_data['title'] = vis_id
-        vis_meta = json.loads(vis_data['kibanaSavedObjectMeta']['searchSourceJSON'])
-        vis_meta['index'] = enrich_index
-        vis_data['kibanaSavedObjectMeta']['searchSourceJSON'] = json.dumps(vis_meta)
-        if "savedSearchId" in vis_data:
-            vis_data["savedSearchId"] = search_id
-
-        url = item_template_url+"/"+vis_id
-
-        r = requests.post(url, data = json.dumps(vis_data))
-        logging.debug("Created new vis %s" % (url))
+    requests.post(url, data = json.dumps(dash_data))
 
 
 if __name__ == '__main__':
 
-    app_init = datetime.now()
-
     args = get_params()
-
-    print(args)
 
     config_logging(args.debug)
 
     try:
-        # Time to create Kibana dashbnoard
-        logging.info("Generating Kibana dashboard")
         create_dashboard(args.elastic_url, args.dashboard, args.index)
-
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
         sys.exit(0)
 
 
-    total_time_min = (datetime.now()-app_init).total_seconds()/60
-
-    logging.info("Finished in %.2f min" % (total_time_min))
+    logging.info("Kibana dashboard generated %s" % (args.index))
