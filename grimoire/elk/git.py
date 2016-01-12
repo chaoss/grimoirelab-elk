@@ -28,9 +28,15 @@ import requests
 
 from grimoire.elk.enrich import Enrich
 
+from sortinghat import api
+from sortinghat.db.model import UniqueIdentity, Identity, Profile,\
+    Organization, Domain, Country, Enrollment
+
+
 class GitEnrich(Enrich):
 
     def __init__(self, git):
+        super().__init__()
         self.elastic = None
         self.perceval_backend = git
         self.index_git = "git"
@@ -62,14 +68,22 @@ class GitEnrich(Enrich):
         identity = {}
         name = git_user.split("<")[0]
         email = git_user.split("<")[1][:-1]
-        identity['username'] = name
+        identity['username'] = None  # git does not have username
         identity['email'] = email
         identity['name'] = name
         return identity
 
 
     def get_rich_commit(self, commit):
-        # Don't enrich anything yet
+        # Enrich SH
+        identity  = self.get_sh_identity(commit["Author"])
+        commit["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
+        enrollments = api.enrollments(self.sh_db, uuid=commit["author_uuid"])
+        # TODO: get the org_name for the current commit time
+        if len(enrollments) > 0:
+            commit["org_name"] = enrollments[0].organization.name
+        else:
+            commit["org_name"] = None
         return commit
 
     def enrich_items(self, commits):
