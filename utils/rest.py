@@ -23,17 +23,41 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from flask import Flask, request, Response
+import argparse
 import json
+import logging
+
+from flask import Flask, request, Response
+from grimoire.utils import get_params_parser, config_logging
+from grimoire.arthur import feed_backend
 
 app = Flask(__name__)
 
+params_fields = ['p2o_params','e2k_params']  # Params needed to create a dashboard
+
 def check_params(params):
     """Check if we have all params to create the dashboard"""
-    return False
+    check = True
+    for f in params_fields:
+        if f not in params:
+            logging.info("Param not received %s " % (f))
+            check = False
+            break
+    return check
 
 def create_dashboard(params):
     dash_url = "http://localhost:5601"
+    parser = get_params_parser()
+    args = parser.parse_args(params['p2o_params'].split())
+
+    config_logging(args.debug)
+
+    url = args.elastic_url
+
+    clean = fetch_cache = False
+
+    feed_backend(url, clean, fetch_cache, args.backend, args.backend_args)
+
     return dash_url
 
 @app.route("/api/dashboard",methods = ['POST'])
@@ -43,10 +67,16 @@ def dashboard():
         params = request.json
         print(request.json)
         if not check_params(params):
-            resp = Response(json.dumps(params), status=502, mimetype='application/json')
+            error = "Error in params. Please include %s" % (", ".join(params_fields))
+            msg = {"params": json.dumps(params), \
+                   "error": error}
+            resp = Response(json.dumps(msg), status=400, mimetype='application/json')
             return resp
-        url = create_dashboard(params)
-        return url
+        else:
+            url = create_dashboard(params)
+            msg = json.dumps({"url": url})
+            resp = Response(msg, status=200, mimetype='application/json')
+        return resp
 
 
 if __name__ == "__main__":
