@@ -33,7 +33,7 @@ from grimoire.arthur import feed_backend, enrich_backend
 from grimoire.ocean.conf import ConfOcean
 
 from grimoire.utils import get_elastic
-from grimoire.utils import get_params_parser, config_logging, get_connectors
+from grimoire.utils import get_params_parser, config_logging
 
 from redis import Redis
 from rq import Queue
