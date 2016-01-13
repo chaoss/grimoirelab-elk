@@ -26,12 +26,11 @@ import json
 import logging
 import requests
 
+from dateutil import parser
+
 from grimoire.elk.enrich import Enrich
 
 from sortinghat import api
-from sortinghat.db.model import UniqueIdentity, Identity, Profile,\
-    Organization, Domain, Country, Enrollment
-
 
 class GitEnrich(Enrich):
 
@@ -48,10 +47,29 @@ class GitEnrich(Enrich):
         return "CommitDate"
 
     def get_field_unique_id(self):
-        return "commit"
+        return "hash"
 
     def get_fields_uuid(self):
         return ["author_uuid", "committer_uuid"]
+
+    def get_elastic_mappings(self):
+
+        mapping = """
+        {
+            "properties": {
+               "author_name": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "org_name": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               }
+            }
+        } """
+
+        return {"items":mapping}
+
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -75,16 +93,43 @@ class GitEnrich(Enrich):
 
 
     def get_rich_commit(self, commit):
+        eitem = {}
+        # Fields that are the same in item and eitem
+        copy_fields = ["message"]
+        for f in copy_fields:
+            eitem[f] = commit[f]
+        # Fields which names are translated
+        map_fields = {"commit": "hash"}
+        for fn in map_fields:
+            eitem[map_fields[fn]] = commit[fn]
+        # Enrich dates
+        author_date = parser.parse(commit["AuthorDate"])
+        commit_date = parser.parse(commit["CommitDate"])
+        eitem["author_date"] = author_date.replace(tzinfo=None).isoformat()
+        eitem["commit_date"] = commit_date.replace(tzinfo=None).isoformat()
+        eitem["utc_author"] = (author_date-author_date.utcoffset()).replace(tzinfo=None).isoformat()
+        eitem["utc_commit"] = (commit_date-commit_date.utcoffset()).replace(tzinfo=None).isoformat()
+        eitem["tz"]  = int(commit_date.strftime("%z")[0:3])
         # Enrich SH
         identity  = self.get_sh_identity(commit["Author"])
-        commit["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
-        enrollments = api.enrollments(self.sh_db, uuid=commit["author_uuid"])
+        eitem["author_name"] = identity['name']
+        eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
+        enrollments = api.enrollments(self.sh_db, uuid=eitem["author_uuid"])
         # TODO: get the org_name for the current commit time
         if len(enrollments) > 0:
-            commit["org_name"] = enrollments[0].organization.name
+            eitem["org_name"] = enrollments[0].organization.name
         else:
-            commit["org_name"] = None
-        return commit
+            eitem["org_name"] = None
+        # bot
+        u = api.unique_identities(self.sh_db, eitem["author_uuid"])[0]
+        if u.profile:
+            eitem["bot"] = u.profile.is_bot
+        else:
+            eitem["bot"] = None
+        # Other enrichment
+        eitem["repo_name"] = self.perceval_backend.unique_id
+
+        return eitem
 
     def enrich_items(self, commits):
         max_items = self.elastic.max_items_bulk
