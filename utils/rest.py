@@ -27,9 +27,14 @@ import argparse
 import json
 import logging
 
+from redis import Redis
+from rq import Queue
+
 from flask import Flask, request, Response
-from grimoire.utils import get_params_parser, config_logging
-from grimoire.arthur import feed_backend
+from grimoire.utils import get_params_parser, config_logging, get_connectors
+from grimoire.arthur import feed_backend, enrich_backend
+
+from e2k import create_dashboard, get_params_parser_create_dash
 
 app = Flask(__name__)
 
@@ -45,18 +50,52 @@ def check_params(params):
             break
     return check
 
-def create_dashboard(params):
-    dash_url = "http://localhost:5601"
+def get_backend_id(backend_name, backend_params):
+
+    if backend_name not in get_connectors():
+        raise RuntimeError("Unknown backend %s" % backend_name)
+    connector = get_connectors()[backend_name]
+    klass = connector[3]  # BackendCmd for the connector
+
+    backend_cmd = klass(*backend_params)
+
+    backend = backend_cmd.backend
+
+    return backend.unique_id
+
+def build_dashboard(params):
     parser = get_params_parser()
+    parser_create_dash = get_params_parser_create_dash()
     args = parser.parse_args(params['p2o_params'].split())
 
     config_logging(args.debug)
 
     url = args.elastic_url
+    clean = False
+    async_ = True
 
-    clean = fetch_cache = False
+    q = Queue('create', connection=Redis(args.redis), async=async_)
+    task_feed = q.enqueue(feed_backend, url, clean, args.fetch_cache,
+                          args.backend, args.backend_args)
+    q = Queue('enrich', connection=Redis(args.redis), async=async_)
+    if async_:
+        # Task enrich after feed
+        result = q.enqueue(enrich_backend, url, clean,
+                           args.backend, args.backend_args,
+                           depends_on=task_feed)
+    else:
+        result = q.enqueue(enrich_backend, url, clean,
+                           args.backend, args.backend_args)
 
-    feed_backend(url, clean, fetch_cache, args.backend, args.backend_args)
+    result = q.enqueue(enrich_backend, url, clean,
+                       args.backend, args.backend_args,
+                       depends_on=task_feed)
+    # The creation of the dashboard is quick. Do it sync and return the URL.
+    enrich_index = args.backend+"_"
+    enrich_index += get_backend_id(args.backend, args.backend_args)+"_enrich"
+    args = parser_create_dash.parse_args(params['e2k_params'].split())
+    kibana_host = "http://localhost:5601"
+    dash_url = create_dashboard(args.elastic_url, args.dashboard, enrich_index, kibana_host)
 
     return dash_url
 
@@ -73,7 +112,7 @@ def dashboard():
             resp = Response(json.dumps(msg), status=400, mimetype='application/json')
             return resp
         else:
-            url = create_dashboard(params)
+            url = build_dashboard(params)
             msg = json.dumps({"url": url})
             resp = Response(msg, status=200, mimetype='application/json')
         return resp
