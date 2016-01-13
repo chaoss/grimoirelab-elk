@@ -25,6 +25,7 @@ RUN apt-get update && \
         python python3 pep8 \
         python3-requests python3-dateutil python3-bs4 \
         python3-pip python3-dev python3-redis python3-sqlalchemy \
+        python3-flask \
         gcc make libmysqlclient-dev mariadb-client \
         unzip curl wget sudo vim ssh \
         && \
@@ -35,6 +36,10 @@ RUN apt-get update && \
 RUN pip3 install mysqlclient
 # rq tasks queue
 RUN pip3 install rq && pip3 install rq-dashboard
+# Fix bug in 0.3.5: https://github.com/nvie/rq-dashboard/pull/89/files
+RUN sed -i /usr/local/lib/python3.4/dist-packages/rq_dashboard/__init__.py \
+    -e "s/import default_settings/from . import default_settings/" \
+    -e "s/from web import blueprint/from .web import blueprint/"
 
 RUN echo "${DEPLOY_USER}    ALL=NOPASSWD: ALL" >> /etc/sudoers
 
