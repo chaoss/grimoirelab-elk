@@ -125,7 +125,7 @@ class GitEnrich(Enrich):
         if u.profile:
             eitem["bot"] = u.profile.is_bot
         else:
-            eitem["bot"] = None
+            eitem["bot"] = 0  # By default, identities are not bots
         # Other enrichment
         eitem["repo_name"] = self.perceval_backend.unique_id
 
