@@ -45,8 +45,8 @@ gelk:
         - elasticsearch
         - redis
         - mariadb
-    # ports:
-    #     - 9181:9181
+    ports:
+        - 5000:5000
     expose:
         - "9181"
     volumes:
