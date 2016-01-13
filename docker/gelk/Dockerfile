@@ -35,11 +35,9 @@ RUN apt-get update && \
 # Not available as package in Debian 8 python3-myssqldb
 RUN pip3 install mysqlclient
 # rq tasks queue
-RUN pip3 install rq && pip3 install rq-dashboard
-# Fix bug in 0.3.5: https://github.com/nvie/rq-dashboard/pull/89/files
-RUN sed -i /usr/local/lib/python3.4/dist-packages/rq_dashboard/__init__.py \
-    -e "s/import default_settings/from . import default_settings/" \
-    -e "s/from web import blueprint/from .web import blueprint/"
+RUN pip3 install rq && pip3 install rq-dashboard==0.3.4
+# Bug in 0.3.5: https://github.com/nvie/rq-dashboard/pull/89/files
+# In 0.3.5 workers don't appear in the dashboard
 
 RUN echo "${DEPLOY_USER}    ALL=NOPASSWD: ALL" >> /etc/sudoers
 
