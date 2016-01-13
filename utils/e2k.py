@@ -38,7 +38,7 @@ E2K_USAGE_MSG = ""
 E2K_USAGE_MSG = ""
 E2K_MSG = ""
 
-def get_params():
+def get_params_parser_create_dash():
     """Parse command line arguments"""
 
     parser = argparse.ArgumentParser(usage=E2K_USAGE_MSG,
@@ -53,6 +53,10 @@ def get_params():
     parser.add_argument("-i", "--index", help="enriched index to be used as data source")
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
 
+    return parser
+
+def get_params():
+    parser = get_params_parser_create_dash()
     args = parser.parse_args()
 
     return args
@@ -227,7 +231,7 @@ def create_index_pattern(elastic_url, dashboard, enrich_index):
 
     return enrich_index
 
-def create_dashboard(elastic_url, dashboard, enrich_index):
+def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host):
     """ Create a new dashboard using dashboard as template 
         and reading the data from enriched_index """
 
@@ -286,7 +290,6 @@ def create_dashboard(elastic_url, dashboard, enrich_index):
             logging.debug("Created new vis %s" % (url))
 
 
-
     # First create always the index pattern as data source
     index_pattern = create_index_pattern(elastic_url, dashboard, enrich_index)
     # If search is used create a new search with the new index_pàttern
@@ -301,21 +304,26 @@ def create_dashboard(elastic_url, dashboard, enrich_index):
     # Load template panels to create the new ones with their new vis
     panels = json.loads(dash_data['panelsJSON'])
     dash_data['panelsJSON'] = json.dumps(new_panels(elastic, panels, search_id))
-    url = elastic.index_url+"/dashboard/"+dashboard+"__"+enrich_index
+    dash_path = "/dashboard/"+dashboard+"__"+enrich_index
+    url = elastic.index_url+dash_path
     requests.post(url, data = json.dumps(dash_data))
 
+    dash_url = kibana_host+"/app/kibana#"+dash_path
+    return dash_url
 
 if __name__ == '__main__':
 
     args = get_params()
 
     config_logging(args.debug)
+    # TODO: Use param to build a real URL if possible
+    kibana_host = "http://localhost:5601"
 
     try:
-        create_dashboard(args.elastic_url, args.dashboard, args.index)
+        url = create_dashboard(args.elastic_url, args.dashboard, args.index, kibana_host)
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
         sys.exit(0)
 
 
-    logging.info("Kibana dashboard generated %s" % (args.index))
+    logging.info("Kibana dashboard generated %s" % (url))
