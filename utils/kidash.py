@@ -158,8 +158,6 @@ if __name__ == '__main__':
     args = get_params()
 
     config_logging(args.debug)
-    # TODO: Use param to build a real URL if possible
-    kibana_host = "http://localhost:5601"
 
     if args.import_file:
         import_dashboard(args.elastic_url, args.import_file)
