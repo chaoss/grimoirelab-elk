@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# Import and Export Kibana dashborads
+# Import and Export Kibana dashboards
 #
 # Copyright (C) 2015 Bitergia
 #
@@ -122,6 +122,7 @@ def export_dashboard(elastic_url, dash_id, export_file):
               "index_patterns": [],
               "searches": []}
 
+    # Used to avoid having duplicates
     search_ids_done = []
     index_ids_done = []
 
@@ -132,8 +133,10 @@ def export_dashboard(elastic_url, dash_id, export_file):
     kibana["dashboard"] = {"id":dash_id, "value":get_dashboard_json(elastic, dash_id)}
 
     if "panelsJSON" not in kibana["dashboard"]["value"]:
+        # The dashboard is empty. No visualizations included.
         return kibana
 
+    # Export all visualizations and the index patterns and searches in them
     for panel in json.loads(kibana["dashboard"]["value"]["panelsJSON"]):
         if panel['type'] in ['visualization']:
             vis_id = panel['id']
