@@ -86,6 +86,39 @@ def get_vis_json(elastic, vis):
 
     return vis_json['_source']
 
+def get_search_json(elastic, search_id):
+    search_json_url = elastic.index_url+"/search/"+search_id
+
+    r = requests.get(search_json_url)
+
+    search_json = r.json()
+    if "_source" not in search_json:
+        logging.error("Can not find search: %s (%s)" % (search_json_url))
+        return
+    return search_json['_source']
+
+def get_index_pattern_json(elastic, index_pattern):
+    index_pattern_json_url = elastic.index_url+"/index-pattern/"+index_pattern
+
+    r = requests.get(index_pattern_json_url)
+
+    index_pattern_json = r.json()
+    if "_source" not in index_pattern_json:
+        logging.error("Can not find search: %s (%s)" % (index_pattern_json_url))
+        return
+    return index_pattern_json['_source']
+
+def get_search_from_vis(elastic, vis):
+    search_id = None
+    vis_json = get_vis_json(elastic, vis)
+    if not vis_json:
+        search_id
+    # The index pattern could be in search or in state
+    # First search for it in saved search
+    if "savedSearchId" in vis_json:
+        search_id = vis_json["savedSearchId"]
+    return search_id
+
 
 def create_search(elastic_url, dashboard, index_pattern):
     """ Create the base search for vis if used
@@ -95,17 +128,6 @@ def create_search(elastic_url, dashboard, index_pattern):
         :param enrich_index: ES index with enriched items used in the new dashboard
 
     """
-
-    def get_search_from_vis(elastic, vis):
-        search_id = None
-        vis_json = get_vis_json(elastic, vis)
-        if not vis_json:
-            search_id
-        # The index pattern could be in search or in state
-        # First search for it in saved search
-        if "savedSearchId" in vis_json:
-            search_id = vis_json["savedSearchId"]
-        return search_id
 
     search_id = None
     es_index = "/.kibana"
@@ -134,9 +156,7 @@ def create_search(elastic_url, dashboard, index_pattern):
 
     logging.debug("Found template search %s" % (search_id))
 
-    search_json_url = elastic.index_url+"/search/"+search_id
-    search_json = requests.get(search_json_url).json()["_source"]
-
+    search_json = get_search_json(elastic, search_id)
     search_source = search_json['kibanaSavedObjectMeta']['searchSourceJSON']
     new_search_source = json.loads(search_source)
     new_search_source['index'] = index_pattern
@@ -153,6 +173,32 @@ def create_search(elastic_url, dashboard, index_pattern):
 
     return new_search_id
 
+def get_index_pattern_from_meta(meta_data):
+    index = None
+    mdata = meta_data["searchSourceJSON"]
+    mdata = json.loads(mdata)
+    if "index" in mdata:
+        index = mdata["index"]
+    if "filter" in mdata:
+        if len(mdata["filter"]) > 0:
+            index = mdata["filter"][0]["meta"]["index"]
+    return index
+
+def get_index_pattern_from_vis(elastic, vis):
+    index_pattern = None
+    vis_json = get_vis_json(elastic, vis)
+    if not vis_json:
+        return
+    # The index pattern could be in search or in state
+    # First search for it in saved search
+    if "savedSearchId" in vis_json:
+        search_json_url = elastic.index_url+"/search/"+vis_json["savedSearchId"]
+        search_json = requests.get(search_json_url).json()["_source"]
+        index_pattern = get_index_pattern_from_meta(search_json["kibanaSavedObjectMeta"])
+    elif "kibanaSavedObjectMeta" in vis_json:
+        index_pattern = get_index_pattern_from_meta(vis_json["kibanaSavedObjectMeta"])
+    return index_pattern
+
 
 def create_index_pattern(elastic_url, dashboard, enrich_index):
     """ Create a index pattern using as template the index pattern 
@@ -163,32 +209,6 @@ def create_index_pattern(elastic_url, dashboard, enrich_index):
         :param enrich_index: ES index with enriched items used in the new dashboard
 
     """
-
-    def get_index_pattern_from_meta(meta_data):
-        index = None
-        mdata = meta_data["searchSourceJSON"]
-        mdata = json.loads(mdata)
-        if "index" in mdata:
-            index = mdata["index"]
-        if "filter" in mdata:
-            if len(mdata["filter"]) > 0:
-                index = mdata["filter"][0]["meta"]["index"]
-        return index
-
-    def get_index_pattern_from_vis(elastic, vis):
-        index_pattern = None
-        vis_json = get_vis_json(elastic, vis)
-        if not vis_json:
-            return
-        # The index pattern could be in search or in state
-        # First search for it in saved search
-        if "savedSearchId" in vis_json:
-            search_json_url = elastic.index_url+"/search/"+vis_json["savedSearchId"]
-            search_json = requests.get(search_json_url).json()["_source"]
-            index_pattern = get_index_pattern_from_meta(search_json["kibanaSavedObjectMeta"])
-        elif "kibanaSavedObjectMeta" in vis_json:
-            index_pattern = get_index_pattern_from_meta(vis_json["kibanaSavedObjectMeta"])
-        return index_pattern
 
     index_pattern = None
     es_index = "/.kibana"
@@ -218,8 +238,8 @@ def create_index_pattern(elastic_url, dashboard, enrich_index):
 
     logging.debug("Found %s template index pattern" % (index_pattern))
 
-    index_pattern_json_url = elastic.index_url+"/index-pattern/"+index_pattern
-    index_pattern_json = requests.get(index_pattern_json_url).json()
+
+    index_pattern_json = get_index_pattern_json(elastic, index_pattern)
 
     new_index_pattern_json = index_pattern_json["_source"]
 
