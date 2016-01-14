@@ -70,7 +70,7 @@ def get_dashboard_json(elastic, dashboard):
     if "_source" not in dash_json:
         logging.error("Can not find dashboard: %s" % (dashboard))
         print (dash_json_url)
-        raise
+        sys.exit(1)
 
     return dash_json['_source']
 
