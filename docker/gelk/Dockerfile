@@ -59,10 +59,8 @@ RUN git clone https://github.com/MetricsGrimoire/sortinghat.git && \
 RUN git clone https://github.com/acs/GrimoireELK
 
 # get Perceval repository, configure arthur branch
-# RUN git clone https://github.com/grimoirelab/perceval.git && \
-RUN git clone https://github.com/acs/perceval-1.git && \
-    cd perceval-1 && git checkout arthur && \
-    sudo python3 setup.py install
+RUN git clone https://github.com/grimoirelab/perceval.git && \
+    cd perceval && sudo python3 setup.py install
 
 ADD init-gelk ${DEPLOY_USER_DIR}/
 
