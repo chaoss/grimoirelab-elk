@@ -32,7 +32,7 @@ from grimoire.ocean.elastic import ElasticOcean
 class GerritOcean(ElasticOcean):
 
     def get_field_date(self):
-        return "lastUpdated_date"
+        return "__metadata__updated_on"
 
     def get_elastic_mappings(self):
 
@@ -57,6 +57,7 @@ class GerritOcean(ElasticOcean):
         return "id"
 
     def add_update_date(self, item):
-        entry_lastUpdated = \
-            datetime.fromtimestamp(item['lastUpdated'])
-        item['lastUpdated_date'] = entry_lastUpdated.isoformat()
+        entry_lastUpdated = datetime.fromtimestamp(item['__metadata__']['updated_on'])
+        # Use local server time for incremental updates
+        update = entry_lastUpdated.replace(tzinfo=None)
+        item['__metadata__updated_on'] = update.isoformat()

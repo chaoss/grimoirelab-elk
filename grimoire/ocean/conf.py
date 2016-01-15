@@ -52,16 +52,17 @@ class ConfOcean(object):
 
 
     @classmethod
-    def add_repo(cls, repo_id, repo):
+    def add_repo(cls, unique_id, repo):
         ''' Add a new perceval repository with its arguments '''
 
         if cls.elastic is None:
             logging.error("Can't add repo to conf. Ocean elastic is not configured")
             return
 
-        url = cls.elastic.url + "/" + cls.conf_repos + "/" + repo_id
+        url = cls.elastic.url + "/" + cls.conf_repos + "/"
+        url += cls.elastic.safe_index(unique_id)
 
-        logging.debug("Addding repo to Ocean %s %s" % (url, repo))
+        logging.debug("Adding repo to Ocean %s %s" % (url, repo))
 
         requests.post(url, data = json.dumps(repo))
 

@@ -57,9 +57,9 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params):
         ocean_backend = connector[1](backend, fetch_cache = fetch_cache)
 
         logging.info("Feeding Ocean from %s (%s)" % (backend_name,
-                                                     backend.unique_id))
+                                                     backend.origin))
 
-        es_index = backend_name + "_" + backend.unique_id
+        es_index = backend_name + "_" + backend.origin
         elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
 
         ocean_backend.set_elastic(elastic_ocean)
@@ -75,7 +75,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params):
     except Exception as ex:
         if backend:
             logging.error("Error feeding ocean from %s (%s): %s" %
-                          (backend_name, backend.unique_id, ex))
+                          (backend_name, backend.origin, ex))
             traceback.print_exc()
         else:
             logging.error("Error feeding ocean %s" % ex)
@@ -234,7 +234,7 @@ def enrich_backend(url, clean, backend_name, backend_params):
 
         backend = backend_cmd.backend
 
-        ocean_index = backend_name + "_" + backend.unique_id
+        ocean_index = backend_name + "_" + backend.origin
         enrich_index = ocean_index+"_enrich"
 
 
@@ -271,7 +271,7 @@ def enrich_backend(url, clean, backend_name, backend_params):
         traceback.print_exc()
         if backend:
             logging.error("Error enriching ocean from %s (%s): %s" %
-                          (backend_name, backend.unique_id, ex))
+                          (backend_name, backend.origin, ex))
         else:
             logging.error("Error enriching ocean %s" % ex)
 

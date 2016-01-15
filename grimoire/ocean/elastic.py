@@ -78,7 +78,7 @@ class ElasticOcean(object):
         return False
 
     def add_update_date(self, item):
-        """ Add and update date field if needed """
+        """ Add and update date field if needed for incremental updates """
         pass
 
     def feed(self, from_date = None):
@@ -101,8 +101,10 @@ class ElasticOcean(object):
             items = self.perceval_backend.fetch_from_cache()
         else:
             if last_update:
-                last_date = parser.parse(last_update)
-                items = self.perceval_backend.fetch(from_date=last_date)
+                # Perceval backend from_date must not include timezone
+                # It always uses the server datetime
+                last_update = last_update.replace(tzinfo=None)
+                items = self.perceval_backend.fetch(from_date=last_update)
             else:
                 items = self.perceval_backend.fetch()
         for item in items:

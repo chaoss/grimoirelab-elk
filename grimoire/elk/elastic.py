@@ -39,11 +39,17 @@ class ElasticWriteException(Exception):
 
 class ElasticSearch(object):
 
+    @classmethod
+    def safe_index(cls, unique_id):
+        """ Return a valid elastic index generated from unique_id """
+        return unique_id.replace("/","_").lower()
+
     def __init__(self, url, index, mappings = None, clean = False):
         ''' clean: remove already existing index '''
 
         self.url = url
-        self.index = index
+        # Valid index for elastic
+        self.index = self.safe_index(index)
         self.index_url = self.url+"/"+self.index
         self.max_items_bulk = 100
         self.wait_bulk_seconds = 2  # time to wait to complete a bulk operation
@@ -176,13 +182,11 @@ class ElasticSearch(object):
         if 'aggregations' in res_json:
             if "value_as_string" in res_json["aggregations"]["1"]:
                 last_date = res_json["aggregations"]["1"]["value_as_string"]
-                last_date = parser.parse(last_date).replace(tzinfo=None)
-                last_date = last_date.isoformat(" ")
+                last_date = parser.parse(last_date)
             else:
                 last_date = res_json["aggregations"]["1"]["value"]
                 if last_date:
                     last_date = datetime.fromtimestamp(last_date)
-                    last_date = last_date.isoformat(" ")
 
         return last_date
 
