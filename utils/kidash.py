@@ -32,7 +32,7 @@ import sys
 
 from grimoire.ocean.elastic import ElasticOcean
  
-from grimoire.utils import get_elastic
+from grimoire.elk.elastic import ElasticSearch
 from grimoire.utils import config_logging
 from e2k import get_dashboard_json, get_vis_json, get_search_json, get_index_pattern_json
 from e2k import get_search_from_vis, get_index_pattern_from_vis
@@ -65,8 +65,10 @@ def get_params():
     return args
 
 def list_dashboards(elastic_url):
-    es_index = "/.kibana"
-    elastic = get_elastic(elastic_url, es_index)
+    es_index = ".kibana"
+
+    elastic = ElasticSearch(elastic_url, es_index)
+
     dash_json_url = elastic.index_url+"/dashboard/_search?size=10000"
 
     print (dash_json_url)
@@ -93,8 +95,8 @@ def import_dashboard(elastic_url, import_file):
             logging.error("Wrong file format. Can't find 'dashboard' field.")
             sys.exit(1)
 
-        es_index = "/.kibana"
-        elastic = get_elastic(elastic_url, es_index)
+        es_index = ".kibana"
+        elastic = ElasticSearch(elastic_url, es_index)
 
         url = elastic.index_url+"/dashboard/"+kibana['dashboard']['id']
         requests.post(url, data = json.dumps(kibana['dashboard']['value']))
@@ -127,8 +129,9 @@ def export_dashboard(elastic_url, dash_id, export_file):
     index_ids_done = []
 
     logging.debug("Exporting dashboard %s to %s" % (args.dashboard, args.export_file))
-    es_index = "/.kibana"
-    elastic = get_elastic(elastic_url, es_index)
+    es_index = ".kibana"
+
+    elastic = ElasticSearch(elastic_url, es_index)
 
     kibana["dashboard"] = {"id":dash_id, "value":get_dashboard_json(elastic, dash_id)}
 
