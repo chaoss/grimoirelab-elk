@@ -196,7 +196,7 @@ class GerritEnrich(Enrich):
         map_fields = {"subject": "summary",
                       "id": "githash",
                       "createdOn": "opened",
-                      "lastUpdated_date": "closed"
+                      "__metadata__updated_on": "closed"
                       }
         for fn in map_fields:
             eitem[map_fields[fn]] = review[fn]
@@ -215,7 +215,7 @@ class GerritEnrich(Enrich):
         createdOn_date = \
             datetime.strptime(review['createdOn'], "%Y-%m-%dT%H:%M:%S")
         updatedOn_date = \
-            datetime.strptime(review['lastUpdated_date'], "%Y-%m-%dT%H:%M:%S")
+            datetime.strptime(review['__metadata__updated_on'], "%Y-%m-%dT%H:%M:%S")
         seconds_day = float(60*60*24)
         timeopen = \
             (updatedOn_date-createdOn_date).total_seconds() / seconds_day
