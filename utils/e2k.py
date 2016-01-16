@@ -31,7 +31,8 @@ import requests
 
 from grimoire.ocean.elastic import ElasticOcean
  
-from grimoire.utils import get_elastic
+
+from grimoire.elk.elastic import ElasticSearch
 from grimoire.utils import config_logging
 
 E2K_USAGE_MSG = ""
@@ -130,8 +131,8 @@ def create_search(elastic_url, dashboard, index_pattern):
     """
 
     search_id = None
-    es_index = "/.kibana"
-    elastic = get_elastic(elastic_url, es_index)
+    es_index = ".kibana"
+    elastic = ElasticSearch(elastic_url, es_index)
 
     dash_data = get_dashboard_json(elastic, dashboard)
 
@@ -211,8 +212,8 @@ def create_index_pattern(elastic_url, dashboard, enrich_index):
     """
 
     index_pattern = None
-    es_index = "/.kibana"
-    elastic = get_elastic(elastic_url, es_index)
+    es_index = ".kibana"
+    elastic = ElasticSearch(elastic_url, es_index)
 
     dash_data = get_dashboard_json(elastic, dashboard)
 
@@ -239,9 +240,7 @@ def create_index_pattern(elastic_url, dashboard, enrich_index):
     logging.debug("Found %s template index pattern" % (index_pattern))
 
 
-    index_pattern_json = get_index_pattern_json(elastic, index_pattern)
-
-    new_index_pattern_json = index_pattern_json["_source"]
+    new_index_pattern_json = get_index_pattern_json(elastic, index_pattern)
 
     new_index_pattern_json['title'] = enrich_index
     url = elastic.index_url+"/index-pattern/"+enrich_index
@@ -315,8 +314,8 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host):
     # If search is used create a new search with the new index_pàttern
     search_id = create_search(elastic_url, dashboard, index_pattern)
 
-    es_index = "/.kibana"
-    elastic = get_elastic(elastic_url, es_index)
+    es_index = ".kibana"
+    elastic = ElasticSearch(elastic_url, es_index)
 
     # Create the new dashboard from the template
     dash_data = get_dashboard_json(elastic, dashboard)
