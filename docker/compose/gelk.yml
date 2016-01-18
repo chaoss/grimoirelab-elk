@@ -5,7 +5,7 @@ mariadbdata:
     image: mariadb:10.0
     volumes:
         - /var/lib/mysql
-    restart: no
+    restart: "no"
     command: /bin/echo "Data-only container for mariadb."
 
 mariadb:
