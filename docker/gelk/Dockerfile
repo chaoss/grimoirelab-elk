@@ -56,7 +56,7 @@ RUN git clone https://github.com/MetricsGrimoire/sortinghat.git && \
     cd sortinghat && sudo python3 setup.py install
 
 # get GrimoireELK repository
-RUN git clone https://github.com/acs/GrimoireELK
+RUN git clone https://github.com/grimoirelab/GrimoireELK
 
 # get Perceval repository, configure arthur branch
 RUN git clone https://github.com/grimoirelab/perceval.git && \
