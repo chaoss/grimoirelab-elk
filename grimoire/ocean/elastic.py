@@ -28,6 +28,7 @@
 
 from datetime import datetime
 from dateutil import parser
+import json
 import logging
 import requests
 
@@ -151,10 +152,6 @@ class ElasticOcean(object):
         max_process_items_pack_time = "3m"  # 3 minutes
         url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
                                                self.elastic_page)
-        if self.elastic_scroll_id:
-            url = self.elastic.url
-            url += "/_search/scroll?scroll=%s&scroll_id=%s" % (max_process_items_pack_time,
-                                                               self.elastic_scroll_id)
 
         if self.from_date and not self.elastic_scroll_id:
             # The filter in scroll api should be added the first query
@@ -175,10 +172,19 @@ class ElasticOcean(object):
             }
             """ % (date_field, from_date)
 
-            r = requests.post(url, data = filter_)
+            r = requests.post(url, data=filter_)
 
         else:
-            r = requests.get(url)
+            if self.elastic_scroll_id:
+                url = self.elastic.url
+                url += "/_search/scroll"
+                scroll_data = {
+                    "scroll" : max_process_items_pack_time,
+                    "scroll_id" : self.elastic_scroll_id
+                    }
+                r = requests.post(url, data=json.dumps(scroll_data))
+            else:
+                r = requests.get(url)
 
         items = []
         rjson = r.json()
@@ -213,4 +219,3 @@ class ElasticOcean(object):
                 return self.__next__()
             else:
                 raise StopIteration
-
