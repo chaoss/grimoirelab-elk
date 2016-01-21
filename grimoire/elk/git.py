@@ -64,6 +64,10 @@ class GitEnrich(Enrich):
                "org_name": {
                   "type": "string",
                   "index":"not_analyzed"
+               },
+               "repo_name": {
+                  "type": "string",
+                  "index":"not_analyzed"
                }
             }
         } """
@@ -130,7 +134,7 @@ class GitEnrich(Enrich):
         else:
             eitem["bot"] = 0  # By default, identities are not bots
         # Other enrichment
-        eitem["repo_name"] = self.perceval_backend.origin
+        eitem["repo_name"] = commit["__metadata__"]["origin"]
 
         return eitem
 
