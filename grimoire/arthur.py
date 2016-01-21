@@ -54,7 +54,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params):
         backend_cmd = klass(*backend_params)
 
         backend = backend_cmd.backend
-        ocean_backend = connector[1](backend, fetch_cache = fetch_cache)
+        ocean_backend = connector[1](backend, fetch_cache=fetch_cache)
 
         logging.info("Feeding Ocean from %s (%s)" % (backend_name,
                                                      backend.origin))
@@ -66,11 +66,15 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params):
 
         ConfOcean.set_elastic(elastic_ocean)
 
-        if backend_cmd.from_date ==  parser.parse("1970-01-01").replace(tzinfo=None):
-            # Don't use the default value
-            ocean_backend.feed()
+        if backend_name != "git":
+            if backend_cmd.from_date == \
+                parser.parse("1970-01-01").replace(tzinfo=None):
+                # Don't use the default value
+                ocean_backend.feed()
+            else:
+                ocean_backend.feed(backend_cmd.from_date)
         else:
-            ocean_backend.feed(backend_cmd.from_date)
+            ocean_backend.feed()
 
     except Exception as ex:
         if backend:
@@ -245,7 +249,7 @@ def enrich_backend(url, clean, backend_name, backend_params):
         # We need to enrich from just updated items since last enrichment
         last_enrich = enrich_backend.get_last_update_from_es()
 
-        logging.debug ("Last enrichment: %s" % (last_enrich))
+        logging.debug("Last enrichment: %s" % (last_enrich))
 
         ocean_backend = connector[1](backend, from_date=last_enrich)
         clean = False  # Don't remove ocean index when enrich
