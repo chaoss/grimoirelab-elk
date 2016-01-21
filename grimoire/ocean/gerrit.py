@@ -49,10 +49,6 @@ class GerritOcean(ElasticOcean):
 
         return {"items":mapping}
 
-    def get_id(self):
-        ''' Return gerrit unique identifier '''
-        return self.repository
-
     def get_field_unique_id(self):
         return "id"
 
