@@ -97,7 +97,10 @@ class GitEnrich(Enrich):
         # Fields that are the same in item and eitem
         copy_fields = ["message"]
         for f in copy_fields:
-            eitem[f] = commit[f]
+            if f in commit:
+                eitem[f] = commit[f]
+            else:
+                eitem[f] = None
         # Fields which names are translated
         map_fields = {"commit": "hash"}
         for fn in map_fields:
@@ -127,7 +130,7 @@ class GitEnrich(Enrich):
         else:
             eitem["bot"] = 0  # By default, identities are not bots
         # Other enrichment
-        eitem["repo_name"] = self.perceval_backend.unique_id
+        eitem["repo_name"] = self.perceval_backend.origin
 
         return eitem
 
