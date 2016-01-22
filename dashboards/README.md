@@ -11,3 +11,4 @@ To use the dashboard as template for generating a new dashboard using gerrit_rev
 ```
 GrimoireELK/utils/e2k.py -g -e http://elasticsearch:9200 -d "Gerrit-Activity" -i gerrit_review.openstack.org_enrich
 ```
+
