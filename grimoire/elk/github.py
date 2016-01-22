@@ -34,6 +34,8 @@ from grimoire.elk.enrich import Enrich
 class GitHubEnrich(Enrich):
 
     def __init__(self, github):
+        super().__init__()
+
         self.elastic = None
         self.perceval_backend = github
         self.index_github = "github"
@@ -45,7 +47,7 @@ class GitHubEnrich(Enrich):
         self.elastic = elastic
         # Recover cache data from Elastic
         self.geolocations = self.geo_locations_from_es()
-        self.users = self.users_from_es() 
+        self.users = self.users_from_es()
 
     def get_field_date(self):
         return "updated_at"
@@ -59,20 +61,15 @@ class GitHubEnrich(Enrich):
 
         for identity in ['user', 'assignee']:
             if item[identity]:
-                user = self.get_sh_identity(item[identity]['login'])
+                # In user_data we have the full user data
+                user = self.get_sh_identity(item[identity+"_data"])
                 identities.append(user)
         return identities
 
-    def get_sh_identity(self, login):
-        if login not in self.users:
-            user = self.perceval_backend.client.get_user(login)
-            self.users[login] = user
-            orgs = self.perceval_backend.client.get_user_orgs(login)
-            self.users[login]['orgs'] = orgs
-        identity = self.users[login]
+    def get_sh_identity(self, user):
+        identity = user
         identity['username'] = identity['login']
         return identity
-
 
     def get_geo_point(self, location):
         geo_point = geo_code = None
@@ -235,22 +232,15 @@ class GitHubEnrich(Enrich):
         rich_pull['time_to_close_days'] = \
             get_time_diff_days(pull['created_at'], pull['closed_at'])
 
-        user_login = pull['user']['login']
-
-        if user_login in self.users:
-            user = GitHubUser(self.users[user_login])
-        else:
-            logging.debug("User login %s not found in GitHub users" % (user_login))
-            user = None
-
-        rich_pull['user_login'] = user_login
+        rich_pull['user_login'] = pull['user']['login']
+        user = pull['user_data']
 
         if user is not None:
-            rich_pull['user_name'] = user.name
-            rich_pull['user_email'] = user.email
-            rich_pull['user_org'] = user.org
-            rich_pull['user_location'] = user.location
-            rich_pull['user_geolocation'] = self.get_geo_point(user.location)
+            rich_pull['user_name'] = user['name']
+            rich_pull['user_email'] = user['email']
+            rich_pull['user_org'] = user['company']
+            rich_pull['user_location'] = user['location']
+            rich_pull['user_geolocation'] = self.get_geo_point(user['location'])
         else:
             rich_pull['user_name'] = None
             rich_pull['user_email'] = None
@@ -262,23 +252,16 @@ class GitHubEnrich(Enrich):
         assignee = None
 
         if pull['assignee'] is not None:
+            assignee = pull['assignee_data']
+            rich_pull['assignee_login'] = pull['assignee']['login']
+            rich_pull['assignee_name'] = assignee['name']
+            rich_pull['assignee_email'] = assignee['email']
+            rich_pull['assignee_org'] = assignee['company']
+            rich_pull['assignee_location'] = assignee['location']
+            rich_pull['assignee_geolocation'] = \
+                self.get_geo_point(assignee['location'])
 
-            assignee_login = pull['assignee']['login']
-
-            if assignee_login in self.users:
-                user = GitHubUser(self.users[assignee_login])
-                assignee = GitHubUser(self.users[assignee_login])
-                rich_pull['assignee_login'] = assignee_login
-                rich_pull['assignee_name'] = assignee.name
-                rich_pull['assignee_email'] = assignee.email
-                rich_pull['assignee_org'] = assignee.org
-                rich_pull['assignee_location'] = assignee.location
-                rich_pull['assignee_geolocation'] = \
-                    self.get_geo_point(assignee.location)
-            else:
-                logging.debug("Assignee login %s not found in GitHub users" % (assignee_login))
-
-        if not assignee:
+        else:
             rich_pull['assignee_name'] = None
             rich_pull['assignee_login'] = None
             rich_pull['assignee_email'] = None
