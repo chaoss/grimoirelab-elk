@@ -1,5 +1,11 @@
 Dashboard templates to be used to create data source dashboards using GrimoireELK platform.
 
+To export a dashboard from a Kibana working with elasticsearch:9200:
+
+```
+GrimoireELK/utils/kidash.py -e http://elasticsearch:9200 -g --export gerrit-activity.json --dashboard Gerrit-Activity
+```
+
 To import a dashboard in Kibana working with elasticsearch:9200:
 
 ```
