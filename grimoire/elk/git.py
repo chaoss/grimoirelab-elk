@@ -89,6 +89,7 @@ class GitEnrich(Enrich):
         # John Smith <john.smith@bitergia.com>
         identity = {}
         name = git_user.split("<")[0]
+        name = name.strip()  # Remove space between user and email
         email = git_user.split("<")[1][:-1]
         identity['username'] = None  # git does not have username
         identity['email'] = email
