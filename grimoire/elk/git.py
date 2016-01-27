@@ -136,6 +136,19 @@ class GitEnrich(Enrich):
             eitem["bot"] = 0  # By default, identities are not bots
         # Other enrichment
         eitem["repo_name"] = commit["__metadata__"]["origin"]
+        # Number of files touched
+        eitem["files"] = len(commit["files"])
+        # Number of lines changed
+        lines_changed = 0
+        for cfile in commit["files"]:
+            if 'added' in cfile and 'removed' in cfile:
+                try:
+                    lines_changed += int(cfile["added"]) + int(cfile["removed"])
+                except ValueError:
+                    # logging.warning(cfile)
+                    continue
+        eitem["lines_changed"] = lines_changed
+
 
         return eitem
 
