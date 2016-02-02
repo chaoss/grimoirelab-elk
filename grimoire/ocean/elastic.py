@@ -156,7 +156,7 @@ class ElasticOcean(object):
         if self.from_date and not self.elastic_scroll_id:
             # The filter in scroll api should be added the first query
             date_field = self.get_field_date()
-            from_date = self.from_date.replace(" ","T")  # elastic format
+            from_date = self.from_date.isoformat()
 
             filter_ = """
             {
@@ -194,8 +194,11 @@ class ElasticOcean(object):
         else:
             self.elastic_scroll_id = None
 
-        for hit in rjson["hits"]["hits"]:
-            items.append(hit['_source'])
+        if "hits" in rjson:
+            for hit in rjson["hits"]["hits"]:
+                items.append(hit['_source'])
+        else:
+            logging.warning("No results found from %s" % (url))
 
         return items
 
