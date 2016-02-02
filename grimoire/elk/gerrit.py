@@ -43,7 +43,7 @@ class GerritEnrich(Enrich):
         self.elastic = elastic
 
     def get_field_date(self):
-        return "approval_grantedOn"
+        return "__metadata__updated_on"
 
     def get_fields_uuid(self):
         return ["review_uuid", "patchSet_uuid", "approval_uuid"]
@@ -113,7 +113,7 @@ class GerritEnrich(Enrich):
                     for approval in patch['approvals']:
                         adate_ts = approval['grantedOn']
                         approval['grantedOn'] = \
-                            time.strftime('%Y-%m-%dT%H:%M:%S', 
+                            time.strftime('%Y-%m-%dT%H:%M:%S',
                                           time.localtime(adate_ts))
         if 'comments' in item.keys():
             for comment in item['comments']:
@@ -189,7 +189,7 @@ class GerritEnrich(Enrich):
         eitem = {}  # Item enriched
 
         # Fields that are the same in item and eitem
-        copy_fields = ["status", "branch", "project", "url"]
+        copy_fields = ["status", "branch", "project", "url","__metadata__updated_on"]
         for f in copy_fields:
             eitem[f] = review[f]
         # Fields which names are translated
@@ -200,10 +200,12 @@ class GerritEnrich(Enrich):
                       }
         for fn in map_fields:
             eitem[map_fields[fn]] = review[fn]
+        eitem["name"] = None
+        eitem["domain"] = None
         if 'name' in review['owner']:
             eitem["name"] = review['owner']['name']
-        else:
-            eitem["name"] = None
+            if 'email' in review['owner']:
+                eitem["domain"] = review['owner']['email'].split("@")[1]
         # New fields generated for enrichment
         identity = GerritEnrich.get_sh_identity(review['owner'])
         ruuid = self.get_uuid(identity, self.get_connector_name())
