@@ -85,7 +85,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params):
             logging.error("Error feeding ocean %s" % ex)
 
         repo['success'] = False
-        repo['error'] = ex
+        repo['error'] = str(ex)
     else:
         repo['success'] = True
 
