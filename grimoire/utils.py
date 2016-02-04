@@ -57,7 +57,7 @@ def get_connector_from_name(name):
     connectors = get_connectors()
 
     for cname in connectors:
-        if cname == name: 
+        if cname == name:
             found = connectors[cname]
 
     return found
@@ -141,6 +141,7 @@ def get_params_parser():
                         help="Enrich items after retrieving")
     parser.add_argument("--enrich_only",  action='store_true',
                         help="Only enrich items")
+    parser.add_argument('--index', help="Ocean index name")
     parser.add_argument('backend', help=argparse.SUPPRESS)
     parser.add_argument('backend_args', nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)

@@ -35,7 +35,7 @@ from grimoire.utils import get_elastic
 from grimoire.utils import get_connectors
 import traceback
 
-def feed_backend(url, clean, fetch_cache, backend_name, backend_params):
+def feed_backend(url, clean, fetch_cache, backend_name, backend_params, index=None):
     """ Feed Ocean with backend data """
 
     backend = None
@@ -59,7 +59,9 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params):
         logging.info("Feeding Ocean from %s (%s)" % (backend_name,
                                                      backend.origin))
 
-        es_index = backend_name + "_" + backend.origin
+        es_index = index
+        if not es_index:
+            es_index = backend_name + "_" + backend.origin
         elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
 
         ocean_backend.set_elastic(elastic_ocean)
@@ -90,6 +92,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params):
         repo['success'] = True
 
     repo['repo_update'] = datetime.now().isoformat()
+    repo['index'] = es_index
 
     if es_index:
         ConfOcean.add_repo(es_index, repo)
@@ -169,7 +172,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     return items
 
 
-def enrich_backend(url, clean, backend_name, backend_params):
+def enrich_backend(url, clean, backend_name, backend_params, index=None):
     """ Enrich Ocean index (including SH) """
 
     def enrich_items(items, enrich_backend):
@@ -238,7 +241,9 @@ def enrich_backend(url, clean, backend_name, backend_params):
 
         backend = backend_cmd.backend
 
-        ocean_index = backend_name + "_" + backend.origin
+        ocean_index = index
+        if not ocean_index:
+            ocean_index = backend_name + "_" + backend.origin
         enrich_index = ocean_index+"_enrich"
 
 
@@ -260,7 +265,6 @@ def enrich_backend(url, clean, backend_name, backend_params):
                      (enrich_backend.elastic.index_url))
 
         enrich_count_merged = 0
-
 
         enrich_count_merged = enrich_sortinghat(backend_name,
                                                 ocean_backend, enrich_backend)
