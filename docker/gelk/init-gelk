@@ -11,7 +11,7 @@ LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 create > /tmp/worke
 LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 update > /tmp/worker-update.log 2>&1 &
 LANG=en_US.utf8 rqworker -u http://redis --worker-ttl 864000 enrich > /tmp/worker-enrich.log 2>&1 &
 
-(sleep 20 && mysqladmin -u root create ocean_sh -h mariadb) &
+(sleep 20 && echo "CREATE DATABASE ocean_sh DEFAULT CHARACTER SET utf8" | mysql -u root -h mariadb) &
 python3 rest.py > rest.log 2>&1 &
 
 LANG=en_US.utf8 rq-dashboard -H redis > /tmp/rq-dashboard.log 2>&1
