@@ -147,8 +147,8 @@ class GitEnrich(Enrich):
                 except ValueError:
                     # logging.warning(cfile)
                     continue
-        eitem["lines_changed"] = lines_changed
-
+        if identity['email']:
+            eitem["domain"] = identity['email'].split("@")[1]
 
         return eitem
 

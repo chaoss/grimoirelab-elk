@@ -255,6 +255,8 @@ class GitHubEnrich(Enrich):
             rich_pull['user_name'] = user['name']
             rich_pull['author_name'] = user['name']
             rich_pull['user_email'] = user['email']
+            if rich_pull['user_email']:
+                rich_pull["user_domain"] = rich_pull['user_email'].split("@")[1]
             rich_pull['user_org'] = user['company']
             rich_pull['user_location'] = user['location']
             rich_pull['user_geolocation'] = self.get_geo_point(user['location'])
@@ -265,6 +267,7 @@ class GitHubEnrich(Enrich):
         else:
             rich_pull['user_name'] = None
             rich_pull['user_email'] = None
+            rich_pull["user_domain"] = None
             rich_pull['user_org'] = None
             rich_pull['user_location'] = None
             rich_pull['user_geolocation'] = None
@@ -280,6 +283,8 @@ class GitHubEnrich(Enrich):
             rich_pull['assignee_login'] = pull['assignee']['login']
             rich_pull['assignee_name'] = assignee['name']
             rich_pull['assignee_email'] = assignee['email']
+            if rich_pull['assignee_email']:
+                rich_pull["assignee_domain"] = rich_pull['assignee_email'].split("@")[1]
             rich_pull['assignee_org'] = assignee['company']
             rich_pull['assignee_location'] = assignee['location']
             rich_pull['assignee_geolocation'] = \
@@ -291,6 +296,7 @@ class GitHubEnrich(Enrich):
             rich_pull['assignee_name'] = None
             rich_pull['assignee_login'] = None
             rich_pull['assignee_email'] = None
+            rich_pull["assignee_domain"] = None
             rich_pull['assignee_org'] = None
             rich_pull['assignee_location'] = None
             rich_pull['assignee_geolocation'] = None
@@ -312,8 +318,6 @@ class GitHubEnrich(Enrich):
         rich_pull['repository'] = pull['__metadata__']['origin']
 
         return rich_pull
-
-
 
     def enrich_items(self, pulls):
         # User info filled in sortinghat pre enrichment
