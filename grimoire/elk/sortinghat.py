@@ -82,6 +82,9 @@ class SortingHat(object):
             except WrappedValueError as ex:
                 logging.warning("Trying to add a None identity. Ignoring it.")
                 continue
+            except UnicodeEncodeError as ex:
+                logging.warning("UnicodeEncodeError. Ignoring it. %s %s %s" % (identity['email'], identity['name'], identity['username']))
+                continue
 
 
             if 'company' in identity and identity['company'] is not None:
