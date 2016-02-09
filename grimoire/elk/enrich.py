@@ -102,4 +102,8 @@ class Enrich(object):
             logger.error("Identity found in Sorting Hat which is not unique")
             logger.error("%s %s" % (identity, uuid))
             uuid = None
+        except UnicodeEncodeError:
+            logger.error("UnicodeEncodeError")
+            logger.error("%s %s" % (identity, uuid))
+            uuid = None
         return uuid

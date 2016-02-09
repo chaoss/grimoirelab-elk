@@ -187,14 +187,18 @@ class ElasticOcean(object):
                 r = requests.get(url)
 
         items = []
-        rjson = r.json()
+        try:
+            rjson = r.json()
+        except:
+            logging.warning("No JSON found in %s" % (r.text))
+            logging.warning("No results found from %s" % (url))
 
-        if "_scroll_id" in rjson:
+        if rjson and "_scroll_id" in rjson:
             self.elastic_scroll_id = rjson["_scroll_id"]
         else:
             self.elastic_scroll_id = None
 
-        if "hits" in rjson:
+        if rjson and "hits" in rjson:
             for hit in rjson["hits"]["hits"]:
                 items.append(hit['_source'])
         else:
