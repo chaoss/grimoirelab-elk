@@ -54,13 +54,11 @@ class StackExchangeEnrich(Enrich):
         mapping = """
         {
             "properties": {
-               "owner": {
-                "display_name": {
+                "question_owner": {
                   "type": "string",
                   "index":"not_analyzed"
                   }
-               }
-               }
+           }
         } """
 
         return {"items":mapping}
