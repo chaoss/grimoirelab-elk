@@ -148,7 +148,11 @@ class GitEnrich(Enrich):
                     # logging.warning(cfile)
                     continue
         if identity['email']:
-            eitem["domain"] = identity['email'].split("@")[1]
+            try:
+                eitem["domain"] = identity['email'].split("@")[1]
+            except IndexError:
+                logging.warning("Bad email format: %s" % (identity['email']))
+                eitem["domain"] = None
 
         return eitem
 
