@@ -35,12 +35,14 @@ from grimoire.ocean.bugzilla import BugzillaOcean
 from grimoire.ocean.gerrit import GerritOcean
 from grimoire.ocean.github import GitHubOcean
 from grimoire.ocean.git import GitOcean
+from grimoire.ocean.stackexchange import StackExchangeOcean
 
 # Connectors for EnrichOcean
 from grimoire.elk.bugzilla import BugzillaEnrich
 from grimoire.elk.gerrit import GerritEnrich
 from grimoire.elk.github import GitHubEnrich
 from grimoire.elk.git import GitEnrich
+from grimoire.elk.stackexchange import StackExchangeEnrich
 
 
 # Connectors for Perceval
@@ -48,6 +50,7 @@ from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
 from perceval.backends.github import GitHub, GitHubCommand
 from perceval.backends.gerrit import Gerrit, GerritCommand
 from perceval.backends.git import Git, GitCommand
+from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
 
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.elk.elastic import ElasticConnectException
@@ -78,6 +81,8 @@ def get_connectors():
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
+            "stackexchange":[StackExchange, StackExchangeOcean,
+                             StackExchangeEnrich, StackExchangeCommand]
             }  # Will come from Registry
 
 def get_elastic(url, es_index, clean = None, ocean_backend = None):

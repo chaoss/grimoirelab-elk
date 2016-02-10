@@ -182,7 +182,12 @@ class ElasticOcean(object):
                     "scroll" : max_process_items_pack_time,
                     "scroll_id" : self.elastic_scroll_id
                     }
-                r = requests.post(url, data=json.dumps(scroll_data))
+                # r = requests.post(url, data=json.dumps(scroll_data))
+                # For compatibility with 1.7
+                get_scroll_data = "scroll=%s&scroll_id=%s" % \
+                    (max_process_items_pack_time, self.elastic_scroll_id)
+                r = requests.get(url+"?"+ get_scroll_data)
+
             else:
                 r = requests.get(url)
 
