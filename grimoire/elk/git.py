@@ -34,8 +34,8 @@ from sortinghat import api
 
 class GitEnrich(Enrich):
 
-    def __init__(self, git):
-        super().__init__()
+    def __init__(self, git, sortinghat=True):
+        super().__init__(sortinghat)
         self.elastic = None
         self.perceval_backend = git
         self.index_git = "git"
@@ -96,11 +96,40 @@ class GitEnrich(Enrich):
         identity['name'] = name
         return identity
 
+    def get_item_sh(self, item):
+        """ Add sorting hat enrichment fields """
+        eitem = {}  # Item enriched
+
+        # Enrich SH
+        identity  = self.get_sh_identity(item["Author"])
+        eitem["author_name"] = identity['name']
+        eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
+        enrollments = api.enrollments(self.sh_db, uuid=eitem["author_uuid"])
+        # TODO: get the org_name for the current commit time
+        if len(enrollments) > 0:
+            eitem["org_name"] = enrollments[0].organization.name
+        else:
+            eitem["org_name"] = None
+        # bot
+        u = api.unique_identities(self.sh_db, eitem["author_uuid"])[0]
+        if u.profile:
+            eitem["bot"] = u.profile.is_bot
+        else:
+            eitem["bot"] = 0  # By default, identities are not bots
+
+        if identity['email']:
+            try:
+                eitem["domain"] = identity['email'].split("@")[1]
+            except IndexError:
+                logging.warning("Bad email format: %s" % (identity['email']))
+                eitem["domain"] = None
+
+        return eitem
 
     def get_rich_commit(self, commit):
         eitem = {}
         # Fields that are the same in item and eitem
-        copy_fields = ["message"]
+        copy_fields = ["message","Author"]
         for f in copy_fields:
             if f in commit:
                 eitem[f] = commit[f]
@@ -118,22 +147,6 @@ class GitEnrich(Enrich):
         eitem["utc_author"] = (author_date-author_date.utcoffset()).replace(tzinfo=None).isoformat()
         eitem["utc_commit"] = (commit_date-commit_date.utcoffset()).replace(tzinfo=None).isoformat()
         eitem["tz"]  = int(commit_date.strftime("%z")[0:3])
-        # Enrich SH
-        identity  = self.get_sh_identity(commit["Author"])
-        eitem["author_name"] = identity['name']
-        eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
-        enrollments = api.enrollments(self.sh_db, uuid=eitem["author_uuid"])
-        # TODO: get the org_name for the current commit time
-        if len(enrollments) > 0:
-            eitem["org_name"] = enrollments[0].organization.name
-        else:
-            eitem["org_name"] = None
-        # bot
-        u = api.unique_identities(self.sh_db, eitem["author_uuid"])[0]
-        if u.profile:
-            eitem["bot"] = u.profile.is_bot
-        else:
-            eitem["bot"] = 0  # By default, identities are not bots
         # Other enrichment
         eitem["repo_name"] = commit["__metadata__"]["origin"]
         # Number of files touched
@@ -147,12 +160,9 @@ class GitEnrich(Enrich):
                 except ValueError:
                     # logging.warning(cfile)
                     continue
-        if identity['email']:
-            try:
-                eitem["domain"] = identity['email'].split("@")[1]
-            except IndexError:
-                logging.warning("Bad email format: %s" % (identity['email']))
-                eitem["domain"] = None
+
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(commit))
 
         return eitem
 

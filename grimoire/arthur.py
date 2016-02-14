@@ -172,8 +172,9 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     return items
 
 
-def enrich_backend(url, clean, backend_name, backend_params, index=None):
-    """ Enrich Ocean index (including SH) """
+def enrich_backend(url, clean, backend_name, backend_params, index=None,
+                   sortinghat=True):
+    """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend):
         total = 0
@@ -247,7 +248,7 @@ def enrich_backend(url, clean, backend_name, backend_params, index=None):
         enrich_index = ocean_index+"_enrich"
 
 
-        enrich_backend = connector[2](backend)
+        enrich_backend = connector[2](backend, sortinghat)
         elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
         enrich_backend.set_elastic(elastic_enrich)
 
@@ -264,15 +265,15 @@ def enrich_backend(url, clean, backend_name, backend_params, index=None):
         logging.info("Adding enrichment data to %s" %
                      (enrich_backend.elastic.index_url))
 
-        enrich_count_merged = 0
+        if sortinghat:
+            enrich_count_merged = 0
 
-        enrich_count_merged = enrich_sortinghat(backend_name,
-                                                ocean_backend, enrich_backend)
+            enrich_count_merged = enrich_sortinghat(backend_name,
+                                                    ocean_backend, enrich_backend)
+            logging.info("Total items enriched for merged identities %i " %  enrich_count_merged)
         # Enrichment for the new items once SH update is finished
         enrich_count = enrich_items(ocean_backend, enrich_backend)
-
         logging.info("Total items enriched %i " %  enrich_count)
-        logging.info("Total items enriched for merged identities %i " %  enrich_count_merged)
 
 
     except Exception as ex:

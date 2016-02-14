@@ -34,8 +34,8 @@ from sortinghat import api
 
 class StackExchangeEnrich(Enrich):
 
-    def __init__(self, stackexchange):
-        super().__init__()
+    def __init__(self, stackexchange, sortinghat=True):
+        super().__init__(sortinghat)
         self.elastic = None
         self.perceval_backend = stackexchange
         self.index_stackexchange = "stackexchange"

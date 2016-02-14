@@ -34,8 +34,8 @@ from grimoire.elk.enrich import Enrich
 
 class GerritEnrich(Enrich):
 
-    def __init__(self, gerrit):
-        super().__init__()
+    def __init__(self, gerrit, sortinghat=True):
+        super().__init__(sortinghat)
         self.elastic = None
         self.type_name = "review"  # type inside the index to store items enriched
 
@@ -58,6 +58,16 @@ class GerritEnrich(Enrich):
         if 'username' in user: identity['username'] = user['username']
         return identity
 
+    def get_item_sh(self, item):
+        """ Add sorting hat enrichment fields """
+        # TODO: bot and orgs
+        eitem = {}  # Item enriched
+
+        identity = GerritEnrich.get_sh_identity(item['owner'])
+        eitem["uuid"] = self.get_uuid(identity, self.get_connector_name())
+        eitem["bot"] = 0  # Not supported yet
+
+        return eitem
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
@@ -182,8 +192,6 @@ class GerritEnrich(Enrich):
 
 
     def review_item(self, review):
-        # TODO: bot
-
         self._fix_review_dates(review)
 
         eitem = {}  # Item enriched
@@ -207,10 +215,6 @@ class GerritEnrich(Enrich):
             if 'email' in review['owner']:
                 eitem["domain"] = review['owner']['email'].split("@")[1]
         # New fields generated for enrichment
-        identity = GerritEnrich.get_sh_identity(review['owner'])
-        ruuid = self.get_uuid(identity, self.get_connector_name())
-        eitem["uuid"] = ruuid
-        eitem["bot"] = 0  # Not supported yet
         eitem["patchsets"] = len(review["patchSets"])
 
         # Time to add the time diffs
@@ -223,13 +227,16 @@ class GerritEnrich(Enrich):
             (updatedOn_date-createdOn_date).total_seconds() / seconds_day
         eitem["timeopen"] =  '%.2f' % timeopen
 
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(review))
+
         bulk_json = '{"index" : {"_id" : "%s" } }\n' % (eitem["githash"])  # Bulk operation
         bulk_json += json.dumps(eitem)+"\n"
 
         return bulk_json
 
-
     def review_events(self, review):
+        # TODO: old enrichment function
 
         self._fix_review_dates(review)
 

@@ -33,8 +33,10 @@ logger = logging.getLogger(__name__)
 
 class Enrich(object):
 
-    def __init__(self):
-        self.sh_db = Database("root", "", "ocean_sh", "mariadb")
+    def __init__(self, sortinghat = True):
+        self.sortinghat = sortinghat
+        if sortinghat:
+            self.sh_db = Database("root", "", "ocean_sh", "mariadb")
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -77,6 +79,10 @@ class Enrich(object):
 
     def get_uuid(self, identity, backend_name):
         """ Return the Sorting Hat uuid for an identity """
+
+        if not self.sortinghat:
+            raise RuntimeError("Sorting Hat not active during enrich")
+
         iden = {}
         uuid = None
 

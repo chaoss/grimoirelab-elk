@@ -33,8 +33,8 @@ from grimoire.elk.enrich import Enrich
 
 class GitHubEnrich(Enrich):
 
-    def __init__(self, github):
-        super().__init__()
+    def __init__(self, github, sortinghat=True):
+        super().__init__(sortinghat)
 
         self.elastic = None
         self.perceval_backend = github
@@ -47,7 +47,6 @@ class GitHubEnrich(Enrich):
         self.elastic = elastic
         # Recover cache data from Elastic
         self.geolocations = self.geo_locations_from_es()
-        self.users = self.users_from_es()
 
     def get_field_date(self):
         return "updated_at"
@@ -70,6 +69,31 @@ class GitHubEnrich(Enrich):
         identity = user
         identity['username'] = identity['login']
         return identity
+
+    def get_item_sh(self, item):
+        """ Add sorting hat enrichment fields """
+        eitem = {}  # Item enriched
+
+        user = item['user_data']
+        if user is not None:
+            identity = self.get_sh_identity(user)
+            eitem["user_uuid"] = \
+                self.get_uuid(identity, self.get_connector_name())
+            eitem["author_uuid"] = eitem["user_uuid"]
+        else:
+            eitem['user_uuid'] = None
+            eitem['author_uuid'] = None
+
+        assignee = item['assignee_data']
+        if assignee:
+            identity = self.get_sh_identity(assignee)
+            eitem["assignee_uuid"] =  \
+                self.get_uuid(identity, self.get_connector_name())
+        else:
+            eitem["assignee_uuid"] = None
+
+        return eitem
+
 
     def get_geo_point(self, location):
         geo_point = geo_code = None
@@ -178,34 +202,6 @@ class GitHubEnrich(Enrich):
 
         logging.debug("Adding geoloc to ES Done")
 
-    def users_from_es(self):
-        return self.get_github_cache("users", "login")
-
-    def users_to_es(self):
-        """ Add GitHub users cache to Ocean """
-
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.url + "/github/users/_bulk"
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        users = self.users
-
-        for login in users:
-            if current >= max_items:
-                requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-            data_json = json.dumps(users[login])
-            user_id = str(users[login]["id"])
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (user_id)
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        requests.put(url, data = bulk_json)
-
 
     def get_elastic_mappings(self):
         """ geopoints type is not created in dynamic mapping """
@@ -260,10 +256,6 @@ class GitHubEnrich(Enrich):
             rich_pull['user_org'] = user['company']
             rich_pull['user_location'] = user['location']
             rich_pull['user_geolocation'] = self.get_geo_point(user['location'])
-            identity = self.get_sh_identity(user)
-            rich_pull["user_uuid"] = \
-                self.get_uuid(identity, self.get_connector_name())
-            rich_pull["author_uuid"] = rich_pull["user_uuid"]
         else:
             rich_pull['user_name'] = None
             rich_pull['user_email'] = None
@@ -271,9 +263,7 @@ class GitHubEnrich(Enrich):
             rich_pull['user_org'] = None
             rich_pull['user_location'] = None
             rich_pull['user_geolocation'] = None
-            rich_pull['user_uuid'] = None
             rich_pull['author_name'] = None
-            rich_pull['author_uuid'] = None
 
 
         assignee = None
@@ -289,9 +279,6 @@ class GitHubEnrich(Enrich):
             rich_pull['assignee_location'] = assignee['location']
             rich_pull['assignee_geolocation'] = \
                 self.get_geo_point(assignee['location'])
-            identity = self.get_sh_identity(assignee)
-            rich_pull["assignee_uuid"] =  \
-                self.get_uuid(identity, self.get_connector_name())
         else:
             rich_pull['assignee_name'] = None
             rich_pull['assignee_login'] = None
@@ -300,7 +287,6 @@ class GitHubEnrich(Enrich):
             rich_pull['assignee_org'] = None
             rich_pull['assignee_location'] = None
             rich_pull['assignee_geolocation'] = None
-            rich_pull["assignee_uuid"] = None
 
         rich_pull['title'] = pull['title']
         rich_pull['state'] = pull['state']
@@ -317,13 +303,12 @@ class GitHubEnrich(Enrich):
         rich_pull['labels'] = labels
         rich_pull['repository'] = pull['__metadata__']['origin']
 
+        if self.sortinghat:
+            rich_pull.update(self.get_item_sh(pull))
+
         return rich_pull
 
     def enrich_items(self, pulls):
-        # User info filled in sortinghat pre enrichment
-        logging.debug("Updating GitHub users in Elastic")
-        self.users_to_es()
-
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""

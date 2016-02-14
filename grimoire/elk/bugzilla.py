@@ -36,8 +36,8 @@ from .utils import get_time_diff_days
 
 class BugzillaEnrich(Enrich):
 
-    def __init__(self, bugzilla):
-        super().__init__()
+    def __init__(self, bugzilla, sortinghat=True):
+        super().__init__(sortinghat)
         self.perceval_backend = bugzilla
         self.elastic = None
 
@@ -74,10 +74,26 @@ class BugzillaEnrich(Enrich):
             identity['username'] = user['Who']
         if 'qa_contact' in user:
             fill_list_identity(identity, user['qa_contact'])
-        if 'changed_by' in user: 
+        if 'changed_by' in user:
             identity['name'] = user['changed_by']
 
         return identity
+
+    def get_item_sh(self, item):
+        """ Add sorting hat enrichment fields """
+        eitem = {}  # Item enriched
+
+        # Sorting Hat integration: reporter and assigned_to uuids
+        if 'assigned_to' in item:
+            identity = BugzillaEnrich.get_sh_identity({'assigned_to':item['assigned_to']})
+            eitem['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
+            eitem['assigned_to_name'] = identity['name']
+        if 'reporter' in item:
+            identity = BugzillaEnrich.get_sh_identity({'reporter':item['reporter']})
+            eitem['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
+            eitem['reporter_name'] = identity['name']
+
+        return eitem
 
 
     def get_identities(self, item):
@@ -100,8 +116,6 @@ class BugzillaEnrich(Enrich):
         elif 'qa_contact' in item:
             identities.append(self.get_sh_identity({'qa_contact':
                                                     item['qa_contact']}))
-
-
         return identities
 
     def enrich_issue(self, issue):
@@ -110,32 +124,36 @@ class BugzillaEnrich(Enrich):
             u = urlparse(self.perceval_backend.url)
             return u.scheme+"//"+u.netloc
 
+        eitem = {}
+        # Fields that are the same in item and eitem
+        copy_fields = ["assigned_to","reporter"]
+        for f in copy_fields:
+            if f in issue:
+                eitem[f] = issue[f]
+            else:
+                eitem[f] = None
+
         # Fix dates
         date_ts = parser.parse(issue['creation_ts'][0]['__text__'])
-        issue['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
+        eitem['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
         date_ts = parser.parse(issue['delta_ts'][0]['__text__'])
-        issue['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
+        eitem['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
         # Add extra JSON fields used in Kibana (enriched fields)
-        issue['number_of_comments'] = 0
-        issue['time_to_last_update_days'] = None
-        issue['url'] = None
+        eitem['number_of_comments'] = 0
+        eitem['time_to_last_update_days'] = None
+        eitem['url'] = None
 
         if 'long_desc' in issue:
-            issue['number_of_comments'] = len(issue['long_desc'])
-        issue['url'] = get_bugzilla_url() + "show_bug.cgi?id=" + issue['bug_id'][0]['__text__']
-        issue['time_to_last_update_days'] = \
-            get_time_diff_days(issue['creation_ts'], issue['delta_ts'])
+            eitem['number_of_comments'] = len(issue['long_desc'])
+        eitem['url'] = get_bugzilla_url() + "show_bug.cgi?id=" + issue['bug_id'][0]['__text__']
+        eitem['time_to_last_update_days'] = \
+            get_time_diff_days(eitem['creation_ts'], eitem['delta_ts'])
 
-        # Sorting Hat integration: reporter and assigned_to uuids
-        if 'assigned_to' in issue:
-            identity = BugzillaEnrich.get_sh_identity({'assigned_to':issue['assigned_to']})
-            issue['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
-        if 'reporter' in issue:
-            identity = BugzillaEnrich.get_sh_identity({'reporter':issue['reporter']})
-            issue['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(issue))
 
-        return issue
+        return eitem
 
 
     def enrich_items(self, items):
@@ -197,8 +215,8 @@ class BugzillaEnrich(Enrich):
                 requests.put(url, data=bulk_json)
                 bulk_json = ""
                 current = 0
-            self.enrich_issue(issue)
-            data_json = json.dumps(issue)
+            eitem = self.enrich_issue(issue)
+            data_json = json.dumps(eitem)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (issue["bug_id"])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
