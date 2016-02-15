@@ -34,7 +34,7 @@ from grimoire.elk.enrich import Enrich
 class GitHubEnrich(Enrich):
 
     def __init__(self, github, sortinghat=True, db_projects_map = None):
-        super().__init__(sortinghat)
+        super().__init__(sortinghat, db_projects_map)
 
         self.elastic = None
         self.perceval_backend = github
