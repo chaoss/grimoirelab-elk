@@ -33,7 +33,7 @@ class GrimoireLibProjects(object):
 
 
     def get_projects(self):
-        """ Get the gerrit projects list from OpenStack official projects """
+        """ Get the projects list from database """
 
         repos_list = []
 
@@ -44,7 +44,7 @@ class GrimoireLibProjects(object):
                        scrdb = None, shdb = gerrit_projects_db, prjdb = None)
 
         sql = """
-            SELECT DISTINCT(repository_name) 
+            SELECT DISTINCT(repository_name)
             FROM project_repositories
             WHERE data_source='scr'
         """

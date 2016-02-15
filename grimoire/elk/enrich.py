@@ -24,6 +24,7 @@
 #
 
 import logging
+import MySQLdb
 
 from sortinghat.db.database import Database
 from sortinghat import api
@@ -33,10 +34,38 @@ logger = logging.getLogger(__name__)
 
 class Enrich(object):
 
-    def __init__(self, sortinghat = True):
+    def __init__(self, sortinghat = True, db_projects_map = None):
         self.sortinghat = sortinghat
         if sortinghat:
             self.sh_db = Database("root", "", "ocean_sh", "mariadb")
+        self.prjs_map = None
+        if  db_projects_map:
+            self.prjs_map = self._get_projects_map(db_projects_map)
+
+    def _get_projects_map(self, db_projects_map):
+        prjs_map = {}
+
+        db = MySQLdb.connect(user="root", passwd="", host="mariadb",
+                             db = db_projects_map)
+        cursor = db.cursor()
+
+        query = """
+        SELECT data_source, p.id, pr.repository_name
+        FROM projects p
+        JOIN project_repositories pr ON p.project_id=pr.project_id
+        """
+
+        res = int(cursor.execute(query))
+        if res > 0:
+            rows = cursor.fetchall()
+            for row in rows:
+                [ds, name, repo] = row
+                if ds not in prjs_map:
+                    prjs_map[ds] = {}
+                prjs_map[ds][repo] = name
+        else:
+            raise RuntimeException("Can't find projects mapping in %s" % (db_projects_map))
+        return prjs_map
 
     def set_elastic(self, elastic):
         self.elastic = elastic

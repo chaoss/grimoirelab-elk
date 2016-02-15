@@ -34,9 +34,10 @@ from grimoire.elk.enrich import Enrich
 
 class GerritEnrich(Enrich):
 
-    def __init__(self, gerrit, sortinghat=True):
-        super().__init__(sortinghat)
+    def __init__(self, gerrit, sortinghat=True, db_projects_map = None):
+        super().__init__(sortinghat, db_projects_map)
         self.elastic = None
+        self.gerrit = gerrit
         self.type_name = "review"  # type inside the index to store items enriched
 
     def set_elastic(self, elastic):
@@ -66,8 +67,19 @@ class GerritEnrich(Enrich):
         identity = GerritEnrich.get_sh_identity(item['owner'])
         eitem["uuid"] = self.get_uuid(identity, self.get_connector_name())
         eitem["bot"] = 0  # Not supported yet
-
         return eitem
+
+    def get_item_project(self, item):
+        """ Get project mapping enrichment field """
+        ds_name = "scr"  # data source name in projects map
+        url = item['__metadata__']['origin']
+        repo = url+"_"+item['project']
+        try:
+            project = (self.prjs_map[ds_name][repo])
+        except KeyError:
+            # logging.warning("Project not found for repository %s" % (repo))
+            project = None
+        return {"project": project}
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
@@ -180,6 +192,10 @@ class GerritEnrich(Enrich):
                   "type": "string",
                   "index":"not_analyzed"
                },
+               "project": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
                "review_status": {
                   "type": "string",
                   "index":"not_analyzed"
@@ -197,14 +213,15 @@ class GerritEnrich(Enrich):
         eitem = {}  # Item enriched
 
         # Fields that are the same in item and eitem
-        copy_fields = ["status", "branch", "project", "url","__metadata__updated_on"]
+        copy_fields = ["status", "branch", "url","__metadata__updated_on"]
         for f in copy_fields:
             eitem[f] = review[f]
         # Fields which names are translated
         map_fields = {"subject": "summary",
                       "id": "githash",
                       "createdOn": "opened",
-                      "__metadata__updated_on": "closed"
+                      "__metadata__updated_on": "closed",
+                      "project": "repository"
                       }
         for fn in map_fields:
             eitem[map_fields[fn]] = review[fn]
@@ -230,7 +247,10 @@ class GerritEnrich(Enrich):
         if self.sortinghat:
             eitem.update(self.get_item_sh(review))
 
-        bulk_json = '{"index" : {"_id" : "%s" } }\n' % (eitem["githash"])  # Bulk operation
+        if self.prjs_map:
+            eitem.update(self.get_item_project(review))
+
+        bulk_json = '{"index" : {"_id" : "%s" } }\n' % (review["number"])  # Bulk operation
         bulk_json += json.dumps(eitem)+"\n"
 
         return bulk_json

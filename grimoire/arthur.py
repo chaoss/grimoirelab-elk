@@ -173,7 +173,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
 
 
 def enrich_backend(url, clean, backend_name, backend_params, index=None,
-                   sortinghat=True):
+                   sortinghat=True, db_projects_map=None):
     """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend):
@@ -248,7 +248,7 @@ def enrich_backend(url, clean, backend_name, backend_params, index=None,
         enrich_index = ocean_index+"_enrich"
 
 
-        enrich_backend = connector[2](backend, sortinghat)
+        enrich_backend = connector[2](backend, sortinghat, db_projects_map)
         elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
         enrich_backend.set_elastic(elastic_enrich)
 
