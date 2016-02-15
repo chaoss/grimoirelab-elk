@@ -96,6 +96,10 @@ if __name__ == '__main__':
     if args.fetch_cache:
         clean = True
 
+    do_sortinghat = True
+    if args.no_sortinghat:
+        do_sortinghat = False
+
     try:
         if args.loop:
             # minimal update duration to avoid too much frequency in secs
@@ -106,7 +110,8 @@ if __name__ == '__main__':
             if not args.enrich_only:
                 q = Queue('create', connection=Redis(args.redis), async=async_)
                 task_feed = q.enqueue(feed_backend, url, clean, args.fetch_cache,
-                                      args.backend, args.backend_args, args.index)
+                                      args.backend, args.backend_args,
+                                      args.index)
                 logging.info("Queued feed_backend job")
                 logging.info(task_feed)
 
@@ -115,11 +120,13 @@ if __name__ == '__main__':
                 if async_:
                     # Task enrich after feed
                     result = q.enqueue(enrich_backend, url, clean,
-                                       args.backend, args.backend_args, args.index,
+                                       args.backend, args.backend_args,
+                                       args.index, do_sortinghat, args.db_projects_map,
                                        depends_on=task_feed)
                 else:
                     result = q.enqueue(enrich_backend, url, clean,
-                                       args.backend, args.backend_args, args.index)
+                                       args.backend, args.backend_args,
+                                       args.index, do_sortinghat, args.db_projects_map)
                 logging.info("Queued enrich_backend job")
                 logging.info(result)
 
