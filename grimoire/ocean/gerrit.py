@@ -50,7 +50,7 @@ class GerritOcean(ElasticOcean):
         return {"items":mapping}
 
     def get_field_unique_id(self):
-        return "id"
+        return "number"
 
     def add_update_date(self, item):
         entry_lastUpdated = datetime.fromtimestamp(item['__metadata__']['updated_on'])
