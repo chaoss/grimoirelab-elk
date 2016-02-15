@@ -34,8 +34,8 @@ from sortinghat import api
 
 class GitEnrich(Enrich):
 
-    def __init__(self, git, sortinghat=True):
-        super().__init__(sortinghat)
+    def __init__(self, git, sortinghat=True, db_projects_map = None):
+        super().__init__(sortinghat, db_projects_map)
         self.elastic = None
         self.perceval_backend = git
         self.index_git = "git"
@@ -126,6 +126,17 @@ class GitEnrich(Enrich):
 
         return eitem
 
+    def get_item_project(self, item):
+        """ Get project mapping enrichment field """
+        ds_name = "scm"  # data source name in projects map
+        url_git = item['__metadata__']['origin'].split("/")[-1]
+        try:
+            project = (self.prjs_map[ds_name][url_git])
+        except KeyError:
+            # logging.warning("Project not found for repository %s" % (url_git))
+            project = None
+        return {"project": project}
+
     def get_rich_commit(self, commit):
         eitem = {}
         # Fields that are the same in item and eitem
@@ -163,6 +174,9 @@ class GitEnrich(Enrich):
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(commit))
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(commit))
 
         return eitem
 

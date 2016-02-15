@@ -36,7 +36,7 @@ from .utils import get_time_diff_days
 
 class BugzillaEnrich(Enrich):
 
-    def __init__(self, bugzilla, sortinghat=True):
+    def __init__(self, bugzilla, sortinghat=True, db_projects_map = None):
         super().__init__(sortinghat)
         self.perceval_backend = bugzilla
         self.elastic = None

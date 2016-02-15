@@ -33,7 +33,7 @@ from grimoire.elk.enrich import Enrich
 
 class GitHubEnrich(Enrich):
 
-    def __init__(self, github, sortinghat=True):
+    def __init__(self, github, sortinghat=True, db_projects_map = None):
         super().__init__(sortinghat)
 
         self.elastic = None
