@@ -68,14 +68,15 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params, index=No
 
         ConfOcean.set_elastic(elastic_ocean)
 
-        if backend_name != "git":
+        try:
             if backend_cmd.from_date == \
                 parser.parse("1970-01-01").replace(tzinfo=None):
                 # Don't use the default value
                 ocean_backend.feed()
             else:
                 ocean_backend.feed(backend_cmd.from_date)
-        else:
+        except AttributeError:
+            # The backend does not support from_date
             ocean_backend.feed()
 
     except Exception as ex:

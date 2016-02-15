@@ -82,6 +82,10 @@ class ElasticOcean(object):
         """ Add and update date field if needed for incremental updates """
         pass
 
+    def _fix_item(self, item):
+        """ Some buggy data sources need fixing (like mbox and message-id) """
+        pass
+
     def feed(self, from_date = None):
         """ Feed data in Elastic from Perceval """
 
@@ -112,6 +116,7 @@ class ElasticOcean(object):
             # print("%s %s" % (item['url'], item['lastUpdated_date']))
             # Add date field for incremental analysis if needed
             self.add_update_date(item)
+            self._fix_item(item)
             if len(items_pack) >= self.elastic.max_items_bulk:
                 self._items_to_es(items_pack)
                 items_pack = []

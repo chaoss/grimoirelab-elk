@@ -189,6 +189,3 @@ class ElasticSearch(object):
                     last_date = datetime.fromtimestamp(last_date)
 
         return last_date
-
-
-
