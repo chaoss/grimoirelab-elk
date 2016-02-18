@@ -39,7 +39,7 @@ class MBoxOcean(ElasticOcean):
 
     def _fix_item(self, item):
         # "Message-Id" and "Message-ID" all converted to "message-id"
-        for f in ["Message-Id", "Message-ID", "message-id"]:
+        for f in ["Message-Id", "Message-ID", "message-id", "Message-id"]:
             if f in item:
                 item["message-id"] = item[f]
 
