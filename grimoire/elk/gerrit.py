@@ -199,6 +199,14 @@ class GerritEnrich(Enrich):
                "review_status": {
                   "type": "string",
                   "index":"not_analyzed"
+               },
+               "repository": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "domain": {
+                  "type": "string",
+                  "index":"not_analyzed"
                }
             }
         }
