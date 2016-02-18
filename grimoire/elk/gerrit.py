@@ -230,7 +230,8 @@ class GerritEnrich(Enrich):
         if 'name' in review['owner']:
             eitem["name"] = review['owner']['name']
             if 'email' in review['owner']:
-                eitem["domain"] = review['owner']['email'].split("@")[1]
+                if '@' in review['owner']['email']:
+                    eitem["domain"] = review['owner']['email'].split("@")[1]
         # New fields generated for enrichment
         eitem["patchsets"] = len(review["patchSets"])
 
