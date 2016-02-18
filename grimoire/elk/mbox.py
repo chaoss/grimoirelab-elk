@@ -61,6 +61,10 @@ class MBoxEnrich(Enrich):
                  "Delivered-To" : {
                    "type": "string",
                    "index":"not_analyzed"
+                 },
+                 "list" : {
+                   "type": "string",
+                   "index":"not_analyzed"
                  }
            }
         } """
@@ -93,6 +97,7 @@ class MBoxEnrich(Enrich):
             eitem[map_fields[fn]] = commit[fn]
         # Enrich dates
         eitem["email_date"] = parser.parse(item["__metadata__updated_on"]).isoformat()
+        eitem["list"] = item["__metadata__"]["origin"]
         return eitem
 
     def enrich_items(self, items):
