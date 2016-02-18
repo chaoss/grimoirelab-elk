@@ -221,7 +221,7 @@ class GerritEnrich(Enrich):
         eitem = {}  # Item enriched
 
         # Fields that are the same in item and eitem
-        copy_fields = ["status", "branch", "url","__metadata__updated_on"]
+        copy_fields = ["status", "branch", "url","__metadata__updated_on","number"]
         for f in copy_fields:
             eitem[f] = review[f]
         # Fields which names are translated
