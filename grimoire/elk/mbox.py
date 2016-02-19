@@ -49,6 +49,9 @@ class MBoxEnrich(Enrich):
     def get_field_unique_id(self):
         return "message-id"
 
+    def get_fields_uuid(self):
+        return ["from_uuid"]
+
     def get_elastic_mappings(self):
 
         mapping = """
@@ -71,16 +74,55 @@ class MBoxEnrich(Enrich):
 
         return {"items":mapping}
 
-
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
 
+        for identity in ['From']:
+            if item[identity]:
+                user = self.get_sh_identity(item[identity])
+                identities.append(user)
         return identities
 
-    def get_sh_identity(self, mbox_user):
+    def get_sh_identity(self, from_data):
+        # "From": "hwalsh at wikiledia.net (Heat Walsh)"
+
         identity = {}
+
+        # First desofuscate the email
+        EMAIL_OBFUSCATION_PATTERNS = [' at ', '_at_', ' en ']
+        for pattern in EMAIL_OBFUSCATION_PATTERNS:
+            if from_data.find(pattern) != -1:
+                from_data = from_data.replace(pattern, '@')
+
+        fields_from = from_data.split(" ",1)
+        identity['username'] = None  # email does not have username
+        identity['email'] = fields_from[0]
+        identity['name'] = fields_from[1].replace("(","").replace(")","")
         return identity
+
+    def get_item_sh(self, item):
+        """ Add sorting hat enrichment fields """
+        eitem = {}  # Item enriched
+
+        # Enrich SH
+        identity  = self.get_sh_identity(item["From"])
+        eitem["from_uuid"] = self.get_uuid(identity, self.get_connector_name())
+        # bot
+        u = api.unique_identities(self.sh_db, eitem["from_uuid"])[0]
+        if u.profile:
+            eitem["from_bot"] = u.profile.is_bot
+        else:
+            eitem["from_bot"] = 0  # By default, identities are not bots
+
+        if identity['email']:
+            try:
+                eitem["domain"] = identity['email'].split("@")[1]
+            except IndexError:
+                logging.warning("Bad email format: %s" % (identity['email']))
+                eitem["domain"] = None
+        return eitem
+
 
     def get_rich_item(self, item):
         eitem = {}
@@ -98,6 +140,10 @@ class MBoxEnrich(Enrich):
         # Enrich dates
         eitem["email_date"] = parser.parse(item["__metadata__updated_on"]).isoformat()
         eitem["list"] = item["__metadata__"]["origin"]
+
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(item))
+
         return eitem
 
     def enrich_items(self, items):
