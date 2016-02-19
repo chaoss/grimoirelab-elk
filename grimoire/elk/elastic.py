@@ -111,7 +111,13 @@ class ElasticSearch(object):
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         task_init = time()
-        requests.put(url, data=bulk_json)
+        try:
+            requests.put(url, data=bulk_json)
+        except UnicodeEncodeError:
+            # Related to body.encode('iso-8859-1'). mbox data
+            logging.error("Encondig error ... converting bulk to iso-8859-1")
+            bulk_json = bulk_json.encode('iso-8859-1','ignore')
+            requests.put(url, data=bulk_json)
         new_items += current
         logging.debug("bulk packet sent (%.2f sec prev, %i total)"
                       % (time()-task_init, new_items))
