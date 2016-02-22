@@ -47,7 +47,7 @@ class MBoxEnrich(Enrich):
         return "__metadata__updated_on"
 
     def get_field_unique_id(self):
-        return "message-id"
+        return "ocean-unique-id"
 
     def get_fields_uuid(self):
         return ["from_uuid"]
@@ -127,7 +127,7 @@ class MBoxEnrich(Enrich):
     def get_rich_item(self, item):
         eitem = {}
         # Fields that are the same in item and eitem
-        copy_fields = ["Date","Delivered-To","From","Subject","message-id"]
+        copy_fields = ["Date","Delivered-To","From","Subject","message-id","ocean-unique-id"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]

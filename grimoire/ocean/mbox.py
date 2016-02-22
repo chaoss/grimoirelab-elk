@@ -30,18 +30,19 @@ from grimoire.ocean.elastic import ElasticOcean
 class MBoxOcean(ElasticOcean):
     """MBox Ocean feeder"""
 
-    def __init__(self, perceval_backend, cache = False,
-                 incremental = True, **nouse):
+    def __init__(self, perceval_backend, cache=False,
+                 incremental=True, **nouse):
         super(MBoxOcean, self).__init__(perceval_backend)
 
     def get_field_unique_id(self):
-        return "message-id"
+        return "ocean-unique-id"
 
     def _fix_item(self, item):
         # "Message-Id" and "Message-ID" all converted to "message-id"
         for f in ["Message-Id", "Message-ID", "message-id", "Message-id"]:
             if f in item:
                 item["message-id"] = item[f]
+        item["ocean-unique-id"] = item["message-id"]+"_"+item["__metadata__"]['origin']
 
     def get_field_date(self):
         return "__metadata__updated_on"
