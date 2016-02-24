@@ -37,6 +37,7 @@ from grimoire.ocean.github import GitHubOcean
 from grimoire.ocean.git import GitOcean
 from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
+from grimoire.ocean.jira import JiraOcean
 
 # Connectors for EnrichOcean
 from grimoire.elk.bugzilla import BugzillaEnrich
@@ -45,6 +46,8 @@ from grimoire.elk.github import GitHubEnrich
 from grimoire.elk.git import GitEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
+from grimoire.elk.jira import JiraEnrich
+
 
 # Connectors for Perceval
 from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
@@ -53,6 +56,7 @@ from perceval.backends.gerrit import Gerrit, GerritCommand
 from perceval.backends.git import Git, GitCommand
 from perceval.backends.mbox import MBox, MBoxCommand
 from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
+from perceval.backends.jira import Jira, JiraCommand
 
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.elk.elastic import ElasticConnectException
@@ -85,7 +89,8 @@ def get_connectors():
             "git":[Git, GitOcean, GitEnrich, GitCommand],
             "mbox":[Git, MBoxOcean, MBoxEnrich, MBoxCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
-                             StackExchangeEnrich, StackExchangeCommand]
+                             StackExchangeEnrich, StackExchangeCommand],
+            "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand]
             }  # Will come from Registry
 
 def get_elastic(url, es_index, clean = None, ocean_backend = None):
