@@ -95,6 +95,19 @@ class BugzillaEnrich(Enrich):
 
         return eitem
 
+    def get_item_project(self, item):
+        """ Get project mapping enrichment field """
+        ds_name = "its"  # data source name in projects map
+        url = item['__metadata__']['origin']
+        # https://bugs.eclipse.org/bugs/buglist.cgi?product=Mylyn%20Tasks
+        product = item['product'][0]['__text__']
+        repo = url+"/buglist.cgi?product="+product
+        try:
+            project = (self.prjs_map[ds_name][repo])
+        except KeyError:
+            # logging.warning("Project not found for repository %s" % (repo))
+            project = None
+        return {"project": project}
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
@@ -171,6 +184,9 @@ class BugzillaEnrich(Enrich):
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(issue))
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(issue))
 
         return eitem
 
