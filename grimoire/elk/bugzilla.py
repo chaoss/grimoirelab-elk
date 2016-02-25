@@ -134,14 +134,18 @@ class BugzillaEnrich(Enrich):
                 eitem[f] = None
 
         if "assigned_to" in issue:
-            eitem["assigned_to"] = issue["assigned_to"][0]["name"]
+            if "name" in issue["assigned_to"][0]:
+                eitem["assigned_to"] = issue["assigned_to"][0]["name"]
 
         if "reporter" in issue:
-            eitem["reporter"] = issue["reporter"][0]["name"]
+            if "name" in issue["reporter"][0]:
+                eitem["reporter"] = issue["reporter"][0]["name"]
 
         eitem["bug_id"] = issue['bug_id'][0]['__text__']
         eitem["status"]  = issue['bug_status'][0]['__text__']
-        eitem["summary"]  = issue['short_desc'][0]['__text__']
+        if "short_desc" in issue:
+            if "__text__" in issue["short_desc"][0]:
+                eitem["summary"]  = issue['short_desc'][0]['__text__']
 
         # Component and product
         eitem["component"] = issue['component'][0]['__text__']
@@ -151,6 +155,7 @@ class BugzillaEnrich(Enrich):
         date_ts = parser.parse(issue['creation_ts'][0]['__text__'])
         eitem['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
         date_ts = parser.parse(issue['delta_ts'][0]['__text__'])
+        eitem['changeddate_date'] = date_ts.isoformat()
         eitem['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
         # Add extra JSON fields used in Kibana (enriched fields)
