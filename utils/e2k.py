@@ -30,7 +30,7 @@ from os import sys
 import requests
 
 from grimoire.ocean.elastic import ElasticOcean
- 
+
 
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.utils import config_logging
@@ -52,6 +52,7 @@ def get_params_parser_create_dash():
 
     parser.add_argument("-d", "--dashboard", help="dashboard to be used as template")
     parser.add_argument("-i", "--index", help="enriched index to be used as data source")
+    parser.add_argument("--kibana", dest="kibana_index", default=".kibana", help="Kibana index name (.kibana default)")
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
 
     return parser
@@ -121,7 +122,7 @@ def get_search_from_vis(elastic, vis):
     return search_id
 
 
-def create_search(elastic_url, dashboard, index_pattern):
+def create_search(elastic_url, dashboard, index_pattern, es_index=None):
     """ Create the base search for vis if used
 
         :param elastic_url: URL for ElasticSearch (ES) server
@@ -131,7 +132,8 @@ def create_search(elastic_url, dashboard, index_pattern):
     """
 
     search_id = None
-    es_index = ".kibana"
+    if not es_index:
+        es_index = ".kibana"
     elastic = ElasticSearch(elastic_url, es_index)
 
     dash_data = get_dashboard_json(elastic, dashboard)
@@ -201,9 +203,9 @@ def get_index_pattern_from_vis(elastic, vis):
     return index_pattern
 
 
-def create_index_pattern(elastic_url, dashboard, enrich_index):
-    """ Create a index pattern using as template the index pattern 
-        in dashboard template vis 
+def create_index_pattern(elastic_url, dashboard, enrich_index, es_index=None):
+    """ Create a index pattern using as template the index pattern
+        in dashboard template vis
 
         :param elastic_url: URL for ElasticSearch (ES) server
         :param dashboard: kibana dashboard to be used as template
@@ -212,7 +214,8 @@ def create_index_pattern(elastic_url, dashboard, enrich_index):
     """
 
     index_pattern = None
-    es_index = ".kibana"
+    if not es_index:
+        es_index = ".kibana"
     elastic = ElasticSearch(elastic_url, es_index)
 
     dash_data = get_dashboard_json(elastic, dashboard)
@@ -250,8 +253,8 @@ def create_index_pattern(elastic_url, dashboard, enrich_index):
 
     return enrich_index
 
-def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host):
-    """ Create a new dashboard using dashboard as template 
+def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index=None):
+    """ Create a new dashboard using dashboard as template
         and reading the data from enriched_index """
 
     def new_panels(elastic, panels, search_id):
@@ -308,13 +311,14 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host):
             r = requests.post(url, data = json.dumps(vis_data))
             logging.debug("Created new vis %s" % (url))
 
+    if not es_index:
+        es_index = ".kibana"
 
     # First create always the index pattern as data source
-    index_pattern = create_index_pattern(elastic_url, dashboard, enrich_index)
+    index_pattern = create_index_pattern(elastic_url, dashboard, enrich_index, es_index)
     # If search is used create a new search with the new index_pàttern
-    search_id = create_search(elastic_url, dashboard, index_pattern)
+    search_id = create_search(elastic_url, dashboard, index_pattern, es_index)
 
-    es_index = ".kibana"
     elastic = ElasticSearch(elastic_url, es_index)
 
     # Create the new dashboard from the template
@@ -339,7 +343,7 @@ if __name__ == '__main__':
     kibana_host = "http://localhost:5601"
 
     try:
-        url = create_dashboard(args.elastic_url, args.dashboard, args.index, kibana_host)
+        url = create_dashboard(args.elastic_url, args.dashboard, args.index, kibana_host, args.kibana_index)
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
         sys.exit(0)
