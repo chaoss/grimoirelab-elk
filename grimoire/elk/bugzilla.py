@@ -133,6 +133,20 @@ class BugzillaEnrich(Enrich):
             else:
                 eitem[f] = None
 
+        if "assigned_to" in issue:
+            eitem["assigned_to"] = issue["assigned_to"][0]["name"]
+
+        if "reporter" in issue:
+            eitem["reporter"] = issue["reporter"][0]["name"]
+
+        eitem["bug_id"] = issue['bug_id'][0]['__text__']
+        eitem["status"]  = issue['bug_status'][0]['__text__']
+        eitem["summary"]  = issue['short_desc'][0]['__text__']
+
+        # Component and product
+        eitem["component"] = issue['component'][0]['__text__']
+        eitem["product"]  = issue['product'][0]['__text__']
+
         # Fix dates
         date_ts = parser.parse(issue['creation_ts'][0]['__text__'])
         eitem['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
