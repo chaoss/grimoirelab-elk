@@ -31,7 +31,7 @@ import requests
 import sys
 
 from grimoire.ocean.elastic import ElasticOcean
- 
+
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.utils import config_logging
 from e2k import get_dashboard_json, get_vis_json, get_search_json, get_index_pattern_json
@@ -48,6 +48,7 @@ def get_params_parser_create_dash():
     parser.add_argument("--dashboard", help="Kibana dashboard id to export")
     parser.add_argument("--export", dest="export_file", help="file with the dashboard exported")
     parser.add_argument("--import", dest="import_file", help="file with the dashboard to be imported")
+    parser.add_argument("--index", dest="kibana_index", default=".kibana", help="Kibana index name (.kibana default)")
     parser.add_argument("--list", action='store_true', help="list available dashboards")
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
 
@@ -64,8 +65,9 @@ def get_params():
             parser.error("--export needs --dashboard")
     return args
 
-def list_dashboards(elastic_url):
-    es_index = ".kibana"
+def list_dashboards(elastic_url, es_index=None):
+    if not es_index:
+        es_index = ".kibana"
 
     elastic = ElasticSearch(elastic_url, es_index)
 
@@ -77,11 +79,15 @@ def list_dashboards(elastic_url):
 
     res_json = r.json()
 
+    if "hits" not in res_json:
+        logging.error("Can't find dashboards")
+        raise RuntimeError("Can't find dashboards")
+
     for dash in res_json["hits"]["hits"]:
         print (dash["_id"])
 
 
-def import_dashboard(elastic_url, import_file):
+def import_dashboard(elastic_url, import_file, es_index=None):
     logging.debug("Reading from %s the JSON for the dashboard to be imported" % (args.import_file))
 
     with open(import_file, 'r') as f:
@@ -95,7 +101,8 @@ def import_dashboard(elastic_url, import_file):
             logging.error("Wrong file format. Can't find 'dashboard' field.")
             sys.exit(1)
 
-        es_index = ".kibana"
+        if not es_index:
+            es_index = ".kibana"
         elastic = ElasticSearch(elastic_url, es_index)
 
         url = elastic.index_url+"/dashboard/"+kibana['dashboard']['id']
@@ -116,7 +123,10 @@ def import_dashboard(elastic_url, import_file):
                 url = elastic.index_url+"/visualization"+"/"+vis['id']
                 requests.post(url, data = json.dumps(vis['value']))
 
-def export_dashboard(elastic_url, dash_id, export_file):
+        logging.debug("Done")
+
+
+def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
 
     # Kibana dashboard fields
     kibana = {"dashboard": None,
@@ -129,7 +139,8 @@ def export_dashboard(elastic_url, dash_id, export_file):
     index_ids_done = []
 
     logging.debug("Exporting dashboard %s to %s" % (args.dashboard, args.export_file))
-    es_index = ".kibana"
+    if not es_index:
+        es_index = ".kibana"
 
     elastic = ElasticSearch(elastic_url, es_index)
 
@@ -155,6 +166,7 @@ def export_dashboard(elastic_url, dash_id, export_file):
                 index_ids_done.append(index_pattern_id)
                 kibana["index_patterns"].append({"id":index_pattern_id,
                                                  "value":get_index_pattern_json(elastic, index_pattern_id)})
+    logging.debug("Done")
 
     with open(export_file, 'w') as f:
         f.write(json.dumps(kibana))
@@ -166,11 +178,11 @@ if __name__ == '__main__':
     config_logging(args.debug)
 
     if args.import_file:
-        import_dashboard(args.elastic_url, args.import_file)
+        import_dashboard(args.elastic_url, args.import_file, args.kibana_index)
     elif args.export_file:
         if os.path.isfile(args.export_file):
             logging.info("%s exists. Remove it before running." % (args.export_file))
             sys.exit(0)
-        export_dashboard(args.elastic_url, args.dashboard, args.export_file)
+        export_dashboard(args.elastic_url, args.dashboard, args.export_file, args.kibana_index)
     elif args.list:
-        list_dashboards(args.elastic_url)
+        list_dashboards(args.elastic_url, args.kibana_index)
