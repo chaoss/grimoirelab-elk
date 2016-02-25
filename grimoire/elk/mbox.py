@@ -171,6 +171,6 @@ class MBoxEnrich(Enrich):
             requests.put(url, data = bulk_json)
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
-            logging.error("Encondig error ... converting bulk to iso-8859-1")
+            logging.error("Encoding error ... converting bulk to iso-8859-1")
             bulk_json = bulk_json.encode('iso-8859-1','ignore')
             requests.put(url, data=bulk_json)
