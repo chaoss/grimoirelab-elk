@@ -48,7 +48,7 @@ def get_params_parser_create_dash():
     parser.add_argument("--dashboard", help="Kibana dashboard id to export")
     parser.add_argument("--export", dest="export_file", help="file with the dashboard exported")
     parser.add_argument("--import", dest="import_file", help="file with the dashboard to be imported")
-    parser.add_argument("--index", dest="kibana_index", default=".kibana", help="Kibana index name (.kibana default)")
+    parser.add_argument("--kibana", dest="kibana_index", default=".kibana", help="Kibana index name (.kibana default)")
     parser.add_argument("--list", action='store_true', help="list available dashboards")
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
 
