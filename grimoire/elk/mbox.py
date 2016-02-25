@@ -79,7 +79,7 @@ class MBoxEnrich(Enrich):
         identities = []
 
         for identity in ['From']:
-            if item[identity]:
+            if identity in item and item[identity]:
                 user = self.get_sh_identity(item[identity])
                 identities.append(user)
         return identities
@@ -98,7 +98,10 @@ class MBoxEnrich(Enrich):
         fields_from = from_data.split(" ",1)
         identity['username'] = None  # email does not have username
         identity['email'] = fields_from[0]
-        identity['name'] = fields_from[1].replace("(","").replace(")","")
+        identity['name'] = None
+        if len(fields_from) == 2:
+            # Name also included
+            identity['name'] = fields_from[1].replace("(","").replace(")","")
         return identity
 
     def get_item_sh(self, item):
