@@ -129,7 +129,7 @@ class GitEnrich(Enrich):
     def get_item_project(self, item):
         """ Get project mapping enrichment field """
         ds_name = "scm"  # data source name in projects map
-        url_git = item['__metadata__']['origin'].split("/")[-1]
+        url_git = item['__metadata__']['origin']
         try:
             project = (self.prjs_map[ds_name][url_git])
         except KeyError:
