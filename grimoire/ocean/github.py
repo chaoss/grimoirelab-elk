@@ -39,13 +39,6 @@ class GitHubOcean(ElasticOcean):
     def get_field_date(self):
         return "__metadata__updated_on"
 
-    def drop_item(self, item):
-        """ Drop issues that are not Pull Requests """
-        drop = False
-        if not 'head' in item.keys() and not 'pull_request' in item.keys():
-            drop = True
-        return drop
-
     def add_update_date(self, item):
         entry_lastUpdated = parser.parse(item['__metadata__']['updated_on'])
         # Use local server time for incremental updates
