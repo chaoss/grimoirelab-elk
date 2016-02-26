@@ -39,6 +39,9 @@ RUN pip3 install rq && pip3 install rq-dashboard==0.3.4
 # Bug in 0.3.5: https://github.com/nvie/rq-dashboard/pull/89/files
 # In 0.3.5 workers don't appear in the dashboard
 
+# perceval needs a newer version than Debian 8
+RUN pip3 install --upgrade requests
+
 RUN echo "${DEPLOY_USER}    ALL=NOPASSWD: ALL" >> /etc/sudoers
 
 # Configuring and UTF-8 local needed by rqworker
