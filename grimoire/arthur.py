@@ -35,14 +35,15 @@ from grimoire.utils import get_elastic
 from grimoire.utils import get_connectors
 import traceback
 
-def feed_backend(url, clean, fetch_cache, backend_name, backend_params, index=None):
+def feed_backend(url, clean, fetch_cache, backend_name, backend_params, es_index=None):
     """ Feed Ocean with backend data """
 
     backend = None
     repo = {}    # repository data to be stored in conf
     repo['backend_name'] = backend_name
     repo['backend_params'] = backend_params
-    es_index = None
+    if es_index:
+        clean = False  # don't remove index, it could be shared
 
 
     if backend_name not in get_connectors():
@@ -59,7 +60,6 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params, index=No
         logging.info("Feeding Ocean from %s (%s)" % (backend_name,
                                                      backend.origin))
 
-        es_index = index
         if not es_index:
             es_index = backend_name + "_" + backend.origin
         elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
@@ -173,7 +173,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     return items
 
 
-def enrich_backend(url, clean, backend_name, backend_params, index=None,
+def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    sortinghat=True, db_projects_map=None):
     """ Enrich Ocean index """
 
@@ -233,6 +233,9 @@ def enrich_backend(url, clean, backend_name, backend_params, index=None,
     backend = None
     enrich_index = None
 
+    if ocean_index:
+        clean = False  # don't remove index, it could be shared
+
     if backend_name not in get_connectors():
         raise RuntimeError("Unknown backend %s" % backend_name)
     connector = get_connectors()[backend_name]
@@ -243,7 +246,6 @@ def enrich_backend(url, clean, backend_name, backend_params, index=None,
 
         backend = backend_cmd.backend
 
-        ocean_index = index
         if not ocean_index:
             ocean_index = backend_name + "_" + backend.origin
         enrich_index = ocean_index+"_enrich"
