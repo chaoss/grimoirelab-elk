@@ -36,4 +36,10 @@ class GitOcean(ElasticOcean):
         return "commit"
 
     def get_field_date(self):
-        return "CommitDate"
+        return "metadata__updated_on"
+
+    def add_update_date(self, item):
+        entry_lastUpdated = parser.parse(item['__metadata__']['updated_on'])
+        # Use local server time for incremental updates
+        # update = entry_lastUpdated.replace(tzinfo=None)
+        item['metadata__updated_on'] = entry_lastUpdated.isoformat()

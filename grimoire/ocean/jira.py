@@ -37,8 +37,8 @@ class JiraOcean(ElasticOcean):
         return "id"
 
     def get_field_date(self):
-        return "__metadata__updated_on"
+        return "metadata__updated_on"
 
     def add_update_date(self, item):
         entry_lastUpdated = parser.parse(item['__metadata__']['updated_on'])
-        item['__metadata__updated_on'] = entry_lastUpdated.isoformat()
+        item['metadata__updated_on'] = entry_lastUpdated.isoformat()
