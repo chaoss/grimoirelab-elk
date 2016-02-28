@@ -171,6 +171,7 @@ class GitEnrich(Enrich):
                 except ValueError:
                     # logging.warning(cfile)
                     continue
+        eitem["lines_changed"] = lines_changed
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(commit))
