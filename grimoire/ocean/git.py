@@ -40,7 +40,7 @@ class GitOcean(ElasticOcean):
 
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["commit"]+"_"+item["__metadata__"]['origin']
-
+        item["metadata__origin"] = item["__metadata__"]['origin']
 
     def add_update_date(self, item):
         entry_lastUpdated = parser.parse(item['__metadata__']['updated_on'])
