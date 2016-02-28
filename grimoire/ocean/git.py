@@ -23,6 +23,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+from dateutil import parser
 from grimoire.ocean.elastic import ElasticOcean
 
 class GitOcean(ElasticOcean):
