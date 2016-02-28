@@ -140,7 +140,7 @@ class GitEnrich(Enrich):
     def get_rich_commit(self, commit):
         eitem = {}
         # Fields that are the same in item and eitem
-        copy_fields = ["message","Author","metadata__updated_on","ocean-unique-id"]
+        copy_fields = ["message","Author","metadata__updated_on","ocean-unique-id","metadata__origin"]
         for f in copy_fields:
             if f in commit:
                 eitem[f] = commit[f]
