@@ -50,6 +50,11 @@ class BugzillaEnrich(Enrich):
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "reporter_uuid"]
 
+    def get_field_unique_id(self):
+        # Not yet in ocean index
+        # return "ocean-unique-id"
+        return "bug_id"
+
     @classmethod
     def get_sh_identity(cls, user):
         """ Return a Sorting Hat identity using bugzilla user data """
@@ -139,7 +144,8 @@ class BugzillaEnrich(Enrich):
 
         eitem = {}
         # Fields that are the same in item and eitem
-        copy_fields = ["assigned_to","reporter"]
+        copy_fields = ["ocean-unique-id"]
+
         for f in copy_fields:
             if f in issue:
                 eitem[f] = issue[f]
@@ -198,7 +204,6 @@ class BugzillaEnrich(Enrich):
 #             self.issues_to_es(items)
         self.issues_to_es(items)
 
-
     def issues_list_to_es(self, items):
 
         elastic_type = "issues_list"
@@ -223,7 +228,7 @@ class BugzillaEnrich(Enrich):
                 logging.debug("bulk packet sent (%.2f sec, %i total)"
                               % (time()-task_init, total))
             data_json = json.dumps(issue)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (issue["bug_id"])
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         task_init = time()

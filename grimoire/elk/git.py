@@ -47,7 +47,7 @@ class GitEnrich(Enrich):
         return "CommitDate"
 
     def get_field_unique_id(self):
-        return "hash"
+        return "ocean-unique-id"
 
     def get_fields_uuid(self):
         return ["author_uuid", "committer_uuid"]
@@ -140,7 +140,7 @@ class GitEnrich(Enrich):
     def get_rich_commit(self, commit):
         eitem = {}
         # Fields that are the same in item and eitem
-        copy_fields = ["message","Author"]
+        copy_fields = ["message","Author","metadata__updated_on"]
         for f in copy_fields:
             if f in commit:
                 eitem[f] = commit[f]

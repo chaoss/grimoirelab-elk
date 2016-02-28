@@ -35,7 +35,7 @@ class BugzillaOcean(ElasticOcean):
         return field
 
     def get_field_unique_id(self):
-        return "bug_id"
+        return "ocean-unique-id"
 
     def get_last_update_from_es(self):
         ''' Find in JSON storage the last update date '''
@@ -47,6 +47,9 @@ class BugzillaOcean(ElasticOcean):
             last_update = last_update
 
         return last_update
+
+    def _fix_item(self, item):
+        item["ocean-unique-id"] = item["bug_id"]+"_"+item["__metadata__"]['origin']
 
     def add_update_date(self, item):
         # entry_lastUpdated = parser.parse(item['delta_ts'][0]["__text__"])

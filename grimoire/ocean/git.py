@@ -33,10 +33,14 @@ class GitOcean(ElasticOcean):
         super(GitOcean, self).__init__(perceval_backend)
 
     def get_field_unique_id(self):
-        return "commit"
+        return "ocean-unique-id"
 
     def get_field_date(self):
         return "metadata__updated_on"
+
+    def _fix_item(self, item):
+        item["ocean-unique-id"] = item["commit"]+"_"+item["__metadata__"]['origin']
+
 
     def add_update_date(self, item):
         entry_lastUpdated = parser.parse(item['__metadata__']['updated_on'])
