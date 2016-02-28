@@ -68,6 +68,10 @@ class GitEnrich(Enrich):
                "repo_name": {
                   "type": "string",
                   "index":"not_analyzed"
+               },
+               "metadata__origin": {
+                  "type": "string",
+                  "index":"not_analyzed"
                }
             }
         } """

@@ -39,6 +39,19 @@ class GitOcean(ElasticOcean):
     def get_field_date(self):
         return "metadata__updated_on"
 
+    def get_elastic_mappings(self):
+
+        mapping = '''
+        {
+            "properties": {
+               "metadata__origin": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               }
+            }
+        }
+        '''
+
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["commit"]+"_"+item["__metadata__"]['origin']
         item["metadata__origin"] = item["__metadata__"]['origin']
