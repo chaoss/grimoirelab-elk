@@ -256,7 +256,12 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         enrich_backend.set_elastic(elastic_enrich)
 
         # We need to enrich from just updated items since last enrichment
-        last_enrich = enrich_backend.get_last_update_from_es()
+        filter_ = None
+        if enrich_backend.get_connector_name() == "git":
+            # In git there are several repositories in the same index
+            filter_ = {"name":"metadata__origin",
+                       "value":backend.origin}
+        last_enrich = enrich_backend.get_last_update_from_es(filter_)
 
         logging.debug("Last enrichment: %s" % (last_enrich))
 

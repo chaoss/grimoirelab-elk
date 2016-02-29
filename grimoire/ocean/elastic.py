@@ -27,11 +27,8 @@
 
 
 from datetime import datetime
-from dateutil import parser
-import json
 import logging
 import requests
-
 
 class ElasticOcean(object):
 
@@ -46,7 +43,7 @@ class ElasticOcean(object):
                             "(default: http://127.0.0.1:9200)")
 
 
-    def __init__(self, perceval_backend, from_date = None, fetch_cache = False):
+    def __init__(self, perceval_backend, from_date=None, fetch_cache=False):
 
         self.perceval_backend = perceval_backend
         self.last_update = None  # Last update in ocean items index for feed
@@ -74,6 +71,11 @@ class ElasticOcean(object):
 
         return last_update
 
+    def get_connector_name(self):
+        """ Find the name for the current connector """
+        from ..utils import get_connector_name
+        return get_connector_name(type(self))
+
     def drop_item(self, item):
         """ Drop items not to be inserted in Elastic """
         return False
@@ -86,10 +88,14 @@ class ElasticOcean(object):
         """ Some buggy data sources need fixing (like mbox and message-id) """
         pass
 
-    def feed(self, from_date = None):
+    def feed(self, from_date=None):
         """ Feed data in Elastic from Perceval """
 
-        self.last_update = self.get_last_update_from_es()
+        filter_ = None
+        if self.get_connector_name() == "git":
+            filter_ = {"name":"metadata__origin",
+                       "value":self.perceval_backend.origin}
+        self.last_update = self.get_last_update_from_es(filter_)
         last_update = self.last_update
         # last_update = '2015-12-28 18:02:00'
         if from_date:
@@ -151,6 +157,25 @@ class ElasticOcean(object):
     # Iterator
     def _get_elastic_items(self):
 
+        def get_origin_filter():
+            # To fix the origin for items
+            filter_ = None
+            if self.get_connector_name() == "git":
+                logging.info("Feeding from origin %s" % (self.perceval_backend.origin))
+                filter_ = {"name":"metadata__origin",
+                           "value":self.perceval_backend.origin}
+                origin_filter = '''
+                    {
+                        "term" : { "%s" : "%s"  }
+                     }
+                ''' % (filter_['name'], filter_['value'])
+            else:
+                origin_filter = None
+
+            return origin_filter
+
+
+
         url = self.elastic.index_url
         # 1 minute to process the results of size items
         # In gerrit enrich with 500 items per page we need >1 min
@@ -163,21 +188,30 @@ class ElasticOcean(object):
             date_field = self.get_field_date()
             from_date = self.from_date.isoformat()
 
-            filter_ = """
+            origin_filter = get_origin_filter()
+
+            filters = '''
+                {"range":
+                    {"%s": {"gte": "%s"}}
+                }
+            ''' % (date_field, from_date)
+
+            if origin_filter:
+                filters += ", %s" % (origin_filter)
+
+
+
+            query = """
             {
                 "query": {
                     "bool": {
-                        "must": [
-                            {"range":
-                                {"%s": {"gte": "%s"}}
-                            }
-                        ]
+                        "must": [%s]
                     }
                 }
             }
-            """ % (date_field, from_date)
+            """ % (filters)
 
-            r = requests.post(url, data=filter_)
+            r = requests.post(url, data=query)
 
         else:
             if self.elastic_scroll_id:
@@ -194,7 +228,22 @@ class ElasticOcean(object):
                 r = requests.get(url+"?"+ get_scroll_data)
 
             else:
-                r = requests.get(url)
+                origin_filter = get_origin_filter()
+
+                if origin_filter:
+                    filters = origin_filter
+                    query = """
+                    {
+                        "query": {
+                            "bool": {
+                                "must": [%s]
+                            }
+                        }
+                    }
+                    """ % (filters)
+                    r = requests.post(url, data=query)
+                else:
+                    r = requests.get(url)
 
         items = []
         try:

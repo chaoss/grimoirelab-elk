@@ -44,7 +44,7 @@ class MBoxEnrich(Enrich):
         self.elastic = elastic
 
     def get_field_date(self):
-        return "__metadata__updated_on"
+        return "metadata__updated_on"
 
     def get_field_unique_id(self):
         return "ocean-unique-id"
@@ -141,7 +141,7 @@ class MBoxEnrich(Enrich):
         for fn in map_fields:
             eitem[map_fields[fn]] = commit[fn]
         # Enrich dates
-        eitem["email_date"] = parser.parse(item["__metadata__updated_on"]).isoformat()
+        eitem["email_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
         eitem["list"] = item["__metadata__"]["origin"]
 
         if self.sortinghat:

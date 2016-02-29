@@ -45,7 +45,7 @@ class JiraEnrich(Enrich):
         self.elastic = elastic
 
     def get_field_date(self):
-        return "__metadata__updated_on"
+        return "metadata__updated_on"
 
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "reporter_uuid"]
@@ -118,7 +118,7 @@ class JiraEnrich(Enrich):
             eitem['number_of_comments'] = len(issue['long_desc'])
         eitem['url'] = self.perceval_backend.url + "/browse/"+ issue['key']
         eitem['time_to_last_update_days'] = \
-            get_time_diff_days(issue['fields']['created'], issue['__metadata__updated_on'])
+            get_time_diff_days(issue['fields']['created'], issue['metadata__updated_on'])
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(issue))

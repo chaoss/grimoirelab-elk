@@ -29,10 +29,6 @@ from grimoire.ocean.elastic import ElasticOcean
 class GitOcean(ElasticOcean):
     """Git Ocean feeder"""
 
-    def __init__(self, perceval_backend, cache = False,
-                 incremental = True, **nouse):
-        super(GitOcean, self).__init__(perceval_backend)
-
     def get_field_unique_id(self):
         return "ocean-unique-id"
 

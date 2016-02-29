@@ -30,10 +30,6 @@ from grimoire.ocean.elastic import ElasticOcean
 class MBoxOcean(ElasticOcean):
     """MBox Ocean feeder"""
 
-    def __init__(self, perceval_backend, cache=False,
-                 incremental=True, **nouse):
-        super(MBoxOcean, self).__init__(perceval_backend)
-
     def get_field_unique_id(self):
         return "ocean-unique-id"
 

@@ -44,7 +44,7 @@ class GitEnrich(Enrich):
         self.elastic = elastic
 
     def get_field_date(self):
-        return "CommitDate"
+        return "metadata__updated_on"
 
     def get_field_unique_id(self):
         return "ocean-unique-id"

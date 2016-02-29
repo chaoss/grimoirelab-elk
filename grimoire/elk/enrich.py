@@ -96,7 +96,7 @@ class Enrich(object):
         # If possible, enriched_item and item will have the same id
         return eitem["_id"]
 
-    def get_last_update_from_es(self, _filter = None):
+    def get_last_update_from_es(self, _filter=None):
 
         last_update = self.elastic.get_last_date(self.get_field_date(), _filter)
 

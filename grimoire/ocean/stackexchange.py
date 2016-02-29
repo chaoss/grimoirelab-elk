@@ -29,10 +29,6 @@ from grimoire.ocean.elastic import ElasticOcean
 class StackExchangeOcean(ElasticOcean):
     """StackExchange Ocean feeder"""
 
-    def __init__(self, perceval_backend, cache = False,
-                 incremental = True, **nouse):
-        super(StackExchangeOcean, self).__init__(perceval_backend)
-
     def get_field_unique_id(self):
         return "question_id"
 

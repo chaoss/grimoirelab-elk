@@ -44,7 +44,7 @@ class GerritEnrich(Enrich):
         self.elastic = elastic
 
     def get_field_date(self):
-        return "__metadata__updated_on"
+        return "metadata__updated_on"
 
     def get_fields_uuid(self):
         return ["review_uuid", "patchSet_uuid", "approval_uuid"]
@@ -221,14 +221,14 @@ class GerritEnrich(Enrich):
         eitem = {}  # Item enriched
 
         # Fields that are the same in item and eitem
-        copy_fields = ["status", "branch", "url","__metadata__updated_on","number"]
+        copy_fields = ["status", "branch", "url","metadata__updated_on","number"]
         for f in copy_fields:
             eitem[f] = review[f]
         # Fields which names are translated
         map_fields = {"subject": "summary",
                       "id": "githash",
                       "createdOn": "opened",
-                      "__metadata__updated_on": "closed",
+                      "metadata__updated_on": "closed",
                       "project": "repository"
                       }
         for fn in map_fields:
@@ -247,7 +247,7 @@ class GerritEnrich(Enrich):
         createdOn_date = \
             datetime.strptime(review['createdOn'], "%Y-%m-%dT%H:%M:%S")
         updatedOn_date = \
-            datetime.strptime(review['__metadata__updated_on'], "%Y-%m-%dT%H:%M:%S")
+            datetime.strptime(review['metadata__updated_on'], "%Y-%m-%dT%H:%M:%S")
         seconds_day = float(60*60*24)
         timeopen = \
             (updatedOn_date-createdOn_date).total_seconds() / seconds_day
