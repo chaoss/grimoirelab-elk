@@ -160,7 +160,8 @@ class ElasticOcean(object):
         def get_origin_filter():
             # To fix the origin for items
             filter_ = None
-            if self.get_connector_name() == "git":
+            if self.get_connector_name() == "git" and \
+                self.perceval_backend.origin != "":
                 logging.info("Feeding from origin %s" % (self.perceval_backend.origin))
                 filter_ = {"name":"metadata__origin",
                            "value":self.perceval_backend.origin}
