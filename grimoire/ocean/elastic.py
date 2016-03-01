@@ -270,7 +270,7 @@ class ElasticOcean(object):
     def __iter__(self):
 
         self.elastic_scroll_id = None
-        self.elastic_page = 500
+        self.elastic_page = 100
         self.iter_items = self._get_elastic_items()
 
         return self
