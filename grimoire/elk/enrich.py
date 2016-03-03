@@ -23,8 +23,10 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+from functools import lru_cache
 import logging
 import MySQLdb
+
 
 from sortinghat.db.database import Database
 from sortinghat import api
@@ -106,8 +108,28 @@ class Enrich(object):
         """ Mappings for enriched indexes """
         pass
 
+
+    # Sorting Hat stuff to be moved to SortingHat class
+    @lru_cache()
+    def get_enrollments(self, uuid):
+        return api.enrollments(self.sh_db, uuid)
+
+    @lru_cache()
+    def get_unique_identities(self, uuid):
+        return api.unique_identities(self.sh_db, uuid)
+
     def get_uuid(self, identity, backend_name):
         """ Return the Sorting Hat uuid for an identity """
+        # Convert the dict to tuple so it is hashable
+        identity_tuple = tuple(identity.items())
+        uuid = self.__get_uuid_cache(identity_tuple, backend_name)
+        return uuid
+
+    @lru_cache()
+    def __get_uuid_cache(self, identity_tuple, backend_name):
+
+        # Convert tuple to the original dict
+        identity = dict((x, y) for x, y in identity_tuple)
 
         if not self.sortinghat:
             raise RuntimeError("Sorting Hat not active during enrich")

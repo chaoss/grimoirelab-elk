@@ -30,8 +30,6 @@ from dateutil import parser
 
 from grimoire.elk.enrich import Enrich
 
-from sortinghat import api
-
 class GitEnrich(Enrich):
 
     def __init__(self, git, sortinghat=True, db_projects_map = None):
@@ -108,14 +106,16 @@ class GitEnrich(Enrich):
         identity  = self.get_sh_identity(item["Author"])
         eitem["author_name"] = identity['name']
         eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
-        enrollments = api.enrollments(self.sh_db, uuid=eitem["author_uuid"])
+        # enrollments = api.enrollments(self.sh_db, uuid=eitem["author_uuid"])
+        enrollments = self.get_enrollments(eitem["author_uuid"])
         # TODO: get the org_name for the current commit time
         if len(enrollments) > 0:
             eitem["org_name"] = enrollments[0].organization.name
         else:
             eitem["org_name"] = None
         # bot
-        u = api.unique_identities(self.sh_db, eitem["author_uuid"])[0]
+        # u = api.unique_identities(self.sh_db, eitem["author_uuid"])[0]
+        u = self.get_unique_identities(eitem["author_uuid"])[0]
         if u.profile:
             eitem["bot"] = u.profile.is_bot
         else:
