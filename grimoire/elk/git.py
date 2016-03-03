@@ -119,7 +119,7 @@ class GitEnrich(Enrich):
         if u.profile:
             eitem["bot"] = u.profile.is_bot
         else:
-            eitem["bot"] = 0  # By default, identities are not bots
+            eitem["bot"] = False  # By default, identities are not bots
 
         if identity['email']:
             try:
