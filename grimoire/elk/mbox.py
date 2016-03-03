@@ -126,6 +126,21 @@ class MBoxEnrich(Enrich):
                 eitem["domain"] = None
         return eitem
 
+    def get_item_project(self, item):
+        """ Get project mapping enrichment field """
+        # "origin": "dltk-commits"
+        # /mnt/mailman_archives/dltk-dev.mbox/dltk-dev.mbox
+        ds_name = "mls"  # data source name in projects map
+        mls_list = item['__metadata__']['origin']
+        path = "/mnt/mailman_archives/"
+        path += mls_list+".mbox/"+mls_list+".mbox"
+
+        try:
+            project = (self.prjs_map[ds_name][path])
+        except KeyError:
+            # logging.warning("Project not found for list %s" % (mls_list))
+            project = None
+        return {"project": project}
 
     def get_rich_item(self, item):
         eitem = {}
@@ -146,6 +161,9 @@ class MBoxEnrich(Enrich):
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(item))
 
         return eitem
 
