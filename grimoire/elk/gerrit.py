@@ -61,11 +61,23 @@ class GerritEnrich(Enrich):
 
     def get_item_sh(self, item):
         """ Add sorting hat enrichment fields """
-        # TODO: bot and orgs
         eitem = {}  # Item enriched
 
         identity = GerritEnrich.get_sh_identity(item['owner'])
         eitem["uuid"] = self.get_uuid(identity, self.get_connector_name())
+
+        enrollments = self.get_enrollments(eitem["uuid"])
+        # TODO: get the org_name for the current commit time
+        if len(enrollments) > 0:
+            eitem["org_name"] = enrollments[0].organization.name
+        else:
+            eitem["org_name"] = None
+        # bot
+        u = self.get_unique_identities(eitem["author_uuid"])[0]
+        if u.profile:
+            eitem["bot"] = u.profile.is_bot
+        else:
+            eitem["bot"] = False  # By default, identities are not bots
         eitem["bot"] = 0  # Not supported yet
         return eitem
 
