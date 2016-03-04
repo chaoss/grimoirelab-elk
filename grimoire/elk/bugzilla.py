@@ -93,10 +93,21 @@ class BugzillaEnrich(Enrich):
             identity = BugzillaEnrich.get_sh_identity({'assigned_to':item['assigned_to']})
             eitem['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['assigned_to_name'] = identity['name']
+            enrollments = self.get_enrollments(eitem['assigned_to_uuid'])
+            if len(enrollments) > 0:
+                eitem["assigned_to_org_name"] = enrollments[0].organization.name
+            else:
+                eitem["assigned_to_org_name"] = None
+
         if 'reporter' in item:
             identity = BugzillaEnrich.get_sh_identity({'reporter':item['reporter']})
             eitem['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['reporter_name'] = identity['name']
+            enrollments = self.get_enrollments(eitem['reporter_uuid'])
+            if len(enrollments) > 0:
+                eitem["reporter_org_name"] = enrollments[0].organization.name
+            else:
+                eitem["reporter_org_name"] = None
 
         return eitem
 
