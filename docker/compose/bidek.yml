@@ -1,0 +1,58 @@
+elasticsearch:
+  restart: "always" 
+  image: elasticsearch:2.2
+  command: elasticsearch -Des.network.bind_host=0.0.0.0 -Des.path.repo='/backups'
+  volumes:
+    - ${DATA_DOCKER}/docker_data_persistence/project/elastic_search-index/:/usr/share/elasticsearch/data
+    - ${DATA_DOCKER}/docker_data_persistence/project/backups/:/backups
+  ports:
+    - "127.0.0.1:9200:9200" 
+
+kibiter-edit:
+  restart: "always" 
+  image: bitergia/kibiter-edit
+  environment:
+    # - BASE_PATH=/eclipse-edit
+    - PROJECT_NAME=Eclipse
+  links:
+    - elasticsearch
+  ports:
+    - "127.0.0.1:5601:5601"
+
+kibiter:
+  restart: "always" 
+  image: bitergia/kibiter
+  environment:
+    # - BASE_PATH=/eclipse
+    - PROJECT_NAME=Eclipse
+  links:
+    - elasticsearch
+  ports:
+    - "127.0.0.1:5602:5601" 
+
+mariadbdata:
+    image: mariadb:10.0
+    volumes:
+        - /var/lib/mysql
+    restart: "no"
+    command: /bin/echo "Data-only container for mariadb."
+
+mariadb:
+    image: mariadb:10.0
+    volumes_from:
+        - mariadbdata
+    expose:
+        - "3306"
+    environment:
+        - MYSQL_ROOT_PASSWORD=
+        - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+
+redis:
+    image: redis
+
+gelk:
+    image: bitergia/gelk
+    links:
+        - elasticsearch
+        - mariadb
+        - redis
