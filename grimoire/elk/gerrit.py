@@ -73,7 +73,7 @@ class GerritEnrich(Enrich):
         else:
             eitem["org_name"] = None
         # bot
-        u = self.get_unique_identities(eitem["author_uuid"])[0]
+        u = self.get_unique_identities(eitem["uuid"])[0]
         if u.profile:
             eitem["bot"] = u.profile.is_bot
         else:
