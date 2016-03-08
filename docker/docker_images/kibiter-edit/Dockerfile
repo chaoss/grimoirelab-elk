@@ -1,5 +1,10 @@
 FROM debian:stable
 
+MAINTAINER David Pose <dpose@bitergia.com>, Alvaro del Castillo <acs@bitergia.com>
+
+# ENV KIBANA_BRANCH integration-4.x
+ENV KIBANA_BRANCH integration-4.4.1
+
 # add our user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r kibana && useradd -r -m -g kibana kibana
 
@@ -32,10 +37,10 @@ RUN arch="$(dpkg --print-architecture)" \
 # Build the release tarball from sources
 
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash
-RUN git clone https://github.com/grimoirelab/kibiter.git
-RUN . /root/.bashrc && cd kibiter && git checkout integration-4.x && nvm install "$(cat .node-version)" && \
+RUN git clone https://github.com/grimoirelab/kibiter.git && cd kibiter && git checkout ${KIBANA_BRANCH}
+RUN . /root/.bashrc && cd kibiter && nvm install "$(cat .node-version)" && \
     npm install -g grunt-cli && npm install && grunt build && \
-    tar xfz target/kibana-4.*-snapshot-linux-x64.tar.gz --directory /opt && mv /opt/* /opt/kibana && \
+    tar xfz target/kibana-4.*-linux-x64.tar.gz --directory /opt && mv /opt/* /opt/kibana && \
     rm -rf /kibiter
 
 ADD kibana.yml /opt/kibana/config/kibana.yml
