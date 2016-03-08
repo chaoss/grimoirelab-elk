@@ -40,11 +40,9 @@ class MBoxOcean(ElasticOcean):
                 item["message-id"] = item[f]
         item["ocean-unique-id"] = item["message-id"]+"_"+item["__metadata__"]['origin']
 
-    def get_field_date(self):
-        return "metadata__updated_on"
 
-    def add_update_date(self, item):
-        if item['__metadata__']['updated_on'] is None:
-            item['__metadata__']['updated_on'] = "1970-01-01"
-        entry_lastUpdated = parser.parse(item['__metadata__']['updated_on'])
-        item['metadata__updated_on'] = entry_lastUpdated.isoformat()
+    # def add_update_date(self, item):
+    #     if item['__metadata__']['updated_on'] is None:
+    #         item['__metadata__']['updated_on'] = "1970-01-01"
+    #     entry_lastUpdated = parser.parse(item['__metadata__']['updated_on'])
+    #     item['metadata__updated_on'] = entry_lastUpdated.isoformat()

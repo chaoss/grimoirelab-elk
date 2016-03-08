@@ -55,8 +55,8 @@ class ElasticOcean(object):
         self.elastic = elastic
 
     def get_field_date(self):
-        """ Field with the date in the JSON items """
-        raise NotImplementedError
+        """ Field with the update in the JSON items. Now the same in all. """
+        return "metadata__updated_on"
 
     def get_field_unique_id(self):
         """ Field with unique identifier in an item  """
@@ -80,13 +80,14 @@ class ElasticOcean(object):
         """ Drop items not to be inserted in Elastic """
         return False
 
-    def add_update_date(self, item):
-        """ Add and update date field if needed for incremental updates """
-        pass
-
     def _fix_item(self, item):
         """ Some buggy data sources need fixing (like mbox and message-id) """
         pass
+
+    def add_update_date(self, item):
+        """ All item['__metadata__']['updated_on'] from perceval is epoch """
+        entry_lastUpdated = datetime.fromtimestamp(item['__metadata__']['updated_on'])
+        item['metadata__updated_on'] = entry_lastUpdated.isoformat()
 
     def feed(self, from_date=None):
         """ Feed data in Elastic from Perceval """

@@ -30,10 +30,6 @@ from grimoire.ocean.elastic import ElasticOcean
 
 class BugzillaOcean(ElasticOcean):
 
-    def get_field_date(self):
-        field = 'metadata__updated_on'
-        return field
-
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
@@ -51,10 +47,3 @@ class BugzillaOcean(ElasticOcean):
     def _fix_item(self, item):
         bug_id = item["bug_id"][0]['__text__']
         item["ocean-unique-id"] = bug_id+"_"+item["__metadata__"]['origin']
-
-    def add_update_date(self, item):
-        # entry_lastUpdated = parser.parse(item['delta_ts'][0]["__text__"])
-        entry_lastUpdated = parser.parse(item['__metadata__']['updated_on'])
-        # Use local server time for incremental updates
-        update = entry_lastUpdated.replace(tzinfo=None)
-        item['metadata__updated_on'] = update.isoformat()

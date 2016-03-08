@@ -32,9 +32,6 @@ class GitOcean(ElasticOcean):
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
-    def get_field_date(self):
-        return "metadata__updated_on"
-
     def get_elastic_mappings(self):
 
         mapping = '''
@@ -53,9 +50,3 @@ class GitOcean(ElasticOcean):
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["commit"]+"_"+item["__metadata__"]['origin']
         item["metadata__origin"] = item["__metadata__"]['origin']
-
-    def add_update_date(self, item):
-        entry_lastUpdated = parser.parse(item['__metadata__']['updated_on'])
-        # Use local server time for incremental updates
-        # update = entry_lastUpdated.replace(tzinfo=None)
-        item['metadata__updated_on'] = entry_lastUpdated.isoformat()
