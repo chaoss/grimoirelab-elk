@@ -5,18 +5,18 @@ RUN groupadd -r kibana && useradd -r -m -g kibana kibana
 
 RUN apt-get update && apt-get install -y \ 
     ca-certificates curl wget \
-    git npm nodejs-legacy zip make g++ \
+    git python zip make g++ \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # grab gosu for easy step-down from root
-# RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
-# RUN arch="$(dpkg --print-architecture)" \
-# 	&& set -x \
-# 	&& curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.3/gosu-$arch" \
-# 	&& curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/1.3/gosu-$arch.asc" \
-# 	&& gpg --verify /usr/local/bin/gosu.asc \
-# 	&& rm /usr/local/bin/gosu.asc \
-# 	&& chmod +x /usr/local/bin/gosu
+RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
+RUN arch="$(dpkg --print-architecture)" \
+	&& set -x \
+	&& curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.3/gosu-$arch" \
+	&& curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/1.3/gosu-$arch.asc" \
+	&& gpg --verify /usr/local/bin/gosu.asc \
+	&& rm /usr/local/bin/gosu.asc \
+	&& chmod +x /usr/local/bin/gosu
 # 
 # ENV KIBANA_VERSION 4.3.1
 # ENV KIBANA_SHA1 115ba22882df75eb5f07330b7ad8781a57569b00
@@ -36,7 +36,7 @@ RUN git clone https://github.com/grimoirelab/kibiter.git
 RUN . /root/.bashrc && cd kibiter && git checkout integration-4.x && nvm install "$(cat .node-version)" && \
     npm install -g grunt-cli && npm install && grunt build && \
     tar xfz target/kibana-4.*-snapshot-linux-x64.tar.gz --directory /opt && mv /opt/* /opt/kibana && \
-    rm -rf /kibiter /root/.nvm
+    rm -rf /kibiter
 
 ADD kibana.yml /opt/kibana/config/kibana.yml
 ADD kibana.yml /opt/kibana/src/config/kibana.yml
