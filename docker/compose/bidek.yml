@@ -10,7 +10,7 @@ elasticsearch:
 
 kibiter-edit:
   restart: "always" 
-  image: acsdocker/kibiter:4.4.1
+  image: bitergia/kibiter:4.4.1
   environment:
     # - BASE_PATH=/eclipse-edit
     - PROJECT_NAME=Eclipse
@@ -21,7 +21,7 @@ kibiter-edit:
 
 kibiter:
   restart: "always" 
-  image: acsdocker/kibiter:4.4.1-public
+  image: bitergia/kibiter:4.4.1-public
   environment:
     # - BASE_PATH=/eclipse
     - PROJECT_NAME=Eclipse
@@ -51,7 +51,7 @@ redis:
     image: redis
 
 gelk:
-    image: acsdocker/gelk
+    image: bitergia/gelk
     links:
         - elasticsearch
         - mariadb
