@@ -39,6 +39,7 @@ from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.jira import JiraOcean
 from grimoire.ocean.jenkins import JenkinsOcean
+from grimoire.ocean.discourse import DiscourseOcean
 
 # Connectors for EnrichOcean
 from grimoire.elk.bugzilla import BugzillaEnrich
@@ -49,7 +50,7 @@ from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
 from grimoire.elk.jira import JiraEnrich
 from grimoire.elk.jenkins import JenkinsEnrich
-
+from grimoire.elk.discourse import DiscourseEnrich
 
 # Connectors for Perceval
 from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
@@ -61,6 +62,7 @@ from perceval.backends.pipermail import Pipermail, PipermailCommand
 from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
 from perceval.backends.jira import Jira, JiraCommand
 from perceval.backends.jenkins import Jenkins, JenkinsCommand
+from perceval.backends.discourse import Discourse, DiscourseCommand
 
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.elk.elastic import ElasticConnectException
@@ -96,7 +98,8 @@ def get_connectors():
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
             "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
-            "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand]
+            "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
+            "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
             }  # Will come from Registry
 
 def get_elastic(url, es_index, clean = None, ocean_backend = None):
