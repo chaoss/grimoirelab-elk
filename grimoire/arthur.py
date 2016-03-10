@@ -69,7 +69,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params, es_index
         ConfOcean.set_elastic(elastic_ocean)
 
         try:
-            if backend_cmd.from_date == \
+            if backend_cmd.from_date.replace(tzinfo=None) == \
                 parser.parse("1970-01-01").replace(tzinfo=None):
                 # Don't use the default value
                 ocean_backend.feed()
