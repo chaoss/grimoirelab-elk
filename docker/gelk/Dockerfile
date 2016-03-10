@@ -61,6 +61,9 @@ RUN git clone https://github.com/MetricsGrimoire/sortinghat.git && \
 # get GrimoireELK repository
 RUN git clone https://github.com/grimoirelab/GrimoireELK
 
+# get VizGrimoireUtils repository for tools like eclipse_projects
+RUN git clone https://github.com/VizGrimoire/VizGrimoireUtils.git
+
 # get Perceval repository, configure arthur branch
 RUN git clone https://github.com/grimoirelab/perceval.git && \
     cd perceval && sudo python3 setup.py install
