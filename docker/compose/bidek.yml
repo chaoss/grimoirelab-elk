@@ -1,7 +1,7 @@
 elasticsearch:
   restart: "always" 
   image: elasticsearch:2.2
-  command: elasticsearch -Des.network.bind_host=0.0.0.0 -Des.path.repo='/backups'
+  command: elasticsearch -Des.network.bind_host=0.0.0.0 -Des.path.repo='/backups' -Dhttp.max_content_length=2000m
   volumes:
     - ${DATA_DOCKER}/docker_data_persistence/project/elastic_search-index/:/usr/share/elasticsearch/data
     - ${DATA_DOCKER}/docker_data_persistence/project/backups/:/backups
@@ -12,8 +12,8 @@ kibiter-edit:
   restart: "always" 
   image: bitergia/kibiter:4.4.1
   environment:
-    # - BASE_PATH=/eclipse-edit
-    - PROJECT_NAME=Eclipse
+    # - BASE_PATH=/project-edit
+    - PROJECT_NAME=Project
   links:
     - elasticsearch
   ports:
@@ -23,8 +23,8 @@ kibiter:
   restart: "always" 
   image: bitergia/kibiter:4.4.1-public
   environment:
-    # - BASE_PATH=/eclipse
-    - PROJECT_NAME=Eclipse
+    # - BASE_PATH=/project
+    - PROJECT_NAME=Project
   links:
     - elasticsearch
   ports:
