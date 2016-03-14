@@ -200,6 +200,10 @@ class GerritEnrich(Enrich):
                   "type": "string",
                   "index":"not_analyzed"
                },
+               "org_name": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
                "review_project": {
                   "type": "string",
                   "index":"not_analyzed"
