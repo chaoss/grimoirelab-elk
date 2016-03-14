@@ -14,6 +14,7 @@ kibiter-edit:
   environment:
     # - BASE_PATH=/project-edit
     - PROJECT_NAME=Project
+    - NODE_OPTIONS=--max-old-space-size=200
   links:
     - elasticsearch
   ports:
@@ -25,6 +26,7 @@ kibiter:
   environment:
     # - BASE_PATH=/project
     - PROJECT_NAME=Project
+    - NODE_OPTIONS=--max-old-space-size=200
   links:
     - elasticsearch
   ports:
