@@ -24,6 +24,7 @@
 #
 
 from datetime import datetime
+from dateutil import parser
 import json
 import logging
 import requests
@@ -260,10 +261,10 @@ class GerritEnrich(Enrich):
         eitem["patchsets"] = len(review["patchSets"])
 
         # Time to add the time diffs
-        createdOn_date = \
-            datetime.strptime(review['createdOn'], "%Y-%m-%dT%H:%M:%S")
-        updatedOn_date = \
-            datetime.strptime(review['metadata__updated_on'], "%Y-%m-%dT%H:%M:%S")
+        createdOn_date = parser.parse(review['createdOn'])
+        if len(review["patchSets"]) > 0:
+            createdOn_date = parser.parse(review["patchSets"][0]['createdOn'])
+        updatedOn_date = parser.parse(review['metadata__updated_on'])
         seconds_day = float(60*60*24)
         timeopen = \
             (updatedOn_date-createdOn_date).total_seconds() / seconds_day
