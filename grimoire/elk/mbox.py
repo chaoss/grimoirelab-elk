@@ -115,7 +115,7 @@ class MBoxEnrich(Enrich):
         if u.profile:
             eitem["from_bot"] = u.profile.is_bot
         else:
-            eitem["from_bot"] = 0  # By default, identities are not bots
+            eitem["from_bot"] = False  # By default, identities are not bots
 
         enrollments = self.get_enrollments(eitem["from_uuid"])
         if len(enrollments) > 0:
