@@ -27,6 +27,7 @@ import logging
 import requests
 
 from dateutil import parser
+import email.utils
 
 from grimoire.elk.enrich import Enrich
 
@@ -95,13 +96,11 @@ class MBoxEnrich(Enrich):
             if from_data.find(pattern) != -1:
                 from_data = from_data.replace(pattern, '@')
 
-        fields_from = from_data.split(" ",1)
+        from_ = email.utils.parseaddr(from_data)
+
         identity['username'] = None  # email does not have username
-        identity['email'] = fields_from[0]
-        identity['name'] = None
-        if len(fields_from) == 2:
-            # Name also included
-            identity['name'] = fields_from[1].replace("(","").replace(")","")
+        identity['email'] = from_[1]
+        identity['name'] = from_[0]
         return identity
 
     def get_item_sh(self, item):
