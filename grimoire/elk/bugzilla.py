@@ -62,10 +62,8 @@ class BugzillaEnrich(Enrich):
         def fill_list_identity(identity, user_list_data):
             """ Fill identity with user data in first item in list """
             if '@' in user_list_data[0]['__text__']:
-                # Auth bugzilla data includes emails
                 identity['email'] = user_list_data[0]['__text__']
-            else:
-                identity['username'] = user_list_data[0]['__text__']
+            identity['username'] = user_list_data[0]['__text__']
             if 'name' in user_list_data[0]:
                 identity['name'] = user_list_data[0]['name']
 
