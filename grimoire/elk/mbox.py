@@ -117,6 +117,12 @@ class MBoxEnrich(Enrich):
         else:
             eitem["from_bot"] = 0  # By default, identities are not bots
 
+        enrollments = self.get_enrollments(eitem["from_uuid"])
+        if len(enrollments) > 0:
+            eitem["from_org_name"] = enrollments[0].organization.name
+        else:
+            eitem["from_org_name"] = None
+
         if identity['email']:
             try:
                 eitem["domain"] = identity['email'].split("@")[1]
