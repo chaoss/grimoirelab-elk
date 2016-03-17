@@ -61,26 +61,29 @@ class BugzillaEnrich(Enrich):
 
         def fill_list_identity(identity, user_list_data):
             """ Fill identity with user data in first item in list """
-            if '@' in user_list_data[0]['__text__']:
-                identity['email'] = user_list_data[0]['__text__']
             identity['username'] = user_list_data[0]['__text__']
+            if '@' in identity['username']:
+                identity['email'] = identity['username']
             if 'name' in user_list_data[0]:
                 identity['name'] = user_list_data[0]['name']
+            return identity
 
         identity = {}
         for field in ['name', 'email', 'username']:
             # Basic fields in Sorting Hat
             identity[field] = None
         if 'reporter' in user:
-            fill_list_identity(identity, user['reporter'])
+            identity = fill_list_identity(identity, user['reporter'])
         if 'assigned_to' in user:
-            fill_list_identity(identity, user['assigned_to'])
+            identity = fill_list_identity(identity, user['assigned_to'])
         if 'who' in user:
-            fill_list_identity(identity, user['who'])
+            identity = fill_list_identity(identity, user['who'])
         if 'Who' in user:
             identity['username'] = user['Who']
+            if '@' in identity['username']:
+                identity['email'] = identity['username']
         if 'qa_contact' in user:
-            fill_list_identity(identity, user['qa_contact'])
+            identity = fill_list_identity(identity, user['qa_contact'])
         if 'changed_by' in user:
             identity['name'] = user['changed_by']
 
