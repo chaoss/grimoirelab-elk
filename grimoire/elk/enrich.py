@@ -36,10 +36,11 @@ logger = logging.getLogger(__name__)
 
 class Enrich(object):
 
-    def __init__(self, sortinghat = True, db_projects_map = None):
-        self.sortinghat = sortinghat
-        if sortinghat:
-            self.sh_db = Database("root", "", "ocean_sh", "mariadb")
+    def __init__(self, db_projects_map = None, db_sortinghat = None, ):
+        self.sortinghat = False
+        if db_sortinghat:
+            self.sh_db = Database("root", "", db_sortinghat, "mariadb")
+            self.sortinghat = True
         self.prjs_map = None
         if  db_projects_map:
             self.prjs_map = self._get_projects_map(db_projects_map)

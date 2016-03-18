@@ -155,9 +155,8 @@ def get_params_parser():
     parser.add_argument("--enrich_only",  action='store_true',
                         help="Only enrich items")
     parser.add_argument('--index', help="Ocean index name")
-    parser.add_argument('--no-sortinghat',  action='store_true',
-                        help="Don't support sortinghat")
     parser.add_argument('--db-projects-map', help="Projects Mapping DB")
+    parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('backend', help=argparse.SUPPRESS)
     parser.add_argument('backend_args', nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)
