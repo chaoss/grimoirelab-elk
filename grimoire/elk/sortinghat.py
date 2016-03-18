@@ -59,6 +59,7 @@ class SortingHat(object):
                             (uuid, identity['name'], identity['email'], total, lidentities))
 
                 total += 1
+                continue  # Don't do the merge here. Too slow in large projects
                 # Time to  merge
                 matches = api.match_identities(db, uuid, matcher)
 
