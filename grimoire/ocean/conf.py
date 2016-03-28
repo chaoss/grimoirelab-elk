@@ -76,7 +76,8 @@ class ConfOcean(object):
             logging.error("Can't get repos. Ocean elastic is not configured")
             return
 
-        url = cls.elastic.url + "/" + cls.conf_repos + "/_search"
+        # TODO: use scrolling API for getting all repos
+        url = cls.elastic.url + "/" + cls.conf_repos + "/_search?size=9999"
 
         r = requests.get(url).json()
 
