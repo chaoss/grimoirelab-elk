@@ -96,7 +96,8 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params, es_index
     repo['index'] = es_index
 
     if es_index:
-        ConfOcean.add_repo(es_index, repo)
+        unique_id = es_index+"_"+backend.origin
+        ConfOcean.add_repo(unique_id, repo)
     else:
         logging.debug("Repository not added to Ocean because errors.")
         logging.debug(backend_params)
