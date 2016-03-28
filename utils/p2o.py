@@ -125,7 +125,8 @@ if __name__ == '__main__':
                     result = q.enqueue(enrich_backend, url, clean,
                                        args.backend, args.backend_args,
                                        args.index,
-                                       args.db_projects_map, args.db_sortinghat)
+                                       args.db_projects_map, args.db_sortinghat,
+                                       args.no_incremental)
                 logging.info("Queued enrich_backend job")
                 logging.info(result)
 
