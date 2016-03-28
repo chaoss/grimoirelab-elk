@@ -119,6 +119,7 @@ if __name__ == '__main__':
                                        args.backend, args.backend_args,
                                        args.index,
                                        args.db_projects_map, args.db_sortinghat,
+                                       args.no_incremental,
                                        depends_on=task_feed)
                 else:
                     result = q.enqueue(enrich_backend, url, clean,

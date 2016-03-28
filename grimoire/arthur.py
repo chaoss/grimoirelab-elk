@@ -174,7 +174,8 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
 
 
 def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
-                   db_projects_map=None, db_sortinghat=None):
+                   db_projects_map=None, db_sortinghat=None,
+                   no_incremental=False):
     """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend):
@@ -257,6 +258,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
         # We need to enrich from just updated items since last enrichment
         last_enrich = enrich_backend.get_last_update_from_es()
+        if no_incremental:
+            last_enrich = None
 
         logging.debug("Last enrichment: %s" % (last_enrich))
 
