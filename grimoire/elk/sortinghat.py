@@ -39,16 +39,21 @@ class SortingHat(object):
     def add_identities(cls, db, identities, backend):
         """ Load identities list from backend in Sorting Hat """
 
+        merge_identities = False
+
         logger.info("Adding the identities to SortingHat")
+        if not merge_identities:
+            logger.info("Not doing identities merge")
 
         total = 0
         lidentities = len(identities)
 
-        matching = 'email-name';
 
-        merged_identities = []  # old identities merged into new ones
-        blacklist = api.blacklist(db)
-        matcher = create_identity_matcher(matching, blacklist)
+        if merge_identities:
+            merged_identities = []  # old identities merged into new ones
+            blacklist = api.blacklist(db)
+            matching = 'email-name'  # Not active
+            matcher = create_identity_matcher(matching, blacklist)
 
         for identity in identities:
             try:
@@ -56,10 +61,13 @@ class SortingHat(object):
                                         identity['name'], identity['username'])
 
                 logger.info("New sortinghat identity %s %s %s (%i/%i)" % \
-                            (uuid, identity['name'], identity['email'], total, lidentities))
+                            (uuid, identity['name'], identity['email'],
+                            total, lidentities))
 
                 total += 1
-                continue  # Don't do the merge here. Too slow in large projects
+                if not merge_identities:
+                    continue  # Don't do the merge here. Too slow in large projects
+
                 # Time to  merge
                 matches = api.match_identities(db, uuid, matcher)
 
@@ -80,13 +88,15 @@ class SortingHat(object):
 
             except AlreadyExistsError as ex:
                 uuid = ex.uuid
+                continue
             except WrappedValueError as ex:
                 logging.warning("Trying to add a None identity. Ignoring it.")
                 continue
             except UnicodeEncodeError as ex:
-                logging.warning("UnicodeEncodeError. Ignoring it. %s %s %s" % (identity['email'], identity['name'], identity['username']))
+                logging.warning("UnicodeEncodeError. Ignoring it. %s %s %s" % \
+                                (identity['email'], identity['name'],
+                                identity['username']))
                 continue
-
 
             if 'company' in identity and identity['company'] is not None:
                 try:
@@ -98,6 +108,10 @@ class SortingHat(object):
                     pass
 
         logger.info("Total NEW identities: %i" % (total))
-        logger.info("Total NEW identities merged: %i" % (len(merged_identities)))
 
-        return merged_identities
+        if merge_identities:
+            logger.info("Total NEW identities merged: %i" % \
+                        (len(merged_identities)))
+            return merged_identities
+        else:
+            return []
