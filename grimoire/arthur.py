@@ -32,7 +32,7 @@ import requests
 from grimoire.elk.sortinghat import SortingHat
 from grimoire.ocean.conf import ConfOcean
 from grimoire.utils import get_elastic
-from grimoire.utils import get_connectors
+from grimoire.utils import get_connectors, get_connector_from_name
 import traceback
 
 def feed_backend(url, clean, fetch_cache, backend_name, backend_params, es_index=None):
@@ -46,9 +46,9 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params, es_index
         clean = False  # don't remove index, it could be shared
 
 
-    if backend_name not in get_connectors():
+    if not get_connector_from_name(backend_name):
         raise RuntimeError("Unknown backend %s" % backend_name)
-    connector = get_connectors()[backend_name]
+    connector = get_connector_from_name(backend_name)
     klass = connector[3]  # BackendCmd for the connector
 
     try:
@@ -238,9 +238,9 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
     if ocean_index:
         clean = False  # don't remove index, it could be shared
 
-    if backend_name not in get_connectors():
+    if not get_connector_from_name(backend_name):
         raise RuntimeError("Unknown backend %s" % backend_name)
-    connector = get_connectors()[backend_name]
+    connector = get_connector_from_name(backend_name)
     klass = connector[3]  # BackendCmd for the connector
 
     try:

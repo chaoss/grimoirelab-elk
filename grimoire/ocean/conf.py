@@ -31,7 +31,7 @@ import requests
 
 class ConfOcean(object):
 
-    conf_index = "/conf"
+    conf_index = "conf"
     conf_repos = conf_index+"/repos"
     elastic = None
 
@@ -107,5 +107,3 @@ class ConfOcean(object):
             [ repos_ids.append(rep['_id']) for rep in repos_raw ]
 
         return repos_ids
-
-

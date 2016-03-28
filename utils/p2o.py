@@ -55,12 +55,14 @@ def feed_backends(url, clean, debug = False, redis = None):
     logging.info("Updating all Ocean")
     elastic = get_elastic(url, ConfOcean.get_index(), clean)
     ConfOcean.set_elastic(elastic)
+    fetch_cache = False
 
     q = Queue('update', connection=Redis(redis), async=async_)
 
     for repo in ConfOcean.get_repos():
-        task_feed = q.enqueue(feed_backend, url, clean,
-                              repo['backend_name'], repo['backend_params'], repo['index'])
+        task_feed = q.enqueue(feed_backend, url, clean, fetch_cache,
+                              repo['backend_name'], repo['backend_params'],
+                              repo['index'])
         logging.info("Queued job")
         logging.info(task_feed)
 
