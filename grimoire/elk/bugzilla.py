@@ -172,6 +172,10 @@ class BugzillaEnrich(Enrich):
             u = urlparse(self.perceval_backend.url)
             return u.scheme+"//"+u.netloc
 
+        if 'bug_id' not in issue:
+            logging.warning("Bug without bug_id %s" % (issue))
+            return None
+
         eitem = {}
         # Fields that are the same in item and eitem
         copy_fields = ["ocean-unique-id"]
@@ -286,6 +290,8 @@ class BugzillaEnrich(Enrich):
                 bulk_json = ""
                 current = 0
             eitem = self.enrich_issue(issue)
+            if not eitem:
+                continue
             data_json = json.dumps(eitem)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (issue["bug_id"])
             bulk_json += data_json +"\n"  # Bulk document
