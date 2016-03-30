@@ -77,6 +77,10 @@ class MBoxEnrich(Enrich):
                  "author_domain": {
                    "type": "string",
                    "index":"not_analyzed"
+                 },
+                 "author_name": {
+                   "type": "string",
+                   "index":"not_analyzed"
                  }
            }
         } """
