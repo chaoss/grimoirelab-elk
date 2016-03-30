@@ -108,6 +108,8 @@ class MBoxEnrich(Enrich):
         eitem = {}  # Item enriched
 
         # Enrich SH
+        if "From" not in item:
+            return eitem
         identity  = self.get_sh_identity(item["From"])
         eitem["from_uuid"] = self.get_uuid(identity, self.get_connector_name())
         # bot
