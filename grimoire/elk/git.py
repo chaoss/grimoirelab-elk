@@ -135,6 +135,8 @@ class GitEnrich(Enrich):
             except IndexError:
                 # logging.warning("Bad email format: %s" % (identity['email']))
                 eitem["domain"] = None
+        else:
+            eitem["domain"] = None
 
         # Unify fields name
         eitem["author_org_name"] = eitem["org_name"]

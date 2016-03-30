@@ -119,6 +119,8 @@ class BugzillaEnrich(Enrich):
                 except IndexError:
                     # logging.warning("Bad email format: %s" % (identity['email']))
                     eitem["reporter_domain"] = None
+            else:
+                eitem["reporter_domain"] = None
 
         # Unify fields name
         eitem["author_uuid"] = eitem["reporter_uuid"]
