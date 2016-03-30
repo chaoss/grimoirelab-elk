@@ -66,6 +66,7 @@ class GerritEnrich(Enrich):
 
         identity = GerritEnrich.get_sh_identity(item['owner'])
         eitem["uuid"] = self.get_uuid(identity, self.get_connector_name())
+        eitem["name"] = identity['name']
 
         enrollments = self.get_enrollments(eitem["uuid"])
         # TODO: get the org_name for the current commit time
@@ -80,6 +81,22 @@ class GerritEnrich(Enrich):
         else:
             eitem["bot"] = False  # By default, identities are not bots
         eitem["bot"] = 0  # Not supported yet
+
+        if identity['email']:
+            try:
+                eitem["domain"] = identity['email'].split("@")[1]
+            except IndexError:
+                logging.warning("Bad email format: %s" % (identity['email']))
+                eitem["domain"] = None
+        else:
+            eitem["domain"] = None
+
+        # Unify fields name
+        eitem["author_uuid"] = eitem["uuid"]
+        eitem["author_name"] = eitem["name"]
+        eitem["author_org_name"] = eitem["org_name"]
+        eitem["author_domain"] = eitem["domain"]
+
         return eitem
 
     def get_item_project(self, item):
@@ -224,6 +241,14 @@ class GerritEnrich(Enrich):
                "domain": {
                   "type": "string",
                   "index":"not_analyzed"
+               },
+               "author_org_name": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "author_domain": {
+                 "type": "string",
+                 "index":"not_analyzed"
                }
             }
         }

@@ -113,6 +113,18 @@ class BugzillaEnrich(Enrich):
                 eitem["reporter_org_name"] = enrollments[0].organization.name
             else:
                 eitem["reporter_org_name"] = None
+            if identity['email']:
+                try:
+                    eitem["reporter_domain"] = identity['email'].split("@")[1]
+                except IndexError:
+                    # logging.warning("Bad email format: %s" % (identity['email']))
+                    eitem["reporter_domain"] = None
+
+        # Unify fields name
+        eitem["author_uuid"] = eitem["reporter_uuid"]
+        eitem["author_name"] = eitem["reporter_name"]
+        eitem["author_org_name"] = eitem["reporter_org_name"]
+        eitem["author_domain"] = eitem["reporter_domain"]
 
         return eitem
 
@@ -298,6 +310,14 @@ class BugzillaEnrich(Enrich):
                "assigned_to": {
                   "type": "string",
                   "index":"not_analyzed"
+               },
+               "author_org_name": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "author_domain": {
+                 "type": "string",
+                 "index":"not_analyzed"
                }
             }
         }

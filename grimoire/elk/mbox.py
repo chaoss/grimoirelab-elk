@@ -69,6 +69,14 @@ class MBoxEnrich(Enrich):
                  "list" : {
                    "type": "string",
                    "index":"not_analyzed"
+                 },
+                 "author_org_name": {
+                   "type": "string",
+                   "index":"not_analyzed"
+                 },
+                 "author_domain": {
+                   "type": "string",
+                   "index":"not_analyzed"
                  }
            }
         } """
@@ -112,6 +120,7 @@ class MBoxEnrich(Enrich):
             return eitem
         identity  = self.get_sh_identity(item["From"])
         eitem["from_uuid"] = self.get_uuid(identity, self.get_connector_name())
+        eitem["from_name"] = identity['name']
         # bot
         u = api.unique_identities(self.sh_db, eitem["from_uuid"])[0]
         if u.profile:
@@ -131,6 +140,14 @@ class MBoxEnrich(Enrich):
             except IndexError:
                 logging.warning("Bad email format: %s" % (identity['email']))
                 eitem["domain"] = None
+        else:
+            eitem["domain"] = None
+
+        # Unify fields name
+        eitem["author_uuid"] = eitem["from_uuid"]
+        eitem["author_name"] = eitem["from_name"]
+        eitem["author_org_name"] = eitem["from_org_name"]
+        eitem["author_domain"] = eitem["domain"]
         return eitem
 
     def get_item_project(self, item):

@@ -70,6 +70,14 @@ class GitEnrich(Enrich):
                "metadata__origin": {
                   "type": "string",
                   "index":"not_analyzed"
+               },
+               "author_org_name": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "author_domain": {
+                 "type": "string",
+                 "index":"not_analyzed"
                }
             }
         } """
@@ -127,6 +135,10 @@ class GitEnrich(Enrich):
             except IndexError:
                 # logging.warning("Bad email format: %s" % (identity['email']))
                 eitem["domain"] = None
+
+        # Unify fields name
+        eitem["author_org_name"] = eitem["org_name"]
+        eitem["author_domain"] = eitem["domain"]
 
         return eitem
 
