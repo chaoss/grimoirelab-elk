@@ -30,4 +30,7 @@ class JiraOcean(ElasticOcean):
     """JIRA Ocean feeder"""
 
     def get_field_unique_id(self):
-        return "id"
+        return "ocean-unique-id"
+
+    def _fix_item(self, item):
+        item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']

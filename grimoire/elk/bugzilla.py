@@ -51,9 +51,7 @@ class BugzillaEnrich(Enrich):
         return ["assigned_to_uuid", "reporter_uuid"]
 
     def get_field_unique_id(self):
-        # Not yet in ocean index
-        # return "ocean-unique-id"
-        return "bug_id"
+        return "ocean-unique-id"
 
     @classmethod
     def get_sh_identity(cls, user):
@@ -94,8 +92,8 @@ class BugzillaEnrich(Enrich):
         eitem = {}  # Item enriched
 
         # Sorting Hat integration: reporter and assigned_to uuids
-        if 'assigned_to' in item:
-            identity = BugzillaEnrich.get_sh_identity({'assigned_to':item['assigned_to']})
+        if 'assigned_to' in item['data']:
+            identity = BugzillaEnrich.get_sh_identity({'assigned_to':item["data"]['assigned_to']})
             eitem['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['assigned_to_name'] = identity['name']
             enrollments = self.get_enrollments(eitem['assigned_to_uuid'])
@@ -104,8 +102,8 @@ class BugzillaEnrich(Enrich):
             else:
                 eitem["assigned_to_org_name"] = None
 
-        if 'reporter' in item:
-            identity = BugzillaEnrich.get_sh_identity({'reporter':item['reporter']})
+        if 'reporter' in item['data']:
+            identity = BugzillaEnrich.get_sh_identity({'reporter':item["data"]['reporter']})
             eitem['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['reporter_name'] = identity['name']
             enrollments = self.get_enrollments(eitem['reporter_uuid'])
@@ -149,42 +147,45 @@ class BugzillaEnrich(Enrich):
 
         identities = []
 
-        if 'activity' in item:
-            for event in item['activity']:
+        if 'activity' in item["data"]:
+            for event in item["data"]['activity']:
                 identities.append(self.get_sh_identity(event))
-        if 'long_desc' in item:
-            for comment in item['long_desc']:
+        if 'long_desc' in item["data"]:
+            for comment in item["data"]['long_desc']:
                 identities.append(self.get_sh_identity(comment))
-        elif 'assigned_to' in item:
+        elif 'assigned_to' in item["data"]:
             identities.append(self.get_sh_identity({'assigned_to':
-                                                    item['assigned_to']}))
-        elif 'reporter' in item:
+                                                    item["data"]['assigned_to']}))
+        elif 'reporter' in item["data"]:
             identities.append(self.get_sh_identity({'reporter':
-                                                    item['reporter']}))
-        elif 'qa_contact' in item:
+                                                    item["data"]['reporter']}))
+        elif 'qa_contact' in item["data"]:
             identities.append(self.get_sh_identity({'qa_contact':
                                                     item['qa_contact']}))
         return identities
 
-    def enrich_issue(self, issue):
+    def enrich_issue(self, item):
 
         def get_bugzilla_url():
             u = urlparse(self.perceval_backend.url)
             return u.scheme+"//"+u.netloc
 
-        if 'bug_id' not in issue:
-            logging.warning("Bug without bug_id %s" % (issue))
+        if 'bug_id' not in item['data']:
+            logging.warning("Dropped bug without bug_id %s" % (issue))
             return None
 
         eitem = {}
-        # Fields that are the same in item and eitem
-        copy_fields = ["ocean-unique-id"]
 
+        # metadata fields to copy
+        copy_fields = ["metadata__updated_on","ocean-unique-id","origin"]
         for f in copy_fields:
-            if f in issue:
-                eitem[f] = issue[f]
+            if f in item:
+                eitem[f] = item[f]
             else:
                 eitem[f] = None
+
+        # The real data
+        issue = item['data']
 
         if "assigned_to" in issue:
             if "name" in issue["assigned_to"][0]:
@@ -223,10 +224,10 @@ class BugzillaEnrich(Enrich):
             get_time_diff_days(eitem['creation_ts'], eitem['delta_ts'])
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(issue))
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(issue))
+            eitem.update(self.get_item_project(item))
 
         return eitem
 
@@ -293,7 +294,7 @@ class BugzillaEnrich(Enrich):
             if not eitem:
                 continue
             data_json = json.dumps(eitem)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (issue["bug_id"])
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (eitem[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         requests.put(url, data=bulk_json)

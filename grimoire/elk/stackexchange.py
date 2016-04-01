@@ -76,24 +76,32 @@ class StackExchangeEnrich(Enrich):
 
     def get_rich_item(self, item):
         eitem = {}
-        # Fields that are the same in item and eitem
-        copy_fields = ["title","question_id","link","view_count",
-                       "answer_count","comment_count"]
+
+        # metadata fields to copy
+        copy_fields = ["metadata__updated_on","ocean-unique-id","origin"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]
             else:
                 eitem[f] = None
-        # Fields which names are translated
-        map_fields = {}
-        for fn in map_fields:
-            eitem[map_fields[fn]] = commit[fn]
+        # The real data
+        question = item['data']
+
+        # data fields to copy
+        copy_fields = ["title","question_id","link","view_count",
+                       "answer_count","comment_count"]
+        for f in copy_fields:
+            if f in question:
+                eitem[f] = question[f]
+            else:
+                eitem[f] = None
+
         # Enrich dates
         eitem["question_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
         # people
-        eitem["question_owner"] = item["owner"]["display_name"]
+        eitem["question_owner"] = question["owner"]["display_name"]
         # eitem["owner_link"] = item["owner"]["link"]
-        eitem["tags"] = ",".join(item["tags"])
+        eitem["tags"] = ",".join(question["tags"])
         return eitem
 
     def enrich_items(self, items):

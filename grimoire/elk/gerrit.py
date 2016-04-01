@@ -50,6 +50,9 @@ class GerritEnrich(Enrich):
     def get_fields_uuid(self):
         return ["review_uuid", "patchSet_uuid", "approval_uuid"]
 
+    def get_field_unique_id(self):
+        return "ocean-unique-id"
+
     @classmethod
     def get_sh_identity(cls, user):
         identity = {}
@@ -115,6 +118,8 @@ class GerritEnrich(Enrich):
         ''' Return the identities from an item '''
 
         identities = []
+
+        item = item['data']
 
         # Changeset owner
         user = item['owner']
@@ -261,20 +266,28 @@ class GerritEnrich(Enrich):
         return {"items":mapping}
 
 
-    def review_item(self, review):
-        self._fix_review_dates(review)
-
+    def review_item(self, item):
         eitem = {}  # Item enriched
 
-        # Fields that are the same in item and eitem
-        copy_fields = ["status", "branch", "url","metadata__updated_on","number"]
+        # metadata fields to copy
+        copy_fields = ["metadata__updated_on","ocean-unique-id","origin"]
+        for f in copy_fields:
+            if f in item:
+                eitem[f] = item[f]
+            else:
+                eitem[f] = None
+        # The real data
+        review = item['data']
+        self._fix_review_dates(review)
+
+        # data fields to copy
+        copy_fields = ["status", "branch", "url"]
         for f in copy_fields:
             eitem[f] = review[f]
         # Fields which names are translated
         map_fields = {"subject": "summary",
                       "id": "githash",
                       "createdOn": "opened",
-                      "metadata__updated_on": "closed",
                       "project": "repository"
                       }
         for fn in map_fields:
@@ -293,7 +306,7 @@ class GerritEnrich(Enrich):
         createdOn_date = parser.parse(review['createdOn'])
         if len(review["patchSets"]) > 0:
             createdOn_date = parser.parse(review["patchSets"][0]['createdOn'])
-        updatedOn_date = parser.parse(review['metadata__updated_on'])
+        updatedOn_date = parser.parse(item['metadata__updated_on'])
         seconds_day = float(60*60*24)
         timeopen = \
             (updatedOn_date-createdOn_date).total_seconds() / seconds_day
@@ -305,116 +318,8 @@ class GerritEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(review))
 
-        bulk_json = '{"index" : {"_id" : "%s" } }\n' % (review["number"])  # Bulk operation
+        bulk_json = '{"index" : {"_id" : "%s" } }\n' % (eitem[self.get_field_unique_id()])  # Bulk operation
         bulk_json += json.dumps(eitem)+"\n"
-
-        return bulk_json
-
-    def review_events(self, review):
-        # TODO: old enrichment function
-
-        self._fix_review_dates(review)
-
-        bulk_json = ""  # Bulk JSON to be feeded in ES
-
-        # Review fields included in all events
-        bulk_json_review  = '"review_id":"%s",' % review['id']
-        bulk_json_review += '"review_createdOn":"%s",' % review['createdOn']
-        if 'owner' in review and 'email' in review['owner']:
-            identity = GerritEnrich.get_sh_identity(review['owner'])
-            ruuid = self.get_uuid(identity, self.get_connector_name())
-            remail = review['owner']['email']
-            bulk_json_review += '"review_email":"%s",' % remail
-            bulk_json_review += '"review_uuid":"%s",' % ruuid
-        else:
-            bulk_json_review += '"review_email":null,'
-            bulk_json_review += '"review_uuid":null,'
-        bulk_json_review += '"review_status":"%s",' % review['status']
-        bulk_json_review += '"review_project":"%s",' % review['project']
-        bulk_json_review += '"review_branch":"%s"' % review['branch']
-        # bulk_json_review += '"review_subject":"%s"' % review['subject']
-        # bulk_json_review += '"review_topic":"%s"' % review['topic']
-
-        # To be used as review['createdOn'] which is wrong in OpenStack/Wikimedia
-        firstPatchCreatedOn = review['patchSets'][0]['createdOn']
-
-        for patch in review['patchSets']:
-            # Patch fields included in all patch events
-            bulk_json_patch  = '"patchSet_id":"%s",' % patch['number']
-            bulk_json_patch += '"patchSet_createdOn":"%s",' % patch['createdOn']
-            if 'author' in patch and 'email' in patch['author']:
-                identity = GerritEnrich.get_sh_identity(patch['author'])
-                puuid = self.get_uuid(identity, self.get_connector_name())
-                pemail = patch['author']['email']
-                bulk_json_patch += '"patchSet_email":"%s",' % pemail
-                bulk_json_patch += '"patchSet_uuid":"%s"' % puuid
-            else:
-                bulk_json_patch += '"patchSet_email":null,'
-                bulk_json_patch += '"patchSet_uuid":null'
-
-            app_count = 0  # Approval counter for unique id
-            if 'approvals' not in patch:
-                bulk_json_ap  = '"approval_type":null,'
-                bulk_json_ap += '"approval_value":null,'
-                bulk_json_ap += '"approval_email":null,'
-                bulk_json_ap += '"approval_uuid":null'
-
-                bulk_json_event = '{%s,%s,%s}' % (bulk_json_review,
-                                                  bulk_json_patch, bulk_json_ap)
-
-                event_id = "%s_%s_%s" % (review['id'], patch['number'], app_count)
-                bulk_json += '{"index" : {"_id" : "%s" } }\n' % (event_id)  # Bulk operation
-                bulk_json += bulk_json_event +"\n"  # Bulk document
-
-            else:
-                for app in patch['approvals']:
-                    bulk_json_ap  = '"approval_type":"%s",' % app['type']
-                    bulk_json_ap += '"approval_value":%i,' % int(app['value'])
-                    bulk_json_ap += '"approval_grantedOn":"%s",' % app['grantedOn']
-                    if 'email' in app['by']:
-                        identity = GerritEnrich.get_sh_identity(app['by'])
-                        auuid = self.get_uuid(identity, self.get_connector_name())
-                        aemail = app['by']['email']
-                        bulk_json_ap += '"approval_email":"%s",' % aemail
-                        bulk_json_ap += '"approval_uuid":"%s",' % auuid
-                    else:
-                        bulk_json_ap += '"approval_email":null,'
-                        bulk_json_ap += '"approval_uuid":null,'
-                    if 'username' in app['by']:
-                        bulk_json_ap += '"approval_username":"%s",' % app['by']['username']
-                    else:
-                        bulk_json_ap += '"approval_username":null,'
-
-                    # Time to add the time diffs
-                    app_time = \
-                        datetime.strptime(app['grantedOn'], "%Y-%m-%dT%H:%M:%S")
-                    patch_time = \
-                        datetime.strptime(patch['createdOn'], "%Y-%m-%dT%H:%M:%S")
-                    # review_time = \
-                    #    datetime.strptime(review['createdOn'], "%Y-%m-%dT%H:%M:%S")
-                    review_time = \
-                        datetime.strptime(firstPatchCreatedOn, "%Y-%m-%dT%H:%M:%S")
-
-                    seconds_day = float(60*60*24)
-                    approval_time = \
-                        (app_time-review_time).total_seconds() / seconds_day
-                    approval_patch_time = \
-                        (app_time-patch_time).total_seconds() / seconds_day
-                    patch_time = \
-                        (patch_time-review_time).total_seconds() / seconds_day
-                    bulk_json_ap += '"approval_time_days":%.2f,' % approval_time
-                    bulk_json_ap += '"approval_patch_time_days":%.2f,' % \
-                        approval_patch_time
-                    bulk_json_ap += '"patch_time_days":%.2f' % patch_time
-
-                    bulk_json_event = '{%s,%s,%s}' % (bulk_json_review,
-                                                      bulk_json_patch, bulk_json_ap)
-
-                    event_id = "%s_%s_%s" % (review['id'], patch['number'], app_count)
-                    bulk_json += '{"index" : {"_id" : "%s" } }\n' % (event_id)  # Bulk operation
-                    bulk_json += bulk_json_event +"\n"  # Bulk document
-
-                    app_count += 1
 
         return bulk_json
 

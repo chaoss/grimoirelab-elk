@@ -32,21 +32,5 @@ class GitOcean(ElasticOcean):
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
-    def get_elastic_mappings(self):
-
-        mapping = '''
-        {
-            "properties": {
-               "metadata__origin": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               }
-            }
-        }
-        '''
-
-        return {"items":mapping}
-
     def _fix_item(self, item):
-        item["ocean-unique-id"] = item["commit"]+"_"+item["__metadata__"]['origin']
-        item["metadata__origin"] = item["__metadata__"]['origin']
+        item["ocean-unique-id"] = item["data"]["commit"]+"_"+item['origin']

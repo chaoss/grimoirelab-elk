@@ -84,19 +84,35 @@ class JiraEnrich(Enrich):
 
         identities = []
 
+        item = item['data']
+
         for field in ["assignee","reporter","creator"]:
             if item["fields"][field]:
                 identities.append(self.get_sh_identity(item["fields"][field]))
 
         return identities
 
-    def enrich_issue(self, issue):
+    def get_field_unique_id(self):
+        return "ocean-unique-id"
+
+    def enrich_issue(self, item):
 
         def get_jira_url():
             u = urlparse(self.perceval_backend.url)
             return u.scheme+"//"+u.netloc
 
         eitem = {}
+
+        # metadata fields to copy
+        copy_fields = ["metadata__updated_on","ocean-unique-id","origin"]
+        for f in copy_fields:
+            if f in item:
+                eitem[f] = item[f]
+            else:
+                eitem[f] = None
+        # The real data
+        issue = item['data']
+
         # Fields that are the same in item and eitem
         copy_fields = ["assigned_to","reporter"]
         for f in copy_fields:
@@ -118,7 +134,7 @@ class JiraEnrich(Enrich):
             eitem['number_of_comments'] = len(issue['long_desc'])
         eitem['url'] = self.perceval_backend.url + "/browse/"+ issue['key']
         eitem['time_to_last_update_days'] = \
-            get_time_diff_days(issue['fields']['created'], issue['metadata__updated_on'])
+            get_time_diff_days(issue['fields']['created'], issue['fields']['updated'])
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(issue))
@@ -158,7 +174,7 @@ class JiraEnrich(Enrich):
                 logging.debug("bulk packet sent (%.2f sec, %i total)"
                               % (time()-task_init, total))
             data_json = json.dumps(issue)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (issue["id"])
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (issue[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         task_init = time()
@@ -187,7 +203,7 @@ class JiraEnrich(Enrich):
                 current = 0
             eitem = self.enrich_issue(issue)
             data_json = json.dumps(eitem)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (issue["id"])
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (eitem[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         requests.put(url, data=bulk_json)

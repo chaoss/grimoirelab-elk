@@ -94,8 +94,8 @@ class GitEnrich(Enrich):
         identities = []
 
         for identity in ['Author', 'Commit']:
-            if item[identity]:
-                user = self.get_sh_identity(item[identity])
+            if item['data'][identity]:
+                user = self.get_sh_identity(item['data'][identity])
                 identities.append(user)
         return identities
 
@@ -159,10 +159,19 @@ class GitEnrich(Enrich):
             project = None
         return {"project": project}
 
-    def get_rich_commit(self, commit):
+    def get_rich_commit(self, item):
         eitem = {}
-        # Fields that are the same in item and eitem
-        copy_fields = ["message","Author","metadata__updated_on","ocean-unique-id","metadata__origin"]
+        # metadata fields to copy
+        copy_fields = ["metadata__updated_on","ocean-unique-id","origin"]
+        for f in copy_fields:
+            if f in item:
+                eitem[f] = item[f]
+            else:
+                eitem[f] = None
+        # The real data
+        commit = item['data']
+        # data fields to copy
+        copy_fields = ["message","Author"]
         for f in copy_fields:
             if f in commit:
                 eitem[f] = commit[f]
@@ -181,7 +190,7 @@ class GitEnrich(Enrich):
         eitem["utc_commit"] = (commit_date-commit_date.utcoffset()).replace(tzinfo=None).isoformat()
         eitem["tz"]  = int(commit_date.strftime("%z")[0:3])
         # Other enrichment
-        eitem["repo_name"] = commit["__metadata__"]["origin"]
+        eitem["repo_name"] = item["origin"]
         # Number of files touched
         eitem["files"] = len(commit["files"])
         # Number of lines changed

@@ -47,4 +47,8 @@ class GerritOcean(ElasticOcean):
         return {"items":mapping}
 
     def get_field_unique_id(self):
-        return "number"
+        return "ocean-unique-id"
+
+    def _fix_item(self, item):
+        item["ocean-unique-id"] = item["data"]["number"]+"_"+item['origin']
+        

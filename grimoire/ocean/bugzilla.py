@@ -33,17 +33,6 @@ class BugzillaOcean(ElasticOcean):
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
-    def get_last_update_from_es(self, filter_=None):
-        ''' Find in JSON storage the last update date '''
-
-        last_update = self.elastic.get_last_date(self.get_field_date(), filter_)
-
-            # Format date so it can be used as URL param in bugzilla
-        if last_update is not None:
-            last_update = last_update
-
-        return last_update
-
     def _fix_item(self, item):
         bug_id = item["bug_id"][0]['__text__']
         item["ocean-unique-id"] = bug_id+"_"+item["__metadata__"]['origin']

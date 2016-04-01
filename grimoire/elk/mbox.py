@@ -91,6 +91,7 @@ class MBoxEnrich(Enrich):
         """ Return the identities from an item """
         identities = []
 
+        item = item['data']
         for identity in ['From']:
             if identity in item and item[identity]:
                 user = self.get_sh_identity(item[identity])
@@ -172,26 +173,33 @@ class MBoxEnrich(Enrich):
 
     def get_rich_item(self, item):
         eitem = {}
-        # Fields that are the same in item and eitem
-        copy_fields = ["Date","Delivered-To","From","Subject","message-id","ocean-unique-id"]
+
+        # metadata fields to copy
+        copy_fields = ["metadata__updated_on","ocean-unique-id","origin"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]
             else:
                 eitem[f] = None
-        # Fields which names are translated
-        map_fields = {}
-        for fn in map_fields:
-            eitem[map_fields[fn]] = commit[fn]
+        # The real data
+        message = item['data']
+
+        # Fields that are the same in message and eitem
+        copy_fields = ["Date","From","Subject","message-id"]
+        for f in copy_fields:
+            if f in message:
+                eitem[f] = message[f]
+            else:
+                eitem[f] = None
         # Enrich dates
         eitem["email_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
         eitem["list"] = item["__metadata__"]["origin"]
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(message))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(message))
 
         return eitem
 

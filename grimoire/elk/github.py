@@ -237,10 +237,22 @@ class GitHubEnrich(Enrich):
 
         return {"items":mapping}
 
+    def get_field_unique_id(self):
+        return "ocean-unique-id"
 
-    def get_rich_pull(self, pull):
+    def get_rich_pull(self, item):
         rich_pull = {}
-        rich_pull['id'] = pull['id']
+
+        # metadata fields to copy
+        copy_fields = ["metadata__updated_on","ocean-unique-id","origin"]
+        for f in copy_fields:
+            if f in item:
+                rich_pull[f] = item[f]
+            else:
+                rich_pull[f] = None
+        # The real data
+        pull = item['data']
+
         rich_pull['time_to_close_days'] = \
             get_time_diff_days(pull['created_at'], pull['closed_at'])
 
@@ -301,7 +313,7 @@ class GitHubEnrich(Enrich):
         if labels != '':
             labels[:-2]
         rich_pull['labels'] = labels
-        rich_pull['repository'] = pull['__metadata__']['origin']
+        rich_pull['repository'] = rich_pull['origin']
 
         if self.sortinghat:
             rich_pull.update(self.get_item_sh(pull))
@@ -320,7 +332,8 @@ class GitHubEnrich(Enrich):
         for pull in pulls:
             if not 'head' in pull.keys() and not 'pull_request' in pull.keys():
                 # And issue that it is not a PR
-                continue
+                # continue
+                pass
 
             if current >= max_items:
                 requests.put(url, data=bulk_json)
@@ -329,7 +342,7 @@ class GitHubEnrich(Enrich):
 
             rich_pull = self.get_rich_pull(pull)
             data_json = json.dumps(rich_pull)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_pull["id"])
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_pull[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         requests.put(url, data = bulk_json)
