@@ -36,13 +36,6 @@ class MBoxOcean(ElasticOcean):
     def _fix_item(self, item):
         # "Message-Id" and "Message-ID" all converted to "message-id"
         for f in ["Message-Id", "Message-ID", "message-id", "Message-id"]:
-            if f in item:
-                item["message-id"] = item[f]
-        item["ocean-unique-id"] = item["message-id"]+"_"+item["__metadata__"]['origin']
-
-
-    # def add_update_date(self, item):
-    #     if item['__metadata__']['updated_on'] is None:
-    #         item['__metadata__']['updated_on'] = "1970-01-01"
-    #     entry_lastUpdated = parser.parse(item['__metadata__']['updated_on'])
-    #     item['metadata__updated_on'] = entry_lastUpdated.isoformat()
+            if f in item["data"]:
+                item["data"]["message-id"] = item["data"][f]
+        item["ocean-unique-id"] = item["data"]["message-id"]+"_"+item['origin']

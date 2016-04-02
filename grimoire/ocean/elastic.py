@@ -86,7 +86,7 @@ class ElasticOcean(object):
 
     def add_update_date(self, item):
         """ All item['__metadata__']['updated_on'] from perceval is epoch """
-        entry_lastUpdated = datetime.fromtimestamp(item['__metadata__']['updated_on'])
+        entry_lastUpdated = datetime.fromtimestamp(item['updated_on'])
         item['metadata__updated_on'] = entry_lastUpdated.isoformat()
 
     def feed(self, from_date=None):
@@ -94,9 +94,11 @@ class ElasticOcean(object):
 
         filter_ = None
         if self.get_connector_name() == "git":
-            filter_ = {"name":"metadata__origin",
+            filter_ = {"name":"origin",
                        "value":self.perceval_backend.origin}
         self.last_update = self.get_last_update_from_es(filter_)
+        if self.get_connector_name() == "mbox":
+            self.last_update = None  # mbox does not support incremental
         last_update = self.last_update
         # last_update = '2015-12-28 18:02:00'
         if from_date:

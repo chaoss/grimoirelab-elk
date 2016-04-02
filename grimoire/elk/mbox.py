@@ -193,7 +193,7 @@ class MBoxEnrich(Enrich):
                 eitem[f] = None
         # Enrich dates
         eitem["email_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
-        eitem["list"] = item["__metadata__"]["origin"]
+        eitem["list"] = item["origin"]
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(message))

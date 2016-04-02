@@ -58,6 +58,8 @@ class GitHubEnrich(Enrich):
         """ Return the identities from an item """
         identities = []
 
+        item = item['data']
+
         for identity in ['user', 'assignee']:
             if item[identity]:
                 # In user_data we have the full user data
@@ -66,8 +68,12 @@ class GitHubEnrich(Enrich):
         return identities
 
     def get_sh_identity(self, user):
-        identity = user
-        identity['username'] = identity['login']
+        identity = {}
+        identity['username'] = user['login']
+        identity['email'] = None
+        identity['name'] = None
+        if 'email' in user:
+            identity['email'] = user['email']
         return identity
 
     def get_item_sh(self, item):

@@ -34,5 +34,5 @@ class BugzillaOcean(ElasticOcean):
         return "ocean-unique-id"
 
     def _fix_item(self, item):
-        bug_id = item["bug_id"][0]['__text__']
-        item["ocean-unique-id"] = bug_id+"_"+item["__metadata__"]['origin']
+        bug_id = item["data"]["bug_id"][0]['__text__']
+        item["ocean-unique-id"] = bug_id+"_"+item['origin']
