@@ -133,7 +133,7 @@ class BugzillaEnrich(Enrich):
         ds_name = "its"  # data source name in projects map
         url = item['origin']
         # https://bugs.eclipse.org/bugs/buglist.cgi?product=Mylyn%20Tasks
-        product = item['product'][0]['__text__']
+        product = item['data']['product'][0]['__text__']
         repo = url+"/buglist.cgi?product="+product
         try:
             project = (self.prjs_map[ds_name][repo])

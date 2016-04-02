@@ -120,6 +120,8 @@ class MBoxEnrich(Enrich):
         """ Add sorting hat enrichment fields """
         eitem = {}  # Item enriched
 
+        item = item['data']
+
         # Enrich SH
         if "From" not in item:
             return eitem
@@ -196,10 +198,10 @@ class MBoxEnrich(Enrich):
         eitem["list"] = item["origin"]
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(message))
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(message))
+            eitem.update(self.get_item_project(item))
 
         return eitem
 

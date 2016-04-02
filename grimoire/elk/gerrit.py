@@ -67,6 +67,8 @@ class GerritEnrich(Enrich):
         """ Add sorting hat enrichment fields """
         eitem = {}  # Item enriched
 
+        item = item['data']
+
         identity = GerritEnrich.get_sh_identity(item['owner'])
         eitem["uuid"] = self.get_uuid(identity, self.get_connector_name())
         eitem["name"] = identity['name']
@@ -106,7 +108,7 @@ class GerritEnrich(Enrich):
         """ Get project mapping enrichment field """
         ds_name = "scr"  # data source name in projects map
         url = item['origin']
-        repo = url+"_"+item['project']
+        repo = url+"_"+item['data']['project']
         try:
             project = (self.prjs_map[ds_name][repo])
         except KeyError:
@@ -313,10 +315,10 @@ class GerritEnrich(Enrich):
         eitem["timeopen"] =  '%.2f' % timeopen
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(review))
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(review))
+            eitem.update(self.get_item_project(item))
 
         bulk_json = '{"index" : {"_id" : "%s" } }\n' % (eitem[self.get_field_unique_id()])  # Bulk operation
         bulk_json += json.dumps(eitem)+"\n"

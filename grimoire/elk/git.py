@@ -114,6 +114,8 @@ class GitEnrich(Enrich):
         """ Add sorting hat enrichment fields """
         eitem = {}  # Item enriched
 
+        item = item['data']
+
         # Enrich SH
         identity  = self.get_sh_identity(item["Author"])
         eitem["author_name"] = identity['name']
@@ -205,10 +207,10 @@ class GitEnrich(Enrich):
         eitem["lines_changed"] = lines_changed
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(commit))
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(commit))
+            eitem.update(self.get_item_project(item))
 
         return eitem
 
