@@ -131,7 +131,7 @@ class BugzillaEnrich(Enrich):
     def get_item_project(self, item):
         """ Get project mapping enrichment field """
         ds_name = "its"  # data source name in projects map
-        url = item['__metadata__']['origin']
+        url = item['origin']
         # https://bugs.eclipse.org/bugs/buglist.cgi?product=Mylyn%20Tasks
         product = item['product'][0]['__text__']
         repo = url+"/buglist.cgi?product="+product

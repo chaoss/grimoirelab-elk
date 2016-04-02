@@ -160,7 +160,7 @@ class MBoxEnrich(Enrich):
         # "origin": "dltk-commits"
         # /mnt/mailman_archives/dltk-dev.mbox/dltk-dev.mbox
         ds_name = "mls"  # data source name in projects map
-        mls_list = item['__metadata__']['origin']
+        mls_list = item['origin']
         path = "/mnt/mailman_archives/"
         path += mls_list+".mbox/"+mls_list+".mbox"
 

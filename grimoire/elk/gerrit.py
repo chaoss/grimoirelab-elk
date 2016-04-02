@@ -105,7 +105,7 @@ class GerritEnrich(Enrich):
     def get_item_project(self, item):
         """ Get project mapping enrichment field """
         ds_name = "scr"  # data source name in projects map
-        url = item['__metadata__']['origin']
+        url = item['origin']
         repo = url+"_"+item['project']
         try:
             project = (self.prjs_map[ds_name][repo])
