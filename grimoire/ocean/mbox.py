@@ -25,6 +25,7 @@
 
 import datetime
 from dateutil import parser
+import logging
 from grimoire.ocean.elastic import ElasticOcean
 
 class MBoxOcean(ElasticOcean):
@@ -34,8 +35,8 @@ class MBoxOcean(ElasticOcean):
         return "ocean-unique-id"
 
     def _fix_item(self, item):
-        # "Message-Id" and "Message-ID" all converted to "message-id"
-        for f in ["Message-Id", "Message-ID", "message-id", "Message-id"]:
-            if f in item["data"]:
-                item["data"]["message-id"] = item["data"][f]
-        item["ocean-unique-id"] = item["data"]["message-id"]+"_"+item['origin']
+        if "Message-ID" in item["data"] and item["data"]["Message-ID"]:
+            item["ocean-unique-id"] = item["data"]["Message-ID"]+"_"+item['origin']
+        else:
+            logging.warning("No Message-ID in %s %s" % (item["data"]["Subject"], item['origin']))
+            item["ocean-unique-id"] = "NONE_"+item['origin']
