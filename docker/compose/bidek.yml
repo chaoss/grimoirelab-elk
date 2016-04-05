@@ -19,6 +19,9 @@ kibiter-edit:
     - elasticsearch
   ports:
     - "127.0.0.1:5601:5601"
+  # To customize quick links in Kibana
+  # volumes:
+  #   - ${DATA_DOCKER}/docker_data_persistence/project/quick_ranges-4.4.1.js:/opt/kibana/src/ui/public/timepicker/quick_ranges.js
 
 kibiter:
   restart: "always" 
@@ -31,6 +34,9 @@ kibiter:
     - elasticsearch
   ports:
     - "127.0.0.1:5602:5601" 
+  # To customize quick links in Kibana
+  # volumes:
+  #   - ${DATA_DOCKER}/docker_data_persistence/project/quick_ranges-4.4.1.js:/opt/kibana/src/ui/public/timepicker/quick_ranges.js
 
 mariadbdata:
     image: mariadb:10.0
