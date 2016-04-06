@@ -64,9 +64,14 @@ RUN git clone https://github.com/grimoirelab/GrimoireELK
 # get VizGrimoireUtils repository for tools like eclipse_projects
 RUN git clone https://github.com/VizGrimoire/VizGrimoireUtils.git
 
-# get Perceval repository, configure arthur branch
+# get Perceval repository
 RUN git clone https://github.com/grimoirelab/perceval.git && \
     cd perceval && sudo python3 setup.py install
+
+# get Arthur repository
+RUN git clone https://github.com/grimoirelab/arthur.git && \
+    cd arthur && sudo python3 setup.py install
+
 
 ADD init-gelk ${DEPLOY_USER_DIR}/
 
