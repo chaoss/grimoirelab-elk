@@ -93,12 +93,10 @@ class ElasticOcean(object):
         """ Feed data in Elastic from Perceval """
 
         filter_ = None
-        if self.get_connector_name() == "git":
+        if self.get_connector_name() in ["git","mbox"]:
             filter_ = {"name":"origin",
                        "value":self.perceval_backend.origin}
         self.last_update = self.get_last_update_from_es(filter_)
-        if self.get_connector_name() == "mbox":
-            self.last_update = None  # mbox does not support incremental
         last_update = self.last_update
         # last_update = '2015-12-28 18:02:00'
         if from_date:
