@@ -26,6 +26,7 @@ RUN apt-get update && \
         python3-requests python3-dateutil python3-bs4 \
         python3-pip python3-dev python3-redis python3-sqlalchemy \
         python3-flask \
+	python-mysqldb \
         gcc make libmysqlclient-dev mariadb-client \
         unzip curl wget sudo vim ssh \
         && \
