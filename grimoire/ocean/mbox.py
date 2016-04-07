@@ -43,6 +43,9 @@ class MBoxOcean(ElasticOcean):
         }
         '''
 
+        return {"items":mapping}
+
+
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
