@@ -27,6 +27,7 @@
 
 
 from datetime import datetime
+import json
 import logging
 import requests
 
@@ -157,26 +158,7 @@ class ElasticOcean(object):
 
     # Iterator
     def _get_elastic_items(self):
-
-        def get_origin_filter():
-            # To fix the origin for items
-            filter_ = None
-            if self.get_connector_name() == "git" and \
-                self.perceval_backend.origin != "":
-                logging.info("Feeding from origin %s" % (self.perceval_backend.origin))
-                filter_ = {"name":"metadata__origin",
-                           "value":self.perceval_backend.origin}
-                origin_filter = '''
-                    {
-                        "term" : { "%s" : "%s"  }
-                     }
-                ''' % (filter_['name'], filter_['value'])
-            else:
-                origin_filter = None
-
-            return origin_filter
-
-
+        """ Get the items from the index related to the backend """
 
         url = self.elastic.index_url
         # 1 minute to process the results of size items
@@ -185,23 +167,26 @@ class ElasticOcean(object):
         url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
                                                self.elastic_page)
 
-        if self.from_date and not self.elastic_scroll_id:
-            # The filter in scroll api should be added the first query
+        if self.elastic_scroll_id:
+            """ Just continue with the scrolling """
+            url = self.elastic.url
+            url += "/_search/scroll"
+            scroll_data = {
+                "scroll" : max_process_items_pack_time,
+                "scroll_id" : self.elastic_scroll_id
+                }
+            r = requests.post(url, data=json.dumps(scroll_data))
+        elif not self.from_date:
+            r = requests.get(url)
+        else:
             date_field = self.get_field_date()
             from_date = self.from_date.isoformat()
-
-            origin_filter = get_origin_filter()
 
             filters = '''
                 {"range":
                     {"%s": {"gte": "%s"}}
                 }
             ''' % (date_field, from_date)
-
-            if origin_filter:
-                filters += ", %s" % (origin_filter)
-
-
 
             query = """
             {
@@ -214,38 +199,6 @@ class ElasticOcean(object):
             """ % (filters)
 
             r = requests.post(url, data=query)
-
-        else:
-            if self.elastic_scroll_id:
-                url = self.elastic.url
-                url += "/_search/scroll"
-                scroll_data = {
-                    "scroll" : max_process_items_pack_time,
-                    "scroll_id" : self.elastic_scroll_id
-                    }
-                # r = requests.post(url, data=json.dumps(scroll_data))
-                # For compatibility with 1.7
-                get_scroll_data = "scroll=%s&scroll_id=%s" % \
-                    (max_process_items_pack_time, self.elastic_scroll_id)
-                r = requests.get(url+"?"+ get_scroll_data)
-
-            else:
-                origin_filter = get_origin_filter()
-
-                if origin_filter:
-                    filters = origin_filter
-                    query = """
-                    {
-                        "query": {
-                            "bool": {
-                                "must": [%s]
-                            }
-                        }
-                    }
-                    """ % (filters)
-                    r = requests.post(url, data=query)
-                else:
-                    r = requests.get(url)
 
         items = []
         try:
@@ -266,7 +219,6 @@ class ElasticOcean(object):
             logging.warning("No results found from %s" % (url))
 
         return items
-
 
     def __iter__(self):
 

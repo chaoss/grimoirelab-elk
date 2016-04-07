@@ -66,21 +66,53 @@ def feed_backends(url, clean, debug = False, redis = None):
         logging.info("Queued job")
         logging.info(task_feed)
 
+def enrich_backends(url, clean, debug = False, redis = None,
+                    db_projects_map=None, db_sortinghat=None):
+    ''' Enrich all existing indexes '''
 
-def loop_update(min_update_time, url, clean, debug, redis):
+    logging.info("Enriching repositories")
+
+    elastic = get_elastic(url, ConfOcean.get_index(), clean)
+    ConfOcean.set_elastic(elastic)
+    fetch_cache = False
+
+    q = Queue('update', connection=Redis(redis), async=async_)
+    index_enriched = []
+
+    for repo in ConfOcean.get_repos():
+        # In enrich, several repos could have the same index. Enrich one time.
+        if repo["index"] not in index_enriched:
+            index_enriched.append(repo["index"])
+        else:
+            continue
+
+        enrich_task = q.enqueue(enrich_backend,
+                                url, clean,
+                                repo['backend_name'], repo['backend_params'],
+                                repo['index'], db_projects_map, db_sortinghat)
+        logging.info("Queued job")
+        logging.info(enrich_task)
+
+def loop_update(min_update_time, url, clean, debug, redis, enrich=False,
+                db_projects_map=None, db_sortinghat=None):
 
     while True:
-        ustart = time()
-
+        ustart_feed = time()
         feed_backends(url, clean, debug, redis)
+        update_time_feed = int(time()-ustart_feed)
+        logging.info("Ocean update time: %i minutes" % (update_time_feed/60))
+        update_sleep = min_update_time - update_time_feed
 
-        update_time = int(time()-ustart)
-        update_sleep = min_update_time - update_time
-        logging.info("Ocean update time: %i minutes" % (update_time/60))
+        if enrich:
+            ustart_enrich = time()
+            enrich_backends(url, clean, debug, redis, db_projects_map, db_sortinghat)
+            update_time_enrich = int(time()-ustart_enrich)
+            logging.info("Enrich update time: %i minutes" % (update_time_enrich/60))
+            update_sleep = min_update_time -(update_time_feed+update_time_enrich)
+
         if update_sleep > 0:
             logging.debug("Waiting for updating %i seconds " % (update_sleep))
             sleep(update_sleep)
-
 
 if __name__ == '__main__':
 
@@ -103,7 +135,9 @@ if __name__ == '__main__':
             # minimal update duration to avoid too much frequency in secs
             min_update_time = 60
             loop_update(min_update_time, url, clean, args.debug,
-                        args.redis)
+                        args.redis, args.enrich,
+                        args.db_projects_map, args.db_sortinghat)
+
         elif args.backend:
             if not args.enrich_only:
                 q = Queue('create', connection=Redis(args.redis), async=async_)

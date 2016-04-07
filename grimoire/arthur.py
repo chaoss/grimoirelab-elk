@@ -68,6 +68,8 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params, es_index
 
         ConfOcean.set_elastic(elastic_ocean)
 
+        repo['repo_update_start'] = datetime.now().isoformat()
+
         try:
             if backend_cmd.from_date.replace(tzinfo=None) == \
                 parser.parse("1970-01-01").replace(tzinfo=None):
@@ -251,7 +253,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if not ocean_index:
             ocean_index = backend_name + "_" + backend.origin
         enrich_index = ocean_index+"_enrich"
-
 
         enrich_backend = connector[2](backend, db_projects_map, db_sortinghat)
         elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
