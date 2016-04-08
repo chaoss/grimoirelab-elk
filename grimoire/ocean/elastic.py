@@ -86,9 +86,12 @@ class ElasticOcean(object):
         pass
 
     def add_update_date(self, item):
-        """ All item['__metadata__']['updated_on'] from perceval is epoch """
-        entry_lastUpdated = datetime.fromtimestamp(item['updated_on'])
-        item['metadata__updated_on'] = entry_lastUpdated.isoformat()
+        """ All item['updated_on'] from perceval is epoch """
+        updated = datetime.fromtimestamp(item['updated_on'])
+        timestamp = datetime.fromtimestamp(item['timestamp'])
+        item['metadata__updated_on'] = updated.isoformat()
+        # Also add timestamp used in incremental enrichment
+        item['metadata__timestamp'] = timestamp.isoformat()
 
     def feed(self, from_date=None):
         """ Feed data in Elastic from Perceval """

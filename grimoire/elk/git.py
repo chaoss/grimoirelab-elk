@@ -164,7 +164,7 @@ class GitEnrich(Enrich):
     def get_rich_commit(self, item):
         eitem = {}
         # metadata fields to copy
-        copy_fields = ["metadata__updated_on","ocean-unique-id","origin"]
+        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]
