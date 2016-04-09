@@ -29,23 +29,5 @@ from grimoire.ocean.elastic import ElasticOcean
 class GitOcean(ElasticOcean):
     """Git Ocean feeder"""
 
-    def get_elastic_mappings(self):
-        mapping = '''
-        {
-            "properties": {
-               "origin": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               }
-            }
-        }
-        '''
-
-        return {"items":mapping}
-
-
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["data"]["commit"]+"_"+item['origin']

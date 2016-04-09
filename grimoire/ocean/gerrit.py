@@ -31,24 +31,5 @@ from grimoire.ocean.elastic import ElasticOcean
 
 class GerritOcean(ElasticOcean):
 
-    def get_elastic_mappings(self):
-
-        mapping = '''
-        {
-            "properties": {
-               "project": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               }
-            }
-        }
-        '''
-
-        return {"items":mapping}
-
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["data"]["number"]+"_"+item['origin']
-        

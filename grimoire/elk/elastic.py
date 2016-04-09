@@ -182,6 +182,7 @@ class ElasticSearch(object):
         { %s  %s
         } ''' % (data_query, data_agg)
 
+        logging.debug("%s %s" % (url, data_json))
         res = requests.post(url, data=data_json)
         res_json = res.json()
 

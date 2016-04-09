@@ -260,6 +260,10 @@ class GerritEnrich(Enrich):
                "author_name": {
                  "type": "string",
                  "index":"not_analyzed"
+               },
+               "origin": {
+                 "type": "string",
+                 "index":"not_analyzed"
                }
             }
         }
@@ -272,7 +276,7 @@ class GerritEnrich(Enrich):
         eitem = {}  # Item enriched
 
         # metadata fields to copy
-        copy_fields = ["metadata__updated_on","ocean-unique-id","origin"]
+        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]

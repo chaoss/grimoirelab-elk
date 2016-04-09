@@ -259,7 +259,10 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         enrich_backend.set_elastic(elastic_enrich)
 
         # We need to enrich from just updated items since last enrichment
-        last_enrich = enrich_backend.get_last_update_from_es()
+        # Always filter by origin to support multi origin indexes
+        filter_ = {"name":"origin",
+                   "value":backend.origin}
+        last_enrich = enrich_backend.get_last_update_from_es(filter_)
         if no_incremental:
             last_enrich = None
 

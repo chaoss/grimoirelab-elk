@@ -60,12 +60,26 @@ class ElasticOcean(object):
         return "metadata__updated_on"
 
     def get_field_unique_id(self):
-        """ Field with unique identifier in an item  """
-        raise NotImplementedError
+        return "ocean-unique-id"
 
     def get_elastic_mappings(self):
-        """ Specific mappings for the State in ES """
-        pass
+        """ origin used to filter in incremental updates """
+        mapping = '''
+        {
+            "properties": {
+               "origin": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "project": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               }
+            }
+        }
+        '''
+
+        return {"items":mapping}
 
     def get_last_update_from_es(self, _filter = None):
         last_update = self.elastic.get_last_date(self.get_field_date(), _filter)
@@ -96,10 +110,9 @@ class ElasticOcean(object):
     def feed(self, from_date=None):
         """ Feed data in Elastic from Perceval """
 
-        filter_ = None
-        if self.get_connector_name() in ["git","mbox"]:
-            filter_ = {"name":"origin",
-                       "value":self.perceval_backend.origin}
+        # Always filter by origin to support multi origin indexes
+        filter_ = {"name":"origin",
+                   "value":self.perceval_backend.origin}
         self.last_update = self.get_last_update_from_es(filter_)
         last_update = self.last_update
         # last_update = '2015-12-28 18:02:00'
@@ -179,17 +192,23 @@ class ElasticOcean(object):
                 "scroll_id" : self.elastic_scroll_id
                 }
             r = requests.post(url, data=json.dumps(scroll_data))
-        elif not self.from_date:
-            r = requests.get(url)
         else:
-            date_field = self.get_field_date()
-            from_date = self.from_date.isoformat()
-
+            # Always filter by origin to support multi origin indexes
             filters = '''
-                {"range":
-                    {"%s": {"gte": "%s"}}
+                {"term":
+                    { "origin" : "%s"  }
                 }
-            ''' % (date_field, from_date)
+            ''' % (self.perceval_backend.origin)
+
+            if self.from_date:
+                date_field = self.get_field_date()
+                from_date = self.from_date.isoformat()
+
+                filters += '''
+                    , {"range":
+                        {"%s": {"gte": "%s"}}
+                    }
+                ''' % (date_field, from_date)
 
             query = """
             {
@@ -200,6 +219,8 @@ class ElasticOcean(object):
                 }
             }
             """ % (filters)
+
+            logging.debug("%s %s" % (url, query))
 
             r = requests.post(url, data=query)
 

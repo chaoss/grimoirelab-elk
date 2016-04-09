@@ -29,8 +29,5 @@ from grimoire.ocean.elastic import ElasticOcean
 class GitHubOcean(ElasticOcean):
     """GitHub Ocean feeder"""
 
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def _fix_item(self, item):
         item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']

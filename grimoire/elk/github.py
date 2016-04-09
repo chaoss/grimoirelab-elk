@@ -236,6 +236,10 @@ class GitHubEnrich(Enrich):
                    "repository": {
                       "type": "string",
                       "index":"not_analyzed"
+                   },
+                   "origin": {
+                     "type": "string",
+                     "index":"not_analyzed"
                    }
                 }
             }

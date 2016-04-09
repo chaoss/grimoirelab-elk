@@ -31,24 +31,6 @@ from grimoire.ocean.elastic import ElasticOcean
 class MBoxOcean(ElasticOcean):
     """MBox Ocean feeder"""
 
-    def get_elastic_mappings(self):
-        mapping = '''
-        {
-            "properties": {
-               "origin": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               }
-            }
-        }
-        '''
-
-        return {"items":mapping}
-
-
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def _fix_item(self, item):
         if "Message-ID" in item["data"] and item["data"]["Message-ID"]:
             item["ocean-unique-id"] = item["data"]["Message-ID"]+"_"+item['origin']

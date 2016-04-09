@@ -228,6 +228,10 @@ class JiraEnrich(Enrich):
                "assigned_to": {
                   "type": "string",
                   "index":"not_analyzed"
+               },
+               "origin": {
+                 "type": "string",
+                 "index":"not_analyzed"
                }
             }
         }

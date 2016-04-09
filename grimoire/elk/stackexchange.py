@@ -57,6 +57,10 @@ class StackExchangeEnrich(Enrich):
                 "question_owner": {
                   "type": "string",
                   "index":"not_analyzed"
+                  },
+                  "origin": {
+                    "type": "string",
+                    "index":"not_analyzed"
                   }
            }
         } """

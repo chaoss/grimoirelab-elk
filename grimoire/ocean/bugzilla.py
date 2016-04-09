@@ -30,9 +30,6 @@ from grimoire.ocean.elastic import ElasticOcean
 
 class BugzillaOcean(ElasticOcean):
 
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def _fix_item(self, item):
         bug_id = item["data"]["bug_id"][0]['__text__']
         item["ocean-unique-id"] = bug_id+"_"+item['origin']
