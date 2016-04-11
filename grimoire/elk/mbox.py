@@ -191,7 +191,7 @@ class MBoxEnrich(Enrich):
         message = item['data']
 
         # Fields that are the same in message and eitem
-        copy_fields = ["Date","From","Subject","message-id"]
+        copy_fields = ["Date","From","Subject","Message-ID"]
         for f in copy_fields:
             if f in message:
                 eitem[f] = message[f]
