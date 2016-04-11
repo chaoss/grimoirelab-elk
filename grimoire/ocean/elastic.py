@@ -193,12 +193,14 @@ class ElasticOcean(object):
                 }
             r = requests.post(url, data=json.dumps(scroll_data))
         else:
-            # Always filter by origin to support multi origin indexes
-            filters = '''
-                {"term":
-                    { "origin" : "%s"  }
-                }
-            ''' % (self.perceval_backend.origin)
+            filters = "{}"
+            # If origin Always filter by origin to support multi origin indexes
+            if self.perceval_backend.origin:
+                filters = '''
+                    {"term":
+                        { "origin" : "%s"  }
+                    }
+                ''' % (self.perceval_backend.origin)
 
             if self.from_date:
                 date_field = self.get_field_date()
