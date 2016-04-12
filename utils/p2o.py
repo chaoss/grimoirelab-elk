@@ -77,15 +77,8 @@ def enrich_backends(url, clean, debug = False, redis = None,
     fetch_cache = False
 
     q = Queue('update', connection=Redis(redis), async=async_)
-    index_enriched = []
 
     for repo in ConfOcean.get_repos():
-        # In enrich, several repos could have the same index. Enrich one time.
-        if repo["index"] not in index_enriched:
-            index_enriched.append(repo["index"])
-        else:
-            continue
-
         enrich_task = q.enqueue(enrich_backend,
                                 url, clean,
                                 repo['backend_name'], repo['backend_params'],
