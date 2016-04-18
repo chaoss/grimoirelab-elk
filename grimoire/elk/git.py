@@ -114,6 +114,16 @@ class GitEnrich(Enrich):
         identity['name'] = name
         return identity
 
+    def get_identity_domain(self, identity):
+        domain = None
+        if identity['email']:
+            try:
+                domain = identity['email'].split("@")[1]
+            except IndexError:
+                # logging.warning("Bad email format: %s" % (identity['email']))
+                pass
+        return domain
+
     def get_item_sh(self, item):
         """ Add sorting hat enrichment fields """
         eitem = {}  # Item enriched
@@ -139,14 +149,7 @@ class GitEnrich(Enrich):
         else:
             eitem["bot"] = False  # By default, identities are not bots
 
-        if identity['email']:
-            try:
-                eitem["domain"] = identity['email'].split("@")[1]
-            except IndexError:
-                # logging.warning("Bad email format: %s" % (identity['email']))
-                eitem["domain"] = None
-        else:
-            eitem["domain"] = None
+        eitem["domain"] = self.get_identity_domain(identity)
 
         # Unify fields name
         eitem["author_org_name"] = eitem["org_name"]
@@ -209,6 +212,11 @@ class GitEnrich(Enrich):
                     # logging.warning(cfile)
                     continue
         eitem["lines_changed"] = lines_changed
+
+        # author_name and author_domain are added always
+        identity  = self.get_sh_identity(commit["Author"])
+        eitem["author_name"] = identity['name']
+        eitem["author_domain"] = self.get_identity_domain(identity)
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
