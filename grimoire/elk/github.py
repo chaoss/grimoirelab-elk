@@ -194,7 +194,7 @@ class GitHubEnrich(Enrich):
             geopoint = self.geolocations[loc]
             location = geopoint.copy()
             location["location"] = loc
-            # First upload the raw pullrequest data to ES
+            # First upload the raw issue data to ES
             data_json = json.dumps(location)
             # Don't include in URL non ascii codes
             safe_loc = str(loc.encode('ascii', 'ignore'),'ascii')
@@ -250,87 +250,91 @@ class GitHubEnrich(Enrich):
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
-    def get_rich_pull(self, item):
-        rich_pull = {}
+    def get_rich_issue(self, item):
+        rich_issue = {}
 
         # metadata fields to copy
         copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
         for f in copy_fields:
             if f in item:
-                rich_pull[f] = item[f]
+                rich_issue[f] = item[f]
             else:
-                rich_pull[f] = None
+                rich_issue[f] = None
         # The real data
-        pull = item['data']
+        issue = item['data']
 
-        rich_pull['time_to_close_days'] = \
-            get_time_diff_days(pull['created_at'], pull['closed_at'])
+        rich_issue['time_to_close_days'] = \
+            get_time_diff_days(issue['created_at'], issue['closed_at'])
 
-        rich_pull['user_login'] = pull['user']['login']
-        user = pull['user_data']
+        rich_issue['user_login'] = issue['user']['login']
+        user = issue['user_data']
 
         if user is not None:
-            rich_pull['user_name'] = user['name']
-            rich_pull['author_name'] = user['name']
-            rich_pull['user_email'] = user['email']
-            if rich_pull['user_email']:
-                rich_pull["user_domain"] = rich_pull['user_email'].split("@")[1]
-            rich_pull['user_org'] = user['company']
-            rich_pull['user_location'] = user['location']
-            rich_pull['user_geolocation'] = self.get_geo_point(user['location'])
+            rich_issue['user_name'] = user['name']
+            rich_issue['author_name'] = user['name']
+            rich_issue['user_email'] = user['email']
+            if rich_issue['user_email']:
+                rich_issue["user_domain"] = rich_issue['user_email'].split("@")[1]
+            rich_issue['user_org'] = user['company']
+            rich_issue['user_location'] = user['location']
+            rich_issue['user_geolocation'] = self.get_geo_point(user['location'])
         else:
-            rich_pull['user_name'] = None
-            rich_pull['user_email'] = None
-            rich_pull["user_domain"] = None
-            rich_pull['user_org'] = None
-            rich_pull['user_location'] = None
-            rich_pull['user_geolocation'] = None
-            rich_pull['author_name'] = None
+            rich_issue['user_name'] = None
+            rich_issue['user_email'] = None
+            rich_issue["user_domain"] = None
+            rich_issue['user_org'] = None
+            rich_issue['user_location'] = None
+            rich_issue['user_geolocation'] = None
+            rich_issue['author_name'] = None
 
 
         assignee = None
 
-        if pull['assignee'] is not None:
-            assignee = pull['assignee_data']
-            rich_pull['assignee_login'] = pull['assignee']['login']
-            rich_pull['assignee_name'] = assignee['name']
-            rich_pull['assignee_email'] = assignee['email']
-            if rich_pull['assignee_email']:
-                rich_pull["assignee_domain"] = rich_pull['assignee_email'].split("@")[1]
-            rich_pull['assignee_org'] = assignee['company']
-            rich_pull['assignee_location'] = assignee['location']
-            rich_pull['assignee_geolocation'] = \
+        if issue['assignee'] is not None:
+            assignee = issue['assignee_data']
+            rich_issue['assignee_login'] = issue['assignee']['login']
+            rich_issue['assignee_name'] = assignee['name']
+            rich_issue['assignee_email'] = assignee['email']
+            if rich_issue['assignee_email']:
+                rich_issue["assignee_domain"] = rich_issue['assignee_email'].split("@")[1]
+            rich_issue['assignee_org'] = assignee['company']
+            rich_issue['assignee_location'] = assignee['location']
+            rich_issue['assignee_geolocation'] = \
                 self.get_geo_point(assignee['location'])
         else:
-            rich_pull['assignee_name'] = None
-            rich_pull['assignee_login'] = None
-            rich_pull['assignee_email'] = None
-            rich_pull["assignee_domain"] = None
-            rich_pull['assignee_org'] = None
-            rich_pull['assignee_location'] = None
-            rich_pull['assignee_geolocation'] = None
+            rich_issue['assignee_name'] = None
+            rich_issue['assignee_login'] = None
+            rich_issue['assignee_email'] = None
+            rich_issue["assignee_domain"] = None
+            rich_issue['assignee_org'] = None
+            rich_issue['assignee_location'] = None
+            rich_issue['assignee_geolocation'] = None
 
-        rich_pull['title'] = pull['title']
-        rich_pull['state'] = pull['state']
-        rich_pull['created_at'] = pull['created_at']
-        rich_pull['updated_at'] = pull['updated_at']
-        rich_pull['closed_at'] = pull['closed_at']
-        rich_pull['url'] = pull['html_url']
+        rich_issue['title'] = issue['title']
+        rich_issue['state'] = issue['state']
+        rich_issue['created_at'] = issue['created_at']
+        rich_issue['updated_at'] = issue['updated_at']
+        rich_issue['closed_at'] = issue['closed_at']
+        rich_issue['url'] = issue['html_url']
         labels = ''
-        if 'labels' in pull:
-            for label in pull['labels']:
+        if 'labels' in issue:
+            for label in issue['labels']:
                 labels += label['name']+";;"
         if labels != '':
             labels[:-2]
-        rich_pull['labels'] = labels
-        rich_pull['repository'] = rich_pull['origin']
+        rich_issue['labels'] = labels
+        rich_issue['repository'] = rich_issue['origin']
+
+        rich_issue['pull_request'] = True
+        if not 'head' in issue.keys() and not 'pull_request' in issue.keys():
+            rich_issue['pull_request'] = False
 
         if self.sortinghat:
-            rich_pull.update(self.get_item_sh(pull))
+            rich_issue.update(self.get_item_sh(issue))
 
-        return rich_pull
+        return rich_issue
 
-    def enrich_items(self, pulls):
+    def enrich_items(self, issues):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
@@ -339,20 +343,15 @@ class GitHubEnrich(Enrich):
 
         logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
-        for pull in pulls:
-            if not 'head' in pull.keys() and not 'pull_request' in pull.keys():
-                # And issue that it is not a PR
-                # continue
-                pass
-
+        for issue in issues:
             if current >= max_items:
                 requests.put(url, data=bulk_json)
                 bulk_json = ""
                 current = 0
 
-            rich_pull = self.get_rich_pull(pull)
-            data_json = json.dumps(rich_pull)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_pull[self.get_field_unique_id()])
+            rich_issue = self.get_rich_issue(issue)
+            data_json = json.dumps(rich_issue)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_issue[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         requests.put(url, data = bulk_json)
