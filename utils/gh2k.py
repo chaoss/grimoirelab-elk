@@ -90,6 +90,9 @@ def get_repositores(org, token, nrepos):
         r.raise_for_status()
         all_repos += r.json()
 
+        logging.debug("Rate limit: %s" % (r.headers['X-RateLimit-Remaining']))
+
+
         if 'next' not in r.links:
             break
 
@@ -111,18 +114,25 @@ if __name__ == '__main__':
 
     config_logging(args.debug)
 
+    # git_index = "github_git_" + args.org
+    # issues_index = "github_issues_" + args.org
+    # All projects share the same index
+    git_index = "github_git"
+    issues_index = "github_issues"
+
     logging.info("Creating new GitHub dashboard with %i repositores from %s" %
                 (args.nrepos, args.org))
     repos = get_repositores(args.org, args.token, args.nrepos)
 
     for repo in repos:
+        project = args.org  # project = org in GitHub
         url = GITHUB_URL+args.org+"/"+repo['name']
-        cmd = "./p2o.py -e %s git %s" % (args.elastic_url, url)
+        cmd = "./p2o.py -e %s --index %s --project %s git %s" % (args.elastic_url, git_index, project, url)
         git_cmd = subprocess.call(cmd, shell=True)
         if git_cmd != 0:
             logging.error("Problems with command: %s" % cmd)
-        cmd = "./p2o.py -e %s github --owner %s --repository %s -t %s " % \
-            (args.elastic_url, args.org, repo['name'], args.token)
+        cmd = "./p2o.py -e %s --index %s --project %s github --owner %s --repository %s -t %s " % \
+            (args.elastic_url, issues_index, project, args.org, repo['name'], args.token)
         issues_cmd = subprocess.call(cmd, shell=True)
         if issues_cmd != 0:
             logging.error("Problems with command: %s" % cmd)

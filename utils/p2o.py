@@ -136,7 +136,7 @@ if __name__ == '__main__':
                 q = Queue('create', connection=Redis(args.redis), async=async_)
                 task_feed = q.enqueue(feed_backend, url, clean, args.fetch_cache,
                                       args.backend, args.backend_args,
-                                      args.index)
+                                      args.index, args.project)
                 logging.info("Queued feed_backend job")
                 logging.info(task_feed)
 
