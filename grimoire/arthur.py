@@ -35,7 +35,8 @@ from grimoire.utils import get_elastic
 from grimoire.utils import get_connectors, get_connector_from_name
 import traceback
 
-def feed_backend(url, clean, fetch_cache, backend_name, backend_params, es_index=None):
+def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
+                 es_index=None, project=None):
     """ Feed Ocean with backend data """
 
     backend = None
@@ -55,7 +56,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params, es_index
         backend_cmd = klass(*backend_params)
 
         backend = backend_cmd.backend
-        ocean_backend = connector[1](backend, fetch_cache=fetch_cache)
+        ocean_backend = connector[1](backend, fetch_cache=fetch_cache, project=project)
 
         logging.info("Feeding Ocean from %s (%s)" % (backend_name,
                                                      backend.origin))

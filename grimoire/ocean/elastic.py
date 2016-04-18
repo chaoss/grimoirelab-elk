@@ -44,12 +44,14 @@ class ElasticOcean(object):
                             "(default: http://127.0.0.1:9200)")
 
 
-    def __init__(self, perceval_backend, from_date=None, fetch_cache=False):
+    def __init__(self, perceval_backend, from_date=None, fetch_cache=False,
+                 project=None):
 
         self.perceval_backend = perceval_backend
         self.last_update = None  # Last update in ocean items index for feed
         self.from_date = from_date  # fetch from_date
         self.fetch_cache = fetch_cache  # fetch from cache
+        self.project = project  # project to be used for this data source
 
     def set_elastic(self, elastic):
         """ Elastic used to store last data source state """
@@ -141,6 +143,8 @@ class ElasticOcean(object):
             # Add date field for incremental analysis if needed
             self.add_update_date(item)
             self._fix_item(item)
+            if self.project:
+                item['project'] = self.project
             if len(items_pack) >= self.elastic.max_items_bulk:
                 self._items_to_es(items_pack)
                 items_pack = []

@@ -86,6 +86,10 @@ class GitEnrich(Enrich):
                "origin": {
                  "type": "string",
                  "index":"not_analyzed"
+               },
+               "project": {
+                 "type": "string",
+                 "index":"not_analyzed"
                }
             }
         } """
@@ -217,6 +221,9 @@ class GitEnrich(Enrich):
         identity  = self.get_sh_identity(commit["Author"])
         eitem["author_name"] = identity['name']
         eitem["author_domain"] = self.get_identity_domain(identity)
+
+        if 'project' in item:
+            eitem['project'] = item['project']
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))

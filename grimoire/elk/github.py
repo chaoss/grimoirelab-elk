@@ -213,36 +213,40 @@ class GitHubEnrich(Enrich):
         """ geopoints type is not created in dynamic mapping """
 
         mapping = """
-            {
-                "properties": {
-                   "assignee_geolocation": {
-                       "type": "geo_point"
-                   },
-                   "user_geolocation": {
-                       "type": "geo_point"
-                   },
-                   "assignee_name": {
-                      "type": "string",
-                      "index":"not_analyzed"
-                   },
-                   "user_name": {
-                      "type": "string",
-                      "index":"not_analyzed"
-                   },
-                   "author_name": {
-                      "type": "string",
-                      "index":"not_analyzed"
-                   },
-                   "repository": {
-                      "type": "string",
-                      "index":"not_analyzed"
-                   },
-                   "origin": {
-                     "type": "string",
-                     "index":"not_analyzed"
-                   }
-                }
+        {
+            "properties": {
+               "assignee_geolocation": {
+                   "type": "geo_point"
+               },
+               "user_geolocation": {
+                   "type": "geo_point"
+               },
+               "assignee_name": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "user_name": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "author_name": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "repository": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "origin": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "project": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               }
             }
+        }
         """
 
         return {"items":mapping}
@@ -328,6 +332,9 @@ class GitHubEnrich(Enrich):
         rich_issue['pull_request'] = True
         if not 'head' in issue.keys() and not 'pull_request' in issue.keys():
             rich_issue['pull_request'] = False
+
+        if 'project' in item:
+            rich_issue['project'] = item['project']
 
         if self.sortinghat:
             rich_issue.update(self.get_item_sh(issue))
