@@ -26,20 +26,19 @@
 import argparse
 from dateutil import parser
 import logging
-from os import sys
+from os import sys, path
 import requests
 import subprocess
 
+import smtplib
+from email.mime.text import MIMEText
+
 from grimoire.ocean.elastic import ElasticOcean
-
-
-from grimoire.elk.elastic import ElasticSearch
 from grimoire.utils import config_logging
 
 GITHUB_URL = "https://github.com/"
 GITHUB_API_URL = "https://api.github.com"
 NREPOS = 10 # Default number of repos to be analyzed
-
 
 def get_params_parser():
     """Parse command line arguments"""
@@ -51,6 +50,13 @@ def get_params_parser():
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
     parser.add_argument('-t', '--token', dest='token', help="GitHub token")
     parser.add_argument('-o', '--org', dest='org', help='GitHub Organization to be analyzed')
+    parser.add_argument('-c', '--contact', dest='contact', help='Contact (mail) to notify events.')
+    parser.add_argument('-w', '--web-dir', default='/var/www/cauldron/dashboards', dest='web_dir',
+                        help='Redirect HTML project pages for accessing Kibana dashboards.')
+    parser.add_argument('-k', '--kibana-url', default='http://thelma.bitergia.net:5601', dest='kibana_url',
+                        help='Kibana URL.')
+    parser.add_argument('-u', '--graas-url', default='http://thelma.bitergia.net', dest='graas_url',
+                        help='GraaS service URL.')
     parser.add_argument('-n', '--nrepos', dest='nrepos', type=int, default=NREPOS,
                         help='Number of GitHub repositories from the Organization to be analyzed (default:10)')
 
@@ -108,14 +114,49 @@ def get_repositores(org, token, nrepos):
 
     return nrepos_sorted
 
+def create_redirect_web_page(web_dir, org_name, kibana_url):
+    """ Create HTML pages with the org name that redirect to
+        the Kibana dashboard filtered for this org """
+    html_redirect = """
+    <html>
+        <head>
+            <meta http-equiv="refresh" content="0; URL=%s/app/kibana#/dashboard/GitHubDash?_a=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:github_git_enrich,key:project,negate:!f,value:%s),query:(match:(project:(query:%s,type:phrase))))))&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-1y,mode:quick,to:now))" />
+        </head>
+    </html>
+    """ % (kibana_url, org_name, org_name)
+    try:
+        with open(path.join(web_dir,org_name),"w") as f:
+            f.write(html_redirect)
+    except FileNotFoundError as ex:
+        logging.error("Wrong web dir for redirect pages: %s" % (web_dir))
+        logging.error(ex)
+
+def notify_contact(mail, org, graas_url):
+    """ Send an email to the contact with the details to access
+        the Kibana dashboard """
+    logging.info("Sending email to %s" % (mail))
+
+    subject = "Bitergia dashboard for %s ready" % (org)
+    body = """
+    %s/dashboards/%s
+    """ % (graas_url, org)
+
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = 'info@bitergia.com'
+    msg['To'] = mail
+
+    s = smtplib.SMTP('localhost')
+    s.send_message(msg)
+    s.quit()
+
+
 if __name__ == '__main__':
 
     args = get_params()
 
     config_logging(args.debug)
 
-    # git_index = "github_git_" + args.org
-    # issues_index = "github_issues_" + args.org
     # All projects share the same index
     git_index = "github_git"
     issues_index = "github_issues"
@@ -138,3 +179,9 @@ if __name__ == '__main__':
         issues_cmd = subprocess.call(cmd, shell=True)
         if issues_cmd != 0:
             logging.error("Problems with command: %s" % cmd)
+
+    # Generate redirect web page
+    create_redirect_web_page(args.web_dir, args.org, args.kibana_url)
+    # Notify the contact about the new dashboard
+    if args.contact:
+        notify_contact(args.contact, args.org, args.graas_url)
