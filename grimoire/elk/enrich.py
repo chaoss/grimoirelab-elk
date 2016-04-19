@@ -93,6 +93,16 @@ class Enrich(object):
         """ Return the identities from an item """
         raise NotImplementedError
 
+    def get_identity_domain(self, identity):
+        domain = None
+        if identity['email']:
+            try:
+                domain = identity['email'].split("@")[1]
+            except IndexError:
+                # logging.warning("Bad email format: %s" % (identity['email']))
+                pass
+        return domain
+
     def get_item_id(self, eitem):
         """ Return the item_id linked to this enriched eitem """
 

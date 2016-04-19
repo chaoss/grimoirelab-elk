@@ -118,16 +118,6 @@ class GitEnrich(Enrich):
         identity['name'] = name
         return identity
 
-    def get_identity_domain(self, identity):
-        domain = None
-        if identity['email']:
-            try:
-                domain = identity['email'].split("@")[1]
-            except IndexError:
-                # logging.warning("Bad email format: %s" % (identity['email']))
-                pass
-        return domain
-
     def get_item_sh(self, item):
         """ Add sorting hat enrichment fields """
         eitem = {}  # Item enriched

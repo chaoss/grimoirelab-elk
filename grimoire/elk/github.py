@@ -278,7 +278,10 @@ class GitHubEnrich(Enrich):
             rich_issue['author_name'] = user['name']
             rich_issue['user_email'] = user['email']
             if rich_issue['user_email']:
-                rich_issue["user_domain"] = rich_issue['user_email'].split("@")[1]
+                try:
+                    rich_issue["user_domain"] = rich_issue['user_email'].split("@")[1]
+                except IndexError:
+                    rich_issue["user_domain"] = None
             rich_issue['user_org'] = user['company']
             rich_issue['user_location'] = user['location']
             rich_issue['user_geolocation'] = self.get_geo_point(user['location'])

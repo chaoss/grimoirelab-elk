@@ -127,12 +127,14 @@ if __name__ == '__main__':
     for repo in repos:
         project = args.org  # project = org in GitHub
         url = GITHUB_URL+args.org+"/"+repo['name']
-        cmd = "./p2o.py -e %s --index %s --project %s git %s" % (args.elastic_url, git_index, project, url)
+        basic_cmd = "./p2o.py -e %s --project %s --enrich" % \
+            (args.elastic_url, project)
+        cmd = basic_cmd + " --index %s git %s" % (git_index, url)
         git_cmd = subprocess.call(cmd, shell=True)
         if git_cmd != 0:
             logging.error("Problems with command: %s" % cmd)
-        cmd = "./p2o.py -e %s --index %s --project %s github --owner %s --repository %s -t %s " % \
-            (args.elastic_url, issues_index, project, args.org, repo['name'], args.token)
+        cmd = basic_cmd + " --index %s github --owner %s --repository %s -t %s " % \
+            (issues_index, args.org, repo['name'], args.token)
         issues_cmd = subprocess.call(cmd, shell=True)
         if issues_cmd != 0:
             logging.error("Problems with command: %s" % cmd)
