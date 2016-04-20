@@ -24,6 +24,7 @@
 #
 
 import argparse
+from datetime import datetime
 from dateutil import parser
 import logging
 from os import sys, path
@@ -90,19 +91,24 @@ def get_repositores(org, token, nrepos):
 
     while True:
         logging.debug("Getting repos from: %s" % (url))
-        r = requests.get(url,
-                        params=get_payload(),
-                        headers=get_headers(token))
-        r.raise_for_status()
-        all_repos += r.json()
+        try:
+            r = requests.get(url,
+                            params=get_payload(),
+                            headers=get_headers(token))
 
-        logging.debug("Rate limit: %s" % (r.headers['X-RateLimit-Remaining']))
+            r.raise_for_status()
+            all_repos += r.json()
+
+            logging.debug("Rate limit: %s" % (r.headers['X-RateLimit-Remaining']))
 
 
-        if 'next' not in r.links:
+            if 'next' not in r.links:
+                break
+
+            url = r.links['next']['url']  # Loving requests :)
+        except requests.exceptions.ConnectionError:
+            logging.error("Can not connect to GitHub")
             break
-
-        url = r.links['next']['url']  # Loving requests :)
 
     # Remove forks
     nrepos_recent = [repo for repo in all_repos if not repo['fork']]
@@ -146,12 +152,17 @@ def notify_contact(mail, org, graas_url):
     msg['From'] = 'info@bitergia.com'
     msg['To'] = mail
 
-    s = smtplib.SMTP('localhost')
-    s.send_message(msg)
-    s.quit()
+    try:
+        s = smtplib.SMTP('localhost')
+        s.send_message(msg)
+        s.quit()
+    except ConnectionRefusedError:
+        logging.error("Can not notify user. Can not connect to email server.")
 
 
 if __name__ == '__main__':
+
+    task_init = datetime.now()
 
     args = get_params()
 
@@ -163,6 +174,11 @@ if __name__ == '__main__':
 
     logging.info("Creating new GitHub dashboard with %i repositores from %s" %
                 (args.nrepos, args.org))
+
+    # Generate redirect web page first so dashboard can be used
+    # with partial data during data retrieval
+    create_redirect_web_page(args.web_dir, args.org, args.kibana_url)
+
     repos = get_repositores(args.org, args.token, args.nrepos)
 
     for repo in repos:
@@ -180,8 +196,10 @@ if __name__ == '__main__':
         if issues_cmd != 0:
             logging.error("Problems with command: %s" % cmd)
 
-    # Generate redirect web page
-    create_redirect_web_page(args.web_dir, args.org, args.kibana_url)
+    total_time_min = (datetime.now()-task_init).total_seconds()/60
+
+    logging.info("Finished %s in %.2f min" % (args.org, total_time_min))
+
     # Notify the contact about the new dashboard
     if args.contact:
         notify_contact(args.contact, args.org, args.graas_url)
