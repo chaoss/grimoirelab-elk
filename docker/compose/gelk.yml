@@ -30,7 +30,7 @@ elasticsearch:
         - ~/Docker/data/elasticsearch/:/usr/share/elasticsearch/data
 
 kibana:
-    image: kibana:4.3
+    image: bitergia/kibiter:4.4.1
     links:
         - elasticsearch
     ports:
