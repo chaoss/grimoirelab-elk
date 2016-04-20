@@ -62,7 +62,7 @@ def feed_backends(url, clean, debug = False, redis = None):
     for repo in ConfOcean.get_repos():
         task_feed = q.enqueue(feed_backend, url, clean, fetch_cache,
                               repo['backend_name'], repo['backend_params'],
-                              repo['index'])
+                              repo['index'], repo['project'])
         logging.info("Queued job")
         logging.info(task_feed)
 

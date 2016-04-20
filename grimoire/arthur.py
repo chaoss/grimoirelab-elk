@@ -97,6 +97,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
 
     repo['repo_update'] = datetime.now().isoformat()
     repo['index'] = es_index
+    repo['project'] = project
 
     if es_index:
         unique_id = es_index+"_"+backend.origin
