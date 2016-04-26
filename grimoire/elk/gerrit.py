@@ -282,6 +282,7 @@ class GerritEnrich(Enrich):
                 eitem[f] = item[f]
             else:
                 eitem[f] = None
+        eitem['closed'] = item['metadata__updated_on']
         # The real data
         review = item['data']
         self._fix_review_dates(review)
