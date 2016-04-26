@@ -137,15 +137,25 @@ def create_redirect_web_page(web_dir, org_name, kibana_url):
         logging.error("Wrong web dir for redirect pages: %s" % (web_dir))
         logging.error(ex)
 
-def notify_contact(mail, org, graas_url):
+def notify_contact(mail, org, graas_url, repos, first_repo=False):
     """ Send an email to the contact with the details to access
         the Kibana dashboard """
-    logging.info("Sending email to %s" % (mail))
+    if first_repo:
+        logging.info("Sending first email to %s" % (mail))
+        subject = "Bitergia dashboard for %s in progress" % (org)
+    else:
+        logging.info("Sending last email to %s" % (mail))
+        subject = "Bitergia dashboard for %s ready" % (org)
 
-    subject = "Bitergia dashboard for %s ready" % (org)
-    body = """
-    %s/dashboards/%s
-    """ % (graas_url, org)
+
+    body = "%s/dashboards/%s\n" % (graas_url, org)
+
+    if first_repo:
+        body += "First repository analized: %s" % (repos[0]['html_url'])
+    else:
+        body += "Repositories analyzed:\n"
+        for repo in repos:
+            body += "%s" % (repo['html_url'])
 
     msg = MIMEText(body)
     msg['Subject'] = subject
@@ -180,21 +190,28 @@ if __name__ == '__main__':
     create_redirect_web_page(args.web_dir, args.org, args.kibana_url)
 
     repos = get_repositores(args.org, args.token, args.nrepos)
+    first_repo = True
 
     for repo in repos:
         project = args.org  # project = org in GitHub
         url = GITHUB_URL+args.org+"/"+repo['name']
-        basic_cmd = "./p2o.py -e %s --project %s --enrich" % \
+        basic_cmd = "./p2o.py -g -e %s --project %s --enrich" % \
             (args.elastic_url, project)
         cmd = basic_cmd + " --index %s git %s" % (git_index, url)
         git_cmd = subprocess.call(cmd, shell=True)
         if git_cmd != 0:
             logging.error("Problems with command: %s" % cmd)
-        cmd = basic_cmd + " --index %s github --owner %s --repository %s -t %s " % \
+        cmd = basic_cmd + " --index %s github --owner %s --repository %s -t %s --sleep-for-rate" % \
             (issues_index, args.org, repo['name'], args.token)
         issues_cmd = subprocess.call(cmd, shell=True)
         if issues_cmd != 0:
             logging.error("Problems with command: %s" % cmd)
+        else:
+            if first_repo:
+                if args.contact:
+                    notify_contact(args.contact, args.org, args.graas_url, repos, first_repo)
+                first_repo = False
+
 
     total_time_min = (datetime.now()-task_init).total_seconds()/60
 
@@ -202,4 +219,4 @@ if __name__ == '__main__':
 
     # Notify the contact about the new dashboard
     if args.contact:
-        notify_contact(args.contact, args.org, args.graas_url)
+        notify_contact(args.contact, args.org, args.graas_url, repos)
