@@ -278,10 +278,7 @@ class GitHubEnrich(Enrich):
             rich_issue['author_name'] = user['name']
             rich_issue['user_email'] = user['email']
             if rich_issue['user_email']:
-                try:
-                    rich_issue["user_domain"] = rich_issue['user_email'].split("@")[1]
-                except IndexError:
-                    rich_issue["user_domain"] = None
+                rich_issue["user_domain"] = self.get_email_domain(rich_issue['user_email'])
             rich_issue['user_org'] = user['company']
             rich_issue['user_location'] = user['location']
             rich_issue['user_geolocation'] = self.get_geo_point(user['location'])
@@ -303,7 +300,7 @@ class GitHubEnrich(Enrich):
             rich_issue['assignee_name'] = assignee['name']
             rich_issue['assignee_email'] = assignee['email']
             if rich_issue['assignee_email']:
-                rich_issue["assignee_domain"] = rich_issue['assignee_email'].split("@")[1]
+                rich_issue["assignee_domain"] = self.get_email_domain(rich_issue['assignee_email'])
             rich_issue['assignee_org'] = assignee['company']
             rich_issue['assignee_location'] = assignee['location']
             rich_issue['assignee_geolocation'] = \
