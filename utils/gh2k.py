@@ -148,14 +148,14 @@ def notify_contact(mail, org, graas_url, repos, first_repo=False):
         subject = "Bitergia dashboard for %s ready" % (org)
 
 
-    body = "%s/dashboards/%s\n" % (graas_url, org)
+    body = "%s/dashboards/%s\n\n" % (graas_url, org)
 
     if first_repo:
-        body += "First repository analized: %s" % (repos[0]['html_url'])
+        body += "First repository analized: %s\n" % (repos[0]['html_url'])
     else:
         body += "Repositories analyzed:\n"
         for repo in repos:
-            body += "%s" % (repo['html_url'])
+            body += "%s\n" % (repo['html_url'])
 
     msg = MIMEText(body)
     msg['Subject'] = subject
