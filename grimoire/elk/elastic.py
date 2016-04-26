@@ -77,30 +77,33 @@ class ElasticSearch(object):
             self.create_mappings(mappings)
 
 
-    def bulk_upload_sync(self, items, field_id):
-        ''' Upload in controlled packs items to ES using bulk API
-            and wait until the items appears in searches '''
+    def _safe_put_bulk(self, url, bulk_json):
+        """ Bulk PUT controlling unicode issues """
 
-        # After a bulk upload the searches are not refreshed real time
-        # This method waits until the upload is visible in searches
+        try:
+            requests.put(url, data=bulk_json)
+        except UnicodeEncodeError:
+            # Related to body.encode('iso-8859-1'). mbox data
+            logging.error("Encondig error ... converting bulk to iso-8859-1")
+            bulk_json = bulk_json.encode('iso-8859-1','ignore')
+            requests.put(url, data=bulk_json)
+
+    def bulk_upload(self, items, field_id):
+        ''' Upload in controlled packs items to ES using bulk API '''
 
         max_items = self.max_items_bulk
         current = 0
         new_items = 0  # total items added with bulk
-        total_search = 0  # total items found with search
         bulk_json = ""
 
         url = self.index_url+'/items/_bulk'
 
         logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-        r = requests.get(self.index_url+'/_search?size=1')
-        total = r.json()['hits']['total']  # Already existing items
-
 
         for item in items:
             if current >= max_items:
                 task_init = time()
-                requests.put(url, data=bulk_json)
+                self._safe_put_bulk(url, bulk_json)
                 bulk_json = ""
                 new_items += current
                 current = 0
@@ -111,21 +114,32 @@ class ElasticSearch(object):
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         task_init = time()
-        try:
-            requests.put(url, data=bulk_json)
-        except UnicodeEncodeError:
-            # Related to body.encode('iso-8859-1'). mbox data
-            logging.error("Encondig error ... converting bulk to iso-8859-1")
-            bulk_json = bulk_json.encode('iso-8859-1','ignore')
-            requests.put(url, data=bulk_json)
+        self._safe_put_bulk(url, bulk_json)
         new_items += current
         logging.debug("bulk packet sent (%.2f sec prev, %i total)"
                       % (time()-task_init, new_items))
 
+        return new_items
+
+    def bulk_upload_sync(self, items, field_id, sync=False):
+        ''' Upload in controlled packs items to ES using bulk API
+            and wait until the items appears in searches '''
+
+        # After a bulk upload the searches are not refreshed real time
+        # This method waits until the upload is visible in searches
+
+        r = requests.get(self.index_url+'/_search?size=1')
+        total = r.json()['hits']['total']  # Already existing items
+        new_items = self.bulk_upload(items, field_id)
+        if not sync:
+            return
+        total += new_items
+
         # Wait until in searches all items are returned
         # In incremental update, some items are updates not additions so
         # this check will fail. Exist ok in the timeout for this case.
-        total += new_items
+
+        total_search = 0  # total items found with search
         search_start = datetime.now()
         while total_search != total:
             sleep(0.1)
@@ -133,7 +147,7 @@ class ElasticSearch(object):
             total_search = r.json()['hits']['total']
             if (datetime.now()-search_start).total_seconds() > self.wait_bulk_seconds:
                 logging.debug("Bulk data does not appear as NEW after %is" % (self.wait_bulk_seconds))
-                logging.debug("%i item updates" % (total-total_search))
+                logging.debug("Probably %i item updates" % (total-total_search))
                 break
 
 
