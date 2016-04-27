@@ -29,6 +29,7 @@ from dateutil import parser
 import logging
 from os import sys, path
 import requests
+from requests_oauthlib import OAuth1
 import subprocess
 
 import smtplib
@@ -52,6 +53,7 @@ def get_params_parser():
     parser.add_argument('-t', '--token', dest='token', help="GitHub token")
     parser.add_argument('-o', '--org', dest='org', help='GitHub Organization to be analyzed')
     parser.add_argument('-c', '--contact', dest='contact', help='Contact (mail) to notify events.')
+    parser.add_argument('--twitter', dest='twitter', help='Twitter account to notify.')
     parser.add_argument('-w', '--web-dir', default='/var/www/cauldron/dashboards', dest='web_dir',
                         help='Redirect HTML project pages for accessing Kibana dashboards.')
     parser.add_argument('-k', '--kibana-url', default='http://thelma.bitergia.net:5601', dest='kibana_url',
@@ -170,6 +172,28 @@ def notify_contact(mail, org, graas_url, repos, first_repo=False):
         logging.error("Can not notify user. Can not connect to email server.")
 
 
+def publish_twitter(twitter_contact, org, graas_url):
+    """ Publish in twitter the dashboard """
+    oauth = get_oauth()
+    r = requests.get(url="https://api.twitter.com/1.1/statuses/mentions_timeline.json", auth=oauth)
+    print (r.json())
+    r = requests.post(url="https://api.twitter.com/1.1/statuses/update.json?status=First%20message", auth=oauth)
+    print (r.json())
+
+def get_oauth():
+    # TODO: read all from a config file
+    CONSUMER_KEY = ""
+    CONSUMER_SECRET = ""
+
+    OAUTH_TOKEN = ""
+    OAUTH_TOKEN_SECRET = ""
+
+    oauth = OAuth1(CONSUMER_KEY,
+                client_secret=CONSUMER_SECRET,
+                resource_owner_key=OAUTH_TOKEN,
+                resource_owner_secret=OAUTH_TOKEN_SECRET)
+    return oauth
+
 if __name__ == '__main__':
 
     task_init = datetime.now()
@@ -220,3 +244,6 @@ if __name__ == '__main__':
     # Notify the contact about the new dashboard
     if args.contact:
         notify_contact(args.contact, args.org, args.graas_url, repos)
+    if args.twitter:
+        logging.debug("Twitter user to be notified: %s" % (args.twitter))
+        # publish_twitter(args.twitter, args.org, args.graas_url, repos)
