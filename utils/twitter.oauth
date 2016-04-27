@@ -1,0 +1,8 @@
+[oauth]
+# Info from: https://apps.twitter.com/app/APP_ID/keys
+# App settings for the application
+CONSUMER_KEY = XXXX
+CONSUMER_SECRET = XXXX
+# Permissions settings for user who tweets
+OAUTH_TOKEN = XXXX
+OAUTH_TOKEN_SECRET = XXXX

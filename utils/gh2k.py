@@ -24,6 +24,7 @@
 #
 
 import argparse
+import configparser
 from datetime import datetime
 from dateutil import parser
 import logging
@@ -31,6 +32,7 @@ from os import sys, path
 import requests
 from requests_oauthlib import OAuth1
 import subprocess
+from urllib.parse import quote_plus
 
 import smtplib
 from email.mime.text import MIMEText
@@ -41,6 +43,7 @@ from grimoire.utils import config_logging
 GITHUB_URL = "https://github.com/"
 GITHUB_API_URL = "https://api.github.com"
 NREPOS = 10 # Default number of repos to be analyzed
+CAULDRON_DASH_URL = "https://thelma.bitergia.net/dashboards"
 
 def get_params_parser():
     """Parse command line arguments"""
@@ -172,26 +175,34 @@ def notify_contact(mail, org, graas_url, repos, first_repo=False):
         logging.error("Can not notify user. Can not connect to email server.")
 
 
-def publish_twitter(twitter_contact, org, graas_url):
+def publish_twitter(twitter_contact, org):
     """ Publish in twitter the dashboard """
+    dashboard_url = CAULDRON_DASH_URL + "/%s" % (org)
+    status = quote_plus("In @CauldronIO, @%s your new dashboard is ready %s" %(twitter_contact, dashboard_url))
     oauth = get_oauth()
-    r = requests.get(url="https://api.twitter.com/1.1/statuses/mentions_timeline.json", auth=oauth)
-    print (r.json())
-    r = requests.post(url="https://api.twitter.com/1.1/statuses/update.json?status=First%20message", auth=oauth)
+    r = requests.post(url="https://api.twitter.com/1.1/statuses/update.json?status="+status, auth=oauth)
     print (r.json())
 
 def get_oauth():
-    # TODO: read all from a config file
-    CONSUMER_KEY = ""
-    CONSUMER_SECRET = ""
+    filepath = "twitter.oauth"
+    with open(filepath, 'r'): pass
+    config = configparser.SafeConfigParser()
+    config.read(filepath)
 
-    OAUTH_TOKEN = ""
-    OAUTH_TOKEN_SECRET = ""
+    params = ['consumer_key','consumer_secret','oauth_token','oauth_token_secret']
 
-    oauth = OAuth1(CONSUMER_KEY,
-                client_secret=CONSUMER_SECRET,
-                resource_owner_key=OAUTH_TOKEN,
-                resource_owner_secret=OAUTH_TOKEN_SECRET)
+    if 'oauth' not in config.sections():
+        raise RuntimeError("Bad oauth file format %s, section missing: %s" % (filepath, 'oauth'))
+    oauth_config =  dict(config.items('oauth'))
+    for param in params:
+        if param not in oauth_config:
+            raise RuntimeError("Bad oauth file format %s, not found param: %s" % (filepath, param))
+
+    oauth = OAuth1(oauth_config['consumer_key'],
+                   client_secret=oauth_config['consumer_secret'],
+                   resource_owner_key=oauth_config['oauth_token'],
+                   resource_owner_secret=oauth_config['oauth_token_secret'])
+
     return oauth
 
 if __name__ == '__main__':
@@ -246,4 +257,4 @@ if __name__ == '__main__':
         notify_contact(args.contact, args.org, args.graas_url, repos)
     if args.twitter:
         logging.debug("Twitter user to be notified: %s" % (args.twitter))
-        # publish_twitter(args.twitter, args.org, args.graas_url, repos)
+        publish_twitter(args.twitter, args.org)
