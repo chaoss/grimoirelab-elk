@@ -294,7 +294,7 @@ class GitHubEnrich(Enrich):
             get_time_diff_days(issue['created_at'], issue['closed_at'])
 
         if issue['state'] != 'closed':
-            rich_issue['time_open'] = \
+            rich_issue['time_open_days'] = \
                 get_time_diff_days(issue['created_at'], datetime.utcnow())
         else:
             rich_issue['time_open_days'] = rich_issue['time_to_close_days']
