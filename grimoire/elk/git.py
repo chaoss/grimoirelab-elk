@@ -90,6 +90,10 @@ class GitEnrich(Enrich):
                "project": {
                  "type": "string",
                  "index":"not_analyzed"
+               },
+               "hash": {
+                 "type": "string",
+                 "index":"not_analyzed"
                }
             }
         } """
