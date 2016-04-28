@@ -295,7 +295,8 @@ class GerritEnrich(Enrich):
         map_fields = {"subject": "summary",
                       "id": "githash",
                       "createdOn": "opened",
-                      "project": "repository"
+                      "project": "repository",
+                      "number": "number"
                       }
         for fn in map_fields:
             eitem[map_fields[fn]] = review[fn]
@@ -313,10 +314,9 @@ class GerritEnrich(Enrich):
         createdOn_date = parser.parse(review['createdOn'])
         if len(review["patchSets"]) > 0:
             createdOn_date = parser.parse(review["patchSets"][0]['createdOn'])
-        updatedOn_date = parser.parse(item['metadata__updated_on'])
         seconds_day = float(60*60*24)
         timeopen = \
-            (updatedOn_date-createdOn_date).total_seconds() / seconds_day
+            (datetime.utcnow()-createdOn_date).total_seconds() / seconds_day
         eitem["timeopen"] =  '%.2f' % timeopen
 
         if self.sortinghat:
