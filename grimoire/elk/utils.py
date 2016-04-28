@@ -23,16 +23,19 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import datetime
 from dateutil import parser
 
-def get_time_diff_days(start_txt, end_txt):
-    ''' Number of days between two days  '''
+def get_time_diff_days(start, end):
+    ''' Number of days between two dates in UTC format  '''
 
-    if start_txt is None or end_txt is None:
+    if start is None or end is None:
         return None
 
-    start = parser.parse(start_txt)
-    end = parser.parse(end_txt)
+    if type(start) is not datetime.datetime:
+        start = parser.parse(start).replace(tzinfo=None)
+    if type(end) is not datetime.datetime:
+        end = parser.parse(end).replace(tzinfo=None)
 
     seconds_day = float(60*60*24)
     diff_days = \

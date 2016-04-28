@@ -25,11 +25,14 @@
 
 import json
 import logging
+
+from datetime import datetime
+
 import requests
+
 from .utils import get_time_diff_days
 
 from grimoire.elk.enrich import Enrich
-
 
 class GitHubEnrich(Enrich):
 
@@ -229,19 +232,39 @@ class GitHubEnrich(Enrich):
                   "type": "string",
                   "index":"not_analyzed"
                },
-               "author_name": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "repository": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
                "origin": {
                  "type": "string",
                  "index":"not_analyzed"
                },
                "project": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "title_not_analyzed": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "state": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "repository": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "domain": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "author_org_name": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "author_domain": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "author_name": {
                  "type": "string",
                  "index":"not_analyzed"
                }
@@ -269,6 +292,12 @@ class GitHubEnrich(Enrich):
 
         rich_issue['time_to_close_days'] = \
             get_time_diff_days(issue['created_at'], issue['closed_at'])
+
+        if issue['state'] != 'closed':
+            rich_issue['time_open'] = \
+                get_time_diff_days(issue['created_at'], datetime.utcnow())
+        else:
+            rich_issue['time_open_days'] = rich_issue['time_to_close_days']
 
         rich_issue['user_login'] = issue['user']['login']
         user = issue['user_data']
@@ -314,7 +343,9 @@ class GitHubEnrich(Enrich):
             rich_issue['assignee_location'] = None
             rich_issue['assignee_geolocation'] = None
 
+        rich_issue['id'] = issue['id']
         rich_issue['title'] = issue['title']
+        rich_issue['title_not_analyzed'] = issue['title']
         rich_issue['state'] = issue['state']
         rich_issue['created_at'] = issue['created_at']
         rich_issue['updated_at'] = issue['updated_at']
