@@ -264,6 +264,14 @@ class GerritEnrich(Enrich):
                "origin": {
                  "type": "string",
                  "index":"not_analyzed"
+               },
+               "url": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "branch": {
+                 "type": "string",
+                 "index":"not_analyzed"
                }
             }
         }
