@@ -196,16 +196,21 @@ class GitEnrich(Enrich):
         eitem["repo_name"] = item["origin"]
         # Number of files touched
         eitem["files"] = len(commit["files"])
-        # Number of lines changed
-        lines_changed = 0
+        # Number of lines added and removed
+        lines_added = 0
+        lines_removed = 0
         for cfile in commit["files"]:
             if 'added' in cfile and 'removed' in cfile:
                 try:
-                    lines_changed += int(cfile["added"]) + int(cfile["removed"])
+                    lines_added += int(cfile["added"])
+                    lines_removed += int(cfile["removed"])
                 except ValueError:
                     # logging.warning(cfile)
                     continue
-        eitem["lines_changed"] = lines_changed
+        eitem["lines_added"] = lines_added
+        eitem["lines_removed"] = lines_removed
+        eitem["lines_changed"] = lines_added + lines_removed
+
 
         # author_name and author_domain are added always
         identity  = self.get_sh_identity(commit["Author"])
