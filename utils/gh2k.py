@@ -59,9 +59,9 @@ def get_params_parser():
     parser.add_argument('--twitter', dest='twitter', help='Twitter account to notify.')
     parser.add_argument('-w', '--web-dir', default='/var/www/cauldron/dashboards', dest='web_dir',
                         help='Redirect HTML project pages for accessing Kibana dashboards.')
-    parser.add_argument('-k', '--kibana-url', default='http://thelma.bitergia.net:5601', dest='kibana_url',
+    parser.add_argument('-k', '--kibana-url', default='http://cauldron.io:5601', dest='kibana_url',
                         help='Kibana URL.')
-    parser.add_argument('-u', '--graas-url', default='http://thelma.bitergia.net', dest='graas_url',
+    parser.add_argument('-u', '--graas-url', default='http://cauldron.io', dest='graas_url',
                         help='GraaS service URL.')
     parser.add_argument('-n', '--nrepos', dest='nrepos', type=int, default=NREPOS,
                         help='Number of GitHub repositories from the Organization to be analyzed (default:10)')
