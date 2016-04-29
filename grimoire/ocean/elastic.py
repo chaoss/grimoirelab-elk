@@ -66,20 +66,7 @@ class ElasticOcean(object):
 
     def get_elastic_mappings(self):
         """ origin used to filter in incremental updates """
-        mapping = '''
-        {
-            "properties": {
-               "origin": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "project": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               }
-            }
-        }
-        '''
+        mapping = '{}'
 
         return {"items":mapping}
 

@@ -58,33 +58,9 @@ class MBoxEnrich(Enrich):
         mapping = """
         {
             "properties": {
-                "From": {
-                  "type": "string",
-                  "index":"not_analyzed"
-                  },
-                 "Delivered-To" : {
+                 "Subject_analyzed": {
                    "type": "string",
-                   "index":"not_analyzed"
-                 },
-                 "list" : {
-                   "type": "string",
-                   "index":"not_analyzed"
-                 },
-                 "author_org_name": {
-                   "type": "string",
-                   "index":"not_analyzed"
-                 },
-                 "author_domain": {
-                   "type": "string",
-                   "index":"not_analyzed"
-                 },
-                 "author_name": {
-                   "type": "string",
-                   "index":"not_analyzed"
-                 },
-                 "origin": {
-                   "type": "string",
-                   "index":"not_analyzed"
+                   "index":"analyzed"
                  }
            }
         } """
@@ -197,6 +173,12 @@ class MBoxEnrich(Enrich):
                 eitem[f] = message[f]
             else:
                 eitem[f] = None
+        # Fields which names are translated
+        map_fields = {"Subject": "Subject_analyzed"
+                      }
+        for fn in map_fields:
+            eitem[map_fields[fn]] = message[fn]
+
         # Enrich dates
         eitem["email_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
         eitem["list"] = item["origin"]

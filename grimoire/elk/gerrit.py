@@ -39,7 +39,7 @@ class GerritEnrich(Enrich):
         super().__init__(sortinghat, db_projects_map)
         self.elastic = None
         self.gerrit = gerrit
-        self.type_name = "review"  # type inside the index to store items enriched
+        self.type_name = "items"  # type inside the index to store items enriched
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -186,92 +186,12 @@ class GerritEnrich(Enrich):
         mapping = """
         {
             "properties": {
-               "name": {
+               "summary_analyzed": {
                   "type": "string",
-                  "index":"not_analyzed"
+                  "index":"analyzed"
                },
                "timeopen": {
                   "type": "double"
-               },
-               "approval_email": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "approval_organization": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "approval_type": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "patchSet_email": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "patchSet_organization": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "review_branch": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "review_email": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "review_organization": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "org_name": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "review_project": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "project": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "review_status": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "repository": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "domain": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "author_org_name": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "author_domain": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "author_name": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "origin": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "url": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "branch": {
-                 "type": "string",
-                 "index":"not_analyzed"
                }
             }
         }
@@ -308,6 +228,7 @@ class GerritEnrich(Enrich):
                       }
         for fn in map_fields:
             eitem[map_fields[fn]] = review[fn]
+        eitem["summary_analyzed"] = eitem["summary"]
         eitem["name"] = None
         eitem["domain"] = None
         if 'name' in review['owner']:

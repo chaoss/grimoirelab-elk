@@ -224,49 +224,9 @@ class GitHubEnrich(Enrich):
                "user_geolocation": {
                    "type": "geo_point"
                },
-               "assignee_name": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "user_name": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "origin": {
+               "title_analyzed": {
                  "type": "string",
-                 "index":"not_analyzed"
-               },
-               "project": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "title_not_analyzed": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "state": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "repository": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "domain": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "author_org_name": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "author_domain": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "author_name": {
-                 "type": "string",
-                 "index":"not_analyzed"
+                 "index":"analyzed"
                }
             }
         }
@@ -345,7 +305,7 @@ class GitHubEnrich(Enrich):
 
         rich_issue['id'] = issue['id']
         rich_issue['title'] = issue['title']
-        rich_issue['title_not_analyzed'] = issue['title']
+        rich_issue['title_analyzed'] = issue['title']
         rich_issue['state'] = issue['state']
         rich_issue['created_at'] = issue['created_at']
         rich_issue['updated_at'] = issue['updated_at']

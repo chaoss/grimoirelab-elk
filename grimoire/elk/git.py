@@ -55,50 +55,15 @@ class GitEnrich(Enrich):
         mapping = """
         {
             "properties": {
-               "author_name": {
+               "message_analyzed": {
                   "type": "string",
-                  "index":"not_analyzed"
-               },
-               "org_name": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "repo_name": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "metadata__origin": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "author_org_name": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "author_domain": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "author_name": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "origin": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "project": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               },
-               "hash": {
-                 "type": "string",
-                 "index":"not_analyzed"
+                  "index":"analyzed"
                }
-            }
-        } """
+           }
+       }"""
 
         return {"items":mapping}
+
 
 
     def get_identities(self, item):
@@ -185,7 +150,7 @@ class GitEnrich(Enrich):
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"commit": "hash"}
+        map_fields = {"commit": "hash","message":"message_analyzed"}
         for fn in map_fields:
             eitem[map_fields[fn]] = commit[fn]
         # Enrich dates

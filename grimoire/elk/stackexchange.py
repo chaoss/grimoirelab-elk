@@ -54,13 +54,9 @@ class StackExchangeEnrich(Enrich):
         mapping = """
         {
             "properties": {
-                "question_owner": {
+                "title_analyzed": {
                   "type": "string",
-                  "index":"not_analyzed"
-                  },
-                  "origin": {
-                    "type": "string",
-                    "index":"not_analyzed"
+                  "index":"analyzed"
                   }
            }
         } """
@@ -99,6 +95,12 @@ class StackExchangeEnrich(Enrich):
                 eitem[f] = question[f]
             else:
                 eitem[f] = None
+        # Fields which names are translated
+        map_fields = {"title": "title_analyzed"
+                      }
+        for fn in map_fields:
+            eitem[map_fields[fn]] = question[fn]
+
 
         # Enrich dates
         eitem["question_date"] = parser.parse(item["metadata__updated_on"]).isoformat()

@@ -186,7 +186,7 @@ class JiraEnrich(Enrich):
 
     def issues_to_es(self, items):
 
-        elastic_type = "issues"
+        elastic_type = "items"
 
         max_items = self.elastic.max_items_bulk
         current = 0
@@ -209,32 +209,3 @@ class JiraEnrich(Enrich):
         requests.put(url, data=bulk_json)
 
         logging.debug("Adding issues to ES Done")
-
-
-    def get_elastic_mappings(self):
-        ''' Specific mappings needed for ES '''
-
-        mapping = '''
-        {
-            "properties": {
-               "product": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "component": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "assigned_to": {
-                  "type": "string",
-                  "index":"not_analyzed"
-               },
-               "origin": {
-                 "type": "string",
-                 "index":"not_analyzed"
-               }
-            }
-        }
-        '''
-
-        return {"items":mapping}

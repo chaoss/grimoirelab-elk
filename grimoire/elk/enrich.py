@@ -122,7 +122,10 @@ class Enrich(object):
 
     def get_elastic_mappings(self):
         """ Mappings for enriched indexes """
-        pass
+
+        mapping = '{}'
+
+        return {"items":mapping}
 
 
     # Sorting Hat stuff to be moved to SortingHat class
