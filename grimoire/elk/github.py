@@ -34,6 +34,8 @@ from .utils import get_time_diff_days
 
 from grimoire.elk.enrich import Enrich
 
+GITHUB = 'https://github.com/'
+
 class GitHubEnrich(Enrich):
 
     def __init__(self, github, sortinghat=True, db_projects_map = None):
@@ -323,6 +325,8 @@ class GitHubEnrich(Enrich):
         rich_issue['pull_request'] = True
         if not 'head' in issue.keys() and not 'pull_request' in issue.keys():
             rich_issue['pull_request'] = False
+
+        rich_issue['github_repo'] = item['origin'].replace(GITHUB,'')
 
         if 'project' in item:
             rich_issue['project'] = item['project']

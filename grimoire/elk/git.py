@@ -30,6 +30,8 @@ from dateutil import parser
 
 from grimoire.elk.enrich import Enrich
 
+from .github import GITHUB
+
 class GitEnrich(Enrich):
 
     def __init__(self, git, sortinghat=True, db_projects_map = None):
@@ -185,6 +187,10 @@ class GitEnrich(Enrich):
         identity  = self.get_sh_identity(commit["Author"])
         eitem["author_name"] = identity['name']
         eitem["author_domain"] = self.get_identity_domain(identity)
+
+        # If it is a github repo, include just the repo string
+        if GITHUB in item['origin']:
+            eitem['github_repo'] = item['origin'].replace(GITHUB,'')
 
         if 'project' in item:
             eitem['project'] = item['project']
