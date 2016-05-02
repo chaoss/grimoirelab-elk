@@ -43,7 +43,7 @@ from grimoire.utils import config_logging
 GITHUB_URL = "https://github.com/"
 GITHUB_API_URL = "https://api.github.com"
 NREPOS = 10 # Default number of repos to be analyzed
-CAULDRON_DASH_URL = "https://thelma.bitergia.net/dashboards"
+CAULDRON_DASH_URL = "https://cauldron.io/dashboards"
 
 def get_params_parser():
     """Parse command line arguments"""
