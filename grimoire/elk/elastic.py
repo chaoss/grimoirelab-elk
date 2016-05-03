@@ -121,7 +121,7 @@ class ElasticSearch(object):
 
         return new_items
 
-    def bulk_upload_sync(self, items, field_id, sync=False):
+    def bulk_upload_sync(self, items, field_id, sync=True):
         ''' Upload in controlled packs items to ES using bulk API
             and wait until the items appears in searches '''
 
