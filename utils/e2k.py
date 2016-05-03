@@ -106,7 +106,7 @@ def get_index_pattern_json(elastic, index_pattern):
 
     index_pattern_json = r.json()
     if "_source" not in index_pattern_json:
-        logging.error("Can not find search: %s (%s)" % (index_pattern_json_url))
+        logging.error("Can not find index_pattern_json: %s" % (index_pattern_json_url))
         return
     return index_pattern_json['_source']
 
