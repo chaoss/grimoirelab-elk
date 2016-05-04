@@ -152,7 +152,7 @@ class GitEnrich(Enrich):
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"commit": "hash","message":"message_analyzed"}
+        map_fields = {"commit": "hash","message":"message_analyzed","Commit":"Committer"}
         for fn in map_fields:
             if fn in commit:
                 eitem[map_fields[fn]] = commit[fn]
@@ -185,11 +185,18 @@ class GitEnrich(Enrich):
         eitem["lines_removed"] = lines_removed
         eitem["lines_changed"] = lines_added + lines_removed
 
-
         # author_name and author_domain are added always
         identity  = self.get_sh_identity(commit["Author"])
         eitem["author_name"] = identity['name']
         eitem["author_domain"] = self.get_identity_domain(identity)
+
+        # committer data
+        identity  = self.get_sh_identity(commit["Commit"])
+        eitem["committer_name"] = identity['name']
+        eitem["committer_domain"] = self.get_identity_domain(identity)
+
+        # title from first line
+        eitem["title"] = commit['message'].split('\n')[0]
 
         # If it is a github repo, include just the repo string
         if GITHUB in item['origin']:
