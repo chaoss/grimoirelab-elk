@@ -158,6 +158,7 @@ class GitEnrich(Enrich):
                 eitem[map_fields[fn]] = commit[fn]
             else:
                 eitem[map_fields[fn]] = None
+        eitem['hash_short'] = eitem['hash'][0:6]
         # Enrich dates
         author_date = parser.parse(commit["AuthorDate"])
         commit_date = parser.parse(commit["CommitDate"])
@@ -198,9 +199,12 @@ class GitEnrich(Enrich):
         # title from first line
         eitem["title"] = commit['message'].split('\n')[0]
 
+
+
         # If it is a github repo, include just the repo string
         if GITHUB in item['origin']:
-            eitem['github_repo'] = item['origin'].replace(GITHUB,'')
+            eitem['github_repo'] = item['origin'].replace(GITHUB,'').replace('.git','')
+            eitem["url_id"] = eitem['github_repo']+"/commit/"+eitem['hash']
 
         if 'project' in item:
             eitem['project'] = item['project']

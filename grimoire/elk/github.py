@@ -327,7 +327,8 @@ class GitHubEnrich(Enrich):
         if not 'head' in issue.keys() and not 'pull_request' in issue.keys():
             rich_issue['pull_request'] = False
 
-        rich_issue['github_repo'] = item['origin'].replace(GITHUB,'')
+        rich_issue['github_repo'] = item['origin'].replace(GITHUB,'').replace('.git','')
+        rich_issue["url_id"] = rich_issue['github_repo']+"/issues/"+rich_issue['id_in_repo']
 
         if 'project' in item:
             rich_issue['project'] = item['project']
