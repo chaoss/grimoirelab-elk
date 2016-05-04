@@ -90,9 +90,22 @@ def get_headers(token):
     headers = {'Authorization': 'token ' + token}
     return headers
 
-def get_repositores(org, token, nrepos):
+def get_repositores(owner, token, nrepos):
+    """ owner could be an org or and user """
     all_repos = []
-    url = GITHUB_API_URL+"/orgs/"+org+"/repos"
+    url_org = GITHUB_API_URL+"/orgs/"+owner+"/repos"
+    url_user = GITHUB_API_URL+"/users/"+owner+"/repos"
+
+    url = url_org  # Use org by default
+
+    try:
+        r = requests.get(url_org,
+                        params=get_payload(),
+                        headers=get_headers(token))
+        r.raise_for_status()
+    except requests.exceptions.HTTPError:
+        # owner is not an org, try with a user
+        url = url_user
 
     while True:
         logging.debug("Getting repos from: %s" % (url))
