@@ -154,7 +154,10 @@ class GitEnrich(Enrich):
         # Fields which names are translated
         map_fields = {"commit": "hash","message":"message_analyzed"}
         for fn in map_fields:
-            eitem[map_fields[fn]] = commit[fn]
+            if fn in commit:
+                eitem[map_fields[fn]] = commit[fn]
+            else:
+                eitem[map_fields[fn]] = None
         # Enrich dates
         author_date = parser.parse(commit["AuthorDate"])
         commit_date = parser.parse(commit["CommitDate"])
