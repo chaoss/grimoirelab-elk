@@ -306,6 +306,7 @@ class GitHubEnrich(Enrich):
             rich_issue['assignee_geolocation'] = None
 
         rich_issue['id'] = issue['id']
+        rich_issue['id_in_repo'] = issue['html_url'].split("/")[-1]
         rich_issue['title'] = issue['title']
         rich_issue['title_analyzed'] = issue['title']
         rich_issue['state'] = issue['state']
