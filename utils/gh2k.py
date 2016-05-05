@@ -25,13 +25,15 @@
 
 import argparse
 import configparser
+import logging
+import requests
+import subprocess
+
 from datetime import datetime
 from dateutil import parser
-import logging
 from os import sys, path
-import requests
+from time import sleep
 from requests_oauthlib import OAuth1
-import subprocess
 from urllib.parse import quote_plus
 
 import smtplib
@@ -59,9 +61,9 @@ def get_params_parser():
     parser.add_argument('--twitter', dest='twitter', help='Twitter account to notify.')
     parser.add_argument('-w', '--web-dir', default='/var/www/cauldron/dashboards', dest='web_dir',
                         help='Redirect HTML project pages for accessing Kibana dashboards.')
-    parser.add_argument('-k', '--kibana-url', default='http://cauldron.io:5601', dest='kibana_url',
+    parser.add_argument('-k', '--kibana-url', default='https://dashboard.cauldron.io', dest='kibana_url',
                         help='Kibana URL.')
-    parser.add_argument('-u', '--graas-url', default='http://cauldron.io', dest='graas_url',
+    parser.add_argument('-u', '--graas-url', default='https://cauldron.io', dest='graas_url',
                         help='GraaS service URL.')
     parser.add_argument('-n', '--nrepos', dest='nrepos', type=int, default=NREPOS,
                         help='Number of GitHub repositories from the Organization to be analyzed (default:10)')
@@ -100,12 +102,21 @@ def get_repositores(owner, token, nrepos):
 
     try:
         r = requests.get(url_org,
-                        params=get_payload(),
-                        headers=get_headers(token))
+                         params=get_payload(),
+                         headers=get_headers(token))
         r.raise_for_status()
-    except requests.exceptions.HTTPError:
-        # owner is not an org, try with a user
-        url = url_user
+
+    except requests.exceptions.HTTPError as e:
+        if r.status_code == 403:
+            rate_limit_reset_ts = datetime.fromtimestamp(int(r.headers['X-RateLimit-Reset']))
+            seconds_to_reset = (rate_limit_reset_ts - datetime.utcnow()).seconds+1
+            logging.info("GitHub rate limit exhausted. Waiting %i secs for rate limit reset." % (seconds_to_reset))
+            sleep(seconds_to_reset)
+            # Token rate limit reset: ready to get the repos
+            return get_repositores(owner, token, nrepos)
+        else:
+            # owner is not an org, try with a user
+            url = url_user
 
     while True:
         logging.debug("Getting repos from: %s" % (url))
@@ -133,9 +144,10 @@ def get_repositores(owner, token, nrepos):
     # Sort by updated_at and limit to nrepos
     nrepos_sorted = sorted(nrepos_recent, key=lambda repo: parser.parse(repo['updated_at']), reverse=True)
     nrepos_sorted = nrepos_sorted[0:nrepos]
+    # First the small repositories to feedback the user quickly
+    nrepos_sorted = sorted(nrepos_sorted, key=lambda repo: repo['size'])
     for repo in nrepos_sorted:
-        logging.debug("%s %s" % (repo['updated_at'], repo['name']))
-
+        logging.debug("%s %i %s" % (repo['updated_at'], repo['size'], repo['name']))
     return nrepos_sorted
 
 def create_redirect_web_page(web_dir, org_name, kibana_url):
