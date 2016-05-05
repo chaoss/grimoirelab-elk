@@ -197,9 +197,10 @@ class GitEnrich(Enrich):
         eitem["committer_domain"] = self.get_identity_domain(identity)
 
         # title from first line
-        eitem["title"] = commit['message'].split('\n')[0]
-
-
+        if 'message' in commit:
+            eitem["title"] = commit['message'].split('\n')[0]
+        else:
+            eitem["title"] = None
 
         # If it is a github repo, include just the repo string
         if GITHUB in item['origin']:
