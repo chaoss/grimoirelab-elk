@@ -156,7 +156,7 @@ def create_redirect_web_page(web_dir, org_name, kibana_url):
     html_redirect = """
     <html>
         <head>
-            <meta http-equiv="refresh" content="0; URL=%s/app/kibana#/dashboard/GitHubDash?_a=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:github_git_enrich,key:project,negate:!f,value:%s),query:(match:(project:(query:%s,type:phrase))))))&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-1y,mode:quick,to:now))" />
+            <meta http-equiv="refresh" content="0; URL=%s/app/kibana#/dashboard/Overview?_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:github_git_enrich,key:project,negate:!f,value:%s),query:(match:(project:(query:%s,type:phrase))))),refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-2y,mode:quick,to:now))" />
         </head>
     </html>
     """ % (kibana_url, org_name, org_name)
