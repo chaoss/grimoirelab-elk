@@ -36,7 +36,7 @@ from grimoire.utils import get_connectors, get_connector_from_name
 import traceback
 
 def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
-                 es_index=None, project=None):
+                 es_index=None, es_index_enrich=None, project=None):
     """ Feed Ocean with backend data """
 
     backend = None
@@ -97,6 +97,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
 
     repo['repo_update'] = datetime.now().isoformat()
     repo['index'] = es_index
+    repo['index_enrich'] = es_index_enrich
     repo['project'] = project
 
     if es_index:
@@ -179,6 +180,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
 
 
 def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
+                   ocean_index_enrich = None,
                    db_projects_map=None, db_sortinghat=None,
                    no_incremental=False):
     """ Enrich Ocean index """
@@ -239,7 +241,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
     backend = None
     enrich_index = None
 
-    if ocean_index:
+    if ocean_index or ocean_index_enrich:
         clean = False  # don't remove index, it could be shared
 
     if not get_connector_from_name(backend_name):
@@ -252,9 +254,12 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
         backend = backend_cmd.backend
 
-        if not ocean_index:
-            ocean_index = backend_name + "_" + backend.origin
-        enrich_index = ocean_index+"_enrich"
+        if ocean_index_enrich:
+            enrich_index = ocean_index_enrich
+        else:
+            if not ocean_index:
+                ocean_index = backend_name + "_" + backend.origin
+            enrich_index = ocean_index+"_enrich"
 
         enrich_backend = connector[2](backend, db_projects_map, db_sortinghat)
         elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)

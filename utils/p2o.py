@@ -62,7 +62,7 @@ def feed_backends(url, clean, debug = False, redis = None):
     for repo in ConfOcean.get_repos():
         task_feed = q.enqueue(feed_backend, url, clean, fetch_cache,
                               repo['backend_name'], repo['backend_params'],
-                              repo['index'], repo['project'])
+                              repo['index'], repo['index_enrich'], repo['project'])
         logging.info("Queued job")
         logging.info(task_feed)
 
@@ -82,7 +82,7 @@ def enrich_backends(url, clean, debug = False, redis = None,
         enrich_task = q.enqueue(enrich_backend,
                                 url, clean,
                                 repo['backend_name'], repo['backend_params'],
-                                repo['index'], db_projects_map, db_sortinghat)
+                                repo['index'], repo['index_enrich'], db_projects_map, db_sortinghat)
         logging.info("Queued job")
         logging.info(enrich_task)
 
@@ -136,7 +136,7 @@ if __name__ == '__main__':
                 q = Queue('create', connection=Redis(args.redis), async=async_)
                 task_feed = q.enqueue(feed_backend, url, clean, args.fetch_cache,
                                       args.backend, args.backend_args,
-                                      args.index, args.project)
+                                      args.index, args.index_enrich, args.project)
                 logging.info("Queued feed_backend job")
                 logging.info(task_feed)
 
@@ -146,14 +146,14 @@ if __name__ == '__main__':
                     # Task enrich after feed
                     result = q.enqueue(enrich_backend, url, clean,
                                        args.backend, args.backend_args,
-                                       args.index,
+                                       args.index, args.index_enrich,
                                        args.db_projects_map, args.db_sortinghat,
                                        args.no_incremental,
                                        depends_on=task_feed)
                 else:
                     result = q.enqueue(enrich_backend, url, clean,
                                        args.backend, args.backend_args,
-                                       args.index,
+                                       args.index, args.index_enrich,
                                        args.db_projects_map, args.db_sortinghat,
                                        args.no_incremental)
                 logging.info("Queued enrich_backend job")
