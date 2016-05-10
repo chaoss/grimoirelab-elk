@@ -88,18 +88,20 @@ class JenkinsEnrich(Enrich):
         build = item['data']
 
         # data fields to copy
-        copy_fields = ["fullDisplayName","url","result","duration"]
+        copy_fields = ["fullDisplayName","url","result","duration","builtOn"]
         for f in copy_fields:
-            if f in question:
-                eitem[f] = question[f]
+            if f in build:
+                eitem[f] = build[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
         map_fields = {"fullDisplayName": "fullDisplayName_analyzed"
                       }
         for fn in map_fields:
-            eitem[map_fields[fn]] = question[fn]
+            eitem[map_fields[fn]] = build[fn]
 
+        # Job url: remove the last /build_id from job_url/build_id/
+        eitem['job_url'] = eitem['url'].rsplit("/",2)[0]
 
         # Enrich dates
         eitem["build_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
