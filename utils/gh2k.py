@@ -265,15 +265,16 @@ if __name__ == '__main__':
     git_index = "github_git"
     issues_index = "github_issues"
 
-    logging.info("Creating new GitHub dashboard with %i repositores from %s" %
-                (args.nrepos, args.org))
 
     # The owner could be a org or an user.
     (owner_url, owner) = get_owner_repos_url(args.org, args.token)
 
+    logging.info("Creating new GitHub dashboard with %i repositores from %s" %
+                (args.nrepos, owner)
+
     # Generate redirect web page first so dashboard can be used
     # with partial data during data retrieval
-    create_redirect_web_page(args.web_dir, args.org, args.kibana_url)
+    create_redirect_web_page(args.web_dir, owner, args.kibana_url)
 
     repos = get_repositores(owner_url, args.token, args.nrepos)
     first_repo = True
