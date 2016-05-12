@@ -270,7 +270,7 @@ if __name__ == '__main__':
     (owner_url, owner) = get_owner_repos_url(args.org, args.token)
 
     logging.info("Creating new GitHub dashboard with %i repositores from %s" %
-                (args.nrepos, owner)
+                (args.nrepos, owner))
 
     # Generate redirect web page first so dashboard can be used
     # with partial data during data retrieval
