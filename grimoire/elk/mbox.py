@@ -183,8 +183,24 @@ class MBoxEnrich(Enrich):
         eitem["email_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
         eitem["list"] = item["origin"]
 
-        if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+        # Root message
+        if 'In-Reply-To' in message:
+            eitem["root"] = False
+        else:
+            eitem["root"] = True
+
+        # Size of the message
+        try:
+            eitem["size"] = len(message['body']['plain'])
+        except:
+            eitem["size"] = None
+
+        # Time zone
+        try:
+            message_date = parser.parse(message['Date'])
+            eitem["tz"]  = int(message_date.strftime("%z")[0:3])
+        except:
+            eitem["tz"]  = None
 
         if self.prjs_map:
             eitem.update(self.get_item_project(item))
