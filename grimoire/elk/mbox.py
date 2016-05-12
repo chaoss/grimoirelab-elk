@@ -202,6 +202,9 @@ class MBoxEnrich(Enrich):
         except:
             eitem["tz"]  = None
 
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(item))
+
         if self.prjs_map:
             eitem.update(self.get_item_project(item))
 
