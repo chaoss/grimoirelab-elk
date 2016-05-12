@@ -92,13 +92,15 @@ def get_headers(token):
     headers = {'Authorization': 'token ' + token}
     return headers
 
-def get_repositores(owner, token, nrepos):
-    """ owner could be an org or and user """
-    all_repos = []
+def get_owner_repos_url(owner, token):
+    """ The owner could be a org or a user.
+        It waits if need to have rate limit.
+        Also it fixes a djando issue changing - with _
+    """
     url_org = GITHUB_API_URL+"/orgs/"+owner+"/repos"
     url_user = GITHUB_API_URL+"/users/"+owner+"/repos"
 
-    url = url_org  # Use org by default
+    url_owner = url_org  # Use org by default
 
     try:
         r = requests.get(url_org,
@@ -112,11 +114,32 @@ def get_repositores(owner, token, nrepos):
             seconds_to_reset = (rate_limit_reset_ts - datetime.utcnow()).seconds+1
             logging.info("GitHub rate limit exhausted. Waiting %i secs for rate limit reset." % (seconds_to_reset))
             sleep(seconds_to_reset)
-            # Token rate limit reset: ready to get the repos
-            return get_repositores(owner, token, nrepos)
         else:
-            # owner is not an org, try with a user
-            url = url_user
+            if "_" in owner:
+                # Hack: try changing "_" with "-". Django issue
+                owner_fixed = owner.replace("_","-")
+                url_org = GITHUB_API_URL+"/orgs/"+owner_fixed+"/repos"
+                try:
+                    r = requests.get(url_org,
+                                     params=get_payload(),
+                                     headers=get_headers(token))
+                    r.raise_for_status()
+                    owner = owner_fixed
+                    url_owner = url_org
+                except requests.exceptions.HTTPError as e:
+                    # owner is not an org, try with a user
+                    url_owner = url_user
+            else:
+                # owner is not an org, try with a user
+                url_owner = url_user
+    return url_owner, owner
+
+
+def get_repositores(owner_url, token, nrepos):
+    """ owner could be an org or and user """
+    all_repos = []
+
+    url = owner_url
 
     while True:
         logging.debug("Getting repos from: %s" % (url))
@@ -245,16 +268,19 @@ if __name__ == '__main__':
     logging.info("Creating new GitHub dashboard with %i repositores from %s" %
                 (args.nrepos, args.org))
 
+    # The owner could be a org or an user.
+    (owner_url, owner) = get_owner_repos_url(args.org, args.token)
+
     # Generate redirect web page first so dashboard can be used
     # with partial data during data retrieval
     create_redirect_web_page(args.web_dir, args.org, args.kibana_url)
 
-    repos = get_repositores(args.org, args.token, args.nrepos)
+    repos = get_repositores(owner_url, args.token, args.nrepos)
     first_repo = True
 
     for repo in repos:
-        project = args.org  # project = org in GitHub
-        url = GITHUB_URL+args.org+"/"+repo['name']
+        project = owner  # project = org in GitHub
+        url = GITHUB_URL+owner+"/"+repo['name']
         basic_cmd = "./p2o.py -g -e %s --project %s --enrich" % \
             (args.elastic_url, project)
         cmd = basic_cmd + " --index %s git %s" % (git_index, url)
@@ -262,24 +288,24 @@ if __name__ == '__main__':
         if git_cmd != 0:
             logging.error("Problems with command: %s" % cmd)
         cmd = basic_cmd + " --index %s github --owner %s --repository %s -t %s --sleep-for-rate" % \
-            (issues_index, args.org, repo['name'], args.token)
+            (issues_index, owner, repo['name'], args.token)
         issues_cmd = subprocess.call(cmd, shell=True)
         if issues_cmd != 0:
             logging.error("Problems with command: %s" % cmd)
         else:
             if first_repo:
                 if args.contact:
-                    notify_contact(args.contact, args.org, args.graas_url, repos, first_repo)
+                    notify_contact(args.contact, owner, args.graas_url, repos, first_repo)
                 first_repo = False
 
 
     total_time_min = (datetime.now()-task_init).total_seconds()/60
 
-    logging.info("Finished %s in %.2f min" % (args.org, total_time_min))
+    logging.info("Finished %s in %.2f min" % (owner, total_time_min))
 
     # Notify the contact about the new dashboard
     if args.contact:
-        notify_contact(args.contact, args.org, args.graas_url, repos)
+        notify_contact(args.contact, owner, args.graas_url, repos)
     if args.twitter:
         logging.debug("Twitter user to be notified: %s" % (args.twitter))
-        publish_twitter(args.twitter, args.org)
+        publish_twitter(args.twitter, owner)
