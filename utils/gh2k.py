@@ -190,26 +190,59 @@ def create_redirect_web_page(web_dir, org_name, kibana_url):
         logging.error("Wrong web dir for redirect pages: %s" % (web_dir))
         logging.error(ex)
 
-def notify_contact(mail, org, graas_url, repos, first_repo=False):
+def notify_contact(mail, owner, graas_url, repos, first_repo=False):
     """ Send an email to the contact with the details to access
         the Kibana dashboard """
+
+    footer = """
+--
+Bitergia Cauldron Team
+http://bitergia.com
+    """
+
+    twitter_txt = "Check Cauldron.io dashboard for %s at %s/dashboards/%s" % (owner, graas_url, owner)
+    twitter_url = "https://twitter.com/intent/tweet?text="+quote_plus(twitter_txt)
+    twitter_url += "&via=bitergia"
+
     if first_repo:
         logging.info("Sending first email to %s" % (mail))
-        subject = "Bitergia dashboard for %s in progress" % (org)
+        subject = "First repository for %s already in the Cauldron" % (owner)
     else:
         logging.info("Sending last email to %s" % (mail))
-        subject = "Bitergia dashboard for %s ready" % (org)
-
-
-    body = "%s/dashboards/%s\n\n" % (graas_url, org)
+        subject = "Your Cauldron %s dashboard is ready!" % (owner)
 
     if first_repo:
-        body += "First repository analized: %s\n" % (repos[0]['html_url'])
-    else:
-        body += "Repositories analyzed:\n"
-        for repo in repos:
-            body += "%s\n" % (repo['html_url'])
+        # body = "%s/dashboards/%s\n\n" % (graas_url, owner)
+        # body += "First repository analized: %s\n" % (repos[0]['html_url'])
+        body = """
+First repository has been analyzed and it's already in the Cauldron. Be patient, we have just started, step by step.
 
+We will notify you when everything is ready.
+
+Meanwhile, check latest dashboards in %s
+
+Thanks,
+%s
+    """ % (graas_url, footer)
+    else:
+        body = """
+Check it at: %s/dashboards/%s
+
+Play with it, and send us feedback:
+https://github.com/Bitergia/cauldron.io/issues/new
+
+Share it on Twitter:
+%s
+
+Thank you very much,
+%s
+    """ % (graas_url, owner, twitter_url, footer)
+#        body += "Repositories analyzed:\n"
+#        for repo in repos:
+#            body += "%s\n" % (repo['html_url'])
+
+
+    print(body)
     msg = MIMEText(body)
     msg['Subject'] = subject
     msg['From'] = 'info@bitergia.com'
