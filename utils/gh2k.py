@@ -237,12 +237,7 @@ Share it on Twitter:
 Thank you very much,
 %s
     """ % (graas_url, owner, twitter_url, footer)
-#        body += "Repositories analyzed:\n"
-#        for repo in repos:
-#            body += "%s\n" % (repo['html_url'])
 
-
-    print(body)
     msg = MIMEText(body)
     msg['Subject'] = subject
     msg['From'] = 'info@bitergia.com'
@@ -263,7 +258,6 @@ def publish_twitter(twitter_contact, owner):
     status = quote_plus(tweet)
     oauth = get_oauth()
     r = requests.post(url="https://api.twitter.com/1.1/statuses/update.json?status="+status, auth=oauth)
-    print (r.json())
 
 def get_oauth():
     filepath = "twitter.oauth"
