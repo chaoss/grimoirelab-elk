@@ -254,7 +254,7 @@ Thank you very much,
 def publish_twitter(twitter_contact, owner):
     """ Publish in twitter the dashboard """
     dashboard_url = CAULDRON_DASH_URL + "/%s" % (owner)
-    tweet = "@%s your https://cauldron.io dashboard is ready at %s. Check it out! #oscon #opendevmetrics " % (twitter_contact, dashboard_url)
+    tweet = "@%s your http://cauldron.io dashboard for %s at GitHub is ready: %s. Check it out! #oscon #opendevmetrics" % (twitter_contact, owner, dashboard_url)
     status = quote_plus(tweet)
     oauth = get_oauth()
     r = requests.post(url="https://api.twitter.com/1.1/statuses/update.json?status="+status, auth=oauth)
@@ -310,7 +310,7 @@ if __name__ == '__main__':
     for repo in repos:
         project = owner  # project = org in GitHub
         url = GITHUB_URL+owner+"/"+repo['name']
-        basic_cmd = "./p2o.py -g -e %s --project %s --enrich" % \
+        basic_cmd = "p2o.py -g -e %s --project %s --enrich" % \
             (args.elastic_url, project)
         cmd = basic_cmd + " --index %s git %s" % (git_index, url)
         git_cmd = subprocess.call(cmd, shell=True)
