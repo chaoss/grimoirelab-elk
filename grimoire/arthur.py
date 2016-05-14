@@ -86,7 +86,9 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
         if backend:
             logging.error("Error feeding ocean from %s (%s): %s" %
                           (backend_name, backend.origin, ex))
-            traceback.print_exc()
+            # don't propagete ... it makes blackbird fails
+            # TODO: manage it in p2o
+            # traceback.print_exc()
         else:
             logging.error("Error feeding ocean %s" % ex)
 
