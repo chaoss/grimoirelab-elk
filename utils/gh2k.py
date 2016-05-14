@@ -254,7 +254,7 @@ Thank you very much,
 def publish_twitter(twitter_contact, owner):
     """ Publish in twitter the dashboard """
     dashboard_url = CAULDRON_DASH_URL + "/%s" % (owner)
-    tweet = "@%s your http://cauldron.io dashboard for %s at GitHub is ready: %s. Check it out! #oscon #opendevmetrics" % (twitter_contact, owner, dashboard_url)
+    tweet = "@%s your http://cauldron.io dashboard for #%s at GitHub is ready: %s. Check it out! #oscon #opendevmetrics" % (twitter_contact, owner, dashboard_url)
     status = quote_plus(tweet)
     oauth = get_oauth()
     r = requests.post(url="https://api.twitter.com/1.1/statuses/update.json?status="+status, auth=oauth)
