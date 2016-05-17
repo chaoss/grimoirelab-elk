@@ -115,24 +115,9 @@ def get_owner_repos_url(owner, token):
             logging.info("GitHub rate limit exhausted. Waiting %i secs for rate limit reset." % (seconds_to_reset))
             sleep(seconds_to_reset)
         else:
-            if "_" in owner:
-                # Hack: try changing "_" with "-". Django issue
-                owner_fixed = owner.replace("_","-")
-                url_org = GITHUB_API_URL+"/orgs/"+owner_fixed+"/repos"
-                try:
-                    r = requests.get(url_org,
-                                     params=get_payload(),
-                                     headers=get_headers(token))
-                    r.raise_for_status()
-                    owner = owner_fixed
-                    url_owner = url_org
-                except requests.exceptions.HTTPError as e:
-                    # owner is not an org, try with a user
-                    url_owner = url_user
-            else:
-                # owner is not an org, try with a user
-                url_owner = url_user
-    return url_owner, owner
+            # owner is not an org, try with a user
+            url_owner = url_user
+    return url_owner
 
 
 def get_repositores(owner_url, token, nrepos):
@@ -296,7 +281,8 @@ if __name__ == '__main__':
 
 
     # The owner could be a org or an user.
-    (owner_url, owner) = get_owner_repos_url(args.org, args.token)
+    owner_url = get_owner_repos_url(args.org, args.token)
+    owner = args.org
 
     logging.info("Creating new GitHub dashboard with %i repositores from %s" %
                 (args.nrepos, owner))
