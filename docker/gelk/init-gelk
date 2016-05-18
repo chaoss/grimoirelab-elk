@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script starts arthur's RQ workers and the dashboard and the initial SH db 
+# This script starts arthur's RQ workers and the dashboard and creates the initial SH db
 
 ELASTIC_URL="http://elasticsearch:9200"
 MYSQL_HOST="mariadb"
