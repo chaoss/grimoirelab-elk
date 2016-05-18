@@ -2,7 +2,7 @@
 
 # This script starts arthur's RQ workers and the dashboard and creates the initial SH db
 
-ELASTIC_URL="http://elasticsearch:9200/ocean"
+ELASTIC_URL_INDEX="http://elasticsearch:9200/ocean"
 MYSQL_HOST="mariadb"
 REDIS_HOST="redis"
 REDIS_URL="redis://$REDIS_HOST/8"
