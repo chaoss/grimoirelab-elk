@@ -40,7 +40,7 @@ RUN pip3 install rq && pip3 install rq-dashboard==0.3.4
 # Bug in 0.3.5: https://github.com/nvie/rq-dashboard/pull/89/files
 # In 0.3.5 workers don't appear in the dashboard
 
-# perceval needs a newer version than Debian 8
+# perceval needs a newer version than Debian 8 - this breaks pip3
 RUN pip3 install --upgrade requests
 
 RUN echo "${DEPLOY_USER}    ALL=NOPASSWD: ALL" >> /etc/sudoers
@@ -71,7 +71,8 @@ RUN git clone https://github.com/grimoirelab/perceval.git && \
 
 # get Arthur repository
 RUN git clone https://github.com/grimoirelab/arthur.git && \
-    cd arthur && sudo python3 setup.py install
+    cd arthur && sudo python3 setup.py install && \
+    chmod 755 bin/*
 
 
 ADD init-gelk ${DEPLOY_USER_DIR}/
