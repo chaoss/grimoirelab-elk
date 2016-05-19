@@ -19,8 +19,8 @@ LANG=en_US.utf8 rqworker -P /usr/local/lib/python3.4/dist-packages -w arthur.wor
 # Start arthur daemon
 PYTHONPATH='$PYTHONPATH:arthur' arthur/bin/arthurd --es-index $ELASTIC_URL_INDEX --log-path $ARTHUR_LOG_PATH -d $REDIS_URL --no-daemon -g &
 
-# Start also a2k daemon to enrich arthur items
-(cd GrimoireELK/utils && ./a2k.py -e $ELASTIC_URL --redis $REDIS_URL --index $ELASTIC_OCEAN_INDEX -g > $A2K_LOG_PATH 2>&1 ) &
+# Start also a2k daemon to enrich arthur items. Wait 5 seconds to let arthur bootstrap
+(sleep 5 && cd GrimoireELK/utils && ./a2k.py -e $ELASTIC_URL --redis $REDIS_URL --index $ELASTIC_OCEAN_INDEX -g > $A2K_LOG_PATH 2>&1 ) &
 
 # Start MariaDB for Sorting Hat and Projects databases
 (echo "CREATE DATABASE ocean_sh DEFAULT CHARACTER SET utf8" | mysql -u root -h mariadb) &
