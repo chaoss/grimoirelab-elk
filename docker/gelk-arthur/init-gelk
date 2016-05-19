@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -e
+
+# This script starts arthur's RQ workers and the dashboard and creates the initial SH db
+
+echo "Waiting 10s so the other services can start ..."
+
+sleep 10
+
+ELASTIC_URL_INDEX=$ELASTIC_URL/$ELASTIC_OCEAN_INDEX
+MYSQL_HOST="mariadb"
+REDIS_HOST="redis-arthur"
+REDIS_URL="redis://$REDIS_HOST/8"
+
+LANG=en_US.utf8 rqworker -P /usr/local/lib/python3.4/dist-packages -w arthur.worker.ArthurWorker -u $REDIS_URL create update > /tmp/worker1.log 2>&1 &
+LANG=en_US.utf8 rqworker -P /usr/local/lib/python3.4/dist-packages -w arthur.worker.ArthurWorker -u $REDIS_URL create update > /tmp/worker2.log 2>&1 &
+
+# Start arthur daemon
+PYTHONPATH='$PYTHONPATH:arthur' arthur/bin/arthurd --es-index $ELASTIC_URL_INDEX --log-path $ARTHUR_LOG_PATH -d $REDIS_URL --no-daemon -g &
+
+# Start also a2k daemon to enrich arthur items
+(cd GrimoireELK/utils && ./a2k.py -e $ELASTIC_URL --redis $REDIS_URL --index $ELASTIC_OCEAN_INDEX -g > $A2K_LOG_PATH 2>&1 ) &
+
+# Start MariaDB for Sorting Hat and Projects databases
+(echo "CREATE DATABASE ocean_sh DEFAULT CHARACTER SET utf8" | mysql -u root -h mariadb) &
+
+# Start the RQ Dashboard
+LANG=en_US.utf8 rq-dashboard -H $REDIS_HOST > /tmp/rq-dashboard.log 2>&1

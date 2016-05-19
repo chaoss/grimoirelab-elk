@@ -7,6 +7,7 @@ help:
 	$(info )
 	$(info - all:			Build all available images)
 	$(info - gelk:			Build gelk image)
+	$(info - gelk-arthur:	Build gelk-arthur image)
 	$(info )
 	@echo ""
 
@@ -14,11 +15,18 @@ help:
 gelk: $@
 	docker build -t bitergia/$@ $@/
 
-.PHONY: all
-all: gelk
+.PHONY: gelk-arthur
+gelk-arthur: $@
+	docker build -t bitergia/$@ $@/
 
-.PHONY: clean clean_gelk
-clean: clean_gelk
+.PHONY: all
+all: gelk gelk-arthur
+
+.PHONY: clean clean_gelk clean_gelk-arthur
+clean: clean_gelk clean_gelk-arthur
 
 clean_gelk:
 	-@docker rmi bitergia/gelk
+
+clean_gelk-arthur:
+	-@docker rmi bitergia/gelk-arthur

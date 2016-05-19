@@ -1,0 +1,52 @@
+redis-arthur:
+    image: redis
+
+mariadbdata-arthur:
+    image: mariadb:10.0
+    volumes:
+        - /var/lib/mysql
+    restart: "no"
+    command: /bin/echo "Data-only container for mariadb."
+
+mariadb:
+    image: mariadb:10.0
+    volumes_from:
+        - mariadbdata-arthur
+    expose:
+        - "3306"
+    environment:
+        - MYSQL_ROOT_PASSWORD=
+        - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+
+    # command: --verbose
+
+# nginx-arthur:
+#     image: nginx
+#     links:
+#         - gelk-arthur
+#     # RQ dashboard
+#     ports:
+#         - 9181:9181
+#     volumes:
+#         - ~/devel/GrimoireELK/docker/compose/rq-dash-nginx.conf:/etc/nginx/nginx.conf:ro
+#         - ~/devel/GrimoireELK/docker/compose/rq-dash-password:/etc/nginx/rq-dash-password:ro
+
+gelk-arthur:
+    image: bitergia/gelk-arthur
+    links:
+        - redis-arthur
+        - mariadb
+    ports:
+        - 8080:8080
+    expose:
+        - "9181"
+    # volumes:
+    #     - ~/devel:/home/bitergia/devel
+    environment:
+      # - ELASTIC_URL=http://localhost:9200
+      - ELASTIC_URL=https://XXXXX:XXXXXXXXXXXXX@elasticsearch.bitergia.com/arthur
+      - ELASTIC_OCEAN_INDEX=ocean
+      - ARTHUR_LOG_PATH=/tmp/arthur
+      - A2K_LOG_PATH=/tmp/a2k
+      # - DB_PROJECTS
+      # - DB_SORTING_HAT
