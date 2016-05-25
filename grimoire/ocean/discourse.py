@@ -28,12 +28,5 @@ from grimoire.ocean.elastic import ElasticOcean
 class DiscourseOcean(ElasticOcean):
     """Discourse Ocean feeder"""
 
-    def get_field_unique_id(self):
-        return "id"
-
-    def add_update_date(self, item):
-        # entry_lastUpdated = parser.parse(item['delta_ts'][0]["__text__"])
-        entry_lastUpdated = parser.parse(item['__metadata__']['updated_on'])
-        # Use local server time for incremental updates
-        update = entry_lastUpdated.replace(tzinfo=None)
-        item['metadata__updated_on'] = update.isoformat()
+    def _fix_item(self, item):
+        item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']

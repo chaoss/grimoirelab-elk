@@ -47,22 +47,7 @@ class DiscourseEnrich(Enrich):
         return "metadata__updated_on"
 
     def get_field_unique_id(self):
-        return "id"
-
-    # def get_elastic_mappings(self):
-    #
-    #     mapping = """
-    #     {
-    #         "properties": {
-    #             "question_owner": {
-    #               "type": "string",
-    #               "index":"not_analyzed"
-    #               }
-    #        }
-    #     } """
-    #
-    #     return {"items":mapping}
-
+        return "ocean-unique-id"
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -75,28 +60,19 @@ class DiscourseEnrich(Enrich):
         return identity
 
     def get_rich_item(self, item):
-
-        return item
-        # eitem = {}
-        # # Fields that are the same in item and eitem
-        # copy_fields = ["title","question_id","link","view_count",
-        #                "answer_count","comment_count"]
-        # for f in copy_fields:
-        #     if f in item:
-        #         eitem[f] = item[f]
-        #     else:
-        #         eitem[f] = None
-        # # Fields which names are translated
-        # map_fields = {}
-        # for fn in map_fields:
-        #     eitem[map_fields[fn]] = commit[fn]
-        # # Enrich dates
-        # eitem["question_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
-        # # people
-        # eitem["question_owner"] = item["owner"]["display_name"]
-        # # eitem["owner_link"] = item["owner"]["link"]
-        # eitem["tags"] = ",".join(item["tags"])
-        # return eitem
+        eitem = {}
+        eitem["metadata__updated_on"] = item["metadata__updated_on"]
+        eitem["ocean-unique-id"] = item["ocean-unique-id"]
+        post = item['data']
+        # Fields that are the same in item and eitem
+        copy_fields = ["topic_slug","display_username","_category_id","avg_time",
+                       "score","reads","id","topic_id","cooked"]
+        for f in copy_fields:
+            if f in post:
+                eitem[f] = post[f]
+            else:
+                eitem[f] = None
+        return eitem
 
     def enrich_items(self, items):
         max_items = self.elastic.max_items_bulk
