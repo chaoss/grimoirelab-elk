@@ -173,6 +173,8 @@ class GitHubEnrich(Enrich):
                 _from += res_size
                 r = requests.get(url+"&from=%i" % _from)
                 type_items = r.json()
+                if 'hits' not in type_items:
+                    break
 
         return cache
 
