@@ -28,14 +28,16 @@ from dateutil import parser
 import json
 import logging
 import requests
+
 from time import time, sleep
+
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 class ElasticConnectException(Exception):
     message = "Can't connect to ElasticSearch"
 
 class ElasticWriteException(Exception):
     message = "Can't write to ElasticSearch"
-
 
 class ElasticSearch(object):
 
@@ -44,8 +46,10 @@ class ElasticSearch(object):
         """ Return a valid elastic index generated from unique_id """
         return unique_id.replace("/","_").lower()
 
-    def __init__(self, url, index, mappings = None, clean = False):
-        ''' clean: remove already existing index '''
+    def __init__(self, url, index, mappings = None, clean = False, insecure=True):
+        ''' clean: remove already existing index
+            insecure: support https with invalid certificates
+        '''
 
         self.url = url
         # Valid index for elastic
@@ -54,15 +58,20 @@ class ElasticSearch(object):
         self.max_items_bulk = 100
         self.wait_bulk_seconds = 2  # time to wait to complete a bulk operation
 
+        self.requests = requests.Session()
+        if insecure:
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+            self.requests.verify = False
+
         try:
-            r = requests.get(self.index_url)
+            r = self.requests.get(self.index_url)
         except requests.exceptions.ConnectionError as ex:
-            print(ex)
+            logging.error(ex)
             raise ElasticConnectException()
 
         if r.status_code != 200:
             # Index does no exists
-            r = requests.post(self.index_url)
+            r = self.requests.post(self.index_url)
             if r.status_code != 200:
                 logging.info("Can't create index %s (%s)" %
                              (self.index_url, r.status_code))
@@ -71,8 +80,8 @@ class ElasticSearch(object):
                 logging.info("Created index " + self.index_url)
         else:
             if clean:
-                requests.delete(self.index_url)
-                requests.post(self.index_url)
+                self.requests.delete(self.index_url)
+                self.requests.post(self.index_url)
                 logging.info("Deleted and created index " + self.index_url)
         if mappings:
             self.create_mappings(mappings)
@@ -82,12 +91,12 @@ class ElasticSearch(object):
         """ Bulk PUT controlling unicode issues """
 
         try:
-            requests.put(url, data=bulk_json)
+            self.requests.put(url, data=bulk_json)
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
             logging.error("Encondig error ... converting bulk to iso-8859-1")
             bulk_json = bulk_json.encode('iso-8859-1','ignore')
-            requests.put(url, data=bulk_json)
+            self.requests.put(url, data=bulk_json)
 
     def bulk_upload(self, items, field_id):
         ''' Upload in controlled packs items to ES using bulk API '''
@@ -129,7 +138,7 @@ class ElasticSearch(object):
         # After a bulk upload the searches are not refreshed real time
         # This method waits until the upload is visible in searches
 
-        r = requests.get(self.index_url+'/_search?size=1')
+        r = self.requests.get(self.index_url+'/_search?size=1')
         total = r.json()['hits']['total']  # Already existing items
         new_items = self.bulk_upload(items, field_id)
         if not sync:
@@ -144,7 +153,7 @@ class ElasticSearch(object):
         search_start = datetime.now()
         while total_search != total:
             sleep(0.1)
-            r = requests.get(self.index_url+'/_search?size=1')
+            r = self.requests.get(self.index_url+'/_search?size=1')
             total_search = r.json()['hits']['total']
             if (datetime.now()-search_start).total_seconds() > self.wait_bulk_seconds:
                 logging.debug("Bulk data does not appear as NEW after %is" % (self.wait_bulk_seconds))
@@ -157,7 +166,7 @@ class ElasticSearch(object):
         for _type in mappings:
             # First create the manual mappings
             url_map = self.index_url + "/"+_type+"/_mapping"
-            r = requests.put(url_map, data=mappings[_type])
+            r = self.requests.put(url_map, data=mappings[_type])
 
             if r.status_code != 200:
                 logging.error("Error creating ES mappings %s" % (r.text))
@@ -177,7 +186,7 @@ class ElasticSearch(object):
                 }
               ]
             } """
-            r = requests.put(url_map, data=not_analyze_strings)
+            r = self.requests.put(url_map, data=not_analyze_strings)
 
             # Disable dynamic mapping for raw data
             disable_dynamic = """ {
@@ -190,7 +199,7 @@ class ElasticSearch(object):
                     }
                 }
             } """
-            r = requests.put(url_map, data=disable_dynamic)
+            r = self.requests.put(url_map, data=disable_dynamic)
 
 
 
@@ -231,7 +240,7 @@ class ElasticSearch(object):
         } ''' % (data_query, data_agg)
 
         logging.debug("%s %s" % (url, data_json))
-        res = requests.post(url, data=data_json)
+        res = self.requests.post(url, data=data_json)
         res_json = res.json()
 
         if 'aggregations' in res_json:

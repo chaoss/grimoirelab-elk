@@ -34,6 +34,12 @@ class ConfOcean(object):
     conf_index = "conf"
     conf_repos = conf_index+"/repos"
     elastic = None
+    requests_session = requests.Session()
+
+    # Support working with https insecure
+    requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+    requests_session.verify = False
+
 
     @classmethod
     def get_index(cls):
@@ -45,9 +51,9 @@ class ConfOcean(object):
 
         # Check conf index
         url = elastic.url + "/" + cls.conf_index
-        r = requests.get(url)
+        r = cls.requests_session.get(url)
         if r.status_code != 200:
-            requests.post(url)
+            cls.requests_session.post(url)
             logging.info("Creating OceanConf index " + url)
 
 
@@ -64,7 +70,7 @@ class ConfOcean(object):
 
         logging.debug("Adding repo to Ocean %s %s" % (url, repo))
 
-        requests.post(url, data = json.dumps(repo))
+        cls.requests_session.post(url, data = json.dumps(repo))
 
     @classmethod
     def get_repos(cls):
@@ -79,7 +85,7 @@ class ConfOcean(object):
         # TODO: use scrolling API for getting all repos
         url = cls.elastic.url + "/" + cls.conf_repos + "/_search?size=9999"
 
-        r = requests.get(url).json()
+        r = cls.requests_session.get(url).json()
 
         if 'hits' in r:
 
@@ -101,7 +107,7 @@ class ConfOcean(object):
 
         url = cls.elastic.url + "/" + cls.conf_repos + "/_search"
 
-        r = requests.get(url).json()
+        r = cls.requests_session.get(url).json()
 
         if 'hits' in r:
             repos_raw = r['hits']['hits']  # Already existing items
