@@ -27,6 +27,7 @@ from functools import lru_cache
 import logging
 import MySQLdb
 
+import requests
 
 from sortinghat.db.database import Database
 from sortinghat import api
@@ -36,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 class Enrich(object):
 
-    def __init__(self, db_projects_map = None, db_sortinghat = None, ):
+    def __init__(self, db_projects_map = None, db_sortinghat = None, insecure=True):
         self.sortinghat = False
         if db_sortinghat:
             self.sh_db = Database("root", "", db_sortinghat, "mariadb")
@@ -44,6 +45,12 @@ class Enrich(object):
         self.prjs_map = None
         if  db_projects_map:
             self.prjs_map = self._get_projects_map(db_projects_map)
+
+        self.requests = requests.Session()
+        if insecure:
+            requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+            self.requests.verify = False
+
 
     def _get_projects_map(self, db_projects_map):
         prjs_map = {}

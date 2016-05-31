@@ -45,13 +45,19 @@ class ElasticOcean(object):
 
 
     def __init__(self, perceval_backend, from_date=None, fetch_cache=False,
-                 project=None):
+                 project=None, insecure=True):
 
         self.perceval_backend = perceval_backend
         self.last_update = None  # Last update in ocean items index for feed
         self.from_date = from_date  # fetch from_date
         self.fetch_cache = fetch_cache  # fetch from cache
         self.project = project  # project to be used for this data source
+
+        self.requests = requests.Session()
+        if insecure:
+            requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+            self.requests.verify = False
+
 
     def set_elastic(self, elastic):
         """ Elastic used to store last data source state """
@@ -182,7 +188,7 @@ class ElasticOcean(object):
                 "scroll" : max_process_items_pack_time,
                 "scroll_id" : self.elastic_scroll_id
                 }
-            r = requests.post(url, data=json.dumps(scroll_data))
+            r = self.requests.post(url, data=json.dumps(scroll_data))
         else:
             filters = "{}"
             # If origin Always filter by origin to support multi origin indexes
@@ -215,7 +221,7 @@ class ElasticOcean(object):
 
             logging.debug("%s %s" % (url, query))
 
-            r = requests.post(url, data=query)
+            r = self.requests.post(url, data=query)
 
         items = []
         try:

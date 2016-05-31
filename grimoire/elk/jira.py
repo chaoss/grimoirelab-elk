@@ -24,10 +24,9 @@
 #
 
 from time import time
-from dateutil import parser
 import json
 import logging
-import requests
+
 from urllib.parse import urlparse
 
 from .enrich import Enrich
@@ -167,7 +166,7 @@ class JiraEnrich(Enrich):
         for issue in items:
             if current >= max_items:
                 task_init = time()
-                requests.put(url, data=bulk_json)
+                self.requests.put(url, data=bulk_json)
                 bulk_json = ""
                 total += current
                 current = 0
@@ -179,7 +178,7 @@ class JiraEnrich(Enrich):
             current += 1
         task_init = time()
         total += current
-        requests.put(url, data=bulk_json)
+        self.requests.put(url, data=bulk_json)
         logging.debug("bulk packet sent (%.2f sec, %i total)"
                       % (time()-task_init, total))
 
@@ -198,7 +197,7 @@ class JiraEnrich(Enrich):
 
         for issue in items:
             if current >= max_items:
-                requests.put(url, data=bulk_json)
+                self.requests.put(url, data=bulk_json)
                 bulk_json = ""
                 current = 0
             eitem = self.enrich_issue(issue)
@@ -206,6 +205,6 @@ class JiraEnrich(Enrich):
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (eitem[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
-        requests.put(url, data=bulk_json)
+        self.requests.put(url, data=bulk_json)
 
         logging.debug("Adding issues to ES Done")

@@ -28,8 +28,6 @@ import logging
 
 from datetime import datetime
 
-import requests
-
 from .utils import get_time_diff_days
 
 from grimoire.elk.enrich import Enrich
@@ -126,7 +124,7 @@ class GitHubEnrich(Enrich):
         else:
             url = 'https://maps.googleapis.com/maps/api/geocode/json'
             params = {'sensor': 'false', 'address': location}
-            r = requests.get(url, params=params)
+            r = self.requests.get(url, params=params)
 
             try:
                 logging.debug("Using Maps API to find %s" % (location))
@@ -159,7 +157,7 @@ class GitHubEnrich(Enrich):
 
         url = self.elastic.url + "/"+index_github
         url += "/_search" + "?" + "size=%i" % res_size
-        r = requests.get(url)
+        r = self.requests.get(url)
         type_items = r.json()
 
         if 'hits' not in type_items:
@@ -171,7 +169,7 @@ class GitHubEnrich(Enrich):
                     item = hit['_source']
                     cache[item[_key]] = item
                 _from += res_size
-                r = requests.get(url+"&from=%i" % _from)
+                r = self.requests.get(url+"&from=%i" % _from)
                 type_items = r.json()
                 if 'hits' not in type_items:
                     break
@@ -194,7 +192,7 @@ class GitHubEnrich(Enrich):
 
         for loc in self.geolocations:
             if current >= max_items:
-                requests.put(url, data=bulk_json)
+                self.requests.put(url, data=bulk_json)
                 bulk_json = ""
                 current = 0
 
@@ -211,7 +209,7 @@ class GitHubEnrich(Enrich):
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
 
-        requests.put(url, data = bulk_json)
+        self.requests.put(url, data = bulk_json)
 
         logging.debug("Adding geoloc to ES Done")
 
@@ -351,7 +349,7 @@ class GitHubEnrich(Enrich):
 
         for issue in issues:
             if current >= max_items:
-                requests.put(url, data=bulk_json)
+                self.requests.put(url, data=bulk_json)
                 bulk_json = ""
                 current = 0
 
@@ -360,7 +358,7 @@ class GitHubEnrich(Enrich):
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_issue[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
-        requests.put(url, data = bulk_json)
+        self.requests.put(url, data = bulk_json)
 
         logging.debug("Updating GitHub users geolocations in Elastic")
         self.geo_locations_to_es() # Update geolocations in Elastic

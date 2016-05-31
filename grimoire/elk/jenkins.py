@@ -24,13 +24,10 @@
 
 import json
 import logging
-import requests
 
 from dateutil import parser
 
 from grimoire.elk.enrich import Enrich
-
-from sortinghat import api
 
 class JenkinsEnrich(Enrich):
 
@@ -118,7 +115,7 @@ class JenkinsEnrich(Enrich):
 
         for item in items:
             if current >= max_items:
-                requests.put(url, data=bulk_json)
+                self.requests.put(url, data=bulk_json)
                 bulk_json = ""
                 current = 0
 
@@ -128,4 +125,4 @@ class JenkinsEnrich(Enrich):
                 (rich_item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
-        requests.put(url, data = bulk_json)
+        self.requests.put(url, data = bulk_json)

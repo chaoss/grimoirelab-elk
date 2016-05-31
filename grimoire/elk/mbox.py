@@ -24,7 +24,6 @@
 
 import json
 import logging
-import requests
 
 from dateutil import parser
 import email.utils
@@ -221,7 +220,7 @@ class MBoxEnrich(Enrich):
 
         for item in items:
             if current >= max_items:
-                requests.put(url, data=bulk_json)
+                self.requests.put(url, data=bulk_json)
                 bulk_json = ""
                 current = 0
 
@@ -232,9 +231,9 @@ class MBoxEnrich(Enrich):
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
         try:
-            requests.put(url, data = bulk_json)
+            self.requests.put(url, data = bulk_json)
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
             logging.error("Encoding error ... converting bulk to iso-8859-1")
             bulk_json = bulk_json.encode('iso-8859-1','ignore')
-            requests.put(url, data=bulk_json)
+            self.requests.put(url, data=bulk_json)
