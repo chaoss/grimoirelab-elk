@@ -102,7 +102,7 @@ class MediaWikiEnrich(Enrich):
         # Revisions
         eitem["nrevisions"] = len(page["revisions"])
         if len(page["revisions"])>0:
-            eitem["last_editor"] = page["revisions"][0]["user"]
+            eitem["first_editor"] = page["revisions"][0]["user"]
         return eitem
 
     def enrich_items(self, items):
