@@ -56,7 +56,8 @@ class ElasticSearch(object):
 
         try:
             r = requests.get(self.index_url)
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as ex:
+            print(ex)
             raise ElasticConnectException()
 
         if r.status_code != 200:
