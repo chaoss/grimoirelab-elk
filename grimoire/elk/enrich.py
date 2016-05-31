@@ -27,6 +27,7 @@ from functools import lru_cache
 import logging
 import MySQLdb
 
+import requests
 
 import requests
 
