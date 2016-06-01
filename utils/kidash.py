@@ -37,6 +37,7 @@ from grimoire.utils import config_logging
 from e2k import get_dashboard_json, get_vis_json, get_search_json, get_index_pattern_json
 from e2k import get_search_from_vis, get_index_pattern_from_vis
 
+
 def get_params_parser_create_dash():
     """Parse command line arguments"""
 
@@ -75,7 +76,7 @@ def list_dashboards(elastic_url, es_index=None):
 
     print (dash_json_url)
 
-    r = requests.get(dash_json_url)
+    r = requests.get(dash_json_url, verify=False)
 
     res_json = r.json()
 
@@ -106,22 +107,22 @@ def import_dashboard(elastic_url, import_file, es_index=None):
         elastic = ElasticSearch(elastic_url, es_index)
 
         url = elastic.index_url+"/dashboard/"+kibana['dashboard']['id']
-        requests.post(url, data = json.dumps(kibana['dashboard']['value']))
+        requests.post(url, data = json.dumps(kibana['dashboard']['value']), verify=False)
 
         if 'searches' in kibana:
             for search in kibana['searches']:
                 url = elastic.index_url+"/search/"+search['id']
-                requests.post(url, data = json.dumps(search['value']))
+                requests.post(url, data = json.dumps(search['value']), verify=False)
 
         if 'index_patterns' in kibana:
             for index in kibana['index_patterns']:
                 url = elastic.index_url+"/index-pattern/"+index['id']
-                requests.post(url, data = json.dumps(index['value']))
+                requests.post(url, data = json.dumps(index['value']), verify=False)
 
         if 'visualizations' in kibana:
             for vis in kibana['visualizations']:
                 url = elastic.index_url+"/visualization"+"/"+vis['id']
-                requests.post(url, data = json.dumps(vis['value']))
+                requests.post(url, data = json.dumps(vis['value']), verify=False)
 
         logging.debug("Done")
 
