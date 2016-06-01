@@ -274,7 +274,7 @@ class BugzillaEnrich(Enrich):
 
     def issues_to_es(self, items):
 
-        elastic_type = "issues"
+        elastic_type = "items"
 
         max_items = self.elastic.max_items_bulk
         current = 0
