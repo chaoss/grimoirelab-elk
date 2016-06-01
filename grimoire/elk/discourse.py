@@ -61,8 +61,8 @@ class DiscourseEnrich(Enrich):
         eitem["ocean-unique-id"] = item["ocean-unique-id"]
         post = item['data']
         # Fields that are the same in item and eitem
-        copy_fields = ["topic_slug","display_username","_category_id","avg_time",
-                       "score","reads","id","topic_id","cooked"]
+        copy_fields = ["topic_slug","username","display_username","_category_id","avg_time",
+                       "score","reads","id","topic_id","cooked","post_number","reply_count"]
         for f in copy_fields:
             if f in post:
                 eitem[f] = post[f]
