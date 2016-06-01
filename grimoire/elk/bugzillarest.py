@@ -186,11 +186,11 @@ class BugzillaRestEnrich(Enrich):
         # The real data
         issue = item['data']
 
-        if "assigned_to" in issue and "name" in issue["assigned_to"]:
-            eitem["assigned_to"] = issue["assigned_to"]
+        if "assigned_to_detail" in issue and "real_name" in issue["assigned_to_detail"]:
+            eitem["assigned_to"] = issue["assigned_to_detail"]["real_name"]
 
-        if "creator" in issue and "name" in issue["creator"]:
-            eitem["creator"] = issue["creator"][0]["name"]
+        if "creator_detail" in issue and "real_name" in issue["creator_detail"]:
+            eitem["creator"] = issue["creator_detail"]["real_name"]
 
         eitem["id"] = issue['id']
         eitem["status"]  = issue['status']
