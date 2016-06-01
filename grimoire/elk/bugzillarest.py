@@ -270,7 +270,7 @@ class BugzillaRestEnrich(Enrich):
 
     def issues_to_es(self, items):
 
-        elastic_type = "issues"
+        elastic_type = "items"
 
         max_items = self.elastic.max_items_bulk
         current = 0
@@ -295,3 +295,44 @@ class BugzillaRestEnrich(Enrich):
         self.requests.put(url, data=bulk_json)
 
         logging.debug("Adding issues to ES Done")
+
+
+    def get_elastic_mappings(self):
+        ''' Specific mappings needed for ES '''
+
+        mapping = '''
+        {
+            "properties": {
+               "product": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "component": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "assigned_to": {
+                  "type": "string",
+                  "index":"not_analyzed"
+               },
+               "author_org_name": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "author_domain": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "author_name": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               },
+               "origin": {
+                 "type": "string",
+                 "index":"not_analyzed"
+               }
+            }
+        }
+        '''
+
+        return {"items":mapping}
