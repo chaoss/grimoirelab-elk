@@ -57,6 +57,7 @@ from perceval.backends.github import GitHub, GitHubCommand
 from perceval.backends.gerrit import Gerrit, GerritCommand
 from perceval.backends.git import Git, GitCommand
 from perceval.backends.mbox import MBox, MBoxCommand
+from perceval.backends.pipermail import Pipermail, PipermailCommand
 from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
 from perceval.backends.jira import Jira, JiraCommand
 from perceval.backends.jenkins import Jenkins, JenkinsCommand
@@ -90,7 +91,8 @@ def get_connectors():
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
-            "mbox":[Git, MBoxOcean, MBoxEnrich, MBoxCommand],
+            "mbox":[MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
+            "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
             "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
