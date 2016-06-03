@@ -49,8 +49,7 @@ class JiraEnrich(Enrich):
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "reporter_uuid"]
 
-    @classmethod
-    def get_sh_identity(cls, user):
+    def get_sh_identity(self, user):
         """ Return a Sorting Hat identity using jira user data """
 
         identity = {}
@@ -72,9 +71,20 @@ class JiraEnrich(Enrich):
         # Sorting Hat integration: reporter, assignee, creator uuids
         for field in ["assignee","reporter","creator"]:
             if field in item:
-                identity = JiraEnrich.get_sh_identity(item['field'][field])
+                identity = self.get_sh_identity(item['field'][field])
                 eitem[field+'_uuid'] = self.get_uuid(identity, self.get_connector_name())
                 eitem[field+'_name'] = identity['displayName']
+                eitem[field+"_org_name"] = self.get_enrollment(eitem[field+'_uuid'], item)
+                eitem[field+"_domain"] = self.get_domain(identity)
+                eitem[field+"_bot"] = self.is_bot(eitem[field+'_uuid'])
+
+
+        # Unify fields for SH filtering
+        eitem["author_uuid"] = eitem["reporter_uuid"]
+        eitem["author_name"] = eitem["reporter_name"]
+        eitem["author_org_name"] = eitem["reporter_org_name"]
+        eitem["author_domain"] = eitem["reporter_domain"]
+
         return eitem
 
 

@@ -67,10 +67,6 @@ class StackExchangeEnrich(Enrich):
 
         return identities
 
-    def get_sh_identity(self, stackexchange_user):
-        identity = {}
-        return identity
-
     def get_rich_item(self, item):
         eitem = {}
 

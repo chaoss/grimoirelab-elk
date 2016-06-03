@@ -52,8 +52,7 @@ class GerritEnrich(Enrich):
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
-    @classmethod
-    def get_sh_identity(cls, user):
+    def get_sh_identity(self, user):
         identity = {}
         for field in ['name', 'email', 'username']:
             identity[field] = None
@@ -61,47 +60,6 @@ class GerritEnrich(Enrich):
         if 'email' in user: identity['email'] = user['email']
         if 'username' in user: identity['username'] = user['username']
         return identity
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields """
-        eitem = {}  # Item enriched
-
-        item = item['data']
-
-        identity = GerritEnrich.get_sh_identity(item['owner'])
-        eitem["uuid"] = self.get_uuid(identity, self.get_connector_name())
-        eitem["name"] = identity['name']
-
-        enrollments = self.get_enrollments(eitem["uuid"])
-        # TODO: get the org_name for the current commit time
-        if len(enrollments) > 0:
-            eitem["org_name"] = enrollments[0].organization.name
-        else:
-            eitem["org_name"] = None
-        # bot
-        u = self.get_unique_identities(eitem["uuid"])[0]
-        if u.profile:
-            eitem["bot"] = u.profile.is_bot
-        else:
-            eitem["bot"] = False  # By default, identities are not bots
-        eitem["bot"] = 0  # Not supported yet
-
-        if identity['email']:
-            try:
-                eitem["domain"] = identity['email'].split("@")[1]
-            except IndexError:
-                logging.warning("Bad email format: %s" % (identity['email']))
-                eitem["domain"] = None
-        else:
-            eitem["domain"] = None
-
-        # Unify fields name
-        eitem["author_uuid"] = eitem["uuid"]
-        eitem["author_name"] = eitem["name"]
-        eitem["author_org_name"] = eitem["org_name"]
-        eitem["author_domain"] = eitem["domain"]
-
-        return eitem
 
     def get_item_project(self, item):
         """ Get project mapping enrichment field """
@@ -248,7 +206,7 @@ class GerritEnrich(Enrich):
         eitem["timeopen"] =  '%.2f' % timeopen
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, "owner"))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(item))

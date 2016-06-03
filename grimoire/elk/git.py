@@ -66,7 +66,6 @@ class GitEnrich(Enrich):
         return {"items":mapping}
 
 
-
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
@@ -87,39 +86,6 @@ class GitEnrich(Enrich):
         identity['email'] = email
         identity['name'] = name
         return identity
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields """
-        eitem = {}  # Item enriched
-
-        item = item['data']
-
-        # Enrich SH
-        identity  = self.get_sh_identity(item["Author"])
-        eitem["author_name"] = identity['name']
-        eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
-        # enrollments = api.enrollments(self.sh_db, uuid=eitem["author_uuid"])
-        enrollments = self.get_enrollments(eitem["author_uuid"])
-        # TODO: get the org_name for the current commit time
-        if len(enrollments) > 0:
-            eitem["org_name"] = enrollments[0].organization.name
-        else:
-            eitem["org_name"] = None
-        # bot
-        # u = api.unique_identities(self.sh_db, eitem["author_uuid"])[0]
-        u = self.get_unique_identities(eitem["author_uuid"])[0]
-        if u.profile:
-            eitem["bot"] = u.profile.is_bot
-        else:
-            eitem["bot"] = False  # By default, identities are not bots
-
-        eitem["domain"] = self.get_identity_domain(identity)
-
-        # Unify fields name
-        eitem["author_org_name"] = eitem["org_name"]
-        eitem["author_domain"] = eitem["domain"]
-
-        return eitem
 
     def get_item_project(self, item):
         """ Get project mapping enrichment field """
@@ -210,7 +176,7 @@ class GitEnrich(Enrich):
             eitem['project'] = item['project']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, "Author"))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(item))

@@ -27,7 +27,10 @@ from functools import lru_cache
 import logging
 import MySQLdb
 
+
 import requests
+
+from dateutil import parser
 
 from sortinghat.db.database import Database
 from sortinghat import api
@@ -136,6 +139,62 @@ class Enrich(object):
 
 
     # Sorting Hat stuff to be moved to SortingHat class
+
+    def get_sh_identity(self, identity):
+        """ Empty identity. Real implementation in each data source. """
+        identity = {}
+        for field in ['name', 'email', 'username']:
+            identity[field] = None
+        return identity
+
+    def get_domain(self, identity):
+        """ Get the domain from a SH identity """
+        domain = None
+        if identity['email']:
+            try:
+                domain = identity['email'].split("@")[1]
+            except IndexError:
+                # logging.warning("Bad email format: %s" % (identity['email']))
+                pass
+        return domain
+
+    def is_bot(self, uuid):
+        bot = False
+        u = self.get_unique_identities(uuid)[0]
+        if u.profile:
+            bot = u.profile.is_bot
+        return bot
+
+    def get_enrollment(self, uuid, item):
+        """ Get the enrollment for the uuid when the item was done """
+        enrollments = self.get_enrollments(uuid)
+        enroll = None
+        if len(enrollments) > 0:
+            item_date = parser.parse(item['metadata__updated_on'])
+            for enrollment in enrollments:
+                if item_date >= enrollment.start and item_date <= enrollment.end:
+                    enroll = enrollment.organization.name
+                    break
+        return enroll
+
+    def get_item_sh(self, item, identity_field):
+        """ Add sorting hat enrichment fields for teh author of the item """
+        eitem = {}  # Item enriched
+
+        data = item['data']
+
+        # Add Sorting Hat fields
+        if identity_field not in data:
+            return eitem
+        identity  = self.get_sh_identity(data[identity_field])
+        eitem["author_name"] = identity['name']
+        eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
+        eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], item)
+        eitem["author_bot"] = self.is_bot(eitem['author_uuid'])
+        eitem["author_domain"] = self.get_identity_domain(identity)
+
+        return eitem
+
     @lru_cache()
     def get_enrollments(self, uuid):
         return api.enrollments(self.sh_db, uuid)

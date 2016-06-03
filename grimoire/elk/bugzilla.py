@@ -95,29 +95,16 @@ class BugzillaEnrich(Enrich):
             identity = BugzillaEnrich.get_sh_identity({'assigned_to':item["data"]['assigned_to']})
             eitem['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['assigned_to_name'] = identity['name']
-            enrollments = self.get_enrollments(eitem['assigned_to_uuid'])
-            if len(enrollments) > 0:
-                eitem["assigned_to_org_name"] = enrollments[0].organization.name
-            else:
-                eitem["assigned_to_org_name"] = None
-
+            eitem["assigned_to_org_name"] = self.get_enrollment(eitem['assigned_to_uuid'], item)
+            eitem["assigned_to_domain"] = self.get_domain(identity)
+            eitem["assigned_to_bot"] = self.is_bot(eitem['assigned_to_uuid'])
         if 'reporter' in item['data']:
             identity = BugzillaEnrich.get_sh_identity({'reporter':item["data"]['reporter']})
             eitem['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['reporter_name'] = identity['name']
-            enrollments = self.get_enrollments(eitem['reporter_uuid'])
-            if len(enrollments) > 0:
-                eitem["reporter_org_name"] = enrollments[0].organization.name
-            else:
-                eitem["reporter_org_name"] = None
-            if identity['email']:
-                try:
-                    eitem["reporter_domain"] = identity['email'].split("@")[1]
-                except IndexError:
-                    # logging.warning("Bad email format: %s" % (identity['email']))
-                    eitem["reporter_domain"] = None
-            else:
-                eitem["reporter_domain"] = None
+            eitem["reporter_org_name"] = self.get_enrollment(eitem['reporter_uuid'], item)
+            eitem["reporter_domain"] = self.get_domain(identity)
+            eitem["reporter_bot"] = self.is_bot(eitem['reporter_uuid'])
 
         # Unify fields name
         eitem["author_uuid"] = eitem["reporter_uuid"]

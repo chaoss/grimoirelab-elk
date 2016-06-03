@@ -83,23 +83,34 @@ class GitHubEnrich(Enrich):
         """ Add sorting hat enrichment fields """
         eitem = {}  # Item enriched
 
-        user = item['user_data']
+        data = item['data']
+        eitem['user_uuid'] = None
+        user = data['user_data']
         if user is not None:
             identity = self.get_sh_identity(user)
             eitem["user_uuid"] = \
                 self.get_uuid(identity, self.get_connector_name())
-            eitem["author_uuid"] = eitem["user_uuid"]
-        else:
-            eitem['user_uuid'] = None
-            eitem['author_uuid'] = None
+            eitem['user_name'] = identity['name']
+            eitem["user_org_name"] = self.get_enrollment(eitem['user_uuid'], item)
+            eitem["user_domain"] = self.get_domain(identity)
+            eitem["user_bot"] = self.is_bot(eitem['user_uuid'])
 
-        assignee = item['assignee_data']
+        eitem["assignee_uuid"] = None
+        assignee = data['assignee_data']
         if assignee:
             identity = self.get_sh_identity(assignee)
             eitem["assignee_uuid"] =  \
                 self.get_uuid(identity, self.get_connector_name())
-        else:
-            eitem["assignee_uuid"] = None
+            eitem['assignee_name'] = identity['name']
+            eitem["assignee_org_name"] = self.get_enrollment(eitem['assignee_uuid'], item)
+            eitem["assignee_domain"] = self.get_domain(identity)
+            eitem["assignee_bot"] = self.is_bot(eitem['assignee_uuid'])
+
+        # Unify fields for SH filtering
+        eitem["author_uuid"] = eitem["user_uuid"]
+        eitem["author_name"] = eitem["user_name"]
+        eitem["author_org_name"] = eitem["user_org_name"]
+        eitem["author_domain"] = eitem["user_domain"]
 
         return eitem
 
@@ -334,7 +345,7 @@ class GitHubEnrich(Enrich):
             rich_issue['project'] = item['project']
 
         if self.sortinghat:
-            rich_issue.update(self.get_item_sh(issue))
+            rich_issue.update(self.get_item_sh(item))
 
         return rich_issue
 

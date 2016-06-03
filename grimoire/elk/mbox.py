@@ -95,46 +95,6 @@ class MBoxEnrich(Enrich):
         identity['name'] = from_[0]
         return identity
 
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields """
-        eitem = {}  # Item enriched
-
-        item = item['data']
-
-        # Enrich SH
-        if "From" not in item:
-            return eitem
-        identity  = self.get_sh_identity(item["From"])
-        eitem["from_uuid"] = self.get_uuid(identity, self.get_connector_name())
-        eitem["from_name"] = identity['name']
-        # bot
-        u = api.unique_identities(self.sh_db, eitem["from_uuid"])[0]
-        if u.profile:
-            eitem["from_bot"] = u.profile.is_bot
-        else:
-            eitem["from_bot"] = False  # By default, identities are not bots
-
-        enrollments = self.get_enrollments(eitem["from_uuid"])
-        if len(enrollments) > 0:
-            eitem["from_org_name"] = enrollments[0].organization.name
-        else:
-            eitem["from_org_name"] = None
-
-        if identity['email']:
-            try:
-                eitem["domain"] = identity['email'].split("@")[1]
-            except IndexError:
-                logging.warning("Bad email format: %s" % (identity['email']))
-                eitem["domain"] = None
-        else:
-            eitem["domain"] = None
-
-        # Unify fields name
-        eitem["author_uuid"] = eitem["from_uuid"]
-        eitem["author_name"] = eitem["from_name"]
-        eitem["author_org_name"] = eitem["from_org_name"]
-        eitem["author_domain"] = eitem["domain"]
-        return eitem
 
     def get_item_project(self, item):
         """ Get project mapping enrichment field """
@@ -202,7 +162,7 @@ class MBoxEnrich(Enrich):
             eitem["tz"]  = None
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item,"From"))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(item))
