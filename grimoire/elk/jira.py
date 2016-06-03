@@ -80,10 +80,11 @@ class JiraEnrich(Enrich):
 
 
         # Unify fields for SH filtering
-        eitem["author_uuid"] = eitem["reporter_uuid"]
-        eitem["author_name"] = eitem["reporter_name"]
-        eitem["author_org_name"] = eitem["reporter_org_name"]
-        eitem["author_domain"] = eitem["reporter_domain"]
+        if 'reporter' in item:
+            eitem["author_uuid"] = eitem["reporter_uuid"]
+            eitem["author_name"] = eitem["reporter_name"]
+            eitem["author_org_name"] = eitem["reporter_org_name"]
+            eitem["author_domain"] = eitem["reporter_domain"]
 
         return eitem
 
