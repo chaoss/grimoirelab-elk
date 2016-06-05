@@ -25,6 +25,8 @@
 import json
 import logging
 
+from .utils import get_time_diff_days
+
 
 from grimoire.elk.enrich import Enrich
 
@@ -59,15 +61,36 @@ class DiscourseEnrich(Enrich):
         eitem = {}
         eitem["metadata__updated_on"] = item["metadata__updated_on"]
         eitem["ocean-unique-id"] = item["ocean-unique-id"]
-        post = item['data']
+        topic = item['data']
+
         # Fields that are the same in item and eitem
-        copy_fields = ["topic_slug","username","display_username","_category_id","avg_time",
-                       "score","reads","id","topic_id","cooked","post_number","reply_count"]
+        copy_fields = ["like_count", "reply_count", "word_count", "posts_count",
+                       "id", "participant_count", "views", "pinned",
+                       "created_at", "last_posted_at", "title"]
         for f in copy_fields:
-            if f in post:
-                eitem[f] = post[f]
+            if f in topic:
+                eitem[f] = topic[f]
             else:
                 eitem[f] = None
+        # Fields which names are translated
+        map_fields = {"slug": "topic_slug"}
+        for fn in map_fields:
+            if fn in topic:
+                eitem[map_fields[fn]] = topic[fn]
+            else:
+                eitem[map_fields[fn]] = None
+
+        eitem['username'] = topic['details']['created_by']['username']
+
+        # First post has the topic contents
+        eitem['description'] = topic['post_stream']['posts'][0]['cooked']
+
+        # First reply time
+        eitem['first_reply_time'] = None
+        if len(topic['post_stream']['posts'])>1:
+            firt_post_time = topic['post_stream']['posts'][0]['created_at']
+            second_post_time = topic['post_stream']['posts'][1]['created_at']
+            eitem['first_reply_time'] = get_time_diff_days(firt_post_time, second_post_time)
         return eitem
 
     def enrich_items(self, items):
