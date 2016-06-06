@@ -51,11 +51,31 @@ class DiscourseEnrich(Enrich):
         """ Return the identities from an item """
         identities = []
 
+        participants = item['data']['details']['participants']
+
+        for identity in participants:
+            user = self.get_sh_identity(identity)
+            identities.append(user)
         return identities
 
-    def get_sh_identity(self, discourse_user):
+    def get_sh_identity(self, user):
         identity = {}
+        identity['username'] = user['username']
+        identity['email'] = None
+        identity['name'] = None
         return identity
+
+    def get_item_sh(self, item):
+        """ Add sorting hat enrichment fields for the author of the item """
+
+        eitem = {}  # Item enriched
+        data = item['data']['details']['created_by']
+
+        identity  = self.get_sh_identity(data)
+        eitem = self.get_item_sh_fields(identity, item)
+
+        return eitem
+
 
     def get_rich_item(self, item):
         eitem = {}
@@ -91,6 +111,10 @@ class DiscourseEnrich(Enrich):
             firt_post_time = topic['post_stream']['posts'][0]['created_at']
             second_post_time = topic['post_stream']['posts'][1]['created_at']
             eitem['first_reply_time'] = get_time_diff_days(firt_post_time, second_post_time)
+
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(item))
+
         return eitem
 
     def enrich_items(self, items):
