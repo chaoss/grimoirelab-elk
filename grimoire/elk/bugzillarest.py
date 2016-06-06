@@ -52,80 +52,37 @@ class BugzillaRestEnrich(Enrich):
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
-    @classmethod
-    def get_sh_identity(cls, user):
-        """ Return a Sorting Hat identity using bugzilla user data """
 
-        def fill_list_identity(identity, user_list_data):
-            """ Fill identity with user data in first item in list """
-            identity['username'] = user_list_data[0]['__text__']
-            if '@' in identity['username']:
-                identity['email'] = identity['username']
-            if 'name' in user_list_data[0]:
-                identity['name'] = user_list_data[0]['name']
-            return identity
+    def get_identities(self, item):
+        """ Return the identities from an item """
+        identities = []
 
+        identity_fields = ['assigned_to_detail', 'qa_contact_detail', 'creator_detail']
+
+        for f in identity_fields:
+            if f in item['data']:
+                user = self.get_sh_identity(item['data'][f])
+            identities.append(user)
+        return identities
+
+    def get_sh_identity(self, user):
         identity = {}
-        for field in ['name', 'email', 'username']:
-            # Basic fields in Sorting Hat
-            identity[field] = None
-        if 'creator' in user:
-            identity = fill_list_identity(identity, user['creator'])
-        if 'assigned_to' in user:
-            identity = fill_list_identity(identity, user['assigned_to'])
-        if 'who' in user:
-            identity = fill_list_identity(identity, user['who'])
-        if 'Who' in user:
-            identity['username'] = user['Who']
-            if '@' in identity['username']:
-                identity['email'] = identity['username']
-        if 'qa_contact' in user:
-            identity = fill_list_identity(identity, user['qa_contact'])
-        if 'changed_by' in user:
-            identity['name'] = user['changed_by']
-
+        identity['username'] = user['name']
+        identity['email'] = user['email']
+        identity['name'] = user['real_name']
         return identity
 
     def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields """
+        """ Add sorting hat enrichment fields for the author of the item """
+
         eitem = {}  # Item enriched
+        data = item['data']['creator_detail']
 
-        # Sorting Hat integration: creator and assigned_to uuids
-        if 'assigned_to' in item['data']:
-            identity = BugzillaRestEnrich.get_sh_identity({'assigned_to':item["data"]['assigned_to']})
-            eitem['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
-            eitem['assigned_to_name'] = identity['name']
-            enrollments = self.get_enrollments(eitem['assigned_to_uuid'])
-            if len(enrollments) > 0:
-                eitem["assigned_to_org_name"] = enrollments[0].organization.name
-            else:
-                eitem["assigned_to_org_name"] = None
-
-        if 'creator' in item['data']:
-            identity = BugzillaRestEnrich.get_sh_identity({'creator':item["data"]['creator']})
-            eitem['creator_uuid'] = self.get_uuid(identity, self.get_connector_name())
-            eitem['creator_name'] = identity['name']
-            enrollments = self.get_enrollments(eitem['creator_uuid'])
-            if len(enrollments) > 0:
-                eitem["creator_org_name"] = enrollments[0].organization.name
-            else:
-                eitem["creator_org_name"] = None
-            if identity['email']:
-                try:
-                    eitem["creator_domain"] = identity['email'].split("@")[1]
-                except IndexError:
-                    # logging.warning("Bad email format: %s" % (identity['email']))
-                    eitem["creator_domain"] = None
-            else:
-                eitem["creator_domain"] = None
-
-        # Unify fields name
-        eitem["author_uuid"] = eitem["creator_uuid"]
-        eitem["author_name"] = eitem["creator_name"]
-        eitem["author_org_name"] = eitem["creator_org_name"]
-        eitem["author_domain"] = eitem["creator_domain"]
+        identity  = self.get_sh_identity(data)
+        eitem = self.get_item_sh_fields(identity, item)
 
         return eitem
+
 
     def get_item_project(self, item):
         """ Get project mapping enrichment field """
@@ -141,27 +98,6 @@ class BugzillaRestEnrich(Enrich):
             project = None
         return {"project": project}
 
-    def get_identities(self, item):
-        ''' Return the identities from an item '''
-
-        identities = []
-
-        if 'activity' in item["data"]:
-            for event in item["data"]['activity']:
-                identities.append(self.get_sh_identity(event))
-        if 'long_desc' in item["data"]:
-            for comment in item["data"]['long_desc']:
-                identities.append(self.get_sh_identity(comment))
-        elif 'assigned_to' in item["data"]:
-            identities.append(self.get_sh_identity({'assigned_to':
-                                                    item["data"]['assigned_to']}))
-        elif 'creator' in item["data"]:
-            identities.append(self.get_sh_identity({'creator':
-                                                    item["data"]['creator']}))
-        elif 'qa_contact' in item["data"]:
-            identities.append(self.get_sh_identity({'qa_contact':
-                                                    item['qa_contact']}))
-        return identities
 
     def enrich_issue(self, item):
 
