@@ -178,21 +178,30 @@ class Enrich(object):
                     break
         return enroll
 
-    def get_item_sh(self, item, identity_field):
-        """ Add sorting hat enrichment fields for teh author of the item """
+    def get_item_sh_fields(self, identity, item):
+        """ Get standard SH fields from a SH identity """
         eitem = {}  # Item enriched
 
+        eitem["author_name"] = identity['name']
+        eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
+        eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], item)
+        eitem["author_bot"] = self.is_bot(eitem['author_uuid'])
+        eitem["author_domain"] = self.get_identity_domain(identity)
+
+        return eitem
+
+
+    def get_item_sh(self, item, identity_field):
+        """ Add sorting hat enrichment fields for the author of the item """
+
+        eitem = {}  # Item enriched
         data = item['data']
 
         # Add Sorting Hat fields
         if identity_field not in data:
             return eitem
         identity  = self.get_sh_identity(data[identity_field])
-        eitem["author_name"] = identity['name']
-        eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
-        eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], item)
-        eitem["author_bot"] = self.is_bot(eitem['author_uuid'])
-        eitem["author_domain"] = self.get_identity_domain(identity)
+        eitem = self.get_item_sh_fields(identity, item)
 
         return eitem
 
