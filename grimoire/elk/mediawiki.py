@@ -65,11 +65,36 @@ class MediaWikiEnrich(Enrich):
         """ Return the identities from an item """
         identities = []
 
+        revisions = item['data']['revisions']
+
+        for revision in revisions:
+            user = self.get_sh_identity(revision)
+            identities.append(user)
         return identities
 
-    def get_sh_identity(self, mediawiki_user):
+    def get_sh_identity(self, revision):
         identity = {}
+        identity['username'] = None
+        identity['email'] = None
+        identity['name'] = None
+        if 'user' in revision:
+            identity['username'] = revision['user']
+            identity['name'] = revision['user']
         return identity
+
+    def get_item_sh(self, item):
+        """ Add sorting hat enrichment fields for the author of the item """
+
+        eitem = {}  # Item enriched
+        if not len(item['data']['revisions']) > 0:
+            return eitem
+
+        first_revision = item['data']['revisions'][0]
+
+        identity  = self.get_sh_identity(first_revision)
+        eitem = self.get_item_sh_fields(identity, item)
+
+        return eitem
 
     def get_rich_item(self, item):
         eitem = {}
@@ -103,6 +128,10 @@ class MediaWikiEnrich(Enrich):
         eitem["nrevisions"] = len(page["revisions"])
         if len(page["revisions"])>0:
             eitem["first_editor"] = page["revisions"][0]["user"]
+
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(item))
+
         return eitem
 
     def enrich_items(self, items):
