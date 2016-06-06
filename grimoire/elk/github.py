@@ -347,6 +347,9 @@ class GitHubEnrich(Enrich):
         if self.sortinghat:
             rich_issue.update(self.get_item_sh(item))
 
+        rich_issue.update(self.get_grimoire_fields(issue['created_at'], "issue"))
+
+
         return rich_issue
 
     def enrich_items(self, issues):

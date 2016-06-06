@@ -101,6 +101,9 @@ class StackExchangeEnrich(Enrich):
         eitem["question_owner"] = question["owner"]["display_name"]
         # eitem["owner_link"] = item["owner"]["link"]
         eitem["tags"] = ",".join(question["tags"])
+
+        eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "question"))
+
         return eitem
 
     def enrich_items(self, items):

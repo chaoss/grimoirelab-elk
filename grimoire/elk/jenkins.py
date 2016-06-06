@@ -98,6 +98,9 @@ class JenkinsEnrich(Enrich):
 
         # Enrich dates
         eitem["build_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
+
+        eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "job"))
+
         return eitem
 
     def enrich_items(self, items):

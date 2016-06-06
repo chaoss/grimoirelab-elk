@@ -211,6 +211,8 @@ class GerritEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(item))
 
+        eitem.update(self.get_grimoire_fields(review['createdOn'], "review"))
+
         bulk_json = '{"index" : {"_id" : "%s" } }\n' % (eitem[self.get_field_unique_id()])  # Bulk operation
         bulk_json += json.dumps(eitem)+"\n"
 

@@ -181,6 +181,8 @@ class GitEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(item))
 
+        eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
+
         return eitem
 
     def enrich_items(self, commits):

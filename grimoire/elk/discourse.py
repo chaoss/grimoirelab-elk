@@ -107,6 +107,7 @@ class DiscourseEnrich(Enrich):
 
         # First reply time
         eitem['first_reply_time'] = None
+        firt_post_time = None
         if len(topic['post_stream']['posts'])>1:
             firt_post_time = topic['post_stream']['posts'][0]['created_at']
             second_post_time = topic['post_stream']['posts'][1]['created_at']
@@ -114,6 +115,8 @@ class DiscourseEnrich(Enrich):
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
+
+        eitem.update(self.get_grimoire_fields(firt_post_time, "topic"))
 
         return eitem
 

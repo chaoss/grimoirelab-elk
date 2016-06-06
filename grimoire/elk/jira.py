@@ -149,6 +149,9 @@ class JiraEnrich(Enrich):
         if self.sortinghat:
             eitem.update(self.get_item_sh(issue))
 
+        eitem.update(self.get_grimoire_fields(issue['fields']['created'], "issue"))
+
+
         return eitem
 
 

@@ -215,6 +215,8 @@ class BugzillaEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(item))
 
+        eitem.update(self.get_grimoire_fields(eitem['creation_ts'],"bug"))
+
         return eitem
 
 

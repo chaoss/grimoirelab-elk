@@ -138,6 +138,17 @@ class Enrich(object):
 
         return {"items":mapping}
 
+    def get_grimoire_fields(self, creation_date, item_name):
+        """ Return common grimoire fields for all data sources """
+
+        grimoire_date = parser.parse(creation_date).isoformat()
+        name = "is_"+self.get_connector_name()+"_"+item_name
+
+        return {
+            "grimoire_creation_date": grimoire_date,
+            name: 1
+        }
+
 
     # Sorting Hat stuff to be moved to SortingHat class
 

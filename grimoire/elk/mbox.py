@@ -167,6 +167,8 @@ class MBoxEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(item))
 
+        eitem.update(self.get_grimoire_fields(message['Date'], "message"))
+
         return eitem
 
     def enrich_items(self, items):
