@@ -62,7 +62,7 @@ class DiscourseEnrich(Enrich):
         identity = {}
         identity['username'] = user['username']
         identity['email'] = None
-        identity['name'] = None
+        identity['name'] = user['username']
         return identity
 
     def get_item_sh(self, item):
