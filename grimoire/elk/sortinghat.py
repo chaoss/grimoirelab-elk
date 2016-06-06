@@ -60,8 +60,8 @@ class SortingHat(object):
                 uuid = api.add_identity(db, backend, identity['email'],
                                         identity['name'], identity['username'])
 
-                logger.info("New sortinghat identity %s %s %s (%i/%i)" % \
-                            (uuid, identity['name'], identity['email'],
+                logger.debug("New sortinghat identity %s %s,%s,%s (%i/%i)" % \
+                            (uuid, identity['username'], identity['name'], identity['email'],
                             total, lidentities))
 
                 total += 1
