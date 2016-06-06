@@ -27,13 +27,12 @@ from datetime import datetime
 from dateutil import parser
 import logging
 import requests
-
+import traceback
 
 from grimoire.elk.sortinghat import SortingHat
 from grimoire.ocean.conf import ConfOcean
 from grimoire.utils import get_elastic
 from grimoire.utils import get_connectors, get_connector_from_name
-import traceback
 
 def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None):
@@ -276,6 +275,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             last_enrich = None
 
         logging.debug("Last enrichment: %s" % (last_enrich))
+
+        # last_enrich=parser.parse('2016-06-01')
 
         ocean_backend = connector[1](backend, from_date=last_enrich)
         clean = False  # Don't remove ocean index when enrich
