@@ -97,6 +97,11 @@ class SortingHat(object):
                                 (identity['email'], identity['name'],
                                 identity['username']))
                 continue
+            except Exception as ex:
+                logging.warning("Unknown exception adding identity. Ignoring it. %s %s %s" % \
+                                (identity['email'], identity['name'],
+                                identity['username']))
+                continue
 
             if 'company' in identity and identity['company'] is not None:
                 try:
