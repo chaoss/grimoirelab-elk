@@ -200,9 +200,14 @@ class GerritEnrich(Enrich):
         createdOn_date = parser.parse(review['createdOn'])
         if len(review["patchSets"]) > 0:
             createdOn_date = parser.parse(review["patchSets"][0]['createdOn'])
+        lastUpdated_date = parser.parse(review['lastUpdated'])
         seconds_day = float(60*60*24)
-        timeopen = \
-            (datetime.utcnow()-createdOn_date).total_seconds() / seconds_day
+        if eitem['status'] in ['MERGED','ABANDONED']:
+            timeopen = \
+                (lastUpdated_date-createdOn_date).total_seconds() / seconds_day
+        else:
+            timeopen = \
+                (datetime.utcnow()-createdOn_date).total_seconds() / seconds_day
         eitem["timeopen"] =  '%.2f' % timeopen
 
         if self.sortinghat:
