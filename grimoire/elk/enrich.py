@@ -141,7 +141,9 @@ class Enrich(object):
     def get_grimoire_fields(self, creation_date, item_name):
         """ Return common grimoire fields for all data sources """
 
-        grimoire_date = parser.parse(creation_date).isoformat()
+        grimoire_date = None
+        if creation_date is not None:
+            grimoire_date = parser.parse(creation_date).isoformat()
         name = "is_"+self.get_connector_name()+"_"+item_name
 
         return {
