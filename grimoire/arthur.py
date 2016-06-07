@@ -183,7 +183,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
 def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    ocean_index_enrich = None,
                    db_projects_map=None, db_sortinghat=None,
-                   no_incremental=False):
+                   no_incremental=False, only_identities=False):
     """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend):
@@ -292,9 +292,14 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             enrich_count_merged = enrich_sortinghat(backend_name,
                                                     ocean_backend, enrich_backend)
             logging.info("Total items enriched for merged identities %i " %  enrich_count_merged)
-        # Enrichment for the new items once SH update is finished
-        enrich_count = enrich_items(ocean_backend, enrich_backend)
-        logging.info("Total items enriched %i " %  enrich_count)
+
+        if not only_identities:
+            # If only_identities, only identities are added to SH, but the enrich is needed
+            # Enrichment for the new items once SH update is finished
+            enrich_count = enrich_items(ocean_backend, enrich_backend)
+            logging.info("Total items enriched %i " %  enrich_count)
+        else:
+            logging.info("Only SH identities added. Enrich not done!")
 
 
     except Exception as ex:
