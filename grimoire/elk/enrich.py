@@ -271,4 +271,8 @@ class Enrich(object):
             logger.error("UnicodeEncodeError")
             logger.error("%s %s" % (identity, uuid))
             uuid = None
+        except Exception as ex:
+            logger.error("Unknown error adding sorting hat identity.")
+            logger.error("%s %s" % (identity, uuid))
+            uuid = None
         return uuid
