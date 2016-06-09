@@ -32,7 +32,7 @@ from grimoire.ocean.elastic import ElasticOcean
 
 # Connectors for Ocean
 from grimoire.ocean.bugzilla import BugzillaOcean
-from grimoire.ocean.bugzillarest import BugzillaRestOcean
+from grimoire.ocean.bugzillarest import BugzillaRESTOcean
 from grimoire.ocean.gerrit import GerritOcean
 from grimoire.ocean.github import GitHubOcean
 from grimoire.ocean.git import GitOcean
@@ -44,7 +44,7 @@ from grimoire.ocean.discourse import DiscourseOcean
 
 # Connectors for EnrichOcean
 from grimoire.elk.bugzilla import BugzillaEnrich
-from grimoire.elk.bugzillarest import BugzillaRestEnrich
+from grimoire.elk.bugzillarest import BugzillaRESTEnrich
 from grimoire.elk.gerrit import GerritEnrich
 from grimoire.elk.github import GitHubEnrich
 from grimoire.elk.git import GitEnrich
@@ -56,7 +56,7 @@ from grimoire.elk.discourse import DiscourseEnrich
 
 # Connectors for Perceval
 from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
-from perceval.backends.bugzillarest import BugzillaRest, BugzillaRestCommand
+from perceval.backends.bugzillarest import BugzillaREST, BugzillaRESTCommand
 from perceval.backends.github import GitHub, GitHubCommand
 from perceval.backends.gerrit import Gerrit, GerritCommand
 from perceval.backends.git import Git, GitCommand
@@ -93,7 +93,7 @@ def get_connector_name(cls):
 def get_connectors():
 
     return {"bugzilla":[Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
-            "bugzillarest":[BugzillaRest, BugzillaRestOcean, BugzillaRestEnrich, BugzillaRestCommand],
+            "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],

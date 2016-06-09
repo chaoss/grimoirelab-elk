@@ -27,7 +27,7 @@
 
 from grimoire.ocean.elastic import ElasticOcean
 
-class BugzillaRestOcean(ElasticOcean):
+class BugzillaRESTOcean(ElasticOcean):
 
     def _fix_item(self, item):
         bug_id = str(item["data"]["id"])

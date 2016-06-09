@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# BugzillaRest to Elastic class helper
+# BugzillaREST to Elastic class helper
 #
 # Copyright (C) 2015 Bitergia
 #
@@ -33,7 +33,7 @@ from .enrich import Enrich
 
 from .utils import get_time_diff_days
 
-class BugzillaRestEnrich(Enrich):
+class BugzillaRESTEnrich(Enrich):
 
     def __init__(self, bugzilla, sortinghat=True, db_projects_map = None):
         super().__init__(sortinghat, db_projects_map)
