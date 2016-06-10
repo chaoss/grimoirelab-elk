@@ -39,6 +39,9 @@ from time import sleep
 from grimoire.ocean.elastic import ElasticOcean
 from grimoire.utils import config_logging
 
+import MySQLdb
+
+
 GITHUB_URL = "https://github.com/"
 GITHUB_API_URL = "https://api.github.com"
 NREPOS = 0 # Default number of repos to be analyzed: all
@@ -60,6 +63,7 @@ def get_params_parser():
     parser.add_argument('--twitter', dest='twitter', help='Twitter account to notify.')
     parser.add_argument('-n', '--nrepos', dest='nrepos', type=int, default=NREPOS,
                         help='Number of GitHub repositories from the Organization to be analyzed (default:0, no limit)')
+    parser.add_argument('--db-projects-map', help="Database to include the projects Mapping DB")
 
     return parser
 
@@ -153,6 +157,71 @@ def get_repositores(owner_url, token, nrepos):
     return nrepos_sorted
 
 
+def create_projects_schema(cursor):
+    project_table = """
+        CREATE TABLE projects (
+            project_id int(11) NOT NULL AUTO_INCREMENT,
+            id varchar(255) NOT NULL,
+            title varchar(255) NOT NULL,
+            PRIMARY KEY (project_id)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8
+    """
+    project_repositories_table = """
+        CREATE TABLE project_repositories (
+            project_id int(11) NOT NULL,
+            data_source varchar(32) NOT NULL,
+            repository_name varchar(255) NOT NULL,
+            UNIQUE (project_id, data_source, repository_name)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8
+    """
+    project_children_table = """
+        CREATE TABLE project_children (
+            project_id int(11) NOT NULL,
+            subproject_id int(11) NOT NULL,
+            UNIQUE (project_id, subproject_id)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8
+    """
+
+    # The data in tables is created automatically.
+    # No worries about dropping tables.
+    cursor.execute("DROP TABLE IF EXISTS projects")
+    cursor.execute("DROP TABLE IF EXISTS project_repositories")
+    cursor.execute("DROP TABLE IF EXISTS project_children")
+
+    cursor.execute(project_table)
+    cursor.execute(project_repositories_table)
+    cursor.execute(project_children_table)
+
+def insert_projects_mapping(db_projects_map, project, repositories):
+    try:
+        db = MySQLdb.connect(user="root", passwd="", host="mariadb",
+                             db = db_projects_map)
+    except Exception:
+        # Try to create the database and the tables
+        db = MySQLdb.connect(user="root", passwd="", host="mariadb")
+        cursor.execute("CREATE DATABASE %s CHARACTER SET utf8" % (db_projects_map))
+        db = MySQLdb.connect(user="root", passwd="", host="mariadb",
+                             db = db_projects_map)
+        cursor = db.cursor()
+        create_projects_schema(cursor)
+
+    cursor = db.cursor()
+
+    # Insert the project in projects
+    query = "INSERT INTO projects (id, title) VALUES (%s, %s)"
+    q = "INSERT INTO projects (title, id) values (%s, %s)"
+    cursor.execute(q, (project, project))
+    project_id = db.insert_id()
+
+    # Insert its repositories in project_repositories
+    for repo in repositories:
+        repo_url = repo['clone_url']
+        q = "INSERT INTO project_repositories (project_id, data_source, repository_name) VALUES (%s, %s, %s)"
+        cursor.execute(q, (project_id, "github", repo_url))
+
+    db.close()
+
+
 if __name__ == '__main__':
 
     task_init = datetime.now()
@@ -173,6 +242,9 @@ if __name__ == '__main__':
     for org in args.org:
         owner_url = get_owner_repos_url(org, args.token)
         repos = get_repositores(owner_url, args.token, args.nrepos)
+        if args.db_projects_map:
+            insert_projects_mapping(args.db_projects_map, org, repos)
+
 
         for repo in repos:
             repo_url = repo['clone_url']
