@@ -29,6 +29,8 @@ import json
 import logging
 import requests
 
+import MySQLdb
+
 from datetime import datetime
 from os import path
 
@@ -36,11 +38,8 @@ from dateutil import parser
 
 from time import sleep
 
-from grimoire.elk.elastic import ElasticSearch
+from grimoire.elk.elastic import ElasticSearch, ElasticConnectException
 from grimoire.utils import config_logging
-
-
-import MySQLdb
 
 
 GITHUB_URL = "https://github.com/"
@@ -201,6 +200,7 @@ def insert_projects_mapping(db_projects_map, project, repositories):
     except Exception:
         # Try to create the database and the tables
         db = MySQLdb.connect(user="root", passwd="", host="mariadb")
+        cursor = db.cursor()
         cursor.execute("CREATE DATABASE %s CHARACTER SET utf8" % (db_projects_map))
         db = MySQLdb.connect(user="root", passwd="", host="mariadb",
                              db = db_projects_map)
@@ -219,7 +219,7 @@ def insert_projects_mapping(db_projects_map, project, repositories):
     for repo in repositories:
         repo_url = repo['clone_url']
         q = "INSERT INTO project_repositories (project_id, data_source, repository_name) VALUES (%s, %s, %s)"
-        cursor.execute(q, (project_id, "github", repo_url))
+        cursor.execute(q, (project_id, PERCEVAL_BACKEND, repo_url))
 
     db.close()
 
@@ -238,13 +238,21 @@ if __name__ == '__main__':
 
     # enrich ocean
     index_enrich = OCEAN_INDEX+"_"+PERCEVAL_BACKEND+"_enrich"
-    es_enrich = ElasticSearch(args.elastic_url, index_enrich)
+    es_enrich = None
+    try:
+        es_enrich = ElasticSearch(args.elastic_url, index_enrich)
+    except ElasticConnectException:
+        logging.error("Can't connect to Elastic Search. Is it running?")
 
 
     # The owner could be an org or an user.
     for org in args.org:
         owner_url = get_owner_repos_url(org, args.token)
-        repos = get_repositores(owner_url, args.token, args.nrepos)
+        try:
+            repos = get_repositores(owner_url, args.token, args.nrepos)
+        except requests.exceptions.HTTPError:
+            logging.error("Can't get repos for %s" % (owner_url))
+            continue
         if args.db_projects_map:
             insert_projects_mapping(args.db_projects_map, org, repos)
 
@@ -254,7 +262,9 @@ if __name__ == '__main__':
             origin = repo_url
             clone_dir = path.join(GIT_CLONE_DIR,repo_url.replace("/","_"))
             _filter = {"name":"origin", "value":origin}
-            last_update = es_enrich.get_last_date("metadata__updated_on", _filter)
+            last_update = None
+            if es_enrich:
+                last_update = es_enrich.get_last_date("metadata__updated_on", _filter)
             if last_update:
                 last_update = last_update.isoformat()
             repo_args = {
