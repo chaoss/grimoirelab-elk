@@ -49,6 +49,7 @@ CAULDRON_DASH_URL = "https://cauldron.io/dashboards"
 GIT_CLONE_DIR = "/tmp"
 OCEAN_INDEX = "ocean"
 PERCEVAL_BACKEND = "git"
+PROJECTS_DS = "scm"
 
 def get_params_parser():
     """Parse command line arguments"""
@@ -219,7 +220,7 @@ def insert_projects_mapping(db_projects_map, project, repositories):
     for repo in repositories:
         repo_url = repo['clone_url']
         q = "INSERT INTO project_repositories (project_id, data_source, repository_name) VALUES (%s, %s, %s)"
-        cursor.execute(q, (project_id, PERCEVAL_BACKEND, repo_url))
+        cursor.execute(q, (project_id, PROJECTS_DS, repo_url))
 
     db.close()
 
