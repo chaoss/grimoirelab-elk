@@ -219,7 +219,7 @@ class ElasticOcean(object):
             }
             """ % (filters)
 
-            logging.debug("%s %s" % (url, query))
+            # logging.debug("%s %s" % (url, query))
 
             r = self.requests.post(url, data=query)
 
