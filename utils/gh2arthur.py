@@ -36,8 +36,9 @@ from dateutil import parser
 
 from time import sleep
 
-from grimoire.ocean.elastic import ElasticOcean
+from grimoire.elk.elastic import ElasticSearch
 from grimoire.utils import config_logging
+
 
 import MySQLdb
 
@@ -47,20 +48,21 @@ GITHUB_API_URL = "https://api.github.com"
 NREPOS = 0 # Default number of repos to be analyzed: all
 CAULDRON_DASH_URL = "https://cauldron.io/dashboards"
 GIT_CLONE_DIR = "/tmp"
+OCEAN_INDEX = "ocean"
+PERCEVAL_BACKEND = "git"
 
 def get_params_parser():
     """Parse command line arguments"""
 
     parser = argparse.ArgumentParser()
 
-    ElasticOcean.add_params(parser)
-
+    parser.add_argument("-e", "--elastic_url",  default="http://127.0.0.1:9200",
+                        help="Host with elastic search" +
+                        "(default: http://127.0.0.1:9200)")
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
     parser.add_argument('-t', '--token', dest='token', help="GitHub token")
     parser.add_argument('-o', '--org', dest='org', nargs='*', help='GitHub Organization/s to be analyzed')
     parser.add_argument('-l', '--list', dest='list', action='store_true', help='Just list the repositories')
-    parser.add_argument('-c', '--contact', dest='contact', help='Contact (mail) to notify events.')
-    parser.add_argument('--twitter', dest='twitter', help='Twitter account to notify.')
     parser.add_argument('-n', '--nrepos', dest='nrepos', type=int, default=NREPOS,
                         help='Number of GitHub repositories from the Organization to be analyzed (default:0, no limit)')
     parser.add_argument('--db-projects-map', help="Database to include the projects Mapping DB")
@@ -232,13 +234,14 @@ if __name__ == '__main__':
 
     config_logging(args.debug)
 
-    # All projects share the same index
-    git_index = "github_git"
-    issues_index = "github_issues"
     total_repos = 0
 
+    # enrich ocean
+    index_enrich = OCEAN_INDEX+"_"+PERCEVAL_BACKEND+"_enrich"
+    es_enrich = ElasticSearch(args.elastic_url, index_enrich)
 
-    # The owner could be a org or an user.
+
+    # The owner could be an org or an user.
     for org in args.org:
         owner_url = get_owner_repos_url(org, args.token)
         repos = get_repositores(owner_url, args.token, args.nrepos)
@@ -248,17 +251,26 @@ if __name__ == '__main__':
 
         for repo in repos:
             repo_url = repo['clone_url']
+            origin = repo_url
             clone_dir = path.join(GIT_CLONE_DIR,repo_url.replace("/","_"))
+            _filter = {"name":"origin", "value":origin}
+            last_update = es_enrich.get_last_date("metadata__updated_on", _filter)
+            if last_update:
+                last_update.isoformat()
+            repo_args = {
+                "gitpath": clone_dir,
+                "uri": repo_url,
+                "cache": False
+            }
+            if last_update:
+                repo_args["from_date"] = last_update
             arthur_repos["repositories"].append({
-                "args": {
-                    "gitpath": clone_dir,
-                    "uri": repo_url,
-                    "cache": False
-                },
-                "backend": "git",
-                "elastic_index": "git",
-                "origin": repo_url
+                "args": repo_args,
+                "backend": PERCEVAL_BACKEND,
+                "origin": repo_url,
+                "elastic_index": PERCEVAL_BACKEND
             })
+
         total_repos += len(repos)
 
 
