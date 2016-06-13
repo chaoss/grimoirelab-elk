@@ -256,7 +256,7 @@ if __name__ == '__main__':
             _filter = {"name":"origin", "value":origin}
             last_update = es_enrich.get_last_date("metadata__updated_on", _filter)
             if last_update:
-                last_update.isoformat()
+                last_update = last_update.isoformat()
             repo_args = {
                 "gitpath": clone_dir,
                 "uri": repo_url,
