@@ -136,7 +136,10 @@ class MBoxEnrich(Enrich):
         map_fields = {"Subject": "Subject_analyzed"
                       }
         for fn in map_fields:
-            eitem[map_fields[fn]] = message[fn]
+            if fn in message:
+                eitem[map_fields[fn]] = message[fn]
+            else:
+                eitem[map_fields[fn]] = None
 
         # Enrich dates
         eitem["email_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
