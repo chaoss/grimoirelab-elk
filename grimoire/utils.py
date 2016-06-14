@@ -173,6 +173,7 @@ def get_params_parser():
     parser.add_argument('--project', help="Project for the repository (origin)")
     parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('--only-identities', action='store_true', help="Only add identities to SortingHat DB")
+    parser.add_argument('--github-token', help="If provided, github usernames will be retrieved in git enrich.")
     parser.add_argument('backend', help=argparse.SUPPRESS)
     parser.add_argument('backend_args', nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)

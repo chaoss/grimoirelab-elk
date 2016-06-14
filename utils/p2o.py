@@ -149,13 +149,15 @@ if __name__ == '__main__':
                                        args.index, args.index_enrich,
                                        args.db_projects_map, args.db_sortinghat,
                                        args.no_incremental, args.only_identities,
+                                       args.github_token,
                                        depends_on=task_feed)
                 else:
                     result = q.enqueue(enrich_backend, url, clean,
                                        args.backend, args.backend_args,
                                        args.index, args.index_enrich,
                                        args.db_projects_map, args.db_sortinghat,
-                                       args.no_incremental, args.only_identities)
+                                       args.no_incremental, args.only_identities,
+                                       args.github_token)
                 logging.info("Queued enrich_backend job")
                 logging.info(result)
 

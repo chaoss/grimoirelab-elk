@@ -183,7 +183,8 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
 def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    ocean_index_enrich = None,
                    db_projects_map=None, db_sortinghat=None,
-                   no_incremental=False, only_identities=False):
+                   no_incremental=False, only_identities=False,
+                   github_token=None):
     """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend):
@@ -265,6 +266,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         enrich_backend = connector[2](backend, db_projects_map, db_sortinghat)
         elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
         enrich_backend.set_elastic(elastic_enrich)
+        if github_token and backend_name == "git":
+            enrich_backend.set_github_token(github_token)
 
         # We need to enrich from just updated items since last enrichment
         # Always filter by origin to support multi origin indexes

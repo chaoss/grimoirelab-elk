@@ -25,11 +25,14 @@
 import json
 import logging
 
+import requests
+
 from dateutil import parser
 
 from grimoire.elk.enrich import Enrich
 
-from .github import GITHUB
+
+GITHUB = 'https://github.com/'
 
 class GitEnrich(Enrich):
 
@@ -38,9 +41,14 @@ class GitEnrich(Enrich):
         self.elastic = None
         self.perceval_backend = git
         self.index_git = "git"
+        self.github_logins = {}
+        self.github_token = None
 
     def set_elastic(self, elastic):
         self.elastic = elastic
+
+    def set_github_token(self, token):
+        self.github_token = token
 
     def get_field_date(self):
         return "metadata__updated_on"
@@ -67,24 +75,43 @@ class GitEnrich(Enrich):
 
 
     def get_identities(self, item):
-        """ Return the identities from an item """
+        """ Return the identities from an item.
+            If the repo is in GitHub, get the usernames from GitHub. """
         identities = []
 
-        for identity in ['Author', 'Commit']:
-            if item['data'][identity]:
-                user = self.get_sh_identity(item['data'][identity])
-                identities.append(user)
+        commit_hash = item['data']['commit']
+        github_repo = None
+        if GITHUB in item['origin']:
+            github_repo = item['origin'].replace(GITHUB,'').replace('.git','')
+
+        if item['data']['Author']:
+            username = None
+            if self.github_token and github_repo:
+                # Get the usename from GitHub
+                username = self.get_github_login(item['data']['Author'], "author", commit_hash, github_repo)
+            user = self.get_sh_identity(item['data']["Author"], username)
+            identities.append(user)
+
+        if item['data']['Commit'] and github_repo:
+            username = None
+            if self.github_token:
+                # Get the username from GitHub
+                username = self.get_github_login(item['data']['Commit'], "committer", commit_hash, github_repo)
+            user = self.get_sh_identity(item['data']['Commit'], username)
+            identities.append(user)
+
         return identities
 
-    def get_sh_identity(self, git_user):
+    def get_sh_identity(self, git_user, username=None):
         # John Smith <john.smith@bitergia.com>
         identity = {}
         name = git_user.split("<")[0]
         name = name.strip()  # Remove space between user and email
         email = git_user.split("<")[1][:-1]
-        identity['username'] = None  # git does not have username
+        identity['username'] = username
         identity['email'] = email
         identity['name'] = name
+
         return identity
 
     def get_item_project(self, item):
@@ -97,6 +124,38 @@ class GitEnrich(Enrich):
             # logging.warning("Project not found for repository %s" % (url_git))
             project = None
         return {"project": project}
+
+    def get_github_login(self, user, rol, commit_hash, repo):
+        """ rol: author or committer """
+        login = None
+        try:
+            login = self.github_logins[user]
+        except KeyError:
+            # Get the login from github API
+            GITHUB_API_URL = "https://api.github.com"
+            commit_url = GITHUB_API_URL+"/repos/%s/commits/%s" % (repo, commit_hash)
+            headers = {'Authorization': 'token ' + self.github_token}
+            r = requests.get(commit_url, headers=headers)
+            r.raise_for_status()
+            logging.debug("Rate limit pending: %s" % (r.headers['X-RateLimit-Remaining']))
+
+            commit_json = r.json()
+            author_login = None
+            if 'author' in commit_json and commit_json['author']:
+                author_login = commit_json['author']['login']
+            user_login = None
+            if 'committer' in commit_json and commit_json['committer']:
+                user_login = commit_json['committer']['login']
+            if rol == "author":
+                login = author_login
+            elif rol == "committer":
+                login = author_login
+            else:
+                logging.error("Wrong rol: %s" % (rol))
+                raise RuntimeError
+            self.github_logins[user] = login
+            logging.debug("%s is %s in github" % (user, login))
+        return login
 
     def get_rich_commit(self, item):
         eitem = {}
