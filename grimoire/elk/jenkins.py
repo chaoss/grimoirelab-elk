@@ -99,6 +99,12 @@ class JenkinsEnrich(Enrich):
         # Enrich dates
         eitem["build_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
 
+        # Add duration in days
+        if "duration" in eitem:
+            seconds_day = float(60*60*24)
+            duration_days = eitem["duration"]/seconds_day
+            eitem["duration_days"] = float('%.2f' % duration_days)
+
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "job"))
 
         return eitem
