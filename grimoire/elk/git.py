@@ -254,14 +254,35 @@ class GitEnrich(Enrich):
 
         return eitem
 
-    def enrich_demography(self):
+    def enrich_demography(self, from_date=None):
         logging.debug("Doing demography enrich from %s" % (self.elastic.index_url))
+        if from_date:
+            logging.debug("Demography since: %s" % (from_date))
 
-        # TODO: Incremental mode!!!
+        query = ''
+        if from_date:
+            date_field = self.get_field_date()
+            from_date = from_date.isoformat()
+
+            filters = '''
+            {"range":
+                {"%s": {"gte": "%s"}}
+            }
+            ''' % (date_field, from_date)
+
+            query = """
+            "query": {
+                "bool": {
+                    "must": [%s]
+                }
+            },
+            """ % (filters)
+
 
         # First, get the min and max commit date for all the authors
         es_query = """
         {
+          %s
           "size": 0,
           "aggs": {
             "author": {
@@ -284,7 +305,7 @@ class GitEnrich(Enrich):
             }
           }
         }
-        """
+        """ % (query)
 
         r = requests.post(self.elastic.index_url+"/_search", data=es_query)
         authors = r.json()['aggregations']['author']['buckets']
