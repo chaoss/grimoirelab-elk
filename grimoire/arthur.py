@@ -184,7 +184,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    ocean_index_enrich = None,
                    db_projects_map=None, db_sortinghat=None,
                    no_incremental=False, only_identities=False,
-                   github_token=None):
+                   github_token=None, studies=False):
     """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend):
@@ -302,13 +302,14 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             enrich_count = enrich_items(ocean_backend, enrich_backend)
             logging.info("Total items enriched %i " %  enrich_count)
 
-            try:
-                for study in enrich_backend.studies:
-                    logging.info("Starting study: %s" % (study))
-                    study()
-            except Exception as e:
-                logging.warning("Problem executing studies for %s" % (backend_name))
-                print(e)
+            if studies:
+                try:
+                    for study in enrich_backend.studies:
+                        logging.info("Starting study: %s" % (study))
+                        study()
+                except Exception as e:
+                    logging.warning("Problem executing studies for %s" % (backend_name))
+                    print(e)
 
         else:
             logging.info("Only SH identities added. Enrich not done!")

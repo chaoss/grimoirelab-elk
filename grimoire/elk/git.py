@@ -43,7 +43,6 @@ class GitEnrich(Enrich):
         self.index_git = "git"
         self.github_logins = {}
         self.github_token = None
-        self.studies = []
         self.studies = [self.enrich_demography]
 
 
@@ -333,6 +332,8 @@ class GitEnrich(Enrich):
             logging.info("Authors processed %i/%i" % (nauthors_done, len(authors)))
 
         self.elastic.bulk_upload(author_items, "ocean-unique-id")
+
+        logging.debug("Completed demography enrich from %s" % (self.elastic.index_url))
 
 
     def enrich_items(self, commits):
