@@ -301,6 +301,15 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             # Enrichment for the new items once SH update is finished
             enrich_count = enrich_items(ocean_backend, enrich_backend)
             logging.info("Total items enriched %i " %  enrich_count)
+
+            try:
+                for study in enrich_backend.studies:
+                    logging.info("Starting study: %s" % (study))
+                    study()
+            except Exception as e:
+                logging.warning("Problem executing studies for %s" % (backend_name))
+                print(e)
+
         else:
             logging.info("Only SH identities added. Enrich not done!")
 

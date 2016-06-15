@@ -43,6 +43,9 @@ class GitEnrich(Enrich):
         self.index_git = "git"
         self.github_logins = {}
         self.github_token = None
+        self.studies = []
+        self.studies = [self.enrich_demography]
+
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -251,6 +254,86 @@ class GitEnrich(Enrich):
         eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
 
         return eitem
+
+    def enrich_demography(self):
+        logging.debug("Doing demography enrich from %s" % (self.elastic.index_url))
+
+        # First, get the min and max commit date for all the authors
+        es_query = """
+        {
+          "size": 0,
+          "aggs": {
+            "author": {
+              "terms": {
+                "field": "Author",
+                "size": 0
+              },
+              "aggs": {
+                "min": {
+                  "min": {
+                    "field": "utc_commit"
+                  }
+                },
+                "max": {
+                  "max": {
+                    "field": "utc_commit"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """
+
+        r = requests.post(self.elastic.index_url+"/_search", data=es_query)
+        authors = r.json()['aggregations']['author']['buckets']
+
+        author_items = []  # items from author with new date fields added
+        nauthors_done = 0
+        for author in authors:
+            # print("%s: %s %s" % (author['key'], author['min']['value_as_string'], author['max']['value_as_string']))
+            # Time to add all the commits (items) from this author
+            author_query = """
+            {
+                "query": {
+                    "bool": {
+                        "must": [
+                            {"term":
+                                { "Author" : ""  }
+                            }
+                            ]
+                    }
+                }
+
+            }
+            """
+            author_query_json = json.loads(author_query)
+            author_query_json['query']['bool']['must'][0]['term']['Author'] = author['key']
+            author_query = json.dumps(author_query_json)
+            r = requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query)
+
+            if "hits" not in r.json():
+                logging.error("Can't find commits for %s" % (author['key']))
+                print(r.json())
+                print(author_query)
+                continue
+            for item in r.json()["hits"]["hits"]:
+                new_item = item['_source']
+                new_item.update(
+                    {"author_min_date":author['min']['value_as_string'],
+                     "author_max_date":author['max']['value_as_string']}
+                )
+                author_items.append(new_item)
+
+            if len(author_items) >= self.elastic.max_items_bulk:
+                self.elastic.bulk_upload(author_items, "ocean-unique-id")
+                author_items = []
+
+            nauthors_done += 1
+            logging.info("Authors processed %i/%i" % (nauthors_done, len(authors)))
+
+        self.elastic.bulk_upload(author_items, "ocean-unique-id")
+
 
     def enrich_items(self, commits):
         max_items = self.elastic.max_items_bulk
