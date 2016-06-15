@@ -257,6 +257,8 @@ class GitEnrich(Enrich):
     def enrich_demography(self):
         logging.debug("Doing demography enrich from %s" % (self.elastic.index_url))
 
+        # TODO: Incremental mode!!!
+
         # First, get the min and max commit date for all the authors
         es_query = """
         {
@@ -289,27 +291,29 @@ class GitEnrich(Enrich):
 
         author_items = []  # items from author with new date fields added
         nauthors_done = 0
+        author_query = """
+        {
+            "query": {
+                "bool": {
+                    "must": [
+                        {"term":
+                            { "Author" : ""  }
+                        }
+                        ]
+                }
+            }
+
+        }
+        """
+        author_query_json = json.loads(author_query)
+
+
         for author in authors:
             # print("%s: %s %s" % (author['key'], author['min']['value_as_string'], author['max']['value_as_string']))
             # Time to add all the commits (items) from this author
-            author_query = """
-            {
-                "query": {
-                    "bool": {
-                        "must": [
-                            {"term":
-                                { "Author" : ""  }
-                            }
-                            ]
-                    }
-                }
-
-            }
-            """
-            author_query_json = json.loads(author_query)
             author_query_json['query']['bool']['must'][0]['term']['Author'] = author['key']
-            author_query = json.dumps(author_query_json)
-            r = requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query)
+            author_query_str = json.dumps(author_query_json)
+            r = requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str)
 
             if "hits" not in r.json():
                 logging.error("Can't find commits for %s" % (author['key']))
