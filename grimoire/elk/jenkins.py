@@ -102,7 +102,7 @@ class JenkinsEnrich(Enrich):
         # Add duration in days
         if "duration" in eitem:
             seconds_day = float(60*60*24)
-            duration_days = eitem["duration"]/seconds_day
+            duration_days = eitem["duration"]/(1000*seconds_day)
             eitem["duration_days"] = float('%.2f' % duration_days)
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "job"))
