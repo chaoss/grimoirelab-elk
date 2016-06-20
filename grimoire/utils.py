@@ -57,15 +57,17 @@ from grimoire.elk.discourse import DiscourseEnrich
 # Connectors for Perceval
 from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
 from perceval.backends.bugzillarest import BugzillaREST, BugzillaRESTCommand
-from perceval.backends.github import GitHub, GitHubCommand
+from perceval.backends.discourse import Discourse, DiscourseCommand
 from perceval.backends.gerrit import Gerrit, GerritCommand
+from perceval.backends.github import GitHub, GitHubCommand
 from perceval.backends.git import Git, GitCommand
+from perceval.backends.gmane import Gmane, GmaneCommand
+from perceval.backends.jenkins import Jenkins, JenkinsCommand
+from perceval.backends.jira import Jira, JiraCommand
 from perceval.backends.mbox import MBox, MBoxCommand
 from perceval.backends.pipermail import Pipermail, PipermailCommand
 from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
-from perceval.backends.jira import Jira, JiraCommand
-from perceval.backends.jenkins import Jenkins, JenkinsCommand
-from perceval.backends.discourse import Discourse, DiscourseCommand
+
 
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.elk.elastic import ElasticConnectException
@@ -94,16 +96,17 @@ def get_connectors():
 
     return {"bugzilla":[Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
             "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
-            "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
+            "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
+            "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
+            "gmane":[Gmane, MBoxOcean, MBoxEnrich, GmaneCommand],
+            "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
+            "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
             "mbox":[MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
-            "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
-            "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
-            "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
             }  # Will come from Registry
 
 def get_elastic(url, es_index, clean = None, ocean_backend = None):
