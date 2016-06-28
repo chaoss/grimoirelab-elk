@@ -46,6 +46,9 @@ class MediaWikiEnrich(Enrich):
     def get_field_unique_id(self):
         return "pageid"
 
+    def get_field_unique_id_review(self):
+        return "revision_revid"
+
     def get_elastic_mappings(self):
 
         mapping = """
@@ -92,9 +95,63 @@ class MediaWikiEnrich(Enrich):
         first_revision = item['data']['revisions'][0]
 
         identity  = self.get_sh_identity(first_revision)
-        eitem = self.get_item_sh_fields(identity, item)
+        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
 
         return eitem
+
+    def get_review_sh(self, revision):
+        """ Add sorting hat enrichment fields for the author of the revision """
+
+        eitem = {}  # Item enriched
+
+        identity  = self.get_sh_identity(revision)
+        erevision = self.get_item_sh_fields(identity, parser.parse(revision['timestamp']))
+
+        return erevision
+
+
+    def get_rich_item_reviews(self, item):
+        erevisions = []
+        eitem = {}
+
+        # All revisions include basic page info
+        eitem = self.get_rich_item(item)
+
+        # Revisions
+        for rev in item["data"]["revisions"]:
+            erevision = {}
+            copy_fields_item = ["origin","metadata__updated_on","metadata__timestamp","pageid","title"]
+            for f in copy_fields_item:
+                if f in eitem:
+                    erevision["page_"+f] = eitem[f]
+                else:
+                    erevision["page_"+f] = None
+            # Copy fields from the review
+            copy_fields = ["revid","user","parentid","timestamp","comment"]
+            for f in copy_fields:
+                if f in rev:
+                    erevision["revision_"+f] = rev[f]
+                else:
+                    erevision["revision_"+f] = None
+            if self.sortinghat:
+                erevision.update(self.get_review_sh(rev))
+
+            # And now some calculated fields
+            erevision["url"] = erevision["page_origin"] + "/" + erevision["page_title"]
+            erevision["iscreated"] = 0
+            erevision["creation_date"] = None
+            erevision["isrevision"] = 0
+            if rev['parentid'] == 0:
+                erevision["iscreated"] = 1
+                erevision["creation_date"] = rev['timestamp']
+            else:
+                erevision["isrevision"] = 1
+            erevision["page_last_edited_date"] = eitem['last_edited_date']
+
+            erevisions.append(erevision)
+
+        return erevisions
+
 
     def get_rich_item(self, item):
         eitem = {}
@@ -117,17 +174,18 @@ class MediaWikiEnrich(Enrich):
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"title": "title_analyzed"
-                      }
+        map_fields = {"title": "title_analyzed"}
         for fn in map_fields:
             eitem[map_fields[fn]] = page[fn]
 
         # Enrich dates
         eitem["update_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
         # Revisions
+        eitem["last_edited_date"] = None
         eitem["nrevisions"] = len(page["revisions"])
         if len(page["revisions"])>0:
             eitem["first_editor"] = page["revisions"][0]["user"]
+            eitem["last_edited_date"] = page["revisions"][-1]["timestamp"]
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
@@ -135,6 +193,11 @@ class MediaWikiEnrich(Enrich):
         return eitem
 
     def enrich_items(self, items):
+
+        if True:
+            self.enrich_events(items)
+            return
+
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
@@ -155,4 +218,27 @@ class MediaWikiEnrich(Enrich):
                 (rich_item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
+        self.requests.put(url, data = bulk_json)
+
+    def enrich_events(self, items):
+        max_items = self.elastic.max_items_bulk
+        current = 0
+        bulk_json = ""
+
+        url = self.elastic.index_url+'/items/_bulk'
+
+        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+
+        for item in items:
+            rich_item_reviews = self.get_rich_item_reviews(item)
+            for enrich_review in rich_item_reviews:
+                if current >= max_items:
+                    self.requests.put(url, data=bulk_json)
+                    bulk_json = ""
+                    current = 0
+                data_json = json.dumps(enrich_review)
+                bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
+                    (enrich_review[self.get_field_unique_id_review()])
+                bulk_json += data_json +"\n"  # Bulk document
+                current += 1
         self.requests.put(url, data = bulk_json)
