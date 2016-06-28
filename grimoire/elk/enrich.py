@@ -182,12 +182,11 @@ class Enrich(object):
             bot = u.profile.is_bot
         return bot
 
-    def get_enrollment(self, uuid, item):
+    def get_enrollment(self, uuid, item_date):
         """ Get the enrollment for the uuid when the item was done """
         enrollments = self.get_enrollments(uuid)
         enroll = None
         if len(enrollments) > 0:
-            item_date = parser.parse(item['metadata__updated_on'])
             for enrollment in enrollments:
                 if item_date >= enrollment.start and item_date <= enrollment.end:
                     enroll = enrollment.organization.name
