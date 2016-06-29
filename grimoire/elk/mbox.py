@@ -93,6 +93,8 @@ class MBoxEnrich(Enrich):
         identity['username'] = None  # email does not have username
         identity['email'] = from_[1]
         identity['name'] = from_[0]
+        if not identity['name']:
+            identity['name'] = identity['email'].split('@')[0]
         return identity
 
 
