@@ -73,10 +73,8 @@ RUN git clone https://github.com/grimoirelab/perceval.git && \
 # RUN git clone https://github.com/grimoirelab/arthur.git && \
 #    cd arthur && sudo python3 setup.py install && \
 #    chmod 755 bin/*
-# Use acs fork until sduenas fixes workers and mappings
-RUN git clone https://github.com/acs/arthur.git && \
-    cd arthur && git checkout mappings && \
-    sudo python3 setup.py install && \
+RUN git clone https://github.com/grimoirelab/arthur.git && \
+    cd arthur && sudo python3 setup.py install && \
     chmod 755 bin/*
 
 
