@@ -74,7 +74,7 @@ class JiraEnrich(Enrich):
                 identity = self.get_sh_identity(item['field'][field])
                 eitem[field+'_uuid'] = self.get_uuid(identity, self.get_connector_name())
                 eitem[field+'_name'] = identity['displayName']
-                eitem[field+"_org_name"] = self.get_enrollment(eitem[field+'_uuid'], parser.parse(item[get_field_date()]))
+                eitem[field+"_org_name"] = self.get_enrollment(eitem[field+'_uuid'], parser.parse(item[self.get_field_date()]))
                 eitem[field+"_domain"] = self.get_domain(identity)
                 eitem[field+"_bot"] = self.is_bot(eitem[field+'_uuid'])
 

@@ -199,7 +199,7 @@ class Enrich(object):
 
         eitem["author_name"] = identity['name']
         eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
-        eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], item)
+        eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], parser.parse(item[self.get_field_date()]))
         eitem["author_bot"] = self.is_bot(eitem['author_uuid'])
         eitem["author_domain"] = self.get_identity_domain(identity)
 

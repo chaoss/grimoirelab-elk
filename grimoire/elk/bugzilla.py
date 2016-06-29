@@ -95,14 +95,14 @@ class BugzillaEnrich(Enrich):
             identity = BugzillaEnrich.get_sh_identity({'assigned_to':item["data"]['assigned_to']})
             eitem['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['assigned_to_name'] = identity['name']
-            eitem["assigned_to_org_name"] = self.get_enrollment(eitem['assigned_to_uuid'], parser.parse(item[get_field_date()]))
+            eitem["assigned_to_org_name"] = self.get_enrollment(eitem['assigned_to_uuid'], parser.parse(item[self.get_field_date()]))
             eitem["assigned_to_domain"] = self.get_domain(identity)
             eitem["assigned_to_bot"] = self.is_bot(eitem['assigned_to_uuid'])
         if 'reporter' in item['data']:
             identity = BugzillaEnrich.get_sh_identity({'reporter':item["data"]['reporter']})
             eitem['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['reporter_name'] = identity['name']
-            eitem["reporter_org_name"] = self.get_enrollment(eitem['reporter_uuid'], parser.parse(item[get_field_date()]))
+            eitem["reporter_org_name"] = self.get_enrollment(eitem['reporter_uuid'], parser.parse(item[self.get_field_date()]))
             eitem["reporter_domain"] = self.get_domain(identity)
             eitem["reporter_bot"] = self.is_bot(eitem['reporter_uuid'])
 
