@@ -27,7 +27,7 @@ RUN apt-get update && \
         python3-pip python3-dev python3-redis python3-sqlalchemy \
         python-mysqldb \
         python3-cherrypy3 \
-        gcc make libmysqlclient-dev mariadb-client \
+        gcc g++ make libmysqlclient-dev mariadb-client \
         unzip curl wget sudo vim ssh \
         && \
     apt-get clean && \
@@ -39,6 +39,9 @@ RUN pip3 install mysqlclient
 RUN pip3 install rq && pip3 install rq-dashboard==0.3.4
 # Bug in 0.3.5: https://github.com/nvie/rq-dashboard/pull/89/files
 # In 0.3.5 workers don't appear in the dashboard
+
+# Dask
+RUN pip3 install dask[complete]
 
 # perceval needs a newer version than Debian 8 - this breaks pip3
 RUN pip3 install --upgrade requests
