@@ -95,17 +95,17 @@ class MediaWikiEnrich(Enrich):
         first_revision = item['data']['revisions'][0]
 
         identity  = self.get_sh_identity(first_revision)
-        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
+        eitem = self.get_item_sh_fields(identity, item)
 
         return eitem
 
-    def get_review_sh(self, revision):
+    def get_review_sh(self, revision, item):
         """ Add sorting hat enrichment fields for the author of the revision """
 
         eitem = {}  # Item enriched
 
         identity  = self.get_sh_identity(revision)
-        erevision = self.get_item_sh_fields(identity, parser.parse(revision['timestamp']))
+        erevision = self.get_item_sh_fields(identity, item)
 
         return erevision
 
@@ -134,7 +134,7 @@ class MediaWikiEnrich(Enrich):
                 else:
                     erevision["revision_"+f] = None
             if self.sortinghat:
-                erevision.update(self.get_review_sh(rev))
+                erevision.update(self.get_review_sh(rev, item))
 
             # And now some calculated fields
             erevision["url"] = erevision["page_origin"] + "/" + erevision["page_title"]
