@@ -206,7 +206,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
         return total
 
-    def enrich_sortinghat(backend_name, ocean_backend, enrich_backend):
+    def enrich_sortinghat(ocean_backend, enrich_backend):
         # First we add all new identities to SH
         item_count = 0
         new_identities = []
@@ -226,7 +226,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         logging.info("Total new identities to be checked %i" % len(new_identities))
 
         merged_identities = SortingHat.add_identities(enrich_backend.sh_db,
-                                                      new_identities, backend_name)
+                                                      new_identities, enrich_backend.get_connector_name())
 
         # Redo enrich for items with new merged identities
         renrich_items = []
@@ -292,8 +292,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if db_sortinghat:
             enrich_count_merged = 0
 
-            enrich_count_merged = enrich_sortinghat(backend_name,
-                                                    ocean_backend, enrich_backend)
+            enrich_count_merged = enrich_sortinghat(ocean_backend, enrich_backend)
             logging.info("Total items enriched for merged identities %i " %  enrich_count_merged)
 
         if not only_identities:
