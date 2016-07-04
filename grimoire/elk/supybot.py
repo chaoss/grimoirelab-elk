@@ -99,7 +99,7 @@ class SupybotEnrich(Enrich):
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"body": "body_analyzed", "timestamp":"message_sent"}
+        map_fields = {"body": "body_analyzed", "timestamp":"sent_date"}
         for fn in map_fields:
             eitem[map_fields[fn]] = message[fn]
 
