@@ -102,13 +102,10 @@ class MediaWikiEnrich(Enrich):
     def get_review_sh(self, revision, item):
         """ Add sorting hat enrichment fields for the author of the revision """
 
-        eitem = {}  # Item enriched
-
         identity  = self.get_sh_identity(revision)
         erevision = self.get_item_sh_fields(identity, item)
 
         return erevision
-
 
     def get_rich_item_reviews(self, item):
         erevisions = []
