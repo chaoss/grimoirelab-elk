@@ -1,0 +1,11 @@
+# Releases
+
+## 4c51c2430c105d8907a7f47e21ed2b34e9480533
+
+* Add new set up options to allow operator to disable different
+  phases using: SKIP_COLLECTION, SKIP_SH and SKIP_ENRICHMENT
+
+* Remove deprecated feature to overwrite enriched index
+
+* DEBUG variable set to 1 avoids entering the update loop
+
