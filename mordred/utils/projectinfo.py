@@ -40,47 +40,47 @@ def add_subparser(subparsers):
 
     add_usage = "projectinfo.py file add [--help] project_name [--repo <repo_type> <url>]"
     add_parser = subparsers.add_parser("add",
-                                    help="add project",
-                                    usage=add_usage)
+                                       help="add project",
+                                       usage=add_usage)
     add_parser.add_argument("project_name",
-                        action="store",
-                        help="project name")
+                            action="store",
+                            help="project name")
     add_parser.add_argument("--repo",
-                        action="store",
-                        dest="repo",
-                        nargs='*',
-                        help="see list of repositories available, url of the repository")
+                            action="store",
+                            dest="repo",
+                            nargs='*',
+                            help="see list of repositories available, url of the repository")
 
 def rm_subparser(subparsers):
     """Remove subparser"""
 
     rm_usage = "projectinfo.py file rm [--help] project_name [--repo <repo_type> <url>]"
     rm_parser = subparsers.add_parser("rm",
-                                    help="remove project",
-                                    usage=rm_usage)
+                                      help="remove project",
+                                      usage=rm_usage)
     rm_parser.add_argument("project_name",
-                        action="store",
-                        help="project name")
+                           action="store",
+                           help="project name")
     rm_parser.add_argument("--repo",
-                        action="store",
-                        dest="repo",
-                        nargs='*',
-                        help="see list of repositories available")
+                           action="store",
+                           dest="repo",
+                           nargs='*',
+                           help="see list of repositories available")
 
 def list_subparser(subparsers):
     """List subparser"""
 
     list_usage = "projectinfo.py file list [--help] project_name"
     list_parser = subparsers.add_parser("list",
-                                    help="add project",
-                                    usage=list_usage)
+                                        help="add project",
+                                        usage=list_usage)
     list_parser.add_argument("project_name",
-                        action="store",
-                        help="project name")
+                             action="store",
+                             help="project name")
     list_parser.add_argument("-p",
-                        action="store",
-                        dest="parent",
-                        help="update the parent project information")
+                             action="store",
+                             dest="parent",
+                             help="update the parent project information")
 
 def read_arguments():
     usage = "projectinfo.py [--help] file command project_name [--repo <repo_type> <url>] [--parent <project_name>]"
@@ -107,10 +107,11 @@ Repositories avaliable
                                      usage=usage)
 
     parser.add_argument("file",
-                      action="store",
-                      help="the JSON file to update")
+                        action="store",
+                        help="the JSON file to update")
 
-    subparsers = parser.add_subparsers(help='command', dest="command")
+    subparsers = parser.add_subparsers(help='command',
+                                       dest="command")
     add_subparser(subparsers)
     rm_subparser(subparsers)
     list_subparser(subparsers)
@@ -119,7 +120,7 @@ Repositories avaliable
 
     if args.command != "list" and args.repo:
         if args.repo[0] not in REPOSITORIES_AVALIABLE:
-            raise KeyError(args.repo,' is not exist')
+            sys.exit(str(args.repo[0]) + ' is not exist')
 
     return args
 
@@ -199,8 +200,8 @@ def remove(conf, raw):
     """Remove a project or a project repository"""
 
     if 'repo' in conf:
-        # $ ./projectinfo.py file rm project_name --repo repo_name url
-        #Removing the source repo https://github.com/appc/spec.git for the project Appc-spec
+        # $ ./projectinfo.py <JSON_file> rm <project_name> --repo <repo_name> <url>
+        #Removing the repo url for the project
         remove_repo = {'url': conf['url']}
         try:
             raw['projects'][conf['project']][conf['repo']].remove(remove_repo)
@@ -269,7 +270,10 @@ if __name__ == '__main__':
             conf['parent'] = args.parent
     else:
         if args.repo:
-            conf['repo'] = args.repo[0]
-            conf['url'] = args.repo[1]
+            if len(args.repo) == 2:
+                conf['repo'] = args.repo[0]
+                conf['url'] = args.repo[1]
+            else:
+                sys.exit("Must have two arguments: --repo <repo_name> <url>")
 
     run(conf)
