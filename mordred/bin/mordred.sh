@@ -309,7 +309,6 @@ create_dbs
 
 init_sh_orgs
 
-COUNTER=0
 
 while true; do
 
@@ -362,19 +361,8 @@ while true; do
 
         log "Enrichment starts"
         START_TIME=$SECONDS
-        if [ $COUNTER -eq 0 ]
-        then
-            log " --no_incremental mode enabled for enrichment"
-            enrich_data_no_inc
-            COUNTER=1
-        elif [ $COUNTER -eq 9 ]
-        then
-            enrich_data
-            COUNTER=0
-        else
-            enrich_data
-            COUNTER=$[$COUNTER +1]
-        fi
+
+        enrich_data
 
         ELAPSED_TIME=$(($SECONDS - $START_TIME))
         log "(T) Data enriched in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
