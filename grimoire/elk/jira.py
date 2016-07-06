@@ -30,6 +30,8 @@ import logging
 
 from urllib.parse import urlparse
 
+from dateutil import parser
+
 from .enrich import Enrich
 
 from .utils import get_time_diff_days
@@ -54,14 +56,19 @@ class JiraEnrich(Enrich):
         """ Return a Sorting Hat identity using jira user data """
 
         identity = {}
+
         for field in ['name', 'email', 'username']:
             # Basic fields in Sorting Hat
             identity[field] = None
+
+        if not user:
+            return identity
+
         if 'displayName' in user:
             identity['name'] = user['displayName']
         if 'name' in user:
             identity['username'] = user['name']
-        if 'email' in user:
+        if 'emailAddress' in user:
             identity['email'] = user['emailAddress']
         return identity
 
@@ -71,17 +78,17 @@ class JiraEnrich(Enrich):
 
         # Sorting Hat integration: reporter, assignee, creator uuids
         for field in ["assignee","reporter","creator"]:
-            if field in item:
-                identity = self.get_sh_identity(item['field'][field])
+            if field in item['data']['fields']:
+                identity = self.get_sh_identity(item['data']['fields'][field])
                 eitem[field+'_uuid'] = self.get_uuid(identity, self.get_connector_name())
-                eitem[field+'_name'] = identity['displayName']
+                eitem[field+'_name'] = identity['name']
                 eitem[field+"_org_name"] = self.get_enrollment(eitem[field+'_uuid'], parser.parse(item[self.get_field_date()]))
                 eitem[field+"_domain"] = self.get_domain(identity)
                 eitem[field+"_bot"] = self.is_bot(eitem[field+'_uuid'])
 
 
         # Unify fields for SH filtering
-        if 'reporter' in item:
+        if 'reporter' in item['data']['fields']:
             eitem["author_uuid"] = eitem["reporter_uuid"]
             eitem["author_name"] = eitem["reporter_name"]
             eitem["author_org_name"] = eitem["reporter_org_name"]
@@ -165,7 +172,11 @@ class JiraEnrich(Enrich):
             eitem['reporter_email'] = issue['fields']['reporter']['emailAddress']
         eitem['reporter_login'] = issue['fields']['reporter']['name']
         eitem['reporter_tz'] = issue['fields']['reporter']['timeZone']
-        eitem['resolution'] = issue['fields']['resolution']
+        if issue['fields']['resolution']:
+            eitem['resolution_id'] = issue['fields']['resolution']['id']
+            eitem['resolution_name'] = issue['fields']['resolution']['name']
+            eitem['resolution_description'] = issue['fields']['resolution']['description']
+            eitem['resolution_self'] = issue['fields']['resolution']['self']
         eitem['resolution_date'] = issue['fields']['resolutiondate']
         eitem['status_description'] = issue['fields']['status']['description']
         eitem['status'] = issue['fields']['status']['name']
@@ -191,7 +202,7 @@ class JiraEnrich(Enrich):
             get_time_diff_days(issue['fields']['created'], datetime.utcnow())
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(issue))
+            eitem.update(self.get_item_sh(item))
 
         eitem.update(self.get_grimoire_fields(issue['fields']['created'], "issue"))
 
