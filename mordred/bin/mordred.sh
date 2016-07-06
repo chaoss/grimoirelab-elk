@@ -272,7 +272,7 @@ function group_unaffiliated_people {
         mysql -uroot -h$DB_HOST $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
         log_result "[sortinghat] Affiliation for $SH_UNAFFILIATED_GROUP finished" "[sortinghat] ERROR: Something went wrong with the affiliation of $SH_UNAFFILIATED_GROUP"
     else
-        log "[sortinghat] (WARNING!) No variable define $SH_UNAFFILIATED_GROUP"
+        log "[sortinghat] (WARNING!) No variable defined SH_UNAFFILIATED_GROUP"
     fi
 }
 
