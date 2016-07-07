@@ -35,53 +35,6 @@ REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'mailing_lists', 'telegram', 
                           'jira',' maniphest', 'gerrit', 'meetup']
 
 
-def add_subparser(subparsers):
-    """Add subparser"""
-
-    add_usage = "projectinfo.py file add [--help] project_name [--repo <repo_type> <url>]"
-    add_parser = subparsers.add_parser("add",
-                                       help="add project",
-                                       usage=add_usage)
-    add_parser.add_argument("project_name",
-                            action="store",
-                            help="project name")
-    add_parser.add_argument("--repo",
-                            action="store",
-                            dest="repo",
-                            nargs='*',
-                            help="see list of repositories available, url of the repository")
-
-def rm_subparser(subparsers):
-    """Remove subparser"""
-
-    rm_usage = "projectinfo.py file rm [--help] project_name [--repo <repo_type> <url>]"
-    rm_parser = subparsers.add_parser("rm",
-                                      help="remove project",
-                                      usage=rm_usage)
-    rm_parser.add_argument("project_name",
-                           action="store",
-                           help="project name")
-    rm_parser.add_argument("--repo",
-                           action="store",
-                           dest="repo",
-                           nargs='*',
-                           help="see list of repositories available")
-
-def list_subparser(subparsers):
-    """List subparser"""
-
-    list_usage = "projectinfo.py file list [--help] project_name"
-    list_parser = subparsers.add_parser("list",
-                                        help="add project",
-                                        usage=list_usage)
-    list_parser.add_argument("project_name",
-                             action="store",
-                             help="project name")
-    list_parser.add_argument("-p",
-                             action="store",
-                             dest="parent",
-                             help="update the parent project information")
-
 def read_arguments():
     usage = "projectinfo.py [--help] file command project_name [--repo <repo_type> <url>] [--parent <project_name>]"
     desc = """
@@ -112,9 +65,47 @@ Repositories avaliable
 
     subparsers = parser.add_subparsers(help='command',
                                        dest="command")
-    add_subparser(subparsers)
-    rm_subparser(subparsers)
-    list_subparser(subparsers)
+
+    # add
+    add_usage = "projectinfo.py file add [--help] project_name [--repo <repo_type> <url>]"
+    add_parser = subparsers.add_parser("add",
+                                       help="add project",
+                                       usage=add_usage)
+    add_parser.add_argument("project_name",
+                            action="store",
+                            help="project name")
+    add_parser.add_argument("--repo",
+                            action="store",
+                            dest="repo",
+                            nargs='*',
+                            help="see list of repositories available, url of the repository")
+
+    # remove
+    rm_usage = "projectinfo.py file rm [--help] project_name [--repo <repo_type> <url>]"
+    rm_parser = subparsers.add_parser("rm",
+                                      help="remove project",
+                                      usage=rm_usage)
+    rm_parser.add_argument("project_name",
+                           action="store",
+                           help="project name")
+    rm_parser.add_argument("--repo",
+                           action="store",
+                           dest="repo",
+                           nargs='*',
+                           help="see list of repositories available")
+
+    # list
+    list_usage = "projectinfo.py file list [--help] project_name"
+    list_parser = subparsers.add_parser("list",
+                                        help="add project",
+                                        usage=list_usage)
+    list_parser.add_argument("project_name",
+                             action="store",
+                             help="project name")
+    list_parser.add_argument("-p",
+                             action="store",
+                             dest="parent",
+                             help="update the parent project information")
 
     args = parser.parse_args()
 
