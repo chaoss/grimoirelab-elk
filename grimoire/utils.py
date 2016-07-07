@@ -38,7 +38,7 @@ from grimoire.ocean.github import GitHubOcean
 from grimoire.ocean.git import GitOcean
 from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
-from grimoire.ocean.mozilla_reps import MozillaRepsOcean
+from grimoire.ocean.remo import ReMoOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.jira import JiraOcean
 from grimoire.ocean.jenkins import JenkinsOcean
@@ -52,7 +52,7 @@ from grimoire.elk.github import GitHubEnrich
 from grimoire.elk.git import GitEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
-from grimoire.elk.mozilla_reps import MozillaRepsEnrich
+from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
 from grimoire.elk.jira import JiraEnrich
 from grimoire.elk.jenkins import JenkinsEnrich
@@ -69,7 +69,7 @@ from perceval.backends.gmane import Gmane, GmaneCommand
 from perceval.backends.jenkins import Jenkins, JenkinsCommand
 from perceval.backends.jira import Jira, JiraCommand
 from perceval.backends.mbox import MBox, MBoxCommand
-from perceval.backends.mozilla_reps import MozillaReps, MozillaRepsCommand
+from perceval.backends.remo import ReMo, ReMoCommand
 from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
 from perceval.backends.pipermail import Pipermail, PipermailCommand
 from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
@@ -111,7 +111,7 @@ def get_connectors():
             "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
             "mbox":[MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
             "mediawiki":[MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
-            "mozilla_reps":[MozillaReps, MozillaRepsOcean, MozillaRepsEnrich, MozillaRepsCommand],
+            "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],

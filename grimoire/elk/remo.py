@@ -29,13 +29,13 @@ from dateutil import parser
 
 from grimoire.elk.enrich import Enrich
 
-class MozillaRepsEnrich(Enrich):
+class ReMoEnrich(Enrich):
 
-    def __init__(self, mozilla_reps, sortinghat=True, db_projects_map = None):
+    def __init__(self, remo, sortinghat=True, db_projects_map = None):
         super().__init__(sortinghat, db_projects_map)
         self.elastic = None
-        self.perceval_backend = mozilla_reps
-        self.index_mozilla_reps = "mozilla_reps"
+        self.perceval_backend = remo
+        self.index_remo = "remo"
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -62,10 +62,25 @@ class MozillaRepsEnrich(Enrich):
 
 
     def get_identities(self, item):
-        """ Return the identities from an item """
+        ''' Return the identities from an item '''
+
         identities = []
 
+        item = item['data']
+
+        for field in ["owner_name"]:
+            if item[field]:
+                identities.append(self.get_sh_identity(item[field]))
         return identities
+
+    def get_sh_identity(self, owner_name):
+        #  "owner_name": "Melchor Compendio"
+        identity = {}
+
+        identity['username'] = owner_name  # email does not have username
+        identity['email'] = None
+        identity['name'] = owner_name
+        return identity
 
     def get_rich_item(self, item):
         eitem = {}
@@ -81,14 +96,26 @@ class MozillaRepsEnrich(Enrich):
         build = item['data']
 
         # data fields to copy
-        copy_fields = ["city","country","description","name","owner_name","event_url"]
+        copy_fields = ["actual_attendance","campaign","city","country",
+                       "description","estimated_attendance","event_url",
+                       "external_link","lat","lon","mozilla_event",
+                       "multiday","owner_profile_url","region","timezone",
+                       "venue"]
         for f in copy_fields:
             if f in build:
                 eitem[f] = build[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"description": "description_analyzed"}
+        map_fields = {
+            "description": "description_analyzed",
+            "end":"end_date",
+            "local_end":"locan_end_date",
+            "start":"start_date",
+            "local_start":"local_start_date",
+            "name":"title",
+            "owner_name":"owner"
+        }
         for fn in map_fields:
             eitem[map_fields[fn]] = build[fn]
 

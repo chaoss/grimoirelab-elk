@@ -23,8 +23,8 @@
 
 from grimoire.ocean.elastic import ElasticOcean
 
-class MozillaRepsOcean(ElasticOcean):
-    """MozillaReps Ocean feeder"""
+class ReMoOcean(ElasticOcean):
+    """ReMo Ocean feeder"""
 
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["data"]["resource_uri"]
