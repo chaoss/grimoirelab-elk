@@ -182,11 +182,16 @@ class JiraEnrich(Enrich):
         eitem['status'] = issue['fields']['status']['name']
         eitem['summary'] = issue['fields']['summary']
         eitem['original_time_estimation'] = issue['fields']['timeoriginalestimate']
+        if eitem['original_time_estimation']:
+            eitem['original_time_estimation_hours'] =  int(eitem['original_time_estimation'])/3600
         eitem['time_spent'] = issue['fields']['timespent']
+        if eitem['time_spent']:
+            eitem['time_spent_hours'] = int(eitem['time_spent'])/3600
         eitem['time_estimation'] = issue['fields']['timeestimate']
+        if eitem['time_estimation']:
+            eitem['time_estimation_hours'] = int(eitem['time_estimation'])/3600
         eitem['watchers'] = issue['fields']['watches']['watchCount']
         eitem['key'] = issue['key']
-
 
         # Add extra JSON fields used in Kibana (enriched fields)
         eitem['number_of_comments'] = 0
