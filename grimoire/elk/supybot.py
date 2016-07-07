@@ -29,13 +29,13 @@ from dateutil import parser
 
 from grimoire.elk.enrich import Enrich
 
-class MediaWikiEnrich(Enrich):
+class SupybotEnrich(Enrich):
 
-    def __init__(self, mediawiki, sortinghat=True, db_projects_map = None):
+    def __init__(self, supybot, sortinghat=True, db_projects_map = None):
         super().__init__(sortinghat, db_projects_map)
         self.elastic = None
-        self.perceval_backend = mediawiki
-        self.index_mediawiki = "mediawiki"
+        self.perceval_backend = supybot
+        self.index_supybot = "supybot"
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -44,17 +44,14 @@ class MediaWikiEnrich(Enrich):
         return "metadata__updated_on"
 
     def get_field_unique_id(self):
-        return "pageid"
-
-    def get_field_unique_id_review(self):
-        return "revision_revid"
+        return "ocean-unique-id"
 
     def get_elastic_mappings(self):
 
         mapping = """
         {
             "properties": {
-                "title_analyzed": {
+                "body_analyzed": {
                   "type": "string",
                   "index":"analyzed"
                   }
@@ -67,88 +64,19 @@ class MediaWikiEnrich(Enrich):
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
-
-        revisions = item['data']['revisions']
-
-        for revision in revisions:
-            user = self.get_sh_identity(revision)
-            identities.append(user)
+        user = self.get_sh_identity(item['data']['nick'])
+        identities.append(user)
         return identities
 
-    def get_sh_identity(self, revision):
+    def get_sh_identity(self, nick):
         identity = {}
         identity['username'] = None
         identity['email'] = None
         identity['name'] = None
-        if 'user' in revision:
-            identity['username'] = revision['user']
-            identity['name'] = revision['user']
+        if nick:
+            identity['username'] = nick
+            identity['name'] = nick
         return identity
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-        if not len(item['data']['revisions']) > 0:
-            return eitem
-
-        first_revision = item['data']['revisions'][0]
-
-        identity  = self.get_sh_identity(first_revision)
-        eitem = self.get_item_sh_fields(identity, item)
-
-        return eitem
-
-    def get_review_sh(self, revision, item):
-        """ Add sorting hat enrichment fields for the author of the revision """
-
-        identity  = self.get_sh_identity(revision)
-        erevision = self.get_item_sh_fields(identity, item)
-
-        return erevision
-
-    def get_rich_item_reviews(self, item):
-        erevisions = []
-        eitem = {}
-
-        # All revisions include basic page info
-        eitem = self.get_rich_item(item)
-
-        # Revisions
-        for rev in item["data"]["revisions"]:
-            erevision = {}
-            copy_fields_item = ["origin","metadata__updated_on","metadata__timestamp","pageid","title"]
-            for f in copy_fields_item:
-                if f in eitem:
-                    erevision["page_"+f] = eitem[f]
-                else:
-                    erevision["page_"+f] = None
-            # Copy fields from the review
-            copy_fields = ["revid","user","parentid","timestamp","comment"]
-            for f in copy_fields:
-                if f in rev:
-                    erevision["revision_"+f] = rev[f]
-                else:
-                    erevision["revision_"+f] = None
-            if self.sortinghat:
-                erevision.update(self.get_review_sh(rev, item))
-
-            # And now some calculated fields
-            erevision["url"] = erevision["page_origin"] + "/" + erevision["page_title"]
-            erevision["iscreated"] = 0
-            erevision["creation_date"] = None
-            erevision["isrevision"] = 0
-            if rev['parentid'] == 0:
-                erevision["iscreated"] = 1
-                erevision["creation_date"] = rev['timestamp']
-            else:
-                erevision["isrevision"] = 1
-            erevision["page_last_edited_date"] = eitem['last_edited_date']
-
-            erevisions.append(erevision)
-
-        return erevisions
-
 
     def get_rich_item(self, item):
         eitem = {}
@@ -161,39 +89,30 @@ class MediaWikiEnrich(Enrich):
             else:
                 eitem[f] = None
         # The real data
-        page = item['data']
+        message = item['data']
 
         # data fields to copy
-        copy_fields = ["pageid","title"]
+        copy_fields = ["nick","body","type"]
         for f in copy_fields:
-            if f in page:
-                eitem[f] = page[f]
+            if f in message:
+                eitem[f] = message[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"title": "title_analyzed"}
+        map_fields = {"body": "body_analyzed", "timestamp":"sent_date"}
         for fn in map_fields:
-            eitem[map_fields[fn]] = page[fn]
+            eitem[map_fields[fn]] = message[fn]
 
         # Enrich dates
         eitem["update_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
-        # Revisions
-        eitem["last_edited_date"] = None
-        eitem["nrevisions"] = len(page["revisions"])
-        if len(page["revisions"])>0:
-            eitem["first_editor"] = page["revisions"][0]["user"]
-            eitem["last_edited_date"] = page["revisions"][-1]["timestamp"]
+        eitem["channel"] = eitem["origin"]
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, "nick"))
 
         return eitem
 
     def enrich_items(self, items):
-
-        if True:
-            self.enrich_events(items)
-            return
 
         max_items = self.elastic.max_items_bulk
         current = 0

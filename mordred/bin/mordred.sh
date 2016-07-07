@@ -272,7 +272,7 @@ function group_unaffiliated_people {
         mysql -uroot -h$DB_HOST $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
         log_result "[sortinghat] Affiliation for $SH_UNAFFILIATED_GROUP finished" "[sortinghat] ERROR: Something went wrong with the affiliation of $SH_UNAFFILIATED_GROUP"
     else
-        log "[sortinghat] (WARNING!) No variable define $SH_UNAFFILIATED_GROUP"
+        log "[sortinghat] (WARNING!) No variable defined SH_UNAFFILIATED_GROUP"
     fi
 }
 
@@ -327,49 +327,68 @@ while true; do
     log "Building projects database"
     update_projects_db
 
-    START_TIME=$SECONDS
-    retrieve_data
-    ELAPSED_TIME=$(($SECONDS - $START_TIME))
-    log "(T) Data collected in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
+    if [ -z $SKIP_COLLECTION ] || [ $SKIP_COLLECTION -eq 0 ]
+        then
 
-    log "Getting identities from raw data and executing sortinghat"
-    START_TIME=$SECONDS
-    get_identities_from_data
-
-    log "[sortinghat] Unify starts"
-    sortinghat_unify
-    log_result "[sortinghat] Unify finished" "[sortinghat] ERROR: Something went wrong with the unify"
-
-    log "[sortinghat] Affiliate starts"
-    sortinghat_affiliate
-    log_result "[sortinghat] Affiliate finished" "[sortinghat] ERROR: Something went wrong with the affiliate"
-
-    group_unaffiliated_people
-
-    ELAPSED_TIME=$(($SECONDS - $START_TIME))
-    log "(T) Identities and sortinghat done in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
-
-    log "Enrichment starts"
-    START_TIME=$SECONDS
-    if [ $COUNTER -eq 0 ]
-    then
-        log " --no_incremental mode enabled for enrichment"
-        enrich_data_no_inc
-        COUNTER=1
-    elif [ $COUNTER -eq 9 ]
-    then
-        enrich_data
-        COUNTER=0
-    else
-        enrich_data
-        COUNTER=$[$COUNTER +1]
+        START_TIME=$SECONDS
+        retrieve_data
+        ELAPSED_TIME=$(($SECONDS - $START_TIME))
+        log "(T) Data collected in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
     fi
-    ELAPSED_TIME=$(($SECONDS - $START_TIME))
-    log "(T) Data enriched in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
+
+    if [ -z $SKIP_SH ] || [ $SKIP_SH -eq 0 ]
+        then
+
+        log "Getting identities from raw data and executing sortinghat"
+        START_TIME=$SECONDS
+        get_identities_from_data
+
+        log "[sortinghat] Unify starts"
+        sortinghat_unify
+        log_result "[sortinghat] Unify finished" "[sortinghat] ERROR: Something went wrong with the unify"
+
+        log "[sortinghat] Affiliate starts"
+        sortinghat_affiliate
+        log_result "[sortinghat] Affiliate finished" "[sortinghat] ERROR: Something went wrong with the affiliate"
+
+        group_unaffiliated_people
+
+        ELAPSED_TIME=$(($SECONDS - $START_TIME))
+        log "(T) Identities and sortinghat done in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
+    fi
+
+    if [ -z $SKIP_ENRICHMENT ] || [ $SKIP_ENRICHMENT -eq 0 ]
+        then
+
+        log "Enrichment starts"
+        START_TIME=$SECONDS
+        if [ $COUNTER -eq 0 ]
+        then
+            log " --no_incremental mode enabled for enrichment"
+            enrich_data_no_inc
+            COUNTER=1
+        elif [ $COUNTER -eq 9 ]
+        then
+            enrich_data
+            COUNTER=0
+        else
+            enrich_data
+            COUNTER=$[$COUNTER +1]
+        fi
+
+        ELAPSED_TIME=$(($SECONDS - $START_TIME))
+        log "(T) Data enriched in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
+    fi
 
     duration=$SECONDS
     log "(T) Dashboard updated in $(($duration / 60)) minutes and $(($duration % 60)) seconds."
 
-    go_to_bed
+    if [ -z $DEBUG ] || [ $DEBUG -eq 0 ]
+        then
+        go_to_bed
+    else
+        log "Debug mode enabled. Loop disabled, exiting now"
+        exit 0
+    fi
 
 done
