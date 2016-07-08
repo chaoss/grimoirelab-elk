@@ -67,19 +67,27 @@ class ReMoEnrich(Enrich):
         identities = []
 
         item = item['data']
+        owner_data = None
+        if "owner_data" in item:
+            owner_data = item['owner_data']
 
-        for field in ["owner_name"]:
-            if item[field]:
-                identities.append(self.get_sh_identity(item[field]))
+        identities.append(self.get_sh_identity(item["owner_name"], owner_data))
+
         return identities
 
-    def get_sh_identity(self, owner_name):
+    def get_sh_identity(self, owner_name, owner_data=None):
         #  "owner_name": "Melchor Compendio"
         identity = {}
 
-        identity['username'] = owner_name  # email does not have username
+        identity['username'] = owner_name
         identity['email'] = None
         identity['name'] = owner_name
+        if owner_data:
+            # There is details about this identity
+            identity['name'] = owner_data['fullname']
+            identity['username'] = owner_data['profile']['display_name']
+            identity['email'] = None
+
         return identity
 
     def get_rich_item(self, item):
@@ -118,6 +126,12 @@ class ReMoEnrich(Enrich):
         }
         for fn in map_fields:
             eitem[map_fields[fn]] = build[fn]
+
+        # geolocation
+        eitem['geolocation'] = {
+            "lat": eitem['lat'],
+            "lon": eitem['lon'],
+        }
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item,"owner_name"))
