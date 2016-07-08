@@ -67,7 +67,7 @@ Repositories avaliable
                                        dest="command")
 
     # add
-    add_usage = "projectinfo.py file add [--help] project_name [--repo <repo_type> <url>]"
+    add_usage = "projectinfo.py file add [--help] project_name [--repo <repo_type> <url>] [--parent <project>]"
     add_parser = subparsers.add_parser("add",
                                        help="add project",
                                        usage=add_usage)
@@ -79,9 +79,13 @@ Repositories avaliable
                             dest="repo",
                             nargs='*',
                             help="see list of repositories available, url of the repository")
+    add_parser.add_argument("-p", "--parent",
+                            action="store",
+                            dest="parent",
+                            help="add the parent project information")
 
     # remove
-    rm_usage = "projectinfo.py file rm [--help] project_name [--repo <repo_type> <url>]"
+    rm_usage = "projectinfo.py file rm [--help] project_name [--repo <repo_type> <url>] [--parent <project>]"
     rm_parser = subparsers.add_parser("rm",
                                       help="remove project",
                                       usage=rm_usage)
@@ -93,6 +97,10 @@ Repositories avaliable
                            dest="repo",
                            nargs='*',
                            help="see list of repositories available")
+    rm_parser.add_argument("-p", "--parent",
+                           action="store",
+                           dest="parent",
+                           help="remove the parent project information")
 
     # list
     list_usage = "projectinfo.py file list [--help] project_name"
@@ -102,10 +110,6 @@ Repositories avaliable
     list_parser.add_argument("project_name",
                              action="store",
                              help="project name")
-    list_parser.add_argument("-p",
-                             action="store",
-                             dest="parent",
-                             help="update the parent project information")
 
     args = parser.parse_args()
 
@@ -164,7 +168,7 @@ def add(conf, raw):
                 }
 
     if 'repo' in conf:
-        #$ ./projectinfo.py <JSON_file> add <projec_name> --repo <repo_name> <url>
+        #$ ./projectinfo.py <JSON_file> add <project_name> --repo <repo_name> <url>
         #Adding a source code repository for the project
         new_repo = {'url': conf['url']}
 
@@ -177,6 +181,21 @@ def add(conf, raw):
                 raw['projects'][conf['project']][conf['repo']].append(new_repo)
             except KeyError:
                 print("No exist the project",conf['project'],"do first --add",conf['project'])
+
+    elif 'parent' in conf:
+        #$ ./projectinfo.py <JSON_file> add <project_name> --parent <project>
+        #We also want a method to update the parent_project information. 1 to n relationship.
+        try:
+            if conf['parent'] not in raw['projects'][conf['project']]['parent_project']:
+                raw['projects'][conf['project']]['parent_project'].append(conf['parent'])
+                print(conf['project']," is now subproject of ",conf['parent'])
+
+                write_file(conf['file'], raw)
+            else:
+                print(conf['project'],"is already a subprocess of",conf['parent'])
+        except KeyError:
+            print(conf['project'],"or",conf['parent'],"is not exist")
+
     else:
         #$ ./projectinfo.py <JSON_file> add <project_name>
         #Adding a project (it will create the file if did not exist):
@@ -198,6 +217,21 @@ def remove(conf, raw):
             raw['projects'][conf['project']][conf['repo']].remove(remove_repo)
         except ValueError:
             print("No exist the URL", conf['url'],"in", conf['repo'], "OR the repository", conf['repo'], "is not exist")
+
+    elif 'parent' in conf:
+        #$ ./projectinfo.py <JSON_file> rm <project_name> --parent <project>
+        #remove the parent_project information.
+        try:
+            if conf['parent'] in raw['projects'][conf['project']]['parent_project']:
+                raw['projects'][conf['project']]['parent_project'].remove(conf['parent'])
+                print(conf['project']," is no longer a subproject of ",conf['parent'])
+
+                write_file(conf['file'], raw)
+            else:
+                print(conf['project'],"is not a subprocess of",conf['parent'])
+        except KeyError:
+            print(conf['project'],"or",conf['parent'],"is not exist")
+
     else:
         #$ ./projectinfo.py <JSON_file> rm <project_name>
         #Removing all the information about the project:
@@ -211,29 +245,18 @@ def remove(conf, raw):
 def lists(conf, raw):
     """List a repository or list the URL of a repository"""
 
-    if 'parent' in conf:
-        #$ ./projectinfo.py <JSON_file> list <projec_name> --parent <project>
-        #We also want a method to update the parent_project information. 1 to n relationship.
-        try:
-            raw['projects'][conf['project']]['parent_project'] = conf['parent']
-            print(conf['project']," is now subproject of ",conf['parent'])
-
-            write_file(conf['file'], raw)
-        except KeyError:
-            print(conf['project'],"or",conf['parent'],"is not exist")
-    else:
-        #$ ./projectinfo.py <JSON_file> list <project_name>
-        #List the information about the project:
-        default = ["bugzilla", "description", "dev_list", "downloads",
-                  "forums", "gerrit_repo", "mailing_lists", "parent_project",
-                  "releases", "title", "wiki_url"]
-        try:
-            for repo in raw['projects'][conf['project']].keys():
-                if repo not in default:
-                    if len(raw['projects'][conf['project']][repo]) > 0:
-                        print(repo)
-        except KeyError:
-            print("No exist the project",conf['project'])
+    #$ ./projectinfo.py <JSON_file> list <project_name>
+    #Mustn't list this list:
+    default = ["bugzilla", "description", "dev_list", "downloads",
+              "forums", "gerrit_repo", "mailing_lists", "parent_project",
+              "releases", "title", "wiki_url"]
+    try:
+        for repo in raw['projects'][conf['project']].keys():
+            if repo not in default:
+                if len(raw['projects'][conf['project']][repo]) > 0:
+                    print(repo)
+    except KeyError:
+        print("No exist the project",conf['project'])
 
 def run(conf):
 
@@ -256,10 +279,9 @@ if __name__ == '__main__':
     if args.file:
         conf['file'] = args.file
 
-    if args.command == "list":
+    if args.command != "list":
         if args.parent:
             conf['parent'] = args.parent
-    else:
         if args.repo:
             if len(args.repo) == 2:
                 conf['repo'] = args.repo[0]
