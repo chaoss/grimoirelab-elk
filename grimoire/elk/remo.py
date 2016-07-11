@@ -54,12 +54,14 @@ class ReMoEnrich(Enrich):
                 "description_analyzed": {
                   "type": "string",
                   "index":"analyzed"
-                  }
+                  },
+                "geolocation": {
+                   "type": "geo_point"
+                }
            }
         } """
 
         return {"items":mapping}
-
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
