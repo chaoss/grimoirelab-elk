@@ -179,8 +179,13 @@ def add(conf, raw):
         new_repo = {'url': conf['url']}
 
         try:
-            if new_repo not in raw['projects'][conf['project']][conf['repo']]:
-                raw['projects'][conf['project']][conf['repo']].append(new_repo)
+            if conf['repo'] == "supybot":
+                raw['projects'][conf['project']][conf['repo']] = {}
+                raw['projects'][conf['project']][conf['repo']]['url'] = conf['url']
+                raw['projects'][conf['project']][conf['repo']]['path'] = conf['path']
+            else:
+                if new_repo not in raw['projects'][conf['project']][conf['repo']]:
+                    raw['projects'][conf['project']][conf['repo']].append(new_repo)
         except KeyError:
             try:
                 raw['projects'][conf['project']][conf['repo']] = []
@@ -218,11 +223,17 @@ def remove(conf, raw):
     if 'repo' in conf:
         # $ ./projectinfo.py <JSON_file> rm <project_name> --repo <repo_name> <url>
         #Removing the repo url for the project
-        remove_repo = {'url': conf['url']}
-        try:
-            raw['projects'][conf['project']][conf['repo']].remove(remove_repo)
-        except ValueError:
-            print("No exist the URL", conf['url'],"in", conf['repo'], "OR the repository", conf['repo'], "is not exist")
+        if conf['repo'] == "supybot" and conf['repo'] in raw['projects'][conf['project']]:
+            del raw['projects'][conf['project']][conf['repo']]
+
+        elif conf['repo'] != "supybot":
+            remove_repo = {'url': conf['url']}
+
+            try:
+                raw['projects'][conf['project']][conf['repo']].remove(remove_repo)
+
+            except ValueError:
+                print("No exist the URL", conf['url'],"in", conf['repo'], "OR the repository", conf['repo'], "is not exist")
 
     elif 'parent' in conf:
         #$ ./projectinfo.py <JSON_file> rm <project_name> --parent <project>
@@ -256,10 +267,11 @@ def lists(conf, raw):
         #Listing the URL's for a repository
         repo = conf['repo']
         try:
-            for project in raw['projects'][conf['project']][repo]:
-                if repo == "supybot":
-                    print(project['url'][0],project['url'][1])
-                else:
+            if repo == "supybot":
+                project = raw['projects'][conf['project']][repo]
+                print(project['url'],project['path'])
+            else:
+                for project in raw['projects'][conf['project']][repo]:
                     print(project['url'])
         except KeyError:
             print("The repository", repo, "is not exist in", conf['project'])
@@ -308,7 +320,8 @@ if __name__ == '__main__':
         if args.repo[0] != "supybot" and len(args.repo) == 2:
             conf['url'] = args.repo[1]
         elif args.repo[0] == "supybot" and len(args.repo) == 3:
-                conf['url'] = args.repo[1:]
+                conf['url'] = args.repo[1]
+                conf['path'] = args.repo[2]
         elif args.command != "list":
             sys.exit("Must have two or three arguments if repo_name is 'supybot': --repo <repo_name> <url> <path>")
         elif len(args.repo) > 1 and args.command == "list":
