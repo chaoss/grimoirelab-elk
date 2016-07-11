@@ -26,10 +26,22 @@ function set_variables {
     DB_SH=$PROJECT_SHORTNAME"_sh"
     DB_PRO=$PROJECT_SHORTNAME"_pro"
 
-    BUGZILLA_ENRICHED_INDEX=$BUGZILLA_INDEX"_enriched"
-    JENKINS_ENRICHED_INDEX=$JENKINS_INDEX"_enriched"
-    GERRIT_ENRICHED_INDEX=$GERRIT_INDEX"_enriched"
-    GIT_ENRICHED_INDEX=$GIT_INDEX"_enriched"
+    if [ -z BUGZILLA_ENRICHED_INDEX ]
+        then
+        BUGZILLA_ENRICHED_INDEX=$BUGZILLA_INDEX"_enriched"
+    fi
+    if [ -z JENKINS_ENRICHED_INDEX ]
+        then
+        JENKINS_ENRICHED_INDEX=$JENKINS_INDEX"_enriched"
+    fi
+    if [ -z GERRIT_ENRICHED_INDEX ]
+        then
+        GERRIT_ENRICHED_INDEX=$GERRIT_INDEX"_enriched"
+    fi
+    if [ -z GIT_ENRICHED_INDEX ]
+        then
+        GIT_ENRICHED_INDEX=$GIT_INDEX"_enriched"
+    fi
 
     LOGS_DIR=$LOGS_DIR"/"$PROJECT_SHORTNAME
     MAINLOG=$LOGS_DIR"/main.log"
