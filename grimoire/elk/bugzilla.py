@@ -95,14 +95,20 @@ class BugzillaEnrich(Enrich):
             identity = BugzillaEnrich.get_sh_identity({'assigned_to':item["data"]['assigned_to']})
             eitem['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['assigned_to_name'] = identity['name']
-            eitem["assigned_to_org_name"] = self.get_enrollment(eitem['assigned_to_uuid'], parser.parse(item[self.get_field_date()]))
+            item_date = item['data'][self.get_field_date()][0]['__text__']
+            item_date_dt = parser.parse(item_date)
+            item_date_utc = (item_date_dt-item_date_dt.utcoffset()).replace(tzinfo=None)
+            eitem["assigned_to_org_name"] = self.get_enrollment(eitem['assigned_to_uuid'], item_date_utc)
             eitem["assigned_to_domain"] = self.get_domain(identity)
             eitem["assigned_to_bot"] = self.is_bot(eitem['assigned_to_uuid'])
         if 'reporter' in item['data']:
             identity = BugzillaEnrich.get_sh_identity({'reporter':item["data"]['reporter']})
             eitem['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['reporter_name'] = identity['name']
-            eitem["reporter_org_name"] = self.get_enrollment(eitem['reporter_uuid'], parser.parse(item[self.get_field_date()]))
+            item_date = item['data'][self.get_field_date()][0]['__text__']
+            item_date_dt = parser.parse(item_date)
+            item_date_utc = (item_date_dt-item_date_dt.utcoffset()).replace(tzinfo=None)
+            eitem["reporter_org_name"] = self.get_enrollment(eitem['reporter_uuid'], item_date_utc)
             eitem["reporter_domain"] = self.get_domain(identity)
             eitem["reporter_bot"] = self.is_bot(eitem['reporter_uuid'])
 

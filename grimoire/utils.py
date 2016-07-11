@@ -33,38 +33,41 @@ from grimoire.ocean.elastic import ElasticOcean
 # Connectors for Ocean
 from grimoire.ocean.bugzilla import BugzillaOcean
 from grimoire.ocean.bugzillarest import BugzillaRESTOcean
+from grimoire.ocean.discourse import DiscourseOcean
 from grimoire.ocean.gerrit import GerritOcean
-from grimoire.ocean.github import GitHubOcean
 from grimoire.ocean.git import GitOcean
+from grimoire.ocean.github import GitHubOcean
+from grimoire.ocean.jenkins import JenkinsOcean
+from grimoire.ocean.jira import JiraOcean
 from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
 from grimoire.ocean.remo import ReMoOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
-from grimoire.ocean.jira import JiraOcean
-from grimoire.ocean.jenkins import JenkinsOcean
-from grimoire.ocean.discourse import DiscourseOcean
+from grimoire.ocean.supybot import SupybotOcean
+
 
 # Connectors for EnrichOcean
 from grimoire.elk.bugzilla import BugzillaEnrich
 from grimoire.elk.bugzillarest import BugzillaRESTEnrich
-from grimoire.elk.gerrit import GerritEnrich
-from grimoire.elk.github import GitHubEnrich
+from grimoire.elk.discourse import DiscourseEnrich
 from grimoire.elk.git import GitEnrich
+from grimoire.elk.github import GitHubEnrich
+from grimoire.elk.gerrit import GerritEnrich
+from grimoire.elk.jenkins import JenkinsEnrich
+from grimoire.elk.jira import JiraEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
 from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
-from grimoire.elk.jira import JiraEnrich
-from grimoire.elk.jenkins import JenkinsEnrich
-from grimoire.elk.discourse import DiscourseEnrich
+from grimoire.elk.supybot import SupybotEnrich
 
 # Connectors for Perceval
 from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
 from perceval.backends.bugzillarest import BugzillaREST, BugzillaRESTCommand
 from perceval.backends.discourse import Discourse, DiscourseCommand
 from perceval.backends.gerrit import Gerrit, GerritCommand
-from perceval.backends.github import GitHub, GitHubCommand
 from perceval.backends.git import Git, GitCommand
+from perceval.backends.github import GitHub, GitHubCommand
 from perceval.backends.gmane import Gmane, GmaneCommand
 from perceval.backends.jenkins import Jenkins, JenkinsCommand
 from perceval.backends.jira import Jira, JiraCommand
@@ -73,7 +76,7 @@ from perceval.backends.remo import ReMo, ReMoCommand
 from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
 from perceval.backends.pipermail import Pipermail, PipermailCommand
 from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
-
+from perceval.backends.supybot import Supybot, SupybotCommand
 
 from grimoire.elk.elastic import ElasticSearch
 from grimoire.elk.elastic import ElasticConnectException
@@ -104,8 +107,8 @@ def get_connectors():
             "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
             "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
-            "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
+            "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
             "gmane":[Gmane, MBoxOcean, MBoxEnrich, GmaneCommand],
             "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
@@ -115,6 +118,7 @@ def get_connectors():
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
+             "supybot":[Supybot, SupybotOcean, SupybotEnrich, SupybotCommand]
             }  # Will come from Registry
 
 def get_elastic(url, es_index, clean = None, ocean_backend = None):
