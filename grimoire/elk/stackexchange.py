@@ -105,8 +105,8 @@ class StackExchangeEnrich(Enrich):
         eitem = {}
 
         # Fields common in questions and answers
-        common_fields = ["title", "comments_count", "question_id",
-                         "creation_date", "delete_vote_count", "up_vote_count",
+        common_fields = ["title", "comment_count", "question_id",
+                         "delete_vote_count", "up_vote_count",
                          "down_vote_count","favorite_count", "view_count",
                          "last_activity_date", "link", "score", "tags"]
 
@@ -127,7 +127,7 @@ class StackExchangeEnrich(Enrich):
             eitem["author_reputation"] = question['owner']['reputation']
 
             # data fields to copy
-            copy_fields = common_fields
+            copy_fields = common_fields + ['answer_count']
             for f in copy_fields:
                 if f in question:
                     eitem[f] = question[f]
@@ -139,7 +139,6 @@ class StackExchangeEnrich(Enrich):
                           }
             for fn in map_fields:
                 eitem[map_fields[fn]] = question[fn]
-
 
             eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "question"))
 
@@ -155,7 +154,7 @@ class StackExchangeEnrich(Enrich):
             eitem["author_reputation"] = answer['owner']['reputation']
 
             # data fields to copy
-            copy_fields = common_fields + ["is_accepted", "answer_id"]
+            copy_fields = common_fields + ["creation_date", "is_accepted", "answer_id"]
             for f in copy_fields:
                 if f in answer:
                     eitem[f] = answer[f]
@@ -169,6 +168,7 @@ class StackExchangeEnrich(Enrich):
                 eitem[map_fields[fn]] = answer[fn]
 
             creation_date = datetime.fromtimestamp(item["creation_date"]).isoformat()
+            eitem['creation_date'] = creation_date
             eitem.update(self.get_grimoire_fields(creation_date, "answer"))
 
             if self.sortinghat:
