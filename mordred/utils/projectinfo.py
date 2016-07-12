@@ -36,7 +36,7 @@ REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'mailing_lists', 'telegram', 
 
 
 def read_arguments():
-    usage = "projectinfo.py [--help] file command project_name [--repo <repo_type> <url>] [--parent <project_name>]"
+    usage = "projectinfo.py [--help] file command [--project_name <project_name>] [--repo <repo_type> <url>] [--parent <project_name>]"
     desc = """
 Repositories avaliable
 
@@ -104,13 +104,13 @@ Repositories avaliable
                            help="remove the parent project information")
 
     # list
-    list_usage = "usage: projectinfo.py list <project_name> [--repo <repo_type>]"
+    list_usage = "usage: projectinfo.py list [--project_name <project_name>] [--repo <repo_type>]"
     list_desc = "List data for a given project name"
     list_parser = subparsers.add_parser("list",
                                         help="list project",
                                         usage=list_usage,
                                         description=list_desc)
-    list_parser.add_argument("project_name",
+    list_parser.add_argument("--project_name",
                              action="store",
                              help="project name")
     list_parser.add_argument("--repo",
@@ -261,32 +261,35 @@ def remove(conf, raw):
 def lists(conf, raw):
     """List a repository or list the URL of a repository"""
 
-    if 'repo' in conf:
-        #$ ./projectinfo.py <JSON_file> list <project_name> --repo <repo_name>
-        #Listing the URL's for a repository
-        repo = conf['repo']
-        try:
-            for project in raw['projects'][conf['project']][repo]:
-                if repo == "supybot":
-                    print(project['url'],project['path'])
-                else:
-                    print(project['url'])
-        except KeyError:
-            print("The repository", repo, "is not exist in", conf['project'])
+    for project in raw['projects']:
+        print(project)
+    if args.project_name:
+        if 'repo' in conf:
+            #$ ./projectinfo.py <JSON_file> list <project_name> --repo <repo_name>
+            #Listing the URL's for a repository
+            repo = conf['repo']
+            try:
+                for project in raw['projects'][conf['project']][repo]:
+                    if repo == "supybot":
+                        print(project['url'],project['path'])
+                    else:
+                        print(project['url'])
+            except KeyError:
+                print("The repository", repo, "is not exist in", conf['project'])
 
-    else:
-        #$ ./projectinfo.py <JSON_file> list <project_name>
-        #Mustn't list this list:
-        default = ["bugzilla", "description", "dev_list", "downloads",
-                  "forums", "gerrit_repo", "mailing_lists", "parent_project",
-                  "releases", "title", "wiki_url"]
-        try:
-            for repo in raw['projects'][conf['project']].keys():
-                if repo not in default:
-                    if len(raw['projects'][conf['project']][repo]) > 0:
-                        print(repo)
-        except KeyError:
-            print("No exist the project",conf['project'])
+        else:
+            #$ ./projectinfo.py <JSON_file> list <project_name>
+            #Mustn't list this list:
+            default = ["bugzilla", "description", "dev_list", "downloads",
+                      "forums", "gerrit_repo", "mailing_lists", "parent_project",
+                      "releases", "title", "wiki_url"]
+            try:
+                for repo in raw['projects'][conf['project']].keys():
+                    if repo not in default:
+                        if len(raw['projects'][conf['project']][repo]) > 0:
+                            print(repo)
+            except KeyError:
+                print("No exist the project",conf['project'])
 
 def run(conf):
 
@@ -322,6 +325,6 @@ if __name__ == '__main__':
                 conf['path'] = args.repo[2]
         elif args.command != "list":
             sys.exit("Must have two or three arguments if repo_name is 'supybot': --repo <repo_name> <url> <path>")
-        elif len(args.repo) > 1 and args.command == "list":
-            sys.exit("Must have one arguments if you use list: list <project_name> --repo <repo_name>")
+        #elif len(args.repo) > 1 and args.command == "list":
+            s#ys.exit("Must have one arguments if you use list: list <project_name> --repo <repo_name>")
     run(conf)
