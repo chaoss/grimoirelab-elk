@@ -176,16 +176,14 @@ def add(conf, raw):
     if 'repo' in conf:
         #$ ./projectinfo.py <JSON_file> add <project_name> --repo <repo_name> <url>
         #Adding a source code repository for the project
-        new_repo = {'url': conf['url']}
+        if conf['repo'] == "supybot":
+            new_repo = {'url': conf['url'], 'path': conf['path']}
+        else:
+            new_repo = {'url': conf['url']}
 
         try:
-            if conf['repo'] == "supybot":
-                raw['projects'][conf['project']][conf['repo']] = {}
-                raw['projects'][conf['project']][conf['repo']]['url'] = conf['url']
-                raw['projects'][conf['project']][conf['repo']]['path'] = conf['path']
-            else:
-                if new_repo not in raw['projects'][conf['project']][conf['repo']]:
-                    raw['projects'][conf['project']][conf['repo']].append(new_repo)
+            if new_repo not in raw['projects'][conf['project']][conf['repo']]:
+                raw['projects'][conf['project']][conf['repo']].append(new_repo)
         except KeyError:
             try:
                 raw['projects'][conf['project']][conf['repo']] = []
@@ -223,17 +221,16 @@ def remove(conf, raw):
     if 'repo' in conf:
         # $ ./projectinfo.py <JSON_file> rm <project_name> --repo <repo_name> <url>
         #Removing the repo url for the project
-        if conf['repo'] == "supybot" and conf['repo'] in raw['projects'][conf['project']]:
-            del raw['projects'][conf['project']][conf['repo']]
-
-        elif conf['repo'] != "supybot":
+        if conf['repo'] == "supybot":
+            remove_repo = {'url': conf['url'], 'path': conf['path']}
+        else:
             remove_repo = {'url': conf['url']}
 
-            try:
-                raw['projects'][conf['project']][conf['repo']].remove(remove_repo)
+        try:
+            raw['projects'][conf['project']][conf['repo']].remove(remove_repo)
 
-            except ValueError:
-                print("No exist the URL", conf['url'],"in", conf['repo'], "OR the repository", conf['repo'], "is not exist")
+        except ValueError:
+            print("No exist the URL", conf['url'],"in", conf['repo'], "OR the repository", conf['repo'], "is not exist")
 
     elif 'parent' in conf:
         #$ ./projectinfo.py <JSON_file> rm <project_name> --parent <project>
@@ -267,11 +264,10 @@ def lists(conf, raw):
         #Listing the URL's for a repository
         repo = conf['repo']
         try:
-            if repo == "supybot":
-                project = raw['projects'][conf['project']][repo]
-                print(project['url'],project['path'])
-            else:
-                for project in raw['projects'][conf['project']][repo]:
+            for project in raw['projects'][conf['project']][repo]:
+                if repo == "supybot":
+                    print(project['url'],project['path'])
+                else:
                     print(project['url'])
         except KeyError:
             print("The repository", repo, "is not exist in", conf['project'])
