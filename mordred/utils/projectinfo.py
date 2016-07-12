@@ -30,9 +30,10 @@ import os
 import sys
 
 
-REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'mailing_lists', 'telegram', 'kuma',
+REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'gmane', 'telegram', 'kuma',
                           'kitsune', 'mozilla_reps', 'mediawiki', 'irc', 'confluence',
-                          'jira',' maniphest', 'gerrit', 'meetup', 'supybot']
+                          'jira',' maniphest', 'gerrit', 'meetup', 'supybot',
+                          'pipermail']
 
 
 def read_arguments():
@@ -54,6 +55,8 @@ Repositories avaliable
     gerrit: Adding a gerrit for the project
     meetup: Adding a meetup for the project
     supybot: Adding a bot for the project, you need to includ the path
+    gmane: Archive mailing lists hosted in gmane
+    pipermail: Archive mailing list hosted with pipermail
     """
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
