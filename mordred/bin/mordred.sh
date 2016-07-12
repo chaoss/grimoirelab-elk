@@ -26,22 +26,11 @@ function set_variables {
     DB_SH=$PROJECT_SHORTNAME"_sh"
     DB_PRO=$PROJECT_SHORTNAME"_pro"
 
-    if [ -z BUGZILLA_ENRICHED_INDEX ]
-        then
-        BUGZILLA_ENRICHED_INDEX=$BUGZILLA_INDEX"_enriched"
-    fi
-    if [ -z JENKINS_ENRICHED_INDEX ]
-        then
-        JENKINS_ENRICHED_INDEX=$JENKINS_INDEX"_enriched"
-    fi
-    if [ -z GERRIT_ENRICHED_INDEX ]
-        then
-        GERRIT_ENRICHED_INDEX=$GERRIT_INDEX"_enriched"
-    fi
-    if [ -z GIT_ENRICHED_INDEX ]
-        then
-        GIT_ENRICHED_INDEX=$GIT_INDEX"_enriched"
-    fi
+    SUPYBOT_ENRICHED_INDEX=$SUPYBOT_INDEX"_enriched"
+    BUGZILLA_ENRICHED_INDEX=$BUGZILLA_INDEX"_enriched"
+    JENKINS_ENRICHED_INDEX=$JENKINS_INDEX"_enriched"
+    GERRIT_ENRICHED_INDEX=$GERRIT_INDEX"_enriched"
+    GIT_ENRICHED_INDEX=$GIT_INDEX"_enriched"
 
     LOGS_DIR=$LOGS_DIR"/"$PROJECT_SHORTNAME
     MAINLOG=$LOGS_DIR"/main.log"
@@ -72,6 +61,8 @@ function set_variables {
         echo "BUGZILLA_INDEX="$BUGZILLA_INDEX
         echo "JENKINS_INDEX=$JENKINS_INDEX"
         echo "JENKINS_ENRICHED_INDEX=$JENKINS_ENRICHED_INDEX"
+        echo "SUPYBOT_INDEX=$SUPYBOT_INDEX"
+        echo "SUPYBOT_ENRICHED_INDEX=$SUPYBOT_ENRICHED_INDEX"
         echo "SH_UNIFY_METHOD=$SH_UNIFY_METHOD"
         echo "SH_UNAFFILIATED_GROUP=$SH_UNAFFILIATED_GROUP"
         echo "LOGS_DIR=$LOGS_DIR"
@@ -169,6 +160,14 @@ function retrieve_data {
         jenkins_retrieval
         log_result "[jenkins] Retrieval finished" "[jenkins] ERROR: Something went wrong with the retrieval"
     fi
+    
+    if [ $SUPYBOT_ENABLED -eq 1 ]
+        then
+        log "[supybot - irc] Retrieving data"
+        supybot_retrieval
+        log_result "[supybot - irc] Retrieval finished" "[supybot - irc] ERROR: Something went wrong with the retrieval"
+    fi
+    
 }
 
 function git_retrieval {
@@ -192,6 +191,25 @@ function bugzilla_retrieval {
 function jenkins_retrieval {
   cd ~/GrimoireELK/utils
   ./p2o.py -e $ES_URI -g --index $JENKINS_INDEX jenkins $JENKINS_URL $FROM_DATE >> $LOGS_DIR"/jenkins-collection.log" 2>&1
+}
+
+function supybot_retrieval {
+  TMP_SUPYBOT_PROJECT_LIST=`mktemp`
+  TMP_SUPYBOT_LIST=`mktemp`
+  cd ~/GrimoireELK/utils
+  ./projectinfo.py $PROJECTS_JSON_FILE list > $TMP_SUPYBOT_PROJECT_LIST
+  IFS=$'\n'
+  for project in $(cat $TMP_SUPYBOT_PROJECT_LIST);
+  do
+    ./projectinfo.py $PROJECTS_JSON_FILE list $project --repo irc list >> $TMP_SUPYBOT_LIST
+  done
+  for url in $(cat $TMP_SUPYBOT_LIST);
+  do
+    SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
+    ./p2o.py -e $ES_URI -g --index $SUPYBOT_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH $FROM_DATE >> $LOGS_DIR"/irc-collection.log" 2>&1
+  done
+  rm $TMP_SUPYBOT_PROJECT_LIST
+  rm $TMP_SUPYBOT_LIST
 }
 
 function get_identities_from_data {
@@ -232,6 +250,14 @@ function enrich_data {
         jenkins_enrichment $1
         log_result "[jenkins] p2o finished" "[jenkins] ERROR: Something went wrong with p2o"
     fi
+
+    if [ $SUPYBOT_ENABLED -eq 1 ]
+        then
+        log "[supybot - irc] Supybot p2o starts"
+        supybot_enrichment $1
+        log_result "[supybot - irc] p2o finished" "[supybot - irc] ERROR: Something went wrong with p2o"
+    fi
+
 }
 
 function git_enrichment {
@@ -260,7 +286,27 @@ function bugzilla_enrichment {
 function jenkins_enrichment {
     ENR_EXTRA_FLAG=$1
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JENKINS_INDEX --index-enrich $JENKINS_ENRICHED_INDEX jenkins $JENKINS_URL >> $LOGS_DIR"/bugzilla-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JENKINS_INDEX --index-enrich $JENKINS_ENRICHED_INDEX jenkins $JENKINS_URL >> $LOGS_DIR"/jenkins-enrichment.log" 2>&1
+}
+
+function supybot_enrichment {
+    TMP_SUPYBOT_PROJECT_LIST=`mktemp`
+    TMP_SUPYBOT_LIST=`mktemp`
+    ENR_EXTRA_FLAG=$1
+    cd ~/GrimoireELK/utils
+    ./projectinfo.py $PROJECTS_JSON_FILE list > $TMP_SUPYBOT_PROJECT_LIST
+    IFS=$'\n'
+    for project in $(cat $TMP_SUPYBOT_PROJECT_LIST);
+    do
+      ./projectinfo.py $PROJECTS_JSON_FILE list $project --repo irc list >> $TMP_SUPYBOT_LIST
+    done
+    for url in $(cat $TMP_SUPYBOT_LIST);
+    do
+      SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
+      ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $SUPYBOT_INDEX --index-enrich $SUPYBOT_ENRICHED_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH >> $LOGS_DIR"/irc-enrichment.log" 2>&1
+    done
+    rm $TMP_SUPYBOT_PROJECT_LIST
+    rm $TMP_SUPYBOT_LIST
 }
 
 function sortinghat_unify {
