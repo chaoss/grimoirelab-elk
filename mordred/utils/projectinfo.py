@@ -79,7 +79,7 @@ Repositories avaliable
                             action="store",
                             dest="repo",
                             nargs='*',
-                            help="see list of repositories available, url of the repository")
+                            help="see the list of available repositories and the repository URL")
     add_parser.add_argument("-p", "--parent",
                             action="store",
                             dest="parent",
@@ -97,17 +97,19 @@ Repositories avaliable
                            action="store",
                            dest="repo",
                            nargs='*',
-                           help="see list of repositories available")
+                           help="see the list of available repositories")
     rm_parser.add_argument("-p", "--parent",
                            action="store",
                            dest="parent",
                            help="remove the parent project information")
 
     # list
-    list_usage = "projectinfo.py file list [--help] project_name"
+    list_usage = "usage: projectinfo.py list <project_name> [--repo <repo_type>]"
+    list_desc = "List data for a given project name"
     list_parser = subparsers.add_parser("list",
-                                        help="add project",
-                                        usage=list_usage)
+                                        help="list project",
+                                        usage=list_usage,
+                                        description=list_desc)
     list_parser.add_argument("project_name",
                              action="store",
                              help="project name")
@@ -115,7 +117,7 @@ Repositories avaliable
                              action="store",
                              dest="repo",
                              nargs='*',
-                             help="see list of repositories available")
+                             help="see the list of available repositories")
 
     args = parser.parse_args()
 
