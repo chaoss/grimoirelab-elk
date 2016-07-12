@@ -180,18 +180,18 @@ function git_retrieval {
 }
 
 function gerrit_retrieval {
-  cd ~/GrimoireELK/utils
-  ./p2o.py -e $ES_URI -g --index $GERRIT_INDEX gerrit --user $GERRIT_USER --url $GERRIT_URL $GERRIT_EXTRA_PARAM $FROM_DATE >> $LOGS_DIR"/gerrit-collection.log" 2>&1
+    cd ~/GrimoireELK/utils
+    ./p2o.py -e $ES_URI -g --index $GERRIT_INDEX gerrit --user $GERRIT_USER --url $GERRIT_URL $GERRIT_EXTRA_PARAM $FROM_DATE >> $LOGS_DIR"/gerrit-collection.log" 2>&1
 }
 
 function bugzilla_retrieval {
-  cd ~/GrimoireELK/utils
-  ./p2o.py -e $ES_URI -g --index $BUGZILLA_INDEX bugzilla -u $BUGZILLA_USER -p $BUGZILLA_PASS $BUGZILLA_URL $FROM_DATE >> $LOGS_DIR"/bugzilla-collection.log" 2>&1
+    cd ~/GrimoireELK/utils
+    ./p2o.py -e $ES_URI -g --index $BUGZILLA_INDEX bugzilla -u $BUGZILLA_USER -p $BUGZILLA_PASS $BUGZILLA_URL $FROM_DATE >> $LOGS_DIR"/bugzilla-collection.log" 2>&1
 }
 
 function jenkins_retrieval {
-  cd ~/GrimoireELK/utils
-  ./p2o.py -e $ES_URI -g --index $JENKINS_INDEX jenkins $JENKINS_URL $FROM_DATE >> $LOGS_DIR"/jenkins-collection.log" 2>&1
+    cd ~/GrimoireELK/utils
+    ./p2o.py -e $ES_URI -g --index $JENKINS_INDEX jenkins $JENKINS_URL $FROM_DATE >> $LOGS_DIR"/jenkins-collection.log" 2>&1
 }
 
 function get_identities_from_data {
