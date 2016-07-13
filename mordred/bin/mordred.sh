@@ -22,6 +22,8 @@ function log_result {
 function set_variables {
     # It's replaced "-" or "." with "_" into the project name to avoid errors into MySQL
     PROJECT_SHORTNAME=`echo $PROJECT_SHORTNAME | sed "s/[-.]/_/g"`
+    PROJECT_INFO="/home/bitergia/GrimoireELK-mordred/mordred/utils/projectinfo.py"
+
     if [ -z FROM_DATE ]
         then
         FROM_DATE_STRING=""
@@ -142,12 +144,11 @@ function compose_git_list {
 
 function compose_supybot_list {
     input_file=`echo $PROJECTS_JSON_FILE | cut -d / -f 3-`
-    cd ~/GrimoireELK/mordred/utils/
-    ./projectinfo.py $input_file list > $1
+    $PROJECT_INFO $input_file list > $1
     IFS=$'\n'
     for project in $(cat $1);
     do
-      ./projectinfo.py $input_file list --project_name $project --repo supybot >> $2
+      $PROJECT_INFO $input_file list $project --repo supybot >> $2
     done
 }
 
