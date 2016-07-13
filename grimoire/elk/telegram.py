@@ -77,30 +77,53 @@ class TelegramEnrich(Enrich):
                 eitem[f] = item[f]
             else:
                 eitem[f] = None
+
+
+        eitem['update_id'] = item['data']['update_id']
+
         # The real data
         message = item['data']['message']
 
         # data fields to copy
-        copy_fields = ["message_id","text","entities"]
+        copy_fields = ["message_id"]
         for f in copy_fields:
             if f in message:
                 eitem[f] = message[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"text": "text_analyzed",
+        map_fields = {"text": "message",
                       "date": "sent_date,"
                       }
         for fn in map_fields:
             eitem[map_fields[fn]] = message[fn]
 
-        # Job url: remove the last /build_id from job_url/build_id/
         eitem['chat_id'] = message['chat']['id']
         eitem['chat_title'] = message['chat']['title']
         eitem['chat_type'] = message['chat']['type']
-        eitem['from_id'] = message['from']['id']
 
-        eitem['from']=message['from']['first_name']
+        eitem['from_id'] = message['from']['id']
+        eitem['author'] = message['from']['first_name']
+        eitem['author_id'] = message['from']['id']
+        if 'last_name' in message['from']:
+            eitem['author_last_name'] = message['from']['last_name']
+        if 'username' in message['from']:
+            eitem['username'] = message['from']['username']
+
+        if 'reply_to_message' in message:
+            eitem['reply_to_message_id'] = message['reply_to_message']['message_id']
+            eitem['reply_to_sent_date'] = message['reply_to_message']['date']
+            eitem['reply_to_message'] = message['reply_to_message']['text']
+            eitem['reply_to_chat_id'] = message['reply_to_message']['chat']['id']
+            eitem['reply_to_chat_title'] = message['reply_to_message']['chat']['title']
+            eitem['reply_to_chat_type'] = message['reply_to_message']['chat']['type']
+            eitem['reply_to_author_id'] = message['reply_to_message']['from']['id']
+            eitem['reply_to_author'] = message['reply_to_message']['from']['first_name']
+            if 'last_name' in message['reply_to_message']['from']:
+                eitem['reply_to_author_last_name'] = message['reply_to_message']['from']['last_name']
+            if 'username' in message['reply_to_message']['from']:
+                eitem['reply_to_username'] = message['reply_to_message']['from']['username']
+
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(message, "from"))
