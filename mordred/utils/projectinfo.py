@@ -31,9 +31,9 @@ import sys
 
 
 REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'gmane', 'telegram', 'kuma',
-                          'kitsune', 'mozilla_reps', 'mediawiki', 'irc', 'confluence',
+                          'kitsune', 'mozilla_reps', 'mediawiki', 'mbox', 'confluence',
                           'jira',' maniphest', 'gerrit', 'meetup', 'supybot',
-                          'pipermail', 'mbox']
+                          'pipermail']
 
 
 def read_arguments():
@@ -48,7 +48,6 @@ Repositories avaliable
     kuma: Adding a kuma for the project
     kitsune: Adding a kitsune for the project
     mozilla_reps: Adding a mozilla reps for the project
-    irc: Adding a irc for the project
     confluence: Adding a confluence for the project
     jira: Adding a jira for the project
     maniphest: Adding a maniphest for the project
