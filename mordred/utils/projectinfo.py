@@ -31,7 +31,7 @@ import sys
 
 
 REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'gmane', 'telegram', 'kuma',
-                          'kitsune', 'mozilla_reps', 'mediawiki', 'irc', 'confluence',
+                          'kitsune', 'mozilla_reps', 'mediawiki', 'mbox', 'confluence',
                           'jira',' maniphest', 'gerrit', 'meetup', 'supybot',
                           'pipermail']
 
@@ -48,15 +48,15 @@ Repositories avaliable
     kuma: Adding a kuma for the project
     kitsune: Adding a kitsune for the project
     mozilla_reps: Adding a mozilla reps for the project
-    irc: Adding a irc for the project
     confluence: Adding a confluence for the project
     jira: Adding a jira for the project
     maniphest: Adding a maniphest for the project
     gerrit: Adding a gerrit for the project
     meetup: Adding a meetup for the project
-    supybot: Adding a bot for the project, you need to includ the path
+    supybot: Adding a irc for the project, you need to includ the path
     gmane: Archive mailing lists hosted in gmane
     pipermail: Archive mailing list hosted with pipermail
+    mbox: Adding a mbox for the project
     """
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
