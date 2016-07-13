@@ -81,21 +81,25 @@ class TelegramEnrich(Enrich):
         message = item['data']['message']
 
         # data fields to copy
-        copy_fields = ["message_id","text","date"]
+        copy_fields = ["message_id","text","entities"]
         for f in copy_fields:
             if f in message:
                 eitem[f] = message[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"text": "text_analyzed"
+        map_fields = {"text": "text_analyzed",
+                      "date": "sent_date,"
                       }
         for fn in map_fields:
             eitem[map_fields[fn]] = message[fn]
 
         # Job url: remove the last /build_id from job_url/build_id/
-        eitem['channel']=message['chat']['title']
-        eitem['from_id']=message['from']['id']
+        eitem['chat_id'] = message['chat']['id']
+        eitem['chat_title'] = message['chat']['title']
+        eitem['chat_type'] = message['chat']['type']
+        eitem['from_id'] = message['from']['id']
+
         eitem['from']=message['from']['first_name']
 
         if self.sortinghat:
