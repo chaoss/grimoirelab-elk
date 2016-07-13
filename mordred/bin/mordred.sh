@@ -36,6 +36,10 @@ function set_variables {
     DB_SH=$PROJECT_SHORTNAME"_sh"
     DB_PRO=$PROJECT_SHORTNAME"_pro"
 
+    if [ -z PIPERMAIL_ENRICHED_INDEX ]
+        then
+        PIPERMAIL_ENRICHED_INDEX=$PIPERMAIL_INDEX"_enriched"
+    fi
     if [ -z GMANE_ENRICHED_INDEX ]
         then
         GMANE_ENRICHED_INDEX=$GMANE_INDEX"_enriched"
@@ -95,6 +99,8 @@ function set_variables {
         echo "SUPYBOT_ENRICHED_INDEX=$SUPYBOT_ENRICHED_INDEX"
         echo "GMANE_INDEX=$GMANE_INDEX"
         echo "GMANE_ENRICHED_INDEX=$GMANE_ENRICHED_INDEX"
+        echo "PIPERMAIL_INDEX=$PIPERMAIL_INDEX"
+        echo "PIPERMAIL_ENRICHED_INDEX=$PIPERMAIL_ENRICHED_INDEX"
         echo "SH_UNIFY_METHOD=$SH_UNIFY_METHOD"
         echo "SH_UNAFFILIATED_GROUP=$SH_UNAFFILIATED_GROUP"
         echo "LOGS_DIR=$LOGS_DIR"
@@ -216,6 +222,13 @@ function retrieve_data {
         gmane_retrieval
         log_result "[gmane - mls] Retrieval finished" "[gmane - mls] ERROR: Something went wrong with the retrieval"
     fi
+
+    if [ $PIPERMAIL_ENABLED -eq 1 ]
+        then
+        log "[pipermail - mls] Retrieving data"
+        pipermail_retrieval
+        log_result "[pipermail - mls] Retrieval finished" "[pipermail - mls] ERROR: Something went wrong with the retrieval"
+    fi
 }
 
 function git_retrieval {
@@ -266,6 +279,19 @@ function gmane_retrieval {
     done
     rm $TMP_GMANE_PROJECT_LIST
     rm $TMP_GMANE_LIST
+}
+
+function pipermail_retrieval {
+    TMP_PIPERMAIL_PROJECT_LIST=`mktemp`
+    TMP_PIPERMAIL_LIST=`mktemp`
+    compose_repo_list $TMP_PIPERMAIL_PROJECT_LIST $TMP_PIPERMAIL_LIST pipermail
+    cd ~/GrimoireELK/utils/
+    for url in $(cat $TMP_PIPERMAIL_LIST);
+    do
+        ./p2o.py -e $ES_URI -g --index $PIPERMAIL_INDEX pipermail $url $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/mls-collection.log" 2>&1
+    done
+    rm $TMP_PIPERMAIL_PROJECT_LIST
+    rm $TMP_PIPERMAIL_LIST
 }
 
 function get_identities_from_data {
@@ -319,6 +345,13 @@ function enrich_data {
         log "[gmane - mls] Gmane p2o starts"
         gmane_enrichment $1
         log_result "[gmane - mls] p2o finished" "[gmane - mls] ERROR: Something went wrong with p2o"
+    fi
+
+    if [ $PIPERMAIL_ENABLED -eq 1 ]
+        then
+        log "[pipermail - mls] Pipermail p2o starts"
+        pipermail_enrichment $1
+        log_result "[pipermail - mls] p2o finished" "[pipermail - mls] ERROR: Something went wrong with p2o"
     fi
 }
 
@@ -378,6 +411,20 @@ function gmane_enrichment {
     done
     rm $TMP_GMANE_PROJECT_LIST
     rm $TMP_GMANE_LIST
+}
+
+function pipermail_enrichment {
+    TMP_PIPERMAIL_PROJECT_LIST=`mktemp`
+    TMP_PIPERMAIL_LIST=`mktemp`
+    ENR_EXTRA_FLAG=$1
+    compose_repo_list $TMP_PIPERMAIL_PROJECT_LIST $TMP_PIPERMAIL_LIST pipermail
+    cd ~/GrimoireELK/utils/
+    for url in $(cat $TMP_PIPERMAIL_LIST);
+    do
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $PIPERMAIL_INDEX --index-enrich $PIPERMAIL_ENRICHED_INDEX pipermail $url >> $LOGS_DIR"/mls-enrichment.log" 2>&1
+    done
+    rm $TMP_PIPERMAIL_PROJECT_LIST
+    rm $TMP_PIPERMAIL_LIST
 }
 
 function sortinghat_unify {
