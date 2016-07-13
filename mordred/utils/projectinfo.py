@@ -115,6 +115,7 @@ Repositories avaliable
                                         description=list_desc)
     list_parser.add_argument("project_name",
                              action="store",
+                             nargs='?',
                              help="project name")
     list_parser.add_argument("--repo",
                              action="store",
@@ -277,7 +278,7 @@ def lists(conf, raw):
         except KeyError:
             print("The repository", repo, "is not exist in", conf['project'])
 
-    else:
+    elif 'project' in conf:
         #$ ./projectinfo.py <JSON_file> list <project_name>
         #Mustn't list this list:
         default = ["bugzilla", "description", "dev_list", "downloads",
@@ -290,6 +291,10 @@ def lists(conf, raw):
                         print(repo)
         except KeyError:
             print("No exist the project",conf['project'])
+
+    else:
+        for proj in raw['projects']:
+            print(proj)
 
 def run(conf):
 
