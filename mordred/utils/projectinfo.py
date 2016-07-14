@@ -31,7 +31,7 @@ import sys
 
 
 REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'gmane', 'telegram', 'kuma',
-                          'kitsune', 'mozilla_reps', 'mediawiki', 'irc', 'confluence',
+                          'kitsune', 'mozilla_reps', 'mediawiki', 'mbox', 'confluence',
                           'jira',' maniphest', 'gerrit', 'meetup', 'supybot',
                           'pipermail']
 
@@ -48,15 +48,15 @@ Repositories avaliable
     kuma: Adding a kuma for the project
     kitsune: Adding a kitsune for the project
     mozilla_reps: Adding a mozilla reps for the project
-    irc: Adding a irc for the project
     confluence: Adding a confluence for the project
     jira: Adding a jira for the project
     maniphest: Adding a maniphest for the project
     gerrit: Adding a gerrit for the project
     meetup: Adding a meetup for the project
-    supybot: Adding a bot for the project, you need to includ the path
+    supybot: Adding a irc for the project, you need to includ the path
     gmane: Archive mailing lists hosted in gmane
     pipermail: Archive mailing list hosted with pipermail
+    mbox: Adding a mbox for the project
     """
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -115,6 +115,7 @@ Repositories avaliable
                                         description=list_desc)
     list_parser.add_argument("project_name",
                              action="store",
+                             nargs='?',
                              help="project name")
     list_parser.add_argument("--repo",
                              action="store",
@@ -277,7 +278,7 @@ def lists(conf, raw):
         except KeyError:
             print("The repository", repo, "is not exist in", conf['project'])
 
-    else:
+    elif 'project' in conf:
         #$ ./projectinfo.py <JSON_file> list <project_name>
         #Mustn't list this list:
         default = ["bugzilla", "description", "dev_list", "downloads",
@@ -290,6 +291,10 @@ def lists(conf, raw):
                         print(repo)
         except KeyError:
             print("No exist the project",conf['project'])
+
+    else:
+        for proj in raw['projects']:
+            print(proj)
 
 def run(conf):
 
