@@ -140,7 +140,9 @@ class StackExchangeEnrich(Enrich):
             for fn in map_fields:
                 eitem[map_fields[fn]] = question[fn]
 
-            eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "question"))
+            creation_date = datetime.fromtimestamp(question["creation_date"]).isoformat()
+            eitem['creation_date'] = creation_date
+            eitem.update(self.get_grimoire_fields(creation_date, "question"))
 
             if self.sortinghat:
                 eitem.update(self.get_item_sh(question, "owner"))
@@ -167,7 +169,7 @@ class StackExchangeEnrich(Enrich):
             for fn in map_fields:
                 eitem[map_fields[fn]] = answer[fn]
 
-            creation_date = datetime.fromtimestamp(item["creation_date"]).isoformat()
+            creation_date = datetime.fromtimestamp(answer["creation_date"]).isoformat()
             eitem['creation_date'] = creation_date
             eitem.update(self.get_grimoire_fields(creation_date, "answer"))
 
