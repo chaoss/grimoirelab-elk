@@ -126,7 +126,8 @@ class StackExchangeEnrich(Enrich):
             eitem["author_link"] = None
             if 'link' in question['owner']:
                 eitem["author_link"] = question['owner']['link']
-            eitem["author_reputation"] = question['owner']['reputation']
+            if 'reputation' in question['owner']:
+                eitem["author_reputation"] = question['owner']['reputation']
 
             # data fields to copy
             copy_fields = common_fields + ['answer_count']
@@ -157,7 +158,8 @@ class StackExchangeEnrich(Enrich):
             eitem["author_link"] = None
             if 'link' in answer['owner']:
                 eitem["author_link"] = answer['owner']['link']
-            eitem["author_reputation"] = answer['owner']['reputation']
+            if 'reputation' in answer['owner']:
+                eitem["author_reputation"] = answer['owner']['reputation']
 
             # data fields to copy
             copy_fields = common_fields + ["creation_date", "is_accepted", "answer_id"]
