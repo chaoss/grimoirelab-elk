@@ -70,13 +70,21 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
 
         repo['repo_update_start'] = datetime.now().isoformat()
 
+        # offset param suppport
+        offset = None
+        if backend_cmd.offset:
+            offset = backend_cmd.offset
+
         try:
-            if backend_cmd.from_date.replace(tzinfo=None) == \
-                parser.parse("1970-01-01").replace(tzinfo=None):
-                # Don't use the default value
-                ocean_backend.feed()
+            if offset:
+                ocean_backend.feed(offset=offset)
             else:
-                ocean_backend.feed(backend_cmd.from_date)
+                if backend_cmd.from_date.replace(tzinfo=None) == \
+                    parser.parse("1970-01-01").replace(tzinfo=None):
+                    # Don't use the default value
+                    ocean_backend.feed()
+                else:
+                    ocean_backend.feed(backend_cmd.from_date)
         except AttributeError:
             # The backend does not support from_date
             ocean_backend.feed()

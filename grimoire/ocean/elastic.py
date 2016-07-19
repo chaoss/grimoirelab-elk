@@ -102,7 +102,7 @@ class ElasticOcean(object):
         # Also add timestamp used in incremental enrichment
         item['metadata__timestamp'] = timestamp.isoformat()
 
-    def feed(self, from_date=None):
+    def feed(self, from_date=None, offset=None):
         """ Feed data in Elastic from Perceval """
 
         # Always filter by origin to support multi origin indexes
@@ -124,13 +124,17 @@ class ElasticOcean(object):
         if self.fetch_cache:
             items = self.perceval_backend.fetch_from_cache()
         else:
-            if last_update:
+            if last_update and not offset:
+                # if offset used for incremental do not use date
                 # Perceval backend from_date must not include timezone
                 # It always uses the server datetime
                 last_update = last_update.replace(tzinfo=None)
                 items = self.perceval_backend.fetch(from_date=last_update)
             else:
-                items = self.perceval_backend.fetch()
+                if offset:
+                    items = self.perceval_backend.fetch(offset=offset)
+                else:
+                    items = self.perceval_backend.fetch()
         for item in items:
             # print("%s %s" % (item['url'], item['lastUpdated_date']))
             # Add date field for incremental analysis if needed
