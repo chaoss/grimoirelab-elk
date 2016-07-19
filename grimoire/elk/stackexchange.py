@@ -123,7 +123,9 @@ class StackExchangeEnrich(Enrich):
 
             eitem["type"] = 'question'
             eitem["author"] = question['owner']['display_name']
-            eitem["author_link"] = question['owner']['link']
+            eitem["author_link"] = None
+            if 'link' in question['owner']:
+                eitem["author_link"] = question['owner']['link']
             eitem["author_reputation"] = question['owner']['reputation']
 
             # data fields to copy
@@ -152,7 +154,9 @@ class StackExchangeEnrich(Enrich):
 
             eitem["type"] = 'answer'
             eitem["author"] = answer['owner']['display_name']
-            eitem["author_link"] = answer['owner']['link']
+            eitem["author_link"] = None
+            if 'link' in answer['owner']:
+                eitem["author_link"] = answer['owner']['link']
             eitem["author_reputation"] = answer['owner']['reputation']
 
             # data fields to copy
