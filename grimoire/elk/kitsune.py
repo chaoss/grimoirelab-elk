@@ -114,11 +114,11 @@ class KitsuneEnrich(Enrich):
     def get_rich_item(self, item, kind='question'):
         eitem = {}
 
-
         # Fields common in questions and answers
         common_fields = ["product", "topic", "locale", "is_spam"]
 
         if kind == 'question':
+            eitem['type'] = kind
             # metadata fields to copy
             copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
             for f in copy_fields:
@@ -172,6 +172,7 @@ class KitsuneEnrich(Enrich):
 
         elif kind == 'answer':
             answer = item
+            eitem['type'] = kind
 
             # data fields to copy
             copy_fields = ["content", "solution"]
