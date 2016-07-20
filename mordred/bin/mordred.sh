@@ -184,7 +184,7 @@ function get_repo_list {
     for p in $PROJECTS
     do
         AUX=`$PROJECT_INFO $PATH_JSON_FILE list $p --repo $1`
-        RES=" $AUX"
+        RES="$RES $AUX"
     done
     echo $RES
 }
