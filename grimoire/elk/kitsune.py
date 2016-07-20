@@ -47,7 +47,7 @@ class KitsuneEnrich(Enrich):
         return "metadata__updated_on"
 
     def get_field_unique_id(self):
-        return "id"
+        return "question_id"
 
     def get_elastic_mappings(self):
 
@@ -57,6 +57,10 @@ class KitsuneEnrich(Enrich):
                 "content_analyzed": {
                   "type": "string",
                   "index":"analyzed"
+                  },
+                "tags_analyzed": {
+                  "type": "string",
+                  "index":"analyzed"
                   }
            }
         } """
@@ -64,56 +68,148 @@ class KitsuneEnrich(Enrich):
         return {"items":mapping}
 
 
+    def get_sh_identity(self, owner):
+        identity = {}
+
+        identity['username'] = owner['username']
+        identity['email'] = None
+        identity['name'] = owner['username']
+        if owner['display_name']:
+            identity['name'] = owner['display_name']
+
+        return identity
+
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
-        user = self.get_sh_identity(item['data']['creator'])
-        identities.append(user)
+
+        item = item['data']
+
+        for identity in ['creator']:
+            # Todo: questions has also involved and solved_by
+            if identity in item and item[identity]:
+                user = self.get_sh_identity(item[identity])
+                identities.append(user)
+            if 'answers_date' in item:
+                for answer in item['answers']:
+                    user = self.get_sh_identity(answer[identity])
+                    identities.append(user)
         return identities
 
-    def get_sh_identity(self, creator):
-        identity = {}
-        identity['username'] = creator['username']
-        identity['name'] = creator['username']
-        if creator['display_name']:
-            identity['name'] = creator['display_name']
-        identity['email'] = None
-        return identity
+    def get_item_sh(self, item, identity_field):
+        """ Add sorting hat enrichment fields for the author of the item """
 
-    def get_rich_item(self, item):
+        eitem = {}  # Item enriched
+
+        update_date = parser.parse(item["updated"])
+
+        # Add Sorting Hat fields
+        if identity_field not in item:
+            return eitem
+        identity  = self.get_sh_identity(item[identity_field])
+        eitem = self.get_item_sh_fields(identity, update_date)
+
+        return eitem
+
+    def get_rich_item(self, item, kind='question'):
         eitem = {}
 
-        # metadata fields to copy
-        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
-        for f in copy_fields:
-            if f in item:
-                eitem[f] = item[f]
-            else:
-                eitem[f] = None
-        # The real data
-        question = item['data']
 
-        # data fields to copy
-        copy_fields = ["id","content","title","topic","num_answers","product","solution","num_votes"]
-        for f in copy_fields:
-            if f in question:
-                eitem[f] = question[f]
-            else:
-                eitem[f] = None
-        # Fields which names are translated
-        map_fields = {"content": "content_analyzed"
-                      }
-        for fn in map_fields:
-            eitem[map_fields[fn]] = question[fn]
+        # Fields common in questions and answers
+        common_fields = ["product", "topic", "locale", "is_spam"]
 
-        # Enrich dates
-        eitem["create_date"] = parser.parse(question["created"]).isoformat()
-        eitem["update_date"] = parser.parse(question["updated"]).isoformat()
+        if kind == 'question':
+            # metadata fields to copy
+            copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
+            for f in copy_fields:
+                if f in item:
+                    eitem[f] = item[f]
+                else:
+                    eitem[f] = None
+            # The real data
+            question = item['data']
 
-        eitem['lifetime_days'] = \
-            get_time_diff_days(question['created'], question['updated'])
+            # data fields to copy
+            copy_fields = ["content", "num_answers", "solution", "title"]
+            copy_fields += common_fields
+            for f in copy_fields:
+                if f in question:
+                    eitem[f] = question[f]
+                else:
+                    eitem[f] = None
+            eitem["content_analyzed"] = question['content']
 
-        eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "job"))
+            # Fields which names are translated
+            map_fields = {
+                    "id": "question_id",
+                    "num_votes": "score"
+            }
+            for fn in map_fields:
+                eitem[map_fields[fn]] = question[fn]
+
+            tags = ''
+            for tag in question['tags']:
+                tags += tag['slug'] + ","
+            tags = tags[0:-1] # remove last ,
+            eitem["tags"] = tags
+            eitem["tags_analyzed"] = tags
+
+            # Enrich dates
+            eitem["creation_date"] = parser.parse(question["created"]).isoformat()
+            eitem["last_activity_date"] = parser.parse(question["updated"]).isoformat()
+
+            eitem['lifetime_days'] = \
+                get_time_diff_days(question['created'], question['updated'])
+
+            eitem.update(self.get_grimoire_fields(question['created'], "question"))
+
+            eitem['author'] = question['creator']['username']
+            if question['creator']['display_name']:
+                eitem['author'] = question['creator']['display_name']
+
+            if self.sortinghat:
+                eitem.update(self.get_item_sh(question, "creator"))
+
+        elif kind == 'answer':
+            answer = item
+
+            # data fields to copy
+            copy_fields = ["content", "solution"]
+            copy_fields += common_fields
+            for f in copy_fields:
+                if f in answer:
+                    eitem[f] = answer[f]
+                else:
+                    eitem[f] = None
+            eitem["content_analyzed"] = answer['content']
+
+            # Fields which names are translated
+            map_fields = {
+                    "id": "answer_id",
+                    "question": "question_id",
+                    "num_helpful_votes": "score",
+                    "num_unhelpful_votes":"unhelpful_answer"
+            }
+            for fn in map_fields:
+                eitem[map_fields[fn]] = answer[fn]
+
+            eitem["helpful_answer"] = answer['num_helpful_votes']
+
+            # Enrich dates
+            eitem["creation_date"] = parser.parse(answer["created"]).isoformat()
+            eitem["last_activity_date"] = parser.parse(answer["updated"]).isoformat()
+
+            eitem['lifetime_days'] = \
+                get_time_diff_days(answer['created'], answer['updated'])
+
+            eitem.update(self.get_grimoire_fields(answer['created'], "answer"))
+
+            eitem['author'] = answer['creator']['username']
+            if answer['creator']['display_name']:
+                eitem['author'] = answer['creator']['display_name']
+
+            if self.sortinghat:
+                eitem.update(self.get_item_sh(answer, "creator"))
 
         return eitem
 
@@ -138,4 +234,18 @@ class KitsuneEnrich(Enrich):
                 (rich_item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
+            # Time to enrich also de answers
+            if 'answers_data' in item['data']:
+                for answer in item['data']['answers_data']:
+                    answer['solution'] = 0
+                    if answer['id'] == item['data']['solution']:
+                        answer['solution'] = 1
+                    rich_answer = self.get_rich_item(answer, kind='answer')
+                    data_json = json.dumps(rich_answer)
+                    bulk_json += '{"index" : {"_id" : "%i_%i" } }\n' % \
+                        (rich_answer[self.get_field_unique_id()],
+                         rich_answer['answer_id'])
+                    bulk_json += data_json +"\n"  # Bulk document
+                    current += 1
+
         self.requests.put(url, data = bulk_json)
