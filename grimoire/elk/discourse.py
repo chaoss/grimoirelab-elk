@@ -25,6 +25,8 @@
 import json
 import logging
 
+from dateutil import parser
+
 from .utils import get_time_diff_days
 
 
@@ -72,7 +74,7 @@ class DiscourseEnrich(Enrich):
         data = item['data']['details']['created_by']
 
         identity  = self.get_sh_identity(data)
-        eitem = self.get_item_sh_fields(identity, item)
+        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
 
         return eitem
 

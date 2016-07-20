@@ -23,11 +23,14 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from time import time
-from dateutil import parser
 import json
 import logging
+
+from datetime import datetime
+from time import time
 from urllib.parse import urlparse
+
+from dateutil import parser
 
 from .enrich import Enrich
 
@@ -96,7 +99,9 @@ class BugzillaEnrich(Enrich):
             eitem['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['assigned_to_name'] = identity['name']
             item_date = item['data'][self.get_field_date()][0]['__text__']
-            eitem["assigned_to_org_name"] = self.get_enrollment(eitem['assigned_to_uuid'], parser.parse(item_date))
+            item_date_dt = parser.parse(item_date)
+            item_date_utc = (item_date_dt-item_date_dt.utcoffset()).replace(tzinfo=None)
+            eitem["assigned_to_org_name"] = self.get_enrollment(eitem['assigned_to_uuid'], item_date_utc)
             eitem["assigned_to_domain"] = self.get_domain(identity)
             eitem["assigned_to_bot"] = self.is_bot(eitem['assigned_to_uuid'])
         if 'reporter' in item['data']:
@@ -104,7 +109,9 @@ class BugzillaEnrich(Enrich):
             eitem['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
             eitem['reporter_name'] = identity['name']
             item_date = item['data'][self.get_field_date()][0]['__text__']
-            eitem["reporter_org_name"] = self.get_enrollment(eitem['reporter_uuid'], parser.parse(item_date))
+            item_date_dt = parser.parse(item_date)
+            item_date_utc = (item_date_dt-item_date_dt.utcoffset()).replace(tzinfo=None)
+            eitem["reporter_org_name"] = self.get_enrollment(eitem['reporter_uuid'], item_date_utc)
             eitem["reporter_domain"] = self.get_domain(identity)
             eitem["reporter_bot"] = self.is_bot(eitem['reporter_uuid'])
 
@@ -175,41 +182,69 @@ class BugzillaEnrich(Enrich):
         # The real data
         issue = item['data']
 
+        # dizquierdo specification
+
+        eitem['changes'] = len(item['data']['activity'])
+
+        eitem['labels'] = item['data']['keywords']
+        eitem['priority'] = item['data']['priority'][0]['__text__']
+        eitem['severity'] = item['data']['bug_severity'][0]['__text__']
+        eitem['op_sys'] = item['data']['op_sys'][0]['__text__']
+        eitem['product'] = item['data']['product'][0]['__text__']
+        eitem['project_name'] = item['data']['product'][0]['__text__']
+        eitem['component'] = item['data']['component'][0]['__text__']
+        eitem['platform'] = item['data']['rep_platform'][0]['__text__']
+        if '__text__' in item['data']['resolution'][0]:
+            eitem['resolution'] = item['data']['resolution'][0]['__text__']
+        if 'watchers' in item['data']:
+            eitem['watchers'] = item['data']['watchers'][0]['__text__']
+        eitem['votes'] = item['data']['votes'][0]['__text__']
+
         if "assigned_to" in issue:
             if "name" in issue["assigned_to"][0]:
-                eitem["assigned_to"] = issue["assigned_to"][0]["name"]
+                eitem["assigned"] = issue["assigned_to"][0]["name"]
+            if "__text__" in issue["assigned_to"][0]:
+                eitem["assignee_email"] = issue["assigned_to"][0]["__text__"]
+
 
         if "reporter" in issue:
             if "name" in issue["reporter"][0]:
-                eitem["reporter"] = issue["reporter"][0]["name"]
+                eitem["reporter_name"] = issue["reporter"][0]["name"]
+                eitem["author_name"] = issue["reporter"][0]["name"]
+            if "__text__" in issue["reporter"][0]:
+                eitem["reporter_email"] = issue["reporter"][0]["__text__"]
+                eitem["author_email"] = issue["reporter"][0]["__text__"]
+
+        date_ts = parser.parse(issue['creation_ts'][0]['__text__'])
+        eitem['creation_date'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
+
 
         eitem["bug_id"] = issue['bug_id'][0]['__text__']
         eitem["status"]  = issue['bug_status'][0]['__text__']
         if "short_desc" in issue:
             if "__text__" in issue["short_desc"][0]:
-                eitem["summary"]  = issue['short_desc'][0]['__text__']
+                eitem["main_description"]  = issue['short_desc'][0]['__text__']
+        if "summary" in issue:
+            if "__text__" in issue["summary"][0]:
+                eitem["summary"]  = issue['summary'][0]['__text__']
 
-        # Component and product
-        eitem["component"] = issue['component'][0]['__text__']
-        eitem["product"]  = issue['product'][0]['__text__']
 
         # Fix dates
-        date_ts = parser.parse(issue['creation_ts'][0]['__text__'])
-        eitem['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
         date_ts = parser.parse(issue['delta_ts'][0]['__text__'])
         eitem['changeddate_date'] = date_ts.isoformat()
         eitem['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
         # Add extra JSON fields used in Kibana (enriched fields)
-        eitem['number_of_comments'] = 0
-        eitem['time_to_last_update_days'] = None
+        eitem['comments'] = 0
         eitem['url'] = None
 
         if 'long_desc' in issue:
-            eitem['number_of_comments'] = len(issue['long_desc'])
+            eitem['comments'] = len(issue['long_desc'])
         eitem['url'] = get_bugzilla_url() + "show_bug.cgi?id=" + issue['bug_id'][0]['__text__']
-        eitem['time_to_last_update_days'] = \
-            get_time_diff_days(eitem['creation_ts'], eitem['delta_ts'])
+        eitem['resolution_days'] = \
+            get_time_diff_days(eitem['creation_date'], eitem['delta_ts'])
+        eitem['timeopen_days'] = \
+            get_time_diff_days(eitem['creation_date'], datetime.utcnow())
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
@@ -217,7 +252,7 @@ class BugzillaEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(item))
 
-        eitem.update(self.get_grimoire_fields(eitem['creation_ts'],"bug"))
+        eitem.update(self.get_grimoire_fields(eitem['creation_date'],"bug"))
 
         return eitem
 

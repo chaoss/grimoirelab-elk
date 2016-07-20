@@ -95,20 +95,17 @@ class MediaWikiEnrich(Enrich):
         first_revision = item['data']['revisions'][0]
 
         identity  = self.get_sh_identity(first_revision)
-        eitem = self.get_item_sh_fields(identity, item)
+        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
 
         return eitem
 
     def get_review_sh(self, revision, item):
         """ Add sorting hat enrichment fields for the author of the revision """
 
-        eitem = {}  # Item enriched
-
         identity  = self.get_sh_identity(revision)
         erevision = self.get_item_sh_fields(identity, item)
 
         return erevision
-
 
     def get_rich_item_reviews(self, item):
         erevisions = []

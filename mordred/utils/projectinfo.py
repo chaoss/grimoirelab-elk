@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# This script manage the information about Eclipse projects
+# This script manage the information about Mordred projects
 #
-# Copyright (C) 2014 Bitergia
+# Copyright (C) 2016 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,13 +30,16 @@ import os
 import sys
 
 
-REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'mailing_lists', 'telegram', 'kuma',
-                          'kitsune', 'mozilla_reps', 'mediawiki', 'irc', 'confluence',
-                          'jira',' maniphest', 'gerrit']
+REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'gmane', 'telegram', 'kuma',
+                          'kitsune', 'mozilla_reps', 'mediawiki', 'mbox', 'confluence',
+                          'jira',' maniphest', 'gerrit', 'meetup', 'supybot',
+                          'pipermail']
+
 
 def read_arguments():
+    usage = "projectinfo.py [--help] file command project_name [--repo <repo_type> <url>] [--parent <project_name>]"
     desc = """
-    Repositories avaliable
+Repositories avaliable
 
     source_repo: Adding a source repo for the project
     github: Adding a github repo for the project
@@ -45,55 +48,86 @@ def read_arguments():
     kuma: Adding a kuma for the project
     kitsune: Adding a kitsune for the project
     mozilla_reps: Adding a mozilla reps for the project
-    irc: Adding a irc for the project
     confluence: Adding a confluence for the project
     jira: Adding a jira for the project
     maniphest: Adding a maniphest for the project
     gerrit: Adding a gerrit for the project
+    meetup: Adding a meetup for the project
+    supybot: Adding a irc for the project, you need to includ the path
+    gmane: Archive mailing lists hosted in gmane
+    pipermail: Archive mailing list hosted with pipermail
+    mbox: Adding a mbox for the project
     """
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-                                     description=desc)
+                                     description=desc,
+                                     usage=usage)
 
-    # Required
-    parser.add_argument("-f", "--file",
-                      action="store",
-                      dest="file",
-                      help="the JSON file to update")
+    parser.add_argument("file",
+                        action="store",
+                        help="the JSON file to update")
 
-    # Actions
-    parser.add_argument("-a", "--add",
-                      action="store",
-                      dest="add",
-                      help="add a new project")
-    parser.add_argument("-r", "--rm",
-                      action="store",
-                      dest="rm",
-                      help="remove a project")
-    parser.add_argument("-l", "--list",
-                      action="store",
-                      dest="list",
-                      help="list the repository")
+    subparsers = parser.add_subparsers(help='command',
+                                       dest="command")
 
-    # Options
-    parser.add_argument("-p", "--parent",
-                      action="store",
-                      dest="parent",
-                      help="update the parent_project information")
-    parser.add_argument("--repo",
-                      action="store",
-                      dest="repo",
-                      help="see list of repositories available")
-    parser.add_argument("-u", "--url",
-                      action="store",
-                      dest="url",
-                      help="the URL of the repo")
+    # add
+    add_usage = "projectinfo.py file add [--help] project_name [--repo <repo_type> <url>] [--parent <project>]"
+    add_parser = subparsers.add_parser("add",
+                                       help="add project",
+                                       usage=add_usage)
+    add_parser.add_argument("project_name",
+                            action="store",
+                            help="project name")
+    add_parser.add_argument("--repo",
+                            action="store",
+                            dest="repo",
+                            nargs='*',
+                            help="see the list of available repositories and the repository URL")
+    add_parser.add_argument("-p", "--parent",
+                            action="store",
+                            dest="parent",
+                            help="add the parent project information")
+
+    # remove
+    rm_usage = "projectinfo.py file rm [--help] project_name [--repo <repo_type> <url>] [--parent <project>]"
+    rm_parser = subparsers.add_parser("rm",
+                                      help="remove project",
+                                      usage=rm_usage)
+    rm_parser.add_argument("project_name",
+                           action="store",
+                           help="project name")
+    rm_parser.add_argument("--repo",
+                           action="store",
+                           dest="repo",
+                           nargs='*',
+                           help="see the list of available repositories")
+    rm_parser.add_argument("-p", "--parent",
+                           action="store",
+                           dest="parent",
+                           help="remove the parent project information")
+
+    # list
+    list_usage = "usage: projectinfo.py list <project_name> [--repo <repo_type>]"
+    list_desc = "List data for a given project name"
+    list_parser = subparsers.add_parser("list",
+                                        help="list project",
+                                        usage=list_usage,
+                                        description=list_desc)
+    list_parser.add_argument("project_name",
+                             action="store",
+                             nargs='?',
+                             help="project name")
+    list_parser.add_argument("--repo",
+                             action="store",
+                             dest="repo",
+                             nargs='*',
+                             help="see the list of available repositories")
 
     args = parser.parse_args()
 
     if args.repo:
-        if args.repo not in REPOSITORIES_AVALIABLE:
-            raise KeyError(args.repo,' is not exist')
+        if args.repo[0] not in REPOSITORIES_AVALIABLE:
+            sys.exit(str(args.repo[0]) + ' is not exist')
 
     return args
 
@@ -140,14 +174,18 @@ def add(conf, raw):
                     "mailing_lists": [],
                     "parent_project": [],
                     "releases": [],
+                    "source_repo": [],
                     "title": conf['project'],
                     "wiki_url": []
                 }
 
     if 'repo' in conf:
-        #$ ./projectinfo.py -f coreos.json --add Appc-spec --repo github --url https://github.com/appc/spec.git
+        #$ ./projectinfo.py <JSON_file> add <project_name> --repo <repo_name> <url>
         #Adding a source code repository for the project
-        new_repo = {'url': conf['url']}
+        if conf['repo'] == "supybot":
+            new_repo = {'url': conf['url'], 'path': conf['path']}
+        else:
+            new_repo = {'url': conf['url']}
 
         try:
             if new_repo not in raw['projects'][conf['project']][conf['repo']]:
@@ -158,8 +196,23 @@ def add(conf, raw):
                 raw['projects'][conf['project']][conf['repo']].append(new_repo)
             except KeyError:
                 print("No exist the project",conf['project'],"do first --add",conf['project'])
+
+    elif 'parent' in conf:
+        #$ ./projectinfo.py <JSON_file> add <project_name> --parent <project>
+        #We also want a method to update the parent_project information. 1 to n relationship.
+        try:
+            if conf['parent'] not in raw['projects'][conf['project']]['parent_project']:
+                raw['projects'][conf['project']]['parent_project'].append(conf['parent'])
+                print(conf['project']," is now subproject of ",conf['parent'])
+
+                write_file(conf['file'], raw)
+            else:
+                print(conf['project'],"is already a subprocess of",conf['parent'])
+        except KeyError:
+            print(conf['project'],"or",conf['parent'],"is not exist")
+
     else:
-        #$ ./projectinfo.py -f coreos.json --add Appc-spec
+        #$ ./projectinfo.py <JSON_file> add <project_name>
         #Adding a project (it will create the file if did not exist):
         if conf['project'] not in raw['projects']:
             raw['projects'][conf['project']] = new_project
@@ -172,15 +225,35 @@ def remove(conf, raw):
     """Remove a project or a project repository"""
 
     if 'repo' in conf:
-        # $ ./projectinfo.py -f coreos.json --rm Appc-spec --repo source_repo --url https://github.com/appc/spec.git
-        #Removing the source repo https://github.com/appc/spec.git for the project Appc-spec
-        remove_repo = {'url': conf['url']}
+        # $ ./projectinfo.py <JSON_file> rm <project_name> --repo <repo_name> <url>
+        #Removing the repo url for the project
+        if conf['repo'] == "supybot":
+            remove_repo = {'url': conf['url'], 'path': conf['path']}
+        else:
+            remove_repo = {'url': conf['url']}
+
         try:
             raw['projects'][conf['project']][conf['repo']].remove(remove_repo)
+
         except ValueError:
             print("No exist the URL", conf['url'],"in", conf['repo'], "OR the repository", conf['repo'], "is not exist")
+
+    elif 'parent' in conf:
+        #$ ./projectinfo.py <JSON_file> rm <project_name> --parent <project>
+        #remove the parent_project information.
+        try:
+            if conf['parent'] in raw['projects'][conf['project']]['parent_project']:
+                raw['projects'][conf['project']]['parent_project'].remove(conf['parent'])
+                print(conf['project']," is no longer a subproject of ",conf['parent'])
+
+                write_file(conf['file'], raw)
+            else:
+                print(conf['project'],"is not a subprocess of",conf['parent'])
+        except KeyError:
+            print(conf['project'],"or",conf['parent'],"is not exist")
+
     else:
-        #$ ./projectinfo.py -f coreos.json --rm Appc-spec
+        #$ ./projectinfo.py <JSON_file> rm <project_name>
         #Removing all the information about the project:
         try:
             del raw['projects'][conf['project']]
@@ -191,29 +264,23 @@ def remove(conf, raw):
 
 def lists(conf, raw):
     """List a repository or list the URL of a repository"""
+
     if 'repo' in conf:
-        #$ ./projectinfo.py -f coreos.json --list Appc-spec --repo source_repo
-        #Listing the source repos for a project
+        #$ ./projectinfo.py <JSON_file> list <project_name> --repo <repo_name>
+        #Listing the URL's for a repository
         repo = conf['repo']
         try:
             for project in raw['projects'][conf['project']][repo]:
-                print(project)
+                if repo == "supybot":
+                    print(project['url'],project['path'])
+                else:
+                    print(project['url'])
         except KeyError:
             print("The repository", repo, "is not exist in", conf['project'])
 
-    elif 'parent' in conf:
-        #$ ./projectinfo.py --list Appc-spec --parent Specs
-        #We also want a method to update the parent_project information. 1 to n relationship.
-        try:
-            raw['projects'][conf['project']]['parent_project'] = conf['parent']
-            print(conf['project']," is now subproject of ",conf['parent'])
-
-            write_file(conf['file'], raw)
-        except KeyError:
-            print(conf['project'],"or",conf['parent'],"is not exist")
-    else:
-        #$ ./projectinfo.py --list Appc-spec
-        #List the information about the project:
+    elif 'project' in conf:
+        #$ ./projectinfo.py <JSON_file> list <project_name>
+        #Mustn't list this list:
         default = ["bugzilla", "description", "dev_list", "downloads",
                   "forums", "gerrit_repo", "mailing_lists", "parent_project",
                   "releases", "title", "wiki_url"]
@@ -224,6 +291,10 @@ def lists(conf, raw):
                         print(repo)
         except KeyError:
             print("No exist the project",conf['project'])
+
+    else:
+        for proj in raw['projects']:
+            print(proj)
 
 def run(conf):
 
@@ -239,23 +310,26 @@ if __name__ == '__main__':
     args = read_arguments()
     conf = {}
 
-    if args.add:
-        conf['option'] = "add"
-        conf['project'] = args.add
-    elif args.list:
-        conf['option'] = "list"
-        conf['project'] = args.list
-    elif args.rm:
-        conf['option'] = "rm"
-        conf['project'] = args.rm
-
+    if args.command:
+        conf['option'] = args.command
+    if args.project_name:
+        conf['project'] = args.project_name
     if args.file:
         conf['file'] = args.file
-    if args.parent:
-        conf['parent'] = args.parent
-    if args.repo:
-        conf['repo'] = args.repo
-    if args.url:
-        conf['url'] = args.url
 
+    if args.command != "list":
+        if args.parent:
+            conf['parent'] = args.parent
+
+    if args.repo:
+        conf['repo'] = args.repo[0]
+        if args.repo[0] != "supybot" and len(args.repo) == 2:
+            conf['url'] = args.repo[1]
+        elif args.repo[0] == "supybot" and len(args.repo) == 3:
+                conf['url'] = args.repo[1]
+                conf['path'] = args.repo[2]
+        elif args.command != "list":
+            sys.exit("Must have two or three arguments if repo_name is 'supybot': --repo <repo_name> <url> <path>")
+        elif len(args.repo) > 1 and args.command == "list":
+            sys.exit("Must have one arguments if you use list: list <project_name> --repo <repo_name>")
     run(conf)

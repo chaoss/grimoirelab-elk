@@ -22,14 +22,48 @@ function log_result {
 function set_variables {
     # It's replaced "-" or "." with "_" into the project name to avoid errors into MySQL
     PROJECT_SHORTNAME=`echo $PROJECT_SHORTNAME | sed "s/[-.]/_/g"`
+    PROJECT_INFO="/home/bitergia/GrimoireELK-mordred/mordred/utils/projectinfo.py"
+
+    if [ -z FROM_DATE ]
+        then
+        FROM_DATE_STRING=""
+        FROM_DATE=""
+    else
+        FROM_DATE_STRING=`echo $FROM_DATE | cut -d " " -f 1`
+        FROM_DATE=`echo $FROM_DATE | cut -d " " -f 2`
+    fi
 
     DB_SH=$PROJECT_SHORTNAME"_sh"
     DB_PRO=$PROJECT_SHORTNAME"_pro"
 
-    BUGZILLA_ENRICHED_INDEX=$BUGZILLA_INDEX"_enriched"
-    JENKINS_ENRICHED_INDEX=$JENKINS_INDEX"_enriched"
-    GERRIT_ENRICHED_INDEX=$GERRIT_INDEX"_enriched"
-    GIT_ENRICHED_INDEX=$GIT_INDEX"_enriched"
+    if [ -z PIPERMAIL_ENRICHED_INDEX ]
+        then
+        PIPERMAIL_ENRICHED_INDEX=$PIPERMAIL_INDEX"_enriched"
+    fi
+    if [ -z GMANE_ENRICHED_INDEX ]
+        then
+        GMANE_ENRICHED_INDEX=$GMANE_INDEX"_enriched"
+    fi
+    if [ -z SUPYBOT_ENRICHED_INDEX ]
+        then
+        SUPYBOT_ENRICHED_INDEX=$SUPYBOT_INDEX"_enriched"
+    fi
+    if [ -z BUGZILLA_ENRICHED_INDEX ]
+        then
+        BUGZILLA_ENRICHED_INDEX=$BUGZILLA_INDEX"_enriched"
+    fi
+    if [ -z JENKINS_ENRICHED_INDEX ]
+        then
+        JENKINS_ENRICHED_INDEX=$JENKINS_INDEX"_enriched"
+    fi
+    if [ -z GERRIT_ENRICHED_INDEX ]
+        then
+        GERRIT_ENRICHED_INDEX=$GERRIT_INDEX"_enriched"
+    fi
+    if [ -z GIT_ENRICHED_INDEX ]
+        then
+        GIT_ENRICHED_INDEX=$GIT_INDEX"_enriched"
+    fi
 
     LOGS_DIR=$LOGS_DIR"/"$PROJECT_SHORTNAME
     MAINLOG=$LOGS_DIR"/main.log"
@@ -37,10 +71,11 @@ function set_variables {
         then
         echo "-- debugging variables --"
         echo "GIT_ENABLED=$GIT_ENABLED"
-        echo "FROM_DATE=$FROM_DATE"
+        echo "FROM_DATE=$FROM_DATE_STRING $FROM_DATE"
         echo "GERRIT_ENABLED=$GERRIT_ENABLED"
         echo "BUGZILLA_ENABLED=$BUGZILLA_ENABLED"
         echo "JENKINS_ENABLED=$JENKINS_ENABLED"
+        echo "SUPYBOT_ENABLED=$SUPYBOT_ENABLED"
         echo "PROJECT_SHORTNAME=$PROJECT_SHORTNAME"
         echo "DB_HOST=$DB_HOST"
         echo "ORGS_ENABLED=$ORGS_ENABLED"
@@ -60,6 +95,12 @@ function set_variables {
         echo "BUGZILLA_INDEX="$BUGZILLA_INDEX
         echo "JENKINS_INDEX=$JENKINS_INDEX"
         echo "JENKINS_ENRICHED_INDEX=$JENKINS_ENRICHED_INDEX"
+        echo "SUPYBOT_INDEX=$SUPYBOT_INDEX"
+        echo "SUPYBOT_ENRICHED_INDEX=$SUPYBOT_ENRICHED_INDEX"
+        echo "GMANE_INDEX=$GMANE_INDEX"
+        echo "GMANE_ENRICHED_INDEX=$GMANE_ENRICHED_INDEX"
+        echo "PIPERMAIL_INDEX=$PIPERMAIL_INDEX"
+        echo "PIPERMAIL_ENRICHED_INDEX=$PIPERMAIL_ENRICHED_INDEX"
         echo "SH_UNIFY_METHOD=$SH_UNIFY_METHOD"
         echo "SH_UNAFFILIATED_GROUP=$SH_UNAFFILIATED_GROUP"
         echo "LOGS_DIR=$LOGS_DIR"
@@ -113,6 +154,16 @@ function compose_git_list {
     log_result ". List of projects generated" ". ERROR: Error creating the Git list of projects"
 }
 
+function compose_repo_list {
+    input_file=`echo $PROJECTS_JSON_FILE | cut -d / -f 3-`
+    $PROJECT_INFO $input_file list > $1
+    IFS=$'\n'
+    for project in $(cat $1);
+    do
+      $PROJECT_INFO $input_file list $project --repo $3 >> $2
+    done
+}
+
 function update_projects_db {
     cd ~/VizGrimoireUtils/eclipse
     CACHED=${PROJECTS_JSON_FILE//\//_}
@@ -157,29 +208,90 @@ function retrieve_data {
         jenkins_retrieval
         log_result "[jenkins] Retrieval finished" "[jenkins] ERROR: Something went wrong with the retrieval"
     fi
+
+    if [ $SUPYBOT_ENABLED -eq 1 ]
+        then
+        log "[supybot - irc] Retrieving data"
+        supybot_retrieval
+        log_result "[supybot - irc] Retrieval finished" "[supybot - irc] ERROR: Something went wrong with the retrieval"
+    fi
+
+    if [ $GMANE_ENABLED -eq 1 ]
+        then
+        log "[gmane - mls] Retrieving data"
+        gmane_retrieval
+        log_result "[gmane - mls] Retrieval finished" "[gmane - mls] ERROR: Something went wrong with the retrieval"
+    fi
+
+    if [ $PIPERMAIL_ENABLED -eq 1 ]
+        then
+        log "[pipermail - mls] Retrieving data"
+        pipermail_retrieval
+        log_result "[pipermail - mls] Retrieval finished" "[pipermail - mls] ERROR: Something went wrong with the retrieval"
+    fi
 }
 
 function git_retrieval {
     TMP_GITLIST=`mktemp`
     compose_git_list $TMP_GITLIST
     cd ~/GrimoireELK/utils
-    awk -v es_uri="$ES_URI" -v myindex="$GIT_INDEX" -v myfrom="$FROM_DATE" '{print "./p2o.py -e "es_uri" --index "myindex" -g git " $3" "myfrom}' $TMP_GITLIST | sh >> $LOGS_DIR"/git-collection.log" 2>&1
+    awk -v es_uri="$ES_URI" -v myindex="$GIT_INDEX" -v myfrom="$FROM_DATE_STRING $FROM_DATE" '{print "./p2o.py -e "es_uri" --index "myindex" -g git " $3" "myfrom}' $TMP_GITLIST | sh >> $LOGS_DIR"/git-collection.log" 2>&1
     rm $TMP_GITLIST
 }
 
 function gerrit_retrieval {
-  cd ~/GrimoireELK/utils
-  ./p2o.py -e $ES_URI -g --index $GERRIT_INDEX gerrit --user $GERRIT_USER --url $GERRIT_URL $GERRIT_EXTRA_PARAM $FROM_DATE >> $LOGS_DIR"/gerrit-collection.log" 2>&1
+    cd ~/GrimoireELK/utils
+    ./p2o.py -e $ES_URI -g --index $GERRIT_INDEX gerrit --user $GERRIT_USER --url $GERRIT_URL $GERRIT_EXTRA_PARAM $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/gerrit-collection.log" 2>&1
 }
 
 function bugzilla_retrieval {
-  cd ~/GrimoireELK/utils
-  ./p2o.py -e $ES_URI -g --index $BUGZILLA_INDEX bugzilla -u $BUGZILLA_USER -p $BUGZILLA_PASS $BUGZILLA_URL $FROM_DATE >> $LOGS_DIR"/bugzilla-collection.log" 2>&1
+    cd ~/GrimoireELK/utils
+    ./p2o.py -e $ES_URI -g --index $BUGZILLA_INDEX bugzilla -u $BUGZILLA_USER -p $BUGZILLA_PASS $BUGZILLA_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/bugzilla-collection.log" 2>&1
 }
 
 function jenkins_retrieval {
-  cd ~/GrimoireELK/utils
-  ./p2o.py -e $ES_URI -g --index $JENKINS_INDEX jenkins $JENKINS_URL $FROM_DATE >> $LOGS_DIR"/jenkins-collection.log" 2>&1
+    cd ~/GrimoireELK/utils
+    ./p2o.py -e $ES_URI -g --index $JENKINS_INDEX jenkins $JENKINS_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jenkins-collection.log" 2>&1
+}
+
+function supybot_retrieval {
+    TMP_SUPYBOT_PROJECT_LIST=`mktemp`
+    TMP_SUPYBOT_LIST=`mktemp`
+    compose_repo_list $TMP_SUPYBOT_PROJECT_LIST $TMP_SUPYBOT_LIST supybot
+    cd ~/GrimoireELK/utils/
+    for url in $(cat $TMP_SUPYBOT_LIST);
+    do
+        SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
+        ./p2o.py -e $ES_URI -g --index $SUPYBOT_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/irc-collection.log" 2>&1
+    done
+    rm $TMP_SUPYBOT_PROJECT_LIST
+    rm $TMP_SUPYBOT_LIST
+}
+
+function gmane_retrieval {
+    TMP_GMANE_PROJECT_LIST=`mktemp`
+    TMP_GMANE_LIST=`mktemp`
+    compose_repo_list $TMP_GMANE_PROJECT_LIST $TMP_GMANE_LIST gmane
+    cd ~/GrimoireELK/utils/
+    for url in $(cat $TMP_GMANE_LIST);
+    do
+        ./p2o.py -e $ES_URI -g --index $GMANE_INDEX gmane $url >> $LOGS_DIR"/mls-collection.log" 2>&1
+    done
+    rm $TMP_GMANE_PROJECT_LIST
+    rm $TMP_GMANE_LIST
+}
+
+function pipermail_retrieval {
+    TMP_PIPERMAIL_PROJECT_LIST=`mktemp`
+    TMP_PIPERMAIL_LIST=`mktemp`
+    compose_repo_list $TMP_PIPERMAIL_PROJECT_LIST $TMP_PIPERMAIL_LIST pipermail
+    cd ~/GrimoireELK/utils/
+    for url in $(cat $TMP_PIPERMAIL_LIST);
+    do
+        ./p2o.py -e $ES_URI -g --index $PIPERMAIL_INDEX pipermail $url $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/mls-collection.log" 2>&1
+    done
+    rm $TMP_PIPERMAIL_PROJECT_LIST
+    rm $TMP_PIPERMAIL_LIST
 }
 
 function get_identities_from_data {
@@ -220,6 +332,27 @@ function enrich_data {
         jenkins_enrichment $1
         log_result "[jenkins] p2o finished" "[jenkins] ERROR: Something went wrong with p2o"
     fi
+
+    if [ $SUPYBOT_ENABLED -eq 1 ]
+        then
+        log "[supybot - irc] Supybot p2o starts"
+        supybot_enrichment $1
+        log_result "[supybot - irc] p2o finished" "[supybot - irc] ERROR: Something went wrong with p2o"
+    fi
+
+    if [ $GMANE_ENABLED -eq 1 ]
+        then
+        log "[gmane - mls] Gmane p2o starts"
+        gmane_enrichment $1
+        log_result "[gmane - mls] p2o finished" "[gmane - mls] ERROR: Something went wrong with p2o"
+    fi
+
+    if [ $PIPERMAIL_ENABLED -eq 1 ]
+        then
+        log "[pipermail - mls] Pipermail p2o starts"
+        pipermail_enrichment $1
+        log_result "[pipermail - mls] p2o finished" "[pipermail - mls] ERROR: Something went wrong with p2o"
+    fi
 }
 
 function git_enrichment {
@@ -251,6 +384,49 @@ function jenkins_enrichment {
     ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JENKINS_INDEX --index-enrich $JENKINS_ENRICHED_INDEX jenkins $JENKINS_URL >> $LOGS_DIR"/bugzilla-enrichment.log" 2>&1
 }
 
+function supybot_enrichment {
+    TMP_SUPYBOT_PROJECT_LIST=`mktemp`
+    TMP_SUPYBOT_LIST=`mktemp`
+    ENR_EXTRA_FLAG=$1
+    compose_repo_list $TMP_SUPYBOT_PROJECT_LIST $TMP_SUPYBOT_LIST supybot
+    cd ~/GrimoireELK/utils/
+    for url in $(cat $TMP_SUPYBOT_LIST);
+    do
+        SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $SUPYBOT_INDEX --index-enrich $SUPYBOT_ENRICHED_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH >> $LOGS_DIR"/irc-enrichment.log" 2>&1
+    done
+    rm $TMP_SUPYBOT_PROJECT_LIST
+    rm $TMP_SUPYBOT_LIST
+}
+
+function gmane_enrichment {
+    TMP_GMANE_PROJECT_LIST=`mktemp`
+    TMP_GMANE_LIST=`mktemp`
+    ENR_EXTRA_FLAG=$1
+    compose_repo_list $TMP_GMANE_PROJECT_LIST $TMP_GMANE_LIST gmane
+    cd ~/GrimoireELK/utils/
+    for url in $(cat $TMP_GMANE_LIST);
+    do
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $GMANE_INDEX --index-enrich $GMANE_ENRICHED_INDEX gmane $url >> $LOGS_DIR"/mls-enrichment.log" 2>&1
+    done
+    rm $TMP_GMANE_PROJECT_LIST
+    rm $TMP_GMANE_LIST
+}
+
+function pipermail_enrichment {
+    TMP_PIPERMAIL_PROJECT_LIST=`mktemp`
+    TMP_PIPERMAIL_LIST=`mktemp`
+    ENR_EXTRA_FLAG=$1
+    compose_repo_list $TMP_PIPERMAIL_PROJECT_LIST $TMP_PIPERMAIL_LIST pipermail
+    cd ~/GrimoireELK/utils/
+    for url in $(cat $TMP_PIPERMAIL_LIST);
+    do
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $PIPERMAIL_INDEX --index-enrich $PIPERMAIL_ENRICHED_INDEX pipermail $url >> $LOGS_DIR"/mls-enrichment.log" 2>&1
+    done
+    rm $TMP_PIPERMAIL_PROJECT_LIST
+    rm $TMP_PIPERMAIL_LIST
+}
+
 function sortinghat_unify {
     if [ -z $SH_UNIFY_METHOD ]
         then
@@ -272,7 +448,7 @@ function group_unaffiliated_people {
         mysql -uroot -h$DB_HOST $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
         log_result "[sortinghat] Affiliation for $SH_UNAFFILIATED_GROUP finished" "[sortinghat] ERROR: Something went wrong with the affiliation of $SH_UNAFFILIATED_GROUP"
     else
-        log "[sortinghat] (WARNING!) No variable define $SH_UNAFFILIATED_GROUP"
+        log "[sortinghat] (WARNING!) No variable defined SH_UNAFFILIATED_GROUP"
     fi
 }
 
@@ -309,7 +485,6 @@ create_dbs
 
 init_sh_orgs
 
-COUNTER=0
 
 while true; do
 
@@ -327,49 +502,57 @@ while true; do
     log "Building projects database"
     update_projects_db
 
-    START_TIME=$SECONDS
-    retrieve_data
-    ELAPSED_TIME=$(($SECONDS - $START_TIME))
-    log "(T) Data collected in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
+    if [ -z $SKIP_COLLECTION ] || [ $SKIP_COLLECTION -eq 0 ]
+        then
 
-    log "Getting identities from raw data and executing sortinghat"
-    START_TIME=$SECONDS
-    get_identities_from_data
-
-    log "[sortinghat] Unify starts"
-    sortinghat_unify
-    log_result "[sortinghat] Unify finished" "[sortinghat] ERROR: Something went wrong with the unify"
-
-    log "[sortinghat] Affiliate starts"
-    sortinghat_affiliate
-    log_result "[sortinghat] Affiliate finished" "[sortinghat] ERROR: Something went wrong with the affiliate"
-
-    group_unaffiliated_people
-
-    ELAPSED_TIME=$(($SECONDS - $START_TIME))
-    log "(T) Identities and sortinghat done in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
-
-    log "Enrichment starts"
-    START_TIME=$SECONDS
-    if [ $COUNTER -eq 0 ]
-    then
-        log " --no_incremental mode enabled for enrichment"
-        enrich_data_no_inc
-        COUNTER=1
-    elif [ $COUNTER -eq 9 ]
-    then
-        enrich_data
-        COUNTER=0
-    else
-        enrich_data
-        COUNTER=$[$COUNTER +1]
+        START_TIME=$SECONDS
+        retrieve_data
+        ELAPSED_TIME=$(($SECONDS - $START_TIME))
+        log "(T) Data collected in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
     fi
-    ELAPSED_TIME=$(($SECONDS - $START_TIME))
-    log "(T) Data enriched in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
+
+    if [ -z $SKIP_SH ] || [ $SKIP_SH -eq 0 ]
+        then
+
+        log "Getting identities from raw data and executing sortinghat"
+        START_TIME=$SECONDS
+        get_identities_from_data
+
+        log "[sortinghat] Unify starts"
+        sortinghat_unify
+        log_result "[sortinghat] Unify finished" "[sortinghat] ERROR: Something went wrong with the unify"
+
+        log "[sortinghat] Affiliate starts"
+        sortinghat_affiliate
+        log_result "[sortinghat] Affiliate finished" "[sortinghat] ERROR: Something went wrong with the affiliate"
+
+        group_unaffiliated_people
+
+        ELAPSED_TIME=$(($SECONDS - $START_TIME))
+        log "(T) Identities and sortinghat done in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
+    fi
+
+    if [ -z $SKIP_ENRICHMENT ] || [ $SKIP_ENRICHMENT -eq 0 ]
+        then
+
+        log "Enrichment starts"
+        START_TIME=$SECONDS
+
+        enrich_data
+
+        ELAPSED_TIME=$(($SECONDS - $START_TIME))
+        log "(T) Data enriched in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
+    fi
 
     duration=$SECONDS
     log "(T) Dashboard updated in $(($duration / 60)) minutes and $(($duration % 60)) seconds."
 
-    go_to_bed
+    if [ -z $DEBUG ] || [ $DEBUG -eq 0 ]
+        then
+        go_to_bed
+    else
+        log "Debug mode enabled. Loop disabled, exiting now"
+        exit 0
+    fi
 
 done

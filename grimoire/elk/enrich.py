@@ -184,6 +184,7 @@ class Enrich(object):
 
     def get_enrollment(self, uuid, item_date):
         """ Get the enrollment for the uuid when the item was done """
+        # item_date must be offset-naive (utc)
         enrollments = self.get_enrollments(uuid)
         enroll = None
         if len(enrollments) > 0:
@@ -193,18 +194,17 @@ class Enrich(object):
                     break
         return enroll
 
-    def get_item_sh_fields(self, identity, item):
+    def get_item_sh_fields(self, identity, item_date):
         """ Get standard SH fields from a SH identity """
         eitem = {}  # Item enriched
 
         eitem["author_name"] = identity['name']
         eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
-        eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], parser.parse(item[self.get_field_date()]))
+        eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], item_date)
         eitem["author_bot"] = self.is_bot(eitem['author_uuid'])
         eitem["author_domain"] = self.get_identity_domain(identity)
 
         return eitem
-
 
     def get_item_sh(self, item, identity_field):
         """ Add sorting hat enrichment fields for the author of the item """
@@ -216,7 +216,7 @@ class Enrich(object):
         if identity_field not in data:
             return eitem
         identity  = self.get_sh_identity(data[identity_field])
-        eitem = self.get_item_sh_fields(identity, item)
+        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
 
         return eitem
 

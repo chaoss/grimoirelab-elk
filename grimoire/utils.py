@@ -42,6 +42,7 @@ from grimoire.ocean.jira import JiraOcean
 from grimoire.ocean.kitsune import KitsuneOcean
 from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
+from grimoire.ocean.remo import ReMoOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.supybot import SupybotOcean
 
@@ -58,6 +59,7 @@ from grimoire.elk.jira import JiraEnrich
 from grimoire.elk.kitsune import KitsuneEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
+from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
 from grimoire.elk.supybot import SupybotEnrich
 
@@ -73,6 +75,7 @@ from perceval.backends.jenkins import Jenkins, JenkinsCommand
 from perceval.backends.jira import Jira, JiraCommand
 from perceval.backends.kitsune import Kitsune, KitsuneCommand
 from perceval.backends.mbox import MBox, MBoxCommand
+from perceval.backends.remo import ReMo, ReMoCommand
 from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
 from perceval.backends.pipermail import Pipermail, PipermailCommand
 from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
@@ -115,6 +118,7 @@ def get_connectors():
             "kitsune":[Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
             "mbox":[MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
             "mediawiki":[MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
+            "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
