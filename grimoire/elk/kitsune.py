@@ -115,7 +115,7 @@ class KitsuneEnrich(Enrich):
         eitem = {}
 
         # Fields common in questions and answers
-        common_fields = ["product", "topic", "locale", "is_spam"]
+        common_fields = ["product", "topic", "locale", "is_spam", "title"]
 
         if kind == 'question':
             eitem['type'] = kind
@@ -130,7 +130,7 @@ class KitsuneEnrich(Enrich):
             question = item['data']
 
             # data fields to copy
-            copy_fields = ["content", "num_answers", "solution", "title"]
+            copy_fields = ["content", "num_answers", "solution"]
             copy_fields += common_fields
             for f in copy_fields:
                 if f in question:
@@ -238,6 +238,8 @@ class KitsuneEnrich(Enrich):
             # Time to enrich also de answers
             if 'answers_data' in item['data']:
                 for answer in item['data']['answers_data']:
+                    # Add question title in answers
+                    answer['title'] = item['data']['title']
                     answer['solution'] = 0
                     if answer['id'] == item['data']['solution']:
                         answer['solution'] = 1
