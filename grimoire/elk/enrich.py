@@ -189,7 +189,10 @@ class Enrich(object):
         enroll = None
         if len(enrollments) > 0:
             for enrollment in enrollments:
-                if item_date >= enrollment.start and item_date <= enrollment.end:
+                if not item_date:
+                    enroll = enrollment.organization.name
+                    break
+                elif item_date >= enrollment.start and item_date <= enrollment.end:
                     enroll = enrollment.organization.name
                     break
         return enroll

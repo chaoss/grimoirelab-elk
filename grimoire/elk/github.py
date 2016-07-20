@@ -28,6 +28,8 @@ import logging
 
 from datetime import datetime
 
+from dateutil import parser
+
 from .utils import get_time_diff_days
 
 from grimoire.elk.enrich import Enrich
@@ -91,7 +93,10 @@ class GitHubEnrich(Enrich):
             eitem["user_uuid"] = \
                 self.get_uuid(identity, self.get_connector_name())
             eitem['user_name'] = identity['name']
-            eitem["user_org_name"] = self.get_enrollment(eitem['user_uuid'], parser.parse(item[self.get_field_date()]))
+            update = None
+            if self.get_field_date() in item:
+                 update = parser.parse(item[self.get_field_date()])
+            eitem["user_org_name"] = self.get_enrollment(eitem['user_uuid'], update)
             eitem["user_domain"] = self.get_domain(identity)
             eitem["user_bot"] = self.is_bot(eitem['user_uuid'])
 
@@ -102,7 +107,10 @@ class GitHubEnrich(Enrich):
             eitem["assignee_uuid"] =  \
                 self.get_uuid(identity, self.get_connector_name())
             eitem['assignee_name'] = identity['name']
-            eitem["assignee_org_name"] = self.get_enrollment(eitem['assignee_uuid'], parser.parse(item[self.get_field_date()]))
+            update = None
+            if self.get_field_date() in item:
+                 update = parser.parse(item[self.get_field_date()])
+            eitem["assignee_org_name"] = self.get_enrollment(eitem['assignee_uuid'], update)
             eitem["assignee_domain"] = self.get_domain(identity)
             eitem["assignee_bot"] = self.is_bot(eitem['assignee_uuid'])
 
