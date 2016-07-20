@@ -55,7 +55,11 @@ class StackExchangeEnrich(Enrich):
                 "title_analyzed": {
                   "type": "string",
                   "index":"analyzed"
-                  }
+                },
+                "tags_analyzed": {
+                    "type": "string",
+                    "index":"analyzed"
+                }
            }
         } """
 
@@ -137,6 +141,9 @@ class StackExchangeEnrich(Enrich):
                 else:
                     eitem[f] = None
 
+            eitem["tags"] = ",".join(question['tags'])
+            eitem["tags_analyzed"] = ",".join(question['tags'])
+
             # Fields which names are translated
             map_fields = {"title": "question_title"
                           }
@@ -168,6 +175,10 @@ class StackExchangeEnrich(Enrich):
                     eitem[f] = answer[f]
                 else:
                     eitem[f] = None
+
+            eitem["tags"] = ",".join(answer['tags'])
+
+            eitem["tags_analyzed"] = ",".join(answer['tags'])
 
             # Fields which names are translated
             map_fields = {"title": "question_title"
