@@ -72,9 +72,14 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
 
         # offset param suppport
         offset = None
-        if backend_cmd.offset:
-            offset = backend_cmd.offset
 
+        try:
+            offset = backend_cmd.offset
+        except AttributeError:
+            # The backend does not support offset
+            pass
+
+        # from_date param support
         try:
             if offset:
                 ocean_backend.feed(offset=offset)
