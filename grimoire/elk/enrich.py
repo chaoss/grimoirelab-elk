@@ -185,7 +185,7 @@ class Enrich(object):
     def get_enrollment(self, uuid, item_date):
         """ Get the enrollment for the uuid when the item was done """
         # item_date must be offset-naive (utc)
-        if item_date.tzinfo:
+        if item_date and item_date.tzinfo:
             item_date = (item_date-item_date.utcoffset()).replace(tzinfo=None)
 
         enrollments = self.get_enrollments(uuid)
