@@ -64,6 +64,10 @@ function set_variables {
         then
         GIT_ENRICHED_INDEX=$GIT_INDEX"_enriched"
     fi
+    if [ -z GITHUB_ENRICHED_INDEX ]
+        then
+        GITHUB_ENRICHED_INDEX=$GITHUB_INDEX"_enriched"
+    fi
 
     LOGS_DIR=$LOGS_DIR"/"$PROJECT_SHORTNAME
     MAINLOG=$LOGS_DIR"/main.log"
@@ -71,6 +75,7 @@ function set_variables {
         then
         echo "-- debugging variables --"
         echo "GIT_ENABLED=$GIT_ENABLED"
+	echo "GITHUB_ENABLED=$GITHUB_ENABLED"
         echo "FROM_DATE=$FROM_DATE_STRING $FROM_DATE"
         echo "GERRIT_ENABLED=$GERRIT_ENABLED"
         echo "BUGZILLA_ENABLED=$BUGZILLA_ENABLED"
@@ -90,6 +95,8 @@ function set_variables {
         echo "DB_PRO="$DB_PRO
         echo "GIT_INDEX="$GIT_INDEX
         echo "GIT_ENRICHED_INDEX=$GIT_ENRICHED_INDEX"
+        echo "GITHUB_INDEX="$GITHUB_INDEX
+        echo "GITHUB_ENRICHED_INDEX=$GITHUB_ENRICHED_INDEX"
         echo "GERRIT_INDEX="$GERRIT_INDEX
         echo "GERRIT_ENRICHED_INDEX=$GERRIT_ENRICHED_INDEX"
         echo "BUGZILLA_INDEX="$BUGZILLA_INDEX
@@ -155,6 +162,9 @@ function compose_git_list {
 }
 
 function compose_repo_list {
+    #
+    # deprecated function. Use get_repo_list instead
+    #
     input_file=`echo $PROJECTS_JSON_FILE | cut -d / -f 3-`
     $PROJECT_INFO $input_file list > $1
     IFS=$'\n'
@@ -162,6 +172,21 @@ function compose_repo_list {
     do
       $PROJECT_INFO $input_file list $project --repo $3 >> $2
     done
+}
+
+function get_repo_list {
+    #
+    # receives a backend name a return the list of repos for all projects
+    #
+    PATH_JSON_FILE="${PROJECTS_JSON_FILE/file:\/\//}" # we remove the file://
+    PROJECTS=`$PROJECT_INFO $PATH_JSON_FILE list`
+    RES=''
+    for p in $PROJECTS
+    do
+        AUX=`$PROJECT_INFO $PATH_JSON_FILE list $p --repo $1`
+        RES="$RES $AUX"
+    done
+    echo $RES
 }
 
 function update_projects_db {
@@ -183,6 +208,13 @@ function retrieve_data {
         log "[git] Retrieving data"
         git_retrieval
         log "[git] Retrieval finished"
+    fi
+
+    if [ $GITHUB_ENABLED -eq 1 ]
+        then
+        log "[github] Retrieving data"
+        github_retrieval
+        log "[github] Retrieval finished"
     fi
 
     if [ $GERRIT_ENABLED -eq 1 ]
@@ -237,6 +269,17 @@ function git_retrieval {
     cd ~/GrimoireELK/utils
     awk -v es_uri="$ES_URI" -v myindex="$GIT_INDEX" -v myfrom="$FROM_DATE_STRING $FROM_DATE" '{print "./p2o.py -e "es_uri" --index "myindex" -g git " $3" "myfrom}' $TMP_GITLIST | sh >> $LOGS_DIR"/git-collection.log" 2>&1
     rm $TMP_GITLIST
+}
+
+function github_retrieval {
+    cd ~/GrimoireELK/utils
+    REPOS=`get_repo_list github`
+    for repo in $REPOS
+    do
+        ORG=`echo $repo|awk -F'/' {'print $4'}`
+        REP=`echo $repo|awk -F'/' {'print $5'} |cut -f1 -d'.'`
+        ./p2o.py -e $ES_URI -g --index $GITHUB_INDEX github --backend-token $GITHUB_TOKEN --owner $ORG --repository $REP --sleep-for-rate >> $LOGS_DIR"/github-collection.log" 2>&1
+    done
 }
 
 function gerrit_retrieval {
@@ -312,6 +355,13 @@ function enrich_data {
         log_result "[git] p2o finished" "[git] ERROR: Something went wrong with p2o"
     fi
 
+    if [ $GITHUB_ENABLED -eq 1 ]
+        then
+        log "[github] Github p2o starts"
+        github_enrichment $1
+        log_result "[github] p2o finished" "[github] ERROR: Something went wrong with p2o"
+    fi
+
     if [ $GERRIT_ENABLED -eq 1 ]
         then
         log "[gerrit] Gerrit p2o starts"
@@ -364,6 +414,18 @@ function git_enrichment {
     fi
     cd ~/GrimoireELK/utils
     ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --studies --enrich_only $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git '' >> $LOGS_DIR"/git-enrichment.log" 2>&1
+}
+
+function github_enrichment {
+    ENR_EXTRA_FLAG=$1
+    cd ~/GrimoireELK/utils
+    REPOS=`get_repo_list github`
+    for repo in $REPOS
+    do
+        ORG=`echo $repo|awk -F'/' {'print $4'}`
+        REP=`echo $repo|awk -F'/' {'print $5'} |cut -f1 -d'.'`
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only  $ENR_EXTRA_FLAG --index $GITHUB_INDEX --index-enrich $GITHUB_ENRICHED_INDEX github --owner $ORG --repository $REP  >> $LOGS_DIR"/github-enrichment.log" 2>&1
+    done
 }
 
 function gerrit_enrichment {

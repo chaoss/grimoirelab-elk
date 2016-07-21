@@ -1,8 +1,16 @@
 # Releases
 
+## 0a94c684ef465556714813c9bc17c0f24c989440
+
+* Adds Github support
+GITHUB_ENABLED
+GITHUB_INDEX
+GITHUB_ENRICHED_INDEX
+
+
 ## ea6a2c80d8824a48f2ddd4e74cabbd17f7ac1b0d
 
-* Allow operator to set enriched index names using the conf variables: 
+* Allow operator to set enriched index names using the conf variables:
  - BUGZILLA_ENRICHED_INDEX
  - JENKINS_ENRICHED_INDEX
  - GERRIT_ENRICHED_INDEX
@@ -16,4 +24,3 @@
 * Remove deprecated feature to overwrite enriched index
 
 * DEBUG variable set to 1 avoids entering the update loop
-
