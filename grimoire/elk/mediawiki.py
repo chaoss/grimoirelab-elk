@@ -95,7 +95,7 @@ class MediaWikiEnrich(Enrich):
         first_revision = item['data']['revisions'][0]
 
         identity  = self.get_sh_identity(first_revision)
-        eitem = self.get_item_sh_fields(identity, item)
+        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
 
         return eitem
 

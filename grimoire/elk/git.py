@@ -146,7 +146,14 @@ class GitEnrich(Enrich):
             commit_url = GITHUB_API_URL+"/repos/%s/commits/%s" % (repo, commit_hash)
             headers = {'Authorization': 'token ' + self.github_token}
             r = requests.get(commit_url, headers=headers)
-            r.raise_for_status()
+
+            try:
+                r.raise_for_status()
+            except requests.exceptions.HTTPError as ex:
+                # commit not found probably: P10
+                logging.error("Can't find commit %s %s", commit_url, ex)
+                return login
+
             logging.debug("Rate limit pending: %s" % (r.headers['X-RateLimit-Remaining']))
 
             commit_json = r.json()

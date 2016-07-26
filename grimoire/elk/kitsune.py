@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 #
-# Copyright (C) 2015 Bitergia
+# Copyright (C) Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,18 +25,20 @@
 import json
 import logging
 
-from datetime import datetime
 from dateutil import parser
 
 from grimoire.elk.enrich import Enrich
 
-class StackExchangeEnrich(Enrich):
+from .utils import get_time_diff_days
 
-    def __init__(self, stackexchange, sortinghat=True, db_projects_map = None):
+
+class KitsuneEnrich(Enrich):
+
+    def __init__(self, jenkins, sortinghat=True, db_projects_map = None):
         super().__init__(sortinghat, db_projects_map)
         self.elastic = None
-        self.perceval_backend = stackexchange
-        self.index_stackexchange = "stackexchange"
+        self.perceval_backend = jenkins
+        self.index_jenkins = "jenkins"
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -52,25 +54,28 @@ class StackExchangeEnrich(Enrich):
         mapping = """
         {
             "properties": {
-                "title_analyzed": {
+                "content_analyzed": {
                   "type": "string",
                   "index":"analyzed"
-                },
+                  },
                 "tags_analyzed": {
-                    "type": "string",
-                    "index":"analyzed"
-                }
+                  "type": "string",
+                  "index":"analyzed"
+                  }
            }
         } """
 
         return {"items":mapping}
 
+
     def get_sh_identity(self, owner):
         identity = {}
 
-        identity['username'] = owner['display_name']
+        identity['username'] = owner['username']
         identity['email'] = None
-        identity['name'] = owner['display_name']
+        identity['name'] = owner['username']
+        if owner['display_name']:
+            identity['name'] = owner['display_name']
 
         return identity
 
@@ -80,11 +85,12 @@ class StackExchangeEnrich(Enrich):
 
         item = item['data']
 
-        for identity in ['owner']:
+        for identity in ['creator']:
+            # Todo: questions has also involved and solved_by
             if identity in item and item[identity]:
                 user = self.get_sh_identity(item[identity])
                 identities.append(user)
-            if 'answers' in item:
+            if 'answers_date' in item:
                 for answer in item['answers']:
                     user = self.get_sh_identity(answer[identity])
                     identities.append(user)
@@ -95,7 +101,7 @@ class StackExchangeEnrich(Enrich):
 
         eitem = {}  # Item enriched
 
-        update_date = datetime.fromtimestamp(item["last_activity_date"])
+        update_date = parser.parse(item["updated"])
 
         # Add Sorting Hat fields
         if identity_field not in item:
@@ -109,13 +115,11 @@ class StackExchangeEnrich(Enrich):
         eitem = {}
 
         # Fields common in questions and answers
-        common_fields = ["title", "comment_count", "question_id",
-                         "delete_vote_count", "up_vote_count",
-                         "down_vote_count","favorite_count", "view_count",
-                         "last_activity_date", "link", "score", "tags"]
+        common_fields = ["product", "topic", "locale", "is_spam", "title"]
 
         if kind == 'question':
-            # metadata fields to copy, only in question (perceval item)
+            eitem['type'] = kind
+            # metadata fields to copy
             copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
             for f in copy_fields:
                 if f in item:
@@ -125,73 +129,88 @@ class StackExchangeEnrich(Enrich):
             # The real data
             question = item['data']
 
-            eitem["type"] = 'question'
-            eitem["author"] = question['owner']['display_name']
-            eitem["author_link"] = None
-            if 'link' in question['owner']:
-                eitem["author_link"] = question['owner']['link']
-            if 'reputation' in question['owner']:
-                eitem["author_reputation"] = question['owner']['reputation']
-
             # data fields to copy
-            copy_fields = common_fields + ['answer_count']
+            copy_fields = ["content", "num_answers", "solution"]
+            copy_fields += common_fields
             for f in copy_fields:
                 if f in question:
                     eitem[f] = question[f]
                 else:
                     eitem[f] = None
-
-            eitem["tags"] = ",".join(question['tags'])
-            eitem["tags_analyzed"] = ",".join(question['tags'])
+            eitem["content_analyzed"] = question['content']
 
             # Fields which names are translated
-            map_fields = {"title": "question_title"
-                          }
+            map_fields = {
+                    "id": "question_id",
+                    "num_votes": "score"
+            }
             for fn in map_fields:
                 eitem[map_fields[fn]] = question[fn]
 
-            creation_date = datetime.fromtimestamp(question["creation_date"]).isoformat()
-            eitem['creation_date'] = creation_date
-            eitem.update(self.get_grimoire_fields(creation_date, "question"))
+            tags = ''
+            for tag in question['tags']:
+                tags += tag['slug'] + ","
+            tags = tags[0:-1] # remove last ,
+            eitem["tags"] = tags
+            eitem["tags_analyzed"] = tags
+
+            # Enrich dates
+            eitem["creation_date"] = parser.parse(question["created"]).isoformat()
+            eitem["last_activity_date"] = parser.parse(question["updated"]).isoformat()
+
+            eitem['lifetime_days'] = \
+                get_time_diff_days(question['created'], question['updated'])
+
+            eitem.update(self.get_grimoire_fields(question['created'], "question"))
+
+            eitem['author'] = question['creator']['username']
+            if question['creator']['display_name']:
+                eitem['author'] = question['creator']['display_name']
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(question, "owner"))
+                eitem.update(self.get_item_sh(question, "creator"))
 
         elif kind == 'answer':
             answer = item
-
-            eitem["type"] = 'answer'
-            eitem["author"] = answer['owner']['display_name']
-            eitem["author_link"] = None
-            if 'link' in answer['owner']:
-                eitem["author_link"] = answer['owner']['link']
-            if 'reputation' in answer['owner']:
-                eitem["author_reputation"] = answer['owner']['reputation']
+            eitem['type'] = kind
 
             # data fields to copy
-            copy_fields = common_fields + ["creation_date", "is_accepted", "answer_id"]
+            copy_fields = ["content", "solution"]
+            copy_fields += common_fields
             for f in copy_fields:
                 if f in answer:
                     eitem[f] = answer[f]
                 else:
                     eitem[f] = None
-
-            eitem["tags"] = ",".join(answer['tags'])
-
-            eitem["tags_analyzed"] = ",".join(answer['tags'])
+            eitem["content_analyzed"] = answer['content']
 
             # Fields which names are translated
-            map_fields = {"title": "question_title"
-                          }
+            map_fields = {
+                    "id": "answer_id",
+                    "question": "question_id",
+                    "num_helpful_votes": "score",
+                    "num_unhelpful_votes":"unhelpful_answer"
+            }
             for fn in map_fields:
                 eitem[map_fields[fn]] = answer[fn]
 
-            creation_date = datetime.fromtimestamp(answer["creation_date"]).isoformat()
-            eitem['creation_date'] = creation_date
-            eitem.update(self.get_grimoire_fields(creation_date, "answer"))
+            eitem["helpful_answer"] = answer['num_helpful_votes']
+
+            # Enrich dates
+            eitem["creation_date"] = parser.parse(answer["created"]).isoformat()
+            eitem["last_activity_date"] = parser.parse(answer["updated"]).isoformat()
+
+            eitem['lifetime_days'] = \
+                get_time_diff_days(answer['created'], answer['updated'])
+
+            eitem.update(self.get_grimoire_fields(answer['created'], "answer"))
+
+            eitem['author'] = answer['creator']['username']
+            if answer['creator']['display_name']:
+                eitem['author'] = answer['creator']['display_name']
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(answer, "owner"))
+                eitem.update(self.get_item_sh(answer, "creator"))
 
         return eitem
 
@@ -202,7 +221,7 @@ class StackExchangeEnrich(Enrich):
 
         url = self.elastic.index_url+'/items/_bulk'
 
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+        logging.debug("Adding items to %s (in %i packs)", url, max_items)
 
         for item in items:
             if current >= max_items:
@@ -217,8 +236,13 @@ class StackExchangeEnrich(Enrich):
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
             # Time to enrich also de answers
-            if 'answers' in item['data']:
-                for answer in item['data']['answers']:
+            if 'answers_data' in item['data']:
+                for answer in item['data']['answers_data']:
+                    # Add question title in answers
+                    answer['title'] = item['data']['title']
+                    answer['solution'] = 0
+                    if answer['id'] == item['data']['solution']:
+                        answer['solution'] = 1
                     rich_answer = self.get_rich_item(answer, kind='answer')
                     data_json = json.dumps(rich_answer)
                     bulk_json += '{"index" : {"_id" : "%i_%i" } }\n' % \
