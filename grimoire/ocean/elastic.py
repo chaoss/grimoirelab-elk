@@ -202,7 +202,7 @@ class ElasticOcean(object):
         else:
             filters = "{}"
             # If origin Always filter by origin to support multi origin indexes
-            if self.perceval_backend.origin:
+            if self.perceval_backend and self.perceval_backend.origin:
                 filters = '''
                     {"term":
                         { "origin" : "%s"  }
