@@ -85,7 +85,7 @@ class TelegramEnrich(Enrich):
         message = item['data']['message']
 
         # data fields to copy
-        copy_fields = ["message_id"]
+        copy_fields = ["message_id", "sticker"]
         for f in copy_fields:
             if f in message:
                 eitem[f] = message[f]
@@ -95,11 +95,18 @@ class TelegramEnrich(Enrich):
         map_fields = {"text": "message",
                       "date": "sent_date,"
                       }
-        for fn in map_fields:
-            eitem[map_fields[fn]] = message[fn]
+        for f in map_fields:
+            if f in message:
+                eitem[map_fields[f]] = message[f]
+            else:
+                eitem[map_fields[f]] = None
+
+        if "text" in message:
+            eitem["text_analyzed"] = message["text"]
 
         eitem['chat_id'] = message['chat']['id']
-        eitem['chat_title'] = message['chat']['title']
+        if 'title' in message['chat']:
+            eitem['chat_title'] = message['chat']['title']
         eitem['chat_type'] = message['chat']['type']
 
         eitem['from_id'] = message['from']['id']
@@ -113,7 +120,10 @@ class TelegramEnrich(Enrich):
         if 'reply_to_message' in message:
             eitem['reply_to_message_id'] = message['reply_to_message']['message_id']
             eitem['reply_to_sent_date'] = message['reply_to_message']['date']
-            eitem['reply_to_message'] = message['reply_to_message']['text']
+            if 'text' in message['reply_to_message']:
+                eitem['reply_to_message'] = message['reply_to_message']['text']
+            elif 'sticker' in message['reply_to_message']:
+                eitem['reply_to_message'] = message['reply_to_message']['sticker']
             eitem['reply_to_chat_id'] = message['reply_to_message']['chat']['id']
             eitem['reply_to_chat_title'] = message['reply_to_message']['chat']['title']
             eitem['reply_to_chat_type'] = message['reply_to_message']['chat']['type']
