@@ -32,7 +32,7 @@ import traceback
 from grimoire.elk.sortinghat import SortingHat
 from grimoire.ocean.conf import ConfOcean
 from grimoire.utils import get_elastic
-from grimoire.utils import get_connectors, get_connector_from_name
+from grimoire.utils import get_connector_from_name
 
 def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None):
@@ -42,9 +42,9 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
     repo = {}    # repository data to be stored in conf
     repo['backend_name'] = backend_name
     repo['backend_params'] = backend_params
+
     if es_index:
         clean = False  # don't remove index, it could be shared
-
 
     if not get_connector_from_name(backend_name):
         raise RuntimeError("Unknown backend %s" % backend_name)
@@ -57,8 +57,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
         backend = backend_cmd.backend
         ocean_backend = connector[1](backend, fetch_cache=fetch_cache, project=project)
 
-        logging.info("Feeding Ocean from %s (%s)" % (backend_name,
-                                                     backend.origin))
+        logging.info("Feeding Ocean from %s (%s)", backend_name, backend.origin)
 
         if not es_index:
             es_index = backend_name + "_" + backend.origin
@@ -69,6 +68,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
         ConfOcean.set_elastic(elastic_ocean)
 
         repo['repo_update_start'] = datetime.now().isoformat()
+
 
         try:
             if backend_cmd.from_date.replace(tzinfo=None) == \
