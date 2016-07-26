@@ -115,7 +115,13 @@ class ElasticOcean(object):
             # Forced from backend command line.
             last_update = from_date
 
-        logging.info("Incremental from: %s" % (last_update))
+        logging.info("Incremental from: %s", last_update)
+
+        # Check if backend supports from_date
+        try:
+            self.perceval_backend.from_date
+        except AttributeError:
+            last_update = None
 
         task_init = datetime.now()
 
