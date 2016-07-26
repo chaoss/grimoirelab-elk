@@ -79,7 +79,7 @@ class BugzillaRESTEnrich(Enrich):
         data = item['data']['creator_detail']
 
         identity  = self.get_sh_identity(data)
-        eitem = self.get_item_sh_fields(identity, item)
+        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
 
         return eitem
 

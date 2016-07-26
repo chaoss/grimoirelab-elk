@@ -39,6 +39,7 @@ from grimoire.ocean.git import GitOcean
 from grimoire.ocean.github import GitHubOcean
 from grimoire.ocean.jenkins import JenkinsOcean
 from grimoire.ocean.jira import JiraOcean
+from grimoire.ocean.kitsune import KitsuneOcean
 from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
 from grimoire.ocean.remo import ReMoOcean
@@ -56,6 +57,7 @@ from grimoire.elk.github import GitHubEnrich
 from grimoire.elk.gerrit import GerritEnrich
 from grimoire.elk.jenkins import JenkinsEnrich
 from grimoire.elk.jira import JiraEnrich
+from grimoire.elk.kitsune import KitsuneEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
 from grimoire.elk.remo import ReMoEnrich
@@ -74,6 +76,7 @@ from perceval.backends.github import GitHub, GitHubCommand
 from perceval.backends.gmane import Gmane, GmaneCommand
 from perceval.backends.jenkins import Jenkins, JenkinsCommand
 from perceval.backends.jira import Jira, JiraCommand
+from perceval.backends.kitsune import Kitsune, KitsuneCommand
 from perceval.backends.mbox import MBox, MBoxCommand
 from perceval.backends.remo import ReMo, ReMoCommand
 from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
@@ -117,6 +120,7 @@ def get_connectors():
             "gmane":[Gmane, MBoxOcean, MBoxEnrich, GmaneCommand],
             "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
+            "kitsune":[Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
             "mbox":[MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
             "mediawiki":[MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],

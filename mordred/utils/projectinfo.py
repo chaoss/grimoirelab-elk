@@ -30,9 +30,10 @@ import os
 import sys
 
 
-REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'mailing_lists', 'telegram', 'kuma',
-                          'kitsune', 'mozilla_reps', 'mediawiki', 'irc', 'confluence',
-                          'jira',' maniphest', 'gerrit', 'meetup', 'supybot']
+REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'gmane', 'telegram', 'kuma',
+                          'kitsune', 'mozilla_reps', 'mediawiki', 'mbox', 'confluence',
+                          'jira',' maniphest', 'gerrit', 'meetup', 'supybot',
+                          'pipermail']
 
 
 def read_arguments():
@@ -47,13 +48,15 @@ Repositories avaliable
     kuma: Adding a kuma for the project
     kitsune: Adding a kitsune for the project
     mozilla_reps: Adding a mozilla reps for the project
-    irc: Adding a irc for the project
     confluence: Adding a confluence for the project
     jira: Adding a jira for the project
     maniphest: Adding a maniphest for the project
     gerrit: Adding a gerrit for the project
     meetup: Adding a meetup for the project
-    supybot: Adding a bot for the project, you need to includ the path
+    supybot: Adding a irc for the project, you need to includ the path
+    gmane: Archive mailing lists hosted in gmane
+    pipermail: Archive mailing list hosted with pipermail
+    mbox: Adding a mbox for the project
     """
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -79,7 +82,7 @@ Repositories avaliable
                             action="store",
                             dest="repo",
                             nargs='*',
-                            help="see list of repositories available, url of the repository")
+                            help="see the list of available repositories and the repository URL")
     add_parser.add_argument("-p", "--parent",
                             action="store",
                             dest="parent",
@@ -97,25 +100,28 @@ Repositories avaliable
                            action="store",
                            dest="repo",
                            nargs='*',
-                           help="see list of repositories available")
+                           help="see the list of available repositories")
     rm_parser.add_argument("-p", "--parent",
                            action="store",
                            dest="parent",
                            help="remove the parent project information")
 
     # list
-    list_usage = "projectinfo.py file list [--help] project_name"
+    list_usage = "usage: projectinfo.py list <project_name> [--repo <repo_type>]"
+    list_desc = "List data for a given project name"
     list_parser = subparsers.add_parser("list",
-                                        help="add project",
-                                        usage=list_usage)
+                                        help="list project",
+                                        usage=list_usage,
+                                        description=list_desc)
     list_parser.add_argument("project_name",
                              action="store",
+                             nargs='?',
                              help="project name")
     list_parser.add_argument("--repo",
                              action="store",
                              dest="repo",
                              nargs='*',
-                             help="see list of repositories available")
+                             help="see the list of available repositories")
 
     args = parser.parse_args()
 
@@ -272,7 +278,7 @@ def lists(conf, raw):
         except KeyError:
             print("The repository", repo, "is not exist in", conf['project'])
 
-    else:
+    elif 'project' in conf:
         #$ ./projectinfo.py <JSON_file> list <project_name>
         #Mustn't list this list:
         default = ["bugzilla", "description", "dev_list", "downloads",
@@ -285,6 +291,10 @@ def lists(conf, raw):
                         print(repo)
         except KeyError:
             print("No exist the project",conf['project'])
+
+    else:
+        for proj in raw['projects']:
+            print(proj)
 
 def run(conf):
 
