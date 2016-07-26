@@ -44,7 +44,7 @@ class ConfluenceEnrich(Enrich):
         return "metadata__updated_on"
 
     def get_field_unique_id(self):
-        return "pageid"
+        return "id"
 
     def get_field_unique_id_review(self):
         return "revision_revid"
@@ -68,33 +68,28 @@ class ConfluenceEnrich(Enrich):
         """ Return the identities from an item """
         identities = []
 
-        revisions = item['data']['revisions']
+        version = item['data']['version']
 
-        for revision in revisions:
-            user = self.get_sh_identity(revision)
-            identities.append(user)
+        user = self.get_sh_identity(version)
+        identities.append(user)
         return identities
 
-    def get_sh_identity(self, revision):
+    def get_sh_identity(self, version):
         identity = {}
         identity['username'] = None
         identity['email'] = None
         identity['name'] = None
-        if 'user' in revision:
-            identity['username'] = revision['user']
-            identity['name'] = revision['user']
+        if 'by' in version:
+            if 'username' in version['by']:
+                identity['username'] = version['by']['username']
+            identity['name'] = version['by']['displayName']
         return identity
 
     def get_item_sh(self, item):
         """ Add sorting hat enrichment fields for the author of the item """
 
         eitem = {}  # Item enriched
-        if not len(item['data']['revisions']) > 0:
-            return eitem
-
-        first_revision = item['data']['revisions'][0]
-
-        identity  = self.get_sh_identity(first_revision)
+        identity  = self.get_sh_identity(item['data']['version'])
         eitem = self.get_item_sh_fields(identity, item)
 
         return eitem
@@ -106,49 +101,6 @@ class ConfluenceEnrich(Enrich):
         erevision = self.get_item_sh_fields(identity, item)
 
         return erevision
-
-    def get_rich_item_reviews(self, item):
-        erevisions = []
-        eitem = {}
-
-        # All revisions include basic page info
-        eitem = self.get_rich_item(item)
-
-        # Revisions
-        for rev in item["data"]["revisions"]:
-            erevision = {}
-            copy_fields_item = ["origin","metadata__updated_on","metadata__timestamp","pageid","title"]
-            for f in copy_fields_item:
-                if f in eitem:
-                    erevision["page_"+f] = eitem[f]
-                else:
-                    erevision["page_"+f] = None
-            # Copy fields from the review
-            copy_fields = ["revid","user","parentid","timestamp","comment"]
-            for f in copy_fields:
-                if f in rev:
-                    erevision["revision_"+f] = rev[f]
-                else:
-                    erevision["revision_"+f] = None
-            if self.sortinghat:
-                erevision.update(self.get_review_sh(rev, item))
-
-            # And now some calculated fields
-            erevision["url"] = erevision["page_origin"] + "/" + erevision["page_title"]
-            erevision["iscreated"] = 0
-            erevision["creation_date"] = None
-            erevision["isrevision"] = 0
-            if rev['parentid'] == 0:
-                erevision["iscreated"] = 1
-                erevision["creation_date"] = rev['timestamp']
-            else:
-                erevision["isrevision"] = 1
-            erevision["page_last_edited_date"] = eitem['last_edited_date']
-
-            erevisions.append(erevision)
-
-        return erevisions
-
 
     def get_rich_item(self, item):
         eitem = {}
@@ -164,7 +116,7 @@ class ConfluenceEnrich(Enrich):
         page = item['data']
 
         # data fields to copy
-        copy_fields = ["pageid","title"]
+        copy_fields = ["type", "id", "status", "title"]
         for f in copy_fields:
             if f in page:
                 eitem[f] = page[f]
@@ -175,14 +127,27 @@ class ConfluenceEnrich(Enrich):
         for fn in map_fields:
             eitem[map_fields[fn]] = page[fn]
 
-        # Enrich dates
-        eitem["update_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
-        # Revisions
-        eitem["last_edited_date"] = None
-        eitem["nrevisions"] = len(page["revisions"])
-        if len(page["revisions"])>0:
-            eitem["first_editor"] = page["revisions"][0]["user"]
-            eitem["last_edited_date"] = page["revisions"][-1]["timestamp"]
+
+        version = page['version']
+
+        if 'username' in version['by']:
+            eitem['author_name'] = version['by']['username']
+        else:
+            eitem['author_name'] = version['by']['displayName']
+
+        eitem['message'] = None
+        if 'message' in version:
+            eitem['message'] = version['message']
+        eitem['version'] = version['number']
+        eitem['date'] = version['when']
+        eitem['url'] =  page['_links']['base'] + page['_links']['webui']
+
+        # Specific enrichment
+        if page['type'] == 'page':
+            if page['version']['number'] == 1:
+                eitem['type'] = 'new_page'
+        eitem['is_'+eitem['type']] = 1
+
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
@@ -191,17 +156,13 @@ class ConfluenceEnrich(Enrich):
 
     def enrich_items(self, items):
 
-        if True:
-            self.enrich_events(items)
-            return
-
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
 
         url = self.elastic.index_url+'/items/_bulk'
 
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+        logging.debug("Adding items to %s (in %i packs)", url, max_items)
 
         for item in items:
             if current >= max_items:
@@ -215,27 +176,4 @@ class ConfluenceEnrich(Enrich):
                 (rich_item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
-        self.requests.put(url, data = bulk_json)
-
-    def enrich_events(self, items):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            rich_item_reviews = self.get_rich_item_reviews(item)
-            for enrich_review in rich_item_reviews:
-                if current >= max_items:
-                    self.requests.put(url, data=bulk_json)
-                    bulk_json = ""
-                    current = 0
-                data_json = json.dumps(enrich_review)
-                bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                    (enrich_review[self.get_field_unique_id_review()])
-                bulk_json += data_json +"\n"  # Bulk document
-                current += 1
         self.requests.put(url, data = bulk_json)
