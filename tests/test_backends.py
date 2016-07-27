@@ -23,14 +23,17 @@
 
 import configparser
 import json
+import logging
 import os
 import sys
 import unittest
 
+from datetime import datetime
+
 if not '..' in sys.path:
     sys.path.insert(0, '..')
 
-from grimoire.utils import get_connectors
+from grimoire.utils import get_connectors, get_elastic
 
 CONFIG_FILE = 'tests.conf'
 NUMBER_BACKENDS = 19
@@ -42,23 +45,102 @@ class TestBackends(unittest.TestCase):
         """Test whether the backends can be loaded """
         self.assertEqual(len(get_connectors()), NUMBER_BACKENDS)
 
-    def test_load(self):
+    def test_read_data(self):
+        """Test load all sources JSON"""
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE)
+        connectors = get_connectors()
+        # Check we have data for all the data sources
+        for con in sorted(connectors.keys()):
+            with open(os.path.join("data", con + ".json")) as f:
+                json.load(f)
+
+    def __ocean_item(self, item):
+        # Hack until we decide the final id to use
+        if 'uuid' in item:
+            item['ocean-unique-id'] = item['uuid']
+        else:
+            # twitter comes from logstash and uses id
+            item['ocean-unique-id'] = item['id']
+
+        # Hack until we decide when to drop this field
+        if 'updated_on' in item:
+            updated = datetime.fromtimestamp(item['updated_on'])
+            item['metadata__updated_on'] = updated.isoformat()
+        return item
+
+    def __data2es(self, items, ocean):
+        items_pack = []  # to feed item in packs
+
+        for item in items:
+            item = self.__ocean_item(item)
+            if len(items_pack) >= ocean.elastic.max_items_bulk:
+                ocean._items_to_es(items_pack)
+                items_pack = []
+            items_pack.append(item)
+        ocean._items_to_es(items_pack)
+
+    def __enrich_items(self, items, enrich_backend):
+        total = 0
+
+        items_pack = []
+
+        for item in items:
+            item = self.__ocean_item(item)
+            if len(items_pack) >= enrich_backend.elastic.max_items_bulk:
+                logging.info("Adding %i (%i done) enriched items to %s",
+                             enrich_backend.elastic.max_items_bulk, total,
+                             enrich_backend.elastic.index_url)
+                enrich_backend.enrich_items(items_pack)
+                items_pack = []
+            items_pack.append(item)
+            total += 1
+        enrich_backend.enrich_items(items_pack)
+
+        return total
+
+    def test_data_load(self):
         """Test load all sources JSON data into ES"""
         config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
-        es = dict(config.items('ElasticSearch'))
+        es_con = dict(config.items('ElasticSearch'))['url']
+        logging.info("Loading data in: %s", es_con)
         connectors = get_connectors()
-        # Check we have config for all the connectors
         for con in sorted(connectors.keys()):
             with open(os.path.join("data", con + ".json")) as f:
-                data_json = json.load(f)
+                items = json.load(f)
+                es_index = "test_"+con
+                clean = True
+                perceval_backend = None
+                ocean_backend = connectors[con][1](perceval_backend)
+                elastic_ocean = get_elastic(es_con, es_index, clean, ocean_backend)
+                ocean_backend.set_elastic(elastic_ocean)
+                self.__data2es(items, ocean_backend)
 
     def test_enrich(self):
         """Test enrich all sources"""
-        pass
-
-
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE)
+        es_con = dict(config.items('ElasticSearch'))['url']
+        logging.info("Enriching data in: %s", es_con)
+        connectors = get_connectors()
+        for con in sorted(connectors.keys()):
+            perceval_backend = None
+            ocean_index = "test_"+con
+            enrich_index = "test_"+con+"_enrich"
+            clean = False
+            ocean_backend = connectors[con][1](perceval_backend)
+            elastic_ocean = get_elastic(es_con, ocean_index, clean, ocean_backend)
+            ocean_backend.set_elastic(elastic_ocean)
+            clean = True
+            print(connectors[con][2])
+            enrich_backend = connectors[con][2](perceval_backend)
+            elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
+            enrich_backend.set_elastic(elastic_enrich)
+            enrich_count = self.__enrich_items(ocean_backend, enrich_backend)
+            logging.info("Total items enriched %i ", enrich_count)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     unittest.main()
