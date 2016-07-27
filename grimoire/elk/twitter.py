@@ -134,6 +134,7 @@ class TwitterEnrich(Enrich):
             eitem['retweeted'] = 1
 
         eitem['url'] = "http://twitter.com/"+tweet['user']['screen_name']+"/status/"+tweet['id_str']
+        eitem['user_url_twitter'] = "http://twitter.com/"+tweet['user']['screen_name']
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(tweet, "user"))
