@@ -264,9 +264,12 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
     klass = connector[3]  # BackendCmd for the connector
 
     try:
-        backend_cmd = klass(*backend_params)
+        backend = None
+        if klass:
+            # Data is retrieved from Perceval
+            backend_cmd = klass(*backend_params)
 
-        backend = backend_cmd.backend
+            backend = backend_cmd.backend
 
         if ocean_index_enrich:
             enrich_index = ocean_index_enrich
@@ -283,13 +286,16 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
         # We need to enrich from just updated items since last enrichment
         # Always filter by origin to support multi origin indexes
-        filter_ = {"name":"origin",
-                   "value":backend.origin}
-        last_enrich = enrich_backend.get_last_update_from_es(filter_)
+        last_enrich = None
+        if backend:
+            # Only supported in data retrieved from a perceval backend
+            filter_ = {"name":"origin",
+                       "value":backend.origin}
+            last_enrich = enrich_backend.get_last_update_from_es(filter_)
         if no_incremental:
             last_enrich = None
 
-        logging.debug("Last enrichment: %s" % (last_enrich))
+        logging.debug("Last enrichment: %s", last_enrich)
 
         # last_enrich=parser.parse('2016-06-01')
 
@@ -298,28 +304,27 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
 
-        logging.info("Adding enrichment data to %s" %
-                     (enrich_backend.elastic.index_url))
+        logging.info("Adding enrichment data to %s", enrich_backend.elastic.index_url)
 
         if db_sortinghat:
             enrich_count_merged = 0
 
             enrich_count_merged = enrich_sortinghat(ocean_backend, enrich_backend)
-            logging.info("Total items enriched for merged identities %i " %  enrich_count_merged)
+            logging.info("Total items enriched for merged identities %i ", enrich_count_merged)
 
         if not only_identities:
             # If only_identities, only identities are added to SH, but the enrich is needed
             # Enrichment for the new items once SH update is finished
             enrich_count = enrich_items(ocean_backend, enrich_backend)
-            logging.info("Total items enriched %i " %  enrich_count)
+            logging.info("Total items enriched %i ", enrich_count)
 
             if studies:
                 try:
                     for study in enrich_backend.studies:
-                        logging.info("Starting study: %s" % (study))
+                        logging.info("Starting study: %s", study)
                         study(from_date=last_enrich)
                 except Exception as e:
-                    logging.warning("Problem executing studies for %s" % (backend_name))
+                    logging.warning("Problem executing studies for %s", backend_name)
                     print(e)
 
         else:
@@ -329,9 +334,9 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
     except Exception as ex:
         traceback.print_exc()
         if backend:
-            logging.error("Error enriching ocean from %s (%s): %s" %
-                          (backend_name, backend.origin, ex))
+            logging.error("Error enriching ocean from %s (%s): %s",
+                          backend_name, backend.origin, ex)
         else:
-            logging.error("Error enriching ocean %s" % ex)
+            logging.error("Error enriching ocean %s", ex)
 
-    logging.info("Done %s " % (backend_name))
+    logging.info("Done %s ", backend_name)

@@ -47,6 +47,7 @@ from grimoire.ocean.remo import ReMoOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.supybot import SupybotOcean
 from grimoire.ocean.telegram import TelegramOcean
+from grimoire.ocean.twitter import TwitterOcean
 
 
 # Connectors for EnrichOcean
@@ -66,7 +67,7 @@ from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
 from grimoire.elk.supybot import SupybotEnrich
 from grimoire.elk.telegram import TelegramEnrich
-
+from grimoire.elk.twitter import TwitterEnrich
 
 # Connectors for Perceval
 from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
@@ -132,7 +133,8 @@ def get_connectors():
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
              "supybot":[Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
-             "telegram":[Telegram, TelegramOcean, TelegramEnrich, TelegramCommand]
+             "telegram":[Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
+             "twitter":[None, TwitterOcean, TwitterEnrich, None]
             }  # Will come from Registry
 
 def get_elastic(url, es_index, clean = None, ocean_backend = None):
