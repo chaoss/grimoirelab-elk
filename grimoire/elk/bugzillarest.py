@@ -35,8 +35,8 @@ from .utils import get_time_diff_days
 
 class BugzillaRESTEnrich(Enrich):
 
-    def __init__(self, bugzilla, sortinghat=True, db_projects_map = None):
-        super().__init__(sortinghat, db_projects_map)
+    def __init__(self, bugzilla, db_sortinghat=None, db_projects_map = None):
+        super().__init__(db_sortinghat, db_projects_map)
         self.perceval_backend = bugzilla
         self.elastic = None
 
@@ -101,10 +101,6 @@ class BugzillaRESTEnrich(Enrich):
 
     def enrich_issue(self, item):
 
-        def get_bugzilla_url():
-            u = urlparse(self.perceval_backend.url)
-            return u.scheme+"://"+u.netloc
-
         if 'id' not in item['data']:
             logging.warning("Dropped bug without bug_id %s" % (issue))
             return None
@@ -150,7 +146,7 @@ class BugzillaRESTEnrich(Enrich):
 
         if 'long_desc' in issue:
             eitem['number_of_comments'] = len(issue['long_desc'])
-        eitem['url'] = get_bugzilla_url() + "/show_bug.cgi?id=" + str(issue['id'])
+        eitem['url'] = item['origin'] + "/show_bug.cgi?id=" + str(issue['id'])
         eitem['time_to_last_update_days'] = \
             get_time_diff_days(eitem['creation_ts'], eitem['delta_ts'])
 

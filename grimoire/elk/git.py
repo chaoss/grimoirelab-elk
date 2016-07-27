@@ -36,8 +36,8 @@ GITHUB = 'https://github.com/'
 
 class GitEnrich(Enrich):
 
-    def __init__(self, git, sortinghat=True, db_projects_map = None):
-        super().__init__(sortinghat, db_projects_map)
+    def __init__(self, git, db_sortinghat=None, db_projects_map = None):
+        super().__init__(db_sortinghat, db_projects_map)
         self.elastic = None
         self.perceval_backend = git
         self.index_git = "git"

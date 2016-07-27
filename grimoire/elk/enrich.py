@@ -41,7 +41,8 @@ logger = logging.getLogger(__name__)
 
 class Enrich(object):
 
-    def __init__(self, db_projects_map = None, db_sortinghat = None, insecure=True):
+    def __init__(self, db_sortinghat=None, db_projects_map=None, insecure=True):
+
         self.sortinghat = False
         if db_sortinghat:
             self.sh_db = Database("root", "", db_sortinghat, "mariadb")

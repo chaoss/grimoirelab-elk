@@ -31,8 +31,8 @@ from grimoire.elk.enrich import Enrich
 
 class MediaWikiEnrich(Enrich):
 
-    def __init__(self, mediawiki, sortinghat=True, db_projects_map = None):
-        super().__init__(sortinghat, db_projects_map)
+    def __init__(self, mediawiki, db_sortinghat=None, db_projects_map = None):
+        super().__init__(db_sortinghat, db_projects_map)
         self.elastic = None
         self.perceval_backend = mediawiki
         self.index_mediawiki = "mediawiki"

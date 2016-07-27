@@ -34,8 +34,8 @@ from sortinghat import api
 
 class MBoxEnrich(Enrich):
 
-    def __init__(self, mbox, sortinghat=True, db_projects_map = None):
-        super().__init__(sortinghat, db_projects_map)
+    def __init__(self, mbox, db_sortinghat=None, db_projects_map = None):
+        super().__init__(db_sortinghat, db_projects_map)
         self.elastic = None
         self.perceval_backend = mbox
         self.index_mbox = "mbox"

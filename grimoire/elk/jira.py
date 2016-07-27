@@ -38,8 +38,8 @@ from .utils import get_time_diff_days
 
 class JiraEnrich(Enrich):
 
-    def __init__(self, jira, sortinghat=True, db_projects_map = None):
-        super().__init__(sortinghat, db_projects_map)
+    def __init__(self, jira, db_sortinghat=None, db_projects_map = None):
+        super().__init__(db_sortinghat, db_projects_map)
         self.perceval_backend = jira
         self.elastic = None
 
@@ -114,10 +114,6 @@ class JiraEnrich(Enrich):
         return "ocean-unique-id"
 
     def enrich_issue(self, item):
-
-        def get_jira_url():
-            u = urlparse(self.perceval_backend.url)
-            return u.scheme+"//"+u.netloc
 
         eitem = {}
 
@@ -200,7 +196,7 @@ class JiraEnrich(Enrich):
 
         if 'long_desc' in issue:
             eitem['number_of_comments'] = len(issue['long_desc'])
-        eitem['url'] = self.perceval_backend.url + "/browse/"+ issue['key']
+        eitem['url'] = item['origin'] + "/browse/"+ issue['key']
         eitem['time_to_close_days'] = \
             get_time_diff_days(issue['fields']['created'], issue['fields']['updated'])
         eitem['time_to_last_update_days'] = \

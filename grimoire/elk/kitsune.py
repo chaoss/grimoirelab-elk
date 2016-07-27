@@ -34,8 +34,8 @@ from .utils import get_time_diff_days
 
 class KitsuneEnrich(Enrich):
 
-    def __init__(self, jenkins, sortinghat=True, db_projects_map = None):
-        super().__init__(sortinghat, db_projects_map)
+    def __init__(self, jenkins, db_sortinghat=None, db_projects_map = None):
+        super().__init__(db_sortinghat, db_projects_map)
         self.elastic = None
         self.perceval_backend = jenkins
         self.index_jenkins = "jenkins"
