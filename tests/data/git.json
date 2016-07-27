@@ -1,0 +1,2263 @@
+[{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Fri Jul 1 17:48:15 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Fri Jul 1 18:07:42 2016 +0200",
+        "commit": "4662b4719c0aec11bce990510cd0078c999efd02",
+        "files": [
+            {
+                "action": "A",
+                "added": "83",
+                "file": "perceval/backends/telegram.py",
+                "indexes": [
+                    "0000000...",
+                    "b1d4d99..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "59",
+                "file": "tests/data/telegram_messages.json",
+                "indexes": [
+                    "0000000...",
+                    "a862b32..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "24",
+                "file": "tests/data/telegram_messages_next.json",
+                "indexes": [
+                    "0000000...",
+                    "2199165..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "120",
+                "file": "tests/test_telegram.py",
+                "indexes": [
+                    "0000000...",
+                    "7a24a4f..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[telegram] Add client to fetch messages sent to a Telegram bot",
+        "parents": [
+            "a4857fc13698125bd4a3ddfe455dc0748942751b"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.467921,
+    "updated_on": 1467389262.0,
+    "uuid": "5ac8bab855cc5a80bf91fe9a5ba3144cd7898520"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 4 13:05:07 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 4 13:31:24 2016 +0200",
+        "commit": "42053cddd917e0856adbf2ef4e269822cf3c1e8d",
+        "files": [
+            {
+                "action": "M",
+                "added": "113",
+                "file": "perceval/backends/telegram.py",
+                "indexes": [
+                    "b1d4d99...",
+                    "505c8f9..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "1",
+                "file": "tests/data/telegram_messages_empty.json",
+                "indexes": [
+                    "0000000...",
+                    "1f48f58..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "133",
+                "file": "tests/test_telegram.py",
+                "indexes": [
+                    "7a24a4f...",
+                    "d794995..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "6"
+            }
+        ],
+        "message": "[telegram] Add Telegram backend class",
+        "parents": [
+            "4662b4719c0aec11bce990510cd0078c999efd02"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.471865,
+    "updated_on": 1467631884.0,
+    "uuid": "8825ba8ab9090ac01dd35cfa32721a233c835dcb"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 4 13:46:51 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 4 13:46:51 2016 +0200",
+        "commit": "11baa689519975ee7bf2d5fa0a1bfb15f0c913b1",
+        "files": [
+            {
+                "action": "M",
+                "added": "43",
+                "file": "perceval/backends/telegram.py",
+                "indexes": [
+                    "505c8f9...",
+                    "05b5107..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "67",
+                "file": "tests/test_telegram.py",
+                "indexes": [
+                    "d794995...",
+                    "d7bfc08..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[telegram] Support cache storage",
+        "parents": [
+            "42053cddd917e0856adbf2ef4e269822cf3c1e8d"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.474126,
+    "updated_on": 1467632811.0,
+    "uuid": "37dbdcf393b8a30c6c6a5bcf8dfcbcd85191125f"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 4 18:48:45 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 4 18:56:31 2016 +0200",
+        "commit": "e6f970a9a0ccb6ce9fdd61065ba694e6e65e9efc",
+        "files": [
+            {
+                "action": "M",
+                "added": "42",
+                "file": "perceval/backends/telegram.py",
+                "indexes": [
+                    "05b5107...",
+                    "41abd3d..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "2"
+            },
+            {
+                "action": "M",
+                "added": "30",
+                "file": "tests/test_telegram.py",
+                "indexes": [
+                    "d7bfc08...",
+                    "24c6c97..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[telegram] Support filtering of messages by chat",
+        "parents": [
+            "11baa689519975ee7bf2d5fa0a1bfb15f0c913b1"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.476302,
+    "updated_on": 1467651391.0,
+    "uuid": "cf74ad7709b7fe232eb2d9ba1984b27150c6e332"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Tue Jul 5 10:44:15 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Tue Jul 5 10:44:15 2016 +0200",
+        "commit": "15d948845fe26b9584ce4fb0090254a8106381c5",
+        "files": [
+            {
+                "action": "M",
+                "added": "92",
+                "file": "perceval/backends/telegram.py",
+                "indexes": [
+                    "41abd3d...",
+                    "fa7dfec..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "2"
+            },
+            {
+                "action": "M",
+                "added": "32",
+                "file": "tests/test_telegram.py",
+                "indexes": [
+                    "24c6c97...",
+                    "da60fe9..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "1"
+            }
+        ],
+        "message": "[telegram] Add TelegramCommand class",
+        "parents": [
+            "e6f970a9a0ccb6ce9fdd61065ba694e6e65e9efc"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.478274,
+    "updated_on": 1467708255.0,
+    "uuid": "3833112ec3ec43b906f8c3599d2b4211bd25e9d1"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Tue Jul 5 10:47:14 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Tue Jul 5 10:47:14 2016 +0200",
+        "commit": "5d6676cfeeb49e81a2f7ae2e4669c0c1656ee92c",
+        "files": [
+            {
+                "action": "M",
+                "added": "12",
+                "file": "README.md",
+                "indexes": [
+                    "58441e1...",
+                    "e96f9df..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "1",
+                "file": "bin/perceval",
+                "indexes": [
+                    "8994292...",
+                    "30f67d6..."
+                ],
+                "modes": [
+                    "100755",
+                    "100755"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "5",
+                "file": "perceval/backends/__init__.py",
+                "indexes": [
+                    "761a108...",
+                    "e6a06fa..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "2"
+            }
+        ],
+        "message": "[perceval] Add Telegram backend",
+        "parents": [
+            "15d948845fe26b9584ce4fb0090254a8106381c5"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.48058,
+    "updated_on": 1467708434.0,
+    "uuid": "2bce88b09d4933e70f8f9c5b2d22b1a124421e01"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Tue Jul 5 10:47:56 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Tue Jul 5 10:47:56 2016 +0200",
+        "Merge": "a4857fc 5d6676c",
+        "commit": "0d44333b38fa7de066d5c723975ebd696d091b87",
+        "files": [
+            {
+                "added": "12",
+                "removed": "0"
+            },
+            {
+                "added": "1",
+                "removed": "0"
+            },
+            {
+                "added": "5",
+                "removed": "2"
+            },
+            {
+                "added": "369",
+                "removed": "0"
+            },
+            {
+                "added": "59",
+                "removed": "0"
+            },
+            {
+                "added": "1",
+                "removed": "0"
+            },
+            {
+                "added": "24",
+                "removed": "0"
+            },
+            {
+                "added": "375",
+                "removed": "0"
+            }
+        ],
+        "message": "Merge branch 'telegram' of 'https://github.com/grimoirelab/perceval.git'",
+        "parents": [
+            "a4857fc13698125bd4a3ddfe455dc0748942751b",
+            "5d6676cfeeb49e81a2f7ae2e4669c0c1656ee92c"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.482678,
+    "updated_on": 1467708476.0,
+    "uuid": "7310fdb5167b48e6d95dbd91cd77e49e2ea703ff"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "quan <zhquan7@gmail.com>",
+        "AuthorDate": "Tue Apr 26 14:05:33 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Tue Jul 5 11:19:00 2016 +0200",
+        "commit": "2c301f21c25d62e7d3e744e735bea8a329b74824",
+        "files": [
+            {
+                "action": "A",
+                "added": "273",
+                "file": "tests/data/jira/jira_issues_page_1.json",
+                "indexes": [
+                    "0000000...",
+                    "a9f3b29..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "138",
+                "file": "tests/data/jira/jira_issues_page_2.json",
+                "indexes": [
+                    "0000000...",
+                    "ddc9b4b..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "6",
+                "file": "tests/data/jira/jira_issues_page_empty.json",
+                "indexes": [
+                    "0000000...",
+                    "9690e24..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "267",
+                "file": "tests/data/jira/jira_issues_parse_expected.json",
+                "indexes": [
+                    "0000000...",
+                    "f22d801..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "455",
+                "file": "tests/test_jira.py",
+                "indexes": [
+                    "0000000...",
+                    "9321f5b..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[tests] Add unit tests for Jira backend",
+        "parents": [
+            "0d44333b38fa7de066d5c723975ebd696d091b87"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.484991,
+    "updated_on": 1467710340.0,
+    "uuid": "a26e3c03988195b4a6c2d496f44b1b94efb46f31"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Tue Jul 5 11:26:06 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Tue Jul 5 11:26:06 2016 +0200",
+        "Merge": "0d44333 2c301f2",
+        "commit": "43e569b30fe6aeffcc0591544f3e91ac17f39e8c",
+        "files": [
+            {
+                "added": "273",
+                "removed": "0"
+            },
+            {
+                "added": "138",
+                "removed": "0"
+            },
+            {
+                "added": "6",
+                "removed": "0"
+            },
+            {
+                "added": "267",
+                "removed": "0"
+            },
+            {
+                "added": "455",
+                "removed": "0"
+            }
+        ],
+        "message": "Merge branch 'test_jira' of 'git://github.com/zhquan/perceval.git'\n\nMerges #40\nCloses #40",
+        "parents": [
+            "0d44333b38fa7de066d5c723975ebd696d091b87",
+            "2c301f21c25d62e7d3e744e735bea8a329b74824"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.487401,
+    "updated_on": 1467710766.0,
+    "uuid": "642da4273ea4457125f6e4a98a8a47b83a805924"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Jesus M. Gonzalez-Barahona <jgb@gsyc.es>",
+        "AuthorDate": "Fri Jun 24 01:29:27 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 12:22:08 2016 +0200",
+        "commit": "b698246755af23eaaceaa7b3fce9d882ffcc1352",
+        "files": [
+            {
+                "action": "M",
+                "added": "1",
+                "file": "perceval/__init__.py",
+                "indexes": [
+                    "b974249...",
+                    "ad7da2b..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "42",
+                "file": "perceval/backends/git.py",
+                "indexes": [
+                    "f72de44...",
+                    "f1ffd4b..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "11"
+            },
+            {
+                "action": "M",
+                "added": "113",
+                "file": "tests/test_git.py",
+                "indexes": [
+                    "51a7a4b...",
+                    "fd5f7fd..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[git] Add support for fetching branches",
+        "parents": [
+            "43e569b30fe6aeffcc0591544f3e91ac17f39e8c"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.489377,
+    "updated_on": 1468232528.0,
+    "uuid": "6127322269a4fec040315155bb3948f65a9c0591"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 11 12:22:27 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 12:22:27 2016 +0200",
+        "Merge": "43e569b b698246",
+        "commit": "971837b026a912d73c57d10fb41d055652890587",
+        "files": [
+            {
+                "added": "1",
+                "removed": "0"
+            },
+            {
+                "added": "42",
+                "removed": "11"
+            },
+            {
+                "added": "113",
+                "removed": "0"
+            }
+        ],
+        "message": "Merge branch 'git_branches' of 'git://github.com/jgbarah/perceval.git'\n\nMerges #45\nCloses #45",
+        "parents": [
+            "43e569b30fe6aeffcc0591544f3e91ac17f39e8c",
+            "b698246755af23eaaceaa7b3fce9d882ffcc1352"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.491729,
+    "updated_on": 1468232547.0,
+    "uuid": "d9d41f37e5f2d209dea698358084532393b879ef"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Thu Jul 7 14:31:23 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 12:24:08 2016 +0200",
+        "commit": "8463d2371adf10b5b01488bb6b1d024d024268bd",
+        "files": [
+            {
+                "action": "A",
+                "added": "144",
+                "file": "perceval/backends/confluence.py",
+                "indexes": [
+                    "0000000...",
+                    "8eab9bf..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "84",
+                "file": "tests/data/confluence_content_1_v1.json",
+                "indexes": [
+                    "0000000...",
+                    "38396d0..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "59",
+                "file": "tests/data/confluence_contents.json",
+                "indexes": [
+                    "0000000...",
+                    "2b3cba3..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "12",
+                "file": "tests/data/confluence_contents_empty.json",
+                "indexes": [
+                    "0000000...",
+                    "b2c120e..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "35",
+                "file": "tests/data/confluence_contents_next.json",
+                "indexes": [
+                    "0000000...",
+                    "f90b8ae..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "172",
+                "file": "tests/test_confluence.py",
+                "indexes": [
+                    "0000000...",
+                    "011ed3c..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[confluence] Add client to use Conluence REST API",
+        "parents": [
+            "971837b026a912d73c57d10fb41d055652890587"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.49405,
+    "updated_on": 1468232648.0,
+    "uuid": "1d9fc86fd9ecec2e59a392f8cc73725f779f644e"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Fri Jul 8 13:24:16 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 12:24:08 2016 +0200",
+        "commit": "ee683855c1bc5a9ce99349213aff67f9ec71e37d",
+        "files": [
+            {
+                "action": "M",
+                "added": "160",
+                "file": "perceval/backends/confluence.py",
+                "indexes": [
+                    "8eab9bf...",
+                    "d0d7938..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "1"
+            },
+            {
+                "action": "M",
+                "added": "4",
+                "file": "tests/data/confluence_content_1_v1.json",
+                "indexes": [
+                    "38396d0...",
+                    "e26ede6..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "4"
+            },
+            {
+                "action": "A",
+                "added": "84",
+                "file": "tests/data/confluence_content_1_v2.json",
+                "indexes": [
+                    "0000000...",
+                    "5a5d93c..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "84",
+                "file": "tests/data/confluence_content_2_v1.json",
+                "indexes": [
+                    "0000000...",
+                    "9418bdc..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "70",
+                "file": "tests/data/confluence_content_att_v1.json",
+                "indexes": [
+                    "0000000...",
+                    "badb48e..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "2",
+                "file": "tests/data/confluence_contents_empty.json",
+                "indexes": [
+                    "b2c120e...",
+                    "c3c049f..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "3"
+            },
+            {
+                "action": "M",
+                "added": "3",
+                "file": "tests/data/confluence_contents_next.json",
+                "indexes": [
+                    "f90b8ae...",
+                    "3d0a9fc..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "3"
+            },
+            {
+                "action": "M",
+                "added": "235",
+                "file": "tests/test_confluence.py",
+                "indexes": [
+                    "011ed3c...",
+                    "0a00469..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "7"
+            }
+        ],
+        "message": "[confluence] Add Confluence backend class",
+        "parents": [
+            "8463d2371adf10b5b01488bb6b1d024d024268bd"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.497025,
+    "updated_on": 1468232648.0,
+    "uuid": "a86f3fccac6dbb33f6efd438acc305e30c87f7ef"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Fri Jul 8 14:26:58 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 12:24:08 2016 +0200",
+        "commit": "d6c40d7667fdb079118f967e56881a3c772c66f0",
+        "files": [
+            {
+                "action": "M",
+                "added": "48",
+                "file": "perceval/backends/confluence.py",
+                "indexes": [
+                    "d0d7938...",
+                    "bf906d0..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "16"
+            },
+            {
+                "action": "M",
+                "added": "67",
+                "file": "tests/test_confluence.py",
+                "indexes": [
+                    "0a00469...",
+                    "048b6f7..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[confluence] Support cache storage",
+        "parents": [
+            "ee683855c1bc5a9ce99349213aff67f9ec71e37d"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.499716,
+    "updated_on": 1468232648.0,
+    "uuid": "608bb1ac735aed4a6eb6c00f96a4784a85db8f13"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 11 11:27:51 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 12:24:08 2016 +0200",
+        "commit": "d1c0c411fa31f15ab6851e7d611c8a89c0b1304b",
+        "files": [
+            {
+                "action": "M",
+                "added": "15",
+                "file": "perceval/backends/confluence.py",
+                "indexes": [
+                    "bf906d0...",
+                    "12fcd9e..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "1"
+            },
+            {
+                "action": "M",
+                "added": "54",
+                "file": "tests/test_confluence.py",
+                "indexes": [
+                    "048b6f7...",
+                    "9cd6f04..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[confluence] Skip removed or private contents\n\nIn Confluence, some removed or private contents might be listed\nwhen a search query is run. Those contents are not available and\nany access to them returns either a 404 or 500 error.\n\nThis patch handles those response errors, skipping the access\nto the contents.",
+        "parents": [
+            "d6c40d7667fdb079118f967e56881a3c772c66f0"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.501881,
+    "updated_on": 1468232648.0,
+    "uuid": "5c012e37ace50627fc70cb4bd9d411b6b4b67626"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 11 12:08:49 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 12:24:08 2016 +0200",
+        "commit": "1a2af6ab70dfc3c90dcbacd36a51175ec9c66021",
+        "files": [
+            {
+                "action": "M",
+                "added": "73",
+                "file": "perceval/backends/confluence.py",
+                "indexes": [
+                    "12fcd9e...",
+                    "b9d5b3b..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "2"
+            },
+            {
+                "action": "M",
+                "added": "26",
+                "file": "tests/test_confluence.py",
+                "indexes": [
+                    "9cd6f04...",
+                    "07ff07a..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "1"
+            }
+        ],
+        "message": "[confluence] Add Confluence command class",
+        "parents": [
+            "d1c0c411fa31f15ab6851e7d611c8a89c0b1304b"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.503877,
+    "updated_on": 1468232648.0,
+    "uuid": "2277ea18c8bde87b9fdfc1029cd3b184403d84c7"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 11 12:13:46 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 12:24:08 2016 +0200",
+        "commit": "80db70b330bb3b183ce82ad7f9aac922fd6a345f",
+        "files": [
+            {
+                "action": "M",
+                "added": "6",
+                "file": "README.md",
+                "indexes": [
+                    "e96f9df...",
+                    "daab44c..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "1",
+                "file": "bin/perceval",
+                "indexes": [
+                    "30f67d6...",
+                    "9f63315..."
+                ],
+                "modes": [
+                    "100755",
+                    "100755"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "3",
+                "file": "perceval/backends/__init__.py",
+                "indexes": [
+                    "e6a06fa...",
+                    "8568805..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[perceval] Add Confluence backend",
+        "parents": [
+            "1a2af6ab70dfc3c90dcbacd36a51175ec9c66021"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.505946,
+    "updated_on": 1468232648.0,
+    "uuid": "1d12420b2823f99052d2318829aafe9ab42e495d"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 11 12:24:32 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 12:24:32 2016 +0200",
+        "Merge": "971837b 80db70b",
+        "commit": "bfa6146c613b569776882683e31aebb10209c98f",
+        "files": [
+            {
+                "added": "6",
+                "removed": "0"
+            },
+            {
+                "added": "1",
+                "removed": "0"
+            },
+            {
+                "added": "3",
+                "removed": "0"
+            },
+            {
+                "added": "420",
+                "removed": "0"
+            },
+            {
+                "added": "84",
+                "removed": "0"
+            },
+            {
+                "added": "84",
+                "removed": "0"
+            },
+            {
+                "added": "84",
+                "removed": "0"
+            },
+            {
+                "added": "70",
+                "removed": "0"
+            },
+            {
+                "added": "59",
+                "removed": "0"
+            },
+            {
+                "added": "11",
+                "removed": "0"
+            },
+            {
+                "added": "35",
+                "removed": "0"
+            },
+            {
+                "added": "546",
+                "removed": "0"
+            }
+        ],
+        "message": "Merge branch 'confluence' of 'https://github.com/grimoirelab/perceval.git'",
+        "parents": [
+            "971837b026a912d73c57d10fb41d055652890587",
+            "80db70b330bb3b183ce82ad7f9aac922fd6a345f"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.508177,
+    "updated_on": 1468232672.0,
+    "uuid": "e9785594c67d0c4b45b5b7efff577f5d5f72c5dc"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 11 12:29:39 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 12:37:05 2016 +0200",
+        "commit": "c53fb2b1b2fc01feeae7e0ef8eb46e984f73d06a",
+        "files": [
+            {
+                "action": "M",
+                "added": "2",
+                "file": "tests/test_telegram.py",
+                "indexes": [
+                    "da60fe9...",
+                    "da4953a..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "2"
+            }
+        ],
+        "message": "[tests] Fix cache tests for Telegram backend\n\nThe test did not use the list of cached items when it checked\nif they were successfully retrieved from the cache. Instead,\nit used the items fetched from the server.",
+        "parents": [
+            "bfa6146c613b569776882683e31aebb10209c98f"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.510594,
+    "updated_on": 1468233425.0,
+    "uuid": "a75d75699a3d7f415936bc439243dcf03bea3de6"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 11 12:52:09 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 13:04:36 2016 +0200",
+        "commit": "29db72276cbc2a5ec4b6ddd45287dac9aef15515",
+        "files": [
+            {
+                "action": "M",
+                "added": "20",
+                "file": "perceval/backends/telegram.py",
+                "indexes": [
+                    "fa7dfec...",
+                    "73be1a7..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "1"
+            },
+            {
+                "action": "M",
+                "added": "15",
+                "file": "tests/test_telegram.py",
+                "indexes": [
+                    "da4953a...",
+                    "8e7c014..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "11"
+            }
+        ],
+        "message": "[telegram] Include 'offset' metadata on each item\n\nDue to Telegram backend only allows to fetch items passing an\n'offset' value and not the typical 'from_date' parameter,\nthat it is used in most of the backends, it is usefull to include\nthe offset of each item as metadata.\n\nThis commit adds the decorator 'telegram_metadata()' to include\nthis keyword in metadata section.\n\nThis commit updates Telegram backend to 0.2.0 version.",
+        "parents": [
+            "c53fb2b1b2fc01feeae7e0ef8eb46e984f73d06a"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.512698,
+    "updated_on": 1468235076.0,
+    "uuid": "ef35341a7d835da6696fd43f2cc6b971f7b8def3"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 11 14:18:33 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 11 14:23:13 2016 +0200",
+        "commit": "7211db4dde58dbedce8a510128ea3555f6269670",
+        "files": [
+            {
+                "action": "M",
+                "added": "15",
+                "file": "perceval/backends/supybot.py",
+                "indexes": [
+                    "fda9755...",
+                    "2b4d411..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "16"
+            },
+            {
+                "action": "M",
+                "added": "1",
+                "file": "tests/data/supybot_2012_10_17.log",
+                "indexes": [
+                    "aebf537...",
+                    "cfe51d1..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "1",
+                "file": "tests/data/supybot_valid.log",
+                "indexes": [
+                    "65eae24...",
+                    "7f8037c..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "33",
+                "file": "tests/test_supybot.py",
+                "indexes": [
+                    "ebc0030...",
+                    "32a3282..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "3"
+            }
+        ],
+        "message": "[supybot] Fix crash while parsing action messages\n\nFixes #48.\n\nThe messages that start with a single '*' are considered as\naction messages sent by a poster or user. The current version\nof the Supybot parser raised an error when these messages were\nfound. This patch fix that problem. Unit tests were also added.\n\nBackend version increased to 0.1.1 .",
+        "parents": [
+            "29db72276cbc2a5ec4b6ddd45287dac9aef15515"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.5149,
+    "updated_on": 1468239793.0,
+    "uuid": "dc6e93c75eed6c7833cb6efd25a12f08db080e10"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Alvaro del Castillo <acs@bitergia.com>",
+        "AuthorDate": "Fri May 20 11:43:58 2016 +0200",
+        "Commit": "Alvaro del Castillo <acs@bitergia.com>",
+        "CommitDate": "Thu Jul 14 13:10:28 2016 +0200",
+        "commit": "90725e1bbb356d96c90880c2c1bbdd836a4dba4f",
+        "files": [
+            {
+                "action": "M",
+                "added": "6",
+                "file": "README.md",
+                "indexes": [
+                    "daab44c...",
+                    "53e3e51..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "1",
+                "file": "bin/perceval",
+                "indexes": [
+                    "9f63315...",
+                    "a12ee66..."
+                ],
+                "modes": [
+                    "100755",
+                    "100755"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "3",
+                "file": "perceval/backends/__init__.py",
+                "indexes": [
+                    "8568805...",
+                    "fcc9ffa..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "339",
+                "file": "perceval/backends/remo.py",
+                "indexes": [
+                    "0000000...",
+                    "e1a4167..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "87",
+                "file": "tests/data/remo_events_1_2.json",
+                "indexes": [
+                    "0000000...",
+                    "5b9c3aa..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "84",
+                "file": "tests/data/remo_events_2_2.json",
+                "indexes": [
+                    "0000000...",
+                    "2a4f4c9..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "10",
+                "file": "tests/data/remo_events_empty.json",
+                "indexes": [
+                    "0000000...",
+                    "ae1952e..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "769",
+                "file": "tests/data/remo_reps.json",
+                "indexes": [
+                    "0000000...",
+                    "3c9c067..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "303",
+                "file": "tests/test_remo.py",
+                "indexes": [
+                    "0000000...",
+                    "4953af7..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[perceval] Add ReMo backend",
+        "parents": [
+            "7211db4dde58dbedce8a510128ea3555f6269670"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.518504,
+    "updated_on": 1468494628.0,
+    "uuid": "11d17054c93bbbf928430cbe8be4a03522bb9196"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Thu Jul 14 13:27:42 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Thu Jul 14 13:27:42 2016 +0200",
+        "Merge": "7211db4 90725e1",
+        "commit": "5974f83fc8f7b89a3dc88745eaf69ad7327b5ee5",
+        "files": [
+            {
+                "added": "6",
+                "removed": "0"
+            },
+            {
+                "added": "1",
+                "removed": "0"
+            },
+            {
+                "added": "3",
+                "removed": "0"
+            },
+            {
+                "added": "339",
+                "removed": "0"
+            },
+            {
+                "added": "87",
+                "removed": "0"
+            },
+            {
+                "added": "84",
+                "removed": "0"
+            },
+            {
+                "added": "10",
+                "removed": "0"
+            },
+            {
+                "added": "769",
+                "removed": "0"
+            },
+            {
+                "added": "303",
+                "removed": "0"
+            }
+        ],
+        "message": "Merge branch 'remo' of 'https://github.com/acs/perceval.git'\n\nMerges #47\nCloses #47",
+        "parents": [
+            "7211db4dde58dbedce8a510128ea3555f6269670",
+            "90725e1bbb356d96c90880c2c1bbdd836a4dba4f"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.521816,
+    "updated_on": 1468495662.0,
+    "uuid": "cb18e1870a44267aafb65de5987fab580800663b"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 18 12:51:38 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 18 12:58:34 2016 +0200",
+        "commit": "ff6ddb3cbe638be22253f76a4b36362d821b2a99",
+        "files": [
+            {
+                "action": "M",
+                "added": "8",
+                "file": "perceval/backends/stackexchange.py",
+                "indexes": [
+                    "048b3d6...",
+                    "202f603..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "202",
+                "file": "tests/data/stackexchange_question_backoff_page",
+                "indexes": [
+                    "0000000...",
+                    "c9244ce..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "38",
+                "file": "tests/test_stackexchange.py",
+                "indexes": [
+                    "d06cc59...",
+                    "45b0232..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[stackexchange] Sleep the client when 'backoff' field is received\n\nAccording to StackExchange documentation, \"a dynamic throttle\nis also in place on a per-method level. If an application\nreceives a response with the backoff field set, it must wait\nthat many seconds before hitting the same method again.\"\n\nThis patch makes the client to wait the seconds set on 'backoff'\nfield before sending a new requests.",
+        "parents": [
+            "5974f83fc8f7b89a3dc88745eaf69ad7327b5ee5"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.524659,
+    "updated_on": 1468839514.0,
+    "uuid": "3aadbc0ebd519b95a0d6067f2c2e29f130ae1cfc"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 18 13:06:14 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 18 13:06:14 2016 +0200",
+        "commit": "06c42808cd41bb9722e48e729604fe527d9d17c3",
+        "files": [
+            {
+                "action": "M",
+                "added": "44",
+                "file": "tests/test_stackexchange.py",
+                "indexes": [
+                    "45b0232...",
+                    "77dd34d..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "21"
+            }
+        ],
+        "message": "[tests] Fix invalid mock server config in stackexchange test\n\nOn 'test_get_questions_more()' test, the httpretty configuration\nfor the mock HTTP server was wrong. It worked because httpretty\npush the bodies that will be returned to a queue, but the coded\nbehaviour was wrong. This patch fixes that problem.\n\nThe test has been renamed to 'test_get_questions_pagination'.",
+        "parents": [
+            "ff6ddb3cbe638be22253f76a4b36362d821b2a99"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.526925,
+    "updated_on": 1468839974.0,
+    "uuid": "1f15173a2f05fc69883681336059b64e137b4c6d"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 18 13:20:19 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 18 13:20:19 2016 +0200",
+        "commit": "8449683b5ee9588c155b1c6a7ba7f68cf5b4b1f0",
+        "files": [
+            {
+                "action": "M",
+                "added": "6",
+                "file": "tests/test_stackexchange.py",
+                "indexes": [
+                    "77dd34d...",
+                    "eaca0a1..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "4"
+            }
+        ],
+        "message": "[tests] Remove unused imports on StackExchange backend tests",
+        "parents": [
+            "06c42808cd41bb9722e48e729604fe527d9d17c3"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.528678,
+    "updated_on": 1468840819.0,
+    "uuid": "6ba625931e5269e11b341d3ce8647764916a081c"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Alvaro del Castillo <acs@bitergia.com>",
+        "AuthorDate": "Fri Jul 15 09:19:28 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 18 13:29:21 2016 +0200",
+        "commit": "1c6989ec4403cc6b46c6eb2feb1919b2df904ed9",
+        "files": [
+            {
+                "action": "M",
+                "added": "1",
+                "file": "perceval/backends/gerrit.py",
+                "indexes": [
+                    "373cb19...",
+                    "c67f8d4..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "1"
+            }
+        ],
+        "message": "[gerrit] Fix query format when filtering several blacklisted reviews\n\nThe query to fetch the reviews was badly formed when serveral\nblacklisted reviews were set to be filtered.\n\nFixes #50",
+        "parents": [
+            "8449683b5ee9588c155b1c6a7ba7f68cf5b4b1f0"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.530608,
+    "updated_on": 1468841361.0,
+    "uuid": "ab8a7f36559fe2bd1570cf77d286687fb443e384"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Mon Jul 18 13:46:19 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Mon Jul 18 13:46:19 2016 +0200",
+        "Merge": "8449683 1c6989e",
+        "commit": "31054987f5512e3d0ba7b54bcd0839196a2a1bf6",
+        "files": [
+            {
+                "added": "1",
+                "removed": "1"
+            }
+        ],
+        "message": "Merge branch 'issue-50' of 'https://github.com/acs/perceval.git'\n\nMerges #51\nCloses #51",
+        "parents": [
+            "8449683b5ee9588c155b1c6a7ba7f68cf5b4b1f0",
+            "1c6989ec4403cc6b46c6eb2feb1919b2df904ed9"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.532424,
+    "updated_on": 1468842379.0,
+    "uuid": "2e5e3c1805aa5ca74b07a03ce5ea9e127e7975ea"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Tue Jul 19 12:02:25 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Tue Jul 19 12:02:25 2016 +0200",
+        "commit": "6c797b8499a70f3af520bcd0863127dc0f29fb94",
+        "files": [
+            {
+                "action": "M",
+                "added": "6",
+                "file": "perceval/backends/supybot.py",
+                "indexes": [
+                    "2b4d411...",
+                    "025138b..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "1"
+            },
+            {
+                "action": "M",
+                "added": "1",
+                "file": "tests/data/supybot_2012_10_17.log",
+                "indexes": [
+                    "cfe51d1...",
+                    "ec584ef..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "1",
+                "file": "tests/data/supybot_valid.log",
+                "indexes": [
+                    "7f8037c...",
+                    "322462a..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "20",
+                "file": "tests/test_supybot.py",
+                "indexes": [
+                    "32a3282...",
+                    "466bbc5..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[supybot] Ignore empty comment lines\n\nSome log files can contain empty comment lines. These lines\nhave the pattern \"2016-07-19T01:02:03  <nick>\". This commit\nmakes the parser to ignore these lines without raising any\nparsing exception.",
+        "parents": [
+            "31054987f5512e3d0ba7b54bcd0839196a2a1bf6"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.534384,
+    "updated_on": 1468922545.0,
+    "uuid": "d91672a92bca628b03720a989ca5a9fd8ae5344b"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Alvaro del Castillo <acs@bitergia.com>",
+        "AuthorDate": "Wed Jul 6 12:56:04 2016 +0200",
+        "Commit": "Alvaro del Castillo <acs@bitergia.com>",
+        "CommitDate": "Wed Jul 20 00:05:21 2016 +0200",
+        "commit": "ba1e441986b32f505e1dbaa1e8e16758c073fc07",
+        "files": [
+            {
+                "action": "M",
+                "added": "6",
+                "file": "README.md",
+                "indexes": [
+                    "53e3e51...",
+                    "4ffb8f7..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "1",
+                "file": "bin/perceval",
+                "indexes": [
+                    "a12ee66...",
+                    "ed78949..."
+                ],
+                "modes": [
+                    "100755",
+                    "100755"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "3",
+                "file": "perceval/backends/__init__.py",
+                "indexes": [
+                    "fcc9ffa...",
+                    "4e6416f..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "388",
+                "file": "perceval/backends/kitsune.py",
+                "indexes": [
+                    "0000000...",
+                    "097a2f8..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "0",
+                "file": "tests/data/kitsune_answers_empty.json",
+                "indexes": [
+                    "0000000...",
+                    "e69de29..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "87",
+                "file": "tests/data/kitsune_question_answers.json",
+                "indexes": [
+                    "0000000...",
+                    "d7b31b3..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "6",
+                "file": "tests/data/kitsune_question_answers_empy.json",
+                "indexes": [
+                    "0000000...",
+                    "a07f3f0..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "141",
+                "file": "tests/data/kitsune_questions_1_2.json",
+                "indexes": [
+                    "0000000...",
+                    "ac19208..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "195",
+                "file": "tests/data/kitsune_questions_2_2.json",
+                "indexes": [
+                    "0000000...",
+                    "41c15e3..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "6",
+                "file": "tests/data/kitsune_questions_empty.json",
+                "indexes": [
+                    "0000000...",
+                    "a07f3f0..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "A",
+                "added": "339",
+                "file": "tests/test_kitsune.py",
+                "indexes": [
+                    "0000000...",
+                    "3961590..."
+                ],
+                "modes": [
+                    "000000",
+                    "100644"
+                ],
+                "removed": "0"
+            }
+        ],
+        "message": "[perceval] Add Kitsune backend",
+        "parents": [
+            "6c797b8499a70f3af520bcd0863127dc0f29fb94"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.537761,
+    "updated_on": 1468965921.0,
+    "uuid": "5f5b25b083a5c4ac1b5a318f3b94a9314cf90d00"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Wed Jul 20 12:08:30 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Wed Jul 20 12:08:30 2016 +0200",
+        "Merge": "6c797b8 ba1e441",
+        "commit": "0cc5a519679b12316c8940c8f2321d15b329dece",
+        "files": [
+            {
+                "added": "6",
+                "removed": "0"
+            },
+            {
+                "added": "1",
+                "removed": "0"
+            },
+            {
+                "added": "3",
+                "removed": "0"
+            },
+            {
+                "added": "388",
+                "removed": "0"
+            },
+            {
+                "added": "0",
+                "removed": "0"
+            },
+            {
+                "added": "87",
+                "removed": "0"
+            },
+            {
+                "added": "6",
+                "removed": "0"
+            },
+            {
+                "added": "141",
+                "removed": "0"
+            },
+            {
+                "added": "195",
+                "removed": "0"
+            },
+            {
+                "added": "6",
+                "removed": "0"
+            },
+            {
+                "added": "339",
+                "removed": "0"
+            }
+        ],
+        "message": "Merge branch 'kitsune' of 'https://github.com/acs/perceval.git'\n\nMerges #49\nCloses #49",
+        "parents": [
+            "6c797b8499a70f3af520bcd0863127dc0f29fb94",
+            "ba1e441986b32f505e1dbaa1e8e16758c073fc07"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.54132,
+    "updated_on": 1469009310.0,
+    "uuid": "1ac8d05ff180970c3f952f768176fe2d90f8553a"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Wed Jul 20 12:31:30 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Wed Jul 20 12:58:42 2016 +0200",
+        "commit": "b10eebf87b7afda2440ad915957c011601571ec3",
+        "files": [
+            {
+                "action": "M",
+                "added": "91",
+                "file": "tests/data/github_issue_expected_1",
+                "indexes": [
+                    "4516caf...",
+                    "838cb3f..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "99"
+            },
+            {
+                "action": "M",
+                "added": "101",
+                "file": "tests/data/github_issue_expected_2",
+                "indexes": [
+                    "d8e57ef...",
+                    "1addf81..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "109"
+            },
+            {
+                "action": "M",
+                "added": "97",
+                "file": "tests/data/github_request_expected",
+                "indexes": [
+                    "a4aa5b0...",
+                    "b2e5ba7..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "105"
+            },
+            {
+                "action": "M",
+                "added": "22",
+                "file": "tests/test_github.py",
+                "indexes": [
+                    "2e5a95b...",
+                    "ec91895..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "10"
+            },
+            {
+                "action": "M",
+                "added": "11",
+                "file": "tests/test_stackexchange.py",
+                "indexes": [
+                    "eaca0a1...",
+                    "58486c2..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "21"
+            }
+        ],
+        "message": "[tests] Improve 'fetch' tests on StackExchange and GitHub backends",
+        "parents": [
+            "0cc5a519679b12316c8940c8f2321d15b329dece"
+        ],
+        "refs": []
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.543489,
+    "updated_on": 1469012322.0,
+    "uuid": "24e24859f600ea8e405a036010a5d195450f91ac"
+},
+{
+    "backend_name": "Git",
+    "backend_version": "0.3.0",
+    "data": {
+        "Author": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "AuthorDate": "Wed Jul 20 12:19:18 2016 +0200",
+        "Commit": "Santiago Due\u00f1as <sduenas@bitergia.com>",
+        "CommitDate": "Wed Jul 20 13:01:13 2016 +0200",
+        "commit": "f327a37b51ef9f7600a725adcbb0409eb5ad9c16",
+        "files": [
+            {
+                "action": "M",
+                "added": "1",
+                "file": "AUTHORS",
+                "indexes": [
+                    "a91f215...",
+                    "dad0396..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "0"
+            },
+            {
+                "action": "M",
+                "added": "55",
+                "file": "NEWS",
+                "indexes": [
+                    "1767d10...",
+                    "37cd1ed..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "1"
+            },
+            {
+                "action": "M",
+                "added": "1",
+                "file": "perceval/_version.py",
+                "indexes": [
+                    "3dc1f76...",
+                    "d3ec452..."
+                ],
+                "modes": [
+                    "100644",
+                    "100644"
+                ],
+                "removed": "1"
+            }
+        ],
+        "message": "Release 0.2.0",
+        "parents": [
+            "b10eebf87b7afda2440ad915957c011601571ec3"
+        ],
+        "refs": [
+            "HEAD",
+            "tag: refs/tags/0.2.0",
+            "refs/remotes/origin/master",
+            "refs/remotes/origin/HEAD",
+            "refs/heads/master"
+        ]
+    },
+    "origin": "https://github.com/grimoirelab/perceval.git",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469617405.545737,
+    "updated_on": 1469012473.0,
+    "uuid": "e78a0fcd13e28af57c281a5beaf6819ee84b41f0"
+}]

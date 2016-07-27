@@ -22,6 +22,8 @@
 #
 
 import configparser
+import json
+import os
 import sys
 import unittest
 
@@ -30,21 +32,31 @@ if not '..' in sys.path:
 
 from grimoire.utils import get_connectors
 
-CONFIG_FILE='tests.conf'
+CONFIG_FILE = 'tests.conf'
+NUMBER_BACKENDS = 19
 
 class TestBackends(unittest.TestCase):
     """Functional tests for GrimoireELK Backends"""
 
     def test_init(self):
         """Test whether the backends can be loaded """
-        self.assertEqual(len(get_connectors()), 18)
+        self.assertEqual(len(get_connectors()), NUMBER_BACKENDS)
 
-    def test_load_data(self):
+    def test_load(self):
+        """Test load all sources JSON data into ES"""
         config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
-        print(config.sections())
-        es =  dict(config.items('ElasticSearch'))
-        print(es)
+        es = dict(config.items('ElasticSearch'))
+        connectors = get_connectors()
+        # Check we have config for all the connectors
+        for con in sorted(connectors.keys()):
+            with open(os.path.join("data", con + ".json")) as f:
+                data_json = json.load(f)
+
+    def test_enrich(self):
+        """Test enrich all sources"""
+        pass
+
 
 
 

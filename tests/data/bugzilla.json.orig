@@ -1,0 +1,4739 @@
+{
+    "backend_name": "Bugzilla",
+    "backend_version": "0.2.0",
+    "data": {
+        "__text__": "\n          ",
+        "activity": [
+            {
+                "Added": "high",
+                "Removed": "unspecified",
+                "What": "Priority",
+                "When": "2016-07-20 18:41:09 EDT",
+                "Who": "Lukas Vrabec"
+            },
+            {
+                "Added": "MODIFIED",
+                "Removed": "NEW",
+                "What": "Status",
+                "When": "2016-07-20 18:41:09 EDT",
+                "Who": "Lukas Vrabec"
+            },
+            {
+                "Added": "lvrabec",
+                "Removed": "mgrepl",
+                "What": "Assignee",
+                "When": "2016-07-20 18:41:09 EDT",
+                "Who": "Lukas Vrabec"
+            },
+            {
+                "Added": "high",
+                "Removed": "unspecified",
+                "What": "Severity",
+                "When": "2016-07-20 18:41:09 EDT",
+                "Who": "Lukas Vrabec"
+            },
+            {
+                "Added": "javiermontano684",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-21 09:38:29 EDT",
+                "Who": "Javier"
+            },
+            {
+                "Added": "chinwen_lin",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-26 02:45:04 EDT",
+                "Who": "CW Lin"
+            },
+            {
+                "Added": "makruiten",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-27 05:51:18 EDT",
+                "Who": "Martijn Kruiten"
+            }
+        ],
+        "assigned_to": [
+            {
+                "__text__": "lvrabec",
+                "name": "Lukas Vrabec"
+            }
+        ],
+        "bug_file_loc": [
+            {}
+        ],
+        "bug_id": [
+            {
+                "__text__": "1358526"
+            }
+        ],
+        "bug_severity": [
+            {
+                "__text__": "high"
+            }
+        ],
+        "bug_status": [
+            {
+                "__text__": "MODIFIED"
+            }
+        ],
+        "cc": [
+            {
+                "__text__": "chinwen_lin"
+            },
+            {
+                "__text__": "dominick.grift"
+            },
+            {
+                "__text__": "dwalsh"
+            },
+            {
+                "__text__": "javiermontano684"
+            },
+            {
+                "__text__": "lvrabec"
+            },
+            {
+                "__text__": "makruiten"
+            },
+            {
+                "__text__": "mgrepl"
+            },
+            {
+                "__text__": "plautrba"
+            }
+        ],
+        "cclist_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "cf_category": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_crm": [
+            {}
+        ],
+        "cf_doc_type": [
+            {
+                "__text__": "If docs needed, set a value"
+            }
+        ],
+        "cf_documentation_action": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_environment": [
+            {}
+        ],
+        "cf_fixed_in": [
+            {}
+        ],
+        "cf_mount_type": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_ovirt_team": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_regression_status": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_release_notes": [
+            {}
+        ],
+        "cf_story_points": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_type": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_verified_branch": [
+            {}
+        ],
+        "classification": [
+            {
+                "__text__": "Fedora"
+            }
+        ],
+        "classification_id": [
+            {
+                "__text__": "2"
+            }
+        ],
+        "comment_sort_order": [
+            {
+                "__text__": "oldest_to_newest"
+            }
+        ],
+        "component": [
+            {
+                "__text__": "selinux-policy"
+            }
+        ],
+        "creation_ts": [
+            {
+                "__text__": "2016-07-20 18:20:00 -0400"
+            }
+        ],
+        "delta_ts": [
+            {
+                "__text__": "2016-07-27 05:51:18 -0400"
+            }
+        ],
+        "everconfirmed": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "keywords": [
+            {}
+        ],
+        "long_desc": [
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-20 18:20:45 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "0"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9534681"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Description of problem:\nI tried to restart systemd-modules-load.service\nSELinux is preventing systemd-modules from 'read' accesses on the file /etc/modprobe.d/lockd.conf.\n\n*****  Plugin catchall (100. confidence) suggests   **************************\n\nIf you believe that systemd-modules should be allowed read access on the lockd.conf file by default.\nThen you should report this as a bug.\nYou can generate a local policy module to allow this access.\nDo\nallow this access for now by executing:\n# ausearch -c 'systemd-modules' --raw | audit2allow -M my-systemdmodules\n# semodule -X 300 -i my-systemdmodules.pp\n\nAdditional Information:\nSource Context                system_u:system_r:systemd_modules_load_t:s0\nTarget Context                system_u:object_r:modules_conf_t:s0\nTarget Objects                /etc/modprobe.d/lockd.conf [ file ]\nSource                        systemd-modules\nSource Path                   systemd-modules\nPort                          <Unknown>\nHost                          (removed)\nSource RPM Packages           \nTarget RPM Packages           nfs-utils-1.3.3-8.rc5.fc24.x86_64\nPolicy RPM                    selinux-policy-3.13.1-191.5.fc24.noarch\nSelinux Enabled               True\nPolicy Type                   targeted\nEnforcing Mode                Enforcing\nHost Name                     (removed)\nPlatform                      Linux (removed) 4.6.3-300.fc24.x86_64 #1 SMP Fri\n                              Jun 24 20:52:41 UTC 2016 x86_64 x86_64\nAlert Count                   2\nFirst Seen                    2016-07-20 19:15:57 BRT\nLast Seen                     2016-07-20 19:15:57 BRT\nLocal ID                      3747e00b-04ad-4dc4-a378-9c4d8e21d475\n\nRaw Audit Messages\ntype=AVC msg=audit(1469052957.223:335): avc:  denied  { read } for  pid=18894 comm=\"systemd-modules\" name=\"lockd.conf\" dev=\"dm-0\" ino=1178822 scontext=system_u:system_r:systemd_modules_load_t:s0 tcontext=system_u:object_r:modules_conf_t:s0 tclass=file permissive=0\n\n\nHash: systemd-modules,systemd_modules_load_t,modules_conf_t,file,read\n\nVersion-Release number of selected component:\nselinux-policy-3.13.1-191.5.fc24.noarch\n\nAdditional info:\nreporter:       libreport-2.7.1\nhashmarkername: setroubleshoot\nkernel:         4.6.3-300.fc24.x86_64\nreproducible:   Not sure how to reproduce the problem\ntype:           libreport"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "andre.ocosta",
+                        "name": "Andre Costa"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-27 05:51:18 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "1"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9557418"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Not sure if this is considered helpful or not, but I can confirm this bug. It was triggered during dnf update.\n\n================================================================================\n Package              Arch     Version           Repository                Size\n================================================================================\nUpgrading:\n VirtualBox           x86_64   5.0.26-1.fc24     rpmfusion-free-updates    24 M\n VirtualBox-kmodsrc   x86_64   5.0.26-1.fc24     rpmfusion-free-updates   763 k\n akmod-VirtualBox     x86_64   5.0.26-1.fc24     rpmfusion-free-updates    26 k\n ffmpeg               x86_64   3.0.2-4.fc24      rpmfusion-free-updates   1.4 M\n ffmpeg-libs          x86_64   3.0.2-4.fc24      rpmfusion-free-updates   5.8 M\n libavdevice          x86_64   3.0.2-4.fc24      rpmfusion-free-updates    88 k\n\nError:\n\nSELinux is preventing systemd-modules from read access on the file /etc/modprobe.d/lockd.conf.\n\n*****  Plugin catchall (100. confidence) suggests   **************************\n\nIf you believe that systemd-modules should be allowed read access on the lockd.conf file by default.\nThen you should report this as a bug.\nYou can generate a local policy module to allow this access.\nDo\nallow this access for now by executing:\n# ausearch -c 'systemd-modules' --raw | audit2allow -M my-systemdmodules\n# semodule -X 300 -i my-systemdmodules.pp\n\nAdditional Information:\nSource Context                system_u:system_r:systemd_modules_load_t:s0\nTarget Context                system_u:object_r:modules_conf_t:s0\nTarget Objects                /etc/modprobe.d/lockd.conf [ file ]\nSource                        systemd-modules\nSource Path                   systemd-modules\nPort                          <Unknown>\nHost                          <Removed>\nSource RPM Packages           \nTarget RPM Packages           nfs-utils-1.3.3-8.rc5.fc24.x86_64\nPolicy RPM                    selinux-policy-3.13.1-191.5.fc24.noarch\nSelinux Enabled               True\nPolicy Type                   targeted\nEnforcing Mode                Enforcing\nHost Name                     <Removed>\nPlatform                      Linux <Removed> 4.6.4-301.fc24.x86_64 #1\n                              SMP Tue Jul 12 11:50:00 UTC 2016 x86_64 x86_64\nAlert Count                   2\nFirst Seen                    2016-07-27 11:40:59 CEST\nLast Seen                     2016-07-27 11:40:59 CEST\nLocal ID                      366941a4-e7ce-4436-8a53-f7e06e72b90e\n\nRaw Audit Messages\ntype=AVC msg=audit(1469612459.729:698): avc:  denied  { read } for  pid=21375 comm=\"systemd-modules\" name=\"lockd.conf\" dev=\"dm-1\" ino=1836486 scontext=system_u:system_r:systemd_modules_load_t:s0 tcontext=system_u:object_r:modules_conf_t:s0 tclass=file permissive=0\n\n\nHash: systemd-modules,systemd_modules_load_t,modules_conf_t,file,read"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "makruiten",
+                        "name": "Martijn Kruiten"
+                    }
+                ]
+            }
+        ],
+        "op_sys": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "priority": [
+            {
+                "__text__": "high"
+            }
+        ],
+        "product": [
+            {
+                "__text__": "Fedora"
+            }
+        ],
+        "qa_contact": [
+            {
+                "__text__": "extras-qa",
+                "name": "Fedora Extras Quality Assurance"
+            }
+        ],
+        "rep_platform": [
+            {
+                "__text__": "x86_64"
+            }
+        ],
+        "reporter": [
+            {
+                "__text__": "andre.ocosta",
+                "name": "Andre Costa"
+            }
+        ],
+        "reporter_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "resolution": [
+            {}
+        ],
+        "short_desc": [
+            {
+                "__text__": "SELinux is preventing systemd-modules from 'read' accesses on the file /etc/modprobe.d/lockd.conf."
+            }
+        ],
+        "status_whiteboard": [
+            {
+                "__text__": "abrt_hash:df4df9412cd3275c92e6f7927d037b36c431db4679ef80f8edb0d7112c55545b;VARIANT_ID=workstation;"
+            }
+        ],
+        "target_milestone": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "target_release": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "version": [
+            {
+                "__text__": "24"
+            }
+        ],
+        "votes": [
+            {
+                "__text__": "0"
+            }
+        ]
+    },
+    "origin": "https://bugzilla.redhat.com/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469613257.996559,
+    "updated_on": 1469598678.0,
+    "uuid": "d01a7df54c32481c76d8c0900291f71389d13841"
+}
+{
+    "backend_name": "Bugzilla",
+    "backend_version": "0.2.0",
+    "data": {
+        "__text__": "\n          ",
+        "activity": [
+            {
+                "Added": "ZStream",
+                "Removed": "",
+                "What": "Keywords",
+                "When": "2016-06-27 06:10:51 EDT",
+                "Who": "Red Hat Bugzilla Rules Engine"
+            },
+            {
+                "Added": "FutureFeature",
+                "Removed": "ZStream",
+                "What": "Keywords",
+                "When": "2016-06-27 06:11:43 EDT",
+                "Who": "Anjana Suparna Sriram"
+            },
+            {
+                "Added": "Enhancement",
+                "Removed": "If docs needed, set a value",
+                "What": "Doc Type",
+                "When": "2016-06-27 06:11:43 EDT",
+                "Who": "Anjana Suparna Sriram"
+            },
+            {
+                "Added": "1332130",
+                "Removed": "",
+                "What": "Blocks",
+                "When": "2016-06-27 06:14:15 EDT",
+                "Who": "Anjana Suparna Sriram"
+            },
+            {
+                "Added": "ASSIGNED",
+                "Removed": "NEW",
+                "What": "Status",
+                "When": "2016-07-14 08:16:47 EDT",
+                "Who": "Bhavana"
+            },
+            {
+                "Added": "bmohanra",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-14 08:16:47 EDT",
+                "Who": "Bhavana"
+            },
+            {
+                "Added": "MODIFIED",
+                "Removed": "ASSIGNED",
+                "What": "Status",
+                "When": "2016-07-14 08:22:08 EDT",
+                "Who": "Bhavana"
+            },
+            {
+                "Added": "mliyazud",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-14 08:22:08 EDT",
+                "Who": "Bhavana"
+            },
+            {
+                "Added": "needinfo?(mliyazud)",
+                "Removed": "",
+                "What": "Flags",
+                "When": "2016-07-14 08:22:08 EDT",
+                "Who": "Bhavana"
+            },
+            {
+                "Added": "bmohanra",
+                "Removed": "storage-doc",
+                "What": "Assignee",
+                "When": "2016-07-14 08:54:24 EDT",
+                "Who": "Anjana Suparna Sriram"
+            },
+            {
+                "Added": "ON_QA",
+                "Removed": "MODIFIED",
+                "What": "Status",
+                "When": "2016-07-15 08:07:59 EDT",
+                "Who": "Bhavana"
+            },
+            {
+                "Added": "ASSIGNED",
+                "Removed": "ON_QA",
+                "What": "Status",
+                "When": "2016-07-20 09:15:43 EDT",
+                "Who": "Mohamed Ashiq"
+            },
+            {
+                "Added": "",
+                "Removed": "needinfo?(mliyazud)",
+                "What": "Flags",
+                "When": "2016-07-20 09:15:43 EDT",
+                "Who": "Mohamed Ashiq"
+            },
+            {
+                "Added": "ON_QA",
+                "Removed": "ASSIGNED",
+                "What": "Status",
+                "When": "2016-07-25 08:11:32 EDT",
+                "Who": "Bhavana"
+            },
+            {
+                "Added": "rcyriac",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-25 14:58:24 EDT",
+                "Who": "Rejy M Cyriac"
+            },
+            {
+                "Added": "pprakash",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-26 03:10:57 EDT",
+                "Who": "Prasanth"
+            },
+            {
+                "Added": "ZStream",
+                "Removed": "",
+                "What": "Keywords",
+                "When": "2016-07-26 04:01:59 EDT",
+                "Who": "Rejy M Cyriac"
+            },
+            {
+                "Added": "RHGS Container Converged 1.0",
+                "Removed": "---",
+                "What": "Target Release",
+                "When": "2016-07-26 04:04:37 EDT",
+                "Who": "Red Hat Bugzilla Rules Engine"
+            },
+            {
+                "Added": "bmekala",
+                "Removed": "storage-qa-internal",
+                "What": "QA Contact",
+                "When": "2016-07-27 01:28:42 EDT",
+                "Who": "Prasanth"
+            },
+            {
+                "Added": "VERIFIED",
+                "Removed": "ON_QA",
+                "What": "Status",
+                "When": "2016-07-27 05:51:27 EDT",
+                "Who": "Bala Konda Reddy M"
+            }
+        ],
+        "assigned_to": [
+            {
+                "__text__": "bmohanra",
+                "name": "Bhavana"
+            }
+        ],
+        "blocked": [
+            {
+                "__text__": "1332130"
+            }
+        ],
+        "bug_file_loc": [
+            {}
+        ],
+        "bug_id": [
+            {
+                "__text__": "1350373"
+            }
+        ],
+        "bug_severity": [
+            {
+                "__text__": "unspecified"
+            }
+        ],
+        "bug_status": [
+            {
+                "__text__": "VERIFIED"
+            }
+        ],
+        "cc": [
+            {
+                "__text__": "asriram"
+            },
+            {
+                "__text__": "bmohanra"
+            },
+            {
+                "__text__": "mliyazud"
+            },
+            {
+                "__text__": "pprakash"
+            },
+            {
+                "__text__": "rcyriac"
+            },
+            {
+                "__text__": "rhs-bugs"
+            },
+            {
+                "__text__": "sankarshan"
+            },
+            {
+                "__text__": "storage-doc"
+            }
+        ],
+        "cclist_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "cf_category": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_crm": [
+            {}
+        ],
+        "cf_doc_type": [
+            {
+                "__text__": "Enhancement"
+            }
+        ],
+        "cf_documentation_action": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_environment": [
+            {}
+        ],
+        "cf_fixed_in": [
+            {}
+        ],
+        "cf_mount_type": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_ovirt_team": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_regression_status": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_release_notes": [
+            {}
+        ],
+        "cf_story_points": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_type": [
+            {
+                "__text__": "Bug"
+            }
+        ],
+        "cf_verified_branch": [
+            {}
+        ],
+        "classification": [
+            {
+                "__text__": "Red Hat"
+            }
+        ],
+        "classification_id": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "comment_sort_order": [
+            {
+                "__text__": "oldest_to_newest"
+            }
+        ],
+        "component": [
+            {
+                "__text__": "Documentation"
+            }
+        ],
+        "creation_ts": [
+            {
+                "__text__": "2016-06-27 06:10:00 -0400"
+            }
+        ],
+        "delta_ts": [
+            {
+                "__text__": "2016-07-27 05:51:27 -0400"
+            }
+        ],
+        "everconfirmed": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "keywords": [
+            {
+                "__text__": "FutureFeature, ZStream"
+            }
+        ],
+        "long_desc": [
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-06-27 06:10:47 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "0"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9454669"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Document URL: \n\nSection Number and Name: \n\nDescribe the issue: \n\nSuggestions for improvement: \n\nAdditional information:"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "asriram",
+                        "name": "Anjana Suparna Sriram"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-14 08:16:47 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "2"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9509159"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "The changes are incorporated based on the reviews received for the documentation over google docs:\n\nhttps://docs.google.com/document/d/1HQ1Yh-LswbP0pnAwFujZLC84D8F_wRS3enBK7uTt6vY/edit"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "bmohanra",
+                        "name": "Bhavana"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-14 08:22:08 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "3"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9509225"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Hello Ashiq,\n\nLet me know if there any more changes that has to made to this Chapter:\n\nhttp://jenkinscat.gsslab.pnq.redhat.com:8080/job/doc-Red_Hat_Gluster_Storage-3.1-Deployment_Guide_for_Containerized_Red_Hat_Gluster_Storage%20%28html-single%29/lastStableBuild/artifact/tmp/en-US/html-single/index.html#chap-Documentation-Deployment_Guide_for_Containerized_Red_Hat_Gluster_Storage-OpenShift_Creating_Persistent_Volumes"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "bmohanra",
+                        "name": "Bhavana"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-15 08:07:59 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "4"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9512577"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "\n\nAuthored the chapter \"Chapter 8. Creating Persistent Volumes\".\n\nhttp://jenkinscat.gsslab.pnq.redhat.com:8080/job/doc-Red_Hat_Gluster_Storage-3.1-Deployment_Guide_for_Containerized_Red_Hat_Gluster_Storage%20%28html-single%29/lastStableBuild/artifact/tmp/en-US/html-single/index.html#chap-Documentation-Deployment_Guide_for_Containerized_Red_Hat_Gluster_Storage-OpenShift_Creating_Persistent_Volumes"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "bmohanra",
+                        "name": "Bhavana"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-20 09:15:43 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "5"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9532349"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Needs few changes. We can discuss on this.\nMoving it back to assigned."
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "mliyazud",
+                        "name": "Mohamed Ashiq"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-25 08:11:32 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "6"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9546329"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Updated the section with the changes suggested by Ashiq over a meeting:\n\nhttp://jenkinscat.gsslab.pnq.redhat.com:8080/job/doc-Red_Hat_Gluster_Storage-3.1-Deployment_Guide_for_Containerized_Red_Hat_Gluster_Storage%20%28html-single%29/lastStableBuild/artifact/tmp/en-US/html-single/index.html#chap-Documentation-Deployment_Guide_for_Containerized_Red_Hat_Gluster_Storage-OpenShift_Creating_Persistent_Volumes\n\n\nMoving the bug on_qa."
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "bmohanra",
+                        "name": "Bhavana"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-27 05:51:27 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "8"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9557419"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Validated the document\nHence marking it as verified"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "bmekala",
+                        "name": "Bala Konda Reddy M"
+                    }
+                ]
+            }
+        ],
+        "op_sys": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "priority": [
+            {
+                "__text__": "unspecified"
+            }
+        ],
+        "product": [
+            {
+                "__text__": "Red Hat Gluster Storage"
+            }
+        ],
+        "qa_contact": [
+            {
+                "__text__": "bmekala",
+                "name": "Bala Konda Reddy M"
+            }
+        ],
+        "rep_platform": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "reporter": [
+            {
+                "__text__": "asriram",
+                "name": "Anjana Suparna Sriram"
+            }
+        ],
+        "reporter_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "resolution": [
+            {}
+        ],
+        "short_desc": [
+            {
+                "__text__": "[Doc RFE] Document how to create persistent volumes"
+            }
+        ],
+        "status_whiteboard": [
+            {}
+        ],
+        "target_milestone": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "target_release": [
+            {
+                "__text__": "RHGS Container Converged 1.0"
+            }
+        ],
+        "version": [
+            {
+                "__text__": "3.1"
+            }
+        ],
+        "votes": [
+            {
+                "__text__": "0"
+            }
+        ]
+    },
+    "origin": "https://bugzilla.redhat.com/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469613259.544749,
+    "updated_on": 1469598687.0,
+    "uuid": "01776c9608915e2103a4b9fef800ca49331dd29d"
+}
+{
+    "backend_name": "Bugzilla",
+    "backend_version": "0.2.0",
+    "data": {
+        "__text__": "\n          ",
+        "activity": [
+            {
+                "Added": "https://retrace.fedoraproject.org/faf/reports/bthash/f04b83204bf9db50318b3b413e2127bdd3ead605",
+                "Removed": "",
+                "What": "URL",
+                "When": "2016-05-26 17:44:36 EDT",
+                "Who": "Fabio Alessandro Locati"
+            },
+            {
+                "Added": "",
+                "Removed": "fabio",
+                "What": "CC",
+                "When": "2016-05-26 17:44:36 EDT",
+                "Who": "Fabio Alessandro Locati"
+            },
+            {
+                "Added": "vladislav.khromov",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-06-27 13:39:45 EDT",
+                "Who": "Vladislav Khromov"
+            },
+            {
+                "Added": "colotunbabay2010",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-08 07:35:17 EDT",
+                "Who": "Alex Gluck"
+            },
+            {
+                "Added": "xzj8b3",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-11 16:24:52 EDT",
+                "Who": "xzj8b3"
+            },
+            {
+                "Added": "cristian.romanescu",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-27 05:51:46 EDT",
+                "Who": "Cristi Romanescu"
+            }
+        ],
+        "assigned_to": [
+            {
+                "__text__": "leigh123linux",
+                "name": "leigh scott"
+            }
+        ],
+        "attachment": [
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157849"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:44:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:44:58 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: backtrace"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "backtrace"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "40692"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157850"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:44:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:44:58 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: cgroup"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "cgroup"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "242"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157851"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:44:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:44:59 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: core_backtrace"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "core_backtrace"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "9279"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157852"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: dso_list"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "dso_list"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "10645"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157853"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:45:01 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: environ"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "environ"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "1344"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157854"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:45:02 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: exploitable"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "exploitable"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "82"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157855"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:45:03 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: limits"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "limits"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "1323"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157856"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:45:04 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: maps"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "maps"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "55677"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157857"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:45:05 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: mountinfo"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "mountinfo"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "3671"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157858"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:45:06 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: namespaces"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "namespaces"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "85"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157859"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:45:07 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: open_fds"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "open_fds"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "3290"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157860"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:45:08 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: proc_pid_status"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "proc_pid_status"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "1122"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attacher": [
+                    {
+                        "__text__": "t.c.rogers1984"
+                    }
+                ],
+                "attachid": [
+                    {
+                        "__text__": "1157861"
+                    }
+                ],
+                "date": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "delta_ts": [
+                    {
+                        "__text__": "2016-05-16 07:45:09 -0400"
+                    }
+                ],
+                "desc": [
+                    {
+                        "__text__": "File: var_log_messages"
+                    }
+                ],
+                "filename": [
+                    {
+                        "__text__": "var_log_messages"
+                    }
+                ],
+                "isobsolete": "0",
+                "ispatch": "0",
+                "isprivate": "0",
+                "size": [
+                    {
+                        "__text__": "293"
+                    }
+                ],
+                "type": [
+                    {
+                        "__text__": "text/plain"
+                    }
+                ]
+            }
+        ],
+        "bug_file_loc": [
+            {
+                "__text__": "https://retrace.fedoraproject.org/faf/reports/bthash/f04b83204bf9db50318b3b413e2127bdd3ead605"
+            }
+        ],
+        "bug_id": [
+            {
+                "__text__": "1336402"
+            }
+        ],
+        "bug_severity": [
+            {
+                "__text__": "unspecified"
+            }
+        ],
+        "bug_status": [
+            {
+                "__text__": "NEW"
+            }
+        ],
+        "cc": [
+            {
+                "__text__": "chat-to-me"
+            },
+            {
+                "__text__": "colotunbabay2010"
+            },
+            {
+                "__text__": "cristian.romanescu"
+            },
+            {
+                "__text__": "leigh123linux"
+            },
+            {
+                "__text__": "miketwebster"
+            },
+            {
+                "__text__": "vladislav.khromov"
+            },
+            {
+                "__text__": "xzj8b3"
+            }
+        ],
+        "cclist_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "cf_category": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_crm": [
+            {}
+        ],
+        "cf_doc_type": [
+            {
+                "__text__": "Bug Fix"
+            }
+        ],
+        "cf_documentation_action": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_environment": [
+            {}
+        ],
+        "cf_fixed_in": [
+            {}
+        ],
+        "cf_mount_type": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_ovirt_team": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_regression_status": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_release_notes": [
+            {}
+        ],
+        "cf_story_points": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_type": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_verified_branch": [
+            {}
+        ],
+        "classification": [
+            {
+                "__text__": "Fedora"
+            }
+        ],
+        "classification_id": [
+            {
+                "__text__": "2"
+            }
+        ],
+        "comment_sort_order": [
+            {
+                "__text__": "oldest_to_newest"
+            }
+        ],
+        "component": [
+            {
+                "__text__": "nemo"
+            }
+        ],
+        "creation_ts": [
+            {
+                "__text__": "2016-05-16 07:44:00 -0400"
+            }
+        ],
+        "delta_ts": [
+            {
+                "__text__": "2016-07-27 05:51:46 -0400"
+            }
+        ],
+        "everconfirmed": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "keywords": [
+            {}
+        ],
+        "long_desc": [
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:44:53 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "0"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329220"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Description of problem:\nI was changing universal folder settings in nemo when it suddenly crashed. I don't remember the box I checked when it crashed.\n\nVersion-Release number of selected component:\nnemo-3.0.0-1.fc24\n\nAdditional info:\nreporter:       libreport-2.7.0\nbacktrace_rating: 4\ncmdline:        nemo -n\ncrash_function: __strcmp_sse2_unaligned\nexecutable:     /usr/bin/nemo\nglobal_pid:     1739\nkernel:         4.5.4-300.fc24.x86_64\npkg_fingerprint: 73BD E983 81B4 6521\npkg_vendor:     Fedora Project\nreproducible:   Not sure how to reproduce the problem\nrunlevel:       N 5\ntype:           CCpp\nuid:            1000\n\nTruncated backtrace:\nThread no. 1 (10 frames)\n #0 __strcmp_sse2_unaligned at ../sysdeps/x86_64/multiarch/strcmp-sse2-unaligned.S:203\n #1 nemo_action_get_visibility at nemo-action.c:1358\n #2 bookmarks_check_popup_sensitivity at nemo-places-sidebar.c:2293\n #3 _g_closure_invoke_va at gclosure.c:867\n #6 _gtk_tree_selection_internal_select_node at gtktreeselection.c:1593\n #7 gtk_tree_view_real_set_cursor at gtktreeview.c:13258\n #8 gtk_tree_view_row_deleted at gtktreeview.c:9344\n #13 gtk_tree_model_row_deleted at gtktreemodel.c:1902\n #14 gtk_tree_model_filter_row_deleted at gtktreemodelfilter.c:2665\n #19 gtk_tree_model_row_deleted at gtktreemodel.c:1902\n\nPotential duplicate: bug 1278458"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157849"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:44:58 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "1"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329221"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157849\nFile: backtrace"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157850"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:44:58 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "2"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329222"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157850\nFile: cgroup"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157851"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:44:59 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "3"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329223"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157851\nFile: core_backtrace"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157852"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:45:00 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "4"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329224"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157852\nFile: dso_list"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157853"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:45:01 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "5"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329225"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157853\nFile: environ"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157854"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:45:02 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "6"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329226"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157854\nFile: exploitable"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157855"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:45:03 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "7"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329227"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157855\nFile: limits"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157856"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:45:04 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "8"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329228"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157856\nFile: maps"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157857"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:45:05 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "9"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329229"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157857\nFile: mountinfo"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157858"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:45:06 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "10"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329230"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157858\nFile: namespaces"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157859"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:45:07 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "11"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329231"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157859\nFile: open_fds"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157860"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:45:08 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "12"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329232"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157860\nFile: proc_pid_status"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "attachid": [
+                    {
+                        "__text__": "1157861"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-16 07:45:09 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "13"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9329233"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Created attachment 1157861\nFile: var_log_messages"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "t.c.rogers1984",
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-06-27 13:39:45 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "14"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9456388"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "*** Bug 1350540 has been marked as a duplicate of this bug. ***"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "vladislav.khromov",
+                        "name": "Vladislav Khromov"
+                    }
+                ]
+            }
+        ],
+        "op_sys": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "priority": [
+            {
+                "__text__": "unspecified"
+            }
+        ],
+        "product": [
+            {
+                "__text__": "Fedora"
+            }
+        ],
+        "qa_contact": [
+            {
+                "__text__": "extras-qa",
+                "name": "Fedora Extras Quality Assurance"
+            }
+        ],
+        "rep_platform": [
+            {
+                "__text__": "x86_64"
+            }
+        ],
+        "reporter": [
+            {
+                "__text__": "t.c.rogers1984"
+            }
+        ],
+        "reporter_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "resolution": [
+            {}
+        ],
+        "short_desc": [
+            {
+                "__text__": "[abrt] nemo: __strcmp_sse2_unaligned(): nemo killed by SIGSEGV"
+            }
+        ],
+        "status_whiteboard": [
+            {
+                "__text__": "abrt_hash:4a30dd6286c1bb235fcd833b18ebf78249c7f58e;"
+            }
+        ],
+        "target_milestone": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "target_release": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "version": [
+            {
+                "__text__": "24"
+            }
+        ],
+        "votes": [
+            {
+                "__text__": "0"
+            }
+        ]
+    },
+    "origin": "https://bugzilla.redhat.com/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469613261.043436,
+    "updated_on": 1469598706.0,
+    "uuid": "731048913adf68771b011c362397106b5bb9b248"
+}
+{
+    "backend_name": "Bugzilla",
+    "backend_version": "0.2.0",
+    "data": {
+        "__text__": "\n          ",
+        "activity": [
+            {
+                "Added": "testing_ack? planning_ack?",
+                "Removed": "",
+                "What": "Flags",
+                "When": "2016-03-18 06:31:29 EDT",
+                "Who": "Red Hat Bugzilla Rules Engine"
+            },
+            {
+                "Added": "medium",
+                "Removed": "unspecified",
+                "What": "Severity",
+                "When": "2016-03-18 06:32:00 EDT",
+                "Who": "Simone Tiraboschi"
+            },
+            {
+                "Added": "oVirt gerrit 54912",
+                "Removed": "",
+                "What": "External Bug ID",
+                "When": "2016-03-18 07:06:26 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "POST",
+                "Removed": "NEW",
+                "What": "Status",
+                "When": "2016-03-18 07:06:26 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "ovirt-3.6.5",
+                "Removed": "---",
+                "What": "Target Milestone",
+                "When": "2016-03-18 07:06:26 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "ovirt-3.6.z?",
+                "Removed": "",
+                "What": "Flags",
+                "When": "2016-03-18 07:06:26 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "khajna",
+                "Removed": "pstehlik",
+                "What": "QA Contact",
+                "When": "2016-03-18 07:10:12 EDT",
+                "Who": "Pavel Stehlik"
+            },
+            {
+                "Added": "testing_ack+",
+                "Removed": "testing_ack?",
+                "What": "Flags",
+                "When": "2016-03-18 07:10:12 EDT",
+                "Who": "Pavel Stehlik"
+            },
+            {
+                "Added": "stirabos",
+                "Removed": "sbonazzo",
+                "What": "Assignee",
+                "When": "2016-03-18 12:10:00 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "bmcclain",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-03-18 13:53:36 EDT",
+                "Who": "Bronce McClain"
+            },
+            {
+                "Added": "planning_ack+",
+                "Removed": "planning_ack?",
+                "What": "Flags",
+                "When": "2016-03-18 13:53:36 EDT",
+                "Who": "Bronce McClain"
+            },
+            {
+                "Added": "ovirt-3.6.z+",
+                "Removed": "ovirt-3.6.z?",
+                "What": "Flags",
+                "When": "2016-03-18 13:53:42 EDT",
+                "Who": "Red Hat Bugzilla Rules Engine"
+            },
+            {
+                "Added": "medium",
+                "Removed": "unspecified",
+                "What": "Priority",
+                "When": "2016-03-22 10:04:13 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "sbonazzo",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-03-22 10:04:13 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "MODIFIED",
+                "Removed": "POST",
+                "What": "Status",
+                "When": "2016-03-23 06:50:30 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "POST",
+                "Removed": "MODIFIED",
+                "What": "Status",
+                "When": "2016-03-23 06:50:30 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "oVirt gerrit 55133",
+                "Removed": "",
+                "What": "External Bug ID",
+                "When": "2016-03-28 16:15:54 EDT",
+                "Who": "Sat6QE Jenkins"
+            },
+            {
+                "Added": "MODIFIED",
+                "Removed": "POST",
+                "What": "Status",
+                "When": "2016-03-28 16:15:54 EDT",
+                "Who": "Sat6QE Jenkins"
+            },
+            {
+                "Added": "POST",
+                "Removed": "MODIFIED",
+                "What": "Status",
+                "When": "2016-03-28 19:37:25 EDT",
+                "Who": "Mike McCune"
+            },
+            {
+                "Added": "ovirt-3.6.6",
+                "Removed": "ovirt-3.6.5",
+                "What": "Target Milestone",
+                "When": "2016-03-31 08:15:12 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "MODIFIED",
+                "Removed": "POST",
+                "What": "Status",
+                "When": "2016-04-26 04:22:25 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "3.6.6",
+                "Removed": "---",
+                "What": "Target Release",
+                "When": "2016-04-26 04:22:25 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "ON_QA",
+                "Removed": "MODIFIED",
+                "What": "Status",
+                "When": "2016-04-29 12:01:37 EDT",
+                "Who": "Simone Tiraboschi"
+            },
+            {
+                "Added": "bkorren",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-04-29 12:01:37 EDT",
+                "Who": "Simone Tiraboschi"
+            },
+            {
+                "Added": "ASSIGNED",
+                "Removed": "ON_QA",
+                "What": "Status",
+                "When": "2016-05-04 07:30:07 EDT",
+                "Who": "Karol\u00edna Hajn\u00e1"
+            },
+            {
+                "Added": "---",
+                "Removed": "3.6.6",
+                "What": "Target Release",
+                "When": "2016-05-04 14:23:34 EDT",
+                "Who": "Yaniv Kaul"
+            },
+            {
+                "Added": "ovirt-3.6.7",
+                "Removed": "ovirt-3.6.6",
+                "What": "Target Milestone",
+                "When": "2016-05-04 14:23:34 EDT",
+                "Who": "Yaniv Kaul"
+            },
+            {
+                "Added": "pstehlik",
+                "Removed": "khajna",
+                "What": "QA Contact",
+                "When": "2016-05-19 21:24:55 EDT",
+                "Who": "John Skeoch"
+            },
+            {
+                "Added": "ydary",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-05-26 07:46:19 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "ovirt-4.0.0-rc",
+                "Removed": "ovirt-3.6.7",
+                "What": "Target Milestone",
+                "When": "2016-05-26 07:46:19 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "ovirt-4.0.0? planning_ack? testing_ack?",
+                "Removed": "ovirt-3.6.z+ planning_ack+ testing_ack+",
+                "What": "Flags",
+                "When": "2016-05-26 07:46:19 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "ovirt-4.0.1",
+                "Removed": "ovirt-4.0.0-rc",
+                "What": "Target Milestone",
+                "When": "2016-06-02 04:43:45 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "ovirt-4.0.z?",
+                "Removed": "ovirt-4.0.0?",
+                "What": "Flags",
+                "When": "2016-06-02 04:43:45 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "ovirt-4.0.2",
+                "Removed": "ovirt-4.0.1",
+                "What": "Target Milestone",
+                "When": "2016-07-08 10:31:41 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "ovirt-4.1.0-alpha",
+                "Removed": "ovirt-4.0.2",
+                "What": "Target Milestone",
+                "When": "2016-07-21 04:35:59 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "ovirt-4.1.0?",
+                "Removed": "ovirt-4.0.z?",
+                "What": "Flags",
+                "When": "2016-07-21 04:35:59 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "lsvaty",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-21 04:51:22 EDT",
+                "Who": "Lukas Svaty"
+            },
+            {
+                "Added": "ovirt-4.0.2",
+                "Removed": "ovirt-4.1.0-alpha",
+                "What": "Target Milestone",
+                "When": "2016-07-21 04:51:22 EDT",
+                "Who": "Lukas Svaty"
+            },
+            {
+                "Added": "pkubica",
+                "Removed": "pstehlik",
+                "What": "QA Contact",
+                "When": "2016-07-21 04:51:22 EDT",
+                "Who": "Lukas Svaty"
+            },
+            {
+                "Added": "testing_ack+",
+                "Removed": "testing_ack?",
+                "What": "Flags",
+                "When": "2016-07-21 04:51:22 EDT",
+                "Who": "Lukas Svaty"
+            },
+            {
+                "Added": "ON_QA",
+                "Removed": "ASSIGNED",
+                "What": "Status",
+                "When": "2016-07-21 08:21:04 EDT",
+                "Who": "Simone Tiraboschi"
+            },
+            {
+                "Added": "planning_ack+",
+                "Removed": "planning_ack?",
+                "What": "Flags",
+                "When": "2016-07-21 08:21:09 EDT",
+                "Who": "Red Hat Bugzilla Rules Engine"
+            },
+            {
+                "Added": "ovirt-4.0.z?",
+                "Removed": "ovirt-4.1.0?",
+                "What": "Flags",
+                "When": "2016-07-25 04:40:22 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "ovirt-4.0.z+",
+                "Removed": "ovirt-4.0.z?",
+                "What": "Flags",
+                "When": "2016-07-25 04:40:28 EDT",
+                "Who": "Red Hat Bugzilla Rules Engine"
+            },
+            {
+                "Added": "ZStream",
+                "Removed": "",
+                "What": "Keywords",
+                "When": "2016-07-25 04:40:56 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "4.0.2.1",
+                "Removed": "---",
+                "What": "Target Release",
+                "When": "2016-07-25 05:04:09 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "engine-setup was failing if the user installed engine rpms but he wanted to configure just other product options.\nFixing it.",
+                "Removed": "",
+                "What": "Doc Text",
+                "When": "2016-07-25 07:49:51 EDT",
+                "Who": "Simone Tiraboschi"
+            },
+            {
+                "Added": "ASSIGNED",
+                "Removed": "ON_QA",
+                "What": "Status",
+                "When": "2016-07-25 08:34:47 EDT",
+                "Who": "Petr Kubica"
+            },
+            {
+                "Added": "---",
+                "Removed": "4.0.2.1",
+                "What": "Target Release",
+                "When": "2016-07-25 08:34:52 EDT",
+                "Who": "Red Hat Bugzilla Rules Engine"
+            },
+            {
+                "Added": "1359832",
+                "Removed": "",
+                "What": "Blocks",
+                "When": "2016-07-25 10:08:15 EDT",
+                "Who": "Simone Tiraboschi"
+            },
+            {
+                "Added": "",
+                "Removed": "1359832",
+                "What": "Blocks",
+                "When": "2016-07-25 11:04:16 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "https://bugzilla.redhat.com/show_bug.cgi?id=1359832",
+                "Removed": "",
+                "What": "See Also",
+                "When": "2016-07-25 11:04:16 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "MODIFIED",
+                "Removed": "ASSIGNED",
+                "What": "Status",
+                "When": "2016-07-27 05:51:55 EDT",
+                "Who": "Simone Tiraboschi"
+            }
+        ],
+        "assigned_to": [
+            {
+                "__text__": "stirabos",
+                "name": "Simone Tiraboschi"
+            }
+        ],
+        "bug_file_loc": [
+            {}
+        ],
+        "bug_id": [
+            {
+                "__text__": "1318986"
+            }
+        ],
+        "bug_severity": [
+            {
+                "__text__": "medium"
+            }
+        ],
+        "bug_status": [
+            {
+                "__text__": "MODIFIED"
+            }
+        ],
+        "cc": [
+            {
+                "__text__": "bkorren"
+            },
+            {
+                "__text__": "bmcclain"
+            },
+            {
+                "__text__": "bugs"
+            },
+            {
+                "__text__": "lsvaty"
+            },
+            {
+                "__text__": "rhev-integ-dev"
+            },
+            {
+                "__text__": "sbonazzo"
+            },
+            {
+                "__text__": "ydary"
+            }
+        ],
+        "cclist_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "cf_category": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_crm": [
+            {}
+        ],
+        "cf_doc_type": [
+            {
+                "__text__": "Bug Fix"
+            }
+        ],
+        "cf_documentation_action": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_environment": [
+            {}
+        ],
+        "cf_fixed_in": [
+            {}
+        ],
+        "cf_mount_type": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_ovirt_team": [
+            {
+                "__text__": "Integration"
+            }
+        ],
+        "cf_regression_status": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_release_notes": [
+            {
+                "__text__": "engine-setup was failing if the user installed engine rpms but he wanted to configure just other product options. \nFixing it."
+            }
+        ],
+        "cf_story_points": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_type": [
+            {
+                "__text__": "Bug"
+            }
+        ],
+        "cf_verified_branch": [
+            {}
+        ],
+        "classification": [
+            {
+                "__text__": "oVirt"
+            }
+        ],
+        "classification_id": [
+            {
+                "__text__": "9"
+            }
+        ],
+        "comment_sort_order": [
+            {
+                "__text__": "oldest_to_newest"
+            }
+        ],
+        "component": [
+            {
+                "__text__": "Setup.Engine"
+            }
+        ],
+        "creation_ts": [
+            {
+                "__text__": "2016-03-18 06:31:00 -0400"
+            }
+        ],
+        "delta_ts": [
+            {
+                "__text__": "2016-07-27 05:51:55 -0400"
+            }
+        ],
+        "everconfirmed": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "external_bugs": [
+            {
+                "__text__": "54912",
+                "name": "oVirt gerrit"
+            },
+            {
+                "__text__": "55133",
+                "name": "oVirt gerrit"
+            }
+        ],
+        "flag": [
+            {
+                "id": "2734110",
+                "name": "ovirt-4.0.z",
+                "setter": "rule-engine",
+                "status": "+",
+                "type_id": "971"
+            },
+            {
+                "id": "2592031",
+                "name": "planning_ack",
+                "setter": "rule-engine",
+                "status": "+",
+                "type_id": "817"
+            },
+            {
+                "id": "2592029",
+                "name": "devel_ack",
+                "setter": "rule-engine",
+                "status": "+",
+                "type_id": "819"
+            },
+            {
+                "id": "2592030",
+                "name": "testing_ack",
+                "setter": "lsvaty",
+                "status": "+",
+                "type_id": "818"
+            }
+        ],
+        "keywords": [
+            {
+                "__text__": "ZStream"
+            }
+        ],
+        "long_desc": [
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-03-18 06:31:26 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "0"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9159132"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Description of problem:\nengine-setup fails if the user install engine rpms but he wants to configure just other product options and so he respond no to:\n\n          Configure Engine on this host (Yes, No) [Yes]: no\n\nAnd yes to another product option (DWH, reports, websocketproxy)\n\nRunning\n   yum remove ovirt-engine-setup-plugin-ovirt-engine\nBefore trying again is enough to avoid it.\n\nVersion-Release number of selected component (if applicable):\n3.6.4\n\nHow reproducible:\n100%\n\nSteps to Reproduce:\n1. Install engine rpms\n2. Respond no to 'Configure Engine on this host' and yes to for another product option\n3.\n\nActual results:\nengine setup fails with:\n    [ INFO  ] Stage: Package installation\n    [ INFO  ] Stage: Misc configuration\n    [ ERROR ] Failed to execute stage 'Misc configuration': 'NoneType' object has no attribute 'execute'\n\nExpected results:\nengine-setup completes successfully configuring just the selected product options.\n\nAdditional info:\nIt happens only if the user installed also engine rpms on the additional host where he wants to avoid engine setup.\nRemoving ovirt-engine-setup-plugin-ovirt-engine rpm is enough to avoid it."
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "stirabos",
+                        "name": "Simone Tiraboschi"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-03-18 07:06:26 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "1"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9159196"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Probably related to bug #1295212 as well"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "sbonazzo",
+                        "name": "Sandro Bonazzola"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-03-28 19:37:25 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "2"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9185524"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "This bug was accidentally moved from POST to MODIFIED via an error in automation, please see mmccune@redhat.com with any questions"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "mmccune",
+                        "name": "Mike McCune"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-04-29 12:01:37 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "3"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9280582"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "*** Bug 1295212 has been marked as a duplicate of this bug. ***"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "stirabos",
+                        "name": "Simone Tiraboschi"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-04 07:30:07 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "4"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9291422"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "This bug still occurs in rhevm-3.6.6-0.1.el6.noarch (build 3.6.6-1)."
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "khajna",
+                        "name": "Karol\u00edna Hajn\u00e1"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-05-04 14:23:34 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "5"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9292965"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Moving to 3.6.7."
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "ykaul",
+                        "name": "Yaniv Kaul"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-21 08:21:04 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "7"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9536578"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Unable to reproduce again with ovirt-engine-setup-plugin-ovirt-engine.noarch 4.0.1.1-1.el7.centos           @ovirt-4.0"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "stirabos",
+                        "name": "Simone Tiraboschi"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-25 08:34:47 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "8"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9546451"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Still failing in rhevm 4.0.2-1\n\n[ INFO  ] Configuring PostgreSQL\n[ INFO  ] Creating/refreshing DWH database schema\n[ ERROR ] Failed to execute stage 'Misc configuration': 'NoneType' object has no attribute 'execute'\n[ INFO  ] Yum Performing yum transaction rollback\n[ INFO  ] Rolling back DWH database schema\n\n- Installing engine without DWH works\n- Installing only DWH (after engine-setup of engine) on separate machine doesn't work\n\nin log:\n2016-07-25 12:15:04 DEBUG otopi.context context.dumpEnvironment:774 ENVIRONMENT DUMP - END\n2016-07-25 12:15:04 DEBUG otopi.context context._executeMethod:128 Stage misc METHOD otopi.plugins.ovirt_engine_setup.rhevm_setup_plugins.distro-rhel.config.Plugin._network\n2016-07-25 12:15:04 DEBUG otopi.context context._executeMethod:142 method exception\nTraceback (most recent call last):\n  File \"/usr/lib/python2.7/site-packages/otopi/context.py\", line 132, in _executeMethod\n    method['method']()\n  File \"/usr/share/ovirt-engine/setup/bin/../plugins/ovirt-engine-setup/rhevm-setup-plugins/distro-rhel/config.py\", line 170, in _network\n    'version': '3.1',\n  File \"/usr/share/ovirt-engine/setup/ovirt_engine_setup/engine/vdcoption.py\", line 117, in updateVdcOptions\n    res = self._statement.execute(\nAttributeError: 'NoneType' object has no attribute 'execute'\n2016-07-25 12:15:04 ERROR otopi.context context._executeMethod:151 Failed to execute stage 'Misc configuration': 'NoneType' object has no attribute 'execute'"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "pkubica",
+                        "name": "Petr Kubica"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-25 08:34:52 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "9"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9546452"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Target release should be placed once a package build is known to fix a issue. Since this bug is not modified, the target version has been reset. Please use target milestone to plan a fix for a oVirt release."
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "rule-engine",
+                        "name": "Red Hat Bugzilla Rules Engine"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-25 08:46:02 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "10"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9546512"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "(In reply to Petr Kubica from comment #8)\n> - Installing engine without DWH works\n> - Installing only DWH (after engine-setup of engine) on separate machine\n> doesn't work\n\nCan you please provide the list of rhev related rpms on the failing hosts? \n\n> in log:\n> 2016-07-25 12:15:04 DEBUG otopi.context context.dumpEnvironment:774\n> ENVIRONMENT DUMP - END\n> 2016-07-25 12:15:04 DEBUG otopi.context context._executeMethod:128 Stage\n> misc METHOD\n> otopi.plugins.ovirt_engine_setup.rhevm_setup_plugins.distro-rhel.config.\n> Plugin._network\n> 2016-07-25 12:15:04 DEBUG otopi.context context._executeMethod:142 method\n> exception\n> Traceback (most recent call last):\n>   File \"/usr/lib/python2.7/site-packages/otopi/context.py\", line 132, in\n> _executeMethod\n>     method['method']()\n>   File\n> \"/usr/share/ovirt-engine/setup/bin/../plugins/ovirt-engine-setup/rhevm-setup-\n> plugins/distro-rhel/config.py\", line 170, in _network\n>     'version': '3.1',\n>   File\n> \"/usr/share/ovirt-engine/setup/ovirt_engine_setup/engine/vdcoption.py\", line\n> 117, in updateVdcOptions\n>     res = self._statement.execute(\n> AttributeError: 'NoneType' object has no attribute 'execute'\n> 2016-07-25 12:15:04 ERROR otopi.context context._executeMethod:151 Failed to\n> execute stage 'Misc configuration': 'NoneType' object has no attribute\n> 'execute'"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "stirabos",
+                        "name": "Simone Tiraboschi"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-25 10:06:33 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "11"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9546840"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Ok, we have an issue with the downstream plugin.\nCloning the bug there."
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "stirabos",
+                        "name": "Simone Tiraboschi"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-26 02:22:18 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "12"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9550360"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "ovirt-engine-sdk-python-3.6.7.0-1.el7ev.noarch\novirt-engine-extensions-api-impl-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-websocket-proxy-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-setup-plugin-vmconsole-proxy-helper-4.0.2-0.1.rc.el7ev.noarch\novirt-host-deploy-1.5.1-1.el7ev.noarch\novirt-log-collector-4.0.0-1.el7ev.noarch\novirt-engine-cli-3.6.7.0-1.el7ev.noarch\novirt-engine-dwh-4.0.1-1.el7ev.noarch\novirt-engine-tools-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-webadmin-portal-4.0.2-0.1.rc.el7ev.noarch\novirt-image-uploader-4.0.0-1.el7ev.noarch\novirt-engine-setup-base-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-dwh-setup-4.0.1-1.el7ev.noarch\novirt-vmconsole-1.0.4-1.el7ev.noarch\novirt-engine-userportal-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-setup-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-restapi-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-4.0.2-0.1.rc.el7ev.noarch\novirt-setup-lib-1.0.2-1.el7ev.noarch\novirt-iso-uploader-4.0.0-1.el7ev.noarch\novirt-host-deploy-java-1.5.1-1.el7ev.noarch\novirt-engine-setup-plugin-websocket-proxy-4.0.2-0.1.rc.el7ev.noarch\novirt-vmconsole-proxy-1.0.4-1.el7ev.noarch\novirt-engine-vmconsole-proxy-helper-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-setup-plugin-ovirt-engine-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-dbscripts-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-lib-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-setup-plugin-ovirt-engine-common-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-backend-4.0.2-0.1.rc.el7ev.noarch\novirt-engine-dashboard-1.0.1-0.el7ev.x86_64\novirt-engine-extension-aaa-jdbc-1.1.0-1.el7ev.noarch\novirt-engine-tools-backup-4.0.2-0.1.rc.el7ev.noarch\npython-ovirt-engine-sdk4-4.0.0-0.5.a5.el7ev.x86_64\notopi-1.5.1-3.el7ev.noarch"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "pkubica",
+                        "name": "Petr Kubica"
+                    }
+                ]
+            }
+        ],
+        "op_sys": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "priority": [
+            {
+                "__text__": "medium"
+            }
+        ],
+        "product": [
+            {
+                "__text__": "ovirt-engine"
+            }
+        ],
+        "qa_contact": [
+            {
+                "__text__": "pkubica",
+                "name": "Petr Kubica"
+            }
+        ],
+        "rep_platform": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "reporter": [
+            {
+                "__text__": "stirabos",
+                "name": "Simone Tiraboschi"
+            }
+        ],
+        "reporter_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "resolution": [
+            {}
+        ],
+        "see_also": [
+            {
+                "__text__": "https://bugzilla.redhat.com/show_bug.cgi?id=1359832"
+            }
+        ],
+        "short_desc": [
+            {
+                "__text__": "[SETUP] engine-setup fails if the user install engine rpms but he wants to configure just other product options"
+            }
+        ],
+        "status_whiteboard": [
+            {}
+        ],
+        "target_milestone": [
+            {
+                "__text__": "ovirt-4.0.2"
+            }
+        ],
+        "target_release": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "version": [
+            {
+                "__text__": "3.6.4"
+            }
+        ],
+        "votes": [
+            {
+                "__text__": "0"
+            }
+        ]
+    },
+    "origin": "https://bugzilla.redhat.com/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469613262.772027,
+    "updated_on": 1469598715.0,
+    "uuid": "5ecea9e4eaee3d811fdf90fcb68070f22018d0f2"
+}
+{
+    "backend_name": "Bugzilla",
+    "backend_version": "0.2.0",
+    "data": {
+        "__text__": "\n          ",
+        "activity": [
+            {
+                "Added": "Regression",
+                "Removed": "",
+                "What": "Keywords",
+                "When": "2016-06-20 05:48:30 EDT",
+                "Who": "Wenjing Zheng"
+            },
+            {
+                "Added": "mnagy",
+                "Removed": "bparees",
+                "What": "Assignee",
+                "When": "2016-06-20 10:27:22 EDT",
+                "Who": "Ben Parees"
+            },
+            {
+                "Added": "bparees",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-25 10:57:49 EDT",
+                "Who": "Ben Parees"
+            },
+            {
+                "Added": "bparees",
+                "Removed": "mnagy",
+                "What": "Assignee",
+                "When": "2016-07-25 10:57:49 EDT",
+                "Who": "Ben Parees"
+            },
+            {
+                "Added": "ON_QA",
+                "Removed": "NEW",
+                "What": "Status",
+                "When": "2016-07-25 15:21:07 EDT",
+                "Who": "Ben Parees"
+            },
+            {
+                "Added": "shiywang",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-25 22:08:14 EDT",
+                "Who": "Wang Haoran"
+            },
+            {
+                "Added": "VERIFIED",
+                "Removed": "ON_QA",
+                "What": "Status",
+                "When": "2016-07-27 05:52:44 EDT",
+                "Who": "XiuJuan Wang"
+            },
+            {
+                "Added": "xiuwang",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-27 05:52:44 EDT",
+                "Who": "XiuJuan Wang"
+            }
+        ],
+        "assigned_to": [
+            {
+                "__text__": "bparees",
+                "name": "Ben Parees"
+            }
+        ],
+        "bug_file_loc": [
+            {}
+        ],
+        "bug_id": [
+            {
+                "__text__": "1348144"
+            }
+        ],
+        "bug_severity": [
+            {
+                "__text__": "medium"
+            }
+        ],
+        "bug_status": [
+            {
+                "__text__": "VERIFIED"
+            }
+        ],
+        "cc": [
+            {
+                "__text__": "aos-bugs"
+            },
+            {
+                "__text__": "bparees"
+            },
+            {
+                "__text__": "jokerman"
+            },
+            {
+                "__text__": "mmccomas"
+            },
+            {
+                "__text__": "shiywang"
+            },
+            {
+                "__text__": "xiuwang"
+            }
+        ],
+        "cclist_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "cf_category": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_crm": [
+            {}
+        ],
+        "cf_doc_type": [
+            {
+                "__text__": "If docs needed, set a value"
+            }
+        ],
+        "cf_documentation_action": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_environment": [
+            {}
+        ],
+        "cf_fixed_in": [
+            {}
+        ],
+        "cf_mount_type": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_ovirt_team": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_regression_status": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_release_notes": [
+            {}
+        ],
+        "cf_story_points": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_type": [
+            {
+                "__text__": "Bug"
+            }
+        ],
+        "cf_verified_branch": [
+            {}
+        ],
+        "classification": [
+            {
+                "__text__": "Red Hat"
+            }
+        ],
+        "classification_id": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "comment_sort_order": [
+            {
+                "__text__": "oldest_to_newest"
+            }
+        ],
+        "component": [
+            {
+                "__text__": "Image"
+            }
+        ],
+        "creation_ts": [
+            {
+                "__text__": "2016-06-20 05:47:00 -0400"
+            }
+        ],
+        "delta_ts": [
+            {
+                "__text__": "2016-07-27 05:52:44 -0400"
+            }
+        ],
+        "everconfirmed": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "keywords": [
+            {
+                "__text__": "Regression"
+            }
+        ],
+        "long_desc": [
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-25 15:21:07 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "1"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9547925"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "at this point the images have probably all changed, but i can't recreate this anymore.. QE can you check if it's still a problem for you?"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "bparees",
+                        "name": "Ben Parees"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-27 05:52:44 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "2"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9557421"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Test in ose 3.2.1.z env with brew...com:8888/openshift3/mysql-55-rhel7(a98ad2e4932c 5 weeks ago),can't reproduce this bug.\nMove this bug to verified."
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "xiuwang",
+                        "name": "XiuJuan Wang"
+                    }
+                ]
+            }
+        ],
+        "op_sys": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "priority": [
+            {
+                "__text__": "medium"
+            }
+        ],
+        "product": [
+            {
+                "__text__": "OpenShift Container Platform"
+            }
+        ],
+        "qa_contact": [
+            {
+                "__text__": "haowang",
+                "name": "Wang Haoran"
+            }
+        ],
+        "rep_platform": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "reporter": [
+            {
+                "__text__": "wzheng",
+                "name": "Wenjing Zheng"
+            }
+        ],
+        "reporter_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "resolution": [
+            {}
+        ],
+        "short_desc": [
+            {
+                "__text__": "Mysql-55-rhel7 pod cannot startup when upgrade to latest image if using persistent storage"
+            }
+        ],
+        "status_whiteboard": [
+            {}
+        ],
+        "target_milestone": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "target_release": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "version": [
+            {
+                "__text__": "3.2.1"
+            }
+        ],
+        "votes": [
+            {
+                "__text__": "0"
+            }
+        ]
+    },
+    "origin": "https://bugzilla.redhat.com/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469613266.479059,
+    "updated_on": 1469598764.0,
+    "uuid": "12706def8e5825ac599caa98bdb97e99024a1096"
+}
+{
+    "backend_name": "Bugzilla",
+    "backend_version": "0.2.0",
+    "data": {
+        "__text__": "\n          ",
+        "activity": [
+            {
+                "Added": "testing_ack? planning_ack?",
+                "Removed": "",
+                "What": "Flags",
+                "When": "2016-07-20 07:36:42 EDT",
+                "Who": "Red Hat Bugzilla Rules Engine"
+            },
+            {
+                "Added": "medium",
+                "Removed": "unspecified",
+                "What": "Priority",
+                "When": "2016-07-21 04:15:41 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "ydary",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-21 04:15:41 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "stirabos",
+                "Removed": "sbonazzo",
+                "What": "Assignee",
+                "When": "2016-07-21 04:15:41 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "ovirt-4.0.2",
+                "Removed": "---",
+                "What": "Target Milestone",
+                "When": "2016-07-21 04:15:41 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "ovirt-4.0.z?",
+                "Removed": "",
+                "What": "Flags",
+                "When": "2016-07-21 04:15:41 EDT",
+                "Who": "Yaniv Dary"
+            },
+            {
+                "Added": "high",
+                "Removed": "low",
+                "What": "Severity",
+                "When": "2016-07-26 11:51:51 EDT",
+                "Who": "Yaniv Kaul"
+            },
+            {
+                "Added": "ASSIGNED",
+                "Removed": "NEW",
+                "What": "Status",
+                "When": "2016-07-27 05:53:18 EDT",
+                "Who": "Sandro Bonazzola"
+            },
+            {
+                "Added": "sbonazzo",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-27 05:53:18 EDT",
+                "Who": "Sandro Bonazzola"
+            }
+        ],
+        "assigned_to": [
+            {
+                "__text__": "stirabos",
+                "name": "Simone Tiraboschi"
+            }
+        ],
+        "bug_file_loc": [
+            {}
+        ],
+        "bug_id": [
+            {
+                "__text__": "1358255"
+            }
+        ],
+        "bug_severity": [
+            {
+                "__text__": "high"
+            }
+        ],
+        "bug_status": [
+            {
+                "__text__": "ASSIGNED"
+            }
+        ],
+        "cc": [
+            {
+                "__text__": "bugs"
+            },
+            {
+                "__text__": "rhev-integ-dev"
+            },
+            {
+                "__text__": "sbonazzo"
+            },
+            {
+                "__text__": "ydary"
+            }
+        ],
+        "cclist_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "cf_category": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_crm": [
+            {}
+        ],
+        "cf_doc_type": [
+            {
+                "__text__": "If docs needed, set a value"
+            }
+        ],
+        "cf_documentation_action": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_environment": [
+            {}
+        ],
+        "cf_fixed_in": [
+            {}
+        ],
+        "cf_mount_type": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_ovirt_team": [
+            {
+                "__text__": "Integration"
+            }
+        ],
+        "cf_regression_status": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_release_notes": [
+            {}
+        ],
+        "cf_story_points": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_type": [
+            {
+                "__text__": "Bug"
+            }
+        ],
+        "cf_verified_branch": [
+            {}
+        ],
+        "classification": [
+            {
+                "__text__": "oVirt"
+            }
+        ],
+        "classification_id": [
+            {
+                "__text__": "9"
+            }
+        ],
+        "comment_sort_order": [
+            {
+                "__text__": "oldest_to_newest"
+            }
+        ],
+        "component": [
+            {
+                "__text__": "General"
+            }
+        ],
+        "creation_ts": [
+            {
+                "__text__": "2016-07-20 07:36:00 -0400"
+            }
+        ],
+        "delta_ts": [
+            {
+                "__text__": "2016-07-27 05:53:18 -0400"
+            }
+        ],
+        "everconfirmed": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "flag": [
+            {
+                "id": "2730446",
+                "name": "ovirt-4.0.z",
+                "setter": "ydary",
+                "status": "?",
+                "type_id": "971"
+            },
+            {
+                "id": "2738345",
+                "name": "exception",
+                "setter": "sbonazzo",
+                "status": "?",
+                "type_id": "815"
+            },
+            {
+                "id": "2729098",
+                "name": "planning_ack",
+                "setter": "rule-engine",
+                "status": "?",
+                "type_id": "817"
+            },
+            {
+                "id": "2729096",
+                "name": "devel_ack",
+                "setter": "sbonazzo",
+                "status": "+",
+                "type_id": "819"
+            },
+            {
+                "id": "2729097",
+                "name": "testing_ack",
+                "setter": "rule-engine",
+                "status": "?",
+                "type_id": "818"
+            }
+        ],
+        "keywords": [
+            {}
+        ],
+        "long_desc": [
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-20 07:36:37 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "0"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9531821"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Description of problem:\n\nsometimes appearance of '[ ERROR ] Hosted Engine upgrade failed: this system is not reliable. If necessary you can use --rollback-upgrade option to recover the engine VM disk from a backup' doesn't make sense.\n\nAn example:\n\n~~~\n...\n[ INFO  ] Checking SPM status on this host\n[ INFO  ] Connecting to the Engine\n[ ERROR ] This host is not the SPM one, please select it as the SPM from the engine or run this tool on the SPM host.\n[ ERROR ] Failed to execute stage 'Environment customization': Cannot run the upgrade tool if the host is not the SPM\n[ INFO  ] Stage: Clean up\n[ INFO  ] Stage: Pre-termination\n[ INFO  ] Stage: Termination\n[ ERROR ] Hosted Engine upgrade failed: this system is not reliable. If necessary you can use --rollback-upgrade option to recover the engine VM disk from a backup\n          Log file is located at /var/log/ovirt-hosted-engine-setup/ovirt-hosted-engine-setup-20160720133011-zv4u3f.log\n~~~\n\nThus there was no upgrade at all but the setup after it fails tells me the env is unstable and do '--rollback-upgrade' even no such upgrade has been practically started.\n\nPlease review under which circumstences this message appear.\n\nVersion-Release number of selected component (if applicable):\novirt-hosted-engine-setup-2.0.1-1.el7ev.noarch\n\nHow reproducible:\n100%\n\nSteps to Reproduce:\n1. rhevh 3.6 legacy with HE (whole env is up and fine)\n2. add redhat-virtualization-host (aka NGN) as another host of SHE env\n3. migrate HE VM to 'NGN' host (ensure old host is still SPM)\n4. global maintenance\n5. hosted-engine --upgrade-appliance\n\nActual results:\nsetup fails as current host (where hosted-engine --upgrade-appliance was executed) is not SPM but then it displays unlogical message\n\nExpected results:\ndo not display this message if the setup has not practically migrated the SHE env\n\nAdditional info:"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "jbelka",
+                        "name": "Jiri Belka"
+                    }
+                ]
+            }
+        ],
+        "op_sys": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "priority": [
+            {
+                "__text__": "medium"
+            }
+        ],
+        "product": [
+            {
+                "__text__": "ovirt-hosted-engine-setup"
+            }
+        ],
+        "qa_contact": [
+            {
+                "__text__": "mavital",
+                "name": "meital avital"
+            }
+        ],
+        "rep_platform": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "reporter": [
+            {
+                "__text__": "jbelka",
+                "name": "Jiri Belka"
+            }
+        ],
+        "reporter_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "resolution": [
+            {}
+        ],
+        "short_desc": [
+            {
+                "__text__": "unlogical appearance of ' Hosted Engine upgrade failed: this system is not reliable.'"
+            }
+        ],
+        "status_whiteboard": [
+            {}
+        ],
+        "target_milestone": [
+            {
+                "__text__": "ovirt-4.0.2"
+            }
+        ],
+        "target_release": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "version": [
+            {
+                "__text__": "2.0.0.1"
+            }
+        ],
+        "votes": [
+            {
+                "__text__": "0"
+            }
+        ]
+    },
+    "origin": "https://bugzilla.redhat.com/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469613267.898739,
+    "updated_on": 1469598798.0,
+    "uuid": "c4c12d58dfa7a1a00215e20ea70ef3a1ad6b8b52"
+}
+{
+    "backend_name": "Bugzilla",
+    "backend_version": "0.2.0",
+    "data": {
+        "__text__": "\n          ",
+        "activity": [
+            {
+                "Added": "ailan",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-27 05:28:43 EDT",
+                "Who": "Marcel Apfelbaum"
+            },
+            {
+                "Added": "mst",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-27 05:29:01 EDT",
+                "Who": "Marcel Apfelbaum"
+            },
+            {
+                "Added": "laine",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-27 05:29:37 EDT",
+                "Who": "Marcel Apfelbaum"
+            },
+            {
+                "Added": "chayang, jinzhao, juzhang, weliao",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-07-27 05:29:59 EDT",
+                "Who": "juzhang"
+            },
+            {
+                "Added": "chayang",
+                "Removed": "virt-bugs",
+                "What": "QA Contact",
+                "When": "2016-07-27 05:29:59 EDT",
+                "Who": "juzhang"
+            },
+            {
+                "Added": "ASSIGNED",
+                "Removed": "NEW",
+                "What": "Status",
+                "When": "2016-07-27 05:31:41 EDT",
+                "Who": "Marcel Apfelbaum"
+            },
+            {
+                "Added": "marcel",
+                "Removed": "virt-maint",
+                "What": "Assignee",
+                "When": "2016-07-27 05:31:41 EDT",
+                "Who": "Marcel Apfelbaum"
+            },
+            {
+                "Added": "[virtio] Update default virtio-1 behavior for virtio devices",
+                "Removed": "[virtio] Update behavior for virtio devices",
+                "What": "Summary",
+                "When": "2016-07-27 05:53:37 EDT",
+                "Who": "Amnon Ilan"
+            }
+        ],
+        "assigned_to": [
+            {
+                "__text__": "marcel",
+                "name": "Marcel Apfelbaum"
+            }
+        ],
+        "bug_file_loc": [
+            {}
+        ],
+        "bug_id": [
+            {
+                "__text__": "1360664"
+            }
+        ],
+        "bug_severity": [
+            {
+                "__text__": "unspecified"
+            }
+        ],
+        "bug_status": [
+            {
+                "__text__": "ASSIGNED"
+            }
+        ],
+        "cc": [
+            {
+                "__text__": "ailan"
+            },
+            {
+                "__text__": "chayang"
+            },
+            {
+                "__text__": "jinzhao"
+            },
+            {
+                "__text__": "juzhang"
+            },
+            {
+                "__text__": "laine"
+            },
+            {
+                "__text__": "mst"
+            },
+            {
+                "__text__": "virt-maint"
+            },
+            {
+                "__text__": "weliao"
+            }
+        ],
+        "cclist_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "cf_category": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_crm": [
+            {}
+        ],
+        "cf_doc_type": [
+            {
+                "__text__": "If docs needed, set a value"
+            }
+        ],
+        "cf_documentation_action": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_environment": [
+            {}
+        ],
+        "cf_fixed_in": [
+            {}
+        ],
+        "cf_mount_type": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_ovirt_team": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_regression_status": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_release_notes": [
+            {}
+        ],
+        "cf_story_points": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_type": [
+            {
+                "__text__": "Bug"
+            }
+        ],
+        "cf_verified_branch": [
+            {}
+        ],
+        "classification": [
+            {
+                "__text__": "Red Hat"
+            }
+        ],
+        "classification_id": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "comment_sort_order": [
+            {
+                "__text__": "oldest_to_newest"
+            }
+        ],
+        "component": [
+            {
+                "__text__": "qemu-kvm-rhev"
+            }
+        ],
+        "creation_ts": [
+            {
+                "__text__": "2016-07-27 05:27:00 -0400"
+            }
+        ],
+        "delta_ts": [
+            {
+                "__text__": "2016-07-27 05:53:37 -0400"
+            }
+        ],
+        "everconfirmed": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "keywords": [
+            {}
+        ],
+        "long_desc": [
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-27 05:27:48 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "0"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9557299"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Enable transitional virtio devices by default.\nEnable virtio-1.0 for devices plugged into\nPCIe ports (Root ports or Downstream ports)."
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "marcel",
+                        "name": "Marcel Apfelbaum"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-07-27 05:30:36 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "1"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9557345"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Series posted upstream:\nhttps://lists.gnu.org/archive/html/qemu-devel/2016-07/msg04744.html"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "marcel",
+                        "name": "Marcel Apfelbaum"
+                    }
+                ]
+            }
+        ],
+        "op_sys": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "priority": [
+            {
+                "__text__": "unspecified"
+            }
+        ],
+        "product": [
+            {
+                "__text__": "Red Hat Enterprise Linux 7"
+            }
+        ],
+        "qa_contact": [
+            {
+                "__text__": "chayang",
+                "name": "Chao Yang"
+            }
+        ],
+        "rep_platform": [
+            {
+                "__text__": "Unspecified"
+            }
+        ],
+        "reporter": [
+            {
+                "__text__": "marcel",
+                "name": "Marcel Apfelbaum"
+            }
+        ],
+        "reporter_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "resolution": [
+            {}
+        ],
+        "short_desc": [
+            {
+                "__text__": "[virtio] Update default virtio-1 behavior for virtio devices"
+            }
+        ],
+        "status_whiteboard": [
+            {}
+        ],
+        "target_milestone": [
+            {
+                "__text__": "rc"
+            }
+        ],
+        "target_release": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "version": [
+            {
+                "__text__": "7.3"
+            }
+        ],
+        "votes": [
+            {
+                "__text__": "0"
+            }
+        ]
+    },
+    "origin": "https://bugzilla.redhat.com/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469613269.444212,
+    "updated_on": 1469598817.0,
+    "uuid": "81c1e42aa3e064a1661d57f00f5936895adb4846"
+}
+{
+    "backend_name": "Bugzilla",
+    "backend_version": "0.2.0",
+    "data": {
+        "__text__": "\n          ",
+        "activity": [
+            {
+                "Added": "8.0",
+                "Removed": "---",
+                "What": "Target Release",
+                "When": "2016-04-07 12:32:14 EDT",
+                "Who": "Red Hat Bugzilla Rules Engine"
+            },
+            {
+                "Added": "high",
+                "Removed": "unspecified",
+                "What": "Priority",
+                "When": "2016-04-07 12:35:00 EDT",
+                "Who": "Lee Yarwood"
+            },
+            {
+                "Added": "ASSIGNED",
+                "Removed": "NEW",
+                "What": "Status",
+                "When": "2016-04-07 12:35:00 EDT",
+                "Who": "Lee Yarwood"
+            },
+            {
+                "Added": "9.0",
+                "Removed": "8.0",
+                "What": "Target Release",
+                "When": "2016-04-07 12:35:00 EDT",
+                "Who": "Lee Yarwood"
+            },
+            {
+                "Added": "lyarwood",
+                "Removed": "eglynn",
+                "What": "Assignee",
+                "When": "2016-04-07 12:35:00 EDT",
+                "Who": "Lee Yarwood"
+            },
+            {
+                "Added": "srevivo",
+                "Removed": "yeylon",
+                "What": "CC",
+                "When": "2016-04-18 04:05:14 EDT",
+                "Who": "John Skeoch"
+            },
+            {
+                "Added": "",
+                "Removed": "ndipanov",
+                "What": "CC",
+                "When": "2016-04-22 01:08:55 EDT",
+                "Who": "John Skeoch"
+            },
+            {
+                "Added": "apevec, lhh",
+                "Removed": "",
+                "What": "CC",
+                "When": "2016-06-15 12:55:32 EDT",
+                "Who": "Lee Yarwood"
+            },
+            {
+                "Added": "python-glance-store",
+                "Removed": "openstack-nova",
+                "What": "Component",
+                "When": "2016-06-15 12:55:32 EDT",
+                "Who": "Lee Yarwood"
+            }
+        ],
+        "assigned_to": [
+            {
+                "__text__": "lyarwood",
+                "name": "Lee Yarwood"
+            }
+        ],
+        "bug_file_loc": [
+            {}
+        ],
+        "bug_id": [
+            {
+                "__text__": "1324943"
+            }
+        ],
+        "bug_severity": [
+            {
+                "__text__": "high"
+            }
+        ],
+        "bug_status": [
+            {
+                "__text__": "ASSIGNED"
+            }
+        ],
+        "cc": [
+            {
+                "__text__": "apevec"
+            },
+            {
+                "__text__": "berrange"
+            },
+            {
+                "__text__": "dansmith"
+            },
+            {
+                "__text__": "eglynn"
+            },
+            {
+                "__text__": "kchamart"
+            },
+            {
+                "__text__": "lhh"
+            },
+            {
+                "__text__": "rbryant"
+            },
+            {
+                "__text__": "sbauza"
+            },
+            {
+                "__text__": "sferdjao"
+            },
+            {
+                "__text__": "sgordon"
+            },
+            {
+                "__text__": "srevivo"
+            },
+            {
+                "__text__": "vromanso"
+            }
+        ],
+        "cclist_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "cf_category": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_crm": [
+            {}
+        ],
+        "cf_doc_type": [
+            {
+                "__text__": "Bug Fix"
+            }
+        ],
+        "cf_documentation_action": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_environment": [
+            {}
+        ],
+        "cf_fixed_in": [
+            {}
+        ],
+        "cf_mount_type": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_ovirt_team": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_regression_status": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_release_notes": [
+            {}
+        ],
+        "cf_story_points": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "cf_type": [
+            {
+                "__text__": "Bug"
+            }
+        ],
+        "cf_verified_branch": [
+            {}
+        ],
+        "classification": [
+            {
+                "__text__": "Red Hat"
+            }
+        ],
+        "classification_id": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "comment_sort_order": [
+            {
+                "__text__": "oldest_to_newest"
+            }
+        ],
+        "component": [
+            {
+                "__text__": "python-glance-store"
+            }
+        ],
+        "creation_ts": [
+            {
+                "__text__": "2016-04-07 12:32:00 -0400"
+            }
+        ],
+        "delta_ts": [
+            {
+                "__text__": "2016-07-27 05:53:52 -0400"
+            }
+        ],
+        "everconfirmed": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "keywords": [
+            {}
+        ],
+        "long_desc": [
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-04-07 12:32:06 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "0"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9216746"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Description of problem:\n\nSince RHEL OSP 5 both openstack-nova and python-glance-store have carried downstream-only patches implementing ceph based snapshotting of ephemeral disks. The following bugs tracked these patches into OSP 8 :\n\nopenstack-nova - Implement proper snapshotting for ceph-based ephemeral disks\nhttps://bugzilla.redhat.com/show_bug.cgi?id=1311314\n\npython-glance-store - support proper snapshotting for ceph-based ephemeral disks\nhttps://bugzilla.redhat.com/show_bug.cgi?id=1318710\n\nThis implementation used Glance to ensure rbd snapshots and images were correctly cleaned up when they were no longer used. As of Mitaka a new implementation has been landed upstream that differs from the above :\n\nlibvirt: make snapshot use RBD snapshot/clone when available\nhttps://review.openstack.org/#/c/205282/\n\nThis new implementation will also be present in OSP 9 and thus a migration path for OSP 8 users to this new implementation in OSP 9 will be required.\n\nVersion-Release number of selected component (if applicable):\nRH OSP 9\n\nHow reproducible:\nN/A\n\nSteps to Reproduce:\nN/A\n\nActual results:\nN/A\n\nExpected results:\nN/A\n\nAdditional info:\nN/A"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "lyarwood",
+                        "name": "Lee Yarwood"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n    ",
+                "bug_when": [
+                    {
+                        "__text__": "2016-06-15 12:55:32 -0400"
+                    }
+                ],
+                "comment_count": [
+                    {
+                        "__text__": "2"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "9419671"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Moving the bug to python-glancestore to forward port the downstream-only patch for it one final time into OSP 9."
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "lyarwood",
+                        "name": "Lee Yarwood"
+                    }
+                ]
+            }
+        ],
+        "op_sys": [
+            {
+                "__text__": "Linux"
+            }
+        ],
+        "priority": [
+            {
+                "__text__": "high"
+            }
+        ],
+        "product": [
+            {
+                "__text__": "Red Hat OpenStack"
+            }
+        ],
+        "qa_contact": [
+            {
+                "__text__": "nlevinki",
+                "name": "nlevinki"
+            }
+        ],
+        "rep_platform": [
+            {
+                "__text__": "x86_64"
+            }
+        ],
+        "reporter": [
+            {
+                "__text__": "lyarwood",
+                "name": "Lee Yarwood"
+            }
+        ],
+        "reporter_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "resolution": [
+            {}
+        ],
+        "short_desc": [
+            {
+                "__text__": "Provide a migration path between rbd ephemeral disk snapshot implementations in OSP 8 and 9"
+            }
+        ],
+        "status_whiteboard": [
+            {}
+        ],
+        "target_milestone": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "target_release": [
+            {
+                "__text__": "9.0 (Mitaka)"
+            }
+        ],
+        "version": [
+            {
+                "__text__": "9.0 (Mitaka)"
+            }
+        ],
+        "votes": [
+            {
+                "__text__": "0"
+            }
+        ]
+    },
+    "origin": "https://bugzilla.redhat.com/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469613271.287736,
+    "updated_on": 1469598832.0,
+    "uuid": "7404003402b955f12d8792934c593107f590537e"
+}

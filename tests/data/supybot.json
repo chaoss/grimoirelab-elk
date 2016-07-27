@@ -1,0 +1,135 @@
+[{
+    "backend_name": "Supybot",
+    "backend_version": "0.1.1",
+    "data": {
+        "body": "percevalbot has joined #test-channel",
+        "nick": "percevalbot",
+        "timestamp": "2016-06-30T14:37:42+0000",
+        "type": "server"
+    },
+    "origin": "http://channel.example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619058.283039,
+    "updated_on": 1467297462.0,
+    "uuid": "642672af51565e0f2f2d7ba05f9243b942a6ffd5"
+},
+{
+    "backend_name": "Supybot",
+    "backend_version": "0.1.1",
+    "data": {
+        "body": ".",
+        "nick": "canas",
+        "timestamp": "2016-06-30T14:38:36+0000",
+        "type": "comment"
+    },
+    "origin": "http://channel.example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619058.284149,
+    "updated_on": 1467297516.0,
+    "uuid": "637c33f023de7cebb9303989c0d467fe81c20b5a"
+},
+{
+    "backend_name": "Supybot",
+    "backend_version": "0.1.1",
+    "data": {
+        "body": "lore ipsum (ignorad este texto)",
+        "nick": "canas",
+        "timestamp": "2016-06-30T14:41:52+0000",
+        "type": "comment"
+    },
+    "origin": "http://channel.example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619058.285548,
+    "updated_on": 1467297712.0,
+    "uuid": "0847a49dbcb47d628dc10403fc3292ef648a1a76"
+},
+{
+    "backend_name": "Supybot",
+    "backend_version": "0.1.1",
+    "data": {
+        "body": "izquierdo: entiendo que bugzilla es m\u00e1s prioritario que jira. En qu\u00e9 ticket lo est\u00e1s trabajando?",
+        "nick": "acs_",
+        "timestamp": "2016-06-30T14:42:15+0000",
+        "type": "comment"
+    },
+    "origin": "http://channel.example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619058.286502,
+    "updated_on": 1467297735.0,
+    "uuid": "8def6590ef1201b389e0978a5b2493125c692c80"
+},
+{
+    "backend_name": "Supybot",
+    "backend_version": "0.1.1",
+    "data": {
+        "body": "percevalbot: hola!",
+        "nick": "duenas",
+        "timestamp": "2016-06-30T14:42:36+0000",
+        "type": "comment"
+    },
+    "origin": "http://channel.example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619058.287463,
+    "updated_on": 1467297756.0,
+    "uuid": "eed2255cf2b9cdde9ef05688bb3d6dea8cfc89b8"
+},
+{
+    "backend_name": "Supybot",
+    "backend_version": "0.1.1",
+    "data": {
+        "body": "duenas: Error: \"hola!\" is not a valid command.",
+        "nick": "percevalbot",
+        "timestamp": "2016-06-30T14:42:36+0000",
+        "type": "comment"
+    },
+    "origin": "http://channel.example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619058.288398,
+    "updated_on": 1467297756.0,
+    "uuid": "dfb59c05bea6ad92e4a4e5c1270ac32364e38e60"
+},
+{
+    "backend_name": "Supybot",
+    "backend_version": "0.1.1",
+    "data": {
+        "body": "T437",
+        "nick": "acs_",
+        "timestamp": "2016-06-30T14:42:37+0000",
+        "type": "comment"
+    },
+    "origin": "http://channel.example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619058.290521,
+    "updated_on": 1467297757.0,
+    "uuid": "25617ce1f8dc3227cd5fb9353c3629bcf7f6d735"
+},
+{
+    "backend_name": "Supybot",
+    "backend_version": "0.1.1",
+    "data": {
+        "body": "ei _acs_ como no hab\udceda ticket de los de desarrollo lo puse en",
+        "nick": "izquierdo",
+        "timestamp": "2016-06-30T14:42:38+0000",
+        "type": "comment"
+    },
+    "origin": "http://channel.example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619058.291626,
+    "updated_on": 1467297758.0,
+    "uuid": "42e546d999afbdcfd0576880abb95de6e3be5da2"
+},
+{
+    "backend_name": "Supybot",
+    "backend_version": "0.1.1",
+    "data": {
+        "body": "guay! me lo a\u00f1ado al plan",
+        "nick": "acs_",
+        "timestamp": "2016-06-30T14:42:50+0000",
+        "type": "comment"
+    },
+    "origin": "http://channel.example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619058.292559,
+    "updated_on": 1467297770.0,
+    "uuid": "92603faca53124e0351dc71ab1658617734ff7e9"
+}]
