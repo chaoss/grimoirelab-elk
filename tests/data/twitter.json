@@ -384,10 +384,6 @@
         }
     },
 {
-    "_id": "756017711503798272",
-    "_index": "twitter-dev",
-    "_score": 1.0,
-    "_source": {
         "@timestamp": "2016-07-21T06:47:23.000Z",
         "@version": "1",
         "contributors": null,
@@ -561,13 +557,8 @@
             "utc_offset": null,
             "verified": false
         }
-    }
 },
 {
-    "_id": "756017870031589377",
-    "_index": "twitter-dev",
-    "_score": 1.0,
-    "_source": {
         "@timestamp": "2016-07-21T06:48:01.000Z",
         "@version": "1",
         "contributors": null,
@@ -765,6 +756,5 @@
             "utc_offset": 32400,
             "verified": false
         }
-    }
 }
 ]
