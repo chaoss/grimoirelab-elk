@@ -33,6 +33,7 @@ from grimoire.ocean.elastic import ElasticOcean
 # Connectors for Ocean
 from grimoire.ocean.bugzilla import BugzillaOcean
 from grimoire.ocean.bugzillarest import BugzillaRESTOcean
+from grimoire.ocean.confluence import ConfluenceOcean
 from grimoire.ocean.discourse import DiscourseOcean
 from grimoire.ocean.gerrit import GerritOcean
 from grimoire.ocean.git import GitOcean
@@ -52,6 +53,7 @@ from grimoire.ocean.twitter import TwitterOcean
 # Connectors for EnrichOcean
 from grimoire.elk.bugzilla import BugzillaEnrich
 from grimoire.elk.bugzillarest import BugzillaRESTEnrich
+from grimoire.elk.confluence import ConfluenceEnrich
 from grimoire.elk.discourse import DiscourseEnrich
 from grimoire.elk.git import GitEnrich
 from grimoire.elk.github import GitHubEnrich
@@ -71,6 +73,7 @@ from grimoire.elk.twitter import TwitterEnrich
 from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
 from perceval.backends.bugzillarest import BugzillaREST, BugzillaRESTCommand
 from perceval.backends.discourse import Discourse, DiscourseCommand
+from perceval.backends.confluence import Confluence, ConfluenceCommand
 from perceval.backends.gerrit import Gerrit, GerritCommand
 from perceval.backends.git import Git, GitCommand
 from perceval.backends.github import GitHub, GitHubCommand
@@ -114,6 +117,7 @@ def get_connectors():
 
     return {"bugzilla":[Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
             "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
+            "confluence":[Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
             "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
