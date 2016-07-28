@@ -4,7 +4,11 @@ In experimental status yet, expect bugs and issues executing them.
 
 Inside the gelk container:
 
-* Load projects data: mysql -u root -h mariadb test_projects < test_projects.sql
+* Load projects data: 
+
+    mysqladmin -u root -h mariadb create test_projects
+    mysql -u root -h mariadb test_projects < test_projects.sql
+
 * Configure the ElasticSearch connection in tests.conf
 * Execute the tests: 
 
