@@ -37,6 +37,7 @@ from grimoire.utils import get_connectors, get_elastic
 
 CONFIG_FILE = 'tests.conf'
 NUMBER_BACKENDS = 19
+DB_SORTINGHAT = "test_sh"
 
 class TestBackends(unittest.TestCase):
     """Functional tests for GrimoireELK Backends"""
@@ -117,7 +118,7 @@ class TestBackends(unittest.TestCase):
                 ocean_backend.set_elastic(elastic_ocean)
                 self.__data2es(items, ocean_backend)
 
-    def test_enrich(self):
+    def test_enrich(self, sortinghat=False):
         """Test enrich all sources"""
         config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
@@ -133,12 +134,20 @@ class TestBackends(unittest.TestCase):
             elastic_ocean = get_elastic(es_con, ocean_index, clean, ocean_backend)
             ocean_backend.set_elastic(elastic_ocean)
             clean = True
-            print(connectors[con][2])
-            enrich_backend = connectors[con][2](perceval_backend)
+            if not sortinghat:
+                enrich_backend = connectors[con][2](perceval_backend)
+            else:
+                enrich_backend = connectors[con][2](perceval_backend,
+                                                    db_sortinghat=DB_SORTINGHAT)
             elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
             enrich_backend.set_elastic(elastic_enrich)
             enrich_count = self.__enrich_items(ocean_backend, enrich_backend)
             logging.info("Total items enriched %i ", enrich_count)
+
+    def test_enrich_sh(self):
+        """Test enrich all sources with SortingHat"""
+
+        self.test_enrich(sortinghat=True)
 
 
 if __name__ == "__main__":
