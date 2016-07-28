@@ -1,1 +1,19 @@
-Functional tests for GrimoireELK.
+Functional tests for GrimoireELK adapted for GrimoireELK docker compose.
+
+In experimental status yet, expect bugs and issues executing them.
+
+Inside the gelk container:
+
+* Load projects data: mysql -u root -h mariadb test_projects < test_projects.sql
+* Configure the ElasticSearch connection in tests.conf
+* Execute the tests: 
+
+    GrimoireELK/tests$ ./run_tests.py
+
+You can execute specific tests. For example, to tests the enrichment with Sorting Hat:
+
+    python3 test_backends.py TestBackends.test_enrich_sh
+
+The current expected duration is more than five minutes.
+
+Please, report issues inside the GitHub project.

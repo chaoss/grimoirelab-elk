@@ -38,6 +38,7 @@ from grimoire.utils import get_connectors, get_elastic
 CONFIG_FILE = 'tests.conf'
 NUMBER_BACKENDS = 19
 DB_SORTINGHAT = "test_sh"
+DB_PROJECTS = "test_projects"
 
 class TestBackends(unittest.TestCase):
     """Functional tests for GrimoireELK Backends"""
@@ -118,7 +119,7 @@ class TestBackends(unittest.TestCase):
                 ocean_backend.set_elastic(elastic_ocean)
                 self.__data2es(items, ocean_backend)
 
-    def test_enrich(self, sortinghat=False):
+    def test_enrich(self, sortinghat=False, projects=False):
         """Test enrich all sources"""
         config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
@@ -134,11 +135,14 @@ class TestBackends(unittest.TestCase):
             elastic_ocean = get_elastic(es_con, ocean_index, clean, ocean_backend)
             ocean_backend.set_elastic(elastic_ocean)
             clean = True
-            if not sortinghat:
+            if not sortinghat and not projects:
                 enrich_backend = connectors[con][2](perceval_backend)
-            else:
+            elif sortinghat and not projects:
                 enrich_backend = connectors[con][2](perceval_backend,
                                                     db_sortinghat=DB_SORTINGHAT)
+            elif not sortinghat and projects:
+                enrich_backend = connectors[con][2](perceval_backend,
+                                                    db_projects_map=DB_PROJECTS)
             elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
             enrich_backend.set_elastic(elastic_enrich)
             enrich_count = self.__enrich_items(ocean_backend, enrich_backend)
@@ -148,6 +152,11 @@ class TestBackends(unittest.TestCase):
         """Test enrich all sources with SortingHat"""
 
         self.test_enrich(sortinghat=True)
+
+    def test_enrich_projects(self):
+        """Test enrich all sources with Projects"""
+
+        self.test_enrich(projects=True)
 
 
 if __name__ == "__main__":
