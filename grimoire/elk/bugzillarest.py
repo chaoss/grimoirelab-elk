@@ -85,11 +85,13 @@ class BugzillaRESTEnrich(Enrich):
 
     def get_item_project(self, item):
         """ Get project mapping enrichment field """
-        ds_name = "its"  # data source name in projects map
+        ds_name = "bugzillarest"  # data source name in projects map
         url = item['origin']
         # https://bugs.eclipse.org/bugs/buglist.cgi?product=Mylyn%20Tasks
         product = item['data']['product']
         repo = url+"/buglist.cgi?product="+product
+        project = (self.prjs_map[ds_name][repo])
+
         try:
             project = (self.prjs_map[ds_name][repo])
         except KeyError:

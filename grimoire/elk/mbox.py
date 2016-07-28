@@ -104,6 +104,7 @@ class MBoxEnrich(Enrich):
         # /mnt/mailman_archives/dltk-dev.mbox/dltk-dev.mbox
         ds_name = "mls"  # data source name in projects map
         mls_list = item['origin']
+        # Eclipse specific yet
         path = "/mnt/mailman_archives/"
         path += mls_list+".mbox/"+mls_list+".mbox"
 
