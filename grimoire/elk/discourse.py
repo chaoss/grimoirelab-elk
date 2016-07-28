@@ -86,7 +86,7 @@ class DiscourseEnrich(Enrich):
         topic = item['data']
 
         # Fields that are the same in item and eitem
-        copy_fields = ["like_count", "reply_count", "word_count", "posts_count",
+        copy_fields = ["created_at", "like_count", "reply_count", "word_count", "posts_count",
                        "id", "participant_count", "views", "pinned",
                        "created_at", "last_posted_at", "title"]
         for f in copy_fields:
