@@ -6,13 +6,16 @@ Inside the gelk container:
 
 * Load projects data: 
 
-    mysqladmin -u root -h mariadb create test_projects
-    mysql -u root -h mariadb test_projects < test_projects.sql
+```
+mysqladmin -u root -h mariadb create test_projects
+mysql -u root -h mariadb test_projects < test_projects.sql
+```
 
 * Configure the ElasticSearch connection in tests.conf
 * Execute the tests: 
-
-    GrimoireELK/tests$ ./run_tests.py
+```
+GrimoireELK/tests$ ./run_tests.py
+```
 
 You can execute specific tests. For example, to tests the enrichment with Sorting Hat:
 
