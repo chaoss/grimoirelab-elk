@@ -41,7 +41,7 @@ class TwitterEnrich(Enrich):
         self.elastic = elastic
 
     def get_field_date(self):
-        return "metadata__updated_on"
+        return "created_at"
 
     def get_field_unique_id(self):
         return "id"

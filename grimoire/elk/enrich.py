@@ -217,7 +217,11 @@ class Enrich(object):
         """ Add sorting hat enrichment fields for the author of the item """
 
         eitem = {}  # Item enriched
-        data = item['data']
+        if 'data' in item:
+            # perceval data
+            data = item['data']
+        else:
+            data = item
 
         # Add Sorting Hat fields
         if identity_field not in data:

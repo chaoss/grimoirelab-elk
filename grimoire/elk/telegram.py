@@ -25,7 +25,7 @@
 import json
 import logging
 
-from dateutil import parser
+from datetime import datetime
 
 from grimoire.elk.enrich import Enrich
 
@@ -60,12 +60,37 @@ class TelegramEnrich(Enrich):
 
         return {"items":mapping}
 
+    def get_sh_identity(self, from_):
+        identity = {}
 
-    def get_identities(self, item):
+        identity['username'] = from_['username']
+        identity['email'] = None
+        identity['name'] = from_['username']
+        if 'first_name' in from_:
+            identity['name'] = from_['first_name']
+        return identity
+
+
+    def get_identities(self, message):
         """ Return the identities from an item """
         identities = []
 
+        identity = self.get_sh_identity(message['from'])
+
+        identities.append(identity)
+
         return identities
+
+    def get_item_sh(self, message, field):
+        """ Add sorting hat enrichment fields for the author of the item """
+
+        eitem = {}  # Item enriched
+
+        identity  = self.get_sh_identity(message[field])
+        update = datetime.fromtimestamp(message['date'])
+        eitem = self.get_item_sh_fields(identity, update)
+
+        return eitem
 
     def get_rich_item(self, item):
         eitem = {}

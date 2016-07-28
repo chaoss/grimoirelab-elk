@@ -90,7 +90,8 @@ class ConfluenceEnrich(Enrich):
 
         eitem = {}  # Item enriched
         identity  = self.get_sh_identity(item['data']['version'])
-        eitem = self.get_item_sh_fields(identity, item)
+        update = parser.parse(item[self.get_field_date()])
+        eitem = self.get_item_sh_fields(identity, update)
 
         return eitem
 
