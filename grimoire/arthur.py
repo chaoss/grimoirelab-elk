@@ -278,7 +278,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                 ocean_index = backend_name + "_" + backend.origin
             enrich_index = ocean_index+"_enrich"
 
-        enrich_backend = connector[2](backend, db_projects_map, db_sortinghat)
+        enrich_backend = connector[2](backend, db_sortinghat, db_projects_map)
         elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
         enrich_backend.set_elastic(elastic_enrich)
         if github_token and backend_name == "git":
