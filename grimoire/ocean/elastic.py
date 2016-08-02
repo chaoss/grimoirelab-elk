@@ -125,7 +125,7 @@ class ElasticOcean(object):
 
         if 'from_date' not in signature.parameters:
             last_update = None
-            logger.debug("Fetch method does not uses 'from_date' parameter")
+            logging.debug("Fetch method does not use 'from_date' parameter")
 
         task_init = datetime.now()
 
