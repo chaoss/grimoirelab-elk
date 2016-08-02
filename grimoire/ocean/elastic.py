@@ -26,10 +26,13 @@
 """Ocean feeder for Elastic from  Perseval data"""
 
 
-from datetime import datetime
+import inspect
 import json
 import logging
 import requests
+
+from datetime import datetime
+
 
 class ElasticOcean(object):
 
@@ -118,10 +121,11 @@ class ElasticOcean(object):
         logging.info("Incremental from: %s", last_update)
 
         # Check if backend supports from_date
-        try:
-            self.perceval_backend.from_date
-        except AttributeError:
+        signature = inspect.signature(self.perceval_backend.fetch)
+
+        if 'from_date' not in signature.parameters:
             last_update = None
+            logger.debug("Fetch method does not uses 'from_date' parameter")
 
         task_init = datetime.now()
 
