@@ -36,6 +36,10 @@ function set_variables {
     DB_SH=$PROJECT_SHORTNAME"_sh"
     DB_PRO=$PROJECT_SHORTNAME"_pro"
 
+    if [ -z TWITTER_ENRICHED_INDEX ]
+        then
+        TWITTER_ENRICHED_INDEX=$TWITTER_INDEX"_enriched"
+    fi
     if [ -z PIPERMAIL_ENRICHED_INDEX ]
         then
         PIPERMAIL_ENRICHED_INDEX=$PIPERMAIL_INDEX"_enriched"
@@ -108,6 +112,8 @@ function set_variables {
         echo "GMANE_ENRICHED_INDEX=$GMANE_ENRICHED_INDEX"
         echo "PIPERMAIL_INDEX=$PIPERMAIL_INDEX"
         echo "PIPERMAIL_ENRICHED_INDEX=$PIPERMAIL_ENRICHED_INDEX"
+        echo "TWITTER_INDEX=$TWITTER_INDEX"
+        echo "TWITTER_ENRICHED_INDEX=$TWITTER_ENRICHED_INDEX"
         echo "SH_UNIFY_METHOD=$SH_UNIFY_METHOD"
         echo "SH_UNAFFILIATED_GROUP=$SH_UNAFFILIATED_GROUP"
         echo "LOGS_DIR=$LOGS_DIR"
@@ -261,6 +267,11 @@ function retrieve_data {
         pipermail_retrieval
         log_result "[pipermail - mls] Retrieval finished" "[pipermail - mls] ERROR: Something went wrong with the retrieval"
     fi
+
+    if [ $TWITTER_ENABLED -eq 1 ]
+        then
+        # the data collection is done by logstash
+    fi
 }
 
 function git_retrieval {
@@ -403,6 +414,13 @@ function enrich_data {
         pipermail_enrichment $1
         log_result "[pipermail - mls] p2o finished" "[pipermail - mls] ERROR: Something went wrong with p2o"
     fi
+
+    if [ $TWITTER_ENABLED -eq 1 ]
+        then
+        log "[twitter] Twitter p2o starts"
+        twitter_enrichment $1
+        log_result "[twitter] p2o finished" "[twitter] ERROR: Something went wrong with p2o"
+    fi
 }
 
 function git_enrichment {
@@ -487,6 +505,11 @@ function pipermail_enrichment {
     done
     rm $TMP_PIPERMAIL_PROJECT_LIST
     rm $TMP_PIPERMAIL_LIST
+}
+
+function twitter_enrichment {
+    cd ~/GrimoireELK/utils/
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $TWITTER_INDEX --index-enrich $TWITTER_ENRICHED_INDEX twitter >> $LOGS_DIR"/twitter-enrichment.log" 2>&1
 }
 
 function sortinghat_unify {
