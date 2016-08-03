@@ -314,7 +314,7 @@ class GitEnrich(Enrich):
         }
         """ % (query)
 
-        r = requests.post(self.elastic.index_url+"/_search", data=es_query)
+        r = requests.post(self.elastic.index_url+"/_search", data=es_query, verify=False)
         authors = r.json()['aggregations']['author']['buckets']
 
         author_items = []  # items from author with new date fields added
@@ -341,7 +341,7 @@ class GitEnrich(Enrich):
             # Time to add all the commits (items) from this author
             author_query_json['query']['bool']['must'][0]['term']['Author'] = author['key']
             author_query_str = json.dumps(author_query_json)
-            r = requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str)
+            r = requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str, verify=False)
 
             if "hits" not in r.json():
                 logging.error("Can't find commits for %s" % (author['key']))
