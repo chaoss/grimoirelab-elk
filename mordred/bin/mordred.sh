@@ -267,11 +267,6 @@ function retrieve_data {
         pipermail_retrieval
         log_result "[pipermail - mls] Retrieval finished" "[pipermail - mls] ERROR: Something went wrong with the retrieval"
     fi
-
-    if [ $TWITTER_ENABLED -eq 1 ]
-        then
-        # the data collection is done by logstash
-    fi
 }
 
 function git_retrieval {
