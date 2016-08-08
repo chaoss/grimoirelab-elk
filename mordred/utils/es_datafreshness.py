@@ -137,18 +137,21 @@ def get_data_smells(datas):
 
     return dict_smells
 
-def get_logs(datas, project, threshold):
+def get_logs(datas, project, thresholds):
     today = datetime.datetime.utcnow().isoformat()
     text = "\n** "+project+" **\n"
 
     for backend in datas:
-        text += today+"\t"+backend+": "+datas[backend]+"\t(threshold="+threshold+")\n"
+        if backend in thresholds:
+            text += today+"\t"+backend+": "+datas[backend]+"\t(threshold="+thresholds[backend]+")\n"
+        else:
+            text += today+"\t"+backend+": "+datas[backend]+"\t(threshold="+thresholds['default']+")\n"
 
     return text
 
-def compose_text(data, conf, threshold):
+def compose_text(data, conf, thresholds):
     text = "\nES datafreshness\n"
-    # pink, blue, etc
+
     for project in data:
         text += "\n** "+project+" **\n"
         # dict with max days peer backend. If len(orgs) == 0 then everything ok
@@ -158,6 +161,11 @@ def compose_text(data, conf, threshold):
                 int_time = int(data[project][backend].split(" days")[0])
             except ValueError:
                 int_time = 0
+
+            threshold = thresholds['default']
+            if backend in thresholds:
+
+                threshold = thresholds[backend]
 
             if int_time > int(threshold):
                 all_ok = False
@@ -199,6 +207,10 @@ def get_conf(conf_name):
             conf[project]['es'] = Config[project]['es']
             conf[project]['user'] = Config[project]['user']
             conf[project]['password'] = Config[project]['password']
+            if Config.has_option(project, 'threshold'):
+                thresholds = Config[project]['threshold'].replace(", ", ",")
+                conf[project]['threshold'] = thresholds.split(',')
+
 
     email_to = Config['notification']['email_to']
     email_from = Config['notification']['email_from']
@@ -216,17 +228,26 @@ def main():
 
     smells = {}
     logs = {}
+    thresholds = {}
+    thresholds['default'] = threshold
     for project in conf:
         time = get_timestamp(conf[project], project)
+
         smell = get_data_smells(time)
         smells[project] = smell
-        log = get_logs(smell, project, threshold)
+
+        if 'threshold' in conf[project]:
+            for t in conf[project]['threshold']:
+                t = t.split(':')
+                thresholds[t[0]] = t[1]
+        log = get_logs(smell, project, thresholds)
+
         logs[project] = log
 
     write_file(log_name, logs, "logs")
 
     if args.send and args.send == 'true':
-        text = compose_text(smells, conf, threshold)
+        text = compose_text(smells, conf, thresholds)
         send_email(email_from, email_to, text)
 
     if args.file:
