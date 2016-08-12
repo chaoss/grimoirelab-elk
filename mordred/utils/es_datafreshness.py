@@ -35,7 +35,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 
-VERSION = "version 0.1"
+VERSION = "version 0.2"
 
 
 def write_file(filename, data, type):
@@ -73,17 +73,8 @@ def read_arguments():
 
     return args
 
-def get_indexes(conf, project):
-    # Get the indexes into a list(indexes)
-    indexes = []
-    for backend in conf['backends']:
-        database = "curl -k -u "+conf['user']+":"+conf['password']+" 'https://"+conf['es']+"/"+project+"/_cat/aliases' 2>/dev/null | grep "+backend+" | cut -d' '  -f1"
-        indexes.append(os.popen(database).read())
-
-    return indexes
-
 def get_query(conf, index, project):
-    query ="curl -k -u "+conf['user']+":"+conf['password']+" -XGET 'https://"+conf['es']+"/"+project+"/"+index+"/_search?q=*' -d "
+    query ="curl -k -u "+conf['user']+":"+conf['password']+" -XGET 'https://"+conf['es']+"/"+index+"/_search?q=*' -d "
     query += """ '{
       "filter" : {
         "match_all" : { }
@@ -103,9 +94,7 @@ def get_query(conf, index, project):
 def get_timestamp(conf, project):
     dict_indexes = {}
 
-    indexes = get_indexes(conf, project)
-    # Get the medatada__timestamp into a dict(dict_indexes)
-    for index in indexes:
+    for index in conf['backends']:
         index = index.split('\n')[0]
 
         query = get_query(conf, index, project)
@@ -210,7 +199,6 @@ def get_conf(conf_name):
             if Config.has_option(project, 'threshold'):
                 thresholds = Config[project]['threshold'].replace(", ", ",")
                 conf[project]['threshold'] = thresholds.split(',')
-
 
     email_to = Config['notification']['email_to']
     email_from = Config['notification']['email_from']
