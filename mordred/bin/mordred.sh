@@ -426,7 +426,13 @@ function git_enrichment {
         GITHUB_PARAMETER="--github-token $GITHUB_TOKEN"
     fi
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --studies --enrich_only $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git '' >> $LOGS_DIR"/git-enrichment.log" 2>&1
+
+    REPOS=`get_repo_list source_repo`
+
+    for r in $REPOS
+    do
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --studies --enrich_only $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git $r >> $LOGS_DIR"/git-enrichment.log" 2>&1
+    done
 }
 
 function github_enrichment {
