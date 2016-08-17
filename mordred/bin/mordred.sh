@@ -19,23 +19,7 @@ function log_result {
     fi
 }
 
-function set_variables {
-    # It's replaced "-" or "." with "_" into the project name to avoid errors into MySQL
-    PROJECT_SHORTNAME=`echo $PROJECT_SHORTNAME | sed "s/[-.]/_/g"`
-    PROJECT_INFO="/home/bitergia/GrimoireELK-mordred/mordred/utils/projectinfo.py"
-
-    if [ -z FROM_DATE ]
-        then
-        FROM_DATE_STRING=""
-        FROM_DATE=""
-    else
-        FROM_DATE_STRING=`echo $FROM_DATE | cut -d " " -f 1`
-        FROM_DATE=`echo $FROM_DATE | cut -d " " -f 2`
-    fi
-
-    DB_SH=$PROJECT_SHORTNAME"_sh"
-    DB_PRO=$PROJECT_SHORTNAME"_pro"
-
+function check_enriched_vars {
     if [ -z TWITTER_ENRICHED_INDEX ]
         then
         TWITTER_ENRICHED_INDEX=$TWITTER_INDEX"_enriched"
@@ -72,6 +56,78 @@ function set_variables {
         then
         GITHUB_ENRICHED_INDEX=$GITHUB_INDEX"_enriched"
     fi
+}
+
+function check_enabled_vars {
+    if [ -z $GIT_ENABLED ]
+        then
+        GIT_ENABLED=0
+    fi
+
+    if [ -z $GITHUB_ENABLED ]
+        then
+        GITHUB_ENABLED=0
+    fi
+
+    if [ -z $GERRIT_ENABLED ]
+        then
+        GERRIT_ENABLED=0
+    fi
+
+    if [ -z $BUGZILLA_ENABLED ]
+        then
+        BUGZILLA_ENABLED=0
+    fi
+
+    if [ -z $JENKINS_ENABLED ]
+        then
+        JENKINS_ENABLED=0
+    fi
+
+    if [ -z $SUPYBOT_ENABLED ]
+        then
+        SUPYBOT_ENABLED=0
+    fi
+
+    if [ -z $GMANE_ENABLED ]
+        then
+        GMANE_ENABLED=0
+    fi
+
+    if [ -z $PIPERMAIL_ENABLED ]
+        then
+        PIPERMAIL_ENABLED=0
+    fi
+
+    if [ -z $TWITTER_ENABLED ]
+        then
+        TWITTER_ENABLED=0
+    fi
+}
+
+function set_variables {
+    ## modify variables in case they are not defined in configuration file
+    ## and print some information
+
+    check_enabled_vars
+    check_enriched_vars
+
+    # It's replaced "-" or "." with "_" into the project name to avoid errors into MySQL
+    PROJECT_SHORTNAME=`echo $PROJECT_SHORTNAME | sed "s/[-.]/_/g"`
+    PROJECT_INFO="/home/bitergia/GrimoireELK-mordred/mordred/utils/projectinfo.py"
+
+    if [ -z FROM_DATE ]
+        then
+        FROM_DATE_STRING=""
+        FROM_DATE=""
+    else
+        FROM_DATE_STRING=`echo $FROM_DATE | cut -d " " -f 1`
+        FROM_DATE=`echo $FROM_DATE | cut -d " " -f 2`
+    fi
+
+    DB_SH=$PROJECT_SHORTNAME"_sh"
+    DB_PRO=$PROJECT_SHORTNAME"_pro"
+
 
     LOGS_DIR=$LOGS_DIR"/"$PROJECT_SHORTNAME
     MAINLOG=$LOGS_DIR"/main.log"
@@ -79,7 +135,7 @@ function set_variables {
         then
         echo "-- debugging variables --"
         echo "GIT_ENABLED=$GIT_ENABLED"
-	echo "GITHUB_ENABLED=$GITHUB_ENABLED"
+	    echo "GITHUB_ENABLED=$GITHUB_ENABLED"
         echo "FROM_DATE=$FROM_DATE_STRING $FROM_DATE"
         echo "GERRIT_ENABLED=$GERRIT_ENABLED"
         echo "BUGZILLA_ENABLED=$BUGZILLA_ENABLED"
@@ -561,6 +617,7 @@ fi
 CONF_FILE=$1
 source $CONF_FILE
 set_variables
+check_enabled_vars
 
 mkdir -p $LOGS_DIR
 
