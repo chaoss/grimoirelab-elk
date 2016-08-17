@@ -20,6 +20,10 @@ function log_result {
 }
 
 function check_enriched_vars {
+    if [ -z STACKEXCHANGE_ENRICHED_INDEX ]
+        then
+        STACKEXCHANGE_ENRICHED_INDEX=$STACKEXCHANGE_INDEX"_enriched"
+    fi
     if [ -z TWITTER_ENRICHED_INDEX ]
         then
         TWITTER_ENRICHED_INDEX=$TWITTER_INDEX"_enriched"
@@ -103,6 +107,11 @@ function check_enabled_vars {
         then
         TWITTER_ENABLED=0
     fi
+
+    if [ -z $STACKEXCHANGE_ENABLED ]
+        then
+        STACKEXCHANGE_ENABLED=0
+    fi
 }
 
 function set_variables {
@@ -170,6 +179,10 @@ function set_variables {
         echo "PIPERMAIL_ENRICHED_INDEX=$PIPERMAIL_ENRICHED_INDEX"
         echo "TWITTER_INDEX=$TWITTER_INDEX"
         echo "TWITTER_ENRICHED_INDEX=$TWITTER_ENRICHED_INDEX"
+        echo "STACKEXCHANGE_INDEX=$STACKEXCHANGE_INDEX"
+        echo "STACKEXCHANGE_ENRICHED_INDEX=$STACKEXCHANGE_ENRICHED_INDEX"
+        echo "STACKEXCHANGE_TAGS=$STACKEXCHANGE_TAGS"
+        echo "STACKEXCHANGE_URL=$STACKEXCHANGE_URL"
         echo "SH_UNIFY_METHOD=$SH_UNIFY_METHOD"
         echo "SH_UNAFFILIATED_GROUP=$SH_UNAFFILIATED_GROUP"
         echo "LOGS_DIR=$LOGS_DIR"
@@ -323,6 +336,13 @@ function retrieve_data {
         pipermail_retrieval
         log_result "[pipermail - mls] Retrieval finished" "[pipermail - mls] ERROR: Something went wrong with the retrieval"
     fi
+
+    if [ $STACKEXCHANGE_ENABLED -eq 1 ]
+        then
+        log "[stack exchange] Retrieving data"
+        stackexchange_retrieval
+        log_result "[stack exchange] Retrieval finished" "[stack exchange] ERROR: Something went wrong with the retrieval"
+    fi
 }
 
 function git_retrieval {
@@ -399,6 +419,18 @@ function pipermail_retrieval {
     rm $TMP_PIPERMAIL_LIST
 }
 
+function stackexchange_retrieval {
+    cd ~/GrimoireELK/utils/
+    STACKEXCHANGE_SITE=`echo $STACKEXCHANGE_URL | cut -d '/' -f 3- | cut -d '/' -f 1`
+    for t in $STACKEXCHANGE_TAGS
+    do  
+        echo "--------------" >> $LOGS_DIR"/stackoverflow-collection.log"
+        echo "Retrieval for $t" >> $LOGS_DIR"/stackoverflow-collection.log"
+        ORG="$STACKEXCHANGE_URL/$t"
+        ./p2o.py -e $ES_URI -g --index $STACKEXCHANGE_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-collection.log" 2>&1
+    done
+}
+
 function get_identities_from_data {
     ENR_EXTRA_FLAG='--only-identities'
     enrich_data $ENR_EXTRA_FLAG
@@ -471,6 +503,13 @@ function enrich_data {
         log "[twitter] Twitter p2o starts"
         twitter_enrichment $1
         log_result "[twitter] p2o finished" "[twitter] ERROR: Something went wrong with p2o"
+    fi
+
+    if [ $STACKEXCHANGE_ENABLED -eq 1 ]
+        then
+        log "[stack exchange] Stack Exchange p2o starts"
+        stackexchange_enrichment $1
+        log_result "[stack exchange] p2o finished" "[stack exchange] ERROR: Something went wrong with p2o"
     fi
 }
 
@@ -576,6 +615,18 @@ function pipermail_enrichment {
 function twitter_enrichment {
     cd ~/GrimoireELK/utils/
     ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $TWITTER_INDEX --index-enrich $TWITTER_ENRICHED_INDEX twitter >> $LOGS_DIR"/twitter-enrichment.log" 2>&1
+}
+
+function stackexchange_enrichment {
+    cd ~/GrimoireELK/utils/
+    STACKEXCHANGE_SITE=`echo $STACKEXCHANGE_URL | cut -d '/' -f 3- | cut -d '/' -f 1`
+    for t in $STACKEXCHANGE_TAGS
+    do  
+        echo "--------------" >> $LOGS_DIR"/stackoverflow-enrichment.log"
+        echo "ENRICHMENT for $t" >> $LOGS_DIR"/stackoverflow-enrichment.log"
+        ORG="$STACKEXCHANGE_URL/$t"
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $STACKEXCHANGE_INDEX --index-enrich $STACKEXCHANGE_ENRICHED_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-enrichment.log" 2>&1
+    done
 }
 
 function sortinghat_unify {
