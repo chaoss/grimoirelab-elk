@@ -253,14 +253,20 @@ function get_repo_list {
     #
     # receives a backend name a return the list of repos for all projects
     #
+
+    IFS=$'\n' #we set the EoL as delimeter
+
     PATH_JSON_FILE="${PROJECTS_JSON_FILE/file:\/\//}" # we remove the file://
     PROJECTS=`$PROJECT_INFO $PATH_JSON_FILE list`
     RES=''
     for p in $PROJECTS
     do
-        AUX=`$PROJECT_INFO $PATH_JSON_FILE list $p --repo $1`
+        AUX=`$PROJECT_INFO $PATH_JSON_FILE list "$p" --repo $1`
         RES="$RES $AUX"
     done
+
+    unset IFS
+
     echo $RES
 }
 
@@ -423,7 +429,7 @@ function stackexchange_retrieval {
     cd ~/GrimoireELK/utils/
     STACKEXCHANGE_SITE=`echo $STACKEXCHANGE_URL | cut -d '/' -f 3- | cut -d '/' -f 1`
     for t in $STACKEXCHANGE_TAGS
-    do  
+    do
         echo "--------------" >> $LOGS_DIR"/stackoverflow-collection.log"
         echo "Retrieval for $t" >> $LOGS_DIR"/stackoverflow-collection.log"
         ORG="$STACKEXCHANGE_URL/$t"
@@ -621,7 +627,7 @@ function stackexchange_enrichment {
     cd ~/GrimoireELK/utils/
     STACKEXCHANGE_SITE=`echo $STACKEXCHANGE_URL | cut -d '/' -f 3- | cut -d '/' -f 1`
     for t in $STACKEXCHANGE_TAGS
-    do  
+    do
         echo "--------------" >> $LOGS_DIR"/stackoverflow-enrichment.log"
         echo "ENRICHMENT for $t" >> $LOGS_DIR"/stackoverflow-enrichment.log"
         ORG="$STACKEXCHANGE_URL/$t"
