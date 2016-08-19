@@ -527,22 +527,8 @@ function git_enrichment {
         GITHUB_PARAMETER="--github-token $GITHUB_TOKEN"
     fi
 
-    ## awful workaround to deal with eclipse format
-    if [ $PROJECT_SHORTNAME == "eclipse" ]
-        then
-        TMP_GITLIST=`mktemp`
-        compose_git_list $TMP_GITLIST
-        REPOS=`cat $TMP_GITLIST |awk '{print $3}'`
-        rm $TMP_GITLIST
-    else
-        REPOS=`get_repo_list source_repo`
-    fi
-
     cd ~/GrimoireELK/utils
-    for r in $REPOS
-    do
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --studies --enrich_only $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git $r >> $LOGS_DIR"/git-enrichment.log" 2>&1
-    done
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --studies --enrich_only $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git '' >> $LOGS_DIR"/git-enrichment.log" 2>&1
 }
 
 function github_enrichment {
