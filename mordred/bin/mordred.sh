@@ -20,6 +20,10 @@ function log_result {
 }
 
 function check_enriched_vars {
+    if [ -z CONFLUENCE_ENRICHED_INDEX ]
+        then
+        CONFLUENCE_ENRICHED_INDEX=$CONFLUENCE_INDEX"_enriched"
+    fi
     if [ -z STACKEXCHANGE_ENRICHED_INDEX ]
         then
         STACKEXCHANGE_ENRICHED_INDEX=$STACKEXCHANGE_INDEX"_enriched"
@@ -112,6 +116,11 @@ function check_enabled_vars {
         then
         STACKEXCHANGE_ENABLED=0
     fi
+
+    if [ -z $CONFLUENCE_ENABLED ]
+        then
+        CONFLUENCE_ENABLED=0
+    fi
 }
 
 function set_variables {
@@ -183,6 +192,9 @@ function set_variables {
         echo "STACKEXCHANGE_ENRICHED_INDEX=$STACKEXCHANGE_ENRICHED_INDEX"
         echo "STACKEXCHANGE_TAGS=$STACKEXCHANGE_TAGS"
         echo "STACKEXCHANGE_URL=$STACKEXCHANGE_URL"
+        echo "CONFLUENCE_INDEX=$CONFLUENCE_INDEX"
+        echo "CONFLUENCE_ENRICHED_INDEX=$CONFLUENCE_ENRICHED_INDEX"
+        echo "CONFLUENCE_URL=$CONFLUENCE_URL"
         echo "SH_UNIFY_METHOD=$SH_UNIFY_METHOD"
         echo "SH_UNAFFILIATED_GROUP=$SH_UNAFFILIATED_GROUP"
         echo "LOGS_DIR=$LOGS_DIR"
@@ -349,6 +361,13 @@ function retrieve_data {
         stackexchange_retrieval
         log_result "[stack exchange] Retrieval finished" "[stack exchange] ERROR: Something went wrong with the retrieval"
     fi
+
+    if [ $CONFLUENCE_ENABLED -eq 1 ]
+        then
+        log "[confluence] Retrieving data"
+        confluence_retrieval
+        log_result "[confluence] Retrieval finished" "[confluence] ERROR: Something went wrong with the retrieval"
+    fi
 }
 
 function git_retrieval {
@@ -433,8 +452,13 @@ function stackexchange_retrieval {
         echo "--------------" >> $LOGS_DIR"/stackoverflow-collection.log"
         echo "Retrieval for $t" >> $LOGS_DIR"/stackoverflow-collection.log"
         ORG="$STACKEXCHANGE_URL/$t"
-        ./p2o.py -e $ES_URI -g --index $STACKEXCHANGE_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-collection.log" 2>&1
+        ./p2o.py -e $ES_URI -g --index $STACKEXCHANGE_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/stackoverflow-collection.log" 2>&1
     done
+}
+
+function confluence_retrieval {
+    cd ~/GrimoireELK/utils/
+    ./p2o.py -e $ES_URI -g --index $CONFLUENCE_INDEX confluence $CONFLUENCE_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/confluence-collection.log" 2>&1
 }
 
 function get_identities_from_data {
@@ -517,6 +541,13 @@ function enrich_data {
         stackexchange_enrichment $1
         log_result "[stack exchange] p2o finished" "[stack exchange] ERROR: Something went wrong with p2o"
     fi
+
+    if [ $CONFLUENCE_ENABLED -eq 1 ]
+        then
+        log "[confluence] Confluence p2o starts"
+        confluence_enrichment $1
+        log_result "[confluence] p2o finished" "[confluence] ERROR: Something went wrong with p2o"
+    fi
 }
 
 function git_enrichment {
@@ -558,7 +589,7 @@ function bugzilla_enrichment {
 function jenkins_enrichment {
     ENR_EXTRA_FLAG=$1
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JENKINS_INDEX --index-enrich $JENKINS_ENRICHED_INDEX jenkins $JENKINS_URL >> $LOGS_DIR"/bugzilla-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JENKINS_INDEX --index-enrich $JENKINS_ENRICHED_INDEX jenkins $JENKINS_URL >> $LOGS_DIR"/jenkins-enrichment.log" 2>&1
 }
 
 function supybot_enrichment {
@@ -619,6 +650,11 @@ function stackexchange_enrichment {
         ORG="$STACKEXCHANGE_URL/$t"
         ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $STACKEXCHANGE_INDEX --index-enrich $STACKEXCHANGE_ENRICHED_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-enrichment.log" 2>&1
     done
+}
+
+function confluence_enrichment {
+    cd ~/GrimoireELK/utils/
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $CONFLUENCE_INDEX --index-enrich $CONFLUENCE_ENRICHED_INDEX confluence $CONFLUENCE_URL >> $LOGS_DIR"/confluence-enrichment.log" 2>&1
 }
 
 function sortinghat_unify {
