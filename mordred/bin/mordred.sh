@@ -20,6 +20,10 @@ function log_result {
 }
 
 function check_enriched_vars {
+    if [ -z JIRA_ENRICHED_INDEX ]
+        then
+        JIRA_ENRICHED_INDEX=$JIRA_INDEX"_enriched"
+    fi
     if [ -z CONFLUENCE_ENRICHED_INDEX ]
         then
         CONFLUENCE_ENRICHED_INDEX=$CONFLUENCE_INDEX"_enriched"
@@ -121,6 +125,11 @@ function check_enabled_vars {
         then
         CONFLUENCE_ENABLED=0
     fi
+
+    if [ -z $JIRA_ENABLED ]
+        then
+        JIRA_ENABLED=0
+    fi
 }
 
 function set_variables {
@@ -195,6 +204,9 @@ function set_variables {
         echo "CONFLUENCE_INDEX=$CONFLUENCE_INDEX"
         echo "CONFLUENCE_ENRICHED_INDEX=$CONFLUENCE_ENRICHED_INDEX"
         echo "CONFLUENCE_URL=$CONFLUENCE_URL"
+        echo "JIRA_INDEX=$JIRA_INDEX"
+        echo "JIRA_ENRICHED_INDEX=$JIRA_ENRICHED_INDEX"
+        echo "JIRA_URL=$JIRA_URL"
         echo "SH_UNIFY_METHOD=$SH_UNIFY_METHOD"
         echo "SH_UNAFFILIATED_GROUP=$SH_UNAFFILIATED_GROUP"
         echo "LOGS_DIR=$LOGS_DIR"
@@ -368,6 +380,13 @@ function retrieve_data {
         confluence_retrieval
         log_result "[confluence] Retrieval finished" "[confluence] ERROR: Something went wrong with the retrieval"
     fi
+
+    if [ $JIRA_ENABLED -eq 1 ]
+        then
+        log "[jira] Retrieving data"
+        jira_retrieval
+        log_result "[jira] Retrieval finished" "[jira] ERROR: Something went wrong with the retrieval"
+    fi
 }
 
 function git_retrieval {
@@ -461,6 +480,11 @@ function confluence_retrieval {
     ./p2o.py -e $ES_URI -g --index $CONFLUENCE_INDEX confluence $CONFLUENCE_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/confluence-collection.log" 2>&1
 }
 
+function jira_retrieval {
+    cd ~/GrimoireELK/utils/
+    ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $JIRA_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+}
+
 function get_identities_from_data {
     ENR_EXTRA_FLAG='--only-identities'
     enrich_data $ENR_EXTRA_FLAG
@@ -547,6 +571,13 @@ function enrich_data {
         log "[confluence] Confluence p2o starts"
         confluence_enrichment $1
         log_result "[confluence] p2o finished" "[confluence] ERROR: Something went wrong with p2o"
+    fi
+
+    if [ $JIRA_ENABLED -eq 1 ]
+        then
+        log "[jira] Jira p2o starts"
+        jira_enrichment $1
+        log_result "[jira] p2o finished" "[jira] ERROR: Something went wrong with p2o"
     fi
 }
 
@@ -655,6 +686,11 @@ function stackexchange_enrichment {
 function confluence_enrichment {
     cd ~/GrimoireELK/utils/
     ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $CONFLUENCE_INDEX --index-enrich $CONFLUENCE_ENRICHED_INDEX confluence $CONFLUENCE_URL >> $LOGS_DIR"/confluence-enrichment.log" 2>&1
+}
+
+function jira_enrichment {
+    cd ~/GrimoireELK/utils/
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $JIRA_URL >> $LOGS_DIR"/jira-enrichment.log" 2>&1
 }
 
 function sortinghat_unify {
