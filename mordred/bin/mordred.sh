@@ -433,7 +433,7 @@ function stackexchange_retrieval {
         echo "--------------" >> $LOGS_DIR"/stackoverflow-collection.log"
         echo "Retrieval for $t" >> $LOGS_DIR"/stackoverflow-collection.log"
         ORG="$STACKEXCHANGE_URL/$t"
-        ./p2o.py -e $ES_URI -g --index $STACKEXCHANGE_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-collection.log" 2>&1
+        ./p2o.py -e $ES_URI -g --index $STACKEXCHANGE_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/stackoverflow-collection.log" 2>&1
     done
 }
 
@@ -558,7 +558,7 @@ function bugzilla_enrichment {
 function jenkins_enrichment {
     ENR_EXTRA_FLAG=$1
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JENKINS_INDEX --index-enrich $JENKINS_ENRICHED_INDEX jenkins $JENKINS_URL >> $LOGS_DIR"/bugzilla-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JENKINS_INDEX --index-enrich $JENKINS_ENRICHED_INDEX jenkins $JENKINS_URL >> $LOGS_DIR"/jenkins-enrichment.log" 2>&1
 }
 
 function supybot_enrichment {
