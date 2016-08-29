@@ -482,7 +482,7 @@ function confluence_retrieval {
 
 function jira_retrieval {
     cd ~/GrimoireELK/utils/
-    ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $JIRA_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+    ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $JIRA_URL -u $JIRA_USER -p $JIRA_PASS $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
 }
 
 function get_identities_from_data {
