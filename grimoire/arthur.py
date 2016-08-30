@@ -196,7 +196,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    ocean_index_enrich = None,
                    db_projects_map=None, db_sortinghat=None,
                    no_incremental=False, only_identities=False,
-                   github_token=None, studies=False, only_studies=False):
+                   github_token=None, studies=False, only_studies=False,
+                   url_enrich=None):
     """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend):
@@ -289,7 +290,10 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             enrich_index = ocean_index+"_enrich"
 
         enrich_backend = connector[2](backend, db_sortinghat, db_projects_map)
-        elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
+        if url_enrich:
+            elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend)
+        else:
+            elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
         enrich_backend.set_elastic(elastic_enrich)
         if github_token and backend_name == "git":
             enrich_backend.set_github_token(github_token)

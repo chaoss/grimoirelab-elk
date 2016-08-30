@@ -45,7 +45,8 @@ class ElasticOcean(object):
         parser.add_argument("-e", "--elastic_url",  default="http://127.0.0.1:9200",
                             help="Host with elastic search" +
                             "(default: http://127.0.0.1:9200)")
-
+        parser.add_argument("--elastic_url-enrich",
+                            help="Host with elastic search and enriched indexes")
 
     def __init__(self, perceval_backend, from_date=None, fetch_cache=False,
                  project=None, insecure=True):
