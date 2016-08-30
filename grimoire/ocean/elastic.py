@@ -224,17 +224,20 @@ class ElasticOcean(object):
                     }
                 ''' % (date_field, from_date)
 
+            order_field = 'metadata__updated_on'
+
             query = """
             {
                 "query": {
                     "bool": {
                         "must": [%s]
                     }
-                }
+                },
+                "sort": { "%s": { "order": "asc" }}
             }
-            """ % (filters)
+            """ % (filters, order_field)
 
-            # logging.debug("%s %s" % (url, query))
+            # logging.debug("%s %s", url, query)
 
             r = self.requests.post(url, data=query)
 
