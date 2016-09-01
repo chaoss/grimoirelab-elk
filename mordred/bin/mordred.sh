@@ -152,6 +152,15 @@ function set_variables {
         FROM_DATE=`echo $FROM_DATE | cut -d " " -f 2`
     fi
 
+    if [ -z DB_PASSWORD ]
+        then
+        DB_PASSWORD="''"
+    fi
+    if [ -z DB_USER ]
+        then
+        DB_USER="root"
+    fi
+
     DB_SH=$PROJECT_SHORTNAME"_sh"
     DB_PRO=$PROJECT_SHORTNAME"_pro"
 
@@ -216,8 +225,8 @@ function set_variables {
 }
 
 function create_dbs {
-    echo "CREATE DATABASE IF NOT EXISTS $DB_SH ;"| mysql -uroot -h$DB_HOST
-    echo "CREATE DATABASE IF NOT EXISTS $DB_PRO ;"| mysql -uroot -h$DB_HOST
+    echo "CREATE DATABASE IF NOT EXISTS $DB_SH ;"| mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD
+    echo "CREATE DATABASE IF NOT EXISTS $DB_PRO ;"| mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD
 }
 
 function init_sh_orgs {
@@ -299,7 +308,7 @@ function update_projects_db {
     CACHED=${PROJECTS_JSON_FILE//\//_}
     rm -f $CACHED.json
     TMP_FAKEAUTOMATOR=`mktemp`
-    echo -e "[generic]\ndb_user = root\ndb_password=\ndb_projects=$DB_PRO\ndb_host=$DB_HOST\n[gerrit]\ntrackers=$GERRIT_URL" > $TMP_FAKEAUTOMATOR
+    echo -e "[generic]\ndb_user = $DB_USER\ndb_password=$DB_PASSWORD\ndb_projects=$DB_PRO\ndb_host=$DB_HOST\n[gerrit]\ntrackers=$GERRIT_URL" > $TMP_FAKEAUTOMATOR
     ## db projects
     ./eclipse_projects.py -u $PROJECTS_JSON_FILE -p -a $TMP_FAKEAUTOMATOR
     log_result "Projects database generated" "ERROR: Projects database not generated"
@@ -711,7 +720,7 @@ function group_unaffiliated_people {
         then
         log "[sortinghat] Affiliating the unaffiliated people to group $SH_UNAFFILIATED_GROUP"
         sortinghat --host $DB_HOST -d $DB_SH orgs -a $SH_UNAFFILIATED_GROUP >> $LOGS_DIR"/sortinghat.log" 2>&1
-        mysql -uroot -h$DB_HOST $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
+        mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
         log_result "[sortinghat] Affiliation for $SH_UNAFFILIATED_GROUP finished" "[sortinghat] ERROR: Something went wrong with the affiliation of $SH_UNAFFILIATED_GROUP"
     else
         log "[sortinghat] (WARNING!) No variable defined SH_UNAFFILIATED_GROUP"
