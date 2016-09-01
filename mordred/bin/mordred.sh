@@ -494,6 +494,11 @@ function jira_retrieval {
     ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $JIRA_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
 }
 
+function enrich_studies {
+    ENR_EXTRA_FLAG='--only-studies'
+    enrich_data $ENR_EXTRA_FLAG
+}
+
 function get_identities_from_data {
     ENR_EXTRA_FLAG='--only-identities'
     enrich_data $ENR_EXTRA_FLAG
@@ -598,8 +603,26 @@ function git_enrichment {
         GITHUB_PARAMETER="--github-token $GITHUB_TOKEN"
     fi
 
+    REPOS=`get_repo_list source_repo`
+
+    if [ $ENR_EXTRA_FLAG == '--only-studies' ]; then
+	# when we execute studies, we want it without going repo by repo
+        REPOS="''"
+    fi
+
+    nrepos=`get_repo_list source_repo|wc -w`
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --studies --enrich_only $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git '' >> $LOGS_DIR"/git-enrichment.log" 2>&1
+    counter=0
+    for r in $REPOS
+    do
+	echo "./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git $r"
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git $r >> $LOGS_DIR"/git-enrichment.log" 2>&1
+        counter=$((counter+1))
+        if [ $(( $counter % 100 )) -eq 0 ]; then
+            log_result "[git]  $counter/$nrepos repos enriched"
+        fi
+    done
+#FIXME --only-enrich everywhere!!
 }
 
 function github_enrichment {
@@ -819,6 +842,19 @@ while true; do
         ELAPSED_TIME=$(($SECONDS - $START_TIME))
         log "(T) Data enriched in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
     fi
+
+    if [ -z $SKIP_STUDIES ] || [ $SKIP_STUDIES -eq 0 ]
+        then
+
+        log "Studies starts"
+        START_TIME=$SECONDS
+
+        enrich_studies
+
+        ELAPSED_TIME=$(($SECONDS - $START_TIME))
+        log "(T) Studies updated in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
+    fi
+
 
     duration=$SECONDS
     log "(T) Dashboard updated in $(($duration / 60)) minutes and $(($duration % 60)) seconds."
