@@ -399,11 +399,19 @@ function retrieve_data {
 }
 
 function git_retrieval {
-    TMP_GITLIST=`mktemp`
-    compose_git_list $TMP_GITLIST
+    REPOS=`get_repo_list source_repo`
+
+    nrepos=`get_repo_list source_repo|wc -w`
     cd ~/GrimoireELK/utils
-    awk -v es_uri="$ES_URI" -v myindex="$GIT_INDEX" -v myfrom="$FROM_DATE_STRING $FROM_DATE" '{print "./p2o.py -e "es_uri" --index "myindex" -g git " $3" "myfrom}' $TMP_GITLIST | sh >> $LOGS_DIR"/git-collection.log" 2>&1
-    rm $TMP_GITLIST
+    counter=0
+    for r in $REPOS
+    do
+        ./p2o.py -e $ES_URI -g --index $GIT_INDEX git $r >> $LOGS_DIR"/git-collection.log" 2>&1
+        counter=$((counter+1))
+        if [ $(( $counter % 100 )) -eq 0 ]; then
+            log_result "[git]  $counter/$nrepos repos collected"
+        fi
+    done
 }
 
 function github_retrieval {
