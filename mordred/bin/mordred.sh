@@ -152,10 +152,6 @@ function set_variables {
         FROM_DATE=`echo $FROM_DATE | cut -d " " -f 2`
     fi
 
-    if [ -z $DB_PASSWORD ]
-        then
-        DB_PASSWORD="''"
-    fi
     if [ -z $DB_USER ]
         then
         DB_USER="root"
@@ -225,8 +221,13 @@ function set_variables {
 }
 
 function create_dbs {
-    echo "CREATE DATABASE IF NOT EXISTS $DB_SH ;"| mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD
-    echo "CREATE DATABASE IF NOT EXISTS $DB_PRO ;"| mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD
+    if [ -z $DB_PASSWORD ]; then
+        echo "CREATE DATABASE IF NOT EXISTS $DB_SH ;"| mysql -u$DB_USER -h$DB_HOST
+        echo "CREATE DATABASE IF NOT EXISTS $DB_PRO ;"| mysql -u$DB_USER -h$DB_HOST
+    else
+        echo "CREATE DATABASE IF NOT EXISTS $DB_SH ;"| mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD
+        echo "CREATE DATABASE IF NOT EXISTS $DB_PRO ;"| mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD
+    fi
 }
 
 function init_sh_orgs {
@@ -308,7 +309,11 @@ function update_projects_db {
     CACHED=${PROJECTS_JSON_FILE//\//_}
     rm -f $CACHED.json
     TMP_FAKEAUTOMATOR=`mktemp`
-    echo -e "[generic]\ndb_user = $DB_USER\ndb_password=$DB_PASSWORD\ndb_projects=$DB_PRO\ndb_host=$DB_HOST\n[gerrit]\ntrackers=$GERRIT_URL" > $TMP_FAKEAUTOMATOR
+    if [ -z $DB_PASSWORD ]; then
+        echo -e "[generic]\ndb_user = $DB_USER\ndb_password=\ndb_projects=$DB_PRO\ndb_host=$DB_HOST\n[gerrit]\ntrackers=$GERRIT_URL" > $TMP_FAKEAUTOMATOR
+    else
+        echo -e "[generic]\ndb_user = $DB_USER\ndb_password=$DB_PASSWORD\ndb_projects=$DB_PRO\ndb_host=$DB_HOST\n[gerrit]\ntrackers=$GERRIT_URL" > $TMP_FAKEAUTOMATOR
+    fi
     ## db projects
     ./eclipse_projects.py -u $PROJECTS_JSON_FILE -p -a $TMP_FAKEAUTOMATOR
     log_result "Projects database generated" "ERROR: Projects database not generated"
@@ -623,14 +628,12 @@ function git_enrichment {
     counter=0
     for r in $REPOS
     do
-	echo "./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git $r"
         ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git $r >> $LOGS_DIR"/git-enrichment.log" 2>&1
         counter=$((counter+1))
         if [ $(( $counter % 100 )) -eq 0 ]; then
             log_result "[git]  $counter/$nrepos repos enriched"
         fi
     done
-#FIXME --only-enrich everywhere!!
 }
 
 function github_enrichment {
@@ -739,20 +742,36 @@ function sortinghat_unify {
         SH_UNIFY_METHOD="email-name"
     fi
     log "[sortinghat] Unify using $SH_UNIFY_METHOD algorithm"
-    sortinghat -u root -p '' --host $DB_HOST -d $DB_SH unify -m $SH_UNIFY_METHOD --fast-matching >> $LOGS_DIR"/sortinghat.log" 2>&1
+
+    if [ -z $DB_PASSWORD ]; then
+        sortinghat -u $DB_USER --host $DB_HOST -d $DB_SH unify -m $SH_UNIFY_METHOD --fast-matching >> $LOGS_DIR"/sortinghat.log" 2>&1
+    else
+        sortinghat -u $DB_USER -p $DB_PASSWORD --host $DB_HOST -d $DB_SH unify -m $SH_UNIFY_METHOD --fast-matching >> $LOGS_DIR"/sortinghat.log" 2>&1
+    fi
 }
 
 function sortinghat_affiliate {
-    sortinghat -u root -p '' --host $DB_HOST -d $DB_SH affiliate >> $LOGS_DIR"/sortinghat.log" 2>&1
+    if [ -z $DB_PASSWORD ]; then
+        sortinghat -u $DB_USER --host $DB_HOST -d $DB_SH affiliate >> $LOGS_DIR"/sortinghat.log" 2>&1
+    else
+        sortinghat -u $DB_USER -p $DB_PASSWORD --host $DB_HOST -d $DB_SH affiliate >> $LOGS_DIR"/sortinghat.log" 2>&1
+    fi
 }
 
 function group_unaffiliated_people {
     if [ ! -z $SH_UNAFFILIATED_GROUP ]
         then
         log "[sortinghat] Affiliating the unaffiliated people to group $SH_UNAFFILIATED_GROUP"
-        sortinghat --host $DB_HOST -d $DB_SH orgs -a $SH_UNAFFILIATED_GROUP >> $LOGS_DIR"/sortinghat.log" 2>&1
-        mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
+
+        if [ -z $DB_PASSWORD ]; then
+            sortinghat --host $DB_HOST -d $DB_SH -u $DB_USER -h $DB_HOST orgs -a $SH_UNAFFILIATED_GROUP >> $LOGS_DIR"/sortinghat.log" 2>&1
+            mysql -u$DB_USER -h$DB_HOST $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
+        else
+            sortinghat --host $DB_HOST -d $DB_SH -u $DB_USER -p $DB_PASSWORD -h $DB_HOST orgs -a $SH_UNAFFILIATED_GROUP >> $LOGS_DIR"/sortinghat.log" 2>&1
+            mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
+        fi
         log_result "[sortinghat] Affiliation for $SH_UNAFFILIATED_GROUP finished" "[sortinghat] ERROR: Something went wrong with the affiliation of $SH_UNAFFILIATED_GROUP"
+
     else
         log "[sortinghat] (WARNING!) No variable defined SH_UNAFFILIATED_GROUP"
     fi
