@@ -20,51 +20,51 @@ function log_result {
 }
 
 function check_enriched_vars {
-    if [ -z JIRA_ENRICHED_INDEX ]
+    if [ -z $JIRA_ENRICHED_INDEX ]
         then
         JIRA_ENRICHED_INDEX=$JIRA_INDEX"_enriched"
     fi
-    if [ -z CONFLUENCE_ENRICHED_INDEX ]
+    if [ -z $CONFLUENCE_ENRICHED_INDEX ]
         then
         CONFLUENCE_ENRICHED_INDEX=$CONFLUENCE_INDEX"_enriched"
     fi
-    if [ -z STACKEXCHANGE_ENRICHED_INDEX ]
+    if [ -z $STACKEXCHANGE_ENRICHED_INDEX ]
         then
         STACKEXCHANGE_ENRICHED_INDEX=$STACKEXCHANGE_INDEX"_enriched"
     fi
-    if [ -z TWITTER_ENRICHED_INDEX ]
+    if [ -z $TWITTER_ENRICHED_INDEX ]
         then
         TWITTER_ENRICHED_INDEX=$TWITTER_INDEX"_enriched"
     fi
-    if [ -z PIPERMAIL_ENRICHED_INDEX ]
+    if [ -z $PIPERMAIL_ENRICHED_INDEX ]
         then
         PIPERMAIL_ENRICHED_INDEX=$PIPERMAIL_INDEX"_enriched"
     fi
-    if [ -z GMANE_ENRICHED_INDEX ]
+    if [ -z $GMANE_ENRICHED_INDEX ]
         then
         GMANE_ENRICHED_INDEX=$GMANE_INDEX"_enriched"
     fi
-    if [ -z SUPYBOT_ENRICHED_INDEX ]
+    if [ -z $SUPYBOT_ENRICHED_INDEX ]
         then
         SUPYBOT_ENRICHED_INDEX=$SUPYBOT_INDEX"_enriched"
     fi
-    if [ -z BUGZILLA_ENRICHED_INDEX ]
+    if [ -z $BUGZILLA_ENRICHED_INDEX ]
         then
         BUGZILLA_ENRICHED_INDEX=$BUGZILLA_INDEX"_enriched"
     fi
-    if [ -z JENKINS_ENRICHED_INDEX ]
+    if [ -z $JENKINS_ENRICHED_INDEX ]
         then
         JENKINS_ENRICHED_INDEX=$JENKINS_INDEX"_enriched"
     fi
-    if [ -z GERRIT_ENRICHED_INDEX ]
+    if [ -z $GERRIT_ENRICHED_INDEX ]
         then
         GERRIT_ENRICHED_INDEX=$GERRIT_INDEX"_enriched"
     fi
-    if [ -z GIT_ENRICHED_INDEX ]
+    if [ -z $GIT_ENRICHED_INDEX ]
         then
         GIT_ENRICHED_INDEX=$GIT_INDEX"_enriched"
     fi
-    if [ -z GITHUB_ENRICHED_INDEX ]
+    if [ -z $GITHUB_ENRICHED_INDEX ]
         then
         GITHUB_ENRICHED_INDEX=$GITHUB_INDEX"_enriched"
     fi
@@ -143,7 +143,7 @@ function set_variables {
     PROJECT_SHORTNAME=`echo $PROJECT_SHORTNAME | sed "s/[-.]/_/g"`
     PROJECT_INFO="/home/bitergia/mordred/utils/projectinfo.py"
 
-    if [ -z FROM_DATE ]
+    if [ -z $FROM_DATE ]
         then
         FROM_DATE_STRING=""
         FROM_DATE=""
@@ -152,11 +152,11 @@ function set_variables {
         FROM_DATE=`echo $FROM_DATE | cut -d " " -f 2`
     fi
 
-    if [ -z DB_PASSWORD ]
+    if [ -z $DB_PASSWORD ]
         then
         DB_PASSWORD="''"
     fi
-    if [ -z DB_USER ]
+    if [ -z $DB_USER ]
         then
         DB_USER="root"
     fi
