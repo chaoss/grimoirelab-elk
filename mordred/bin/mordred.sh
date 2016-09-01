@@ -141,7 +141,7 @@ function set_variables {
 
     # It's replaced "-" or "." with "_" into the project name to avoid errors into MySQL
     PROJECT_SHORTNAME=`echo $PROJECT_SHORTNAME | sed "s/[-.]/_/g"`
-    PROJECT_INFO="/home/bitergia/GrimoireELK-mordred/mordred/utils/projectinfo.py"
+    PROJECT_INFO="/home/bitergia/mordred/utils/projectinfo.py"
 
     if [ -z FROM_DATE ]
         then
