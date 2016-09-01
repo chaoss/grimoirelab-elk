@@ -641,26 +641,26 @@ function github_enrichment {
     do
         ORG=`echo $repo|awk -F'/' {'print $4'}`
         REP=`echo $repo|awk -F'/' {'print $5'} |cut -f1 -d'.'`
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only  $ENR_EXTRA_FLAG --index $GITHUB_INDEX --index-enrich $GITHUB_ENRICHED_INDEX github --owner $ORG --repository $REP  >> $LOGS_DIR"/github-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich  $ENR_EXTRA_FLAG --index $GITHUB_INDEX --index-enrich $GITHUB_ENRICHED_INDEX github --owner $ORG --repository $REP  >> $LOGS_DIR"/github-enrichment.log" 2>&1
     done
 }
 
 function gerrit_enrichment {
     ENR_EXTRA_FLAG=$1
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $GERRIT_INDEX --index-enrich $GERRIT_ENRICHED_INDEX gerrit --user $GERRIT_USER --url $GERRIT_URL >> $LOGS_DIR"/gerrit-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $GERRIT_INDEX --index-enrich $GERRIT_ENRICHED_INDEX gerrit --user $GERRIT_USER --url $GERRIT_URL >> $LOGS_DIR"/gerrit-enrichment.log" 2>&1
 }
 
 function bugzilla_enrichment {
     ENR_EXTRA_FLAG=$1
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $BUGZILLA_INDEX --index-enrich $BUGZILLA_ENRICHED_INDEX bugzilla $BUGZILLA_URL >> $LOGS_DIR"/bugzilla-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $BUGZILLA_INDEX --index-enrich $BUGZILLA_ENRICHED_INDEX bugzilla $BUGZILLA_URL >> $LOGS_DIR"/bugzilla-enrichment.log" 2>&1
 }
 
 function jenkins_enrichment {
     ENR_EXTRA_FLAG=$1
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JENKINS_INDEX --index-enrich $JENKINS_ENRICHED_INDEX jenkins $JENKINS_URL >> $LOGS_DIR"/jenkins-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JENKINS_INDEX --index-enrich $JENKINS_ENRICHED_INDEX jenkins $JENKINS_URL >> $LOGS_DIR"/jenkins-enrichment.log" 2>&1
 }
 
 function supybot_enrichment {
@@ -672,7 +672,7 @@ function supybot_enrichment {
     for url in $(cat $TMP_SUPYBOT_LIST);
     do
         SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $SUPYBOT_INDEX --index-enrich $SUPYBOT_ENRICHED_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH >> $LOGS_DIR"/irc-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $SUPYBOT_INDEX --index-enrich $SUPYBOT_ENRICHED_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH >> $LOGS_DIR"/irc-enrichment.log" 2>&1
     done
     rm $TMP_SUPYBOT_PROJECT_LIST
     rm $TMP_SUPYBOT_LIST
@@ -686,7 +686,7 @@ function gmane_enrichment {
     cd ~/GrimoireELK/utils/
     for url in $(cat $TMP_GMANE_LIST);
     do
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $GMANE_INDEX --index-enrich $GMANE_ENRICHED_INDEX gmane $url >> $LOGS_DIR"/mls-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $GMANE_INDEX --index-enrich $GMANE_ENRICHED_INDEX gmane $url >> $LOGS_DIR"/mls-enrichment.log" 2>&1
     done
     rm $TMP_GMANE_PROJECT_LIST
     rm $TMP_GMANE_LIST
@@ -700,7 +700,7 @@ function pipermail_enrichment {
     cd ~/GrimoireELK/utils/
     for url in $(cat $TMP_PIPERMAIL_LIST);
     do
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $PIPERMAIL_INDEX --index-enrich $PIPERMAIL_ENRICHED_INDEX pipermail $url >> $LOGS_DIR"/mls-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $PIPERMAIL_INDEX --index-enrich $PIPERMAIL_ENRICHED_INDEX pipermail $url >> $LOGS_DIR"/mls-enrichment.log" 2>&1
     done
     rm $TMP_PIPERMAIL_PROJECT_LIST
     rm $TMP_PIPERMAIL_LIST
@@ -708,7 +708,7 @@ function pipermail_enrichment {
 
 function twitter_enrichment {
     cd ~/GrimoireELK/utils/
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $TWITTER_INDEX --index-enrich $TWITTER_ENRICHED_INDEX twitter >> $LOGS_DIR"/twitter-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $TWITTER_INDEX --index-enrich $TWITTER_ENRICHED_INDEX twitter >> $LOGS_DIR"/twitter-enrichment.log" 2>&1
 }
 
 function stackexchange_enrichment {
@@ -719,18 +719,18 @@ function stackexchange_enrichment {
         echo "--------------" >> $LOGS_DIR"/stackoverflow-enrichment.log"
         echo "ENRICHMENT for $t" >> $LOGS_DIR"/stackoverflow-enrichment.log"
         ORG="$STACKEXCHANGE_URL/$t"
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $STACKEXCHANGE_INDEX --index-enrich $STACKEXCHANGE_ENRICHED_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $STACKEXCHANGE_INDEX --index-enrich $STACKEXCHANGE_ENRICHED_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-enrichment.log" 2>&1
     done
 }
 
 function confluence_enrichment {
     cd ~/GrimoireELK/utils/
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $CONFLUENCE_INDEX --index-enrich $CONFLUENCE_ENRICHED_INDEX confluence $CONFLUENCE_URL >> $LOGS_DIR"/confluence-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $CONFLUENCE_INDEX --index-enrich $CONFLUENCE_ENRICHED_INDEX confluence $CONFLUENCE_URL >> $LOGS_DIR"/confluence-enrichment.log" 2>&1
 }
 
 function jira_enrichment {
     cd ~/GrimoireELK/utils/
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $JIRA_URL >> $LOGS_DIR"/jira-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $JIRA_URL >> $LOGS_DIR"/jira-enrichment.log" 2>&1
 }
 
 function sortinghat_unify {
