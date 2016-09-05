@@ -20,51 +20,51 @@ function log_result {
 }
 
 function check_enriched_vars {
-    if [ -z JIRA_ENRICHED_INDEX ]
+    if [ -z $JIRA_ENRICHED_INDEX ]
         then
         JIRA_ENRICHED_INDEX=$JIRA_INDEX"_enriched"
     fi
-    if [ -z CONFLUENCE_ENRICHED_INDEX ]
+    if [ -z $CONFLUENCE_ENRICHED_INDEX ]
         then
         CONFLUENCE_ENRICHED_INDEX=$CONFLUENCE_INDEX"_enriched"
     fi
-    if [ -z STACKEXCHANGE_ENRICHED_INDEX ]
+    if [ -z $STACKEXCHANGE_ENRICHED_INDEX ]
         then
         STACKEXCHANGE_ENRICHED_INDEX=$STACKEXCHANGE_INDEX"_enriched"
     fi
-    if [ -z TWITTER_ENRICHED_INDEX ]
+    if [ -z $TWITTER_ENRICHED_INDEX ]
         then
         TWITTER_ENRICHED_INDEX=$TWITTER_INDEX"_enriched"
     fi
-    if [ -z PIPERMAIL_ENRICHED_INDEX ]
+    if [ -z $PIPERMAIL_ENRICHED_INDEX ]
         then
         PIPERMAIL_ENRICHED_INDEX=$PIPERMAIL_INDEX"_enriched"
     fi
-    if [ -z GMANE_ENRICHED_INDEX ]
+    if [ -z $GMANE_ENRICHED_INDEX ]
         then
         GMANE_ENRICHED_INDEX=$GMANE_INDEX"_enriched"
     fi
-    if [ -z SUPYBOT_ENRICHED_INDEX ]
+    if [ -z $SUPYBOT_ENRICHED_INDEX ]
         then
         SUPYBOT_ENRICHED_INDEX=$SUPYBOT_INDEX"_enriched"
     fi
-    if [ -z BUGZILLA_ENRICHED_INDEX ]
+    if [ -z $BUGZILLA_ENRICHED_INDEX ]
         then
         BUGZILLA_ENRICHED_INDEX=$BUGZILLA_INDEX"_enriched"
     fi
-    if [ -z JENKINS_ENRICHED_INDEX ]
+    if [ -z $JENKINS_ENRICHED_INDEX ]
         then
         JENKINS_ENRICHED_INDEX=$JENKINS_INDEX"_enriched"
     fi
-    if [ -z GERRIT_ENRICHED_INDEX ]
+    if [ -z $GERRIT_ENRICHED_INDEX ]
         then
         GERRIT_ENRICHED_INDEX=$GERRIT_INDEX"_enriched"
     fi
-    if [ -z GIT_ENRICHED_INDEX ]
+    if [ -z $GIT_ENRICHED_INDEX ]
         then
         GIT_ENRICHED_INDEX=$GIT_INDEX"_enriched"
     fi
-    if [ -z GITHUB_ENRICHED_INDEX ]
+    if [ -z $GITHUB_ENRICHED_INDEX ]
         then
         GITHUB_ENRICHED_INDEX=$GITHUB_INDEX"_enriched"
     fi
@@ -141,15 +141,20 @@ function set_variables {
 
     # It's replaced "-" or "." with "_" into the project name to avoid errors into MySQL
     PROJECT_SHORTNAME=`echo $PROJECT_SHORTNAME | sed "s/[-.]/_/g"`
-    PROJECT_INFO="/home/bitergia/GrimoireELK-mordred/mordred/utils/projectinfo.py"
+    PROJECT_INFO="/home/bitergia/mordred/utils/projectinfo.py"
 
-    if [ -z FROM_DATE ]
+    if [ -z $FROM_DATE ]
         then
         FROM_DATE_STRING=""
         FROM_DATE=""
     else
         FROM_DATE_STRING=`echo $FROM_DATE | cut -d " " -f 1`
         FROM_DATE=`echo $FROM_DATE | cut -d " " -f 2`
+    fi
+
+    if [ -z $DB_USER ]
+        then
+        DB_USER="root"
     fi
 
     DB_SH=$PROJECT_SHORTNAME"_sh"
@@ -216,8 +221,13 @@ function set_variables {
 }
 
 function create_dbs {
-    echo "CREATE DATABASE IF NOT EXISTS $DB_SH ;"| mysql -uroot -h$DB_HOST
-    echo "CREATE DATABASE IF NOT EXISTS $DB_PRO ;"| mysql -uroot -h$DB_HOST
+    if [ -z $DB_PASSWORD ]; then
+        echo "CREATE DATABASE IF NOT EXISTS $DB_SH ;"| mysql -u$DB_USER -h$DB_HOST
+        echo "CREATE DATABASE IF NOT EXISTS $DB_PRO ;"| mysql -u$DB_USER -h$DB_HOST
+    else
+        echo "CREATE DATABASE IF NOT EXISTS $DB_SH ;"| mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD
+        echo "CREATE DATABASE IF NOT EXISTS $DB_PRO ;"| mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD
+    fi
 }
 
 function init_sh_orgs {
@@ -299,7 +309,11 @@ function update_projects_db {
     CACHED=${PROJECTS_JSON_FILE//\//_}
     rm -f $CACHED.json
     TMP_FAKEAUTOMATOR=`mktemp`
-    echo -e "[generic]\ndb_user = root\ndb_password=\ndb_projects=$DB_PRO\ndb_host=$DB_HOST\n[gerrit]\ntrackers=$GERRIT_URL" > $TMP_FAKEAUTOMATOR
+    if [ -z $DB_PASSWORD ]; then
+        echo -e "[generic]\ndb_user = $DB_USER\ndb_password=\ndb_projects=$DB_PRO\ndb_host=$DB_HOST\n[gerrit]\ntrackers=$GERRIT_URL" > $TMP_FAKEAUTOMATOR
+    else
+        echo -e "[generic]\ndb_user = $DB_USER\ndb_password=$DB_PASSWORD\ndb_projects=$DB_PRO\ndb_host=$DB_HOST\n[gerrit]\ntrackers=$GERRIT_URL" > $TMP_FAKEAUTOMATOR
+    fi
     ## db projects
     ./eclipse_projects.py -u $PROJECTS_JSON_FILE -p -a $TMP_FAKEAUTOMATOR
     log_result "Projects database generated" "ERROR: Projects database not generated"
@@ -390,11 +404,19 @@ function retrieve_data {
 }
 
 function git_retrieval {
-    TMP_GITLIST=`mktemp`
-    compose_git_list $TMP_GITLIST
+    REPOS=`get_repo_list source_repo`
+
+    nrepos=`get_repo_list source_repo|wc -w`
     cd ~/GrimoireELK/utils
-    awk -v es_uri="$ES_URI" -v myindex="$GIT_INDEX" -v myfrom="$FROM_DATE_STRING $FROM_DATE" '{print "./p2o.py -e "es_uri" --index "myindex" -g git " $3" "myfrom}' $TMP_GITLIST | sh >> $LOGS_DIR"/git-collection.log" 2>&1
-    rm $TMP_GITLIST
+    counter=0
+    for r in $REPOS
+    do
+        ./p2o.py -e $ES_URI -g --index $GIT_INDEX git $r >> $LOGS_DIR"/git-collection.log" 2>&1
+        counter=$((counter+1))
+        if [ $(( $counter % 100 )) -eq 0 ]; then
+            log_result "[git]  $counter/$nrepos repos collected"
+        fi
+    done
 }
 
 function github_retrieval {
@@ -483,6 +505,11 @@ function confluence_retrieval {
 function jira_retrieval {
     cd ~/GrimoireELK/utils/
     ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $JIRA_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+}
+
+function enrich_studies {
+    ENR_EXTRA_FLAG='--only-studies'
+    enrich_data $ENR_EXTRA_FLAG
 }
 
 function get_identities_from_data {
@@ -589,8 +616,24 @@ function git_enrichment {
         GITHUB_PARAMETER="--github-token $GITHUB_TOKEN"
     fi
 
+    REPOS=`get_repo_list source_repo`
+
+    if [ $ENR_EXTRA_FLAG == '--only-studies' ]; then
+	# when we execute studies, we want it without going repo by repo
+        REPOS="''"
+    fi
+
+    nrepos=`get_repo_list source_repo|wc -w`
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --studies --enrich_only $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git '' >> $LOGS_DIR"/git-enrichment.log" 2>&1
+    counter=0
+    for r in $REPOS
+    do
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG $GITHUB_PARAMETER --index $GIT_INDEX --index-enrich $GIT_ENRICHED_INDEX git $r >> $LOGS_DIR"/git-enrichment.log" 2>&1
+        counter=$((counter+1))
+        if [ $(( $counter % 100 )) -eq 0 ]; then
+            log_result "[git]  $counter/$nrepos repos enriched"
+        fi
+    done
 }
 
 function github_enrichment {
@@ -601,26 +644,26 @@ function github_enrichment {
     do
         ORG=`echo $repo|awk -F'/' {'print $4'}`
         REP=`echo $repo|awk -F'/' {'print $5'} |cut -f1 -d'.'`
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only  $ENR_EXTRA_FLAG --index $GITHUB_INDEX --index-enrich $GITHUB_ENRICHED_INDEX github --owner $ORG --repository $REP  >> $LOGS_DIR"/github-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich  $ENR_EXTRA_FLAG --index $GITHUB_INDEX --index-enrich $GITHUB_ENRICHED_INDEX github --owner $ORG --repository $REP  >> $LOGS_DIR"/github-enrichment.log" 2>&1
     done
 }
 
 function gerrit_enrichment {
     ENR_EXTRA_FLAG=$1
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $GERRIT_INDEX --index-enrich $GERRIT_ENRICHED_INDEX gerrit --user $GERRIT_USER --url $GERRIT_URL >> $LOGS_DIR"/gerrit-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $GERRIT_INDEX --index-enrich $GERRIT_ENRICHED_INDEX gerrit --user $GERRIT_USER --url $GERRIT_URL >> $LOGS_DIR"/gerrit-enrichment.log" 2>&1
 }
 
 function bugzilla_enrichment {
     ENR_EXTRA_FLAG=$1
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $BUGZILLA_INDEX --index-enrich $BUGZILLA_ENRICHED_INDEX bugzilla $BUGZILLA_URL >> $LOGS_DIR"/bugzilla-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $BUGZILLA_INDEX --index-enrich $BUGZILLA_ENRICHED_INDEX bugzilla $BUGZILLA_URL >> $LOGS_DIR"/bugzilla-enrichment.log" 2>&1
 }
 
 function jenkins_enrichment {
     ENR_EXTRA_FLAG=$1
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JENKINS_INDEX --index-enrich $JENKINS_ENRICHED_INDEX jenkins $JENKINS_URL >> $LOGS_DIR"/jenkins-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JENKINS_INDEX --index-enrich $JENKINS_ENRICHED_INDEX jenkins $JENKINS_URL >> $LOGS_DIR"/jenkins-enrichment.log" 2>&1
 }
 
 function supybot_enrichment {
@@ -632,7 +675,7 @@ function supybot_enrichment {
     for url in $(cat $TMP_SUPYBOT_LIST);
     do
         SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $SUPYBOT_INDEX --index-enrich $SUPYBOT_ENRICHED_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH >> $LOGS_DIR"/irc-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $SUPYBOT_INDEX --index-enrich $SUPYBOT_ENRICHED_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH >> $LOGS_DIR"/irc-enrichment.log" 2>&1
     done
     rm $TMP_SUPYBOT_PROJECT_LIST
     rm $TMP_SUPYBOT_LIST
@@ -646,7 +689,7 @@ function gmane_enrichment {
     cd ~/GrimoireELK/utils/
     for url in $(cat $TMP_GMANE_LIST);
     do
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $GMANE_INDEX --index-enrich $GMANE_ENRICHED_INDEX gmane $url >> $LOGS_DIR"/mls-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $GMANE_INDEX --index-enrich $GMANE_ENRICHED_INDEX gmane $url >> $LOGS_DIR"/mls-enrichment.log" 2>&1
     done
     rm $TMP_GMANE_PROJECT_LIST
     rm $TMP_GMANE_LIST
@@ -660,7 +703,7 @@ function pipermail_enrichment {
     cd ~/GrimoireELK/utils/
     for url in $(cat $TMP_PIPERMAIL_LIST);
     do
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $PIPERMAIL_INDEX --index-enrich $PIPERMAIL_ENRICHED_INDEX pipermail $url >> $LOGS_DIR"/mls-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $PIPERMAIL_INDEX --index-enrich $PIPERMAIL_ENRICHED_INDEX pipermail $url >> $LOGS_DIR"/mls-enrichment.log" 2>&1
     done
     rm $TMP_PIPERMAIL_PROJECT_LIST
     rm $TMP_PIPERMAIL_LIST
@@ -668,7 +711,7 @@ function pipermail_enrichment {
 
 function twitter_enrichment {
     cd ~/GrimoireELK/utils/
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $TWITTER_INDEX --index-enrich $TWITTER_ENRICHED_INDEX twitter >> $LOGS_DIR"/twitter-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $TWITTER_INDEX --index-enrich $TWITTER_ENRICHED_INDEX twitter >> $LOGS_DIR"/twitter-enrichment.log" 2>&1
 }
 
 function stackexchange_enrichment {
@@ -679,18 +722,18 @@ function stackexchange_enrichment {
         echo "--------------" >> $LOGS_DIR"/stackoverflow-enrichment.log"
         echo "ENRICHMENT for $t" >> $LOGS_DIR"/stackoverflow-enrichment.log"
         ORG="$STACKEXCHANGE_URL/$t"
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $STACKEXCHANGE_INDEX --index-enrich $STACKEXCHANGE_ENRICHED_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $STACKEXCHANGE_INDEX --index-enrich $STACKEXCHANGE_ENRICHED_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-enrichment.log" 2>&1
     done
 }
 
 function confluence_enrichment {
     cd ~/GrimoireELK/utils/
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $CONFLUENCE_INDEX --index-enrich $CONFLUENCE_ENRICHED_INDEX confluence $CONFLUENCE_URL >> $LOGS_DIR"/confluence-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $CONFLUENCE_INDEX --index-enrich $CONFLUENCE_ENRICHED_INDEX confluence $CONFLUENCE_URL >> $LOGS_DIR"/confluence-enrichment.log" 2>&1
 }
 
 function jira_enrichment {
     cd ~/GrimoireELK/utils/
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --enrich_only $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $JIRA_URL >> $LOGS_DIR"/jira-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $JIRA_URL >> $LOGS_DIR"/jira-enrichment.log" 2>&1
 }
 
 function sortinghat_unify {
@@ -699,20 +742,36 @@ function sortinghat_unify {
         SH_UNIFY_METHOD="email-name"
     fi
     log "[sortinghat] Unify using $SH_UNIFY_METHOD algorithm"
-    sortinghat -u root -p '' --host $DB_HOST -d $DB_SH unify -m $SH_UNIFY_METHOD --fast-matching >> $LOGS_DIR"/sortinghat.log" 2>&1
+
+    if [ -z $DB_PASSWORD ]; then
+        sortinghat -u $DB_USER --host $DB_HOST -d $DB_SH unify -m $SH_UNIFY_METHOD --fast-matching >> $LOGS_DIR"/sortinghat.log" 2>&1
+    else
+        sortinghat -u $DB_USER -p $DB_PASSWORD --host $DB_HOST -d $DB_SH unify -m $SH_UNIFY_METHOD --fast-matching >> $LOGS_DIR"/sortinghat.log" 2>&1
+    fi
 }
 
 function sortinghat_affiliate {
-    sortinghat -u root -p '' --host $DB_HOST -d $DB_SH affiliate >> $LOGS_DIR"/sortinghat.log" 2>&1
+    if [ -z $DB_PASSWORD ]; then
+        sortinghat -u $DB_USER --host $DB_HOST -d $DB_SH affiliate >> $LOGS_DIR"/sortinghat.log" 2>&1
+    else
+        sortinghat -u $DB_USER -p $DB_PASSWORD --host $DB_HOST -d $DB_SH affiliate >> $LOGS_DIR"/sortinghat.log" 2>&1
+    fi
 }
 
 function group_unaffiliated_people {
     if [ ! -z $SH_UNAFFILIATED_GROUP ]
         then
         log "[sortinghat] Affiliating the unaffiliated people to group $SH_UNAFFILIATED_GROUP"
-        sortinghat --host $DB_HOST -d $DB_SH orgs -a $SH_UNAFFILIATED_GROUP >> $LOGS_DIR"/sortinghat.log" 2>&1
-        mysql -uroot -h$DB_HOST $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
+
+        if [ -z $DB_PASSWORD ]; then
+            sortinghat --host $DB_HOST -d $DB_SH -u $DB_USER -h $DB_HOST orgs -a $SH_UNAFFILIATED_GROUP >> $LOGS_DIR"/sortinghat.log" 2>&1
+            mysql -u$DB_USER -h$DB_HOST $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
+        else
+            sortinghat --host $DB_HOST -d $DB_SH -u $DB_USER -p $DB_PASSWORD -h $DB_HOST orgs -a $SH_UNAFFILIATED_GROUP >> $LOGS_DIR"/sortinghat.log" 2>&1
+            mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
+        fi
         log_result "[sortinghat] Affiliation for $SH_UNAFFILIATED_GROUP finished" "[sortinghat] ERROR: Something went wrong with the affiliation of $SH_UNAFFILIATED_GROUP"
+
     else
         log "[sortinghat] (WARNING!) No variable defined SH_UNAFFILIATED_GROUP"
     fi
@@ -810,6 +869,19 @@ while true; do
         ELAPSED_TIME=$(($SECONDS - $START_TIME))
         log "(T) Data enriched in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
     fi
+
+    if [ -z $SKIP_STUDIES ] || [ $SKIP_STUDIES -eq 0 ]
+        then
+
+        log "Studies starts"
+        START_TIME=$SECONDS
+
+        enrich_studies
+
+        ELAPSED_TIME=$(($SECONDS - $START_TIME))
+        log "(T) Studies updated in $(($ELAPSED_TIME / 60)) minutes and $(($ELAPSED_TIME % 60)) seconds."
+    fi
+
 
     duration=$SECONDS
     log "(T) Dashboard updated in $(($duration / 60)) minutes and $(($duration % 60)) seconds."
