@@ -94,13 +94,15 @@ class TwitterEnrich(Enrich):
         tweet = item
 
         # data fields to copy
-        copy_fields = ["id", "created_at", "lang", "place", "retweet_count",
+        copy_fields = ["id", "lang", "place", "retweet_count",
                        "text", "in_reply_to_user_id_str", "in_reply_to_screen_name"]
         for f in copy_fields:
             if f in tweet:
                 eitem[f] = tweet[f]
             else:
                 eitem[f] = None
+        # Date fields
+        eitem["created_at"]  = parser.parse(tweet["created_at"]).isoformat()
         # Fields which names are translated
         map_fields = {"@timestamp": "timestamp",
                       "@version": "version"
@@ -139,7 +141,7 @@ class TwitterEnrich(Enrich):
         if self.sortinghat:
             eitem.update(self.get_item_sh(tweet, "user"))
 
-        eitem.update(self.get_grimoire_fields(item["@timestamp"], "twitter"))
+        eitem.update(self.get_grimoire_fields(tweet["created_at"], "twitter"))
 
         return eitem
 
