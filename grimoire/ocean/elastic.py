@@ -225,6 +225,10 @@ class ElasticOcean(object):
                 ''' % (date_field, from_date)
 
             order_field = 'metadata__updated_on'
+            order_query = ''
+            if self.perceval_backend:
+                # logstash backends does not have the order_field
+                order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
 
             query = """
             {
@@ -232,10 +236,9 @@ class ElasticOcean(object):
                     "bool": {
                         "must": [%s]
                     }
-                },
-                "sort": { "%s": { "order": "asc" }}
+                } %s
             }
-            """ % (filters, order_field)
+            """ % (filters, order_query)
 
             # logging.debug("%s %s", url, query)
 
