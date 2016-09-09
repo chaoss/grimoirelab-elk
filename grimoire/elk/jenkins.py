@@ -141,13 +141,16 @@ class JenkinsEnrich(Enrich):
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"fullDisplayName": "fullDisplayName_analyzed"
+        map_fields = {"fullDisplayName": "fullDisplayName_analyzed",
+                      "number": "build"
                       }
         for fn in map_fields:
             eitem[map_fields[fn]] = build[fn]
 
         # Job url: remove the last /build_id from job_url/build_id/
-        eitem['job_url'] = eitem['url'].rsplit("/",2)[0]
+        eitem['job_url'] = eitem['url'].rsplit("/", 2)[0]
+        eitem['job_name'] = eitem['url'].rsplit('/', 3)[1]
+        eitem['job_build'] = eitem['job_name']+'/'+str(eitem['build'])
 
         # Enrich dates
         eitem["build_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
@@ -159,7 +162,7 @@ class JenkinsEnrich(Enrich):
             eitem["duration_days"] = float('%.2f' % duration_days)
 
         # Add extra fields extracted from job name
-        eitem.update(self.get_fields_from_job_name(build['fullDisplayName']))
+        eitem.update(self.get_fields_from_job_name(eitem['job_name']))
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "job"))
 
