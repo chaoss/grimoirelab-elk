@@ -107,6 +107,9 @@ class DiscourseEnrich(Enrich):
         # First post has the topic contents
         eitem['description'] = topic['post_stream']['posts'][0]['cooked']
 
+        # Topic URL
+        eitem['topic_url'] = item["origin"] + '/t/' + str(topic['id'])
+
         # First reply time
         eitem['first_reply_time'] = None
         firt_post_time = None

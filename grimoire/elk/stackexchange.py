@@ -56,7 +56,11 @@ class StackExchangeEnrich(Enrich):
                   "type": "string",
                   "index":"analyzed"
                 },
-                "tags_analyzed": {
+                "question_tags_analyzed": {
+                    "type": "string",
+                    "index":"analyzed"
+                },
+                "answer_tags_analyzed": {
                     "type": "string",
                     "index":"analyzed"
                 }
@@ -105,7 +109,7 @@ class StackExchangeEnrich(Enrich):
 
         return eitem
 
-    def get_rich_item(self, item, kind='question'):
+    def get_rich_item(self, item, kind='question', question_tags = None):
         eitem = {}
 
         # Fields common in questions and answers
@@ -141,8 +145,8 @@ class StackExchangeEnrich(Enrich):
                 else:
                     eitem[f] = None
 
-            eitem["tags"] = ",".join(question['tags'])
-            eitem["tags_analyzed"] = ",".join(question['tags'])
+            eitem["question_tags"] = ",".join(question['tags'])
+            eitem["question_tags_analyzed"] = ",".join(question['tags'])
 
             # Fields which names are translated
             map_fields = {"title": "question_title"
@@ -176,9 +180,10 @@ class StackExchangeEnrich(Enrich):
                 else:
                     eitem[f] = None
 
-            eitem["tags"] = ",".join(answer['tags'])
-
-            eitem["tags_analyzed"] = ",".join(answer['tags'])
+            eitem["question_tags"] = question_tags
+            eitem["question_tags_analyzed"] = question_tags
+            eitem["answer_tags"] = ",".join(answer['tags'])
+            eitem["answer_tags_analyzed"] = ",".join(answer['tags'])
 
             # Fields which names are translated
             map_fields = {"title": "question_title"
@@ -202,7 +207,7 @@ class StackExchangeEnrich(Enrich):
 
         url = self.elastic.index_url+'/items/_bulk'
 
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+        logging.debug("Adding items to %s (in %i packs)", url, max_items)
 
         for item in items:
             if current >= max_items:
@@ -219,7 +224,7 @@ class StackExchangeEnrich(Enrich):
             # Time to enrich also de answers
             if 'answers' in item['data']:
                 for answer in item['data']['answers']:
-                    rich_answer = self.get_rich_item(answer, kind='answer')
+                    rich_answer = self.get_rich_item(answer, kind='answer', question_tags=rich_item['question_tags'])
                     data_json = json.dumps(rich_answer)
                     bulk_json += '{"index" : {"_id" : "%i_%i" } }\n' % \
                         (rich_answer[self.get_field_unique_id()],

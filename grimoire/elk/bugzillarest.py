@@ -90,7 +90,6 @@ class BugzillaRESTEnrich(Enrich):
         # https://bugs.eclipse.org/bugs/buglist.cgi?product=Mylyn%20Tasks
         product = item['data']['product']
         repo = url+"/buglist.cgi?product="+product
-        project = (self.prjs_map[ds_name][repo])
 
         try:
             project = (self.prjs_map[ds_name][repo])

@@ -196,7 +196,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    ocean_index_enrich = None,
                    db_projects_map=None, db_sortinghat=None,
                    no_incremental=False, only_identities=False,
-                   github_token=None, studies=False):
+                   github_token=None, studies=False, only_studies=False,
+                   url_enrich=None):
     """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend):
@@ -251,6 +252,16 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         enrich_count_merged = enrich_items(renrich_items, enrich_backend)
         return enrich_count_merged
 
+    def do_studies(enrich_backend, last_enrich):
+        try:
+            for study in enrich_backend.studies:
+                logging.info("Starting study: %s", study)
+                study(from_date=last_enrich)
+        except Exception as e:
+            logging.warning("Problem executing studies for %s", backend_name)
+            print(e)
+
+
 
     backend = None
     enrich_index = None
@@ -279,7 +290,10 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             enrich_index = ocean_index+"_enrich"
 
         enrich_backend = connector[2](backend, db_sortinghat, db_projects_map)
-        elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
+        if url_enrich:
+            elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend)
+        else:
+            elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
         enrich_backend.set_elastic(elastic_enrich)
         if github_token and backend_name == "git":
             enrich_backend.set_github_token(github_token)
@@ -306,30 +320,27 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
         logging.info("Adding enrichment data to %s", enrich_backend.elastic.index_url)
 
-        if db_sortinghat:
-            enrich_count_merged = 0
-
-            enrich_count_merged = enrich_sortinghat(ocean_backend, enrich_backend)
-            logging.info("Total items enriched for merged identities %i ", enrich_count_merged)
-
-        if not only_identities:
-            # If only_identities, only identities are added to SH, but the enrich is needed
-            # Enrichment for the new items once SH update is finished
-            enrich_count = enrich_items(ocean_backend, enrich_backend)
-            logging.info("Total items enriched %i ", enrich_count)
-
-            if studies:
-                try:
-                    for study in enrich_backend.studies:
-                        logging.info("Starting study: %s", study)
-                        study(from_date=last_enrich)
-                except Exception as e:
-                    logging.warning("Problem executing studies for %s", backend_name)
-                    print(e)
+        if only_studies:
+            logging.info("Running only studies (no SH and no enrichment)")
+            do_studies(enrich_backend, last_enrich)
 
         else:
-            logging.info("Only SH identities added. Enrich not done!")
+            if db_sortinghat:
+                enrich_count_merged = 0
 
+                enrich_count_merged = enrich_sortinghat(ocean_backend, enrich_backend)
+                logging.info("Total items enriched for merged identities %i ", enrich_count_merged)
+
+            if only_identities:
+                logging.info("Only SH identities added. Enrich not done!")
+
+            else:
+                # Enrichment for the new items once SH update is finished
+                enrich_count = enrich_items(ocean_backend, enrich_backend)
+                logging.info("Total items enriched %i ", enrich_count)
+
+                if studies:
+                    do_studies(enrich_backend, last_enrich)
 
     except Exception as ex:
         traceback.print_exc()

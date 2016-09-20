@@ -127,7 +127,7 @@ Repositories avaliable
 
     if args.repo:
         if args.repo[0] not in REPOSITORIES_AVALIABLE:
-            sys.exit(str(args.repo[0]) + ' is not exist')
+            sys.exit(str(args.repo[0]) + ' does not exist')
 
     return args
 
@@ -195,7 +195,7 @@ def add(conf, raw):
                 raw['projects'][conf['project']][conf['repo']] = []
                 raw['projects'][conf['project']][conf['repo']].append(new_repo)
             except KeyError:
-                print("No exist the project",conf['project'],"do first --add",conf['project'])
+                sys.exit("Project "+conf['project']+" does not exist, do first --add "+conf['project'])
 
     elif 'parent' in conf:
         #$ ./projectinfo.py <JSON_file> add <project_name> --parent <project>
@@ -207,9 +207,9 @@ def add(conf, raw):
 
                 write_file(conf['file'], raw)
             else:
-                print(conf['project'],"is already a subprocess of",conf['parent'])
+                sys.exit(conf['project']+" is already a subproject of "+conf['parent'])
         except KeyError:
-            print(conf['project'],"or",conf['parent'],"is not exist")
+            sys.exit(conf['project']+" or "+conf['parent']+" does not exist")
 
     else:
         #$ ./projectinfo.py <JSON_file> add <project_name>
@@ -217,7 +217,7 @@ def add(conf, raw):
         if conf['project'] not in raw['projects']:
             raw['projects'][conf['project']] = new_project
         else:
-            print('The project', conf['project'], 'already exist')
+            sys.exit('The project "'+conf['project']+'" already exist')
 
     write_file(conf['file'], raw)
 
@@ -234,9 +234,8 @@ def remove(conf, raw):
 
         try:
             raw['projects'][conf['project']][conf['repo']].remove(remove_repo)
-
         except ValueError:
-            print("No exist the URL", conf['url'],"in", conf['repo'], "OR the repository", conf['repo'], "is not exist")
+            sys.exit("URL "+conf['url']+" does not exist in "+conf['repo']+" OR the repository "+conf['repo']+" does not exist")
 
     elif 'parent' in conf:
         #$ ./projectinfo.py <JSON_file> rm <project_name> --parent <project>
@@ -248,9 +247,9 @@ def remove(conf, raw):
 
                 write_file(conf['file'], raw)
             else:
-                print(conf['project'],"is not a subprocess of",conf['parent'])
+                sys.exit(conf['project']+" is not a subproject of "+conf['parent'])
         except KeyError:
-            print(conf['project'],"or",conf['parent'],"is not exist")
+            sys.exit(conf['project']+" or "+conf['parent']+" does not exist")
 
     else:
         #$ ./projectinfo.py <JSON_file> rm <project_name>
@@ -258,7 +257,7 @@ def remove(conf, raw):
         try:
             del raw['projects'][conf['project']]
         except KeyError:
-            print("No exist the project",conf['project'])
+            sys.exit("Project "+conf['project'])
 
     write_file(conf['file'], raw)
 
@@ -276,7 +275,7 @@ def lists(conf, raw):
                 else:
                     print(project['url'])
         except KeyError:
-            print("The repository", repo, "is not exist in", conf['project'])
+            sys.exit("The repository "+repo+" does not exist in "+conf['project'])
 
     elif 'project' in conf:
         #$ ./projectinfo.py <JSON_file> list <project_name>
@@ -290,15 +289,15 @@ def lists(conf, raw):
                     if len(raw['projects'][conf['project']][repo]) > 0:
                         print(repo)
         except KeyError:
-            print("No exist the project",conf['project'])
+            sys.exit("Project "+conf['project']+" does not exist")
 
     else:
         for proj in raw['projects']:
             print(proj)
 
 def run(conf):
-
     f = read_file(conf['file'])
+
     if conf['option'] == "add":
         add(conf, f)
     elif conf['option'] == "rm":
@@ -332,4 +331,5 @@ if __name__ == '__main__':
             sys.exit("Must have two or three arguments if repo_name is 'supybot': --repo <repo_name> <url> <path>")
         elif len(args.repo) > 1 and args.command == "list":
             sys.exit("Must have one arguments if you use list: list <project_name> --repo <repo_name>")
+
     run(conf)

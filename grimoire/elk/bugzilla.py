@@ -194,7 +194,8 @@ class BugzillaEnrich(Enrich):
             eitem['resolution'] = item['data']['resolution'][0]['__text__']
         if 'watchers' in item['data']:
             eitem['watchers'] = item['data']['watchers'][0]['__text__']
-        eitem['votes'] = item['data']['votes'][0]['__text__']
+        if 'votes' in item['data']:
+            eitem['votes'] = item['data']['votes'][0]['__text__']
 
         if "assigned_to" in issue:
             if "name" in issue["assigned_to"][0]:

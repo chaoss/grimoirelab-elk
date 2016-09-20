@@ -201,7 +201,9 @@ def get_params_parser():
     parser.add_argument("--enrich",  action='store_true',
                         help="Enrich items after retrieving")
     parser.add_argument("--enrich_only",  action='store_true',
-                        help="Only enrich items")
+                        help="Only enrich items (DEPRECATED, use --only-enrich)")
+    parser.add_argument("--only-enrich",  dest='enrich_only', action='store_true',
+                        help="Only enrich items (DEPRECATED, use --only-enrich)")
     parser.add_argument('--index', help="Ocean index name")
     parser.add_argument('--index-enrich', dest="index_enrich", help="Ocean enriched index name")
     parser.add_argument('--db-projects-map', help="Projects Mapping DB")
@@ -210,6 +212,7 @@ def get_params_parser():
     parser.add_argument('--only-identities', action='store_true', help="Only add identities to SortingHat DB")
     parser.add_argument('--github-token', help="If provided, github usernames will be retrieved in git enrich.")
     parser.add_argument('--studies', action='store_true', help="Execute studies after enrichment.")
+    parser.add_argument('--only-studies', action='store_true', help="Execute only studies.")
     parser.add_argument('backend', help=argparse.SUPPRESS)
     parser.add_argument('backend_args', nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)

@@ -190,7 +190,7 @@ class Enrich(object):
             item_date = (item_date-item_date.utcoffset()).replace(tzinfo=None)
 
         enrollments = self.get_enrollments(uuid)
-        enroll = None
+        enroll = 'Unknown'
         if len(enrollments) > 0:
             for enrollment in enrollments:
                 if not item_date:

@@ -26,10 +26,13 @@
 """Ocean feeder for Elastic from  Perseval data"""
 
 
-from datetime import datetime
+import inspect
 import json
 import logging
 import requests
+
+from datetime import datetime
+
 
 class ElasticOcean(object):
 
@@ -42,7 +45,8 @@ class ElasticOcean(object):
         parser.add_argument("-e", "--elastic_url",  default="http://127.0.0.1:9200",
                             help="Host with elastic search" +
                             "(default: http://127.0.0.1:9200)")
-
+        parser.add_argument("--elastic_url-enrich",
+                            help="Host with elastic search and enriched indexes")
 
     def __init__(self, perceval_backend, from_date=None, fetch_cache=False,
                  project=None, insecure=True):
@@ -118,10 +122,11 @@ class ElasticOcean(object):
         logging.info("Incremental from: %s", last_update)
 
         # Check if backend supports from_date
-        try:
-            self.perceval_backend.from_date
-        except AttributeError:
+        signature = inspect.signature(self.perceval_backend.fetch)
+
+        if 'from_date' not in signature.parameters:
             last_update = None
+            logging.debug("Fetch method does not use 'from_date' parameter")
 
         task_init = datetime.now()
 
@@ -219,17 +224,23 @@ class ElasticOcean(object):
                     }
                 ''' % (date_field, from_date)
 
+            order_field = 'metadata__updated_on'
+            order_query = ''
+            if self.perceval_backend:
+                # logstash backends does not have the order_field
+                order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
+
             query = """
             {
                 "query": {
                     "bool": {
                         "must": [%s]
                     }
-                }
+                } %s
             }
-            """ % (filters)
+            """ % (filters, order_query)
 
-            # logging.debug("%s %s" % (url, query))
+            # logging.debug("%s %s", url, query)
 
             r = self.requests.post(url, data=query)
 
