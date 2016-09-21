@@ -25,9 +25,13 @@
 import json
 import logging
 
+from datetime import datetime
+
 from dateutil import parser
 
 from grimoire.elk.enrich import Enrich
+
+from .utils import get_time_diff_days
 
 class PhabricatorEnrich(Enrich):
 
@@ -51,7 +55,15 @@ class PhabricatorEnrich(Enrich):
         mapping = """
         {
             "properties": {
-                "description_analyzed": {
+                "main_description": {
+                  "type": "string",
+                  "index":"analyzed"
+                  },
+                "author_roles_analyzed": {
+                  "type": "string",
+                  "index":"analyzed"
+                  },
+                "assigned_to_roles_analyzed": {
                   "type": "string",
                   "index":"analyzed"
                   }
@@ -61,11 +73,48 @@ class PhabricatorEnrich(Enrich):
         return {"items":mapping}
 
     def get_identities(self, item):
-        ''' Return the identities from an item '''
-
+        """ Return the identities from an item """
         identities = []
 
+        if 'authorData' in item['data']['fields']:
+            user = self.get_sh_identity(item['data']['fields']['authorData'])
+            identities.append(user)
+
+        if 'ownerData' in item['data']['fields']:
+            user = self.get_sh_identity(item['data']['fields']['ownerData'])
+            identities.append(user)
+
         return identities
+
+    def get_sh_identity(self, user):
+        identity = {}
+        identity['email'] = None
+        identity['username'] = user['userName']
+        identity['name'] = user['realName']
+
+        return identity
+
+    def get_item_sh(self, item):
+        """ Add sorting hat enrichment fields for the author of the item """
+
+        eitem = {}  # Item enriched
+
+        if 'authorData' in item['data']['fields']:
+            identity  = self.get_sh_identity(item['data']['fields']['authorData'])
+            eitem.update(self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()])))
+        if 'ownerData' in item['data']['fields']:
+            identity  = self.get_sh_identity(item['data']['fields']['ownerData'])
+            assigned_to = {}
+            assigned_to["assigned_to_name"] = identity['name']
+            assigned_to["assigned_to_user_name"] = identity['username']
+            assigned_to["assigned_to_uuid"] = self.get_uuid(identity, self.get_connector_name())
+            assigned_to["assigned_to_org_name"] = self.get_enrollment(assigned_to["assigned_to_uuid"], parser.parse(item[self.get_field_date()]))
+            assigned_to["assigned_to_bot"] = self.is_bot(assigned_to['assigned_to_uuid'])
+            assigned_to["assigned_to_domain"] = self.get_identity_domain(identity)
+            eitem.update(assigned_to)
+
+        return eitem
+
 
     def get_rich_item(self, item):
         eitem = {}
@@ -81,7 +130,7 @@ class PhabricatorEnrich(Enrich):
         phab_item = item['data']
 
         # data fields to copy
-        copy_fields = ["phid","id","type"]
+        copy_fields = ["phid", "id", "type"]
         for f in copy_fields:
             if f in phab_item:
                 eitem[f] = phab_item[f]
@@ -89,6 +138,7 @@ class PhabricatorEnrich(Enrich):
                 eitem[f] = None
         # Fields which names are translated
         map_fields = {
+            "id": "bug_id"
         }
         for f in map_fields:
             if f in phab_item:
@@ -98,8 +148,37 @@ class PhabricatorEnrich(Enrich):
 
         eitem['num_changes'] = len(phab_item['transactions'])
 
-        # if self.sortinghat:
-        #    eitem.update(self.get_item_sh(item,"owner_name"))
+        if 'authorData' in phab_item['fields']:
+            eitem['author_roles'] = ",".join(phab_item['fields']['authorData']['roles'])
+            eitem['author_roles_analyzed'] = eitem['author_roles']
+        if 'ownerData' in phab_item['fields']:
+            eitem['assigned_to_roles'] = ",".join(phab_item['fields']['ownerData']['roles'])
+            eitem['assgined_to_roles_analyzed'] = eitem['assigned_to_roles']
+
+        eitem['priority'] = phab_item['fields']['priority'] ['name']
+        eitem['priority_value'] = phab_item['fields']['priority']['value']
+        eitem['status'] = phab_item['fields']['status']['name']
+        eitem['creation_date'] = datetime.fromtimestamp(phab_item['fields']['dateCreated']).isoformat()
+        eitem['modification_date'] = datetime.fromtimestamp(phab_item['fields']['dateModified']).isoformat()
+        eitem['update_date'] = datetime.fromtimestamp(item['updated_on']).isoformat()
+        eitem['main_description'] = phab_item['fields']['name']
+
+        eitem['timeopen_days'] = \
+            get_time_diff_days(eitem['creation_date'], eitem['update_date'])
+        if eitem['status'] == 'Open':
+            eitem['timeopen_days'] = \
+                get_time_diff_days(eitem['creation_date'], datetime.utcnow())
+
+        eitem['changes'] = len(phab_item['transactions'])
+        eitem['comments'] = 0
+        for tr in phab_item['transactions']:
+            if tr ['comments']:
+                eitem['comments'] += 1
+
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(item))
+
+        eitem.update(self.get_grimoire_fields(eitem['creation_date'], "task"))
 
         return eitem
 

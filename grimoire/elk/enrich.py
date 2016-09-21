@@ -206,6 +206,7 @@ class Enrich(object):
         eitem = {}  # Item enriched
 
         eitem["author_name"] = identity['name']
+        eitem["author_user_name"] = identity['username']
         eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
         eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], item_date)
         eitem["author_bot"] = self.is_bot(eitem['author_uuid'])
