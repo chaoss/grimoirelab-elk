@@ -281,6 +281,8 @@ function compose_repo_list {
     do
       $PROJECT_INFO $input_file list $project --repo $3 >> $2
     done
+
+    unset IFS
 }
 
 function get_repo_list {
@@ -759,15 +761,15 @@ function sortinghat_affiliate {
 }
 
 function group_unaffiliated_people {
-    if [ ! -z $SH_UNAFFILIATED_GROUP ]
+    if [ ! -z "$SH_UNAFFILIATED_GROUP" ]
         then
         log "[sortinghat] Affiliating the unaffiliated people to group $SH_UNAFFILIATED_GROUP"
 
         if [ -z $DB_PASSWORD ]; then
-            sortinghat --host $DB_HOST -d $DB_SH -u $DB_USER -h $DB_HOST orgs -a $SH_UNAFFILIATED_GROUP >> $LOGS_DIR"/sortinghat.log" 2>&1
+            sortinghat --host $DB_HOST -d $DB_SH -u $DB_USER orgs -a $SH_UNAFFILIATED_GROUP >> $LOGS_DIR"/sortinghat.log" 2>&1
             mysql -u$DB_USER -h$DB_HOST $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
         else
-            sortinghat --host $DB_HOST -d $DB_SH -u $DB_USER -p $DB_PASSWORD -h $DB_HOST orgs -a $SH_UNAFFILIATED_GROUP >> $LOGS_DIR"/sortinghat.log" 2>&1
+            sortinghat --host $DB_HOST -d $DB_SH -u $DB_USER -p $DB_PASSWORD orgs -a $SH_UNAFFILIATED_GROUP >> $LOGS_DIR"/sortinghat.log" 2>&1
             mysql -u$DB_USER -h$DB_HOST -p$DB_PASSWORD $DB_SH -e "INSERT INTO enrollments (start, end, uuid, organization_id) SELECT '1900-01-01 00:00:00','2100-01-01 00:00:00', A.uuid,B.id FROM (select DISTINCT uuid from uidentities where uuid NOT IN (SELECT DISTINCT uuid from enrollments)) A, (SELECT id FROM organizations WHERE name = '$SH_UNAFFILIATED_GROUP') B;"
         fi
         log_result "[sortinghat] Affiliation for $SH_UNAFFILIATED_GROUP finished" "[sortinghat] ERROR: Something went wrong with the affiliation of $SH_UNAFFILIATED_GROUP"
