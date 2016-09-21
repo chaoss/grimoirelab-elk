@@ -761,7 +761,7 @@ function sortinghat_affiliate {
 }
 
 function group_unaffiliated_people {
-    if [ ! -z $SH_UNAFFILIATED_GROUP ]
+    if [ ! -z "$SH_UNAFFILIATED_GROUP" ]
         then
         log "[sortinghat] Affiliating the unaffiliated people to group $SH_UNAFFILIATED_GROUP"
 
