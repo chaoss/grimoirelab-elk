@@ -118,6 +118,14 @@ class MediaWikiEnrich(Enrich):
         # Revisions
         for rev in item["data"]["revisions"]:
             erevision = {}
+            # Metadata needed for enrichment
+            copy_fields_item = ["origin","metadata__updated_on","metadata__timestamp"]
+            for f in copy_fields_item:
+                if f in eitem:
+                    erevision[f] = eitem[f]
+                else:
+                    erevision[f] = None
+            # Metadata related to the page according to the enrichment specification
             copy_fields_item = ["origin","metadata__updated_on","metadata__timestamp","pageid","title"]
             for f in copy_fields_item:
                 if f in eitem:
