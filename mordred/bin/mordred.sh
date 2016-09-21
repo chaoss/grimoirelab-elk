@@ -281,6 +281,8 @@ function compose_repo_list {
     do
       $PROJECT_INFO $input_file list $project --repo $3 >> $2
     done
+
+    unset IFS
 }
 
 function get_repo_list {
