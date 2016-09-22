@@ -222,11 +222,15 @@ class GitEnrich(Enrich):
         # Other enrichment
         eitem["repo_name"] = item["origin"]
         # Number of files touched
-        eitem["files"] = len(commit["files"])
+        eitem["files"] = 0
         # Number of lines added and removed
         lines_added = 0
         lines_removed = 0
         for cfile in commit["files"]:
+            if 'action' not in cfile:
+                # merges are not counted
+                continue
+            eitem["files"] += 1
             if 'added' in cfile and 'removed' in cfile:
                 try:
                     lines_added += int(cfile["added"])
