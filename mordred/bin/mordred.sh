@@ -434,7 +434,7 @@ function github_retrieval {
 
 function gerrit_retrieval {
     cd ~/GrimoireELK/utils
-    ./p2o.py -e $ES_URI -g --index $GERRIT_INDEX gerrit --user $GERRIT_USER --url $GERRIT_URL $GERRIT_EXTRA_PARAM $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/gerrit-collection.log" 2>&1
+    ./p2o.py -e $ES_URI -g --index $GERRIT_INDEX gerrit --user $GERRIT_USER $GERRIT_EXTRA_PARAM $FROM_DATE_STRING $FROM_DATE $GERRIT_URL >> $LOGS_DIR"/gerrit-collection.log" 2>&1
 }
 
 function bugzilla_retrieval {
@@ -653,7 +653,7 @@ function github_enrichment {
 function gerrit_enrichment {
     ENR_EXTRA_FLAG=$1
     cd ~/GrimoireELK/utils
-    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $GERRIT_INDEX --index-enrich $GERRIT_ENRICHED_INDEX gerrit --user $GERRIT_USER --url $GERRIT_URL >> $LOGS_DIR"/gerrit-enrichment.log" 2>&1
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $GERRIT_INDEX --index-enrich $GERRIT_ENRICHED_INDEX gerrit --user $GERRIT_USER $GERRIT_URL >> $LOGS_DIR"/gerrit-enrichment.log" 2>&1
 }
 
 function bugzilla_enrichment {
