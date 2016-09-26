@@ -29,21 +29,28 @@ import MySQLdb
 
 import requests
 
-import requests
-
 from dateutil import parser
 
-from sortinghat.db.database import Database
-from sortinghat import api
-from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
-
 logger = logging.getLogger(__name__)
+
+try:
+    from sortinghat.db.database import Database
+    from sortinghat import api
+    from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
+    SORTINGHAT_LIBS = True
+except ImportError:
+    logger.info("SortingHat not available")
+    SORTINGHAT_LIBS = False
+
 
 class Enrich(object):
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, insecure=True):
 
         self.sortinghat = False
+        if db_sortinghat and not SORTINGHAT_LIBS:
+            logger.error("Sorting hat configured but libraries not available.")
+            raise
         if db_sortinghat:
             self.sh_db = Database("root", "", db_sortinghat, "mariadb")
             self.sortinghat = True

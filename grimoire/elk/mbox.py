@@ -30,8 +30,6 @@ import email.utils
 
 from grimoire.elk.enrich import Enrich
 
-from sortinghat import api
-
 class MBoxEnrich(Enrich):
 
     def __init__(self, mbox, db_sortinghat=None, db_projects_map = None):
