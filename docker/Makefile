@@ -8,8 +8,13 @@ help:
 	$(info - all:			Build all available images)
 	$(info - gelk:			Build gelk image)
 	$(info - gelk-arthur:	Build gelk-arthur image)
+	$(info - gelk-lite:	    Minimal gelk version)
 	$(info )
 	@echo ""
+
+.PHONY: gelk-lite
+gelk-lite: $@
+	docker build -t bitergia/$@ $@/
 
 .PHONY: gelk
 gelk: $@
@@ -22,8 +27,11 @@ gelk-arthur: $@
 .PHONY: all
 all: gelk gelk-arthur
 
-.PHONY: clean clean_gelk clean_gelk-arthur
-clean: clean_gelk clean_gelk-arthur
+.PHONY: clean clean_gelk clean_gelk-arthur clean_gelk-lite
+clean: clean_gelk clean_gelk-arthur clean_gelk-lite
+
+clean_gelk-lite:
+	-@docker rmi bitergia/gelk-lite
 
 clean_gelk:
 	-@docker rmi bitergia/gelk

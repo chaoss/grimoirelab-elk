@@ -23,15 +23,22 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from functools import lru_cache
+
 import logging
-import MySQLdb
 
 import requests
 
 from dateutil import parser
+from functools import lru_cache
 
 logger = logging.getLogger(__name__)
+
+try:
+    import MySQLdb
+    MYSQL_LIBS = True
+except ImportError:
+    logger.info("MySQL not available")
+    MYSQL_LIBS = False
 
 try:
     from sortinghat.db.database import Database
@@ -49,12 +56,14 @@ class Enrich(object):
 
         self.sortinghat = False
         if db_sortinghat and not SORTINGHAT_LIBS:
-            logger.error("Sorting hat configured but libraries not available.")
-            raise
+            raise RuntimeError("Sorting hat configured but libraries not available.")
         if db_sortinghat:
             self.sh_db = Database("root", "", db_sortinghat, "mariadb")
             self.sortinghat = True
+
         self.prjs_map = None
+        if db_projects_map and not MYSQL_LIBS:
+            raise RuntimeError("Projects configured but MySQL libraries not available.")
         if  db_projects_map:
             self.prjs_map = self._get_projects_map(db_projects_map)
 
@@ -86,7 +95,7 @@ class Enrich(object):
                     prjs_map[ds] = {}
                 prjs_map[ds][repo] = name
         else:
-            raise RuntimeException("Can't find projects mapping in %s" % (db_projects_map))
+            raise RuntimeError("Can't find projects mapping in %s" % (db_projects_map))
         return prjs_map
 
     def set_elastic(self, elastic):
