@@ -36,7 +36,7 @@ if not '..' in sys.path:
 from grimoire.utils import get_connectors, get_elastic
 
 CONFIG_FILE = 'tests.conf'
-NUMBER_BACKENDS = 19
+NUMBER_BACKENDS = 20
 DB_SORTINGHAT = "test_sh"
 DB_PROJECTS = "test_projects"
 
