@@ -29,7 +29,6 @@ import logging
 import requests
 import traceback
 
-from grimoire.elk.sortinghat import SortingHat
 from grimoire.ocean.conf import ConfOcean
 from grimoire.utils import get_elastic
 from grimoire.utils import get_connector_from_name
@@ -198,6 +197,11 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    github_token=None, studies=False, only_studies=False,
                    url_enrich=None):
     """ Enrich Ocean index """
+
+    try:
+        from grimoire.elk.sortinghat import SortingHat
+    except ImportError:
+        logging.warning("SortingHat not available.")
 
     def enrich_items(items, enrich_backend):
         total = 0
