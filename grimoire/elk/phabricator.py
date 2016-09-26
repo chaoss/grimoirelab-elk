@@ -58,15 +58,19 @@ class PhabricatorEnrich(Enrich):
                 "main_description": {
                   "type": "string",
                   "index":"analyzed"
-                  },
+                },
                 "author_roles_analyzed": {
                   "type": "string",
                   "index":"analyzed"
-                  },
+                },
                 "assigned_to_roles_analyzed": {
                   "type": "string",
                   "index":"analyzed"
-                  }
+                 },
+                "author_roles_analyzed": {
+                   "type": "string",
+                   "index":"analyzed"
+                 }
            }
         } """
 
@@ -174,6 +178,14 @@ class PhabricatorEnrich(Enrich):
         for tr in phab_item['transactions']:
             if tr ['comments']:
                 eitem['comments'] += 1
+
+        eitem['tags'] = None
+        for project in phab_item['projects']:
+            if not eitem['tags']:
+                eitem['tags'] = project['name']
+            else:
+                eitem['tags'] += ',' + project['name']
+        eitem['tags_analyzed'] = eitem['tags']
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
