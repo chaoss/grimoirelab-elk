@@ -164,12 +164,14 @@ class ElasticSearch(object):
     def create_mappings(self, mappings):
 
         for _type in mappings:
-            # First create the manual mappings
-            url_map = self.index_url + "/"+_type+"/_mapping"
-            r = self.requests.put(url_map, data=mappings[_type])
 
-            if r.status_code != 200:
-                logging.error("Error creating ES mappings %s" % (r.text))
+            url_map = self.index_url + "/"+_type+"/_mapping"
+
+            # First create the manual mappings
+            if mappings[_type] != '{}':
+                r = self.requests.put(url_map, data=mappings[_type])
+                if r.status_code != 200:
+                    logging.error("Error creating ES mappings %s", r.text)
 
             # By default all strings are not analyzed
             not_analyze_strings = """
@@ -200,9 +202,6 @@ class ElasticSearch(object):
                 }
             } """
             r = self.requests.put(url_map, data=disable_dynamic)
-
-
-
 
     def get_last_date(self, field, _filter = None):
         '''
