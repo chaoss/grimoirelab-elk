@@ -43,6 +43,7 @@ from grimoire.ocean.jira import JiraOcean
 from grimoire.ocean.kitsune import KitsuneOcean
 from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
+from grimoire.ocean.mozillaclub import MozillaClubOcean
 from grimoire.ocean.phabricator import PhabricatorOcean
 from grimoire.ocean.remo import ReMoOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
@@ -64,6 +65,7 @@ from grimoire.elk.jira import JiraEnrich
 from grimoire.elk.kitsune import KitsuneEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
+from grimoire.elk.mozillaclub import MozillaClubEnrich
 from grimoire.elk.phabricator import PhabricatorEnrich
 from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
@@ -85,6 +87,7 @@ from perceval.backends.jira import Jira, JiraCommand
 from perceval.backends.kitsune import Kitsune, KitsuneCommand
 from perceval.backends.mbox import MBox, MBoxCommand
 from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
+from perceval.backends.mozillaclub import MozillaClub, MozillaClubCommand
 from perceval.backends.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.pipermail import Pipermail, PipermailCommand
 from perceval.backends.remo import ReMo, ReMoCommand
@@ -131,6 +134,7 @@ def get_connectors():
             "kitsune":[Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
             "mbox":[MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
             "mediawiki":[MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
+            "mozillaclub":[MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
             "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
