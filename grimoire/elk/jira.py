@@ -140,34 +140,44 @@ class JiraEnrich(Enrich):
         if issue["fields"]["assignee"]:
             eitem['assignee'] =  issue["fields"]["assignee"]["displayName"]
             eitem['assignee_email'] = None
-            if "emailAddress" in issue["fields"]["creator"]:
+            if "creator" in issue["fields"] and issue["fields"]["creator"] \
+                and "emailAddress" in issue["fields"]["creator"]:
                 eitem['assignee_email'] = issue["fields"]["assignee"]["emailAddress"]
             eitem['assignee_tz'] = issue["fields"]["assignee"]["timeZone"]
-        eitem['author_name'] =  issue["fields"]["creator"]["displayName"]
+
+        if issue["fields"]["creator"] and "creator" in issue["fields"]:
+            eitem['author_name'] =  issue["fields"]["creator"]["displayName"]
+            if "emailAddress" in issue["fields"]["creator"]:
+                eitem['author_email'] = issue["fields"]["creator"]["emailAddress"]
+            eitem['author_login'] = issue["fields"]["creator"]["name"]
+            eitem['author_tz'] = issue["fields"]["creator"]["timeZone"]
+
         eitem['author_email'] = None
-        if "emailAddress" in issue["fields"]["creator"]:
-            eitem['author_email'] = issue["fields"]["creator"]["emailAddress"]
-        eitem['author_login'] = issue["fields"]["creator"]["name"]
-        eitem['author_tz'] = issue["fields"]["creator"]["timeZone"]
         eitem['creation_date'] = issue["fields"]['created']
         eitem['main_description'] = issue["fields"]['description']
         eitem['isssue_type'] = issue["fields"]['issuetype']['name']
         eitem['issue_description'] = issue["fields"]['issuetype']['description']
 
         eitem['labels'] = issue['fields']['labels']
-        eitem['priority'] = issue['fields']['priority']['name']
+
+        if 'priority' in issue['fields'] and issue['fields']['priority'] \
+            and 'name' in issue['fields']['priority']:
+            eitem['priority'] = issue['fields']['priority']['name']
+
         # data.fields.progress.percent not exists in Puppet JIRA
         eitem['progress_total'] = issue['fields']['progress']['total']
         eitem['project_id'] = issue['fields']['project']['id']
         eitem['project_key'] = issue['fields']['project']['key']
         eitem['project_name'] = issue['fields']['project']['name']
 
-        eitem['reporter_name'] = issue['fields']['reporter']['displayName']
-        eitem['reporter_email'] = None
-        if "emailAddress" in issue["fields"]["reporter"]:
-            eitem['reporter_email'] = issue['fields']['reporter']['emailAddress']
-        eitem['reporter_login'] = issue['fields']['reporter']['name']
-        eitem['reporter_tz'] = issue['fields']['reporter']['timeZone']
+        if issue['fields']['reporter'] and 'reporter' in issue['fields']:
+            eitem['reporter_name'] = issue['fields']['reporter']['displayName']
+            eitem['reporter_email'] = None
+            if "emailAddress" in issue["fields"]["reporter"]:
+                eitem['reporter_email'] = issue['fields']['reporter']['emailAddress']
+            eitem['reporter_login'] = issue['fields']['reporter']['name']
+            eitem['reporter_tz'] = issue['fields']['reporter']['timeZone']
+
         if issue['fields']['resolution']:
             eitem['resolution_id'] = issue['fields']['resolution']['id']
             eitem['resolution_name'] = issue['fields']['resolution']['name']
