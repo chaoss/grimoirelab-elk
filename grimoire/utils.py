@@ -44,7 +44,8 @@ from grimoire.ocean.kitsune import KitsuneOcean
 from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
 from grimoire.ocean.phabricator import PhabricatorOcean
-from grimoire.ocean.remo import ReMoOcean
+# from grimoire.ocean.remo import ReMoOcean
+from grimoire.ocean.remo2 import ReMoOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.supybot import SupybotOcean
 from grimoire.ocean.telegram import TelegramOcean
@@ -65,7 +66,8 @@ from grimoire.elk.kitsune import KitsuneEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
 from grimoire.elk.phabricator import PhabricatorEnrich
-from grimoire.elk.remo import ReMoEnrich
+# from grimoire.elk.remo import ReMoEnrich
+from grimoire.elk.remo2 import ReMoEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
 from grimoire.elk.supybot import SupybotEnrich
 from grimoire.elk.telegram import TelegramEnrich
@@ -87,7 +89,8 @@ from perceval.backends.mbox import MBox, MBoxCommand
 from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
 from perceval.backends.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.pipermail import Pipermail, PipermailCommand
-from perceval.backends.remo import ReMo, ReMoCommand
+# from perceval.backends.remo import ReMo, ReMoCommand
+from perceval.backends.remo2 import ReMo, ReMoCommand
 from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
 from perceval.backends.supybot import Supybot, SupybotCommand
 from perceval.backends.telegram import Telegram, TelegramCommand
@@ -133,6 +136,7 @@ def get_connectors():
             "mediawiki":[MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
             "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
+            # "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
