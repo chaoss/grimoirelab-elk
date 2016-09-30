@@ -106,7 +106,7 @@ class ElasticOcean(object):
         # Also add timestamp used in incremental enrichment
         item['metadata__timestamp'] = timestamp.isoformat()
 
-    def feed(self, from_date=None, offset=None):
+    def feed(self, from_date=None, offset=None, kind=None):
         """ Feed data in Elastic from Perceval """
 
         # Always filter by origin to support multi origin indexes
@@ -142,8 +142,12 @@ class ElasticOcean(object):
                 last_update = last_update.replace(tzinfo=None)
                 items = self.perceval_backend.fetch(from_date=last_update)
             else:
-                if offset:
+                if offset and kind:
+                    items = self.perceval_backend.fetch(offset=offset, kind=kind)
+                elif offset:
                     items = self.perceval_backend.fetch(offset=offset)
+                elif kind:
+                    items = self.perceval_backend.fetch(kind=kind)
                 else:
                     items = self.perceval_backend.fetch()
         for item in items:

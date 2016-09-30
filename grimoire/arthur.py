@@ -68,29 +68,51 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
 
         repo['repo_update_start'] = datetime.now().isoformat()
 
+        #
+        # TODO: improve how filtering in the backend is managed
+        #
+
         # offset param suppport
         offset = None
-
         try:
             offset = backend_cmd.offset
         except AttributeError:
             # The backend does not support offset
             pass
 
+        # kind param suppport
+        kind = None
+        try:
+            kind = backend_cmd.kind
+        except AttributeError:
+            # The backend does not support kind
+            pass
+
         # from_date param support
         try:
-            if offset:
+            if offset and kind:
+                ocean_backend.feed(offset=offset, kind=kind)
+            elif offset:
                 ocean_backend.feed(offset=offset)
             else:
                 if backend_cmd.from_date.replace(tzinfo=None) == \
                     parser.parse("1970-01-01").replace(tzinfo=None):
                     # Don't use the default value
-                    ocean_backend.feed()
+                    if kind:
+                        ocean_backend.feed(kind=kind)
+                    else:
+                        ocean_backend.feed()
                 else:
-                    ocean_backend.feed(backend_cmd.from_date)
+                    if kind:
+                        ocean_backend.feed(backend_cmd.from_date, kind=kind)
+                    else:
+                        ocean_backend.feed(backend_cmd.from_date)
         except AttributeError:
             # The backend does not support from_date
-            ocean_backend.feed()
+            if kind:
+                ocean_backend.feed(kind=kind)
+            else:
+                ocean_backend.feed()
 
     except Exception as ex:
         if backend:
