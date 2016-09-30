@@ -258,6 +258,17 @@ class GitHubEnrich(Enrich):
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
+    def get_item_project(self, item):
+        """ Get project mapping enrichment field """
+        ds_name = "github"  # data source name in projects map
+        url = item['origin']
+        try:
+            project = (self.prjs_map[ds_name][url])
+        except KeyError:
+            logging.warning("Project not found for repository %s" % (url))
+            project = None
+        return {"project": project}
+
     def get_rich_issue(self, item):
         rich_issue = {}
 
@@ -351,8 +362,8 @@ class GitHubEnrich(Enrich):
         rich_issue['github_repo'] = item['origin'].replace(GITHUB,'').replace('.git','')
         rich_issue["url_id"] = rich_issue['github_repo']+"/issues/"+rich_issue['id_in_repo']
 
-        if 'project' in item:
-            rich_issue['project'] = item['project']
+        if self.prjs_map:
+            rich_issue.update(self.get_item_project(item))
 
         if self.sortinghat:
             rich_issue.update(self.get_item_sh(item))
