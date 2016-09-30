@@ -60,6 +60,11 @@ def filter_json(content):
         output["projects"][p]["parent_project"] = tree["projects"][p]["parent_project"]
         output["projects"][p]["bugzilla"] = tree["projects"][p]["bugzilla"]
         output["projects"][p]["mailing_lists"] = tree["projects"][p]["mailing_lists"]
+        output["projects"][p]["description"] = tree["projects"][p]["description"]
+        output["projects"][p]["dev_list"] = tree["projects"][p]["dev_list"]
+        output["projects"][p]["downloads"] = tree["projects"][p]["downloads"]
+        output["projects"][p]["wiki_url"] = tree["projects"][p]["wiki_url"]
+        output["projects"][p]["forums"] = tree["projects"][p]["forums"]
 
     print("Converting project/repos JSON to Grimoire format from Eclipse")
     print("- %s projects" % len(tree["projects"]))
