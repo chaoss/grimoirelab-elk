@@ -124,27 +124,8 @@ class GitEnrich(Enrich):
 
         return identity
 
-    def get_item_project(self, item):
-        """ Get project mapping enrichment field """
-        item_project = {}
-        ds_name = "scm"  # data source name in projects map
-        url_git = item['origin']
-        try:
-            project = (self.prjs_map[ds_name][url_git])
-        except KeyError:
-            # logging.warning("Project not found for repository %s" % (url_git))
-            project = None
-        item_project = {"project": project}
-        # Time to add the project levels: eclipse.platform.releng.aggregator
-        item_path = ''
-        if project is not None:
-            subprojects = project.split('.')
-            for i in range(0, len(subprojects)):
-                if i > 0:
-                    item_path += "."
-                item_path += subprojects[i]
-                item_project['project_' + str(i+1)] = item_path
-        return item_project
+    def get_project_repository(self, item):
+        return item['origin']
 
     def get_github_login(self, user, rol, commit_hash, repo):
         """ rol: author or committer """

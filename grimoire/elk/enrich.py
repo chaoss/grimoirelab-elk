@@ -171,6 +171,38 @@ class Enrich(object):
             name: 1
         }
 
+    # Project field enrichment
+
+    def get_project_repository(self, item):
+        """
+            Get the repository name used for mapping to project name
+            To be implemented for each data source
+        """
+        return ''
+
+    def get_item_project(self, item):
+        """ Get project mapping enrichment field """
+        item_project = {}
+        print(self)
+        ds_name = self.get_connector_name()  # data source name in projects map
+        repository = self.get_project_repository(item)
+        try:
+            project = (self.prjs_map[ds_name][repository])
+            # logging.debug("Project FOUND for repository %s %s", repository, project)
+        except KeyError:
+            # logging.warning("Project not found for repository %s (data source: %s)", repository, ds_name)
+            project = None
+        item_project = {"project": project}
+        # Time to add the project levels: eclipse.platform.releng.aggregator
+        item_path = ''
+        if project is not None:
+            subprojects = project.split('.')
+            for i in range(0, len(subprojects)):
+                if i > 0:
+                    item_path += "."
+                item_path += subprojects[i]
+                item_project['project_' + str(i+1)] = item_path
+        return item_project
 
     # Sorting Hat stuff to be moved to SortingHat class
 

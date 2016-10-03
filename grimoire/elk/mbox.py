@@ -95,23 +95,12 @@ class MBoxEnrich(Enrich):
             identity['name'] = identity['email'].split('@')[0]
         return identity
 
-
-    def get_item_project(self, item):
-        """ Get project mapping enrichment field """
-        # "origin": "dltk-commits"
-        # /mnt/mailman_archives/dltk-dev.mbox/dltk-dev.mbox
-        ds_name = "mls"  # data source name in projects map
+    def get_project_repository(self, item):
         mls_list = item['origin']
         # Eclipse specific yet
-        path = "/mnt/mailman_archives/"
-        path += mls_list+".mbox/"+mls_list+".mbox"
-
-        try:
-            project = (self.prjs_map[ds_name][path])
-        except KeyError:
-            # logging.warning("Project not found for list %s" % (mls_list))
-            project = None
-        return {"project": project}
+        repo = "/mnt/mailman_archives/"
+        repo += mls_list+".mbox/"+mls_list+".mbox"
+        return repo
 
     def get_rich_item(self, item):
         eitem = {}

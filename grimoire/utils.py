@@ -113,7 +113,12 @@ def get_connector_name(cls):
     for cname in connectors:
         for con in connectors[cname]:
             if cls == con:
-                found = cname
+                if found:
+                    # The canonical name is included in the classname
+                    if cname in cls.__name__.lower():
+                        found = cname
+                else:
+                    found = cname
     return found
 
 def get_connectors():
