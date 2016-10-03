@@ -49,11 +49,12 @@ class ElasticOcean(object):
                             help="Host with elastic search and enriched indexes")
 
     def __init__(self, perceval_backend, from_date=None, fetch_cache=False,
-                 project=None, insecure=True):
+                 project=None, insecure=True, offset=None):
 
         self.perceval_backend = perceval_backend
         self.last_update = None  # Last update in ocean items index for feed
         self.from_date = from_date  # fetch from_date
+        self.offset = offset  # fetch from offset
         self.fetch_cache = fetch_cache  # fetch from cache
         self.project = project  # project to be used for this data source
 
@@ -106,20 +107,8 @@ class ElasticOcean(object):
         # Also add timestamp used in incremental enrichment
         item['metadata__timestamp'] = timestamp.isoformat()
 
-    def feed(self, from_date=None, offset=None, kind=None):
+    def feed(self, from_date=None, offset=None, category=None):
         """ Feed data in Elastic from Perceval """
-
-        # Always filter by origin to support multi origin indexes
-        filter_ = {"name":"origin",
-                   "value":self.perceval_backend.origin}
-        self.last_update = self.get_last_update_from_es(filter_)
-        last_update = self.last_update
-        # last_update = '2015-12-28 18:02:00'
-        if from_date:
-            # Forced from backend command line.
-            last_update = from_date
-
-        logging.info("Incremental from: %s", last_update)
 
         # Check if backend supports from_date
         signature = inspect.signature(self.perceval_backend.fetch)
@@ -127,6 +116,20 @@ class ElasticOcean(object):
         if 'from_date' not in signature.parameters:
             last_update = None
             logging.debug("Fetch method does not use 'from_date' parameter")
+
+        else:
+            # Always filter by origin to support multi origin indexes
+            filter_ = {"name":"origin",
+                       "value":self.perceval_backend.origin}
+            self.last_update = self.get_last_update_from_es(filter_)
+            last_update = self.last_update
+            # last_update = '2015-12-28 18:02:00'
+            if from_date:
+                # Forced from backend command line.
+                last_update = from_date
+
+            logging.info("Incremental from: %s", last_update)
+
 
         task_init = datetime.now()
 
@@ -142,12 +145,12 @@ class ElasticOcean(object):
                 last_update = last_update.replace(tzinfo=None)
                 items = self.perceval_backend.fetch(from_date=last_update)
             else:
-                if offset and kind:
-                    items = self.perceval_backend.fetch(offset=offset, kind=kind)
+                if offset and category:
+                    items = self.perceval_backend.fetch(offset=offset, category=category)
                 elif offset:
                     items = self.perceval_backend.fetch(offset=offset)
-                elif kind:
-                    items = self.perceval_backend.fetch(kind=kind)
+                elif category:
+                    items = self.perceval_backend.fetch(category=category)
                 else:
                     items = self.perceval_backend.fetch()
         for item in items:
@@ -227,6 +230,13 @@ class ElasticOcean(object):
                         {"%s": {"gte": "%s"}}
                     }
                 ''' % (date_field, from_date)
+            elif self.offset:
+                filters += '''
+                    , {"range":
+                        {"offset": {"gte": "%s"}}
+                    }
+                ''' % (self.offset)
+
 
             order_field = 'metadata__updated_on'
             order_query = ''

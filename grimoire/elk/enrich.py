@@ -148,6 +148,12 @@ class Enrich(object):
 
         return last_update
 
+    def get_last_offset_from_es(self, _filter=None):
+        # offset is always the field name from perceval
+        last_update = self.elastic.get_last_offset("offset", _filter)
+
+        return last_update
+
     def get_elastic_mappings(self):
         """ Mappings for enriched indexes """
 

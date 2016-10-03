@@ -209,13 +209,35 @@ class ElasticSearch(object):
             :_filter: additional filter to find the date
         '''
 
-        last_date = None
+        last_date = self.__get_last_item_field(field, _filter=_filter)
+
+        return last_date
+
+    def get_last_offset(self, field, _filter = None):
+        '''
+            :field: field with the data
+            :_filter: additional filter to find the date
+        '''
+
+        offset = self.__get_last_item_field(field, _filter=_filter, offset=True)
+
+        return offset
+
+    def __get_last_item_field(self, field, _filter = None, offset = False):
+        '''
+            :field: field with the data
+            :_filter: additional filter to find the date
+            :offset: Return offset field insted of date field
+        '''
+
+        last_value = None
 
         url = self.index_url
         url += "/_search"
 
         if _filter:
             data_query = '''
+                "size": 0,
                 "query" : {
                     "term" : { "%s" : "%s"  }
                  },
@@ -238,17 +260,19 @@ class ElasticSearch(object):
         { %s  %s
         } ''' % (data_query, data_agg)
 
-        # logging.debug("%s %s" % (url, data_json))
+        logging.debug("%s %s", url, data_json)
         res = self.requests.post(url, data=data_json)
         res_json = res.json()
 
         if 'aggregations' in res_json:
-            if "value_as_string" in res_json["aggregations"]["1"]:
-                last_date = res_json["aggregations"]["1"]["value_as_string"]
-                last_date = parser.parse(last_date)
-            else:
-                last_date = res_json["aggregations"]["1"]["value"]
-                if last_date:
-                    last_date = datetime.fromtimestamp(last_date)
+            last_value = res_json["aggregations"]["1"]["value"]
 
-        return last_date
+            if not offset:
+                if "value_as_string" in res_json["aggregations"]["1"]:
+                    last_value = res_json["aggregations"]["1"]["value_as_string"]
+                    last_value = parser.parse(last_value)
+                else:
+                    last_value = res_json["aggregations"]["1"]["value"]
+                    if last_value:
+                        last_value = datetime.fromtimestamp(last_value)
+        return last_value

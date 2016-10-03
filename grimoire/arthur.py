@@ -23,11 +23,13 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from datetime import datetime
-from dateutil import parser
+import inspect
 import logging
 import requests
 import traceback
+
+from datetime import datetime
+from dateutil import parser
 
 from grimoire.ocean.conf import ConfOcean
 from grimoire.utils import get_elastic
@@ -80,37 +82,37 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
             # The backend does not support offset
             pass
 
-        # kind param suppport
-        kind = None
+        # category param suppport
+        category = None
         try:
-            kind = backend_cmd.kind
+            category = backend_cmd.category
         except AttributeError:
-            # The backend does not support kind
+            # The backend does not support category
             pass
 
         # from_date param support
         try:
-            if offset and kind:
-                ocean_backend.feed(offset=offset, kind=kind)
+            if offset and category:
+                ocean_backend.feed(offset=offset, category=category)
             elif offset:
                 ocean_backend.feed(offset=offset)
             else:
                 if backend_cmd.from_date.replace(tzinfo=None) == \
                     parser.parse("1970-01-01").replace(tzinfo=None):
                     # Don't use the default value
-                    if kind:
-                        ocean_backend.feed(kind=kind)
+                    if category:
+                        ocean_backend.feed(category=category)
                     else:
                         ocean_backend.feed()
                 else:
-                    if kind:
-                        ocean_backend.feed(backend_cmd.from_date, kind=kind)
+                    if category:
+                        ocean_backend.feed(backend_cmd.from_date, category=category)
                     else:
                         ocean_backend.feed(backend_cmd.from_date)
         except AttributeError:
             # The backend does not support from_date
-            if kind:
-                ocean_backend.feed(kind=kind)
+            if category:
+                ocean_backend.feed(category=category)
             else:
                 ocean_backend.feed()
 
@@ -330,15 +332,23 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             # Only supported in data retrieved from a perceval backend
             filter_ = {"name":"origin",
                        "value":backend.origin}
+        # Check if backend supports from_date
+        signature = inspect.signature(backend.fetch)
+
+        if 'from_date' in signature.parameters:
             last_enrich = enrich_backend.get_last_update_from_es(filter_)
+        elif 'offset' in signature.parameters:
+            last_enrich = enrich_backend.get_last_offset_from_es(filter_)
         if no_incremental:
             last_enrich = None
 
         logging.debug("Last enrichment: %s", last_enrich)
 
-        # last_enrich=parser.parse('2016-06-01')
 
-        ocean_backend = connector[1](backend, from_date=last_enrich)
+        if 'from_date' in signature.parameters:
+            ocean_backend = connector[1](backend, from_date=last_enrich)
+        elif 'offset' in signature.parameters:
+            ocean_backend = connector[1](backend, offset=last_enrich)
         clean = False  # Don't remove ocean index when enrich
         elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
