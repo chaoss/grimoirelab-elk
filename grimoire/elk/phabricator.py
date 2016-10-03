@@ -55,7 +55,7 @@ class PhabricatorEnrich(Enrich):
         mapping = """
         {
             "properties": {
-                "main_description": {
+                "main_description_analyzed": {
                   "type": "string",
                   "index":"analyzed"
                 },
@@ -166,6 +166,8 @@ class PhabricatorEnrich(Enrich):
         eitem['modification_date'] = datetime.fromtimestamp(phab_item['fields']['dateModified']).isoformat()
         eitem['update_date'] = datetime.fromtimestamp(item['updated_on']).isoformat()
         eitem['main_description'] = phab_item['fields']['name']
+        eitem['main_description_analyzed'] = eitem['main_description']
+        eitem['url'] = eitem['origin']+"/T"+str(eitem['bug_id'])
 
         eitem['timeopen_days'] = \
             get_time_diff_days(eitem['creation_date'], eitem['update_date'])
