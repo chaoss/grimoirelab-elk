@@ -106,7 +106,7 @@ def add_tabs(config_file, es_url, sources=None):
         add_default_tabs(config_file, es_url)
     else:
         tabs = get_tabs(es_url, "True")
-        data_sources = list_data_sources(config_file, tabs)
+        data_sources = list_data_sources(config_file, json.loads(tabs))
         for source in sources.split(", "):
             data_sources.append(source)
         tabs_list = list_tabs(config_file, data_sources)
