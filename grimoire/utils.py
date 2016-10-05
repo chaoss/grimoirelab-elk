@@ -59,12 +59,14 @@ from grimoire.elk.discourse import DiscourseEnrich
 from grimoire.elk.git import GitEnrich
 from grimoire.elk.github import GitHubEnrich
 from grimoire.elk.gerrit import GerritEnrich
+from grimoire.elk.gmane import GmaneEnrich
 from grimoire.elk.jenkins import JenkinsEnrich
 from grimoire.elk.jira import JiraEnrich
 from grimoire.elk.kitsune import KitsuneEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
 from grimoire.elk.phabricator import PhabricatorEnrich
+from grimoire.elk.pipermail import PipermailEnrich
 from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
 from grimoire.elk.supybot import SupybotEnrich
@@ -130,14 +132,14 @@ def get_connectors():
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
-            "gmane":[Gmane, MBoxOcean, MBoxEnrich, GmaneCommand],
+            "gmane":[Gmane, MBoxOcean, GmaneEnrich, GmaneCommand],
             "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
             "kitsune":[Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
             "mbox":[MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
             "mediawiki":[MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
             "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
-            "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
+            "pipermail":[Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
