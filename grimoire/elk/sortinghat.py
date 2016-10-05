@@ -25,6 +25,7 @@
 
 from datetime import datetime
 import logging
+import traceback
 
 from sortinghat import api
 from sortinghat.db.model import UniqueIdentity
@@ -60,9 +61,14 @@ class SortingHat(object):
                 uuid = api.add_identity(db, backend, identity['email'],
                                         identity['name'], identity['username'])
 
-                logger.debug("New sortinghat identity %s %s,%s,%s (%i/%i)" % \
-                            (uuid, identity['username'], identity['name'], identity['email'],
-                            total, lidentities))
+                logger.debug("New sortinghat identity %s %s,%s,%s (%i/%i)",
+                            uuid, identity['username'], identity['name'], identity['email'],
+                            total, lidentities)
+
+                profile = {"name": identity['name'] if identity['name'] else identity['username'],
+                           "email": identity['email']}
+
+                api.edit_profile(db, uuid, **profile)
 
                 total += 1
                 if not merge_identities:
@@ -101,6 +107,7 @@ class SortingHat(object):
                 logging.warning("Unknown exception adding identity. Ignoring it. %s %s %s" % \
                                 (identity['email'], identity['name'],
                                 identity['username']))
+                traceback.print_exc()
                 continue
 
             if 'company' in identity and identity['company'] is not None:

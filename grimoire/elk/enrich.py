@@ -252,14 +252,33 @@ class Enrich(object):
         """ Get standard SH fields from a SH identity """
         eitem = {}  # Item enriched
 
-        eitem["author_name"] = identity['name']
-        eitem["author_user_name"] = identity['username']
         eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
+        # Always try to use first the data from SH
+        identity_sh = self.get_identity_sh(eitem["author_uuid"])
+
+        if identity_sh:
+            eitem["author_name"] = identity_sh['name']
+            eitem["author_user_name"] = identity_sh['username']
+            eitem["author_domain"] = self.get_identity_domain(identity_sh)
+        else:
+            eitem["author_name"] = identity['name']
+            eitem["author_user_name"] = identity['username']
+            eitem["author_domain"] = self.get_identity_domain(identity)
+
         eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], item_date)
         eitem["author_bot"] = self.is_bot(eitem['author_uuid'])
-        eitem["author_domain"] = self.get_identity_domain(identity)
-
         return eitem
+
+    def get_identity_sh(self, uuid):
+        identity = {}
+
+        u = self.get_unique_identities(uuid)[0]
+        if u.profile:
+            identity['name'] = u.profile.name
+            identity['username'] = None
+            identity['email'] = u.profile.email
+
+        return identity
 
     def get_item_sh(self, item, identity_field):
         """ Add sorting hat enrichment fields for the author of the item """
