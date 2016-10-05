@@ -183,7 +183,6 @@ class Enrich(object):
     def get_item_project(self, item):
         """ Get project mapping enrichment field """
         item_project = {}
-        print(self)
         ds_name = self.get_connector_name()  # data source name in projects map
         repository = self.get_project_repository(item)
         try:
