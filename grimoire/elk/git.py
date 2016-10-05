@@ -283,6 +283,8 @@ class GitEnrich(Enrich):
 
 
         # First, get the min and max commit date for all the authors
+        # Limit aggregations: https://github.com/elastic/elasticsearch/issues/18838
+        # 10000 seems to be a sensible number of the number of people in git
         es_query = """
         {
           %s
@@ -291,7 +293,7 @@ class GitEnrich(Enrich):
             "author": {
               "terms": {
                 "field": "Author",
-                "size": 0
+                "size": 10000
               },
               "aggs": {
                 "min": {
