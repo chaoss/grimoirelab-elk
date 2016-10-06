@@ -191,6 +191,9 @@ class Enrich(object):
         except KeyError:
             # logging.warning("Project not found for repository %s (data source: %s)", repository, ds_name)
             project = None
+            # Try to use always the origin in any case
+            if item['origin'] in self.prjs_map[ds_name]:
+                project = self.prjs_map[ds_name][item['origin']]
         item_project = {"project": project}
         # Time to add the project levels: eclipse.platform.releng.aggregator
         item_path = ''
