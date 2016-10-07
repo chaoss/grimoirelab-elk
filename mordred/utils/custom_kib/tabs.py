@@ -90,7 +90,7 @@ def get_tabs(es_url, add="False"):
     if value['found'] == True:
         msg_value = json.dumps(value['_source'], indent=1)
     else:
-        msg_value = ""
+        msg_value = json.dumps("{}")
     if add == "False":
         print("List of tabs ("+project_url+"):\n"+msg_value)
 
