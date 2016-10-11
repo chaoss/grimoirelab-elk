@@ -83,21 +83,11 @@ class BugzillaRESTEnrich(Enrich):
 
         return eitem
 
-    def get_item_project(self, item):
-        """ Get project mapping enrichment field """
-        ds_name = "bugzillarest"  # data source name in projects map
-        url = item['origin']
-        # https://bugs.eclipse.org/bugs/buglist.cgi?product=Mylyn%20Tasks
+    def get_project_repository(self, item):
+        repo = item['origin']
         product = item['data']['product']
-        repo = url+"/buglist.cgi?product="+product
-
-        try:
-            project = (self.prjs_map[ds_name][repo])
-        except KeyError:
-            # logging.warning("Project not found for repository %s" % (repo))
-            project = None
-        return {"project": project}
-
+        repo += "/buglist.cgi?product="+product
+        return repo
 
     def enrich_issue(self, item):
 

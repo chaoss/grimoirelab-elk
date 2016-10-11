@@ -285,10 +285,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                 logging.info("Starting study: %s", study)
                 study(from_date=last_enrich)
         except Exception as e:
-            logging.warning("Problem executing studies for %s", backend_name)
-            print(e)
-
-
+            logging.error("Problem executing studies for %s", backend_name)
+            traceback.print_exc()
 
     backend = None
     enrich_index = None

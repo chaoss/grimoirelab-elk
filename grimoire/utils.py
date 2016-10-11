@@ -44,7 +44,6 @@ from grimoire.ocean.kitsune import KitsuneOcean
 from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
 from grimoire.ocean.phabricator import PhabricatorOcean
-# from grimoire.ocean.remo import ReMoOcean
 from grimoire.ocean.remo2 import ReMoOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.supybot import SupybotOcean
@@ -60,6 +59,7 @@ from grimoire.elk.discourse import DiscourseEnrich
 from grimoire.elk.git import GitEnrich
 from grimoire.elk.github import GitHubEnrich
 from grimoire.elk.gerrit import GerritEnrich
+from grimoire.elk.gmane import GmaneEnrich
 from grimoire.elk.jenkins import JenkinsEnrich
 from grimoire.elk.jira import JiraEnrich
 from grimoire.elk.kitsune import KitsuneEnrich
@@ -68,6 +68,7 @@ from grimoire.elk.mediawiki import MediaWikiEnrich
 from grimoire.elk.phabricator import PhabricatorEnrich
 # from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.remo2 import ReMoEnrich
+from grimoire.elk.pipermail import PipermailEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
 from grimoire.elk.supybot import SupybotEnrich
 from grimoire.elk.telegram import TelegramEnrich
@@ -116,7 +117,12 @@ def get_connector_name(cls):
     for cname in connectors:
         for con in connectors[cname]:
             if cls == con:
-                found = cname
+                if found:
+                    # The canonical name is included in the classname
+                    if cname in cls.__name__.lower():
+                        found = cname
+                else:
+                    found = cname
     return found
 
 def get_connectors():
@@ -128,7 +134,7 @@ def get_connectors():
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
-            "gmane":[Gmane, MBoxOcean, MBoxEnrich, GmaneCommand],
+            "gmane":[Gmane, MBoxOcean, GmaneEnrich, GmaneCommand],
             "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
             "kitsune":[Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
@@ -136,7 +142,7 @@ def get_connectors():
             "mediawiki":[MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
             "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
-            # "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
+            "pipermail":[Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],

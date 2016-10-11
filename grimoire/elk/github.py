@@ -258,6 +258,10 @@ class GitHubEnrich(Enrich):
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
+    def get_project_repository(self, item):
+        repo = item['origin']
+        return repo
+
     def get_rich_issue(self, item):
         rich_issue = {}
 
@@ -351,8 +355,8 @@ class GitHubEnrich(Enrich):
         rich_issue['github_repo'] = item['origin'].replace(GITHUB,'').replace('.git','')
         rich_issue["url_id"] = rich_issue['github_repo']+"/issues/"+rich_issue['id_in_repo']
 
-        if 'project' in item:
-            rich_issue['project'] = item['project']
+        if self.prjs_map:
+            rich_issue.update(self.get_item_project(item))
 
         if self.sortinghat:
             rich_issue.update(self.get_item_sh(item))

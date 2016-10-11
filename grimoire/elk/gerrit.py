@@ -61,17 +61,10 @@ class GerritEnrich(Enrich):
         if 'username' in user: identity['username'] = user['username']
         return identity
 
-    def get_item_project(self, item):
-        """ Get project mapping enrichment field """
-        ds_name = "scr"  # data source name in projects map
-        url = item['origin']
-        repo = url+"_"+item['data']['project']
-        try:
-            project = (self.prjs_map[ds_name][repo])
-        except KeyError:
-            # logging.warning("Project not found for repository %s" % (repo))
-            project = None
-        return {"project": project}
+    def get_project_repository(self, item):
+        repo = item['origin']
+        repo += "_" + item['data']['project']
+        return repo
 
     def get_identities(self, item):
         ''' Return the identities from an item '''

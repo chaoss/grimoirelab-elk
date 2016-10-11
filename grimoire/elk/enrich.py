@@ -177,6 +177,40 @@ class Enrich(object):
             name: 1
         }
 
+    # Project field enrichment
+
+    def get_project_repository(self, item):
+        """
+            Get the repository name used for mapping to project name
+            To be implemented for each data source
+        """
+        return ''
+
+    def get_item_project(self, item):
+        """ Get project mapping enrichment field """
+        item_project = {}
+        ds_name = self.get_connector_name()  # data source name in projects map
+        repository = self.get_project_repository(item)
+        try:
+            project = (self.prjs_map[ds_name][repository])
+            # logging.debug("Project FOUND for repository %s %s", repository, project)
+        except KeyError:
+            # logging.warning("Project not found for repository %s (data source: %s)", repository, ds_name)
+            project = None
+            # Try to use always the origin in any case
+            if ds_name in self.prjs_map and item['origin'] in self.prjs_map[ds_name]:
+                project = self.prjs_map[ds_name][item['origin']]
+        item_project = {"project": project}
+        # Time to add the project levels: eclipse.platform.releng.aggregator
+        item_path = ''
+        if project is not None:
+            subprojects = project.split('.')
+            for i in range(0, len(subprojects)):
+                if i > 0:
+                    item_path += "."
+                item_path += subprojects[i]
+                item_project['project_' + str(i+1)] = item_path
+        return item_project
 
     # Sorting Hat stuff to be moved to SortingHat class
 
@@ -227,14 +261,33 @@ class Enrich(object):
         """ Get standard SH fields from a SH identity """
         eitem = {}  # Item enriched
 
-        eitem["author_name"] = identity['name']
-        eitem["author_user_name"] = identity['username']
         eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
+        # Always try to use first the data from SH
+        identity_sh = self.get_identity_sh(eitem["author_uuid"])
+
+        if identity_sh:
+            eitem["author_name"] = identity_sh['name']
+            eitem["author_user_name"] = identity_sh['username']
+            eitem["author_domain"] = self.get_identity_domain(identity_sh)
+        else:
+            eitem["author_name"] = identity['name']
+            eitem["author_user_name"] = identity['username']
+            eitem["author_domain"] = self.get_identity_domain(identity)
+
         eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], item_date)
         eitem["author_bot"] = self.is_bot(eitem['author_uuid'])
-        eitem["author_domain"] = self.get_identity_domain(identity)
-
         return eitem
+
+    def get_identity_sh(self, uuid):
+        identity = {}
+
+        u = self.get_unique_identities(uuid)[0]
+        if u.profile:
+            identity['name'] = u.profile.name
+            identity['username'] = None
+            identity['email'] = u.profile.email
+
+        return identity
 
     def get_item_sh(self, item, identity_field):
         """ Add sorting hat enrichment fields for the author of the item """

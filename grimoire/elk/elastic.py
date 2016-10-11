@@ -71,10 +71,10 @@ class ElasticSearch(object):
 
         if r.status_code != 200:
             # Index does no exists
-            r = self.requests.post(self.index_url)
+            r = self.requests.put(self.index_url)
             if r.status_code != 200:
-                logging.info("Can't create index %s (%s)" %
-                             (self.index_url, r.status_code))
+                logging.error("Can't create index %s (%s)",
+                              self.index_url, r.status_code)
                 raise ElasticWriteException()
             else:
                 logging.info("Created index " + self.index_url)
