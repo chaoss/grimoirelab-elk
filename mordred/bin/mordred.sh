@@ -20,6 +20,10 @@ function log_result {
 }
 
 function check_enriched_vars {
+    if [ -z $MEDIAWIKI_ENRICHED_INDEX ]
+        then
+        MEDIAWIKI_ENRICHED_INDEX=$MEDIAWIKI_INDEX"_enriched"
+    fi
     if [ -z $JIRA_ENRICHED_INDEX ]
         then
         JIRA_ENRICHED_INDEX=$JIRA_INDEX"_enriched"
@@ -129,6 +133,11 @@ function check_enabled_vars {
     if [ -z $JIRA_ENABLED ]
         then
         JIRA_ENABLED=0
+    fi
+
+    if [ -z $MEDIAWIKI_ENABLED ]
+        then
+        MEDIAWIKI_ENABLED=0
     fi
 }
 
@@ -403,6 +412,13 @@ function retrieve_data {
         jira_retrieval
         log_result "[jira] Retrieval finished" "[jira] ERROR: Something went wrong with the retrieval"
     fi
+
+    if [ $MEDIAWIKI_ENABLED -eq 1 ]
+        then
+        log "[mediawiki] Retrieving data"
+        mediawiki_retrieval
+        log_result "[mediawiki] Retrieval finished" "[mediawiki] ERROR: Something went wrong with the retrieval"
+    fi
 }
 
 function git_retrieval {
@@ -509,6 +525,11 @@ function jira_retrieval {
     ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $JIRA_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
 }
 
+function mediawiki_retrieval {
+    cd ~/GrimoireELK/utils/
+    ./p2o.py -e $ES_URI -g --index $MEDIAWIKI_INDEX mediawiki $MEDIAWIKI_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/mediawiki-collection.log" 2>&1
+}
+
 function enrich_studies {
     ENR_EXTRA_FLAG='--only-studies'
     enrich_data $ENR_EXTRA_FLAG
@@ -607,6 +628,13 @@ function enrich_data {
         log "[jira] Jira p2o starts"
         jira_enrichment $1
         log_result "[jira] p2o finished" "[jira] ERROR: Something went wrong with p2o"
+    fi
+
+    if [ $MEDIAWIKI_ENABLED -eq 1 ]
+        then
+        log "[mediawiki] Mediawiki p2o starts"
+        mediawiki_enrichment $1
+        log_result "[mediawiki] p2o finished" "[mediawiki] ERROR: Something went wrong with p2o"
     fi
 }
 
@@ -736,6 +764,11 @@ function confluence_enrichment {
 function jira_enrichment {
     cd ~/GrimoireELK/utils/
     ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $JIRA_URL >> $LOGS_DIR"/jira-enrichment.log" 2>&1
+}
+
+function mediawiki_enrichment {
+    cd ~/GrimoireELK/utils/
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $MEDIAWIKI_INDEX --index-enrich $MEDIAWIKI_ENRICHED_INDEX mediawiki $MEDIAWIKI_URL >> $LOGS_DIR"/mediawiki-enrichment.log" 2>&1
 }
 
 function sortinghat_unify {
