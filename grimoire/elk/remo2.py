@@ -88,8 +88,10 @@ class ReMoEnrich(Enrich):
         #             "_url": "https://reps.mozilla.org/api/beta/users/959/",
         #             "display_name": "huda_sarfraz"
         #          },
-        identity = {}
+        identity = {'username':None, 'email':None, 'name':None}
 
+        if not owner:
+           return identity
         identity['username'] = owner["display_name"]
         identity['email'] = None
         identity['name'] = owner["first_name"]+" "+owner["last_name"]
