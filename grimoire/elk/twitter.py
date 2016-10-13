@@ -31,15 +31,6 @@ from grimoire.elk.enrich import Enrich
 
 class TwitterEnrich(Enrich):
 
-    def __init__(self, twitter, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = twitter
-        self.index_twitter = "twitter"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
     def get_field_date(self):
         return "created_at"
 

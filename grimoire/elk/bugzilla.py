@@ -38,14 +38,6 @@ from .utils import get_time_diff_days
 
 class BugzillaEnrich(Enrich):
 
-    def __init__(self, bugzilla, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.perceval_backend = bugzilla
-        self.elastic = None
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
     def get_field_date(self):
         return "delta_ts"
 
@@ -247,10 +239,6 @@ class BugzillaEnrich(Enrich):
 
 
     def enrich_items(self, items):
-#         if self.perceval_backend.detail == "list":
-#             self.issues_list_to_es(items)
-#         else:
-#             self.issues_to_es(items)
         self.issues_to_es(items)
 
     def issues_list_to_es(self, items):

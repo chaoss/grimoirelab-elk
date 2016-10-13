@@ -35,18 +35,6 @@ from .utils import get_time_diff_days
 
 class PhabricatorEnrich(Enrich):
 
-    def __init__(self, phabricator, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = phabricator
-        self.index_phabricator = "phabricator"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
     def get_field_unique_id(self):
         return "phid"
 

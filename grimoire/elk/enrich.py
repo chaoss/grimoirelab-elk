@@ -23,7 +23,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-
+import json
 import logging
 
 import requests
@@ -52,7 +52,7 @@ except ImportError:
 
 class Enrich(object):
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, insecure=True):
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None, insecure=True):
 
         self.sortinghat = False
         if db_sortinghat and not SORTINGHAT_LIBS:
@@ -62,16 +62,28 @@ class Enrich(object):
             self.sortinghat = True
 
         self.prjs_map = None
+        self.json_projects = None
+        if json_projects_map:
+            with open(json_projects_map) as data_file:
+                self.json_projects = json.load(data_file)
         if db_projects_map and not MYSQL_LIBS:
             raise RuntimeError("Projects configured but MySQL libraries not available.")
         if  db_projects_map:
             self.prjs_map = self._get_projects_map(db_projects_map)
+
+        if self.prjs_map and self.json_projects:
+            logging.info("Comparing db and json projects")
 
         self.requests = requests.Session()
         if insecure:
             requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
             self.requests.verify = False
 
+        self.elastic = None
+        self.type_name = "items"  # type inside the index to store items enriched
+
+    def set_elastic(self, elastic):
+        self.elastic = elastic
 
     def _get_projects_map(self, db_projects_map):
         prjs_map = {}
@@ -111,7 +123,7 @@ class Enrich(object):
 
     def get_field_date(self):
         """ Field with the date in the JSON enriched items """
-        raise NotImplementedError
+        return "metadata__updated_on"
 
     def get_fields_uuid(self):
         """ Fields with unique identities in the JSON enriched items """

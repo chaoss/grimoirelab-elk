@@ -34,18 +34,6 @@ from grimoire.elk.enrich import Enrich
 
 class GerritEnrich(Enrich):
 
-    def __init__(self, gerrit, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.gerrit = gerrit
-        self.type_name = "items"  # type inside the index to store items enriched
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
     def get_fields_uuid(self):
         return ["review_uuid", "patchSet_uuid", "approval_uuid"]
 

@@ -31,18 +31,6 @@ from grimoire.elk.enrich import Enrich
 
 class ReMoEnrich(Enrich):
 
-    def __init__(self, remo, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = remo
-        self.index_remo = "remo"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
     def get_field_unique_id(self):
         return "remo_url"
 

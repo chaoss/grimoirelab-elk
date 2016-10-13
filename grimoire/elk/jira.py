@@ -23,12 +23,11 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from datetime import datetime
-from time import time
 import json
 import logging
 
-from urllib.parse import urlparse
+from datetime import datetime
+from time import time
 
 from dateutil import parser
 
@@ -37,17 +36,6 @@ from .enrich import Enrich
 from .utils import get_time_diff_days
 
 class JiraEnrich(Enrich):
-
-    def __init__(self, jira, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.perceval_backend = jira
-        self.elastic = None
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
 
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "reporter_uuid"]
@@ -220,12 +208,7 @@ class JiraEnrich(Enrich):
         return eitem
 
     def enrich_items(self, items):
-#         if self.perceval_backend.detail == "list":
-#             self.issues_list_to_es(items)
-#         else:
-#             self.issues_to_es(items)
         self.issues_to_es(items)
-
 
     def issues_list_to_es(self, items):
 

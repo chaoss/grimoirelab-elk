@@ -31,18 +31,6 @@ from grimoire.elk.enrich import Enrich
 
 class ConfluenceEnrich(Enrich):
 
-    def __init__(self, confluence, db_sortinghat=None, db_projects_map=None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = confluence
-        self.index_confluence = "confluence"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
     def get_field_unique_id(self):
         return "id"
 

@@ -32,18 +32,6 @@ from grimoire.elk.enrich import Enrich
 
 class StackExchangeEnrich(Enrich):
 
-    def __init__(self, stackexchange, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = stackexchange
-        self.index_stackexchange = "stackexchange"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
     def get_field_unique_id(self):
         return "question_id"
 

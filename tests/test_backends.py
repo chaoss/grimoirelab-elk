@@ -136,13 +136,11 @@ class TestBackends(unittest.TestCase):
             ocean_backend.set_elastic(elastic_ocean)
             clean = True
             if not sortinghat and not projects:
-                enrich_backend = connectors[con][2](perceval_backend)
+                enrich_backend = connectors[con][2]()
             elif sortinghat and not projects:
-                enrich_backend = connectors[con][2](perceval_backend,
-                                                    db_sortinghat=DB_SORTINGHAT)
+                enrich_backend = connectors[con][2](db_sortinghat=DB_SORTINGHAT)
             elif not sortinghat and projects:
-                enrich_backend = connectors[con][2](perceval_backend,
-                                                    db_projects_map=DB_PROJECTS)
+                enrich_backend = connectors[con][2](db_projects_map=DB_PROJECTS)
             elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
             enrich_backend.set_elastic(elastic_enrich)
             enrich_count = self.__enrich_items(ocean_backend, enrich_backend)

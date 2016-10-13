@@ -130,7 +130,8 @@ if __name__ == '__main__':
             if args.enrich or args.enrich_only:
                 enrich_backend(url, clean, args.backend, args.backend_args,
                                args.index, args.index_enrich,
-                               args.db_projects_map, args.db_sortinghat,
+                               args.db_projects_map, args.json_projects_map,
+                               args.db_sortinghat,
                                args.no_incremental, args.only_identities,
                                args.github_token,
                                args.studies, args.only_studies,

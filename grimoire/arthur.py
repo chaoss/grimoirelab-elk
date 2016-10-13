@@ -216,7 +216,8 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
 
 def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    ocean_index_enrich = None,
-                   db_projects_map=None, db_sortinghat=None,
+                   db_projects_map=None, json_projects_map=None,
+                   db_sortinghat=None,
                    no_incremental=False, only_identities=False,
                    github_token=None, studies=False, only_studies=False,
                    url_enrich=None):
@@ -314,7 +315,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                 ocean_index = backend_name + "_" + backend.origin
             enrich_index = ocean_index+"_enrich"
 
-        enrich_backend = connector[2](backend, db_sortinghat, db_projects_map)
+        enrich_backend = connector[2](db_sortinghat, db_projects_map, json_projects_map)
         if url_enrich:
             elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend)
         else:

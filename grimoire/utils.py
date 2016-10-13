@@ -217,6 +217,7 @@ def get_params_parser():
     parser.add_argument('--index', help="Ocean index name")
     parser.add_argument('--index-enrich', dest="index_enrich", help="Ocean enriched index name")
     parser.add_argument('--db-projects-map', help="Projects Mapping DB")
+    parser.add_argument('--json-projects-map', help="Projects Mapping JSON file")
     parser.add_argument('--project', help="Project for the repository (origin)")
     parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('--only-identities', action='store_true', help="Only add identities to SortingHat DB")

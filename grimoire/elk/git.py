@@ -36,24 +36,14 @@ GITHUB = 'https://github.com/'
 
 class GitEnrich(Enrich):
 
-    def __init__(self, git, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = git
-        self.index_git = "git"
-        self.github_logins = {}
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map)
         self.github_token = None
+        self.github_logins = {}
         self.studies = [self.enrich_demography]
-
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
 
     def set_github_token(self, token):
         self.github_token = token
-
-    def get_field_date(self):
-        return "metadata__updated_on"
 
     def get_field_unique_id(self):
         return "ocean-unique-id"
