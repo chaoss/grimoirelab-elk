@@ -72,6 +72,7 @@ class Enrich(object):
             self.prjs_map = self._get_projects_map(db_projects_map)
 
         if self.prjs_map and self.json_projects:
+            self._compare_projects_map(self.prjs_map, self.json_projects)
             logging.info("Comparing db and json projects")
 
         self.requests = requests.Session()
@@ -84,6 +85,66 @@ class Enrich(object):
 
     def set_elastic(self, elastic):
         self.elastic = elastic
+
+    def _compare_projects_map(self, db, json):
+        # Compare the projects coming from db and from a json file in eclipse
+        ds_map_db = {}
+        ds_map_json = {
+            "git":"scm",
+            "pipermail":"mls",
+            "gerrit":"scr",
+            "bugzilla":"its"
+        }
+        for ds in ds_map_json:
+            ds_map_db[ds_map_json[ds]] = ds
+
+        db_projects = []
+        dss = db.keys()
+
+        # Check that all db data is in the JSON file
+        for ds in dss:
+            for repository in db[ds]:
+                # A repository could be in more than one project. But we get only one.
+                project = db[ds][repository]
+                if project not in db_projects:
+                    db_projects.append(project)
+                if project not in json:
+                    logging.error("Project not found in JSON ", project)
+                    raise
+                else:
+                    if ds == 'mls':
+                        repo_mls = repository.split("/")[-1]
+                        repo_mls = repo_mls.replace(".mbox", "")
+                        repository = 'https://dev.eclipse.org/mailman/listinfo/' + repo_mls
+                    if ds_map_db[ds] not in json[project]:
+                        logging.error("db repository not found in json %s", repository)
+                    elif repository not in json[project][ds_map_db[ds]]:
+                        logging.error("db repository not found in json %s", repository)
+
+        for project in json.keys():
+            if project not in db_projects:
+                logging.debug("JSON project %s not found in db" % project)
+
+        # Check that all JSON data is in the database
+        for project in json:
+            for ds in json[project]:
+                if ds not in ds_map_json:
+                    # meta
+                    continue
+                for repo in json[project][ds]:
+                    if ds == 'pipermail':
+                        repo_mls = repo.split("/")[-1]
+                        repo = "/mnt/mailman_archives/%s.mbox/%s.mbox" % (repo_mls, repo_mls)
+                    if repo in db[ds_map_json[ds]]:
+                        # print("Found ", repo, ds)
+                        pass
+                    else:
+                        logging.debug("Not found repository in db %s %s", repo, ds)
+
+        logging.debug("Number of db projects: %i", len(db_projects))
+        logging.debug("Number of json projects: %i (>=%i)", len(json.keys()), len(db_projects))
+
+        raise
 
     def _get_projects_map(self, db_projects_map):
         prjs_map = {}
