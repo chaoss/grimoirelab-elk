@@ -61,19 +61,24 @@ class Enrich(object):
             self.sh_db = Database("root", "", db_sortinghat, "mariadb")
             self.sortinghat = True
 
-        self.prjs_map = None
-        self.json_projects = None
+        self.prjs_map = None  # mapping beetween repositories and projects
+        json_projects = None
+
         if json_projects_map:
             with open(json_projects_map) as data_file:
-                self.json_projects = json.load(data_file)
-        if db_projects_map and not MYSQL_LIBS:
-            raise RuntimeError("Projects configured but MySQL libraries not available.")
-        if  db_projects_map:
-            self.prjs_map = self._get_projects_map(db_projects_map)
+                json_projects = json.load(data_file)
+                # If we have JSON projects always use them for mapping
+                self.prjs_map = self.__convert_json_to_projects_map(json_projects)
+        if not json_projects:
+            if db_projects_map and not MYSQL_LIBS:
+                raise RuntimeError("Projects configured but MySQL libraries not available.")
+            if  db_projects_map and not json_projects:
+                self.prjs_map = self.__get_projects_map(db_projects_map)
 
-        if self.prjs_map and self.json_projects:
-            self._compare_projects_map(self.prjs_map, self.json_projects)
-            logging.info("Comparing db and json projects")
+        if self.prjs_map and json_projects:
+            # logging.info("Comparing db and json projects")
+            # self.__compare_projects_map(self.prjs_map, self.json_projects)
+            pass
 
         self.requests = requests.Session()
         if insecure:
@@ -86,7 +91,37 @@ class Enrich(object):
     def set_elastic(self, elastic):
         self.elastic = elastic
 
-    def _compare_projects_map(self, db, json):
+    def __convert_json_to_projects_map(self, json):
+        """ Convert JSON format to the projects map format
+        map[ds][repository] = project
+        If a repository is in several projects assign to leaf
+        Check that all JSON data is in the database
+
+        :param json: data with the projects to repositories mapping
+        :returns: the repositories to projects mapping per data source
+        """
+        ds_repo_to_prj = {}
+
+        for project in json:
+            for ds in json[project]:
+                if ds == "meta": continue  # not a real data source
+                if ds not in ds_repo_to_prj:
+                    if not ds in ds_repo_to_prj:
+                        ds_repo_to_prj[ds] = {}
+                for repo in json[project][ds]:
+                    if repo in ds_repo_to_prj[ds]:
+                        if project == ds_repo_to_prj[ds][repo]:
+                            logging.debug("Duplicated repo: %s %s %s", ds, repo, project)
+                        else:
+                            if len(project.split(".")) > len(ds_repo_to_prj[ds][repo].split(".")):
+                                logging.debug("Changed repo project because we found a leaf: %s leaf vs %s (%s, %s)",
+                                              project, ds_repo_to_prj[ds][repo], repo, ds)
+                                ds_repo_to_prj[ds][repo] = project
+                    else:
+                        ds_repo_to_prj[ds][repo] = project
+        return  ds_repo_to_prj
+
+    def __compare_projects_map(self, db, json):
         # Compare the projects coming from db and from a json file in eclipse
         ds_map_db = {}
         ds_map_json = {
@@ -144,19 +179,18 @@ class Enrich(object):
         logging.debug("Number of db projects: %i", len(db_projects))
         logging.debug("Number of json projects: %i (>=%i)", len(json.keys()), len(db_projects))
 
-        raise
-
-    def _get_projects_map(self, db_projects_map):
-        prjs_map = {}
+    def __get_projects_map(self, db_projects_map):
+        # Read the repo to project mapping from a database
+        ds_repo_to_prj = {}
 
         db = MySQLdb.connect(user="root", passwd="", host="mariadb",
                              db = db_projects_map)
         cursor = db.cursor()
 
         query = """
-        SELECT data_source, p.id, pr.repository_name
-        FROM projects p
-        JOIN project_repositories pr ON p.project_id=pr.project_id
+            SELECT data_source, p.id, pr.repository_name
+            FROM projects p
+            JOIN project_repositories pr ON p.project_id=pr.project_id
         """
 
         res = int(cursor.execute(query))
@@ -164,12 +198,12 @@ class Enrich(object):
             rows = cursor.fetchall()
             for row in rows:
                 [ds, name, repo] = row
-                if ds not in prjs_map:
-                    prjs_map[ds] = {}
-                prjs_map[ds][repo] = name
+                if ds not in ds_repo_to_prj:
+                    ds_repo_to_prj[ds] = {}
+                ds_repo_to_prj[ds][repo] = name
         else:
             raise RuntimeError("Can't find projects mapping in %s" % (db_projects_map))
-        return prjs_map
+        return ds_repo_to_prj
 
     def set_elastic(self, elastic):
         self.elastic = elastic
