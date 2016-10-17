@@ -49,6 +49,7 @@ except ImportError:
     logger.info("SortingHat not available")
     SORTINGHAT_LIBS = False
 
+DEFAULT_PROJECT = 'Main'
 
 class Enrich(object):
 
@@ -307,6 +308,10 @@ class Enrich(object):
             # Try to use always the origin in any case
             if ds_name in self.prjs_map and item['origin'] in self.prjs_map[ds_name]:
                 project = self.prjs_map[ds_name][item['origin']]
+
+        if project is None:
+            project = DEFAULT_PROJECT
+
         item_project = {"project": project}
         # Time to add the project levels: eclipse.platform.releng.aggregator
         item_path = ''
