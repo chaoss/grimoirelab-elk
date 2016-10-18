@@ -207,7 +207,8 @@ class ElasticOcean(object):
         url = self.elastic.index_url
         # 1 minute to process the results of size items
         # In gerrit enrich with 500 items per page we need >1 min
-        max_process_items_pack_time = "3m"  # 3 minutes
+        # In Mozilla ES in Amazon we need 10m
+        max_process_items_pack_time = "10m"  # 10 minutes
         url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
                                                self.elastic_page)
 
