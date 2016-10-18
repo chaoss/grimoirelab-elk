@@ -130,6 +130,15 @@ class ElasticOcean(object):
 
             logging.info("Incremental from: %s", last_update)
 
+        if 'offset' in signature.parameters:
+            # Try to get the offset from ES
+            # Always filter by origin to support multi origin indexes
+            filter_ = {"name":"origin",
+                       "value":self.perceval_backend.origin}
+            offset = self.elastic.get_last_offset("offset", filter_)
+
+            logging.info("Incremental from: %i offset", offset)
+
 
         task_init = datetime.now()
 
