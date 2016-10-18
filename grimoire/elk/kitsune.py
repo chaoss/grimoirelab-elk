@@ -108,7 +108,7 @@ class KitsuneEnrich(Enrich):
         if kind == 'question':
             eitem['type'] = kind
             # metadata fields to copy
-            copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
+            copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin","offset"]
             for f in copy_fields:
                 if f in item:
                     eitem[f] = item[f]
