@@ -242,7 +242,7 @@ class ElasticOcean(object):
             elif self.offset:
                 filters += '''
                     , {"range":
-                        {"offset": {"gte": "%s"}}
+                        {"offset": {"gte": %i}}
                     }
                 ''' % (self.offset)
 
