@@ -348,6 +348,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             ocean_backend = connector[1](backend, from_date=last_enrich)
         elif 'offset' in signature.parameters:
             ocean_backend = connector[1](backend, offset=last_enrich)
+        else:
+            ocean_backend = connector[1](backend)
         clean = False  # Don't remove ocean index when enrich
         elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
