@@ -58,6 +58,10 @@ class PhabricatorEnrich(Enrich):
                 "author_roles_analyzed": {
                    "type": "string",
                    "index":"analyzed"
+                 },
+                "tags_analyzed": {
+                   "type": "string",
+                   "index":"analyzed"
                  }
            }
         } """
@@ -143,9 +147,14 @@ class PhabricatorEnrich(Enrich):
         if 'authorData' in phab_item['fields']:
             eitem['author_roles'] = ",".join(phab_item['fields']['authorData']['roles'])
             eitem['author_roles_analyzed'] = eitem['author_roles']
+            eitem['author_userName'] = phab_item['fields']['authorData']['userName']
+            eitem['author_realName'] = phab_item['fields']['authorData']['realName']
         if 'ownerData' in phab_item['fields']:
             eitem['assigned_to_roles'] = ",".join(phab_item['fields']['ownerData']['roles'])
-            eitem['assgined_to_roles_analyzed'] = eitem['assigned_to_roles']
+            eitem['assigned_to_roles_analyzed'] = eitem['assigned_to_roles']
+            eitem['assigned_to_userName'] = phab_item['fields']['ownerData']['userName']
+            eitem['assigned_to_realName'] = phab_item['fields']['ownerData']['realName']
+
 
         eitem['priority'] = phab_item['fields']['priority'] ['name']
         eitem['priority_value'] = phab_item['fields']['priority']['value']
@@ -164,6 +173,19 @@ class PhabricatorEnrich(Enrich):
                 get_time_diff_days(eitem['creation_date'], datetime.utcnow())
 
         eitem['changes'] = len(phab_item['transactions'])
+        # Number of assignments changes
+        eitem['changes_assignment'] = 0
+        # Number of assignees in the changes
+        eitem['changes_assignee_number'] = 0
+        # List the changes assignees
+        changes_assignee_list = []
+        for change in phab_item['transactions']:
+            if change["transactionType"] == "reassign":
+                if change['authorData']['userName'] not in changes_assignee_list:
+                    changes_assignee_list.append(change['authorData']['userName'])
+                    eitem['changes_assignment'] += 1
+        eitem['changes_assignee_number'] = len(changes_assignee_list)
+        eitem['changes_assignee_list'] = ','.join(changes_assignee_list)
         eitem['comments'] = 0
         for tr in phab_item['transactions']:
             if tr ['comments']:
