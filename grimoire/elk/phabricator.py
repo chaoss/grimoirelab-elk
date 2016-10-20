@@ -183,7 +183,7 @@ class PhabricatorEnrich(Enrich):
             if change["transactionType"] == "reassign":
                 if change['authorData']['userName'] not in changes_assignee_list:
                     changes_assignee_list.append(change['authorData']['userName'])
-                    eitem['changes_assignment'] += 1
+                eitem['changes_assignment'] += 1
         eitem['changes_assignee_number'] = len(changes_assignee_list)
         eitem['changes_assignee_list'] = ','.join(changes_assignee_list)
         eitem['comments'] = 0
