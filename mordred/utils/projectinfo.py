@@ -30,7 +30,7 @@ import os
 import sys
 
 
-REPOSITORIES_AVALIABLE = ['source_repo', 'github', 'gmane', 'telegram', 'kuma',
+REPOSITORIES_AVALIABLE = ['source_repo', 'git','github', 'gmane', 'telegram', 'kuma',
                           'kitsune', 'mozilla_reps', 'mediawiki', 'mbox', 'confluence',
                           'jira',' maniphest', 'gerrit', 'meetup', 'supybot',
                           'pipermail']
@@ -145,7 +145,7 @@ def read_file(filename):
 
 def write_file(filename, data):
     with open(filename, 'w+') as f:
-        json.dump(data, f)
+        json.dump(data, f, sort_keys=True, indent=4)
 
 def add(conf, raw):
     """Add a new project or a project repository"""

@@ -116,5 +116,5 @@ if __name__ == '__main__':
 
     repos, github = get_repo_url(user, blacklist)
 
-    project_info(json, proj_name, repos, "source_repo")
-    project_info(json, proj_name, github, "github")
+    project_info(json, proj_name, repos, "github")
+    project_info(json, proj_name, github, "git")

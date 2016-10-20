@@ -422,9 +422,9 @@ function retrieve_data {
 }
 
 function git_retrieval {
-    REPOS=`get_repo_list source_repo`
+    REPOS=`get_repo_list git`
 
-    nrepos=`get_repo_list source_repo|wc -w`
+    nrepos=`get_repo_list git|wc -w`
     cd ~/GrimoireELK/utils
     counter=0
     for r in $REPOS
@@ -646,14 +646,14 @@ function git_enrichment {
         GITHUB_PARAMETER="--github-token $GITHUB_TOKEN"
     fi
 
-    REPOS=`get_repo_list source_repo`
+    REPOS=`get_repo_list git`
 
     if [ $ENR_EXTRA_FLAG == '--only-studies' ]; then
 	# when we execute studies, we want it without going repo by repo
         REPOS="''"
     fi
 
-    nrepos=`get_repo_list source_repo|wc -w`
+    nrepos=`get_repo_list git|wc -w`
     cd ~/GrimoireELK/utils
     counter=0
     for r in $REPOS
