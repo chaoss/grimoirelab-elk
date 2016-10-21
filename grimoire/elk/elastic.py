@@ -33,6 +33,8 @@ from time import time, sleep
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+from .utils import unixtime_to_datetime
+
 WAIT_INDEX_CREATION = 2  # number of seconds to wait for index creation
 
 class ElasticConnectException(Exception):
@@ -293,5 +295,5 @@ class ElasticSearch(object):
                 else:
                     last_value = res_json["aggregations"]["1"]["value"]
                     if last_value:
-                        last_value = datetime.fromtimestamp(last_value)
+                        last_value = unixtime_to_datetime(last_value)
         return last_value

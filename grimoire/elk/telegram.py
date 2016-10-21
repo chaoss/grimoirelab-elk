@@ -29,6 +29,8 @@ from datetime import datetime
 
 from grimoire.elk.enrich import Enrich
 
+from .utils import unixtime_to_datetime
+
 class TelegramEnrich(Enrich):
 
     def get_field_unique_id(self):
@@ -75,7 +77,7 @@ class TelegramEnrich(Enrich):
         eitem = {}  # Item enriched
 
         identity  = self.get_sh_identity(message[field])
-        update = datetime.fromtimestamp(message['date'])
+        update = unixtime_to_datetime(message['date'])
         eitem = self.get_item_sh_fields(identity, update)
 
         return eitem
