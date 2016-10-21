@@ -214,6 +214,8 @@ def get_params_parser():
                         help="Only enrich items (DEPRECATED, use --only-enrich)")
     parser.add_argument("--only-enrich",  dest='enrich_only', action='store_true',
                         help="Only enrich items (DEPRECATED, use --only-enrich)")
+    parser.add_argument("--events-enrich",  dest='events_enrich', action='store_true',
+                        help="Enrich events in items")
     parser.add_argument('--index', help="Ocean index name")
     parser.add_argument('--index-enrich', dest="index_enrich", help="Ocean enriched index name")
     parser.add_argument('--db-projects-map', help="Projects Mapping DB")
