@@ -37,9 +37,6 @@ class GerritEnrich(Enrich):
     def get_fields_uuid(self):
         return ["review_uuid", "patchSet_uuid", "approval_uuid"]
 
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def get_sh_identity(self, user):
         identity = {}
         for field in ['name', 'email', 'username']:
@@ -138,7 +135,7 @@ class GerritEnrich(Enrich):
         return {"items":mapping}
 
 
-    def review_item(self, item):
+    def get_rich_item(self, item):
         eitem = {}  # Item enriched
 
         # metadata fields to copy
@@ -199,41 +196,4 @@ class GerritEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(review['createdOn'], "review"))
 
-        bulk_json = '{"index" : {"_id" : "%s" } }\n' % (eitem[self.get_field_unique_id()])  # Bulk operation
-        bulk_json += json.dumps(eitem)+"\n"
-
-        return bulk_json
-
-
-    def enrich_items(self, items):
-        """ Fetch in ES patches and comments (events) as documents """
-
-        def send_bulk_json(bulk_json, current):
-            url_bulk = self.elastic.index_url+'/'+self.type_name+'/_bulk'
-            try:
-                task_init = time.time()
-                self.requests.put(url_bulk, data=bulk_json)
-                logging.debug("bulk packet sent (%.2f sec, %i items)"
-                              % (time.time()-task_init, current))
-            except UnicodeEncodeError:
-                # Why is requests encoding the POST data as ascii?
-                logging.error("Unicode error for events in review: " + review['id'])
-                safe_json = str(bulk_json.encode('ascii', 'ignore'),'ascii')
-                self.requests.put(url_bulk, data=safe_json)
-                # Continue with execution.
-
-        bulk_json = ""  # json data added in bulk operations
-        total = 0
-        current = 0
-
-        for review in items:
-            if current >= self.elastic.max_items_bulk:
-                send_bulk_json(bulk_json, current)
-                total += current
-                current = 0
-                bulk_json = ""
-            # data_json = self.review_events(review)
-            data_json = self.review_item(review)
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        send_bulk_json(bulk_json, current)
+        return eitem

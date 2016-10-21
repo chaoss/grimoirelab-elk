@@ -34,9 +34,6 @@ from grimoire.elk.enrich import Enrich
 
 class DiscourseEnrich(Enrich):
 
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
@@ -112,26 +109,3 @@ class DiscourseEnrich(Enrich):
         eitem.update(self.get_grimoire_fields(firt_post_time, "topic"))
 
         return eitem
-
-    def enrich_items(self, items):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-
-            rich_item = self.get_rich_item(item)
-            data_json = json.dumps(rich_item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data = bulk_json)

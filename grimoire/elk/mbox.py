@@ -153,6 +153,13 @@ class MBoxEnrich(Enrich):
         return eitem
 
     def enrich_items(self, items):
+        # Use standard method and if fails, use the old one with Unicode control
+        try:
+            super(MBoxEnrich, self).enrich_items(items)
+        except UnicodeEncodeError:
+            self.enrich_items_old(items)
+
+    def enrich_items_old(self, items):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""

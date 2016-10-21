@@ -31,9 +31,6 @@ from grimoire.elk.enrich import Enrich
 
 class SupybotEnrich(Enrich):
 
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def get_elastic_mappings(self):
 
         mapping = """
@@ -99,50 +96,3 @@ class SupybotEnrich(Enrich):
             eitem.update(self.get_item_sh(item, "nick"))
 
         return eitem
-
-    def enrich_items(self, items):
-
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-
-            rich_item = self.get_rich_item(item)
-            data_json = json.dumps(rich_item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data = bulk_json)
-
-    def enrich_events(self, items):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            rich_item_reviews = self.get_rich_item_reviews(item)
-            for enrich_review in rich_item_reviews:
-                if current >= max_items:
-                    self.requests.put(url, data=bulk_json)
-                    bulk_json = ""
-                    current = 0
-                data_json = json.dumps(enrich_review)
-                bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                    (enrich_review[self.get_field_unique_id_review()])
-                bulk_json += data_json +"\n"  # Bulk document
-                current += 1
-        self.requests.put(url, data = bulk_json)
