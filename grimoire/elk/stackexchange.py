@@ -29,6 +29,8 @@ from datetime import datetime
 
 from grimoire.elk.enrich import Enrich
 
+from .utils import unixtime_to_datetime
+
 class StackExchangeEnrich(Enrich):
 
     def get_field_unique_id(self):
@@ -86,7 +88,7 @@ class StackExchangeEnrich(Enrich):
 
         eitem = {}  # Item enriched
 
-        update_date = datetime.fromtimestamp(item["last_activity_date"])
+        update_date = unixtime_to_datetime(item["last_activity_date"])
 
         # Add Sorting Hat fields
         if identity_field not in item:
@@ -141,7 +143,7 @@ class StackExchangeEnrich(Enrich):
             for fn in map_fields:
                 eitem[map_fields[fn]] = question[fn]
 
-            creation_date = datetime.fromtimestamp(question["creation_date"]).isoformat()
+            creation_date = unixtime_to_datetime(question["creation_date"]).isoformat()
             eitem['creation_date'] = creation_date
             eitem.update(self.get_grimoire_fields(creation_date, "question"))
 
@@ -178,7 +180,7 @@ class StackExchangeEnrich(Enrich):
             for fn in map_fields:
                 eitem[map_fields[fn]] = answer[fn]
 
-            creation_date = datetime.fromtimestamp(answer["creation_date"]).isoformat()
+            creation_date = unixtime_to_datetime(answer["creation_date"]).isoformat()
             eitem['creation_date'] = creation_date
             eitem.update(self.get_grimoire_fields(creation_date, "answer"))
 

@@ -33,6 +33,8 @@ from time import time, sleep
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+from .utils import unixtime_to_datetime
+
 class ElasticConnectException(Exception):
     message = "Can't connect to ElasticSearch"
 
@@ -274,5 +276,5 @@ class ElasticSearch(object):
                 else:
                     last_value = res_json["aggregations"]["1"]["value"]
                     if last_value:
-                        last_value = datetime.fromtimestamp(last_value)
+                        last_value = unixtime_to_datetime(last_value)
         return last_value
