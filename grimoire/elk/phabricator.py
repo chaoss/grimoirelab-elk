@@ -35,6 +35,9 @@ from .utils import get_time_diff_days, unixtime_to_datetime
 
 class PhabricatorEnrich(Enrich):
 
+    def get_field_event_unique_id(self):
+        return "transactionID"
+
     def get_elastic_mappings(self):
 
         mapping = """
@@ -107,6 +110,46 @@ class PhabricatorEnrich(Enrich):
             eitem.update(assigned_to)
 
         return eitem
+
+    def get_rich_events(self, item):
+        events = []
+
+        # Events are in transactions field
+        transactions = item['data']['transactions']
+        for t in transactions:
+            event = {}
+            # Needed for incremental updates from the item
+            event['metadata__updated_on'] = item['metadata__updated_on']
+            event['origin'] = item['origin']
+            # Real event data
+            event['transactionID'] = t['transactionID']
+            event['type'] = t['transactionType']
+            event['bug_id'] = t['taskID']
+            event['username'] = None
+            if 'authorData' in t and 'userName' in t['authorData']:
+                event['username'] = t['authorData']['userName']
+            event['update_date'] = unixtime_to_datetime(float(t['dateCreated'])).isoformat()
+            event['oldValue'] = ''
+            event['newValue'] = ''
+            if event['type'] == 'core:edge':
+                for val in t['oldValue']:
+                    event['oldValue'] += "," + val
+                for val in t['newValue']:
+                    event['newValue'] += "," + val
+            elif event['type'] in  ['status', 'description', 'priority', 'reassign', 'title', 'space', 'create']:
+                event['oldValue'] = t['oldValue']
+                event['newValue'] = t['newValue']
+            elif event['type'] == 'core:comment':
+                event['newValue'] = t['comments']
+            elif event['type'] == 'core:subscribers':
+                event['newValue']= ",".join(t['newValue'])
+            else:
+                # logging.debug("Event type %s old to new value not supported", t['transactionType'])
+                pass
+
+            events.append(event)
+
+        return events
 
 
     def get_rich_item(self, item):
