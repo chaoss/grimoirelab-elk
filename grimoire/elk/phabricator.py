@@ -33,6 +33,9 @@ from grimoire.elk.enrich import Enrich
 
 from .utils import get_time_diff_days, unixtime_to_datetime
 
+
+TASK_INIT_STATUS = 'open'
+
 class PhabricatorEnrich(Enrich):
 
     def get_field_event_unique_id(self):
@@ -114,6 +117,9 @@ class PhabricatorEnrich(Enrich):
     def get_rich_events(self, item):
         events = []
 
+        task_status = TASK_INIT_STATUS  # to follow changes in status
+        task_priority = None # to follow changes in priority
+
         # Events are in transactions field
         transactions = item['data']['transactions']
         for t in transactions:
@@ -136,7 +142,7 @@ class PhabricatorEnrich(Enrich):
                     event['oldValue'] += "," + val
                 for val in t['newValue']:
                     event['newValue'] += "," + val
-            elif event['type'] in  ['status', 'description', 'priority', 'reassign', 'title', 'space', 'create']:
+            elif event['type'] in  ['status', 'description', 'priority', 'reassign', 'title', 'space', 'create', 'parent']:
                 event['oldValue'] = t['oldValue']
                 event['newValue'] = t['newValue']
             elif event['type'] == 'core:comment':
@@ -146,6 +152,14 @@ class PhabricatorEnrich(Enrich):
             else:
                 # logging.debug("Event type %s old to new value not supported", t['transactionType'])
                 pass
+
+            if event['type'] == 'status':
+                task_status = event['newValue']
+            elif event['type'] == 'priority':
+                task_priority = event['newValue']
+
+            event['status'] = task_status
+            event['priority'] = task_priority
 
             events.append(event)
 
