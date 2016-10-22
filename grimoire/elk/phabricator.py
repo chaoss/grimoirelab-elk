@@ -38,6 +38,12 @@ TASK_INIT_STATUS = 'open'
 
 class PhabricatorEnrich(Enrich):
 
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None, insecure=True):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map, insecure)
+
+        self.tasks_closed = 0
+        self.tasks_opened = 0
+
     def get_field_event_unique_id(self):
         return "transactionID"
 
@@ -142,7 +148,7 @@ class PhabricatorEnrich(Enrich):
                     event['oldValue'] += "," + val
                 for val in t['newValue']:
                     event['newValue'] += "," + val
-            elif event['type'] in  ['status', 'description', 'priority', 'reassign', 'title', 'space', 'create', 'parent']:
+            elif event['type'] in  ['status', 'description', 'priority', 'reassign', 'title', 'space', 'core:create', 'parent']:
                 event['oldValue'] = t['oldValue']
                 event['newValue'] = t['newValue']
             elif event['type'] == 'core:comment':
@@ -153,13 +159,23 @@ class PhabricatorEnrich(Enrich):
                 # logging.debug("Event type %s old to new value not supported", t['transactionType'])
                 pass
 
+            # To track history of status and priority
             if event['type'] == 'status':
                 task_status = event['newValue']
             elif event['type'] == 'priority':
                 task_priority = event['newValue']
-
             event['status'] = task_status
             event['priority'] = task_priority
+
+
+            # For the burn vis
+            if event['type'] in  ['core:create']:
+                self.tasks_opened += 1
+            if event['newValue'] in  ['resolved']:
+                self.tasks_closed += 1
+            event['tasks_opened'] = self.tasks_opened
+            event['tasks_closed'] = self.tasks_closed
+            event['tasks_burn'] = self.tasks_opened-self.tasks_closed
 
             events.append(event)
 
