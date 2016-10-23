@@ -43,6 +43,7 @@ class PhabricatorEnrich(Enrich):
 
         self.tasks_closed = 0
         self.tasks_opened = 0
+        self.phab_ids_names = {}  # To convert from phab ids to phab names
 
     def get_field_event_unique_id(self):
         return "transactionID"
@@ -121,12 +122,32 @@ class PhabricatorEnrich(Enrich):
         return eitem
 
     def get_rich_events(self, item):
+        """
+        In the events there are some common fields with the task. The name
+        of the field must be the same in the task and in the event
+        so we can filer using it in task and event at the same time.
+
+        * Fields that don't change: the field does not change with the events
+        in a task so the value is always the same in the events of a task.
+
+        * Fields that change: the value of teh field changes with events
+        """
         events = []
 
-        task_status = TASK_INIT_STATUS  # to follow changes in status
-        task_priority = None # to follow changes in priority
+        # To get values from the task
+        eitem = self.get_rich_item(item)
 
-        # Events are in transactions field
+        # Fields that don't change never
+        task_fields_nochange = ['author_userName', 'creation_date', 'url']
+
+        # Follow changes in this fields
+        task_fields_change = ['priority_value', 'status', 'assigned_to_userName']
+        task_change = {}
+        for f in task_fields_change:
+            task_change[f] = None
+        task_change['status'] = TASK_INIT_STATUS
+
+        # Events are in transactions field (changes in fields)
         transactions = item['data']['transactions']
         for t in transactions:
             event = {}
@@ -159,14 +180,24 @@ class PhabricatorEnrich(Enrich):
                 # logging.debug("Event type %s old to new value not supported", t['transactionType'])
                 pass
 
-            # To track history of status and priority
-            if event['type'] == 'status':
-                task_status = event['newValue']
-            elif event['type'] == 'priority':
-                task_priority = event['newValue']
-            event['status'] = task_status
-            event['priority'] = task_priority
+            for f in task_fields_nochange:
+                # The field name must be the same thna in task for filtering
+                event[f] = eitem[f]
 
+            # To track history of some fields
+            if event['type'] in ['status']:
+                task_change['status'] = event['newValue']
+            elif event['type'] == 'priority':
+                task_change['priority_value'] = event['newValue']
+            if event['type'] in  ['reassign']:
+                if event['newValue'] in self.phab_ids_names:
+                    # Try to get the userName and not the user id
+                    task_change['assigned_to_userName'] = self.phab_ids_names[event['newValue']]
+                else:
+                    task_change['assigned_to_userName'] = event['newValue']
+
+            for f in task_change:
+                event[f] = task_change[f]
 
             # For the burn vis
             if event['type'] in  ['core:create']:
@@ -182,8 +213,24 @@ class PhabricatorEnrich(Enrich):
         return events
 
 
+    def __fill_phab_ids(self, item):
+        """ Get mappings between phab ids and names """
+        for p in item['projects']:
+            self.phab_ids_names[p['phid']] = p['name']
+        self.phab_ids_names[item['fields']['authorData']['phid']] = item['fields']['authorData']['userName']
+        if 'ownerData' in item['fields']:
+            self.phab_ids_names[item['fields']['ownerData']['phid']] = item['fields']['ownerData']['userName']
+        for t in item['transactions']:
+            if 'userName' in t['authorData']:
+                self.phab_ids_names[t['authorData']['phid']] = t['authorData']['userName']
+            elif 'name' in t['authorData']:
+                # Herald
+                self.phab_ids_names[t['authorData']['phid']] = t['authorData']['name']
+
     def get_rich_item(self, item):
         eitem = {}
+
+        self.__fill_phab_ids(item['data'])
 
         # metadata fields to copy
         copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
