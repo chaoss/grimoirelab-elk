@@ -138,7 +138,7 @@ class PhabricatorEnrich(Enrich):
         eitem = self.get_rich_item(item)
 
         # Fields that don't change never
-        task_fields_nochange = ['author_userName', 'creation_date', 'url']
+        task_fields_nochange = ['author_userName', 'creation_date', 'url', 'id', 'bug_id']
 
         # Follow changes in this fields
         task_fields_change = ['priority_value', 'status', 'assigned_to_userName']
@@ -148,6 +148,8 @@ class PhabricatorEnrich(Enrich):
         task_change['status'] = TASK_INIT_STATUS
 
         # Events are in transactions field (changes in fields)
+        # We need to revert them to go from older to newer
+        item['data']['transactions'].reverse()
         transactions = item['data']['transactions']
         for t in transactions:
             event = {}
@@ -157,7 +159,6 @@ class PhabricatorEnrich(Enrich):
             # Real event data
             event['transactionID'] = t['transactionID']
             event['type'] = t['transactionType']
-            event['bug_id'] = t['taskID']
             event['username'] = None
             if 'authorData' in t and 'userName' in t['authorData']:
                 event['username'] = t['authorData']['userName']
@@ -233,7 +234,7 @@ class PhabricatorEnrich(Enrich):
         self.__fill_phab_ids(item['data'])
 
         # metadata fields to copy
-        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
+        copy_fields = ["metadata__updated_on", "metadata__timestamp", "ocean-unique-id", "origin"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]
@@ -274,7 +275,7 @@ class PhabricatorEnrich(Enrich):
 
         eitem['priority'] = phab_item['fields']['priority'] ['name']
         eitem['priority_value'] = phab_item['fields']['priority']['value']
-        eitem['status'] = phab_item['fields']['status']['name']
+        eitem['status'] = phab_item['fields']['status']['value']
         eitem['creation_date'] = unixtime_to_datetime(phab_item['fields']['dateCreated']).isoformat()
         eitem['modification_date'] = unixtime_to_datetime(phab_item['fields']['dateModified']).isoformat()
         eitem['update_date'] = unixtime_to_datetime(item['updated_on']).isoformat()
