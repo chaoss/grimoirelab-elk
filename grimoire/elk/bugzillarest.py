@@ -35,7 +35,7 @@ from .utils import get_time_diff_days
 class BugzillaRESTEnrich(Enrich):
 
     def get_field_date(self):
-        return "last_change_time"
+        return "metadata__updated_on"
 
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "creator_uuid"]
