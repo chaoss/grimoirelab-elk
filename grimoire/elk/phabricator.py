@@ -34,7 +34,8 @@ from grimoire.elk.enrich import Enrich
 from .utils import get_time_diff_days, unixtime_to_datetime
 
 
-TASK_INIT_STATUS = 'open'
+TASK_OPEN_STATUS = 'open'
+TASK_CLOSED_STATUS = 'resolved'
 
 class PhabricatorEnrich(Enrich):
 
@@ -145,7 +146,7 @@ class PhabricatorEnrich(Enrich):
         task_change = {}
         for f in task_fields_change:
             task_change[f] = None
-        task_change['status'] = TASK_INIT_STATUS
+        task_change['status'] = TASK_OPEN_STATUS
 
         # Events are in transactions field (changes in fields)
         # We need to revert them to go from older to newer
@@ -286,7 +287,7 @@ class PhabricatorEnrich(Enrich):
 
         eitem['timeopen_days'] = \
             get_time_diff_days(eitem['creation_date'], eitem['update_date'])
-        if eitem['status'] == 'Open':
+        if eitem['status'] == TASK_OPEN_STATUS:
             eitem['timeopen_days'] = \
                 get_time_diff_days(eitem['creation_date'], datetime.utcnow())
 
