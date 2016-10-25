@@ -24,6 +24,7 @@
 
 import json
 import logging
+import time
 
 import requests
 
@@ -38,9 +39,17 @@ class GitEnrich(Enrich):
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map)
+
+        self.studies = [self.enrich_demography]
+
+        # GitHub API management
         self.github_token = None
         self.github_logins = {}
-        self.studies = [self.enrich_demography]
+        self.github_logins_committer_not_found = 0
+        self.github_logins_author_not_found = 0
+        self.rate_limit = None
+        self.rate_limit_reset_ts = None
+        self.min_rate_to_sleep = 100  # if pending rate < 100 sleep
 
     def set_github_token(self, token):
         self.github_token = token
@@ -127,33 +136,53 @@ class GitEnrich(Enrich):
             GITHUB_API_URL = "https://api.github.com"
             commit_url = GITHUB_API_URL+"/repos/%s/commits/%s" % (repo, commit_hash)
             headers = {'Authorization': 'token ' + self.github_token}
+
             r = requests.get(commit_url, headers=headers)
+
+            self.rate_limit = int(r.headers['X-RateLimit-Remaining'])
+            self.rate_limit_reset_ts = int(r.headers['X-RateLimit-Reset'])
+            logging.debug("Rate limit pending: %s", self.rate_limit)
+            if self.rate_limit <= self.min_rate_to_sleep:
+                seconds_to_reset = self.rate_limit_reset_ts - int(time.time()) + 1
+                cause = "GitHub rate limit exhausted."
+                logging.info("%s Waiting %i secs for rate limit reset.", cause, seconds_to_reset)
+                time.sleep(seconds_to_reset)
+                # Retry once we have rate limit
+                r = requests.get(commit_url, headers=headers)
 
             try:
                 r.raise_for_status()
             except requests.exceptions.HTTPError as ex:
-                # commit not found probably: P10
+                # commit not found probably or rate limit exhausted
                 logging.error("Can't find commit %s %s", commit_url, ex)
                 return login
-
-            logging.debug("Rate limit pending: %s" % (r.headers['X-RateLimit-Remaining']))
 
             commit_json = r.json()
             author_login = None
             if 'author' in commit_json and commit_json['author']:
                 author_login = commit_json['author']['login']
+            else:
+                self.github_logins_author_not_found += 1
+
             user_login = None
             if 'committer' in commit_json and commit_json['committer']:
                 user_login = commit_json['committer']['login']
+            else:
+                self.github_logins_committer_not_found += 1
+
             if rol == "author":
                 login = author_login
             elif rol == "committer":
-                login = author_login
+                login = user_login
             else:
                 logging.error("Wrong rol: %s" % (rol))
                 raise RuntimeError
+
             self.github_logins[user] = login
-            logging.debug("%s is %s in github" % (user, login))
+            logging.debug("%s is %s in github (not found %i a %i u)", user, login,
+                          self.github_logins_author_not_found,
+                          self.github_logins_committer_not_found)
+
         return login
 
     def get_rich_commit(self, item):
