@@ -327,6 +327,30 @@ class Enrich(object):
 
         return {"items":mapping}
 
+    def get_elastic_analyzers(self):
+        """ Custom analyzers for our indexes  """
+
+        analyzers = '''
+        {
+                "analysis" : {
+                    "tokenizer" : {
+                        "comma" : {
+                            "type" : "pattern",
+                            "pattern" : ","
+                        }
+                    },
+                    "analyzer" : {
+                        "comma" : {
+                            "type" : "custom",
+                            "tokenizer" : "comma"
+                        }
+                    }
+                }
+        }
+        '''
+
+        return analyzers
+
     def get_grimoire_fields(self, creation_date, item_name):
         """ Return common grimoire fields for all data sources """
 

@@ -151,22 +151,22 @@ def get_connectors():
              "twitter":[None, TwitterOcean, TwitterEnrich, None]
             }  # Will come from Registry
 
-def get_elastic(url, es_index, clean = None, ocean_backend = None):
+def get_elastic(url, es_index, clean = None, backend = None):
 
     mapping = None
 
-    if ocean_backend:
-        mapping = ocean_backend.get_elastic_mappings()
-
+    if backend:
+        mapping = backend.get_elastic_mappings()
+        analyzers = backend.get_elastic_analyzers()
     try:
-        ocean_index = es_index
-        elastic_ocean = ElasticSearch(url, ocean_index, mapping, clean)
+        insecure = True
+        elastic = ElasticSearch(url, es_index, mapping, clean, insecure, analyzers)
 
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
 
-    return elastic_ocean
+    return elastic
 
 def config_logging(debug):
 

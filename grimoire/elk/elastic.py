@@ -35,6 +35,8 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from .utils import unixtime_to_datetime
 
+WAIT_INDEX_CREATION = 2  # number of seconds to wait for index creation
+
 class ElasticConnectException(Exception):
     message = "Can't connect to ElasticSearch"
 
@@ -48,7 +50,8 @@ class ElasticSearch(object):
         """ Return a valid elastic index generated from unique_id """
         return unique_id.replace("/","_").lower()
 
-    def __init__(self, url, index, mappings = None, clean = False, insecure=True):
+    def __init__(self, url, index, mappings = None, clean = False,
+                 insecure=True, analyzers=None):
         ''' clean: remove already existing index
             insecure: support https with invalid certificates
         '''
@@ -85,9 +88,10 @@ class ElasticSearch(object):
                 self.requests.delete(self.index_url)
                 self.requests.post(self.index_url)
                 logging.info("Deleted and created index " + self.index_url)
+        if analyzers:
+            self.create_custom_analyzers(analyzers)
         if mappings:
             self.create_mappings(mappings)
-
 
     def _safe_put_bulk(self, url, bulk_json):
         """ Bulk PUT controlling unicode issues """
@@ -162,6 +166,21 @@ class ElasticSearch(object):
                 logging.debug("Probably %i item updates" % (total-total_search))
                 break
 
+    def create_custom_analyzers(self, analyzers):
+        # Close the index
+        # Wait until the creation is finished
+        sleep(WAIT_INDEX_CREATION)
+        r = self.requests.post(self.index_url + "/_close")
+        if r.status_code != 200:
+            logging.error("Error closing index %s", r.text)
+        # Add the custom analyzers
+        r = self.requests.put(self.index_url+"/_settings", data=analyzers)
+        if r.status_code != 200:
+            logging.error("Error creating custom analyzers %s", r.text)
+        # Open the index
+        r = self.requests.post(self.index_url + "/_open")
+        if r.status_code != 200:
+            logging.error("Error opening index %s", r.text)
 
     def create_mappings(self, mappings):
 

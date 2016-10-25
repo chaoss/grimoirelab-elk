@@ -81,6 +81,11 @@ class ElasticOcean(object):
 
         return {"items":mapping}
 
+    def get_elastic_analyzers(self):
+        """ Custom analyzers for our indexes  """
+
+        return None
+
     def get_last_update_from_es(self, _filter = None):
         last_update = self.elastic.get_last_date(self.get_field_date(), _filter)
 
