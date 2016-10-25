@@ -73,7 +73,11 @@ class PhabricatorEnrich(Enrich):
                 "tags_analyzed": {
                    "type": "string",
                    "index":"analyzed"
-                 }
+                 },
+                "tags_custom_analyzed" : {
+                    "type" : "string",
+                    "analyzer" : "comma"
+                }
            }
         } """
 
@@ -317,6 +321,7 @@ class PhabricatorEnrich(Enrich):
             else:
                 eitem['tags'] += ',' + project['name']
         eitem['tags_analyzed'] = eitem['tags']
+        eitem['tags_custom_analyzed'] = eitem['tags']
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
