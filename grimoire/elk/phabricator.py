@@ -146,7 +146,7 @@ class PhabricatorEnrich(Enrich):
         task_fields_nochange = ['author_userName', 'creation_date', 'url', 'id', 'bug_id']
 
         # Follow changes in this fields
-        task_fields_change = ['priority_value', 'status', 'assigned_to_userName']
+        task_fields_change = ['priority_value', 'status', 'assigned_to_userName', 'tags_custom_analyzed']
         task_change = {}
         for f in task_fields_change:
             task_change[f] = None
@@ -166,18 +166,28 @@ class PhabricatorEnrich(Enrich):
             event['type'] = t['transactionType']
             event['username'] = None
             if 'authorData' in t and 'userName' in t['authorData']:
-                event['username'] = t['authorData']['userName']
+                event['event_author_name'] = t['authorData']['userName']
             event['update_date'] = unixtime_to_datetime(float(t['dateCreated'])).isoformat()
             event['oldValue'] = ''
             event['newValue'] = ''
             if event['type'] == 'core:edge':
                 for val in t['oldValue']:
+                    if val in self.phab_ids_names:
+                        val = self.phab_ids_names[val]
                     event['oldValue'] += "," + val
+                event['oldValue'] = event['oldValue'][1:]  # remove first comma
                 for val in t['newValue']:
+                    if val in self.phab_ids_names:
+                        val = self.phab_ids_names[val]
                     event['newValue'] += "," + val
+                event['newValue'] = event['newValue'][1:]  # remove first comma
             elif event['type'] in  ['status', 'description', 'priority', 'reassign', 'title', 'space', 'core:create', 'parent']:
                 event['oldValue'] = t['oldValue']
+                if event['oldValue'] in self.phab_ids_names:
+                    event['oldValue'] = self.phab_ids_names[event['oldValue']]
                 event['newValue'] = t['newValue']
+                if event['newValue'] in self.phab_ids_names:
+                    event['newValue'] = self.phab_ids_names[event['newValue']]
             elif event['type'] == 'core:comment':
                 event['newValue'] = t['comments']
             elif event['type'] == 'core:subscribers':
@@ -187,20 +197,25 @@ class PhabricatorEnrich(Enrich):
                 pass
 
             for f in task_fields_nochange:
-                # The field name must be the same thna in task for filtering
+                # The field name must be the same than in task for filtering
                 event[f] = eitem[f]
 
             # To track history of some fields
             if event['type'] in ['status']:
                 task_change['status'] = event['newValue']
             elif event['type'] == 'priority':
-                task_change['priority_value'] = event['newValue']
+                task_change['priority'] =  event['newValue']
             if event['type'] in  ['reassign']:
+                # Try to get the userName and not the user id
                 if event['newValue'] in self.phab_ids_names:
-                    # Try to get the userName and not the user id
                     task_change['assigned_to_userName'] = self.phab_ids_names[event['newValue']]
+                    event['newValue'] = task_change['assigned_to_userName']
                 else:
                     task_change['assigned_to_userName'] = event['newValue']
+                if event['oldValue'] in self.phab_ids_names:
+                    # Try to get the userName and not the user id
+                    event['oldValue'] = self.phab_ids_names[event['oldValue']]
+
 
             for f in task_change:
                 event[f] = task_change[f]
@@ -226,6 +241,8 @@ class PhabricatorEnrich(Enrich):
         self.phab_ids_names[item['fields']['authorData']['phid']] = item['fields']['authorData']['userName']
         if 'ownerData' in item['fields']:
             self.phab_ids_names[item['fields']['ownerData']['phid']] = item['fields']['ownerData']['userName']
+        if 'priority' in item['fields']:
+            self.phab_ids_names[item['fields']['priority']['value']] = item['fields']['priority']['name']
         for t in item['transactions']:
             if 'userName' in t['authorData']:
                 self.phab_ids_names[t['authorData']['phid']] = t['authorData']['userName']
