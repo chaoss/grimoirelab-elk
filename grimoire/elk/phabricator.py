@@ -151,6 +151,7 @@ class PhabricatorEnrich(Enrich):
         for f in task_fields_change:
             task_change[f] = None
         task_change['status'] = TASK_OPEN_STATUS
+        task_change['tags_custom_analyzed'] = eitem['tags_custom_analyzed']
 
         # Events are in transactions field (changes in fields)
         # We need to revert them to go from older to newer
@@ -205,6 +206,8 @@ class PhabricatorEnrich(Enrich):
                 task_change['status'] = event['newValue']
             elif event['type'] == 'priority':
                 task_change['priority'] =  event['newValue']
+            elif event['type'] == 'core:edge':
+                task_change['tags_custom_analyzed'] =  event['newValue']
             if event['type'] in  ['reassign']:
                 # Try to get the userName and not the user id
                 if event['newValue'] in self.phab_ids_names:
