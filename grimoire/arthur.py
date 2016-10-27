@@ -332,31 +332,34 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             # Only supported in data retrieved from a perceval backend
             filter_ = {"name":"origin",
                        "value":backend.origin}
-        # Check if backend supports from_date
-        signature = inspect.signature(backend.fetch)
+            # Check if backend supports from_date
+            signature = inspect.signature(backend.fetch)
 
-        if 'from_date' in signature.parameters:
-            last_enrich = enrich_backend.get_last_update_from_es(filter_)
-        elif 'offset' in signature.parameters:
-            last_enrich = enrich_backend.get_last_offset_from_es(filter_)
-        if no_incremental:
-            last_enrich = None
-
-        # If from_date of offset in the backed, use it
-        if backend_cmd:
             if 'from_date' in signature.parameters:
-                last_enrich = backend_cmd.from_date
+                last_enrich = enrich_backend.get_last_update_from_es(filter_)
             elif 'offset' in signature.parameters:
-                last_enrich = backend_cmd.offset
+                last_enrich = enrich_backend.get_last_offset_from_es(filter_)
+            if no_incremental:
+                last_enrich = None
 
-        logging.debug("Last enrichment: %s", last_enrich)
+            # If from_date of offset in the backed, use it
+            if backend_cmd:
+                if 'from_date' in signature.parameters:
+                    last_enrich = backend_cmd.from_date
+                elif 'offset' in signature.parameters:
+                    last_enrich = backend_cmd.offset
 
-        if 'from_date' in signature.parameters:
-            ocean_backend = connector[1](backend, from_date=last_enrich)
-        elif 'offset' in signature.parameters:
-            ocean_backend = connector[1](backend, offset=last_enrich)
+            logging.debug("Last enrichment: %s", last_enrich)
+
+            if 'from_date' in signature.parameters:
+                ocean_backend = connector[1](backend, from_date=last_enrich)
+            elif 'offset' in signature.parameters:
+                ocean_backend = connector[1](backend, offset=last_enrich)
+            else:
+                ocean_backend = connector[1](backend)
         else:
             ocean_backend = connector[1](backend)
+
         clean = False  # Don't remove ocean index when enrich
         elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
