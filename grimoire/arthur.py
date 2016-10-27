@@ -306,6 +306,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
     try:
         backend = None
+        backend_cmd = None
         if klass:
             # Data is retrieved from Perceval
             backend_cmd = klass(*backend_params)
@@ -347,8 +348,14 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if no_incremental:
             last_enrich = None
 
-        logging.debug("Last enrichment: %s", last_enrich)
+        # If from_date of offset in the backed, use it
+        if backend_cmd:
+            if 'from_date' in signature.parameters:
+                last_enrich = backend_cmd.from_date
+            elif 'offset' in signature.parameters:
+                last_enrich = backend_cmd.offset
 
+        logging.debug("Last enrichment: %s", last_enrich)
 
         if 'from_date' in signature.parameters:
             ocean_backend = connector[1](backend, from_date=last_enrich)
