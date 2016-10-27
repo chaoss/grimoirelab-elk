@@ -511,7 +511,7 @@ function stackexchange_retrieval {
         echo "--------------" >> $LOGS_DIR"/stackoverflow-collection.log"
         echo "Retrieval for $t" >> $LOGS_DIR"/stackoverflow-collection.log"
         ORG="$STACKEXCHANGE_URL/$t"
-        ./p2o.py -e $ES_URI -g --index $STACKEXCHANGE_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/stackoverflow-collection.log" 2>&1
+        ./p2o.py -e $ES_URI -g --index $STACKEXCHANGE_INDEX stackexchange --site $STACKEXCHANGE_SITE --tag $ORG --tagged $t --token $STACKEXCHANGE_TOKEN $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/stackoverflow-collection.log" 2>&1
     done
 }
 
@@ -752,7 +752,7 @@ function stackexchange_enrichment {
         echo "--------------" >> $LOGS_DIR"/stackoverflow-enrichment.log"
         echo "ENRICHMENT for $t" >> $LOGS_DIR"/stackoverflow-enrichment.log"
         ORG="$STACKEXCHANGE_URL/$t"
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $STACKEXCHANGE_INDEX --index-enrich $STACKEXCHANGE_ENRICHED_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $STACKEXCHANGE_INDEX --index-enrich $STACKEXCHANGE_ENRICHED_INDEX stackexchange --site $STACKEXCHANGE_SITE --tag $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-enrichment.log" 2>&1
     done
 }
 
