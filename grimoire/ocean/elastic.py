@@ -32,6 +32,7 @@ import logging
 import requests
 
 from datetime import datetime
+from grimoire.elk.utils import unixtime_to_datetime
 
 
 class ElasticOcean(object):
@@ -106,8 +107,8 @@ class ElasticOcean(object):
 
     def add_update_date(self, item):
         """ All item['updated_on'] from perceval is epoch """
-        updated = datetime.fromtimestamp(item['updated_on'])
-        timestamp = datetime.fromtimestamp(item['timestamp'])
+        updated = unixtime_to_datetime(item['updated_on'])
+        timestamp = unixtime_to_datetime(item['timestamp'])
         item['metadata__updated_on'] = updated.isoformat()
         # Also add timestamp used in incremental enrichment
         item['metadata__timestamp'] = timestamp.isoformat()
@@ -269,7 +270,7 @@ class ElasticOcean(object):
             }
             """ % (filters, order_query)
 
-            # logging.debug("%s %s", url, query)
+            logging.debug("%s %s", url, query)
 
             r = self.requests.post(url, data=query)
 

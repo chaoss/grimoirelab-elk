@@ -75,6 +75,8 @@ class GitHubEnrich(Enrich):
         identity['name'] = None
         if 'email' in user:
             identity['email'] = user['email']
+        if 'name' in user:
+            identity['name'] = user['name']
         return identity
 
     def get_item_sh(self, item):

@@ -54,8 +54,8 @@ def filter_json(content):
             url = url.replace("git.eclipse.org/c/","git.eclipse.org/gitroot/")
             res_repos.append({"url":url})
         count_repos += len(tree["projects"][p]["source_repo"])
-        output["projects"][p]["source_repo"] = res_repos
-
+        output["projects"][p]["source_repo"] = []
+        output["projects"][p]["git"] = res_repos
         output["projects"][p]["title"] = tree["projects"][p]["title"]
         output["projects"][p]["parent_project"] = tree["projects"][p]["parent_project"]
         output["projects"][p]["bugzilla"] = tree["projects"][p]["bugzilla"]
