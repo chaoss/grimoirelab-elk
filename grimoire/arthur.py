@@ -341,6 +341,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                         last_enrich = backend_cmd.from_date
                 elif 'offset' in signature.parameters:
                     if backend_cmd.offset and backend_cmd.offset != 0:
+                        last_enrich = backend_cmd.offset
 
             logging.debug("Last enrichment: %s", last_enrich)
 
