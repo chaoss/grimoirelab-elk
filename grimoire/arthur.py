@@ -70,51 +70,36 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
 
         repo['repo_update_start'] = datetime.now().isoformat()
 
-        #
-        # TODO: improve how filtering in the backend is managed
-        #
-
-        # offset param suppport
+        # perceval backends fetch params
         offset = None
-        try:
-            offset = backend_cmd.offset
-        except AttributeError:
-            # The backend does not support offset
-            pass
-
-        # category param suppport
+        from_date = None
         category = None
-        try:
+
+        signature = inspect.signature(backend.fetch)
+
+        if 'from_date' in signature.parameters:
+            from_date = backend_cmd.from_date
+
+        if 'offset' in signature.parameters:
+            offset = backend_cmd.offset
+
+        if 'category' in signature.parameters:
             category = backend_cmd.category
-        except AttributeError:
-            # The backend does not support category
-            pass
 
         # from_date param support
-        try:
-            if offset and category:
-                ocean_backend.feed(offset=offset, category=category)
-            elif offset:
-                ocean_backend.feed(offset=offset)
-            else:
-                if backend_cmd.from_date.replace(tzinfo=None) == \
-                    parser.parse("1970-01-01").replace(tzinfo=None):
-                    # Don't use the default value
-                    if category:
-                        ocean_backend.feed(category=category)
-                    else:
-                        ocean_backend.feed()
-                else:
-                    if category:
-                        ocean_backend.feed(backend_cmd.from_date, category=category)
-                    else:
-                        ocean_backend.feed(backend_cmd.from_date)
-        except AttributeError:
-            # The backend does not support from_date
+        if offset and category:
+            ocean_backend.feed(from_offset=offset, category=category)
+        elif offset:
+            ocean_backend.feed(from_offset=offset)
+        elif from_date and from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
             if category:
-                ocean_backend.feed(category=category)
+                ocean_backend.feed(backend_cmd.from_date, category=category)
             else:
-                ocean_backend.feed()
+                ocean_backend.feed(backend_cmd.from_date)
+        elif category:
+            ocean_backend.feed(category=category)
+        else:
+            ocean_backend.feed()
 
     except Exception as ex:
         if backend:
@@ -339,15 +324,17 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                 last_enrich = enrich_backend.get_last_update_from_es(filter_)
             elif 'offset' in signature.parameters:
                 last_enrich = enrich_backend.get_last_offset_from_es(filter_)
+
             if no_incremental:
                 last_enrich = None
 
             # If from_date of offset in the backed, use it
             if backend_cmd:
                 if 'from_date' in signature.parameters:
-                    last_enrich = backend_cmd.from_date
+                    if backend_cmd.from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
+                        last_enrich = backend_cmd.from_date
                 elif 'offset' in signature.parameters:
-                    last_enrich = backend_cmd.offset
+                    if backend_cmd.offset and backend_cmd.offset != 0:
 
             logging.debug("Last enrichment: %s", last_enrich)
 
