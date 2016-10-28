@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# Gerrit Ocean feeder
+# Bugzilla Ocean feeder
 #
-# Copyright (C) 2015 Bitergia
+# Copyright (C) 2016 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,9 +23,8 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-'''Gerrit Ocean feeder'''
+'''Bugzilla Ocean feeder'''
 
-from dateutil import parser
 from grimoire.ocean.elastic import ElasticOcean
 
 class BugzillaOcean(ElasticOcean):
@@ -33,3 +32,6 @@ class BugzillaOcean(ElasticOcean):
     def _fix_item(self, item):
         bug_id = item["data"]["bug_id"][0]['__text__']
         item["ocean-unique-id"] = bug_id+"_"+item['origin']
+        # Could be used for filtering
+        product = item['data']['product'][0]['__text__']
+        item['product'] = product

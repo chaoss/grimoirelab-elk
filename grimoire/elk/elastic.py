@@ -224,30 +224,30 @@ class ElasticSearch(object):
             } """
             r = self.requests.put(url_map, data=disable_dynamic)
 
-    def get_last_date(self, field, _filter = None):
+    def get_last_date(self, field, _filters = []):
         '''
             :field: field with the data
             :_filter: additional filter to find the date
         '''
 
-        last_date = self.__get_last_item_field(field, _filter=_filter)
+        last_date = self.__get_last_item_field(field, _filters=_filters)
 
         return last_date
 
-    def get_last_offset(self, field, _filter = None):
+    def get_last_offset(self, field, _filters = []):
         '''
             :field: field with the data
             :_filter: additional filter to find the date
         '''
 
-        offset = self.__get_last_item_field(field, _filter=_filter, offset=True)
+        offset = self.__get_last_item_field(field, _filters=_filters, offset=True)
 
         return offset
 
-    def __get_last_item_field(self, field, _filter = None, offset = False):
+    def __get_last_item_field(self, field, _filters = [], offset = False):
         '''
             :field: field with the data
-            :_filter: additional filter to find the date
+            :_filters: additional filters to find the date
             :offset: Return offset field insted of date field
         '''
 
@@ -256,16 +256,15 @@ class ElasticSearch(object):
         url = self.index_url
         url += "/_search"
 
-        if _filter:
-            data_query = '''
-                "size": 0,
+        data_query = ''
+        for _filter in _filters:
+            if not _filter:
+                continue
+            data_query += '''
                 "query" : {
                     "term" : { "%s" : "%s"  }
                  },
             ''' % (_filter['name'], _filter['value'])
-
-        else:
-            data_query = ''
 
         data_agg = '''
             "aggs": {
@@ -278,7 +277,7 @@ class ElasticSearch(object):
         ''' % (field)
 
         data_json = '''
-        { %s  %s
+        { "size": 0, %s  %s
         } ''' % (data_query, data_agg)
 
         logging.debug("%s %s", url, data_json)

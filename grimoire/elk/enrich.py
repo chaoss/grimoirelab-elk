@@ -250,15 +250,15 @@ class Enrich(object):
         # If possible, enriched_item and item will have the same id
         return eitem["_id"]
 
-    def get_last_update_from_es(self, _filter=None):
+    def get_last_update_from_es(self, _filters=[]):
 
-        last_update = self.elastic.get_last_date(self.get_field_date(), _filter)
+        last_update = self.elastic.get_last_date(self.get_field_date(), _filters)
 
         return last_update
 
-    def get_last_offset_from_es(self, _filter=None):
+    def get_last_offset_from_es(self, _filters=[]):
         # offset is always the field name from perceval
-        last_update = self.elastic.get_last_offset("offset", _filter)
+        last_update = self.elastic.get_last_offset("offset", _filters)
 
         return last_update
 

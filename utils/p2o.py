@@ -135,7 +135,8 @@ if __name__ == '__main__':
                                args.no_incremental, args.only_identities,
                                args.github_token,
                                args.studies, args.only_studies,
-                               args.elastic_url_enrich)
+                               args.elastic_url_enrich,
+                               args.filter_raw)
                 logging.info("Enrich backend completed")
 
         else:

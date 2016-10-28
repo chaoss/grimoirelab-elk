@@ -205,7 +205,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    db_sortinghat=None,
                    no_incremental=False, only_identities=False,
                    github_token=None, studies=False, only_studies=False,
-                   url_enrich=None):
+                   url_enrich=None, filter_raw=None):
     """ Enrich Ocean index """
 
     try:
@@ -310,6 +310,12 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if github_token and backend_name == "git":
             enrich_backend.set_github_token(github_token)
 
+        # filter_raw must be converted from the string param to a dict
+        filter_raw_dict = {}
+        if filter_raw:
+            filter_raw_dict['name'] = filter_raw.split(":")[0].replace('"','')
+            filter_raw_dict['value'] = filter_raw.split(":")[1].replace('"','')
+
         # We need to enrich from just updated items since last enrichment
         # Always filter by origin to support multi origin indexes
         last_enrich = None
@@ -321,9 +327,9 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             signature = inspect.signature(backend.fetch)
 
             if 'from_date' in signature.parameters:
-                last_enrich = enrich_backend.get_last_update_from_es(filter_)
+                last_enrich = enrich_backend.get_last_update_from_es([filter_, filter_raw_dict])
             elif 'offset' in signature.parameters:
-                last_enrich = enrich_backend.get_last_offset_from_es(filter_)
+                last_enrich = enrich_backend.get_last_offset_from_es([filter_, filter_raw_dict])
 
             if no_incremental:
                 last_enrich = None
@@ -347,6 +353,9 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                 ocean_backend = connector[1](backend)
         else:
             ocean_backend = connector[1](backend)
+
+        if filter_raw:
+            ocean_backend.set_filter_raw(filter_raw_dict)
 
         clean = False  # Don't remove ocean index when enrich
         elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)

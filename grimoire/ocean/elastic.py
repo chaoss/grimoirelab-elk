@@ -58,6 +58,7 @@ class ElasticOcean(object):
         self.offset = offset  # fetch from offset
         self.fetch_cache = fetch_cache  # fetch from cache
         self.project = project  # project to be used for this data source
+        self.filter_raw = None  # to filter raw items from Ocean
 
         self.requests = requests.Session()
         if insecure:
@@ -241,6 +242,13 @@ class ElasticOcean(object):
                     }
                 ''' % (self.perceval_backend.origin)
 
+            if self.filter_raw:
+                filters += '''
+                    , {"term":
+                        { "%s":"%s"  }
+                    }
+                ''' % (self.filter_raw['name'], self.filter_raw['value'])
+
             if self.from_date:
                 date_field = self.get_field_date()
                 from_date = self.from_date.isoformat()
@@ -297,6 +305,12 @@ class ElasticOcean(object):
             logging.error("No results found from %s" % (url))
 
         return items
+
+    def set_filter_raw(self, filter_raw):
+        """ Filter to be used when getting items from Ocean index """
+
+        self.filter_raw = filter_raw
+
 
     def __iter__(self):
 
