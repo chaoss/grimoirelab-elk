@@ -113,38 +113,40 @@ class ElasticOcean(object):
         # Also add timestamp used in incremental enrichment
         item['metadata__timestamp'] = timestamp.isoformat()
 
-    def feed(self, from_date=None, offset=None, category=None):
+    def feed(self, from_date=None, from_offset=None, category=None):
         """ Feed data in Elastic from Perceval """
+
+        if from_date and from_offset:
+            raise RuntimeError("Can't not feed using from_date and from_offset.")
 
         # Check if backend supports from_date
         signature = inspect.signature(self.perceval_backend.fetch)
 
-        if 'from_date' not in signature.parameters:
-            last_update = None
-            logging.debug("Fetch method does not use 'from_date' parameter")
 
-        else:
-            # Always filter by origin to support multi origin indexes
-            filter_ = {"name":"origin",
-                       "value":self.perceval_backend.origin}
-            self.last_update = self.get_last_update_from_es(filter_)
-            last_update = self.last_update
-            # last_update = '2015-12-28 18:02:00'
+        last_update = None
+        if 'from_date' in signature.parameters:
             if from_date:
-                # Forced from backend command line.
                 last_update = from_date
+            else:
+                # Always filter by origin to support multi origin indexes
+                filter_ = {"name":"origin",
+                           "value":self.perceval_backend.origin}
+                self.last_update = self.get_last_update_from_es(filter_)
+                last_update = self.last_update
 
             logging.info("Incremental from: %s", last_update)
 
+        offset = None
         if 'offset' in signature.parameters:
-            # Try to get the offset from ES
-            # Always filter by origin to support multi origin indexes
-            filter_ = {"name":"origin",
-                       "value":self.perceval_backend.origin}
-            offset = self.elastic.get_last_offset("offset", filter_)
+            if from_offset:
+                offset = from_offset
+            else:
+                # Always filter by origin to support multi origin indexes
+                filter_ = {"name":"origin",
+                           "value":self.perceval_backend.origin}
+                offset = self.elastic.get_last_offset("offset", filter_)
 
             logging.info("Incremental from: %i offset", offset)
-
 
         task_init = datetime.now()
 
@@ -153,21 +155,23 @@ class ElasticOcean(object):
         if self.fetch_cache:
             items = self.perceval_backend.fetch_from_cache()
         else:
-            if last_update and not offset:
+            if last_update:
                 # if offset used for incremental do not use date
                 # Perceval backend from_date must not include timezone
                 # It always uses the server datetime
                 last_update = last_update.replace(tzinfo=None)
-                items = self.perceval_backend.fetch(from_date=last_update)
-            else:
-                if offset and category:
-                    items = self.perceval_backend.fetch(offset=offset, category=category)
-                elif offset:
-                    items = self.perceval_backend.fetch(offset=offset)
-                elif category:
-                    items = self.perceval_backend.fetch(category=category)
+                if category:
+                    items = self.perceval_backend.fetch(from_date=last_update, category=category)
                 else:
-                    items = self.perceval_backend.fetch()
+                    items = self.perceval_backend.fetch(from_date=last_update)
+            elif offset:
+                if category:
+                    items = self.perceval_backend.fetch(offset=offset, category=category)
+                else:
+                    items = self.perceval_backend.fetch(offset=offset)
+            else:
+                items = self.perceval_backend.fetch()
+
         for item in items:
             # print("%s %s" % (item['url'], item['lastUpdated_date']))
             # Add date field for incremental analysis if needed
