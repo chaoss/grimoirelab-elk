@@ -22,7 +22,6 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
 
 from datetime import datetime
@@ -183,10 +182,11 @@ class PhabricatorEnrich(Enrich):
                     event['newValue'] += "," + val
                 event['newValue'] = event['newValue'][1:]  # remove first comma
             elif event['type'] in  ['status', 'description', 'priority', 'reassign', 'title', 'space', 'core:create', 'parent']:
-                event['oldValue'] = t['oldValue']
+                # Convert to str so the field is always a string
+                event['oldValue'] = str(t['oldValue'])
                 if event['oldValue'] in self.phab_ids_names:
                     event['oldValue'] = self.phab_ids_names[event['oldValue']]
-                event['newValue'] = t['newValue']
+                event['newValue'] = str(t['newValue'])
                 if event['newValue'] in self.phab_ids_names:
                     event['newValue'] = self.phab_ids_names[event['newValue']]
             elif event['type'] == 'core:comment':
@@ -226,7 +226,7 @@ class PhabricatorEnrich(Enrich):
             # For the burn vis
             if event['type'] in  ['core:create']:
                 self.tasks_opened += 1
-            if event['newValue'] in  ['resolved']:
+            if event['newValue'] in ['resolved']:
                 self.tasks_closed += 1
             event['tasks_opened'] = self.tasks_opened
             event['tasks_closed'] = self.tasks_closed
@@ -245,7 +245,8 @@ class PhabricatorEnrich(Enrich):
         if 'ownerData' in item['fields']:
             self.phab_ids_names[item['fields']['ownerData']['phid']] = item['fields']['ownerData']['userName']
         if 'priority' in item['fields']:
-            self.phab_ids_names[item['fields']['priority']['value']] = item['fields']['priority']['name']
+            val = item['fields']['priority']['value']
+            self.phab_ids_names[str(val)] = item['fields']['priority']['name']
         for t in item['transactions']:
             if 'userName' in t['authorData']:
                 self.phab_ids_names[t['authorData']['phid']] = t['authorData']['userName']
