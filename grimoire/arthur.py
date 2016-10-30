@@ -208,32 +208,13 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    url_enrich=None, events_enrich=False):
     """ Enrich Ocean index """
 
-    try:
-        from grimoire.elk.sortinghat import SortingHat
-    except ImportError:
-        logging.warning("SortingHat not available.")
-
     def enrich_items(items, enrich_backend, events=False):
         total = 0
 
-        items_pack = []
-
-        for item in items:
-            if len(items_pack) >= enrich_backend.elastic.max_items_bulk:
-                logging.info("Adding %i (%i done) enriched items to %s" % \
-                             (enrich_backend.elastic.max_items_bulk, total,
-                              enrich_backend.elastic.index_url))
-                if not events_enrich:
-                    enrich_backend.enrich_items(items_pack)
-                else:
-                    enrich_backend.enrich_events(items_pack)
-                items_pack = []
-            items_pack.append(item)
-            total += 1
-        if not events_enrich:
-            enrich_backend.enrich_items(items_pack)
+        if not events:
+            total= enrich_backend.enrich_items(items)
         else:
-            enrich_backend.enrich_events(items_pack)
+            total = enrich_backend.enrich_events(items)
         return total
 
     def enrich_sortinghat(ocean_backend, enrich_backend):
@@ -277,6 +258,11 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         except Exception as e:
             logging.error("Problem executing studies for %s", backend_name)
             traceback.print_exc()
+
+    try:
+        from grimoire.elk.sortinghat import SortingHat
+    except ImportError:
+        logging.warning("SortingHat not available.")
 
     backend = None
     enrich_index = None
@@ -380,6 +366,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                     logging.info("Total items enriched %i ", enrich_count)
                 else:
                     enrich_count = enrich_items(ocean_backend, enrich_backend, events=True)
+                    logging.info("Total events enriched %i ", enrich_count)
                 if studies:
                     do_studies(enrich_backend, last_enrich)
 
