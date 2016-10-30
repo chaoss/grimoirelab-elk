@@ -86,7 +86,7 @@ class ElasticSearch(object):
         else:
             if clean:
                 self.requests.delete(self.index_url)
-                self.requests.post(self.index_url)
+                self.requests.put(self.index_url)
                 logging.info("Deleted and created index " + self.index_url)
         if analyzers:
             self.create_custom_analyzers(analyzers)
