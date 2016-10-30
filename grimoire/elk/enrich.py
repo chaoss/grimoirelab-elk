@@ -226,11 +226,12 @@ class Enrich(object):
         raise NotImplementedError
 
     def enrich_events(self, items):
-        self.enrich_items(items, events=True)
+        return self.enrich_items(items, events=True)
 
     def enrich_items(self, items, events=False):
         max_items = self.elastic.max_items_bulk
         current = 0
+        total = 0
         bulk_json = ""
 
         url = self.elastic.index_url+'/items/_bulk'
@@ -244,6 +245,7 @@ class Enrich(object):
             if current >= max_items:
                 try:
                     self.requests.put(url, data=bulk_json)
+                    logging.debug("Added %i items to %s", total, url)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
                     logging.error("Unicode error in enriched items")
@@ -259,6 +261,8 @@ class Enrich(object):
                 bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                     (item[self.get_field_unique_id()])
                 bulk_json += data_json +"\n"  # Bulk document
+                current += 1
+                total += 1
             else:
                 rich_events = self.get_rich_events(item)
                 for rich_event in rich_events:
@@ -267,8 +271,11 @@ class Enrich(object):
                         (item[self.get_field_unique_id()],
                          rich_event[self.get_field_event_unique_id()])
                     bulk_json += data_json +"\n"  # Bulk document
-            current += 1
+                    current += 1
+                    total += 1
         self.requests.put(url, data = bulk_json)
+
+        return total
 
     def get_connector_name(self):
         """ Find the name for the current connector """
