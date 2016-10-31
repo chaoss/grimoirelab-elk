@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 #
-# Copyright (C) 2015 Bitergia
+# Copyright (C) 2016 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,12 +22,16 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
+
+from datetime import datetime
 
 from dateutil import parser
 
 from grimoire.elk.enrich import Enrich
+
+from .utils import get_time_diff_days
+
 
 class RedmineEnrich(Enrich):
 
@@ -36,7 +40,7 @@ class RedmineEnrich(Enrich):
         mapping = """
         {
             "properties": {
-                "fullDisplayName_analyzed": {
+                "description_analyzed": {
                   "type": "string",
                   "index":"analyzed"
                   }
@@ -44,41 +48,34 @@ class RedmineEnrich(Enrich):
         } """
 
         return {"items":mapping}
+
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
 
-        revisions = item['data']['revisions']
+        data = item['data']
+        if 'assigned_to' in data:
+            identities.append(self.get_sh_identity(data['assigned_to']))
+        identities.append(self.get_sh_identity(data['author']))
 
-        for revision in revisions:
-            user = self.get_sh_identity(revision)
-            identities.append(user)
         return identities
 
-    def get_sh_identity(self, revision):
+    def get_sh_identity(self, user):
         identity = {}
-        identity['username'] = None
         identity['email'] = None
-        identity['name'] = None
-        if 'user' in revision:
-            identity['username'] = revision['user']
-            identity['name'] = revision['user']
+        identity['username'] = user['id']
+        identity['name'] = user['name']
         return identity
 
     def get_item_sh(self, item):
         """ Add sorting hat enrichment fields for the author of the item """
 
         eitem = {}  # Item enriched
-        if not len(item['data']['revisions']) > 0:
-            return eitem
 
-        first_revision = item['data']['revisions'][0]
-
-        identity  = self.get_sh_identity(first_revision)
+        identity  = self.get_sh_identity(item['data']['author'])
         eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
 
         return eitem
-
 
     def get_rich_item(self, item):
         eitem = {}
@@ -94,37 +91,39 @@ class RedmineEnrich(Enrich):
         ticket = item['data']
 
         # data fields to copy
-        copy_fields = ["fullDisplayName","url","result","duration","builtOn"]
+        copy_fields = ["subject","description","created_on","updated_on"]
         for f in copy_fields:
             if f in ticket:
                 eitem[f] = ticket[f]
             else:
                 eitem[f] = None
+        eitem['description_analyzed'] = eitem['description']
         # Fields which names are translated
-        map_fields = {"fullDisplayName": "fullDisplayName_analyzed",
-                      "number": "ticket"
-                      }
+        map_fields = {}
         for fn in map_fields:
             eitem[map_fields[fn]] = ticket[fn]
 
-        # Job url: remove the last /ticket_id from job_url/ticket_id/
-        eitem['job_url'] = eitem['url'].rsplit("/", 2)[0]
-        eitem['job_name'] = eitem['url'].rsplit('/', 3)[1]
-        eitem['job_ticket'] = eitem['job_name']+'/'+str(eitem['ticket'])
+        # People
+        eitem['author_id'] = ticket['author']['id']
+        eitem['author_name'] = ticket['author']['name']
+        if 'assigned_to' in ticket:
+            eitem['assigned_to_id'] = ticket['assigned_to']['id']
+            eitem['assigned_to_name'] = ticket['assigned_to']['name']
+
+
+        # Time to
+        eitem['resolution_days'] = \
+            get_time_diff_days(eitem['created_on'], eitem['updated_on'])
+        eitem['timeopen_days'] = \
+            get_time_diff_days(eitem['created_on'], datetime.utcnow())
 
         # Enrich dates
-        eitem["ticket_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
-
-        # Add duration in days
-        if "duration" in eitem:
-            seconds_day = float(60*60*24)
-            duration_days = eitem["duration"]/(1000*seconds_day)
-            eitem["duration_days"] = float('%.2f' % duration_days)
+        eitem["created_on"] = parser.parse(eitem["created_on"]).isoformat()
+        eitem["updated_on"] = parser.parse(eitem["updated_on"]).isoformat()
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "job"))
 
         if self.sortinghat:
-            erevision.update(self.get_review_sh(ticket, item))
-
+            eitem.update(self.get_item_sh(item))
 
         return eitem
