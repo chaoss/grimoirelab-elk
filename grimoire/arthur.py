@@ -363,10 +363,12 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                 # Enrichment for the new items once SH update is finished
                 if not events_enrich:
                     enrich_count = enrich_items(ocean_backend, enrich_backend)
-                    logging.info("Total items enriched %i ", enrich_count)
+                    if enrich_count:
+                        logging.info("Total items enriched %i ", enrich_count)
                 else:
                     enrich_count = enrich_items(ocean_backend, enrich_backend, events=True)
-                    logging.info("Total events enriched %i ", enrich_count)
+                    if enrich_count:
+                        logging.info("Total events enriched %i ", enrich_count)
                 if studies:
                     do_studies(enrich_backend, last_enrich)
 
