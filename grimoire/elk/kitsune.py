@@ -203,6 +203,7 @@ class KitsuneEnrich(Enrich):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
+        total = 0
 
         url = self.elastic.index_url+'/items/_bulk'
 
@@ -220,6 +221,7 @@ class KitsuneEnrich(Enrich):
                 (item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
+            total += 1
             # Time to enrich also de answers
             if 'answers_data' in item['data']:
                 for answer in item['data']['answers_data']:
@@ -235,5 +237,8 @@ class KitsuneEnrich(Enrich):
                          rich_answer['answer_id'])
                     bulk_json += data_json +"\n"  # Bulk document
                     current += 1
+                    total += 1
 
         self.requests.put(url, data = bulk_json)
+
+        return total

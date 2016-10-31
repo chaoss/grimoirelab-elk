@@ -186,8 +186,7 @@ class MediaWikiEnrich(Enrich):
     def enrich_items(self, items):
         if True:
             # Hack: by default we use events in MediaWiki
-            self.enrich_events(items)
-            return
+            return self.enrich_events(items)
         else:
             super(MediaWikiEnrich, self).enrich_items(items)
 
@@ -196,6 +195,7 @@ class MediaWikiEnrich(Enrich):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
+        total = 0
 
         url = self.elastic.index_url+'/items/_bulk'
 
@@ -213,4 +213,7 @@ class MediaWikiEnrich(Enrich):
                     (enrich_review[self.get_field_unique_id_review()])
                 bulk_json += data_json +"\n"  # Bulk document
                 current += 1
+                total += 1
         self.requests.put(url, data = bulk_json)
+
+        return total

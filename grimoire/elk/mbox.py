@@ -154,14 +154,18 @@ class MBoxEnrich(Enrich):
 
     def enrich_items(self, items):
         # Use standard method and if fails, use the old one with Unicode control
+        total = 0
         try:
-            super(MBoxEnrich, self).enrich_items(items)
+            total = super(MBoxEnrich, self).enrich_items(items)
         except UnicodeEncodeError:
-            self.enrich_items_old(items)
+            total = self.enrich_items_old(items)
+
+        return total
 
     def enrich_items_old(self, items):
         max_items = self.elastic.max_items_bulk
         current = 0
+        total = 0
         bulk_json = ""
 
         url = self.elastic.index_url+'/items/_bulk'
@@ -180,6 +184,7 @@ class MBoxEnrich(Enrich):
                 (rich_item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
+            total += 1
         try:
             self.requests.put(url, data = bulk_json)
         except UnicodeEncodeError:
@@ -187,3 +192,5 @@ class MBoxEnrich(Enrich):
             logging.error("Encoding error ... converting bulk to iso-8859-1")
             bulk_json = bulk_json.encode('iso-8859-1','ignore')
             self.requests.put(url, data=bulk_json)
+
+        return total
