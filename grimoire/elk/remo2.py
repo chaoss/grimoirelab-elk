@@ -200,8 +200,11 @@ class ReMoEnrich(Enrich):
         for fn in map_fields:
             eitem[map_fields[fn]] = event[fn]
 
-        eitem['owner_profile_url'] = event['owner']['_url']
-        eitem['owner'] = event['owner']['display_name']
+        eitem['owner_profile_url'] = None
+        eitem['owner'] = None
+        if 'owner' in event:
+            eitem['owner_profile_url'] = event['owner']['_url']
+            eitem['owner'] = event['owner']['display_name']
 
         # geolocation
         eitem['geolocation'] = {
