@@ -185,7 +185,7 @@ class GitEnrich(Enrich):
 
         return login
 
-    def get_rich_commit(self, item):
+    def get_rich_item(self, item):
         eitem = {}
         # metadata fields to copy
         copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
@@ -383,27 +383,3 @@ class GitEnrich(Enrich):
         self.elastic.bulk_upload(author_items, "ocean-unique-id")
 
         logging.debug("Completed demography enrich from %s" % (self.elastic.index_url))
-
-
-    def enrich_items(self, commits):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for commit in commits:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-
-            rich_commit = self.get_rich_commit(commit)
-            data_json = json.dumps(rich_commit)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_commit[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data = bulk_json)

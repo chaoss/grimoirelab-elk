@@ -260,7 +260,7 @@ class GitHubEnrich(Enrich):
         repo = item['origin']
         return repo
 
-    def get_rich_issue(self, item):
+    def get_rich_item(self, item):
         rich_issue = {}
 
         # metadata fields to copy
@@ -364,27 +364,8 @@ class GitHubEnrich(Enrich):
 
         return rich_issue
 
-    def enrich_items(self, issues):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for issue in issues:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-
-            rich_issue = self.get_rich_issue(issue)
-            data_json = json.dumps(rich_issue)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_issue[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data = bulk_json)
+    def enrich_items(self, items):
+        super(GitHubEnrich, self).enrich_items(items)
 
         logging.debug("Updating GitHub users geolocations in Elastic")
         self.geo_locations_to_es() # Update geolocations in Elastic

@@ -34,9 +34,6 @@ from .utils import get_time_diff_days
 
 class KitsuneEnrich(Enrich):
 
-    def get_field_unique_id(self):
-        return "question_id"
-
     def get_elastic_mappings(self):
 
         mapping = """
@@ -220,7 +217,7 @@ class KitsuneEnrich(Enrich):
             rich_item = self.get_rich_item(item)
             data_json = json.dumps(rich_item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_item[self.get_field_unique_id()])
+                (item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
             # Time to enrich also de answers
@@ -233,8 +230,8 @@ class KitsuneEnrich(Enrich):
                         answer['solution'] = 1
                     rich_answer = self.get_rich_item(answer, kind='answer')
                     data_json = json.dumps(rich_answer)
-                    bulk_json += '{"index" : {"_id" : "%i_%i" } }\n' % \
-                        (rich_answer[self.get_field_unique_id()],
+                    bulk_json += '{"index" : {"_id" : "%s_%i" } }\n' % \
+                        (item[self.get_field_unique_id()],
                          rich_answer['answer_id'])
                     bulk_json += data_json +"\n"  # Bulk document
                     current += 1

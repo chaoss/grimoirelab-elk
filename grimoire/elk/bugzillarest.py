@@ -79,10 +79,10 @@ class BugzillaRESTEnrich(Enrich):
         repo += "/buglist.cgi?product="+product
         return repo
 
-    def enrich_issue(self, item):
+    def get_rich_item(self, item):
 
         if 'id' not in item['data']:
-            logging.warning("Dropped bug without bug_id %s" % (issue))
+            logging.warning("Dropped bug without bug_id %s" % (item))
             return None
 
         eitem = {}
@@ -137,69 +137,3 @@ class BugzillaRESTEnrich(Enrich):
             eitem.update(self.get_item_project(item))
 
         return eitem
-
-
-    def enrich_items(self, items):
-        self.issues_to_es(items)
-
-    def issues_list_to_es(self, items):
-
-        elastic_type = "issues_list"
-
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        total = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        # In this client, we will publish all data in Elastic Search
-        for issue in items:
-            if current >= max_items:
-                task_init = time()
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                total += current
-                current = 0
-                logging.debug("bulk packet sent (%.2f sec, %i total)"
-                              % (time()-task_init, total))
-            data_json = json.dumps(issue)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        task_init = time()
-        total += current
-        self.requests.put(url, data=bulk_json)
-        logging.debug("bulk packet sent (%.2f sec, %i total)"
-                      % (time()-task_init, total))
-
-
-    def issues_to_es(self, items):
-
-        elastic_type = "items"
-
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for issue in items:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-            eitem = self.enrich_issue(issue)
-            if not eitem:
-                continue
-            data_json = json.dumps(eitem)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (eitem[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data=bulk_json)
-
-        logging.debug("Adding issues to ES Done")

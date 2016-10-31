@@ -209,8 +209,73 @@ class Enrich(object):
     def set_elastic(self, elastic):
         self.elastic = elastic
 
-    def enrich_items(self, items):
+    def get_field_unique_id(self):
+        """ Field in the raw item with the unique id """
+        return "uuid"
+
+    def get_field_event_unique_id(self):
+        """ Field in the rich event with the unique id """
         raise NotImplementedError
+
+    def get_rich_item(self, item):
+        """ Create a rich item from the raw item """
+        raise NotImplementedError
+
+    def get_rich_events(self, item):
+        """ Create rich events from the raw item """
+        raise NotImplementedError
+
+    def enrich_events(self, items):
+        return self.enrich_items(items, events=True)
+
+    def enrich_items(self, items, events=False):
+        max_items = self.elastic.max_items_bulk
+        current = 0
+        total = 0
+        bulk_json = ""
+
+        url = self.elastic.index_url+'/items/_bulk'
+
+        logging.debug("Adding items to %s (in %i packs)", url, max_items)
+
+        if events:
+            logging.debug("Adding events items")
+
+        for item in items:
+            if current >= max_items:
+                try:
+                    self.requests.put(url, data=bulk_json)
+                    logging.debug("Added %i items to %s", total, url)
+                except UnicodeEncodeError:
+                    # Why is requests encoding the POST data as ascii?
+                    logging.error("Unicode error in enriched items")
+                    logging.debug(bulk_json)
+                    safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
+                    self.requests.put(url, data=safe_json)
+                bulk_json = ""
+                current = 0
+
+            if not events:
+                rich_item = self.get_rich_item(item)
+                data_json = json.dumps(rich_item)
+                bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
+                    (item[self.get_field_unique_id()])
+                bulk_json += data_json +"\n"  # Bulk document
+                current += 1
+                total += 1
+            else:
+                rich_events = self.get_rich_events(item)
+                for rich_event in rich_events:
+                    data_json = json.dumps(rich_event)
+                    bulk_json += '{"index" : {"_id" : "%s_%s" } }\n' % \
+                        (item[self.get_field_unique_id()],
+                         rich_event[self.get_field_event_unique_id()])
+                    bulk_json += data_json +"\n"  # Bulk document
+                    current += 1
+                    total += 1
+        self.requests.put(url, data = bulk_json)
+
+        return total
 
     def get_connector_name(self):
         """ Find the name for the current connector """

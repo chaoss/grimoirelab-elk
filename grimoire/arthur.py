@@ -206,30 +206,16 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    no_incremental=False, only_identities=False,
                    github_token=None, studies=False, only_studies=False,
                    url_enrich=None, filter_raw=None):
+                   url_enrich=None, events_enrich=False, filter_raw=None):
     """ Enrich Ocean index """
 
-    try:
-        from grimoire.elk.sortinghat import SortingHat
-    except ImportError:
-        logging.warning("SortingHat not available.")
-
-    def enrich_items(items, enrich_backend):
+    def enrich_items(items, enrich_backend, events=False):
         total = 0
 
-        items_pack = []
-
-        for item in items:
-            # print("%s %s" % (item['url'], item['lastUpdated_date']))
-            if len(items_pack) >= enrich_backend.elastic.max_items_bulk:
-                logging.info("Adding %i (%i done) enriched items to %s" % \
-                             (enrich_backend.elastic.max_items_bulk, total,
-                              enrich_backend.elastic.index_url))
-                enrich_backend.enrich_items(items_pack)
-                items_pack = []
-            items_pack.append(item)
-            total += 1
-        enrich_backend.enrich_items(items_pack)
-
+        if not events:
+            total= enrich_backend.enrich_items(items)
+        else:
+            total = enrich_backend.enrich_events(items)
         return total
 
     def enrich_sortinghat(ocean_backend, enrich_backend):
@@ -274,6 +260,11 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             logging.error("Problem executing studies for %s", backend_name)
             traceback.print_exc()
 
+    try:
+        from grimoire.elk.sortinghat import SortingHat
+    except ImportError:
+        logging.warning("SortingHat not available.")
+
     backend = None
     enrich_index = None
 
@@ -300,6 +291,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             if not ocean_index:
                 ocean_index = backend_name + "_" + backend.origin
             enrich_index = ocean_index+"_enrich"
+        if events_enrich:
+            enrich_index += "_events"
 
         enrich_backend = connector[2](db_sortinghat, db_projects_map, json_projects_map)
         if url_enrich:
@@ -366,7 +359,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if only_studies:
             logging.info("Running only studies (no SH and no enrichment)")
             do_studies(enrich_backend, last_enrich)
-
         else:
             if db_sortinghat:
                 enrich_count_merged = 0
@@ -379,9 +371,12 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
             else:
                 # Enrichment for the new items once SH update is finished
-                enrich_count = enrich_items(ocean_backend, enrich_backend)
-                logging.info("Total items enriched %i ", enrich_count)
-
+                if not events_enrich:
+                    enrich_count = enrich_items(ocean_backend, enrich_backend)
+                    logging.info("Total items enriched %i ", enrich_count)
+                else:
+                    enrich_count = enrich_items(ocean_backend, enrich_backend, events=True)
+                    logging.info("Total events enriched %i ", enrich_count)
                 if studies:
                     do_studies(enrich_backend, last_enrich)
 
