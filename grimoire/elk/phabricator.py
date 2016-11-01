@@ -75,7 +75,8 @@ class PhabricatorEnrich(Enrich):
                  },
                 "tags_custom_analyzed" : {
                     "type" : "string",
-                    "analyzer" : "comma"
+                    "analyzer" : "comma",
+                    "fielddata" : "true"
                 }
            }
         } """
