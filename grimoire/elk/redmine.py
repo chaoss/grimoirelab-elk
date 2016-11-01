@@ -63,6 +63,8 @@ class RedmineEnrich(Enrich):
     def get_sh_identity(self, user):
         identity = {}
         identity['email'] = None
+        if 'email' in user:
+            identity['email'] = user['email']
         identity['username'] = user['id']
         identity['name'] = user['name']
         return identity
