@@ -521,8 +521,21 @@ function confluence_retrieval {
 }
 
 function jira_retrieval {
-    cd ~/GrimoireELK/utils/
-    ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $JIRA_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+    REPOS=`get_repo_list jira`
+
+    nrepos=`get_repo_list jira|wc -w`
+    cd ~/GrimoireELK/utils
+    counter=0
+    for r in $REPOS
+    do
+      ROOT_URL=`echo $r|awk -F'/browse/' '{print $1}'`
+      PROJECT=`echo $r|awk -F'/browse/' '{print $2}'`
+      ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $ROOT_URL --project $PROJECT $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+      counter=$((counter+1))
+      if [ $(( $counter % 100 )) -eq 0 ]; then
+          log_result "[jira]  $counter/$nrepos projects collected"
+      fi
+    done
 }
 
 function mediawiki_retrieval {
@@ -762,6 +775,27 @@ function confluence_enrichment {
 }
 
 function jira_enrichment {
+    ENR_EXTRA_FLAG=$1
+
+    REPOS=`get_repo_list jira`
+    nrepos=`get_repo_list jira|wc -w`
+    cd ~/GrimoireELK/utils
+    counter=0
+    for r in $REPOS
+    do
+        ROOT_URL=`echo $r|awk -F'/browse/' '{print $1}'`
+        PROJECT=`echo $r|awk -F'/browse/' '{print $2}'`
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $ROOT_URL --project $PROJECT >> $LOGS_DIR"/jira-enrichment.log" 2>&1
+        counter=$((counter+1))
+        if [ $(( $counter % 100 )) -eq 0 ]; then
+            log_result "[jira]  $counter/$nrepos projects enriched"
+        fi
+    done
+
+
+
+
+
     cd ~/GrimoireELK/utils/
     ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $JIRA_URL >> $LOGS_DIR"/jira-enrichment.log" 2>&1
 }
