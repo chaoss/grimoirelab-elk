@@ -309,19 +309,16 @@ class PhabricatorEnrich(Enrich):
         eitem['main_description_analyzed'] = eitem['main_description']
         eitem['url'] = eitem['origin']+"/T"+str(eitem['bug_id'])
 
-        eitem['time_to_close_days'] = \
-            get_time_diff_days(eitem['creation_date'], eitem['update_date'])
-        # if eitem['status'] == TASK_OPEN_STATUS:
-        #     # Implemented in painless
-        #     eitem['time_open_days'] = \
-        #         get_time_diff_days(eitem['creation_date'], datetime.utcnow())
-
         # Time to assign (time to open -> time to assign)
-        eitem['time_to_assign'] = None
+        eitem['time_to_assign_days'] = None
         # Time to attend (time to assign-> time to first activity from assignee)
-        eitem['time_to_attend'] = None
+        eitem['time_to_attend_days'] = None
         # Time to close (time open -> time last updated for closed tasks)
         # We can improve it later using events: time open event -> time resolved event
+        eitem['time_to_close_days'] = None
+        if eitem['status'] not in [TASK_OPEN_STATUS, 'spite', 'stalled']:
+            eitem['time_to_close_days'] = \
+                get_time_diff_days(eitem['creation_date'], eitem['update_date'])
         # Time open (time to open -> now): with painless
         # Time from last update (time last update -> now): with painless
 
@@ -339,16 +336,16 @@ class PhabricatorEnrich(Enrich):
         for change in phab_item['transactions']:
             change_date = unixtime_to_datetime(float(change['dateCreated'])).isoformat()
             if change["transactionType"] == "reassign":
-                if not eitem['time_to_assign']:
-                    eitem['time_to_assign'] = get_time_diff_days(eitem['creation_date'], change_date)
+                if not eitem['time_to_assign_days']:
+                    eitem['time_to_assign_days'] = get_time_diff_days(eitem['creation_date'], change_date)
                     first_assignee_phid = change['newValue']
                     first_assignee_date = change_date
                 if change['authorData']['userName'] not in changes_assignee_list:
                     changes_assignee_list.append(change['authorData']['userName'])
                 eitem['changes_assignment'] += 1
-            if not eitem['time_to_attend'] and first_assignee_phid:
+            if not eitem['time_to_attend_days'] and first_assignee_phid:
                 if change['authorData']['phid'] == first_assignee_phid:
-                    eitem['time_to_attend'] = get_time_diff_days(first_assignee_date, change_date)
+                    eitem['time_to_attend_days'] = get_time_diff_days(first_assignee_date, change_date)
         eitem['changes_assignee_number'] = len(changes_assignee_list)
         eitem['changes_assignee_list'] = ','.join(changes_assignee_list)
         eitem['comments'] = 0
