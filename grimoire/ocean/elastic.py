@@ -152,6 +152,7 @@ class ElasticOcean(object):
 
         items_pack = []  # to feed item in packs
         drop = 0
+        added = 0
         if self.fetch_cache:
             items = self.perceval_backend.fetch_from_cache()
         else:
@@ -184,6 +185,7 @@ class ElasticOcean(object):
                 items_pack = []
             if not self.drop_item(item):
                 items_pack.append(item)
+                added += 1
             else:
                 drop +=1
         self._items_to_es(items_pack)
@@ -191,6 +193,7 @@ class ElasticOcean(object):
 
         total_time_min = (datetime.now()-task_init).total_seconds()/60
 
+        logging.debug("Added %i items to ocean", added)
         logging.debug("Dropped %i items using drop_item filter" % (drop))
         logging.info("Finished in %.2f min" % (total_time_min))
 
