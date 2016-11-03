@@ -26,5 +26,9 @@ from grimoire.ocean.elastic import ElasticOcean
 class TwitterOcean(ElasticOcean):
     """Twitter Ocean feeder"""
 
+    def get_field_date(self):
+        """ Field with the update in the JSON items. Now the same in all. """
+        return "@timestamp"
+
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["data"]["id"]
