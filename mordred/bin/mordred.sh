@@ -468,11 +468,14 @@ function supybot_retrieval {
     TMP_SUPYBOT_LIST=`mktemp`
     compose_repo_list $TMP_SUPYBOT_PROJECT_LIST $TMP_SUPYBOT_LIST supybot
     cd ~/GrimoireELK/utils/
+    IFS=$'\n'
     for url in $(cat $TMP_SUPYBOT_LIST);
     do
-        SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
+        SUPYBOT_URL=`echo $url | cut -d \' -f 2`
+        SUPYBOT_PATH=`echo $url | cut -d \' -f 4`
         ./p2o.py -e $ES_URI -g --index $SUPYBOT_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/irc-collection.log" 2>&1
     done
+    unset IFS
     rm $TMP_SUPYBOT_PROJECT_LIST
     rm $TMP_SUPYBOT_LIST
 }
@@ -715,11 +718,14 @@ function supybot_enrichment {
     ENR_EXTRA_FLAG=$1
     compose_repo_list $TMP_SUPYBOT_PROJECT_LIST $TMP_SUPYBOT_LIST supybot
     cd ~/GrimoireELK/utils/
+    IFS=$'\n'
     for url in $(cat $TMP_SUPYBOT_LIST);
     do
-        SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
+        SUPYBOT_URL=`echo $url | cut -d \' -f 2`
+        SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
         ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $SUPYBOT_INDEX --index-enrich $SUPYBOT_ENRICHED_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH >> $LOGS_DIR"/irc-enrichment.log" 2>&1
     done
+    unset IFS
     rm $TMP_SUPYBOT_PROJECT_LIST
     rm $TMP_SUPYBOT_LIST
 }
