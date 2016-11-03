@@ -41,8 +41,6 @@ class PhabricatorEnrich(Enrich):
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None, insecure=True):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map, insecure)
 
-        self.tasks_closed = 0
-        self.tasks_opened = 0
         self.phab_ids_names = {}  # To convert from phab ids to phab names
 
     def get_field_event_unique_id(self):
@@ -221,15 +219,6 @@ class PhabricatorEnrich(Enrich):
 
             for f in task_change:
                 event[f] = task_change[f]
-
-            # For the burn vis
-            if event['type'] in  ['core:create']:
-                self.tasks_opened += 1
-            if event['newValue'] in ['resolved']:
-                self.tasks_closed += 1
-            event['tasks_opened'] = self.tasks_opened
-            event['tasks_closed'] = self.tasks_closed
-            event['tasks_burn'] = self.tasks_opened-self.tasks_closed
 
             events.append(event)
 
