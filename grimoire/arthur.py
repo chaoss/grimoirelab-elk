@@ -338,7 +338,15 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             else:
                 ocean_backend = connector[1](backend)
         else:
-            ocean_backend = connector[1](backend)
+            if not no_incremental:
+                last_enrich = enrich_backend.get_last_update_from_es()
+            logging.debug("Last enrichment: %s", last_enrich)
+            if last_enrich:
+                logging.debug("Last enrichment: %s", last_enrich)
+                ocean_backend = connector[1](backend, from_date=last_enrich)
+            else:
+                ocean_backend = connector[1](backend)
+
 
         clean = False  # Don't remove ocean index when enrich
         elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
