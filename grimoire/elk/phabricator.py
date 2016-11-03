@@ -311,11 +311,20 @@ class PhabricatorEnrich(Enrich):
         eitem['main_description_analyzed'] = eitem['main_description']
         eitem['url'] = eitem['origin']+"/T"+str(eitem['bug_id'])
 
-        eitem['timeopen_days'] = \
+        eitem['time_to_close_days'] = \
             get_time_diff_days(eitem['creation_date'], eitem['update_date'])
-        if eitem['status'] == TASK_OPEN_STATUS:
-            eitem['timeopen_days'] = \
-                get_time_diff_days(eitem['creation_date'], datetime.utcnow())
+        # if eitem['status'] == TASK_OPEN_STATUS:
+        #     # Implemented in painless
+        #     eitem['time_open_days'] = \
+        #         get_time_diff_days(eitem['creation_date'], datetime.utcnow())
+
+        # Time to assign (time to open -> time to assign)
+        eitem['time_to_assign'] = None
+        # Time to attend (time to assign-> time to first activity from assignee)
+        # Time to close (time open -> time last updated for closed tasks)
+        # We can improve it later using events: time open event -> time resolved event
+        # Time open (time to open -> now): with painless
+        # Time from last update (time last update -> now): with painless
 
         eitem['changes'] = len(phab_item['transactions'])
         # Number of assignments changes
@@ -325,7 +334,10 @@ class PhabricatorEnrich(Enrich):
         # List the changes assignees
         changes_assignee_list = []
         for change in phab_item['transactions']:
+            change_date = unixtime_to_datetime(float(change['dateCreated'])).isoformat()
             if change["transactionType"] == "reassign":
+                if not eitem['time_to_assign']:
+                    eitem['time_to_assign'] = get_time_diff_days(eitem['creation_date'], change_date)
                 if change['authorData']['userName'] not in changes_assignee_list:
                     changes_assignee_list.append(change['authorData']['userName'])
                 eitem['changes_assignment'] += 1
