@@ -309,6 +309,8 @@ class PhabricatorEnrich(Enrich):
             eitem['time_to_close_days'] = \
                 get_time_diff_days(eitem['creation_date'], eitem['update_date'])
         # Time open (time to open -> now): with painless
+        # Time open using the enrich date. Field needed for filtering.
+        eitem['time_open_days_enrich'] = get_time_diff_days(eitem['creation_date'], datetime.utcnow())
         # Time from last update (time last update -> now): with painless
 
         eitem['changes'] = len(phab_item['transactions'])
