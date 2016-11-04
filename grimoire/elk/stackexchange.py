@@ -52,9 +52,20 @@ class StackExchangeEnrich(Enrich):
                 "answer_tags_analyzed": {
                     "type": "string",
                     "index":"analyzed"
+                },
+                "question_tags_custom_analyzed" : {
+                  "type" : "string",
+                  "analyzer" : "comma"
                 }
            }
         } """
+
+        # For ES 5
+        # "question_tags_custom_analyzed_5" : {
+        #   "type" : "string",
+        #   "analyzer" : "comma",
+        #   "fielddata" : "true" }
+
 
         return {"items":mapping}
 
@@ -136,6 +147,7 @@ class StackExchangeEnrich(Enrich):
 
             eitem["question_tags"] = ",".join(question['tags'])
             eitem["question_tags_analyzed"] = ",".join(question['tags'])
+            eitem["question_tags_custom_analyzed"] = ",".join(question['tags'])
 
             # Fields which names are translated
             map_fields = {"title": "question_title"
@@ -192,6 +204,7 @@ class StackExchangeEnrich(Enrich):
     def enrich_items(self, items):
         max_items = self.elastic.max_items_bulk
         current = 0
+        total = 0
         bulk_json = ""
 
         url = self.elastic.index_url+'/items/_bulk'
@@ -210,6 +223,7 @@ class StackExchangeEnrich(Enrich):
                 (rich_item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
+            total += 1
             # Time to enrich also de answers
             if 'answers' in item['data']:
                 for answer in item['data']['answers']:
@@ -220,5 +234,8 @@ class StackExchangeEnrich(Enrich):
                          rich_answer['answer_id'])
                     bulk_json += data_json +"\n"  # Bulk document
                     current += 1
+                    total += 1
 
         self.requests.put(url, data = bulk_json)
+
+        return total
