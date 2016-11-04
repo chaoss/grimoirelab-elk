@@ -205,7 +205,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    db_sortinghat=None,
                    no_incremental=False, only_identities=False,
                    github_token=None, studies=False, only_studies=False,
-                   url_enrich=None, events_enrich=False):
+                   url_enrich=None, events_enrich=False,
+                   db_user=None, db_password=None, db_host=None):
     """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend, events=False):
@@ -293,7 +294,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if events_enrich:
             enrich_index += "_events"
 
-        enrich_backend = connector[2](db_sortinghat, db_projects_map, json_projects_map)
+        enrich_backend = connector[2](db_sortinghat, db_projects_map, json_projects_map,
+                                      db_user, db_password, db_host)
         if url_enrich:
             elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend)
         else:
@@ -338,7 +340,15 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             else:
                 ocean_backend = connector[1](backend)
         else:
-            ocean_backend = connector[1](backend)
+            if not no_incremental:
+                last_enrich = enrich_backend.get_last_update_from_es()
+            logging.debug("Last enrichment: %s", last_enrich)
+            if last_enrich:
+                logging.debug("Last enrichment: %s", last_enrich)
+                ocean_backend = connector[1](backend, from_date=last_enrich)
+            else:
+                ocean_backend = connector[1](backend)
+
 
         clean = False  # Don't remove ocean index when enrich
         elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)

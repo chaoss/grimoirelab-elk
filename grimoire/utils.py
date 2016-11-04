@@ -207,9 +207,6 @@ def get_params_parser():
                         help="don't use last state for data source")
     parser.add_argument("--fetch_cache",  action='store_true',
                         help="Use cache for item retrieval")
-
-    parser.add_argument("--loop",  action='store_true',
-                        help="loop the ocean update until process termination")
     parser.add_argument("--redis",  default="redis",
                         help="url for the redis server")
     parser.add_argument("--enrich",  action='store_true',
@@ -222,10 +219,16 @@ def get_params_parser():
                         help="Enrich events in items")
     parser.add_argument('--index', help="Ocean index name")
     parser.add_argument('--index-enrich', dest="index_enrich", help="Ocean enriched index name")
+    parser.add_argument('--db-user', help="User for db connection (default to root)",
+                        default="root")
+    parser.add_argument('--db-password', help="Password for db connection (default empty)",
+                        default="")
+    parser.add_argument('--db-host', help="Host for db connection (default to mariadb)",
+                        default="mariadb")
     parser.add_argument('--db-projects-map', help="Projects Mapping DB")
+    parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('--json-projects-map', help="Projects Mapping JSON file")
     parser.add_argument('--project', help="Project for the repository (origin)")
-    parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('--only-identities', action='store_true', help="Only add identities to SortingHat DB")
     parser.add_argument('--github-token', help="If provided, github usernames will be retrieved in git enrich.")
     parser.add_argument('--studies', action='store_true', help="Execute studies after enrichment.")

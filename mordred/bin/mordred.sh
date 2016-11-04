@@ -468,11 +468,14 @@ function supybot_retrieval {
     TMP_SUPYBOT_LIST=`mktemp`
     compose_repo_list $TMP_SUPYBOT_PROJECT_LIST $TMP_SUPYBOT_LIST supybot
     cd ~/GrimoireELK/utils/
+    IFS=$'\n'
     for url in $(cat $TMP_SUPYBOT_LIST);
     do
-        SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
+        SUPYBOT_URL=`echo $url | cut -d \' -f 2`
+        SUPYBOT_PATH=`echo $url | cut -d \' -f 4`
         ./p2o.py -e $ES_URI -g --index $SUPYBOT_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/irc-collection.log" 2>&1
     done
+    unset IFS
     rm $TMP_SUPYBOT_PROJECT_LIST
     rm $TMP_SUPYBOT_LIST
 }
@@ -521,8 +524,21 @@ function confluence_retrieval {
 }
 
 function jira_retrieval {
-    cd ~/GrimoireELK/utils/
-    ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $JIRA_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+    REPOS=`get_repo_list jira`
+
+    nrepos=`get_repo_list jira|wc -w`
+    cd ~/GrimoireELK/utils
+    counter=0
+    for r in $REPOS
+    do
+      ROOT_URL=`echo $r|awk -F'/browse/' '{print $1}'`
+      PROJECT=`echo $r|awk -F'/browse/' '{print $2}'`
+      ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $ROOT_URL --project $PROJECT $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+      counter=$((counter+1))
+      if [ $(( $counter % 100 )) -eq 0 ]; then
+          log_result "[jira]  $counter/$nrepos projects collected"
+      fi
+    done
 }
 
 function mediawiki_retrieval {
@@ -702,11 +718,14 @@ function supybot_enrichment {
     ENR_EXTRA_FLAG=$1
     compose_repo_list $TMP_SUPYBOT_PROJECT_LIST $TMP_SUPYBOT_LIST supybot
     cd ~/GrimoireELK/utils/
+    IFS=$'\n'
     for url in $(cat $TMP_SUPYBOT_LIST);
     do
-        SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
+        SUPYBOT_URL=`echo $url | cut -d \' -f 2`
+        SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
         ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $SUPYBOT_INDEX --index-enrich $SUPYBOT_ENRICHED_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH >> $LOGS_DIR"/irc-enrichment.log" 2>&1
     done
+    unset IFS
     rm $TMP_SUPYBOT_PROJECT_LIST
     rm $TMP_SUPYBOT_LIST
 }
@@ -762,6 +781,27 @@ function confluence_enrichment {
 }
 
 function jira_enrichment {
+    ENR_EXTRA_FLAG=$1
+
+    REPOS=`get_repo_list jira`
+    nrepos=`get_repo_list jira|wc -w`
+    cd ~/GrimoireELK/utils
+    counter=0
+    for r in $REPOS
+    do
+        ROOT_URL=`echo $r|awk -F'/browse/' '{print $1}'`
+        PROJECT=`echo $r|awk -F'/browse/' '{print $2}'`
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $ROOT_URL --project $PROJECT >> $LOGS_DIR"/jira-enrichment.log" 2>&1
+        counter=$((counter+1))
+        if [ $(( $counter % 100 )) -eq 0 ]; then
+            log_result "[jira]  $counter/$nrepos projects enriched"
+        fi
+    done
+
+
+
+
+
     cd ~/GrimoireELK/utils/
     ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $JIRA_URL >> $LOGS_DIR"/jira-enrichment.log" 2>&1
 }

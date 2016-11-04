@@ -181,6 +181,7 @@ class ElasticSearch(object):
         r = self.requests.post(self.index_url + "/_open")
         if r.status_code != 200:
             logging.error("Error opening index %s", r.text)
+        logging.debug("Index custom analyzers created")
 
     def create_mappings(self, mappings):
 
