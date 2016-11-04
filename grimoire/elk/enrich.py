@@ -50,16 +50,20 @@ except ImportError:
     SORTINGHAT_LIBS = False
 
 DEFAULT_PROJECT = 'Main'
+DEFAULT_DB_USER = 'root'
 
 class Enrich(object):
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None, insecure=True):
-
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                 db_user='', db_password='', db_host='', insecure=True):
         self.sortinghat = False
+        if db_user == '':
+            db_user = DEFAULT_DB_USER
         if db_sortinghat and not SORTINGHAT_LIBS:
             raise RuntimeError("Sorting hat configured but libraries not available.")
         if db_sortinghat:
-            self.sh_db = Database("root", "", db_sortinghat, "mariadb")
+            # self.sh_db = Database("root", "", db_sortinghat, "mariadb")
+            self.sh_db = Database(db_user, db_password, db_sortinghat, db_host)
             self.sortinghat = True
 
         self.prjs_map = None  # mapping beetween repositories and projects
@@ -74,7 +78,9 @@ class Enrich(object):
             if db_projects_map and not MYSQL_LIBS:
                 raise RuntimeError("Projects configured but MySQL libraries not available.")
             if  db_projects_map and not json_projects:
-                self.prjs_map = self.__get_projects_map(db_projects_map)
+                self.prjs_map = self.__get_projects_map(db_projects_map,
+                                                        db_user, db_password,
+                                                        db_host)
 
         if self.prjs_map and json_projects:
             # logging.info("Comparing db and json projects")
@@ -180,12 +186,12 @@ class Enrich(object):
         logging.debug("Number of db projects: %i", len(db_projects))
         logging.debug("Number of json projects: %i (>=%i)", len(json.keys()), len(db_projects))
 
-    def __get_projects_map(self, db_projects_map):
+    def __get_projects_map(self, db_projects_map, db_user=None, db_password=None, db_host=None):
         # Read the repo to project mapping from a database
         ds_repo_to_prj = {}
 
-        db = MySQLdb.connect(user="root", passwd="", host="mariadb",
-                             db = db_projects_map)
+        db = MySQLdb.connect(user=db_user, passwd=db_password, host=db_host,
+                             db=db_projects_map)
         cursor = db.cursor()
 
         query = """

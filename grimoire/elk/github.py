@@ -38,8 +38,10 @@ GITHUB = 'https://github.com/'
 
 class GitHubEnrich(Enrich):
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None):
-        super().__init__(db_sortinghat, db_projects_map, json_projects_map)
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                 db_user='', db_password='', db_host=''):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+                         db_user, db_password, db_host)
         self.users = {}  # cache users
         self.location = {}  # cache users location
         self.location_not_found = []  # location not found in map api

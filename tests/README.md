@@ -4,6 +4,12 @@ In experimental status yet, expect bugs and issues executing them.
 
 Inside the gelk container:
 
+* Create database for SortingHat:
+
+```
+mysqladmin -u root -h mariadb create test_sh
+```
+
 * Load projects data: 
 
 ```
