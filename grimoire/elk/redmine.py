@@ -55,18 +55,20 @@ class RedmineEnrich(Enrich):
 
         data = item['data']
         if 'assigned_to' in data:
-            identities.append(self.get_sh_identity(data['assigned_to']))
-        identities.append(self.get_sh_identity(data['author']))
+            identities.append(self.get_sh_identity(data, 'assigned_to'))
+        identities.append(self.get_sh_identity(data, 'author'))
+        # TODO: identities in journals not added yet
 
         return identities
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, data, rol):
         identity = {}
         identity['email'] = None
-        if 'email' in user:
-            identity['email'] = user['email']
-        identity['username'] = user['id']
-        identity['name'] = user['name']
+        if rol+"_data" in data:
+            if 'mail' in data[rol+"_data"]:
+                identity['email'] = data[rol+"_data"]['mail']
+        identity['username'] = data[rol]['id']
+        identity['name'] = data[rol]['name']
         return identity
 
     def get_item_sh(self, item):
@@ -74,7 +76,7 @@ class RedmineEnrich(Enrich):
 
         eitem = {}  # Item enriched
 
-        identity  = self.get_sh_identity(item['data']['author'])
+        identity  = self.get_sh_identity(item['data'], 'author')
         eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
 
         return eitem
