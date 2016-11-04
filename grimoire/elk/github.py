@@ -367,10 +367,12 @@ class GitHubEnrich(Enrich):
         return rich_issue
 
     def enrich_items(self, items):
-        super(GitHubEnrich, self).enrich_items(items)
+        total = super(GitHubEnrich, self).enrich_items(items)
 
         logging.debug("Updating GitHub users geolocations in Elastic")
         self.geo_locations_to_es() # Update geolocations in Elastic
+
+        return total
 
 
 class GitHubUser(object):
