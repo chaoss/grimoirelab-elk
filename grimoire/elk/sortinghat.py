@@ -37,6 +37,50 @@ logger = logging.getLogger(__name__)
 class SortingHat(object):
 
     @classmethod
+    def add_identity(cls, db, identity, backend):
+        """ Load and identity list from backend in Sorting Hat """
+        print(identity)
+        uuid = None
+        try:
+            uuid = api.add_identity(db, backend, identity['email'],
+                                    identity['name'], identity['username'])
+
+            logger.debug("New sortinghat identity %s %s,%s,%s (%i/%i)",
+                        uuid, identity['username'], identity['name'], identity['email'],
+                        total, lidentities)
+
+            profile = {"name": identity['name'] if identity['name'] else identity['username'],
+                       "email": identity['email']}
+
+            api.edit_profile(db, uuid, **profile)
+
+        except AlreadyExistsError as ex:
+            uuid = ex.uuid
+        except WrappedValueError as ex:
+            logging.warning("Trying to add a None identity. Ignoring it.")
+        except UnicodeEncodeError as ex:
+            logging.warning("UnicodeEncodeError. Ignoring it. %s %s %s",
+                            identity['email'], identity['name'],
+                            identity['username'])
+        except Exception as ex:
+            logging.warning("Unknown exception adding identity. Ignoring it. %s %s %s",
+                            identity['email'], identity['name'],
+                            identity['username'])
+            traceback.print_exc()
+
+        if 'company' in identity and identity['company'] is not None:
+            try:
+                api.add_organization(db, identity['company'])
+                api.add_enrollment(db, uuid, identity['company'],
+                                   datetime(1900, 1, 1),
+                                   datetime(2100, 1, 1))
+            except AlreadyExistsError:
+                pass
+
+        return uuid
+
+
+    @classmethod
     def add_identities(cls, db, identities, backend):
         """ Load identities list from backend in Sorting Hat """
 
@@ -57,67 +101,30 @@ class SortingHat(object):
             matcher = create_identity_matcher(matching, blacklist)
 
         for identity in identities:
-            try:
-                uuid = api.add_identity(db, backend, identity['email'],
-                                        identity['name'], identity['username'])
+            uuid = cls.add_identity(db, identity, backend)
 
-                logger.debug("New sortinghat identity %s %s,%s,%s (%i/%i)",
-                            uuid, identity['username'], identity['name'], identity['email'],
-                            total, lidentities)
+            total += 1
 
-                profile = {"name": identity['name'] if identity['name'] else identity['username'],
-                           "email": identity['email']}
+            if not merge_identities:
+                continue  # Don't do the merge here. Too slow in large projects
 
-                api.edit_profile(db, uuid, **profile)
+            # Time to  merge
+            matches = api.match_identities(db, uuid, matcher)
 
-                total += 1
-                if not merge_identities:
-                    continue  # Don't do the merge here. Too slow in large projects
-
-                # Time to  merge
-                matches = api.match_identities(db, uuid, matcher)
-
-                if len(matches) > 1:
-                    u = api.unique_identities(db, uuid)[0]
-                    for m in matches:
-                        # First add the old uuid to the list of changed by merge uuids
-                        if m.uuid not in merged_identities:
-                            merged_identities.append(m.uuid)
-                        if m.uuid == uuid:
-                            continue
-                        # Merge matched identity into added identity
-                        api.merge_unique_identities(db, m.uuid, u.uuid)
-                        # uuid = m.uuid
-                        # u = api.unique_identities(db, uuid, backend)[0]
-                        # Include all identities related to this uuid
-                        # merged_identities.append(m.uuid)
-
-            except AlreadyExistsError as ex:
-                uuid = ex.uuid
-                continue
-            except WrappedValueError as ex:
-                logging.warning("Trying to add a None identity. Ignoring it.")
-                continue
-            except UnicodeEncodeError as ex:
-                logging.warning("UnicodeEncodeError. Ignoring it. %s %s %s" % \
-                                (identity['email'], identity['name'],
-                                identity['username']))
-                continue
-            except Exception as ex:
-                logging.warning("Unknown exception adding identity. Ignoring it. %s %s %s" % \
-                                (identity['email'], identity['name'],
-                                identity['username']))
-                traceback.print_exc()
-                continue
-
-            if 'company' in identity and identity['company'] is not None:
-                try:
-                    api.add_organization(db, identity['company'])
-                    api.add_enrollment(db, uuid, identity['company'],
-                                       datetime(1900, 1, 1),
-                                       datetime(2100, 1, 1))
-                except AlreadyExistsError:
-                    pass
+            if len(matches) > 1:
+                u = api.unique_identities(db, uuid)[0]
+                for m in matches:
+                    # First add the old uuid to the list of changed by merge uuids
+                    if m.uuid not in merged_identities:
+                        merged_identities.append(m.uuid)
+                    if m.uuid == uuid:
+                        continue
+                    # Merge matched identity into added identity
+                    api.merge_unique_identities(db, m.uuid, u.uuid)
+                    # uuid = m.uuid
+                    # u = api.unique_identities(db, uuid, backend)[0]
+                    # Include all identities related to this uuid
+                    # merged_identities.append(m.uuid)
 
         logger.info("Total NEW identities: %i" % (total))
 
