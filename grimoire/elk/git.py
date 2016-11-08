@@ -127,13 +127,6 @@ class GitEnrich(Enrich):
         # John Smith <john.smith@bitergia.com>
         identity = {}
 
-        if username is None and self.github_token:
-            # Try to get the GitHub login from the cache
-            try:
-                username = self.github_logins[git_user]
-            except KeyError:
-                pass
-
         name = git_user.split("<")[0]
         name = name.strip()  # Remove space between user and email
         email = git_user.split("<")[1][:-1]
