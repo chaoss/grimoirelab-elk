@@ -222,6 +222,7 @@ def get_params_parser():
     parser.add_argument('--db-host', help="Host for db connection (default to mariadb)",
                         default="mariadb")
     parser.add_argument('--db-projects-map', help="Projects Mapping DB")
+    parser.add_argument('--refresh-projects', action='store_true', help="Refresh projects in enriched items")
     parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('--json-projects-map', help="Projects Mapping JSON file")
     parser.add_argument('--project', help="Project for the repository (origin)")
