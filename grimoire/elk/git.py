@@ -78,23 +78,12 @@ class GitEnrich(Enrich):
 
         return {"items":mapping}
 
-
-    def __get_github_commit_identity(self, user):
-        """ Search for user identity in Sorting Hat """
-        return self.__get_uuid_cache(user, SH_GIT_COMMIT)
-
-    def __add_github_commit_identity(self, user):
-        """ Add user identity in Sorting Hat """
-        source = SH_GIT_COMMIT
-        return SortingHat.add_identity(self.sh_db, user, source)
-
-
     def get_identities(self, item):
         """ Return the identities from an item.
             If the repo is in GitHub, get the usernames from GitHub. """
         identities = []
 
-        def add_sh_github_identity(user, field, rol):
+        def add_sh_github_identity(user, user_field, rol):
             """ Add a new github identity to SH if it does not exists """
             github_repo = None
             if GITHUB in item['origin']:
@@ -103,19 +92,19 @@ class GitEnrich(Enrich):
                 return
 
             # Try to get the identity from SH
-            uuid_found = self.__get_github_commit_identity(user)
-            if not uuid_found:
+            user_data = item['data'][user_field]
+            sh_identity = SortingHat.get_github_commit_username(self.sh_db, user, SH_GIT_COMMIT)
+            if not sh_identity:
                 # Get the usename from GitHub
-                gh_username = self.get_github_login(item['data'][field], rol, commit_hash, github_repo)
+                gh_username = self.get_github_login(user_data, rol, commit_hash, github_repo)
                 # Create a new SH identity with name, email from git and username from github
                 logging.debug("Adding new identity %s to SH %s: %s", gh_username, SH_GIT_COMMIT, user)
-                user = self.get_sh_identity(item['data'][field], gh_username)
-                self.__add_github_commit_identity(user)
+                user = self.get_sh_identity(user_data, gh_username)
+                SortingHat.add_identity(self.sh_db, user, SH_GIT_COMMIT)
             else:
-                self.github_logins[user] = uuid_found
-                logging.debug("GitHub-commit Identity already exists %s", uuid_found)
-
-
+                if user_data not in self.github_logins:
+                    self.github_logins[user_data] = sh_identity['username']
+                    logging.debug("GitHub-commit exists. username:%s user:%s", username, user_data)
 
         commit_hash = item['data']['commit']
 
