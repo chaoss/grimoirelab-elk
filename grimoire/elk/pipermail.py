@@ -26,5 +26,5 @@ from grimoire.elk.mbox import MBoxEnrich
 
 class PipermailEnrich(MBoxEnrich):
 
-    def get_project_repository(self, item):
-        return item['origin']
+    def get_project_repository(self, eitem):
+        return eitem['origin']

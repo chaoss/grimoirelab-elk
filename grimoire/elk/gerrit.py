@@ -46,9 +46,9 @@ class GerritEnrich(Enrich):
         if 'username' in user: identity['username'] = user['username']
         return identity
 
-    def get_project_repository(self, item):
-        repo = item['origin']
-        repo += "_" + item['data']['project']
+    def get_project_repository(self, eitem):
+        repo = eitem['origin']
+        repo += "_" + eitem['repository']
         return repo
 
     def get_identities(self, item):
@@ -192,7 +192,7 @@ class GerritEnrich(Enrich):
             eitem.update(self.get_item_sh(item, "owner"))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(review['createdOn'], "review"))
 
