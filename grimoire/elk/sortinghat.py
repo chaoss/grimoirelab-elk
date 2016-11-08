@@ -43,12 +43,12 @@ class SortingHat(object):
         with db.connect() as session:
             query = session.query(Identity).\
             filter(Identity.name == identity['name'], Identity.email == identity['email'], Identity.source == source)
-        identities = query.all()
-        if identities:
-            user = {}
-            user['name'] = identities[0].name
-            user['email'] = identities[0].email
-            user['username'] = identities[0].username
+            identities = query.all()
+            if identities:
+                user = {}
+                user['name'] = identities[0].name
+                user['email'] = identities[0].email
+                user['username'] = identities[0].username
         return user
 
     @classmethod
