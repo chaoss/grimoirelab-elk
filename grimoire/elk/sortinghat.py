@@ -28,13 +28,28 @@ import logging
 import traceback
 
 from sortinghat import api
-from sortinghat.db.model import UniqueIdentity
+from sortinghat.db.model import Identity, UniqueIdentity
 from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
 from sortinghat.matcher import create_identity_matcher
 
 logger = logging.getLogger(__name__)
 
 class SortingHat(object):
+
+    @classmethod
+    def get_github_commit_username(cls, db, identity, source):
+        user = None
+
+        with db.connect() as session:
+            query = session.query(Identity).\
+            filter(Identity.name == identity['name'], Identity.email == identity['email'], Identity.source == source)
+        identities = query.all()
+        if identities:
+            user = {}
+            user['name'] = identities[0].name
+            user['email'] = identities[0].email
+            user['username'] = identities[0].username
+        return user
 
     @classmethod
     def add_identity(cls, db, identity, backend):
@@ -45,9 +60,8 @@ class SortingHat(object):
             uuid = api.add_identity(db, backend, identity['email'],
                                     identity['name'], identity['username'])
 
-            logger.debug("New sortinghat identity %s %s,%s,%s (%i/%i)",
-                        uuid, identity['username'], identity['name'], identity['email'],
-                        total, lidentities)
+            logger.debug("New sortinghat identity %s %s,%s,%s ",
+                        uuid, identity['username'], identity['name'], identity['email'])
 
             profile = {"name": identity['name'] if identity['name'] else identity['username'],
                        "email": identity['email']}
