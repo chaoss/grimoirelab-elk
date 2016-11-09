@@ -54,7 +54,6 @@ class SortingHat(object):
     @classmethod
     def add_identity(cls, db, identity, backend):
         """ Load and identity list from backend in Sorting Hat """
-        print(identity)
         uuid = None
         try:
             uuid = api.add_identity(db, backend, identity['email'],
@@ -106,7 +105,6 @@ class SortingHat(object):
 
         total = 0
         lidentities = len(identities)
-
 
         if merge_identities:
             merged_identities = []  # old identities merged into new ones
