@@ -207,7 +207,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    github_token=None, studies=False, only_studies=False,
                    url_enrich=None, events_enrich=False,
                    db_user=None, db_password=None, db_host=None,
-                   refresh_projects=False):
+                   do_refresh_projects=False):
     """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend, events=False):
@@ -367,7 +367,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if only_studies:
             logging.info("Running only studies (no SH and no enrichment)")
             do_studies(enrich_backend, last_enrich)
-        elif refresh_projects:
+        elif do_refresh_projects:
             logging.info("Refreshing project field in enriched index")
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_projects(enrich_backend)
