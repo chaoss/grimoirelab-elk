@@ -206,7 +206,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    no_incremental=False, only_identities=False,
                    github_token=None, studies=False, only_studies=False,
                    url_enrich=None, events_enrich=False,
-                   db_user=None, db_password=None, db_host=None):
+                   db_user=None, db_password=None, db_host=None,
+                   refresh_projects=False):
     """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend, events=False):
@@ -251,6 +252,22 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         enrich_count_merged = enrich_items(renrich_items, enrich_backend)
         return enrich_count_merged
 
+    def refresh_projects(enrich_backend):
+        logging.debug("Refreshing project field in  %s", enrich_backend.elastic.index_url)
+        total = 0
+
+        new_eitems = []
+
+        eitems = enrich_backend.fetch()
+        for eitem in eitems:
+            new_project = enrich_backend.get_item_project(eitem)
+            eitem.update(new_project)
+            new_eitems.append(eitem)
+            total += 1
+        print("Total eitems %i" % total)
+
+        return eitems
+
     def do_studies(enrich_backend, last_enrich):
         try:
             for study in enrich_backend.studies:
@@ -259,6 +276,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         except Exception as e:
             logging.error("Problem executing studies for %s", backend_name)
             traceback.print_exc()
+
 
     try:
         from grimoire.elk.sortinghat import SortingHat
@@ -349,17 +367,19 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             else:
                 ocean_backend = connector[1](backend)
 
-
-        clean = False  # Don't remove ocean index when enrich
-        elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
-        ocean_backend.set_elastic(elastic_ocean)
-
-        logging.info("Adding enrichment data to %s", enrich_backend.elastic.index_url)
-
         if only_studies:
             logging.info("Running only studies (no SH and no enrichment)")
             do_studies(enrich_backend, last_enrich)
+        elif refresh_projects:
+            logging.info("Refreshing project field in enriched index")
+            refresh_projects(enrich_backend)
         else:
+            clean = False  # Don't remove ocean index when enrich
+            elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
+            ocean_backend.set_elastic(elastic_ocean)
+
+            logging.info("Adding enrichment data to %s", enrich_backend.elastic.index_url)
+
             if db_sortinghat:
                 enrich_count_merged = 0
 
