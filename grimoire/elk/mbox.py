@@ -83,8 +83,8 @@ class MBoxEnrich(Enrich):
             identity['name'] = identity['email'].split('@')[0]
         return identity
 
-    def get_project_repository(self, item):
-        mls_list = item['origin']
+    def get_project_repository(self, eitem):
+        mls_list = eitem['origin']
         # Eclipse specific yet
         repo = "/mnt/mailman_archives/"
         repo += mls_list+".mbox/"+mls_list+".mbox"
@@ -146,7 +146,7 @@ class MBoxEnrich(Enrich):
             eitem.update(self.get_item_sh(item,"From"))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(message['Date'], "message"))
 

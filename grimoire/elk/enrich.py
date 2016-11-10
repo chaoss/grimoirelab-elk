@@ -380,20 +380,101 @@ class Enrich(object):
             name: 1
         }
 
-    # Project field enrichment
+    # Get items for the generator: initial scroll query
+    def __get_elastic_items(self, elastic_scroll_id=None):
+        """ Get the items from the enriched index related to the backend """
 
-    def get_project_repository(self, item):
+        elastic_page = 1000
+        url = self.elastic.index_url
+        max_process_items_pack_time = "10m"  # 10 minutes
+        url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
+                                               elastic_page)
+        res_json = None # query results in JSON format
+
+        if elastic_scroll_id:
+            """ Just continue with the scrolling """
+            url = self.elastic.url
+            url += "/_search/scroll"
+            scroll_data = {
+                "scroll" : max_process_items_pack_time,
+                "scroll_id" : elastic_scroll_id
+            }
+            r = self.requests.post(url, data=json.dumps(scroll_data))
+        else:
+            filters = """
+            {
+              "query_string": {
+                "analyze_wildcard": true,
+                "query": "*"
+              }
+            }
+            """
+            order_field = self.get_field_date()
+            order_query = ''
+            order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
+
+            query = """
+            {
+                "query": {
+                    "bool": {
+                        "must": [%s]
+                    }
+                } %s
+            }
+            """ % (filters, order_query)
+
+            logging.debug("%s %s", url, query)
+
+            r = self.requests.post(url, data=query)
+
+        try:
+            res_json = r.json()
+        except Exception as e:
+            print(e)
+            logging.error("No JSON found in %s", r.text)
+            logging.error("No results found from %s", url)
+
+        return res_json
+
+
+    # Enriched items generator
+    def fetch(self):
+        logging.debug("Creating enriched items generator.")
+
+        elastic_scroll_id = None
+
+        while True:
+            rjson = self.__get_elastic_items(elastic_scroll_id)
+
+            if rjson and "_scroll_id" in rjson:
+                elastic_scroll_id = rjson["_scroll_id"]
+
+            if rjson and "hits" in rjson:
+                if len(rjson["hits"]["hits"]) == 0:
+                    break
+                for hit in rjson["hits"]["hits"]:
+                    eitem = hit['_source']
+                    yield eitem
+            else:
+                logging.error("No results found from %s", self.elastic.index_url)
+                break
+
+        return
+
+    # Project field enrichment
+    def get_project_repository(self, eitem):
         """
-            Get the repository name used for mapping to project name
+            Get the repository name used for mapping to project name from
+            the enriched item.
             To be implemented for each data source
         """
         return ''
 
-    def get_item_project(self, item):
+    def get_item_project(self, eitem):
         """ Get project mapping enrichment field """
-        item_project = {}
+        eitem_project = {}
         ds_name = self.get_connector_name()  # data source name in projects map
-        repository = self.get_project_repository(item)
+        repository = self.get_project_repository(eitem)
         try:
             project = (self.prjs_map[ds_name][repository])
             # logging.debug("Project FOUND for repository %s %s", repository, project)
@@ -401,23 +482,23 @@ class Enrich(object):
             # logging.warning("Project not found for repository %s (data source: %s)", repository, ds_name)
             project = None
             # Try to use always the origin in any case
-            if ds_name in self.prjs_map and item['origin'] in self.prjs_map[ds_name]:
-                project = self.prjs_map[ds_name][item['origin']]
+            if ds_name in self.prjs_map and eitem['origin'] in self.prjs_map[ds_name]:
+                project = self.prjs_map[ds_name][eitem['origin']]
 
         if project is None:
             project = DEFAULT_PROJECT
 
-        item_project = {"project": project}
+        eitem_project = {"project": project}
         # Time to add the project levels: eclipse.platform.releng.aggregator
-        item_path = ''
+        eitem_path = ''
         if project is not None:
             subprojects = project.split('.')
             for i in range(0, len(subprojects)):
                 if i > 0:
-                    item_path += "."
-                item_path += subprojects[i]
-                item_project['project_' + str(i+1)] = item_path
-        return item_project
+                    eitem_path += "."
+                eitem_path += subprojects[i]
+                eitem_project['project_' + str(i+1)] = eitem_path
+        return eitem_project
 
     # Sorting Hat stuff to be moved to SortingHat class
 

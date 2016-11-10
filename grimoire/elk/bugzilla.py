@@ -115,9 +115,9 @@ class BugzillaEnrich(Enrich):
 
         return eitem
 
-    def get_project_repository(self, item):
-        repo = item['origin']
-        product = item['data']['product'][0]['__text__']
+    def get_project_repository(self, eitem):
+        repo = eitem['origin']
+        product = eitem['product']
         repo += "buglist.cgi?product="+product
         return repo
 
@@ -231,7 +231,7 @@ class BugzillaEnrich(Enrich):
             eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(eitem['creation_date'],"bug"))
 

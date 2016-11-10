@@ -136,8 +136,8 @@ class GitEnrich(Enrich):
 
         return identity
 
-    def get_project_repository(self, item):
-        return item['origin']
+    def get_project_repository(self, eitem):
+        return eitem['origin']
 
     def get_github_login(self, user, rol, commit_hash, repo):
         """ rol: author or committer """
@@ -283,7 +283,7 @@ class GitEnrich(Enrich):
             eitem.update(self.get_item_sh(item, "Author"))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
 
