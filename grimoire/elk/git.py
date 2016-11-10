@@ -31,8 +31,12 @@ import requests
 from dateutil import parser
 
 from grimoire.elk.enrich import Enrich
-from grimoire.elk.sortinghat import SortingHat
 
+try:
+    from grimoire.elk.sortinghat import SortingHat
+    SORTINGHAT_LIBS = True
+except ImportError:
+    SORTINGHAT_LIBS = False
 
 GITHUB = 'https://github.com/'
 SH_GIT_COMMIT = 'github-commit'
