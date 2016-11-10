@@ -256,17 +256,14 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         logging.debug("Refreshing project field in  %s", enrich_backend.elastic.index_url)
         total = 0
 
-        new_eitems = []
-
         eitems = enrich_backend.fetch()
         for eitem in eitems:
             new_project = enrich_backend.get_item_project(eitem)
             eitem.update(new_project)
-            new_eitems.append(eitem)
+            yield eitem
             total += 1
-        print("Total eitems %i" % total)
 
-        return eitems
+        logging.info("Total eitems refreshed for project field %i" % total)
 
     def do_studies(enrich_backend, last_enrich):
         try:
@@ -372,7 +369,9 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             do_studies(enrich_backend, last_enrich)
         elif refresh_projects:
             logging.info("Refreshing project field in enriched index")
-            refresh_projects(enrich_backend)
+            field_id = enrich_backend.get_field_unique_id()
+            eitems = refresh_projects(enrich_backend)
+            enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
         else:
             clean = False  # Don't remove ocean index when enrich
             elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
