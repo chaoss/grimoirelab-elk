@@ -207,7 +207,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    github_token=None, studies=False, only_studies=False,
                    url_enrich=None, events_enrich=False,
                    db_user=None, db_password=None, db_host=None,
-                   do_refresh_projects=False):
+                   do_refresh_projects=False, do_refresh_identities=False):
     """ Enrich Ocean index """
 
     def enrich_items(items, enrich_backend, events=False):
@@ -253,7 +253,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         return enrich_count_merged
 
     def refresh_projects(enrich_backend):
-        logging.debug("Refreshing project field in  %s", enrich_backend.elastic.index_url)
+        logging.debug("Refreshing project field in %s", enrich_backend.elastic.index_url)
         total = 0
 
         eitems = enrich_backend.fetch()
@@ -263,7 +263,20 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             yield eitem
             total += 1
 
-        logging.info("Total eitems refreshed for project field %i" % total)
+        logging.info("Total eitems refreshed for project field %i", total)
+
+    def refresh_identities(enrich_backend):
+        logging.debug("Refreshing identities fields from %s", enrich_backend.elastic.index_url)
+        total = 0
+
+        for eitem in enrich_backend.fetch():
+            new_identities = enrich_backend.get_item_sh_from_id(eitem['author_id'])
+            eitem.update(new_identities)
+            yield eitem
+            total += 1
+
+        logging.info("Total eitems refreshed for identities fields %i", total)
+
 
     def do_studies(enrich_backend, last_enrich):
         try:
@@ -371,6 +384,11 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             logging.info("Refreshing project field in enriched index")
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_projects(enrich_backend)
+            enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
+        elif do_refresh_identities:
+            logging.info("Refreshing identities fields in enriched index")
+            field_id = enrich_backend.get_field_unique_id()
+            eitems = refresh_identities(enrich_backend)
             enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
         else:
             clean = False  # Don't remove ocean index when enrich

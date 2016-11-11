@@ -88,7 +88,9 @@ class BugzillaEnrich(Enrich):
         # Sorting Hat integration: reporter and assigned_to uuids
         if 'assigned_to' in item['data']:
             identity = BugzillaEnrich.get_sh_identity({'assigned_to':item["data"]['assigned_to']})
-            eitem['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
+            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
+            eitem['assigned_to_uuid'] = sh_ids['uuid']
+            eitem['assigned_to_id'] = sh_ids['id']
             eitem['assigned_to_name'] = identity['name']
             item_date = item['data'][self.get_field_date()][0]['__text__']
             item_date_dt = parser.parse(item_date)
@@ -98,8 +100,9 @@ class BugzillaEnrich(Enrich):
             eitem["assigned_to_bot"] = self.is_bot(eitem['assigned_to_uuid'])
         if 'reporter' in item['data']:
             identity = BugzillaEnrich.get_sh_identity({'reporter':item["data"]['reporter']})
-            eitem['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
-            eitem['reporter_name'] = identity['name']
+            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
+            eitem['reporter_uuid'] = sh_ids['uuid']
+            eitem['reporter_id'] = sh_ids['id']
             item_date = item['data'][self.get_field_date()][0]['__text__']
             item_date_dt = parser.parse(item_date)
             item_date_utc = (item_date_dt-item_date_dt.utcoffset()).replace(tzinfo=None)

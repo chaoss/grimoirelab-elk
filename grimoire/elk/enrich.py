@@ -42,7 +42,7 @@ except ImportError:
 
 try:
     from sortinghat.db.database import Database
-    from sortinghat import api
+    from sortinghat import api, utils
     from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
     SORTINGHAT_LIBS = True
 except ImportError:
@@ -553,7 +553,10 @@ class Enrich(object):
         """ Get standard SH fields from a SH identity """
         eitem = {}  # Item enriched
 
-        eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
+        sh_ids = self.get_sh_ids(identity, self.get_connector_name())
+        eitem["author_id"] = sh_ids['id']
+        eitem["author_uuid"] = sh_ids['uuid']
+
         # Always try to use first the data from SH
         identity_sh = self.get_identity_sh(eitem["author_uuid"])
 
@@ -609,15 +612,15 @@ class Enrich(object):
     def get_unique_identities(self, uuid):
         return api.unique_identities(self.sh_db, uuid)
 
-    def get_uuid(self, identity, backend_name):
-        """ Return the Sorting Hat uuid for an identity """
+    def get_sh_ids(self, identity, backend_name):
+        """ Return the Sorting Hat id and uuid for an identity """
         # Convert the dict to tuple so it is hashable
         identity_tuple = tuple(identity.items())
-        uuid = self.__get_uuid_cache(identity_tuple, backend_name)
-        return uuid
+        sh_ids = self.__get_sh_ids_cache(identity_tuple, backend_name)
+        return sh_ids
 
     @lru_cache()
-    def __get_uuid_cache(self, identity_tuple, backend_name):
+    def __get_sh_ids_cache(self, identity_tuple, backend_name):
 
         # Convert tuple to the original dict
         identity = dict((x, y) for x, y in identity_tuple)
@@ -626,7 +629,7 @@ class Enrich(object):
             raise RuntimeError("Sorting Hat not active during enrich")
 
         iden = {}
-        uuid = None
+        sh_ids = {"id": None, "uuid": None}
 
         for field in ['email', 'name', 'username']:
             iden[field] = None
@@ -641,21 +644,20 @@ class Enrich(object):
         except AlreadyExistsError as ex:
             uuid = ex.uuid
             u = api.unique_identities(self.sh_db, uuid)[0]
-            uuid = u.uuid
+            sh_ids['id'] = utils.uuid(backend_name, email=iden['email'],
+                                      name=iden['name'], username=iden['username'])
+            sh_ids['uuid'] = u.uuid
         except WrappedValueError:
             logger.error("None Identity found")
-            logger.error("%s %s" % (identity, uuid))
-            uuid = None
+            logger.error(identity)
         except NotFoundError:
-            logger.error("Identity found in Sorting Hat which is not unique")
-            logger.error("%s %s" % (identity, uuid))
-            uuid = None
+            logger.error("Identity not found in Sorting Hat")
+            logger.error(identity)
         except UnicodeEncodeError:
             logger.error("UnicodeEncodeError")
-            logger.error("%s %s" % (identity, uuid))
-            uuid = None
+            logger.error(identity)
         except Exception as ex:
-            logger.error("Unknown error adding sorting hat identity.")
-            logger.error("%s %s" % (identity, uuid))
-            uuid = None
-        return uuid
+            logger.error("Unknown error adding sorting hat identity %s", ex)
+            logger.error(identity)
+
+        return sh_ids

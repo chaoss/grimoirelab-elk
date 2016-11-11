@@ -90,8 +90,9 @@ class GitHubEnrich(Enrich):
         user = data['user_data']
         if user is not None:
             identity = self.get_sh_identity(user)
-            eitem["user_uuid"] = \
-                self.get_uuid(identity, self.get_connector_name())
+            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
+            eitem["user_uuid"] = sh_ids['uuid']
+            eitem["user_id"] = sh_ids['id']
             eitem['user_name'] = identity['name']
             update = None
             if self.get_field_date() in item:
@@ -104,8 +105,9 @@ class GitHubEnrich(Enrich):
         assignee = data['assignee_data']
         if assignee:
             identity = self.get_sh_identity(assignee)
-            eitem["assignee_uuid"] =  \
-                self.get_uuid(identity, self.get_connector_name())
+            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
+            eitem["assignee_uuid"] = sh_ids['uuid']
+            eitem["assignee_id"] = sh_ids['id']
             eitem['assignee_name'] = identity['name']
             update = None
             if self.get_field_date() in item:

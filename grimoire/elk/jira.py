@@ -68,7 +68,9 @@ class JiraEnrich(Enrich):
         for field in ["assignee","reporter","creator"]:
             if field in item['data']['fields']:
                 identity = self.get_sh_identity(item['data']['fields'][field])
-                eitem[field+'_uuid'] = self.get_uuid(identity, self.get_connector_name())
+                sh_ids = self.get_sh_ids(identity, self.get_connector_name())
+                eitem[field+'_uuid'] = sh_ids['uuid']
+                eitem[field+'_id'] = sh_ids['id']
                 eitem[field+'_name'] = identity['name']
                 eitem[field+"_org_name"] = self.get_enrollment(eitem[field+'_uuid'], parser.parse(item[self.get_field_date()]))
                 eitem[field+"_domain"] = self.get_domain(identity)
@@ -78,6 +80,7 @@ class JiraEnrich(Enrich):
         # Unify fields for SH filtering
         if 'reporter' in item['data']['fields']:
             eitem["author_uuid"] = eitem["reporter_uuid"]
+            eitem["author_id"] = eitem["reporter_id"]
             eitem["author_name"] = eitem["reporter_name"]
             eitem["author_org_name"] = eitem["reporter_org_name"]
             eitem["author_domain"] = eitem["reporter_domain"]

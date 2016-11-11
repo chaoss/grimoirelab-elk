@@ -117,7 +117,9 @@ class PhabricatorEnrich(Enrich):
             assigned_to = {}
             assigned_to["assigned_to_name"] = identity['name']
             assigned_to["assigned_to_user_name"] = identity['username']
-            assigned_to["assigned_to_uuid"] = self.get_uuid(identity, self.get_connector_name())
+            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
+            assigned_to["assigned_to_uuid"] = sh_ids['uuid']
+            assigned_to["assigned_to_id"] = sh_ids['id']
             assigned_to["assigned_to_org_name"] = self.get_enrollment(assigned_to["assigned_to_uuid"], parser.parse(item[self.get_field_date()]))
             assigned_to["assigned_to_bot"] = self.is_bot(assigned_to['assigned_to_uuid'])
             assigned_to["assigned_to_domain"] = self.get_identity_domain(identity)
