@@ -26,6 +26,9 @@ from grimoire.elk.enrich import Enrich
 
 class ReMoEnrich(Enrich):
 
+    def get_field_author(self):
+        return "owner_name"
+
     def get_elastic_mappings(self):
 
         mapping = """
@@ -116,6 +119,6 @@ class ReMoEnrich(Enrich):
         }
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item,"owner_name"))
+            eitem.update(self.get_item_sh(item))
 
         return eitem

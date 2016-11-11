@@ -33,6 +33,9 @@ from .utils import unixtime_to_datetime
 
 class TelegramEnrich(Enrich):
 
+    def get_field_author(self):
+        return "from"
+
     def get_elastic_mappings(self):
 
         mapping = """
@@ -68,10 +71,14 @@ class TelegramEnrich(Enrich):
 
         return identities
 
-    def get_item_sh(self, message, field):
+    def get_item_sh(self, item):
         """ Add sorting hat enrichment fields for the author of the item """
 
         eitem = {}  # Item enriched
+
+        field = self.get_field_author()
+
+        message = item['data']['message']
 
         identity  = self.get_sh_identity(message[field])
         update = unixtime_to_datetime(message['date'])
@@ -148,7 +155,7 @@ class TelegramEnrich(Enrich):
 
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(message, "from"))
+            eitem.update(self.get_item_sh(item))
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "telegram"))
 

@@ -31,6 +31,9 @@ from grimoire.elk.enrich import Enrich
 
 class SupybotEnrich(Enrich):
 
+    def get_field_author(self):
+        return "nick"
+
     def get_elastic_mappings(self):
 
         mapping = """
@@ -93,6 +96,6 @@ class SupybotEnrich(Enrich):
         eitem["channel"] = eitem["origin"]
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, "nick"))
+            eitem.update(self.get_item_sh(item))
 
         return eitem

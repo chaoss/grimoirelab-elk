@@ -34,6 +34,9 @@ from .utils import get_time_diff_days
 
 class KitsuneEnrich(Enrich):
 
+    def get_field_author(self):
+        return "creator"
+
     def get_elastic_mappings(self):
 
         mapping = """
@@ -81,10 +84,12 @@ class KitsuneEnrich(Enrich):
                     identities.append(user)
         return identities
 
-    def get_item_sh(self, item, identity_field):
+    def get_item_sh(self, item):
         """ Add sorting hat enrichment fields for the author of the item """
 
         eitem = {}  # Item enriched
+
+        identity_field = self.get_field_author()
 
         update_date = parser.parse(item["updated"])
 
@@ -153,7 +158,7 @@ class KitsuneEnrich(Enrich):
                 eitem['author'] = question['creator']['display_name']
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(question, "creator"))
+                eitem.update(self.get_item_sh(question))
 
         elif kind == 'answer':
             answer = item
@@ -195,7 +200,7 @@ class KitsuneEnrich(Enrich):
                 eitem['author'] = answer['creator']['display_name']
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(answer, "creator"))
+                eitem.update(self.get_item_sh(answer))
 
         return eitem
 

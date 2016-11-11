@@ -32,6 +32,9 @@ from grimoire.elk.enrich import Enrich
 
 class MBoxEnrich(Enrich):
 
+    def get_field_author(self):
+        return "From"
+
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
@@ -143,7 +146,7 @@ class MBoxEnrich(Enrich):
             eitem["tz"]  = None
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item,"From"))
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))

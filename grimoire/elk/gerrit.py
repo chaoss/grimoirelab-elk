@@ -34,6 +34,9 @@ from grimoire.elk.enrich import Enrich
 
 class GerritEnrich(Enrich):
 
+    def get_field_author(self):
+        return "owner"
+
     def get_fields_uuid(self):
         return ["review_uuid", "patchSet_uuid", "approval_uuid"]
 
@@ -189,7 +192,7 @@ class GerritEnrich(Enrich):
         eitem["timeopen"] =  '%.2f' % timeopen
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, "owner"))
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))

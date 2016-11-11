@@ -28,6 +28,15 @@ from grimoire.elk.enrich import Enrich
 
 class ReMoEnrich(Enrich):
 
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                 db_user='', db_password='', db_host=''):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+                         db_user, db_password, db_host)
+        self.author = "user"  # changes if we are generating events
+
+    def get_field_author(self):
+        return self.author
+
     def get_elastic_mappings(self):
 
         mapping = """
@@ -165,7 +174,8 @@ class ReMoEnrich(Enrich):
             eitem['functional_areas'] += "," + area['name']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, "user"))
+            self.author = "user"
+            eitem.update(self.get_item_sh(item))
 
         return eitem
 
@@ -213,6 +223,7 @@ class ReMoEnrich(Enrich):
         }
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, "owner"))
+            self.author = 'owner'
+            eitem.update(self.get_item_sh(item))
 
         return eitem

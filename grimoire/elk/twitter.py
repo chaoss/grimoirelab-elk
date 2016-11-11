@@ -28,6 +28,9 @@ from grimoire.elk.enrich import Enrich
 
 class TwitterEnrich(Enrich):
 
+    def get_field_author(self):
+        return  "user"
+
     def get_field_date(self):
         return "created_at"
 
@@ -127,7 +130,7 @@ class TwitterEnrich(Enrich):
         eitem['user_url_twitter'] = "http://twitter.com/"+tweet['user']['screen_name']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(tweet, "user"))
+            eitem.update(self.get_item_sh(tweet))
 
         eitem.update(self.get_grimoire_fields(tweet["created_at"], "twitter"))
 

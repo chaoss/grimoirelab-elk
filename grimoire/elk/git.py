@@ -62,6 +62,9 @@ class GitEnrich(Enrich):
     def set_github_token(self, token):
         self.github_token = token
 
+    def get_field_author(self):
+        return "Author"
+
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
@@ -284,7 +287,7 @@ class GitEnrich(Enrich):
             eitem['project'] = item['project']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, "Author"))
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))

@@ -36,6 +36,9 @@ class StackExchangeEnrich(Enrich):
     def get_field_unique_id(self):
         return "question_id"
 
+    def get_field_author(self):
+        return "owner"
+
     def get_elastic_mappings(self):
 
         mapping = """
@@ -94,10 +97,12 @@ class StackExchangeEnrich(Enrich):
                     identities.append(user)
         return identities
 
-    def get_item_sh(self, item, identity_field):
+    def get_item_sh(self, item):
         """ Add sorting hat enrichment fields for the author of the item """
 
         eitem = {}  # Item enriched
+
+        identity_field = self.get_field_author()
 
         update_date = unixtime_to_datetime(item["last_activity_date"])
 
@@ -160,7 +165,7 @@ class StackExchangeEnrich(Enrich):
             eitem.update(self.get_grimoire_fields(creation_date, "question"))
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(question, "owner"))
+                eitem.update(self.get_item_sh(question))
 
         elif kind == 'answer':
             answer = item
@@ -197,7 +202,7 @@ class StackExchangeEnrich(Enrich):
             eitem.update(self.get_grimoire_fields(creation_date, "answer"))
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(answer, "owner"))
+                eitem.update(self.get_item_sh(answer))
 
         return eitem
 

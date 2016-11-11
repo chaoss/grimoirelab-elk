@@ -56,13 +56,15 @@ class DiscourseEnrich(Enrich):
         """ Add sorting hat enrichment fields for the author of the item """
 
         eitem = {}  # Item enriched
-        data = item['data']['details']['created_by']
+        data = item['data']['details'][self.get_field_author()]
 
         identity  = self.get_sh_identity(data)
         eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
 
         return eitem
 
+    def get_field_author(self):
+        return 'created_by'
 
     def get_rich_item(self, item):
         eitem = {}

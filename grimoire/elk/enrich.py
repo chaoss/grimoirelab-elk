@@ -288,6 +288,10 @@ class Enrich(object):
         from ..utils import get_connector_name
         return get_connector_name(type(self))
 
+    def get_field_author(self):
+        """ Field with the author information """
+        raise NotImplementedError
+
     def get_field_date(self):
         """ Field with the date in the JSON enriched items """
         return "metadata__updated_on"
@@ -577,8 +581,10 @@ class Enrich(object):
 
         return identity
 
-    def get_item_sh(self, item, identity_field):
+    def get_item_sh(self, item):
         """ Add sorting hat enrichment fields for the author of the item """
+
+        identity_field = self.get_field_author()
 
         eitem = {}  # Item enriched
         if 'data' in item:
