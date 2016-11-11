@@ -533,7 +533,11 @@ function jira_retrieval {
     do
       ROOT_URL=`echo $r|awk -F'/browse/' '{print $1}'`
       PROJECT=`echo $r|awk -F'/browse/' '{print $2}'`
-      ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $ROOT_URL --project $PROJECT $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+      if [ -z "$PROJECT" ]; then
+        ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $ROOT_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+      else
+        ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $ROOT_URL --project $PROJECT $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+      fi
       counter=$((counter+1))
       if [ $(( $counter % 100 )) -eq 0 ]; then
           log_result "[jira]  $counter/$nrepos projects collected"
@@ -791,7 +795,11 @@ function jira_enrichment {
     do
         ROOT_URL=`echo $r|awk -F'/browse/' '{print $1}'`
         PROJECT=`echo $r|awk -F'/browse/' '{print $2}'`
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $ROOT_URL --project $PROJECT >> $LOGS_DIR"/jira-enrichment.log" 2>&1
+        if [ -z "$PROJECT" ]; then
+          ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $ROOT_URL >> $LOGS_DIR"/jira-enrichment.log" 2>&1
+        else
+          ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $ROOT_URL --project $PROJECT >> $LOGS_DIR"/jira-enrichment.log" 2>&1
+        fi
         counter=$((counter+1))
         if [ $(( $counter % 100 )) -eq 0 ]; then
             log_result "[jira]  $counter/$nrepos projects enriched"
