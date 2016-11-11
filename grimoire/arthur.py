@@ -270,7 +270,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         total = 0
 
         for eitem in enrich_backend.fetch():
-            new_identities = enrich_backend.get_item_sh_from_id(eitem['author_id'])
+            new_identities = enrich_backend.get_item_sh_from_id(eitem)
             eitem.update(new_identities)
             yield eitem
             total += 1
@@ -298,6 +298,9 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
     if ocean_index or ocean_index_enrich:
         clean = False  # don't remove index, it could be shared
+
+    if do_refresh_projects or do_refresh_identities:
+        clean = False  # refresh works over the existing enriched items
 
     if not get_connector_from_name(backend_name):
         raise RuntimeError("Unknown backend %s" % backend_name)

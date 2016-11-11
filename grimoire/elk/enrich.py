@@ -44,6 +44,9 @@ try:
     from sortinghat.db.database import Database
     from sortinghat import api, utils
     from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
+
+    from grimoire.elk.sortinghat import SortingHat
+
     SORTINGHAT_LIBS = True
 except ImportError:
     logger.info("SortingHat not available")
@@ -526,7 +529,7 @@ class Enrich(object):
 
     def is_bot(self, uuid):
         bot = False
-        u = self.get_unique_identities(uuid)[0]
+        u = self.get_unique_identity(uuid)
         if u.profile:
             bot = u.profile.is_bot
         return bot
@@ -549,43 +552,67 @@ class Enrich(object):
                     break
         return enroll
 
-    def get_item_sh_fields(self, identity, item_date):
+    def get_item_sh_fields(self, identity=None, item_date=None, sh_id=None):
         """ Get standard SH fields from a SH identity """
-        eitem = {}  # Item enriched
+        eitem_sh = {}  # Item enriched
 
-        sh_ids = self.get_sh_ids(identity, self.get_connector_name())
-        eitem["author_id"] = sh_ids['id']
-        eitem["author_uuid"] = sh_ids['uuid']
-
-        # Always try to use first the data from SH
-        identity_sh = self.get_identity_sh(eitem["author_uuid"])
-
-        if identity_sh:
-            eitem["author_name"] = identity_sh['name']
-            eitem["author_user_name"] = identity_sh['username']
-            eitem["author_domain"] = self.get_identity_domain(identity_sh)
+        if identity:
+            # Use the identity to get the SortingHat identity
+            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
+            eitem_sh["author_id"] = sh_ids['id']
+            eitem_sh["author_uuid"] = sh_ids['uuid']
+        elif sh_id:
+            # Use the SortingHat id to get the identity
+            eitem_sh["author_id"] = sh_id
+            eitem_sh["author_uuid"] = self.get_uuid_from_id(sh_id)
         else:
-            eitem["author_name"] = identity['name']
-            eitem["author_user_name"] = identity['username']
-            eitem["author_domain"] = self.get_identity_domain(identity)
+            raise RuntimeError("identity or sh_id needed for sortinghat fields")
 
-        eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], item_date)
-        eitem["author_bot"] = self.is_bot(eitem['author_uuid'])
+        # Get the SH profile to use first this data
+        profile = self.get_profile_sh(eitem_sh["author_uuid"])
+
+        if profile:
+            eitem_sh["author_name"] = profile['name']
+            # username is not included in SH profile
+            eitem_sh["author_user_name"] = None
+            if identity:
+                eitem_sh["author_user_name"] = identity['username']
+            eitem_sh["author_domain"] = self.get_identity_domain(profile)
+        elif not profile and sh_id:
+            logger.warning("Can't find SH identity: %s", sh_id)
+            return {}
+        else:
+            # Just use directly the data in the identity
+            eitem_sh["author_name"] = identity['name']
+            eitem_sh["author_user_name"] = identity['username']
+            eitem_sh["author_domain"] = self.get_identity_domain(identity)
+
+        eitem_sh["author_org_name"] = self.get_enrollment(eitem_sh["author_uuid"], item_date)
+        eitem_sh["author_bot"] = self.is_bot(eitem_sh['author_uuid'])
+        return eitem_sh
+
+    def get_profile_sh(self, uuid):
+        profile = {}
+
+        u = self.get_unique_identity(uuid)
+        if u.profile:
+            profile['name'] = u.profile.name
+            profile['email'] = u.profile.email
+
+        return profile
+
+    def get_item_sh_from_id(self, eitem):
+        # Get the SH fields from the data in the enriched item
+
+        # Just support for author SH fields now
+        sh_id = eitem["author_id"]
+        date = parser.parse(eitem[self.get_field_date()])
+        eitem = self.get_item_sh_fields(sh_id=sh_id, item_date=date)
+
         return eitem
 
-    def get_identity_sh(self, uuid):
-        identity = {}
-
-        u = self.get_unique_identities(uuid)[0]
-        if u.profile:
-            identity['name'] = u.profile.name
-            identity['username'] = None
-            identity['email'] = u.profile.email
-
-        return identity
-
     def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
+        """ Get Sorting Hat enrichment fields for the author of the item """
 
         identity_field = self.get_field_author()
 
@@ -609,8 +636,13 @@ class Enrich(object):
         return api.enrollments(self.sh_db, uuid)
 
     @lru_cache()
-    def get_unique_identities(self, uuid):
-        return api.unique_identities(self.sh_db, uuid)
+    def get_unique_identity(self, uuid):
+        return api.unique_identities(self.sh_db, uuid)[0]
+
+    @lru_cache()
+    def get_uuid_from_id(self, sh_id):
+        """ Get the SH identity uuid from the id """
+        return SortingHat.get_uuid_from_id(self.sh_db, sh_id)
 
     def get_sh_ids(self, identity, backend_name):
         """ Return the Sorting Hat id and uuid for an identity """

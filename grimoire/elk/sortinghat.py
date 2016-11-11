@@ -37,6 +37,18 @@ logger = logging.getLogger(__name__)
 class SortingHat(object):
 
     @classmethod
+    def get_uuid_from_id(cls, db, sh_id):
+        uuid = None
+
+        with db.connect() as session:
+            query = session.query(Identity).\
+            filter(Identity.id == sh_id)
+            identities = query.all()
+            if identities:
+                uuid = identities[0].uuid
+        return uuid
+
+    @classmethod
     def get_github_commit_username(cls, db, identity, source):
         user = None
 
@@ -55,6 +67,7 @@ class SortingHat(object):
     def add_identity(cls, db, identity, backend):
         """ Load and identity list from backend in Sorting Hat """
         uuid = None
+
         try:
             uuid = api.add_identity(db, backend, identity['email'],
                                     identity['name'], identity['username'])
@@ -115,8 +128,6 @@ class SortingHat(object):
         for identity in identities:
             uuid = cls.add_identity(db, identity, backend)
 
-            total += 1
-
             if not merge_identities:
                 continue  # Don't do the merge here. Too slow in large projects
 
@@ -137,8 +148,6 @@ class SortingHat(object):
                     # u = api.unique_identities(db, uuid, backend)[0]
                     # Include all identities related to this uuid
                     # merged_identities.append(m.uuid)
-
-        logger.info("Total NEW identities: %i" % (total))
 
         if merge_identities:
             logger.info("Total NEW identities merged: %i" % \
