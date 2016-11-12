@@ -32,7 +32,7 @@ from grimoire.elk.enrich import Enrich
 class ConfluenceEnrich(Enrich):
 
     def get_field_author(self):
-        return 'version'
+        return 'by'
 
     def get_elastic_mappings(self):
 
@@ -54,19 +54,27 @@ class ConfluenceEnrich(Enrich):
 
         version = item['data']['version']
 
-        user = self.get_sh_identity(version)
-        identities.append(user)
+        field = self.get_field_author()
+
+        if field in version and 'username' in version[field]:
+            user = self.get_sh_identity(version[field])
+            identities.append(user)
+
         return identities
 
-    def get_sh_identity(self, version):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
+
+        user = item  # by default a specific user dict is expected
+        if 'data' in item:
+            user = item['data']['version'][identity_field]
+
         identity['username'] = None
         identity['email'] = None
         identity['name'] = None
-        if 'by' in version:
-            if 'username' in version['by']:
-                identity['username'] = version['by']['username']
-            identity['name'] = version['by']['displayName']
+
+        identity['username'] = user['username']
+        identity['name'] = user['displayName']
         return identity
 
     def get_rich_item(self, item):

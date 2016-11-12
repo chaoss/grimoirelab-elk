@@ -40,7 +40,7 @@ class JiraEnrich(Enrich):
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "reporter_uuid"]
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field=None):
         """ Return a Sorting Hat identity using jira user data """
 
         identity = {}
@@ -49,8 +49,12 @@ class JiraEnrich(Enrich):
             # Basic fields in Sorting Hat
             identity[field] = None
 
-        if not user:
+        if item is None:
             return identity
+
+        user = item
+        if 'data' in item:
+            user = item['data']['fields'][identity_field]
 
         if 'displayName' in user:
             identity['name'] = user['displayName']

@@ -55,8 +55,13 @@ class BugzillaRESTEnrich(Enrich):
             identities.append(user)
         return identities
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
+
+        user = item  # by default a specific user dict is used
+        if 'data' in item:
+            user = item['data'][identity_field]
+
         identity['username'] = user['name']
         identity['email'] = user['email']
         identity['name'] = user['real_name']

@@ -72,7 +72,7 @@ class ReMoEnrich(Enrich):
 
         return identities
 
-    def get_sh_identity(self, owner):
+    def get_sh_identity(self, item, identity_field=None):
 		# "owner": {
         #             "first_name": "Huda",
         #             "last_name": "Sarfraz",
@@ -81,11 +81,16 @@ class ReMoEnrich(Enrich):
         #          },
         identity = {'username':None, 'email':None, 'name':None}
 
-        if not owner:
-           return identity
-        identity['username'] = owner["display_name"]
+        if not item:
+            return identity
+
+        user = item
+        if 'data' in item:
+            user = item['data'][identity_field]
+
+        identity['username'] = user["display_name"]
         identity['email'] = None
-        identity['name'] = owner["first_name"]+" "+owner["last_name"]
+        identity['name'] = user["first_name"]+" "+user["last_name"]
 
         return identity
 

@@ -58,15 +58,15 @@ class TwitterEnrich(Enrich):
 
         return {"items":mapping}
 
-    def get_sh_identity(self, item):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
         identity['username'] = None
         identity['email'] = None
         identity['name'] = None
 
-        if 'user' in item:
-            identity['username'] = item['user']['screen_name']
-            identity['name'] = item['user']['name']
+        if identity_field in item:
+            identity['username'] = item[identity_field]['screen_name']
+            identity['name'] = item[identity_field]['name']
         return identity
 
     def get_identities(self, item):

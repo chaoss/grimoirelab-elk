@@ -67,8 +67,13 @@ class GitHubEnrich(Enrich):
                 identities.append(user)
         return identities
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
+
+        user = item  # by default a specific user dict is expected
+        if 'data' in item:
+            user = item['data'][identity_field]
+
         identity['username'] = user['login']
         identity['email'] = None
         identity['name'] = None

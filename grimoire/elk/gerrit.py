@@ -40,10 +40,15 @@ class GerritEnrich(Enrich):
     def get_fields_uuid(self):
         return ["review_uuid", "patchSet_uuid", "approval_uuid"]
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
         for field in ['name', 'email', 'username']:
             identity[field] = None
+
+        user = item  # by default a specific user dict is expected
+        if 'data' in item:
+            user = item['data'][identity_field]
+
         if 'name' in user: identity['name'] = user['name']
         if 'email' in user: identity['email'] = user['email']
         if 'username' in user: identity['username'] = user['username']

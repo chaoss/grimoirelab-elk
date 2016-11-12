@@ -509,7 +509,7 @@ class Enrich(object):
 
     # Sorting Hat stuff to be moved to SortingHat class
 
-    def get_sh_identity(self, identity):
+    def get_sh_identity(self, item, identity_field):
         """ Empty identity. Real implementation in each data source. """
         identity = {}
         for field in ['name', 'email', 'username']:
@@ -611,26 +611,44 @@ class Enrich(object):
 
         return eitem
 
-    def get_item_sh(self, item, rol="author"):
-        """ Get Sorting Hat enrichment fields for the author of the item """
+    def get_item_sh(self, item, roles=None):
+        """
+        Add sorting hat enrichment fields for different roles
 
-        eitem_sh = {}  # SH fields
+        If there are no roles, just add the author fields.
 
-        identity_field = self.get_field_author()
-        if 'data' in item:
-            # perceval data
-            data = item['data']
-        else:
-            data = item
+        """
 
-        # Add Sorting Hat fields
-        if identity_field not in data:
-            return eitem_sh
-        identity  = self.get_sh_identity(data[identity_field])
+        eitem_sh = {}  # Item enriched
+
+        author_field = self.get_field_author()
+
+        if not roles:
+            roles = [author_field]
+
         item_date = parser.parse(item[self.get_field_date()])
-        eitem_sh = self.get_item_sh_fields(identity, item_date, rol=rol)
+
+        if 'data' in item:
+            item_data = item['data']
+        else:
+            # the item is directly the data (kitsune answer)
+            item_data = item
+
+        for rol in roles:
+            if rol in item_data:
+                identity = self.get_sh_identity(item, rol)
+                if not identity:
+                    continue
+                eitem_sh.update(self.get_item_sh_fields(identity, item_date, rol=rol))
+
+        # Add the author field common in all data sources
+        rol_author = 'author'
+        if author_field in item_data and author_field != rol_author:
+            identity = self.get_sh_identity(item, author_field)
+            eitem_sh.update(self.get_item_sh_fields(identity, item_date, rol=rol_author))
 
         return eitem_sh
+
 
     @lru_cache()
     def get_enrollments(self, uuid):

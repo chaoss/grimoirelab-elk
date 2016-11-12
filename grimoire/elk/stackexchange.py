@@ -72,12 +72,19 @@ class StackExchangeEnrich(Enrich):
 
         return {"items":mapping}
 
-    def get_sh_identity(self, owner):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
 
-        identity['username'] = owner['display_name']
+        user = item
+        if 'data' in item:
+            user = item['data'][identity_field]
+        elif identity_field in item:
+            # for answers
+            user = item[identity_field]
+
+        identity['username'] = user['display_name']
         identity['email'] = None
-        identity['name'] = owner['display_name']
+        identity['name'] = user['display_name']
 
         return identity
 

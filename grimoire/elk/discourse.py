@@ -45,23 +45,18 @@ class DiscourseEnrich(Enrich):
             identities.append(user)
         return identities
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field):
         identity = {}
+
+        user = item  # by default a specific user dict is expected
+        if 'data' in item:
+            user = item['data']['details']['participants']
+
+        user = item['data']['details'][identity_field]
         identity['username'] = user['username']
         identity['email'] = None
         identity['name'] = user['username']
         return identity
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-        data = item['data']['details'][self.get_field_author()]
-
-        identity  = self.get_sh_identity(data)
-        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
-
-        return eitem
 
     def get_field_author(self):
         return 'created_by'

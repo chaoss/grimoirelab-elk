@@ -43,6 +43,8 @@ SH_GIT_COMMIT = 'github-commit'
 
 class GitEnrich(Enrich):
 
+    roles = ['Author', 'Commit']
+
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
@@ -106,38 +108,42 @@ class GitEnrich(Enrich):
                 gh_username = self.get_github_login(user_data, rol, commit_hash, github_repo)
                 # Create a new SH identity with name, email from git and username from github
                 logging.debug("Adding new identity %s to SH %s: %s", gh_username, SH_GIT_COMMIT, user)
-                user = self.get_sh_identity(user_data, gh_username)
+                user = self.get_sh_identity(user_data)
+                user['username'] = gh_username
                 SortingHat.add_identity(self.sh_db, user, SH_GIT_COMMIT)
             else:
                 if user_data not in self.github_logins:
                     self.github_logins[user_data] = sh_identity['username']
-                    logging.debug("GitHub-commit exists. username:%s user:%s", username, user_data)
+                    logging.debug("GitHub-commit exists. username:%s user:%s",
+                                  sh_identity['username'], user_data)
 
         commit_hash = item['data']['commit']
 
         if item['data']['Author']:
-            username = None
-            user = self.get_sh_identity(item['data']["Author"], username)
+            user = self.get_sh_identity(item['data']["Author"])
             identities.append(user)
             if self.github_token:
                 add_sh_github_identity(user, 'Author', 'author')
         if item['data']['Commit']:
-            username = None
-            user = self.get_sh_identity(item['data']['Commit'], username)
+            user = self.get_sh_identity(item['data']['Commit'])
             identities.append(user)
             if self.github_token:
                 add_sh_github_identity(user, 'Commit', 'committer')
 
         return identities
 
-    def get_sh_identity(self, git_user, username=None):
+    def get_sh_identity(self, item, identity_field=None):
         # John Smith <john.smith@bitergia.com>
         identity = {}
+
+        git_user = item  # by default a specific user dict is expected
+        if 'data' in item:
+            git_user = item['data'][identity_field]
 
         name = git_user.split("<")[0]
         name = name.strip()  # Remove space between user and email
         email = git_user.split("<")[1][:-1]
-        identity['username'] = username
+        identity['username'] = None
         identity['email'] = email
         identity['name'] = name
 
@@ -287,7 +293,7 @@ class GitEnrich(Enrich):
             eitem['project'] = item['project']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, self.roles))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))

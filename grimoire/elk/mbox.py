@@ -66,10 +66,14 @@ class MBoxEnrich(Enrich):
                 identities.append(user)
         return identities
 
-    def get_sh_identity(self, from_data):
+    def get_sh_identity(self, item, identity_field=None):
         # "From": "hwalsh at wikiledia.net (Heat Walsh)"
 
         identity = {}
+
+        from_data = item
+        if 'data' in item:
+            from_data = item['data'][identity_field]
 
         # First desofuscate the email
         EMAIL_OBFUSCATION_PATTERNS = [' at ', '_at_', ' en ']

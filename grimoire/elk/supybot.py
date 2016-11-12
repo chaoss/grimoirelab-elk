@@ -56,14 +56,22 @@ class SupybotEnrich(Enrich):
         identities.append(user)
         return identities
 
-    def get_sh_identity(self, nick):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
         identity['username'] = None
         identity['email'] = None
         identity['name'] = None
-        if nick:
-            identity['username'] = nick
-            identity['name'] = nick
+
+        if not item:
+            return identity
+
+        nick = item
+        if 'data' in item:
+            nick = item['data'][identity_field]
+
+        identity['username'] = nick
+        identity['name'] = nick
+
         return identity
 
     def get_rich_item(self, item):

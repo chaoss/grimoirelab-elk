@@ -87,17 +87,24 @@ class PhabricatorEnrich(Enrich):
         identities = []
 
         if 'authorData' in item['data']['fields']:
+            print(item['data']['fields']['authorData'])
             user = self.get_sh_identity(item['data']['fields']['authorData'])
             identities.append(user)
 
         if 'ownerData' in item['data']['fields']:
+            print(item['data']['fields']['ownerData'])
             user = self.get_sh_identity(item['data']['fields']['ownerData'])
             identities.append(user)
 
         return identities
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
+
+        user = item
+        if 'data' in item:
+            user = item['data']['fields'][identity_field]
+
         identity['email'] = None
         identity['username'] = user['userName']
         identity['name'] = user['realName']

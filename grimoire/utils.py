@@ -66,7 +66,6 @@ from grimoire.elk.kitsune import KitsuneEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
 from grimoire.elk.phabricator import PhabricatorEnrich
-# from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.remo2 import ReMoEnrich
 from grimoire.elk.pipermail import PipermailEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
@@ -90,7 +89,6 @@ from perceval.backends.mbox import MBox, MBoxCommand
 from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
 from perceval.backends.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.pipermail import Pipermail, PipermailCommand
-# from perceval.backends.remo import ReMo, ReMoCommand
 from perceval.backends.remo2 import ReMo, ReMoCommand
 from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
 from perceval.backends.supybot import Supybot, SupybotCommand

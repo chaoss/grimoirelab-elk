@@ -47,8 +47,12 @@ class TelegramEnrich(Enrich):
 
         return {"items":mapping}
 
-    def get_sh_identity(self, from_):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
+
+        from_ = item
+        if 'data' in item:
+            from_ = item['data']['message'][identity_field]
 
         identity['username'] = from_['username']
         identity['email'] = None
@@ -67,21 +71,6 @@ class TelegramEnrich(Enrich):
         identities.append(identity)
 
         return identities
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-
-        field = self.get_field_author()
-
-        message = item['data']['message']
-
-        identity  = self.get_sh_identity(message[field])
-        item_date = parser.parse(item[self.get_field_date()])
-        eitem = self.get_item_sh_fields(identity, item_date)
-
-        return eitem
 
     def get_rich_item(self, item):
         eitem = {}
