@@ -602,12 +602,21 @@ class Enrich(object):
 
         return profile
 
-    def get_item_sh_from_id(self, eitem, rol='author'):
+    def get_item_sh_from_id(self, eitem, roles=None):
         # Get the SH fields from the data in the enriched item
 
-        sh_id = eitem[rol+"_id"]
+        eitem_sh = {}  # Item enriched
+
+        author_field = self.get_field_author()
+
+        if not roles:
+            roles = [author_field]
+
         date = parser.parse(eitem[self.get_field_date()])
-        eitem = self.get_item_sh_fields(sh_id=sh_id, item_date=date, rol=rol)
+
+        for rol in roles:
+            sh_id = eitem[rol+"_id"]
+            eitem_sh.update(self.get_item_sh_fields(sh_id=sh_id, item_date=date, rol=rol))
 
         return eitem
 
