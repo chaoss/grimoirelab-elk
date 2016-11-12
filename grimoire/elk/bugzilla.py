@@ -38,17 +38,13 @@ from .utils import get_time_diff_days
 
 class BugzillaEnrich(Enrich):
 
-    def get_field_date(self):
-        return "delta_ts"
-
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "reporter_uuid"]
 
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
-    @classmethod
-    def get_sh_identity(cls, user):
+    def get_sh_identity(self, user):
         """ Return a Sorting Hat identity using bugzilla user data """
 
         def fill_list_identity(identity, user_list_data):
@@ -85,36 +81,20 @@ class BugzillaEnrich(Enrich):
         """ Add sorting hat enrichment fields """
         eitem = {}  # Item enriched
 
-        # Sorting Hat integration: reporter and assigned_to uuids
-        if 'assigned_to' in item['data']:
-            identity = BugzillaEnrich.get_sh_identity({'assigned_to':item["data"]['assigned_to']})
-            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
-            eitem['assigned_to_uuid'] = sh_ids['uuid']
-            eitem['assigned_to_id'] = sh_ids['id']
-            eitem['assigned_to_name'] = identity['name']
-            item_date = item['data'][self.get_field_date()][0]['__text__']
-            item_date_dt = parser.parse(item_date)
-            item_date_utc = (item_date_dt-item_date_dt.utcoffset()).replace(tzinfo=None)
-            eitem["assigned_to_org_name"] = self.get_enrollment(eitem['assigned_to_uuid'], item_date_utc)
-            eitem["assigned_to_domain"] = self.get_domain(identity)
-            eitem["assigned_to_bot"] = self.is_bot(eitem['assigned_to_uuid'])
-        if 'reporter' in item['data']:
-            identity = BugzillaEnrich.get_sh_identity({'reporter':item["data"]['reporter']})
-            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
-            eitem['reporter_uuid'] = sh_ids['uuid']
-            eitem['reporter_id'] = sh_ids['id']
-            item_date = item['data'][self.get_field_date()][0]['__text__']
-            item_date_dt = parser.parse(item_date)
-            item_date_utc = (item_date_dt-item_date_dt.utcoffset()).replace(tzinfo=None)
-            eitem["reporter_org_name"] = self.get_enrollment(eitem['reporter_uuid'], item_date_utc)
-            eitem["reporter_domain"] = self.get_domain(identity)
-            eitem["reporter_bot"] = self.is_bot(eitem['reporter_uuid'])
+        roles = ['assigned_to', 'reporter']
 
-        # Unify fields name
-        eitem["author_uuid"] = eitem["reporter_uuid"]
-        eitem["author_name"] = eitem["reporter_name"]
-        eitem["author_org_name"] = eitem["reporter_org_name"]
-        eitem["author_domain"] = eitem["reporter_domain"]
+        item_date = parser.parse(item[self.get_field_date()])
+
+        for rol in roles:
+            if rol in item['data']:
+                identity = self.get_sh_identity({rol:item["data"][rol]})
+                eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
+
+        if 'reporter' in item['data']:
+            # Add reporter as author fields also as in other data sources
+            identity = self.get_sh_identity({'reporter':item["data"]['reporter']})
+            rol = 'author'
+            eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
 
         return eitem
 

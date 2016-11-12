@@ -51,9 +51,6 @@ class GitHubEnrich(Enrich):
         # Recover cache data from Elastic
         self.geolocations = self.geo_locations_from_es()
 
-    def get_field_date(self):
-        return "updated_at"
-
     def get_fields_uuid(self):
         return ["assignee_uuid", "user_uuid"]
 
@@ -85,45 +82,23 @@ class GitHubEnrich(Enrich):
         """ Add sorting hat enrichment fields """
         eitem = {}  # Item enriched
 
-        data = item['data']
-        eitem['user_uuid'] = None
-        user = data['user_data']
-        if user is not None:
-            identity = self.get_sh_identity(user)
-            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
-            eitem["user_uuid"] = sh_ids['uuid']
-            eitem["user_id"] = sh_ids['id']
-            eitem['user_name'] = identity['name']
-            update = None
-            if self.get_field_date() in item:
-                 update = parser.parse(item[self.get_field_date()])
-            eitem["user_org_name"] = self.get_enrollment(eitem['user_uuid'], update)
-            eitem["user_domain"] = self.get_domain(identity)
-            eitem["user_bot"] = self.is_bot(eitem['user_uuid'])
+        roles = ['assignee', 'user']
 
-        eitem["assignee_uuid"] = None
-        assignee = data['assignee_data']
-        if assignee:
-            identity = self.get_sh_identity(assignee)
-            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
-            eitem["assignee_uuid"] = sh_ids['uuid']
-            eitem["assignee_id"] = sh_ids['id']
-            eitem['assignee_name'] = identity['name']
-            update = None
-            if self.get_field_date() in item:
-                 update = parser.parse(item[self.get_field_date()])
-            eitem["assignee_org_name"] = self.get_enrollment(eitem['assignee_uuid'], update)
-            eitem["assignee_domain"] = self.get_domain(identity)
-            eitem["assignee_bot"] = self.is_bot(eitem['assignee_uuid'])
+        item_date = parser.parse(item[self.get_field_date()])
 
-        # Unify fields for SH filtering
-        eitem["author_uuid"] = eitem["user_uuid"]
-        eitem["author_name"] = eitem["user_name"]
-        eitem["author_org_name"] = eitem["user_org_name"]
-        eitem["author_domain"] = eitem["user_domain"]
+        for rol in roles:
+            if rol+"_data" in item['data'] and item['data'][rol+"_data"]:
+                identity = self.get_sh_identity(item['data'][rol+"_data"])
+                eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
+
+        if 'user_data' in item['data']:
+            # Add user as author fields also as in other data sources
+            rol = 'user'
+            identity = self.get_sh_identity(item['data'][rol+"_data"])
+            rol ='author'
+            eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
 
         return eitem
-
 
     def get_geo_point(self, location):
         geo_point = geo_code = None

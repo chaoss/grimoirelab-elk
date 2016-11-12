@@ -22,14 +22,11 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
-import logging
+from dateutil import parser
 
-from datetime import datetime
 
 from grimoire.elk.enrich import Enrich
 
-from .utils import unixtime_to_datetime
 
 class TelegramEnrich(Enrich):
 
@@ -81,8 +78,8 @@ class TelegramEnrich(Enrich):
         message = item['data']['message']
 
         identity  = self.get_sh_identity(message[field])
-        update = unixtime_to_datetime(message['date'])
-        eitem = self.get_item_sh_fields(identity, update)
+        item_date = parser.parse(item[self.get_field_date()])
+        eitem = self.get_item_sh_fields(identity, item_date)
 
         return eitem
 

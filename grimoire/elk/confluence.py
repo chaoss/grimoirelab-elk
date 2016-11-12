@@ -31,6 +31,9 @@ from grimoire.elk.enrich import Enrich
 
 class ConfluenceEnrich(Enrich):
 
+    def get_field_author(self):
+        return 'version'
+
     def get_elastic_mappings(self):
 
         mapping = """
@@ -44,7 +47,6 @@ class ConfluenceEnrich(Enrich):
         } """
 
         return {"items":mapping}
-
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -66,24 +68,6 @@ class ConfluenceEnrich(Enrich):
                 identity['username'] = version['by']['username']
             identity['name'] = version['by']['displayName']
         return identity
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-        identity  = self.get_sh_identity(item['data']['version'])
-        update = parser.parse(item[self.get_field_date()])
-        eitem = self.get_item_sh_fields(identity, update)
-
-        return eitem
-
-    def get_review_sh(self, revision, item):
-        """ Add sorting hat enrichment fields for the author of the revision """
-
-        identity  = self.get_sh_identity(revision)
-        erevision = self.get_item_sh_fields(identity, item)
-
-        return erevision
 
     def get_rich_item(self, item):
         eitem = {}
@@ -109,7 +93,6 @@ class ConfluenceEnrich(Enrich):
         map_fields = {"title": "title_analyzed"}
         for fn in map_fields:
             eitem[map_fields[fn]] = page[fn]
-
 
         version = page['version']
 

@@ -97,23 +97,6 @@ class StackExchangeEnrich(Enrich):
                     identities.append(user)
         return identities
 
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-
-        identity_field = self.get_field_author()
-
-        update_date = unixtime_to_datetime(item["last_activity_date"])
-
-        # Add Sorting Hat fields
-        if identity_field not in item:
-            return eitem
-        identity  = self.get_sh_identity(item[identity_field])
-        eitem = self.get_item_sh_fields(identity, update_date)
-
-        return eitem
-
     def get_rich_item(self, item, kind='question', question_tags = None):
         eitem = {}
 
@@ -165,7 +148,7 @@ class StackExchangeEnrich(Enrich):
             eitem.update(self.get_grimoire_fields(creation_date, "question"))
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(question))
+                eitem.update(self.get_item_sh(item))
 
         elif kind == 'answer':
             answer = item
@@ -202,6 +185,8 @@ class StackExchangeEnrich(Enrich):
             eitem.update(self.get_grimoire_fields(creation_date, "answer"))
 
             if self.sortinghat:
+                # date field must be the same than in question to share code
+                answer[self.get_field_date()] = eitem['creation_date']
                 eitem.update(self.get_item_sh(answer))
 
         return eitem

@@ -64,29 +64,23 @@ class JiraEnrich(Enrich):
         """ Add sorting hat enrichment fields """
         eitem = {}  # Item enriched
 
-        # Sorting Hat integration: reporter, assignee, creator uuids
-        for field in ["assignee","reporter","creator"]:
-            if field in item['data']['fields']:
-                identity = self.get_sh_identity(item['data']['fields'][field])
-                sh_ids = self.get_sh_ids(identity, self.get_connector_name())
-                eitem[field+'_uuid'] = sh_ids['uuid']
-                eitem[field+'_id'] = sh_ids['id']
-                eitem[field+'_name'] = identity['name']
-                eitem[field+"_org_name"] = self.get_enrollment(eitem[field+'_uuid'], parser.parse(item[self.get_field_date()]))
-                eitem[field+"_domain"] = self.get_domain(identity)
-                eitem[field+"_bot"] = self.is_bot(eitem[field+'_uuid'])
+        roles = ["assignee", "reporter", "creator"]
 
+        item_date = parser.parse(item[self.get_field_date()])
 
-        # Unify fields for SH filtering
+        for rol in roles:
+            if rol in item['data']['fields']:
+                identity = self.get_sh_identity(item['data']['fields'][rol])
+                eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
+
         if 'reporter' in item['data']['fields']:
-            eitem["author_uuid"] = eitem["reporter_uuid"]
-            eitem["author_id"] = eitem["reporter_id"]
-            eitem["author_name"] = eitem["reporter_name"]
-            eitem["author_org_name"] = eitem["reporter_org_name"]
-            eitem["author_domain"] = eitem["reporter_domain"]
+            # Add user as author fields also as in other data sources
+            rol = 'reporter'
+            identity = self.get_sh_identity(item['data']['fields'][rol])
+            rol ='author'
+            eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
 
         return eitem
-
 
     def get_identities(self, item):
         ''' Return the identities from an item '''

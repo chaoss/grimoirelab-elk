@@ -105,25 +105,17 @@ class PhabricatorEnrich(Enrich):
         return identity
 
     def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
+        """ Add sorting hat enrichment fields """
         eitem = {}  # Item enriched
 
-        if 'authorData' in item['data']['fields']:
-            identity  = self.get_sh_identity(item['data']['fields']['authorData'])
-            eitem.update(self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()])))
-        if 'ownerData' in item['data']['fields']:
-            identity  = self.get_sh_identity(item['data']['fields']['ownerData'])
-            assigned_to = {}
-            assigned_to["assigned_to_name"] = identity['name']
-            assigned_to["assigned_to_user_name"] = identity['username']
-            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
-            assigned_to["assigned_to_uuid"] = sh_ids['uuid']
-            assigned_to["assigned_to_id"] = sh_ids['id']
-            assigned_to["assigned_to_org_name"] = self.get_enrollment(assigned_to["assigned_to_uuid"], parser.parse(item[self.get_field_date()]))
-            assigned_to["assigned_to_bot"] = self.is_bot(assigned_to['assigned_to_uuid'])
-            assigned_to["assigned_to_domain"] = self.get_identity_domain(identity)
-            eitem.update(assigned_to)
+        roles = ['author', 'owner']
+
+        item_date = parser.parse(item[self.get_field_date()])
+
+        for rol in roles:
+            if rol+"Data" in item['data']['fields']:
+                identity = self.get_sh_identity(item['data']['fields'][rol+"Data"])
+                eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
 
         return eitem
 

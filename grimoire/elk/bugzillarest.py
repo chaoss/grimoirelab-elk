@@ -37,9 +37,6 @@ class BugzillaRESTEnrich(Enrich):
     def get_field_author(self):
         return 'creator_detail'
 
-    def get_field_date(self):
-        return "metadata__updated_on"
-
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "creator_uuid"]
 
@@ -64,17 +61,6 @@ class BugzillaRESTEnrich(Enrich):
         identity['email'] = user['email']
         identity['name'] = user['real_name']
         return identity
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-        data = item['data'][self.get_field_author()]
-
-        identity  = self.get_sh_identity(data)
-        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
-
-        return eitem
 
     def get_project_repository(self, eitem):
         repo = eitem['origin']

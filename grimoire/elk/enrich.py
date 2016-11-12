@@ -552,43 +552,44 @@ class Enrich(object):
                     break
         return enroll
 
-    def get_item_sh_fields(self, identity=None, item_date=None, sh_id=None):
+    def get_item_sh_fields(self, identity=None, item_date=None, sh_id=None,
+                           rol='author'):
         """ Get standard SH fields from a SH identity """
         eitem_sh = {}  # Item enriched
 
         if identity:
             # Use the identity to get the SortingHat identity
             sh_ids = self.get_sh_ids(identity, self.get_connector_name())
-            eitem_sh["author_id"] = sh_ids['id']
-            eitem_sh["author_uuid"] = sh_ids['uuid']
+            eitem_sh[rol+"_id"] = sh_ids['id']
+            eitem_sh[rol+"_uuid"] = sh_ids['uuid']
         elif sh_id:
             # Use the SortingHat id to get the identity
-            eitem_sh["author_id"] = sh_id
-            eitem_sh["author_uuid"] = self.get_uuid_from_id(sh_id)
+            eitem_sh[rol+"_id"] = sh_id
+            eitem_sh[rol+"_uuid"] = self.get_uuid_from_id(sh_id)
         else:
             raise RuntimeError("identity or sh_id needed for sortinghat fields")
 
         # Get the SH profile to use first this data
-        profile = self.get_profile_sh(eitem_sh["author_uuid"])
+        profile = self.get_profile_sh(eitem_sh[rol+"_uuid"])
 
         if profile:
-            eitem_sh["author_name"] = profile['name']
+            eitem_sh[rol+"_name"] = profile['name']
             # username is not included in SH profile
-            eitem_sh["author_user_name"] = None
+            eitem_sh[rol+"_user_name"] = None
             if identity:
-                eitem_sh["author_user_name"] = identity['username']
-            eitem_sh["author_domain"] = self.get_identity_domain(profile)
+                eitem_sh[rol+"_user_name"] = identity['username']
+            eitem_sh[rol+"_domain"] = self.get_identity_domain(profile)
         elif not profile and sh_id:
             logger.warning("Can't find SH identity: %s", sh_id)
             return {}
         else:
             # Just use directly the data in the identity
-            eitem_sh["author_name"] = identity['name']
-            eitem_sh["author_user_name"] = identity['username']
-            eitem_sh["author_domain"] = self.get_identity_domain(identity)
+            eitem_sh[rol+"_name"] = identity['name']
+            eitem_sh[rol+"_user_name"] = identity['username']
+            eitem_sh[rol+"_domain"] = self.get_identity_domain(identity)
 
-        eitem_sh["author_org_name"] = self.get_enrollment(eitem_sh["author_uuid"], item_date)
-        eitem_sh["author_bot"] = self.is_bot(eitem_sh['author_uuid'])
+        eitem_sh[rol+"_org_name"] = self.get_enrollment(eitem_sh[rol+"_uuid"], item_date)
+        eitem_sh[rol+"_bot"] = self.is_bot(eitem_sh[rol+'_uuid'])
         return eitem_sh
 
     def get_profile_sh(self, uuid):
@@ -601,22 +602,21 @@ class Enrich(object):
 
         return profile
 
-    def get_item_sh_from_id(self, eitem):
+    def get_item_sh_from_id(self, eitem, rol='author'):
         # Get the SH fields from the data in the enriched item
 
-        # Just support for author SH fields now
-        sh_id = eitem["author_id"]
+        sh_id = eitem[rol+"_id"]
         date = parser.parse(eitem[self.get_field_date()])
-        eitem = self.get_item_sh_fields(sh_id=sh_id, item_date=date)
+        eitem = self.get_item_sh_fields(sh_id=sh_id, item_date=date, rol=rol)
 
         return eitem
 
-    def get_item_sh(self, item):
+    def get_item_sh(self, item, rol="author"):
         """ Get Sorting Hat enrichment fields for the author of the item """
 
-        identity_field = self.get_field_author()
+        eitem_sh = {}  # SH fields
 
-        eitem = {}  # Item enriched
+        identity_field = self.get_field_author()
         if 'data' in item:
             # perceval data
             data = item['data']
@@ -625,11 +625,12 @@ class Enrich(object):
 
         # Add Sorting Hat fields
         if identity_field not in data:
-            return eitem
+            return eitem_sh
         identity  = self.get_sh_identity(data[identity_field])
-        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
+        item_date = parser.parse(item[self.get_field_date()])
+        eitem_sh = self.get_item_sh_fields(identity, item_date, rol=rol)
 
-        return eitem
+        return eitem_sh
 
     @lru_cache()
     def get_enrollments(self, uuid):

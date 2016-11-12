@@ -84,22 +84,6 @@ class KitsuneEnrich(Enrich):
                     identities.append(user)
         return identities
 
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-
-        identity_field = self.get_field_author()
-
-        update_date = parser.parse(item["updated"])
-
-        # Add Sorting Hat fields
-        if identity_field not in item:
-            return eitem
-        identity  = self.get_sh_identity(item[identity_field])
-        eitem = self.get_item_sh_fields(identity, update_date)
-
-        return eitem
 
     def get_rich_item(self, item, kind='question'):
         eitem = {}
@@ -158,7 +142,7 @@ class KitsuneEnrich(Enrich):
                 eitem['author'] = question['creator']['display_name']
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(question))
+                eitem.update(self.get_item_sh(item))
 
         elif kind == 'answer':
             answer = item
@@ -200,6 +184,8 @@ class KitsuneEnrich(Enrich):
                 eitem['author'] = answer['creator']['display_name']
 
             if self.sortinghat:
+                # date field must be the same than in question to share code
+                answer[self.get_field_date()] = answer['updated']
                 eitem.update(self.get_item_sh(answer))
 
         return eitem
