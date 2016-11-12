@@ -611,6 +611,16 @@ class Enrich(object):
 
         return eitem
 
+    def get_users_data(self, item):
+        """ If user fields are inside the global item dict """
+        if 'data' in item:
+            users_data = item['data']
+        else:
+            # the item is directly the data (kitsune answer)
+            users_data = item
+
+        return users_data
+
     def get_item_sh(self, item, roles=None):
         """
         Add sorting hat enrichment fields for different roles
@@ -628,14 +638,10 @@ class Enrich(object):
 
         item_date = parser.parse(item[self.get_field_date()])
 
-        if 'data' in item:
-            item_data = item['data']
-        else:
-            # the item is directly the data (kitsune answer)
-            item_data = item
+        users_data = self.get_users_data(item)
 
         for rol in roles:
-            if rol in item_data:
+            if rol in users_data:
                 identity = self.get_sh_identity(item, rol)
                 if not identity:
                     continue
@@ -643,7 +649,7 @@ class Enrich(object):
 
         # Add the author field common in all data sources
         rol_author = 'author'
-        if author_field in item_data and author_field != rol_author:
+        if author_field in users_data and author_field != rol_author:
             identity = self.get_sh_identity(item, author_field)
             eitem_sh.update(self.get_item_sh_fields(identity, item_date, rol=rol_author))
 

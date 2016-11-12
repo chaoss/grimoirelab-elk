@@ -38,6 +38,8 @@ TASK_CLOSED_STATUS = 'resolved'
 
 class PhabricatorEnrich(Enrich):
 
+    roles = ['authorData', 'ownerData']
+
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                      db_user='', db_password='', db_host=''):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map, db_user, db_password, db_host)
@@ -46,6 +48,9 @@ class PhabricatorEnrich(Enrich):
 
     def get_field_event_unique_id(self):
         return "transactionID"
+
+    def get_field_author(self):
+        return "authorData"
 
     def get_elastic_mappings(self):
 
@@ -111,20 +116,14 @@ class PhabricatorEnrich(Enrich):
 
         return identity
 
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields """
-        eitem = {}  # Item enriched
-
-        roles = ['author', 'owner']
-
-        item_date = parser.parse(item[self.get_field_date()])
-
-        for rol in roles:
-            if rol+"Data" in item['data']['fields']:
-                identity = self.get_sh_identity(item['data']['fields'][rol+"Data"])
-                eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
-
-        return eitem
+    def get_users_data(self, item):
+        """ If user fields are inside the global item dict """
+        if 'data' in item:
+            users_data = item['data']['fields']
+        else:
+            # the item is directly the data (kitsune answer)
+            users_data = item
+        return users_data
 
     def get_rich_events(self, item):
         """
@@ -356,7 +355,7 @@ class PhabricatorEnrich(Enrich):
         eitem['tags_custom_analyzed'] = eitem['tags']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, self.roles))
 
         eitem.update(self.get_grimoire_fields(eitem['creation_date'], "task"))
 

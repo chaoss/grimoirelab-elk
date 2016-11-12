@@ -38,6 +38,8 @@ GITHUB = 'https://github.com/'
 
 class GitHubEnrich(Enrich):
 
+    roles = ['assignee_data', 'user_data']
+
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
@@ -50,6 +52,9 @@ class GitHubEnrich(Enrich):
         self.elastic = elastic
         # Recover cache data from Elastic
         self.geolocations = self.geo_locations_from_es()
+
+    def get_field_author(self):
+        return "user_data"
 
     def get_fields_uuid(self):
         return ["assignee_uuid", "user_uuid"]
@@ -74,6 +79,9 @@ class GitHubEnrich(Enrich):
         if 'data' in item:
             user = item['data'][identity_field]
 
+        if not user:
+            return identity
+
         identity['username'] = user['login']
         identity['email'] = None
         identity['name'] = None
@@ -82,28 +90,6 @@ class GitHubEnrich(Enrich):
         if 'name' in user:
             identity['name'] = user['name']
         return identity
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields """
-        eitem = {}  # Item enriched
-
-        roles = ['assignee', 'user']
-
-        item_date = parser.parse(item[self.get_field_date()])
-
-        for rol in roles:
-            if rol+"_data" in item['data'] and item['data'][rol+"_data"]:
-                identity = self.get_sh_identity(item['data'][rol+"_data"])
-                eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
-
-        if 'user_data' in item['data']:
-            # Add user as author fields also as in other data sources
-            rol = 'user'
-            identity = self.get_sh_identity(item['data'][rol+"_data"])
-            rol ='author'
-            eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
-
-        return eitem
 
     def get_geo_point(self, location):
         geo_point = geo_code = None
@@ -341,7 +327,7 @@ class GitHubEnrich(Enrich):
             rich_issue.update(self.get_item_project(rich_issue))
 
         if self.sortinghat:
-            rich_issue.update(self.get_item_sh(item))
+            rich_issue.update(self.get_item_sh(item, self.roles))
 
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], "issue"))
 

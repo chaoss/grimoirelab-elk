@@ -37,8 +37,13 @@ from .utils import get_time_diff_days
 
 class JiraEnrich(Enrich):
 
+    roles = ["assignee", "reporter", "creator"]
+
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "reporter_uuid"]
+
+    def get_field_author(self):
+        return "reporter"
 
     def get_sh_identity(self, item, identity_field=None):
         """ Return a Sorting Hat identity using jira user data """
@@ -56,6 +61,9 @@ class JiraEnrich(Enrich):
         if 'data' in item:
             user = item['data']['fields'][identity_field]
 
+        if user is None:
+            return identity
+
         if 'displayName' in user:
             identity['name'] = user['displayName']
         if 'name' in user:
@@ -64,27 +72,14 @@ class JiraEnrich(Enrich):
             identity['email'] = user['emailAddress']
         return identity
 
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields """
-        eitem = {}  # Item enriched
-
-        roles = ["assignee", "reporter", "creator"]
-
-        item_date = parser.parse(item[self.get_field_date()])
-
-        for rol in roles:
-            if rol in item['data']['fields']:
-                identity = self.get_sh_identity(item['data']['fields'][rol])
-                eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
-
-        if 'reporter' in item['data']['fields']:
-            # Add user as author fields also as in other data sources
-            rol = 'reporter'
-            identity = self.get_sh_identity(item['data']['fields'][rol])
-            rol ='author'
-            eitem.update(self.get_item_sh_fields(identity, item_date, rol=rol))
-
-        return eitem
+    def get_users_data(self, item):
+        """ If user fields are inside the global item dict """
+        if 'data' in item:
+            users_data = item['data']['fields']
+        else:
+            # the item is directly the data (kitsune answer)
+            users_data = item
+        return users_data
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
@@ -199,7 +194,7 @@ class JiraEnrich(Enrich):
             get_time_diff_days(issue['fields']['created'], datetime.utcnow())
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, self.roles))
 
         eitem.update(self.get_grimoire_fields(issue['fields']['created'], "issue"))
 
