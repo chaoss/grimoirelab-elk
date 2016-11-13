@@ -45,14 +45,12 @@ class DiscourseEnrich(Enrich):
             identities.append(user)
         return identities
 
-    def get_sh_identity(self, item, identity_field):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
 
         user = item  # by default a specific user dict is expected
         if 'data' in item:
-            user = item['data']['details']['participants']
-
-        user = item['data']['details'][identity_field]
+            user = item['data']['details']['participants'][identity_field]
         identity['username'] = user['username']
         identity['email'] = None
         identity['name'] = user['username']

@@ -52,15 +52,19 @@ class ConfluenceEnrich(Enrich):
         """ Return the identities from an item """
         identities = []
 
-        version = item['data']['version']
-
         field = self.get_field_author()
-
-        if field in version and 'username' in version[field]:
-            user = self.get_sh_identity(version[field])
-            identities.append(user)
+        identities.append(self.get_sh_identity(item, field))
 
         return identities
+
+    def get_users_data(self, item):
+        """ If user fields are inside the global item dict """
+        if 'data' in item:
+            users_data = item['data']['version']
+        else:
+            # the item is directly the data (kitsune answer)
+            users_data = item
+        return users_data
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
@@ -69,12 +73,10 @@ class ConfluenceEnrich(Enrich):
         if 'data' in item:
             user = item['data']['version'][identity_field]
 
-        identity['username'] = None
-        identity['email'] = None
-        identity['name'] = None
-
         identity['username'] = user['username']
+        identity['email'] = None
         identity['name'] = user['displayName']
+
         return identity
 
     def get_rich_item(self, item):
@@ -121,7 +123,6 @@ class ConfluenceEnrich(Enrich):
             if page['version']['number'] == 1:
                 eitem['type'] = 'new_page'
         eitem['is_'+eitem['type']] = 1
-
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))

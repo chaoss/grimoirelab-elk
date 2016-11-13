@@ -615,10 +615,15 @@ class Enrich(object):
         date = parser.parse(eitem[self.get_field_date()])
 
         for rol in roles:
+            if rol+"_id" not in eitem:
+                continue
             sh_id = eitem[rol+"_id"]
+            if not sh_id:
+                logging.warning("%s_id is None", sh_id)
+                continue
             eitem_sh.update(self.get_item_sh_fields(sh_id=sh_id, item_date=date, rol=rol))
 
-        return eitem
+        return eitem_sh
 
     def get_users_data(self, item):
         """ If user fields are inside the global item dict """

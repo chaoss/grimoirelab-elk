@@ -105,6 +105,10 @@ class JenkinsEnrich(Enrich):
 
         return extra_fields
 
+    def get_item_sh_from_id(self, eitem, roles):
+        # No SH support
+        return {}
+
     def get_rich_item(self, item):
         eitem = {}
 

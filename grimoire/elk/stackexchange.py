@@ -194,6 +194,7 @@ class StackExchangeEnrich(Enrich):
             if self.sortinghat:
                 # date field must be the same than in question to share code
                 answer[self.get_field_date()] = eitem['creation_date']
+                eitem[self.get_field_date()] = eitem['creation_date']
                 eitem.update(self.get_item_sh(answer))
 
         return eitem

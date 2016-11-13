@@ -69,7 +69,8 @@ class GitHubEnrich(Enrich):
             if item[identity]:
                 # In user_data we have the full user data
                 user = self.get_sh_identity(item[identity+"_data"])
-                identities.append(user)
+                if user:
+                    identities.append(user)
         return identities
 
     def get_sh_identity(self, item, identity_field=None):

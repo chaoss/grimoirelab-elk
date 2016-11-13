@@ -85,8 +85,8 @@ class KitsuneEnrich(Enrich):
             if identity in item and item[identity]:
                 user = self.get_sh_identity(item[identity])
                 identities.append(user)
-            if 'answers_date' in item:
-                for answer in item['answers']:
+            if 'answers_data' in item:
+                for answer in item['answers_data']:
                     user = self.get_sh_identity(answer[identity])
                     identities.append(user)
         return identities
@@ -193,6 +193,7 @@ class KitsuneEnrich(Enrich):
             if self.sortinghat:
                 # date field must be the same than in question to share code
                 answer[self.get_field_date()] = answer['updated']
+                eitem[self.get_field_date()] = answer[self.get_field_date()]
                 eitem.update(self.get_item_sh(answer))
 
         return eitem

@@ -198,6 +198,82 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
 
     return items
 
+def refresh_projects(enrich_backend):
+    logging.debug("Refreshing project field in %s", enrich_backend.elastic.index_url)
+    total = 0
+
+    eitems = enrich_backend.fetch()
+    for eitem in eitems:
+        new_project = enrich_backend.get_item_project(eitem)
+        eitem.update(new_project)
+        yield eitem
+        total += 1
+
+    logging.info("Total eitems refreshed for project field %i", total)
+
+def refresh_identities(enrich_backend):
+    logging.debug("Refreshing identities fields from %s", enrich_backend.elastic.index_url)
+    total = 0
+
+    for eitem in enrich_backend.fetch():
+        roles = None
+        try:
+            roles = enrich_backend.roles
+        except AttributeError:
+            pass
+        new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
+        eitem.update(new_identities)
+        yield eitem
+        total += 1
+
+    logging.info("Total eitems refreshed for identities fields %i", total)
+
+def enrich_sortinghat(ocean_backend, enrich_backend):
+    try:
+        from grimoire.elk.sortinghat import SortingHat
+    except ImportError:
+        logging.warning("SortingHat not available.")
+
+    # First we add all new identities to SH
+    item_count = 0
+    new_identities = []
+
+    for item in ocean_backend:
+        item_count += 1
+        # Get identities from new items to be added to SortingHat
+        identities = enrich_backend.get_identities(item)
+        for identity in identities:
+            if identity not in new_identities:
+                new_identities.append(identity)
+        if item_count % 1000 == 0:
+            logging.debug("Processed %i items identities (%i identities)" \
+                           % (item_count, len(new_identities)))
+    logging.debug("TOTAL ITEMS: %i" % (item_count))
+
+    logging.info("Total new identities to be checked %i" % len(new_identities))
+
+    merged_identities = SortingHat.add_identities(enrich_backend.sh_db,
+                                                  new_identities, enrich_backend.get_connector_name())
+
+    # Redo enrich for items with new merged identities
+    renrich_items = []
+    # For testing
+    # merged_identities = ['7e0bcf6ff46848403eaffa29ef46109f386fa24b']
+    for mid in merged_identities:
+        renrich_items += get_items_from_uuid(mid, enrich_backend, ocean_backend)
+
+    # Enrich items with merged identities
+    enrich_count_merged = enrich_items(renrich_items, enrich_backend)
+    return enrich_count_merged
+
+def enrich_items(items, enrich_backend, events=False):
+    total = 0
+
+    if not events:
+        total= enrich_backend.enrich_items(items)
+    else:
+        total = enrich_backend.enrich_events(items)
+    return total
 
 def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    ocean_index_enrich = None,
@@ -210,74 +286,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    do_refresh_projects=False, do_refresh_identities=False):
     """ Enrich Ocean index """
 
-    def enrich_items(items, enrich_backend, events=False):
-        total = 0
-
-        if not events:
-            total= enrich_backend.enrich_items(items)
-        else:
-            total = enrich_backend.enrich_events(items)
-        return total
-
-    def enrich_sortinghat(ocean_backend, enrich_backend):
-        # First we add all new identities to SH
-        item_count = 0
-        new_identities = []
-
-        for item in ocean_backend:
-            item_count += 1
-            # Get identities from new items to be added to SortingHat
-            identities = enrich_backend.get_identities(item)
-            for identity in identities:
-                if identity not in new_identities:
-                    new_identities.append(identity)
-            if item_count % 1000 == 0:
-                logging.debug("Processed %i items identities (%i identities)" \
-                               % (item_count, len(new_identities)))
-        logging.debug("TOTAL ITEMS: %i" % (item_count))
-
-        logging.info("Total new identities to be checked %i" % len(new_identities))
-
-        merged_identities = SortingHat.add_identities(enrich_backend.sh_db,
-                                                      new_identities, enrich_backend.get_connector_name())
-
-        # Redo enrich for items with new merged identities
-        renrich_items = []
-        # For testing
-        # merged_identities = ['7e0bcf6ff46848403eaffa29ef46109f386fa24b']
-        for mid in merged_identities:
-            renrich_items += get_items_from_uuid(mid, enrich_backend, ocean_backend)
-
-        # Enrich items with merged identities
-        enrich_count_merged = enrich_items(renrich_items, enrich_backend)
-        return enrich_count_merged
-
-    def refresh_projects(enrich_backend):
-        logging.debug("Refreshing project field in %s", enrich_backend.elastic.index_url)
-        total = 0
-
-        eitems = enrich_backend.fetch()
-        for eitem in eitems:
-            new_project = enrich_backend.get_item_project(eitem)
-            eitem.update(new_project)
-            yield eitem
-            total += 1
-
-        logging.info("Total eitems refreshed for project field %i", total)
-
-    def refresh_identities(enrich_backend):
-        logging.debug("Refreshing identities fields from %s", enrich_backend.elastic.index_url)
-        total = 0
-
-        for eitem in enrich_backend.fetch():
-            new_identities = enrich_backend.get_item_sh_from_id(eitem)
-            eitem.update(new_identities)
-            yield eitem
-            total += 1
-
-        logging.info("Total eitems refreshed for identities fields %i", total)
-
-
     def do_studies(enrich_backend, last_enrich):
         try:
             for study in enrich_backend.studies:
@@ -287,11 +295,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             logging.error("Problem executing studies for %s", backend_name)
             traceback.print_exc()
 
-
-    try:
-        from grimoire.elk.sortinghat import SortingHat
-    except ImportError:
-        logging.warning("SortingHat not available.")
 
     backend = None
     enrich_index = None
