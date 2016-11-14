@@ -22,7 +22,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class ReMoEnrich(Enrich):
 
@@ -72,6 +72,7 @@ class ReMoEnrich(Enrich):
 
         return identity
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 

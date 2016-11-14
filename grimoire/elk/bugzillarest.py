@@ -28,7 +28,7 @@ from dateutil import parser
 import json
 import logging
 
-from .enrich import Enrich
+from .enrich import Enrich, metadata
 
 from .utils import get_time_diff_days
 
@@ -79,6 +79,7 @@ class BugzillaRESTEnrich(Enrich):
         repo += "/buglist.cgi?product="+product
         return repo
 
+    @metadata
     def get_rich_item(self, item):
 
         if 'id' not in item['data']:

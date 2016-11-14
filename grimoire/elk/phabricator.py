@@ -28,7 +28,7 @@ from datetime import datetime
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 from .utils import get_time_diff_days, unixtime_to_datetime
 

@@ -30,7 +30,7 @@ import requests
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 try:
     from grimoire.elk.sortinghat import SortingHat
@@ -202,6 +202,7 @@ class GitEnrich(Enrich):
 
         return login
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
         # metadata fields to copy

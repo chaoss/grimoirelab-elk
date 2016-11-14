@@ -31,7 +31,7 @@ from time import time
 
 from dateutil import parser
 
-from .enrich import Enrich
+from .enrich import Enrich, metadata
 
 from .utils import get_time_diff_days
 
@@ -98,6 +98,7 @@ class JiraEnrich(Enrich):
 
         return identities
 
+    @metadata
     def get_rich_item(self, item):
 
         eitem = {}

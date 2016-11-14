@@ -27,7 +27,7 @@ import logging
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class JenkinsEnrich(Enrich):
 
@@ -105,6 +105,7 @@ class JenkinsEnrich(Enrich):
 
         return extra_fields
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 

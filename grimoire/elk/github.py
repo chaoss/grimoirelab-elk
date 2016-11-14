@@ -32,7 +32,7 @@ from dateutil import parser
 
 from .utils import get_time_diff_days
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 GITHUB = 'https://github.com/'
 
@@ -262,6 +262,7 @@ class GitHubEnrich(Enrich):
         repo = eitem['origin']
         return repo
 
+    @metadata
     def get_rich_item(self, item):
         rich_issue = {}
 

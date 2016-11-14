@@ -29,8 +29,7 @@ from dateutil import parser
 
 from .utils import get_time_diff_days
 
-
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class DiscourseEnrich(Enrich):
 
@@ -63,7 +62,7 @@ class DiscourseEnrich(Enrich):
 
         return eitem
 
-
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
         eitem["metadata__updated_on"] = item["metadata__updated_on"]

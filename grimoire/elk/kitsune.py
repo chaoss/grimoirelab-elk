@@ -27,7 +27,7 @@ import logging
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 from .utils import get_time_diff_days
 
@@ -96,6 +96,7 @@ class KitsuneEnrich(Enrich):
 
         return eitem
 
+    @metadata
     def get_rich_item(self, item, kind='question'):
         eitem = {}
 

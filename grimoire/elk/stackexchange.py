@@ -27,7 +27,7 @@ import logging
 
 from datetime import datetime
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 from .utils import unixtime_to_datetime
 
@@ -109,6 +109,7 @@ class StackExchangeEnrich(Enrich):
 
         return eitem
 
+    @metadata
     def get_rich_item(self, item, kind='question', question_tags = None):
         eitem = {}
 

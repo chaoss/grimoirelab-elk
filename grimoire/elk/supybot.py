@@ -27,7 +27,7 @@ import logging
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class SupybotEnrich(Enrich):
 
@@ -63,6 +63,7 @@ class SupybotEnrich(Enrich):
             identity['name'] = nick
         return identity
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 

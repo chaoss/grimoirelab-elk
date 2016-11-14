@@ -28,7 +28,7 @@ import logging
 from dateutil import parser
 import email.utils
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class MBoxEnrich(Enrich):
 
@@ -90,6 +90,7 @@ class MBoxEnrich(Enrich):
         repo += mls_list+".mbox/"+mls_list+".mbox"
         return repo
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 

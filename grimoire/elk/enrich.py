@@ -24,9 +24,13 @@
 #
 
 import json
+import functools
 import logging
+import subprocess
 
 import requests
+
+from datetime import datetime as dt
 
 from dateutil import parser
 from functools import lru_cache
@@ -51,6 +55,26 @@ except ImportError:
 
 DEFAULT_PROJECT = 'Main'
 DEFAULT_DB_USER = 'root'
+
+def metadata(func):
+    """Add metadata to an item.
+
+    Decorator that adds metadata to a given item such as
+    the gelk revision used.
+
+    """
+    @functools.wraps(func)
+    def decorator(self, *args, **kwargs):
+        eitem = func(self, *args, **kwargs)
+        metadata = {
+            '@gelk_version': self.gelk_version,
+            '@backend_name' : self.__class__.__name__,
+            '@timestamp' : dt.utcnow().isoformat()
+        }
+        eitem.update(metadata)
+        return eitem
+    return decorator
+
 
 class Enrich(object):
 
@@ -94,6 +118,10 @@ class Enrich(object):
 
         self.elastic = None
         self.type_name = "items"  # type inside the index to store items enriched
+
+        # To add the gelk version to enriched items
+        self.gelk_version = subprocess.check_output(["git", "describe"]).strip()
+        self.gelk_version = self.gelk_version.decode("utf-8")
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -223,6 +251,7 @@ class Enrich(object):
         """ Field in the rich event with the unique id """
         raise NotImplementedError
 
+    @metadata
     def get_rich_item(self, item):
         """ Create a rich item from the raw item """
         raise NotImplementedError
