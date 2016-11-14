@@ -123,8 +123,12 @@ class Enrich(object):
         self.type_name = "items"  # type inside the index to store items enriched
 
         # To add the gelk version to enriched items
-        self.gelk_version = subprocess.check_output(["git", "describe"]).strip()
-        self.gelk_version = self.gelk_version.decode("utf-8")
+        try:
+            self.gelk_version = subprocess.check_output(["git", "describe"]).strip()
+            self.gelk_version = self.gelk_version.decode("utf-8")
+        except subprocess.CalledProcessError:
+            logging.warning("Can't get the gelk version.")
+            self.gelk_version = 'Unknown'
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -645,7 +649,8 @@ class Enrich(object):
 
         for rol in roles:
             if rol+"_id" not in eitem:
-                raise RuntimeError("Enriched index does not include SH ids")
+                logging.warning("Enriched index does not include SH ids for %s. Can not refresh it.", rol+"_id")
+                continue
             sh_id = eitem[rol+"_id"]
             if not sh_id:
                 logging.warning("%s_id is None", sh_id)
