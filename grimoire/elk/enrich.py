@@ -31,6 +31,7 @@ import subprocess
 import requests
 
 from datetime import datetime as dt
+from os import path
 
 from dateutil import parser
 from functools import lru_cache
@@ -124,10 +125,12 @@ class Enrich(object):
 
         # To add the gelk version to enriched items
         try:
-            self.gelk_version = subprocess.check_output(["git", "describe"]).strip()
+            # gelk is executed directly from a git clone
+            git_path = path.dirname(__file__)
+            self.gelk_version = subprocess.check_output(["git", "-C", git_path, "describe"]).strip()
             self.gelk_version = self.gelk_version.decode("utf-8")
         except subprocess.CalledProcessError:
-            logging.warning("Can't get the gelk version.")
+            logging.warning("Can't get the gelk version. %s", __file__)
             self.gelk_version = 'Unknown'
 
     def set_elastic(self, elastic):
