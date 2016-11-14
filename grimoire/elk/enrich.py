@@ -72,8 +72,8 @@ def metadata(func):
         eitem = func(self, *args, **kwargs)
         metadata = {
             'metadata__gelk_version': self.gelk_version,
-            'metadata__backend_name' : self.__class__.__name__,
-            'metadata__timestamp' : dt.utcnow().isoformat()
+            'metadata__gelk_backend_name' : self.__class__.__name__,
+            'metadata__enriched_on' : dt.utcnow().isoformat()
         }
         eitem.update(metadata)
         return eitem
