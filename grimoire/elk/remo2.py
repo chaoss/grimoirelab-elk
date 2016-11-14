@@ -24,7 +24,7 @@
 
 import logging
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class ReMoEnrich(Enrich):
 
@@ -111,6 +111,7 @@ class ReMoEnrich(Enrich):
 
         return category
 
+    @metadata
     def get_rich_item(self, item):
         # We need to detect the category of item: activities (report), events or users
         eitem = {}

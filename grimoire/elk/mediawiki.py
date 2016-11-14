@@ -27,7 +27,7 @@ import logging
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class MediaWikiEnrich(Enrich):
 
@@ -139,7 +139,7 @@ class MediaWikiEnrich(Enrich):
 
         return erevisions
 
-
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 

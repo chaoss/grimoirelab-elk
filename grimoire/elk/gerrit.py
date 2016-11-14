@@ -30,7 +30,7 @@ import logging
 import time
 
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class GerritEnrich(Enrich):
 
@@ -143,6 +143,7 @@ class GerritEnrich(Enrich):
         return {"items":mapping}
 
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}  # Item enriched
 

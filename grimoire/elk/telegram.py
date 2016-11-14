@@ -25,7 +25,7 @@
 from dateutil import parser
 
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 
 class TelegramEnrich(Enrich):
@@ -74,6 +74,8 @@ class TelegramEnrich(Enrich):
 
         return identities
 
+
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 

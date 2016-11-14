@@ -30,7 +30,8 @@ from datetime import datetime
 
 from dateutil import parser
 
-from .enrich import Enrich
+from .enrich import Enrich, metadata
+
 from .utils import get_time_diff_days
 
 class BugzillaEnrich(Enrich):
@@ -96,6 +97,7 @@ class BugzillaEnrich(Enrich):
 
         return identities
 
+    @metadata
     def get_rich_item(self, item):
 
         if 'bug_id' not in item['data']:
