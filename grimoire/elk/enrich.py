@@ -645,7 +645,7 @@ class Enrich(object):
 
         for rol in roles:
             if rol+"_id" not in eitem:
-                continue
+                raise RuntimeError("Enriched index does not include SH ids")
             sh_id = eitem[rol+"_id"]
             if not sh_id:
                 logging.warning("%s_id is None", sh_id)
