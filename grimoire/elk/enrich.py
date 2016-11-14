@@ -71,9 +71,9 @@ def metadata(func):
     def decorator(self, *args, **kwargs):
         eitem = func(self, *args, **kwargs)
         metadata = {
-            '@gelk_version': self.gelk_version,
-            '@backend_name' : self.__class__.__name__,
-            '@timestamp' : dt.utcnow().isoformat()
+            'metadata__gelk_version': self.gelk_version,
+            'metadata__backend_name' : self.__class__.__name__,
+            'metadata__timestamp' : dt.utcnow().isoformat()
         }
         eitem.update(metadata)
         return eitem
