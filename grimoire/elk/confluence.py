@@ -70,7 +70,7 @@ class ConfluenceEnrich(Enrich):
         identity = {}
 
         user = item  # by default a specific user dict is expected
-        if 'data' in item:
+        if 'data' in item and type(item) == dict:
             user = item['data']['version'][identity_field]
 
         identity['username'] = user['username']

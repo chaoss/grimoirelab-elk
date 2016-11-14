@@ -137,7 +137,7 @@ class GitEnrich(Enrich):
         identity = {}
 
         git_user = item  # by default a specific user dict is expected
-        if 'data' in item:
+        if 'data' in item and type(item) == dict:
             git_user = item['data'][identity_field]
 
         name = git_user.split("<")[0]

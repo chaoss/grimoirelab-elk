@@ -66,7 +66,7 @@ class SupybotEnrich(Enrich):
             return identity
 
         nick = item
-        if 'data' in item:
+        if 'data' in item and type(item) == dict:
             nick = item['data'][identity_field]
 
         identity['username'] = nick

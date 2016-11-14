@@ -67,7 +67,7 @@ class MediaWikiEnrich(Enrich):
 
         revision = item
 
-        if 'data' in item:
+        if 'data' in item and type(item) == dict:
             revision = item['data']['revisions'][0]
 
         identity = {}

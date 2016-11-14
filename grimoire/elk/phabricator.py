@@ -107,7 +107,7 @@ class PhabricatorEnrich(Enrich):
         identity = {}
 
         user = item
-        if 'data' in item:
+        if 'data' in item and type(item) == dict:
             user = item['data']['fields'][identity_field]
 
         identity['email'] = None

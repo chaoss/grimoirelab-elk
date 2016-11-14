@@ -48,7 +48,7 @@ class DiscourseEnrich(Enrich):
         identity = {}
 
         user = item  # by default a specific user dict is expected
-        if 'data' in item:
+        if 'data' in item and type(item) == dict:
             user = item['data']['details']['participants'][identity_field]
         identity['username'] = user['username']
         identity['email'] = None

@@ -77,7 +77,7 @@ class GitHubEnrich(Enrich):
         identity = {}
 
         user = item  # by default a specific user dict is expected
-        if 'data' in item:
+        if 'data' in item and type(item) == dict:
             user = item['data'][identity_field]
 
         if not user:

@@ -72,7 +72,7 @@ class MBoxEnrich(Enrich):
         identity = {}
 
         from_data = item
-        if 'data' in item:
+        if 'data' in item and type(item) == dict:
             from_data = item['data'][identity_field]
 
         # First desofuscate the email

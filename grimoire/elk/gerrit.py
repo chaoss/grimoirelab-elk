@@ -46,7 +46,7 @@ class GerritEnrich(Enrich):
             identity[field] = None
 
         user = item  # by default a specific user dict is expected
-        if 'data' in item:
+        if 'data' in item and type(item) == dict:
             user = item['data'][identity_field]
 
         if 'name' in user: identity['name'] = user['name']

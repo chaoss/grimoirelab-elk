@@ -85,7 +85,7 @@ class ReMoEnrich(Enrich):
             return identity
 
         user = item
-        if 'data' in item:
+        if 'data' in item and type(item) == dict:
             user = item['data'][identity_field]
 
         identity['username'] = user["display_name"]
