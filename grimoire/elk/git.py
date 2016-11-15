@@ -170,6 +170,8 @@ class GitEnrich(Enrich):
             logging.debug("Rate limit pending: %s", self.rate_limit)
             if self.rate_limit <= self.min_rate_to_sleep:
                 seconds_to_reset = self.rate_limit_reset_ts - int(time.time()) + 1
+                if seconds_to_reset < 0:
+                    seconds_to_reset = 0
                 cause = "GitHub rate limit exhausted."
                 logging.info("%s Waiting %i secs for rate limit reset.", cause, seconds_to_reset)
                 time.sleep(seconds_to_reset)
