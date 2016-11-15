@@ -33,8 +33,8 @@ from dateutil import parser
 from grimoire.elk.elastic import ElasticSearch
 
 def get_params():
-    parser = argparse.ArgumentParser(usage="usage: kidash [options]",
-                                     description="Import or Export a Kibana Dashboard")
+    parser = argparse.ArgumentParser(usage="usage: twitter2es [options]",
+                                     description="Import tweets in ElasticSearch")
     parser.add_argument("-d", "--json-dir", required=True, help="Directory with the tweets JSON files")
     parser.add_argument("-e", "--elastic-url", required=True, help="ElasticSearch URL")
     parser.add_argument("-i", "--index", required=True, help="ElasticSearch index in which to import the tweets")
