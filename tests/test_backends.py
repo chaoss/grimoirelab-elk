@@ -33,7 +33,7 @@ from datetime import datetime
 if not '..' in sys.path:
     sys.path.insert(0, '..')
 
-from grimoire.arthur import enrich_sortinghat
+from grimoire.arthur import load_identities
 from grimoire.utils import get_connectors, get_elastic
 
 
@@ -147,7 +147,7 @@ class TestBackends(unittest.TestCase):
             enrich_backend.set_elastic(elastic_enrich)
             if sortinghat:
                 # Load SH identities
-                enrich_sortinghat(ocean_backend, enrich_backend)
+                load_identities(ocean_backend, enrich_backend)
             enrich_count = self.__enrich_items(ocean_backend, enrich_backend)
             logging.info("Total items enriched %i ", enrich_count)
 
