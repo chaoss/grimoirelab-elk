@@ -669,8 +669,6 @@ class Enrich(object):
         if sh_id_author and author_field != rol_author:
             eitem_sh.update(self.get_item_sh_fields(sh_id=sh_id_author,
                                                     item_date=date, rol=rol_author))
-        import json
-        print(json.dumps(eitem_sh, indent=4, sort_keys=True))
         return eitem_sh
 
     def get_users_data(self, item):
