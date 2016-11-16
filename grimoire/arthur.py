@@ -33,7 +33,7 @@ from dateutil import parser
 
 from grimoire.ocean.conf import ConfOcean
 from grimoire.utils import get_elastic
-from grimoire.utils import get_connector_from_name
+from grimoire.utils import get_connectors, get_connector_from_name
 
 def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None):
@@ -228,43 +228,34 @@ def refresh_identities(enrich_backend):
 
     logging.info("Total eitems refreshed for identities fields %i", total)
 
-def enrich_sortinghat(ocean_backend, enrich_backend):
+def load_identities(ocean_backend, enrich_backend):
     try:
         from grimoire.elk.sortinghat import SortingHat
     except ImportError:
         logging.warning("SortingHat not available.")
 
     # First we add all new identities to SH
-    item_count = 0
+    items_count = 0
     new_identities = []
 
     for item in ocean_backend:
-        item_count += 1
+        items_count += 1
         # Get identities from new items to be added to SortingHat
         identities = enrich_backend.get_identities(item)
         for identity in identities:
             if identity not in new_identities:
                 new_identities.append(identity)
-        if item_count % 1000 == 0:
-            logging.debug("Processed %i items identities (%i identities)" \
-                           % (item_count, len(new_identities)))
-    logging.debug("TOTAL ITEMS: %i" % (item_count))
+        if items_count % 100 == 0:
+            logging.debug("Processed %i items identities (%i identities)",
+                          items_count, len(new_identities))
+    logging.debug("TOTAL ITEMS: %i", items_count)
 
-    logging.info("Total new identities to be checked %i" % len(new_identities))
+    logging.info("Total new identities to be checked %i", len(new_identities))
 
-    merged_identities = SortingHat.add_identities(enrich_backend.sh_db,
-                                                  new_identities, enrich_backend.get_connector_name())
+    SortingHat.add_identities(enrich_backend.sh_db, new_identities,
+                              enrich_backend.get_connector_name())
 
-    # Redo enrich for items with new merged identities
-    renrich_items = []
-    # For testing
-    # merged_identities = ['7e0bcf6ff46848403eaffa29ef46109f386fa24b']
-    for mid in merged_identities:
-        renrich_items += get_items_from_uuid(mid, enrich_backend, ocean_backend)
-
-    # Enrich items with merged identities
-    enrich_count_merged = enrich_items(renrich_items, enrich_backend)
-    return enrich_count_merged
+    return items_count
 
 def enrich_items(items, enrich_backend, events=False):
     total = 0
@@ -274,6 +265,65 @@ def enrich_items(items, enrich_backend, events=False):
     else:
         total = enrich_backend.enrich_events(items)
     return total
+
+def get_ocean_backend(backend_name, backend_cmd, enrich_backend, no_incremental):
+    """ Get the ocean backend configured to start from the last enriched date """
+
+    # Supports having a backend name but not the backend_cmd instance
+
+    last_enrich = None
+
+    connector = get_connectors()[enrich_backend.get_connector_name()]
+
+    if backend_cmd:
+        backend = backend_cmd.backend
+
+        # Only supported in data retrieved from a perceval backend
+        # Always filter by origin to support multi origin indexes
+
+        filter_ = {"name":"origin",
+                   "value":backend.origin}
+        # Check if backend supports from_date
+        signature = inspect.signature(backend.fetch)
+
+        if 'from_date' in signature.parameters:
+            last_enrich = enrich_backend.get_last_update_from_es(filter_)
+        elif 'offset' in signature.parameters:
+            last_enrich = enrich_backend.get_last_offset_from_es(filter_)
+
+        if no_incremental:
+            last_enrich = None
+
+        # If from_date of offset in the backed, use it
+        if backend_cmd:
+            if 'from_date' in signature.parameters:
+                if backend_cmd.from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
+                    last_enrich = backend_cmd.from_date
+            elif 'offset' in signature.parameters:
+                if backend_cmd.offset and backend_cmd.offset != 0:
+                    last_enrich = backend_cmd.offset
+
+        logging.debug("Last enrichment: %s", last_enrich)
+
+        if 'from_date' in signature.parameters:
+            ocean_backend = connector[1](backend, from_date=last_enrich)
+        elif 'offset' in signature.parameters:
+            ocean_backend = connector[1](backend, offset=last_enrich)
+        else:
+            ocean_backend = connector[1](backend)
+    else:
+        if not no_incremental:
+            last_enrich = enrich_backend.get_last_update_from_es()
+        logging.debug("Last enrichment: %s", last_enrich)
+        if last_enrich:
+            logging.debug("Last enrichment: %s", last_enrich)
+            ocean_backend = connector[1](backend, from_date=last_enrich)
+        else:
+            ocean_backend = connector[1](backend)
+
+    return ocean_backend
+
+
 
 def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    ocean_index_enrich = None,
@@ -316,7 +366,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if klass:
             # Data is retrieved from Perceval
             backend_cmd = klass(*backend_params)
-
             backend = backend_cmd.backend
 
         if ocean_index_enrich:
@@ -338,50 +387,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if github_token and backend_name == "git":
             enrich_backend.set_github_token(github_token)
 
-        # We need to enrich from just updated items since last enrichment
-        # Always filter by origin to support multi origin indexes
-        last_enrich = None
-        if backend:
-            # Only supported in data retrieved from a perceval backend
-            filter_ = {"name":"origin",
-                       "value":backend.origin}
-            # Check if backend supports from_date
-            signature = inspect.signature(backend.fetch)
-
-            if 'from_date' in signature.parameters:
-                last_enrich = enrich_backend.get_last_update_from_es(filter_)
-            elif 'offset' in signature.parameters:
-                last_enrich = enrich_backend.get_last_offset_from_es(filter_)
-
-            if no_incremental:
-                last_enrich = None
-
-            # If from_date of offset in the backed, use it
-            if backend_cmd:
-                if 'from_date' in signature.parameters:
-                    if backend_cmd.from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
-                        last_enrich = backend_cmd.from_date
-                elif 'offset' in signature.parameters:
-                    if backend_cmd.offset and backend_cmd.offset != 0:
-                        last_enrich = backend_cmd.offset
-
-            logging.debug("Last enrichment: %s", last_enrich)
-
-            if 'from_date' in signature.parameters:
-                ocean_backend = connector[1](backend, from_date=last_enrich)
-            elif 'offset' in signature.parameters:
-                ocean_backend = connector[1](backend, offset=last_enrich)
-            else:
-                ocean_backend = connector[1](backend)
-        else:
-            if not no_incremental:
-                last_enrich = enrich_backend.get_last_update_from_es()
-            logging.debug("Last enrichment: %s", last_enrich)
-            if last_enrich:
-                logging.debug("Last enrichment: %s", last_enrich)
-                ocean_backend = connector[1](backend, from_date=last_enrich)
-            else:
-                ocean_backend = connector[1](backend)
+        ocean_backend = get_ocean_backend(backend, backend_cmd, enrich_backend, no_incremental)
 
         if only_studies:
             logging.info("Running only studies (no SH and no enrichment)")
@@ -406,7 +412,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             if db_sortinghat:
                 enrich_count_merged = 0
 
-                enrich_count_merged = enrich_sortinghat(ocean_backend, enrich_backend)
+                enrich_count_merged = load_identities(ocean_backend, enrich_backend)
                 logging.info("Total items enriched for merged identities %i ", enrich_count_merged)
 
             if only_identities:

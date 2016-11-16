@@ -110,48 +110,12 @@ class SortingHat(object):
     def add_identities(cls, db, identities, backend):
         """ Load identities list from backend in Sorting Hat """
 
-        merge_identities = False
-
         logger.info("Adding the identities to SortingHat")
-        if not merge_identities:
-            logger.info("Not doing identities merge")
 
         total = 0
-        lidentities = len(identities)
-
-        if merge_identities:
-            merged_identities = []  # old identities merged into new ones
-            blacklist = api.blacklist(db)
-            matching = 'email-name'  # Not active
-            matcher = create_identity_matcher(matching, blacklist)
 
         for identity in identities:
-            uuid = cls.add_identity(db, identity, backend)
+            cls.add_identity(db, identity, backend)
+            total +=1
 
-            if not merge_identities:
-                continue  # Don't do the merge here. Too slow in large projects
-
-            # Time to  merge
-            matches = api.match_identities(db, uuid, matcher)
-
-            if len(matches) > 1:
-                u = api.unique_identities(db, uuid)[0]
-                for m in matches:
-                    # First add the old uuid to the list of changed by merge uuids
-                    if m.uuid not in merged_identities:
-                        merged_identities.append(m.uuid)
-                    if m.uuid == uuid:
-                        continue
-                    # Merge matched identity into added identity
-                    api.merge_unique_identities(db, m.uuid, u.uuid)
-                    # uuid = m.uuid
-                    # u = api.unique_identities(db, uuid, backend)[0]
-                    # Include all identities related to this uuid
-                    # merged_identities.append(m.uuid)
-
-        if merge_identities:
-            logger.info("Total NEW identities merged: %i" % \
-                        (len(merged_identities)))
-            return merged_identities
-        else:
-            return []
+        logging.info("Total identities added to SH: %i", total)
