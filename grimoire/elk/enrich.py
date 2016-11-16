@@ -644,6 +644,7 @@ class Enrich(object):
         eitem_sh = {}  # Item enriched
 
         author_field = self.get_field_author()
+        sh_id_author = None
 
         if not roles:
             roles = [author_field]
@@ -658,8 +659,18 @@ class Enrich(object):
             if not sh_id:
                 logging.warning("%s_id is None", sh_id)
                 continue
-            eitem_sh.update(self.get_item_sh_fields(sh_id=sh_id, item_date=date, rol=rol))
+            if rol == author_field:
+                sh_id_author = sh_id
+            eitem_sh.update(self.get_item_sh_fields(sh_id=sh_id, item_date=date,
+                                                    rol=rol))
 
+        # Add the author field common in all data sources
+        rol_author = 'author'
+        if sh_id_author and author_field != rol_author:
+            eitem_sh.update(self.get_item_sh_fields(sh_id=sh_id_author,
+                                                    item_date=date, rol=rol_author))
+        import json
+        print(json.dumps(eitem_sh, indent=4, sort_keys=True))
         return eitem_sh
 
     def get_users_data(self, item):
@@ -705,7 +716,6 @@ class Enrich(object):
             eitem_sh.update(self.get_item_sh_fields(identity, item_date, rol=rol_author))
 
         return eitem_sh
-
 
     @lru_cache()
     def get_enrollments(self, uuid):
