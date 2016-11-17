@@ -115,6 +115,8 @@ class Enrich(object):
             # self.__compare_projects_map(self.prjs_map, self.json_projects)
             pass
 
+        self.studies = []
+
         self.requests = requests.Session()
         if insecure:
             requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)

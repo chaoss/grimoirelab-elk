@@ -266,15 +266,8 @@ def enrich_items(items, enrich_backend, events=False):
         total = enrich_backend.enrich_events(items)
     return total
 
-def get_ocean_backend(backend_name, backend_cmd, enrich_backend, no_incremental):
-    """ Get the ocean backend configured to start from the last enriched date """
-
-    # Supports having a backend name but not the backend_cmd instance
-
+def get_last_enrich(backend_cmd, enrich_backend):
     last_enrich = None
-    backend = None
-
-    connector = get_connectors()[enrich_backend.get_connector_name()]
 
     if backend_cmd:
         backend = backend_cmd.backend
@@ -288,24 +281,39 @@ def get_ocean_backend(backend_name, backend_cmd, enrich_backend, no_incremental)
         signature = inspect.signature(backend.fetch)
 
         if 'from_date' in signature.parameters:
-            last_enrich = enrich_backend.get_last_update_from_es(filter_)
+            if backend_cmd.from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
+                last_enrich = backend_cmd.from_date
+            else:
+                last_enrich = enrich_backend.get_last_update_from_es(filter_)
+
         elif 'offset' in signature.parameters:
-            last_enrich = enrich_backend.get_last_offset_from_es(filter_)
+            if backend_cmd.offset and backend_cmd.offset != 0:
+                last_enrich = backend_cmd.offset
+            else:
+                last_enrich = enrich_backend.get_last_offset_from_es(filter_)
+    else:
+        last_enrich = enrich_backend.get_last_update_from_es()
 
-        if no_incremental:
-            last_enrich = None
+    return last_enrich
 
-        # If from_date of offset in the backed, use it
-        if backend_cmd:
-            if 'from_date' in signature.parameters:
-                if backend_cmd.from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
-                    last_enrich = backend_cmd.from_date
-            elif 'offset' in signature.parameters:
-                if backend_cmd.offset and backend_cmd.offset != 0:
-                    last_enrich = backend_cmd.offset
 
-        logging.debug("Last enrichment: %s", last_enrich)
+def get_ocean_backend(backend_cmd, enrich_backend, no_incremental):
+    """ Get the ocean backend configured to start from the last enriched date """
 
+    if no_incremental:
+        last_enrich = None
+    else:
+        last_enrich = get_last_enrich(backend_cmd, enrich_backend)
+
+    logging.debug("Last enrichment: %s", last_enrich)
+
+    backend = None
+
+    connector = get_connectors()[enrich_backend.get_connector_name()]
+
+    if backend_cmd:
+        backend = backend_cmd.backend
+        signature = inspect.signature(backend.fetch)
         if 'from_date' in signature.parameters:
             ocean_backend = connector[1](backend, from_date=last_enrich)
         elif 'offset' in signature.parameters:
@@ -313,18 +321,23 @@ def get_ocean_backend(backend_name, backend_cmd, enrich_backend, no_incremental)
         else:
             ocean_backend = connector[1](backend)
     else:
-        if not no_incremental:
-            last_enrich = enrich_backend.get_last_update_from_es()
-        logging.debug("Last enrichment: %s", last_enrich)
         if last_enrich:
-            logging.debug("Last enrichment: %s", last_enrich)
             ocean_backend = connector[1](backend, from_date=last_enrich)
         else:
             ocean_backend = connector[1](backend)
 
     return ocean_backend
 
+def do_studies(enrich_backend):
+    last_enrich = get_last_enrich(None, enrich_backend)
 
+    try:
+        for study in enrich_backend.studies:
+            logging.info("Starting study: %s (from %s)", study, last_enrich)
+            study(from_date=last_enrich)
+    except Exception as e:
+        logging.error("Problem executing study %s", study)
+        traceback.print_exc()
 
 def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    ocean_index_enrich = None,
@@ -336,15 +349,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    db_user=None, db_password=None, db_host=None,
                    do_refresh_projects=False, do_refresh_identities=False):
     """ Enrich Ocean index """
-
-    def do_studies(enrich_backend, last_enrich):
-        try:
-            for study in enrich_backend.studies:
-                logging.info("Starting study: %s", study)
-                study(from_date=last_enrich)
-        except Exception as e:
-            logging.error("Problem executing studies for %s", backend_name)
-            traceback.print_exc()
 
 
     backend = None
@@ -388,11 +392,11 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if github_token and backend_name == "git":
             enrich_backend.set_github_token(github_token)
 
-        ocean_backend = get_ocean_backend(backend, backend_cmd, enrich_backend, no_incremental)
+        ocean_backend = get_ocean_backend(backend_cmd, enrich_backend, no_incremental)
 
         if only_studies:
             logging.info("Running only studies (no SH and no enrichment)")
-            do_studies(enrich_backend, last_enrich)
+            do_studies(enrich_backend)
         elif do_refresh_projects:
             logging.info("Refreshing project field in enriched index")
             field_id = enrich_backend.get_field_unique_id()
@@ -430,7 +434,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                     if enrich_count:
                         logging.info("Total events enriched %i ", enrich_count)
                 if studies:
-                    do_studies(enrich_backend, last_enrich)
+                    do_studies(enrich_backend)
 
     except Exception as ex:
         traceback.print_exc()
