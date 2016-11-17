@@ -163,7 +163,7 @@ class GitEnrich(Enrich):
             commit_url = GITHUB_API_URL+"/repos/%s/commits/%s" % (repo, commit_hash)
             headers = {'Authorization': 'token ' + self.github_token}
 
-            r = requests.get(commit_url, headers=headers)
+            r = self.requests.get(commit_url, headers=headers)
 
             self.rate_limit = int(r.headers['X-RateLimit-Remaining'])
             self.rate_limit_reset_ts = int(r.headers['X-RateLimit-Reset'])
@@ -176,7 +176,7 @@ class GitEnrich(Enrich):
                 logging.info("%s Waiting %i secs for rate limit reset.", cause, seconds_to_reset)
                 time.sleep(seconds_to_reset)
                 # Retry once we have rate limit
-                r = requests.get(commit_url, headers=headers)
+                r = self.requests.get(commit_url, headers=headers)
 
             try:
                 r.raise_for_status()
@@ -360,7 +360,14 @@ class GitEnrich(Enrich):
         }
         """ % (query)
 
-        r = requests.post(self.elastic.index_url+"/_search", data=es_query, verify=False)
+        r = self.requests.post(self.elastic.index_url+"/_search", data=es_query, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logging.error("Error getting authors mix and max date. Demography aborted.")
+            logging.error(ex)
+            return
+
         authors = r.json()['aggregations']['author']['buckets']
 
         author_items = []  # items from author with new date fields added
@@ -387,7 +394,7 @@ class GitEnrich(Enrich):
             # Time to add all the commits (items) from this author
             author_query_json['query']['bool']['must'][0]['term']['Author'] = author['key']
             author_query_str = json.dumps(author_query_json)
-            r = requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str, verify=False)
+            r = self.requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str, verify=False)
 
             if "hits" not in r.json():
                 logging.error("Can't find commits for %s" % (author['key']))
