@@ -29,25 +29,9 @@ from dateutil import parser
 
 from .utils import get_time_diff_days
 
-
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class DiscourseEnrich(Enrich):
-
-    def __init__(self, discourse, db_sortinghat=None, db_projects_map=None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = discourse
-        self.index_Discourse = "discourse"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -60,25 +44,21 @@ class DiscourseEnrich(Enrich):
             identities.append(user)
         return identities
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
+
+        user = item  # by default a specific user dict is expected
+        if 'data' in item and type(item) == dict:
+            user = item['data']['details']['participants'][identity_field]
         identity['username'] = user['username']
         identity['email'] = None
         identity['name'] = user['username']
         return identity
 
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
+    def get_field_author(self):
+        return 'created_by'
 
-        eitem = {}  # Item enriched
-        data = item['data']['details']['created_by']
-
-        identity  = self.get_sh_identity(data)
-        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
-
-        return eitem
-
-
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
         eitem["metadata__updated_on"] = item["metadata__updated_on"]
@@ -124,26 +104,3 @@ class DiscourseEnrich(Enrich):
         eitem.update(self.get_grimoire_fields(firt_post_time, "topic"))
 
         return eitem
-
-    def enrich_items(self, items):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-
-            rich_item = self.get_rich_item(item)
-            data_json = json.dumps(rich_item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data = bulk_json)

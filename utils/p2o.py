@@ -130,13 +130,17 @@ if __name__ == '__main__':
             if args.enrich or args.enrich_only:
                 enrich_backend(url, clean, args.backend, args.backend_args,
                                args.index, args.index_enrich,
-                               args.db_projects_map, args.db_sortinghat,
+                               args.db_projects_map, args.json_projects_map,
+                               args.db_sortinghat,
                                args.no_incremental, args.only_identities,
                                args.github_token,
                                args.studies, args.only_studies,
-                               args.elastic_url_enrich)
+                               args.elastic_url_enrich, args.events_enrich,
+                               args.db_user, args.db_password, args.db_host,
+                               args.refresh_projects, args.refresh_identities)
                 logging.info("Enrich backend completed")
-
+            elif args.events_enrich:
+                logging.info("Enrich option is needed for events_enrich")
         else:
             logging.error("You must configure a backend")
 

@@ -45,7 +45,7 @@ from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
 from grimoire.ocean.mozillaclub import MozillaClubOcean
 from grimoire.ocean.phabricator import PhabricatorOcean
-from grimoire.ocean.remo import ReMoOcean
+from grimoire.ocean.remo2 import ReMoOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.supybot import SupybotOcean
 from grimoire.ocean.telegram import TelegramOcean
@@ -60,6 +60,7 @@ from grimoire.elk.discourse import DiscourseEnrich
 from grimoire.elk.git import GitEnrich
 from grimoire.elk.github import GitHubEnrich
 from grimoire.elk.gerrit import GerritEnrich
+from grimoire.elk.gmane import GmaneEnrich
 from grimoire.elk.jenkins import JenkinsEnrich
 from grimoire.elk.jira import JiraEnrich
 from grimoire.elk.kitsune import KitsuneEnrich
@@ -67,7 +68,8 @@ from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
 from grimoire.elk.mozillaclub import MozillaClubEnrich
 from grimoire.elk.phabricator import PhabricatorEnrich
-from grimoire.elk.remo import ReMoEnrich
+from grimoire.elk.remo2 import ReMoEnrich
+from grimoire.elk.pipermail import PipermailEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
 from grimoire.elk.supybot import SupybotEnrich
 from grimoire.elk.telegram import TelegramEnrich
@@ -90,7 +92,7 @@ from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
 from perceval.backends.mozillaclub import MozillaClub, MozillaClubCommand
 from perceval.backends.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.pipermail import Pipermail, PipermailCommand
-from perceval.backends.remo import ReMo, ReMoCommand
+from perceval.backends.remo2 import ReMo, ReMoCommand
 from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
 from perceval.backends.supybot import Supybot, SupybotCommand
 from perceval.backends.telegram import Telegram, TelegramCommand
@@ -116,7 +118,12 @@ def get_connector_name(cls):
     for cname in connectors:
         for con in connectors[cname]:
             if cls == con:
-                found = cname
+                if found:
+                    # The canonical name is included in the classname
+                    if cname in cls.__name__.lower():
+                        found = cname
+                else:
+                    found = cname
     return found
 
 def get_connectors():
@@ -128,7 +135,7 @@ def get_connectors():
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
-            "gmane":[Gmane, MBoxOcean, MBoxEnrich, GmaneCommand],
+            "gmane":[Gmane, MBoxOcean, GmaneEnrich, GmaneCommand],
             "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
             "kitsune":[Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
@@ -137,6 +144,7 @@ def get_connectors():
             "mozillaclub":[MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
             "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
+            "pipermail":[Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
@@ -145,22 +153,22 @@ def get_connectors():
              "twitter":[None, TwitterOcean, TwitterEnrich, None]
             }  # Will come from Registry
 
-def get_elastic(url, es_index, clean = None, ocean_backend = None):
+def get_elastic(url, es_index, clean = None, backend = None):
 
     mapping = None
 
-    if ocean_backend:
-        mapping = ocean_backend.get_elastic_mappings()
-
+    if backend:
+        mapping = backend.get_elastic_mappings()
+        analyzers = backend.get_elastic_analyzers()
     try:
-        ocean_index = es_index
-        elastic_ocean = ElasticSearch(url, ocean_index, mapping, clean)
+        insecure = True
+        elastic = ElasticSearch(url, es_index, mapping, clean, insecure, analyzers)
 
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
 
-    return elastic_ocean
+    return elastic
 
 def config_logging(debug):
 
@@ -197,9 +205,6 @@ def get_params_parser():
                         help="don't use last state for data source")
     parser.add_argument("--fetch_cache",  action='store_true',
                         help="Use cache for item retrieval")
-
-    parser.add_argument("--loop",  action='store_true',
-                        help="loop the ocean update until process termination")
     parser.add_argument("--redis",  default="redis",
                         help="url for the redis server")
     parser.add_argument("--enrich",  action='store_true',
@@ -208,12 +213,23 @@ def get_params_parser():
                         help="Only enrich items (DEPRECATED, use --only-enrich)")
     parser.add_argument("--only-enrich",  dest='enrich_only', action='store_true',
                         help="Only enrich items (DEPRECATED, use --only-enrich)")
+    parser.add_argument("--events-enrich",  dest='events_enrich', action='store_true',
+                        help="Enrich events in items")
     parser.add_argument('--index', help="Ocean index name")
     parser.add_argument('--index-enrich', dest="index_enrich", help="Ocean enriched index name")
+    parser.add_argument('--db-user', help="User for db connection (default to root)",
+                        default="root")
+    parser.add_argument('--db-password', help="Password for db connection (default empty)",
+                        default="")
+    parser.add_argument('--db-host', help="Host for db connection (default to mariadb)",
+                        default="mariadb")
     parser.add_argument('--db-projects-map', help="Projects Mapping DB")
+    parser.add_argument('--json-projects-map', help="Projects Mapping JSON file")
     parser.add_argument('--project', help="Project for the repository (origin)")
+    parser.add_argument('--refresh-projects', action='store_true', help="Refresh projects in enriched items")
     parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('--only-identities', action='store_true', help="Only add identities to SortingHat DB")
+    parser.add_argument('--refresh-identities', action='store_true', help="Refresh identities in enriched items")
     parser.add_argument('--github-token', help="If provided, github usernames will be retrieved in git enrich.")
     parser.add_argument('--studies', action='store_true', help="Execute studies after enrichment.")
     parser.add_argument('--only-studies', action='store_true', help="Execute only studies.")

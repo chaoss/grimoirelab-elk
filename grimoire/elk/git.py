@@ -24,36 +24,48 @@
 
 import json
 import logging
+import time
 
 import requests
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
+try:
+    from grimoire.elk.sortinghat import SortingHat
+    SORTINGHAT_LIBS = True
+except ImportError:
+    SORTINGHAT_LIBS = False
 
 GITHUB = 'https://github.com/'
+SH_GIT_COMMIT = 'github-commit'
 
 class GitEnrich(Enrich):
 
-    def __init__(self, git, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = git
-        self.index_git = "git"
-        self.github_logins = {}
-        self.github_token = None
+    roles = ['Author', 'Commit']
+
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                 db_user='', db_password='', db_host=''):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+                         db_user, db_password, db_host)
+
         self.studies = [self.enrich_demography]
 
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
+        # GitHub API management
+        self.github_token = None
+        self.github_logins = {}
+        self.github_logins_committer_not_found = 0
+        self.github_logins_author_not_found = 0
+        self.rate_limit = None
+        self.rate_limit_reset_ts = None
+        self.min_rate_to_sleep = 100  # if pending rate < 100 sleep
 
     def set_github_token(self, token):
         self.github_token = token
 
-    def get_field_date(self):
-        return "metadata__updated_on"
+    def get_field_author(self):
+        return "Author"
 
     def get_field_unique_id(self):
         return "ocean-unique-id"
@@ -75,76 +87,70 @@ class GitEnrich(Enrich):
 
         return {"items":mapping}
 
-
     def get_identities(self, item):
         """ Return the identities from an item.
             If the repo is in GitHub, get the usernames from GitHub. """
         identities = []
 
+        def add_sh_github_identity(user, user_field, rol):
+            """ Add a new github identity to SH if it does not exists """
+            github_repo = None
+            if GITHUB in item['origin']:
+                github_repo = item['origin'].replace(GITHUB,'').replace('.git','')
+            if not github_repo:
+                return
+
+            # Try to get the identity from SH
+            user_data = item['data'][user_field]
+            sh_identity = SortingHat.get_github_commit_username(self.sh_db, user, SH_GIT_COMMIT)
+            if not sh_identity:
+                # Get the usename from GitHub
+                gh_username = self.get_github_login(user_data, rol, commit_hash, github_repo)
+                # Create a new SH identity with name, email from git and username from github
+                logging.debug("Adding new identity %s to SH %s: %s", gh_username, SH_GIT_COMMIT, user)
+                user = self.get_sh_identity(user_data)
+                user['username'] = gh_username
+                SortingHat.add_identity(self.sh_db, user, SH_GIT_COMMIT)
+            else:
+                if user_data not in self.github_logins:
+                    self.github_logins[user_data] = sh_identity['username']
+                    logging.debug("GitHub-commit exists. username:%s user:%s",
+                                  sh_identity['username'], user_data)
+
         commit_hash = item['data']['commit']
-        github_repo = None
-        if GITHUB in item['origin']:
-            github_repo = item['origin'].replace(GITHUB,'').replace('.git','')
 
         if item['data']['Author']:
-            username = None
-            if self.github_token and github_repo:
-                # Get the usename from GitHub
-                username = self.get_github_login(item['data']['Author'], "author", commit_hash, github_repo)
-            user = self.get_sh_identity(item['data']["Author"], username)
+            user = self.get_sh_identity(item['data']["Author"])
             identities.append(user)
-
-        if item['data']['Commit'] and github_repo:
-            username = None
             if self.github_token:
-                # Get the username from GitHub
-                username = self.get_github_login(item['data']['Commit'], "committer", commit_hash, github_repo)
-            user = self.get_sh_identity(item['data']['Commit'], username)
+                add_sh_github_identity(user, 'Author', 'author')
+        if item['data']['Commit']:
+            user = self.get_sh_identity(item['data']['Commit'])
             identities.append(user)
+            if self.github_token:
+                add_sh_github_identity(user, 'Commit', 'committer')
 
         return identities
 
-    def get_sh_identity(self, git_user, username=None):
+    def get_sh_identity(self, item, identity_field=None):
         # John Smith <john.smith@bitergia.com>
         identity = {}
 
-        if username is None and self.github_token:
-            # Try to get the GitHub login from the cache
-            try:
-                username = self.github_logins[git_user]
-            except KeyError:
-                pass
+        git_user = item  # by default a specific user dict is expected
+        if 'data' in item and type(item) == dict:
+            git_user = item['data'][identity_field]
 
         name = git_user.split("<")[0]
         name = name.strip()  # Remove space between user and email
         email = git_user.split("<")[1][:-1]
-        identity['username'] = username
+        identity['username'] = None
         identity['email'] = email
         identity['name'] = name
 
         return identity
 
-    def get_item_project(self, item):
-        """ Get project mapping enrichment field """
-        item_project = {}
-        ds_name = "scm"  # data source name in projects map
-        url_git = item['origin']
-        try:
-            project = (self.prjs_map[ds_name][url_git])
-        except KeyError:
-            # logging.warning("Project not found for repository %s" % (url_git))
-            project = None
-        item_project = {"project": project}
-        # Time to add the project levels: eclipse.platform.releng.aggregator
-        item_path = ''
-        if project is not None:
-            subprojects = project.split('.')
-            for i in range(0, len(subprojects)):
-                if i > 0:
-                    item_path += "."
-                item_path += subprojects[i]
-                item_project['project_' + str(i+1)] = item_path
-        return item_project
+    def get_project_repository(self, eitem):
+        return eitem['origin']
 
     def get_github_login(self, user, rol, commit_hash, repo):
         """ rol: author or committer """
@@ -156,36 +162,59 @@ class GitEnrich(Enrich):
             GITHUB_API_URL = "https://api.github.com"
             commit_url = GITHUB_API_URL+"/repos/%s/commits/%s" % (repo, commit_hash)
             headers = {'Authorization': 'token ' + self.github_token}
-            r = requests.get(commit_url, headers=headers)
+
+            r = self.requests.get(commit_url, headers=headers)
+
+            self.rate_limit = int(r.headers['X-RateLimit-Remaining'])
+            self.rate_limit_reset_ts = int(r.headers['X-RateLimit-Reset'])
+            logging.debug("Rate limit pending: %s", self.rate_limit)
+            if self.rate_limit <= self.min_rate_to_sleep:
+                seconds_to_reset = self.rate_limit_reset_ts - int(time.time()) + 1
+                if seconds_to_reset < 0:
+                    seconds_to_reset = 0
+                cause = "GitHub rate limit exhausted."
+                logging.info("%s Waiting %i secs for rate limit reset.", cause, seconds_to_reset)
+                time.sleep(seconds_to_reset)
+                # Retry once we have rate limit
+                r = self.requests.get(commit_url, headers=headers)
 
             try:
                 r.raise_for_status()
             except requests.exceptions.HTTPError as ex:
-                # commit not found probably: P10
+                # commit not found probably or rate limit exhausted
                 logging.error("Can't find commit %s %s", commit_url, ex)
                 return login
-
-            logging.debug("Rate limit pending: %s" % (r.headers['X-RateLimit-Remaining']))
 
             commit_json = r.json()
             author_login = None
             if 'author' in commit_json and commit_json['author']:
                 author_login = commit_json['author']['login']
+            else:
+                self.github_logins_author_not_found += 1
+
             user_login = None
             if 'committer' in commit_json and commit_json['committer']:
                 user_login = commit_json['committer']['login']
+            else:
+                self.github_logins_committer_not_found += 1
+
             if rol == "author":
                 login = author_login
             elif rol == "committer":
-                login = author_login
+                login = user_login
             else:
                 logging.error("Wrong rol: %s" % (rol))
                 raise RuntimeError
+
             self.github_logins[user] = login
-            logging.debug("%s is %s in github" % (user, login))
+            logging.debug("%s is %s in github (not found %i authors %i committers )", user, login,
+                          self.github_logins_author_not_found,
+                          self.github_logins_committer_not_found)
+
         return login
 
-    def get_rich_commit(self, item):
+    @metadata
+    def get_rich_item(self, item):
         eitem = {}
         # metadata fields to copy
         copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
@@ -267,10 +296,10 @@ class GitEnrich(Enrich):
             eitem['project'] = item['project']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, "Author"))
+            eitem.update(self.get_item_sh(item, self.roles))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
 
@@ -302,6 +331,8 @@ class GitEnrich(Enrich):
 
 
         # First, get the min and max commit date for all the authors
+        # Limit aggregations: https://github.com/elastic/elasticsearch/issues/18838
+        # 10000 seems to be a sensible number of the number of people in git
         es_query = """
         {
           %s
@@ -310,7 +341,7 @@ class GitEnrich(Enrich):
             "author": {
               "terms": {
                 "field": "Author",
-                "size": 0
+                "size": 10000
               },
               "aggs": {
                 "min": {
@@ -329,7 +360,14 @@ class GitEnrich(Enrich):
         }
         """ % (query)
 
-        r = requests.post(self.elastic.index_url+"/_search", data=es_query, verify=False)
+        r = self.requests.post(self.elastic.index_url+"/_search", data=es_query, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logging.error("Error getting authors mix and max date. Demography aborted.")
+            logging.error(ex)
+            return
+
         authors = r.json()['aggregations']['author']['buckets']
 
         author_items = []  # items from author with new date fields added
@@ -356,7 +394,7 @@ class GitEnrich(Enrich):
             # Time to add all the commits (items) from this author
             author_query_json['query']['bool']['must'][0]['term']['Author'] = author['key']
             author_query_str = json.dumps(author_query_json)
-            r = requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str, verify=False)
+            r = self.requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str, verify=False)
 
             if "hits" not in r.json():
                 logging.error("Can't find commits for %s" % (author['key']))
@@ -381,27 +419,3 @@ class GitEnrich(Enrich):
         self.elastic.bulk_upload(author_items, "ocean-unique-id")
 
         logging.debug("Completed demography enrich from %s" % (self.elastic.index_url))
-
-
-    def enrich_items(self, commits):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for commit in commits:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-
-            rich_commit = self.get_rich_commit(commit)
-            data_json = json.dumps(rich_commit)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_commit[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data = bulk_json)

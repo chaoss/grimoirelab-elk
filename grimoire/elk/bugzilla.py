@@ -23,31 +23,23 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
+
 import logging
 
 from datetime import datetime
-from time import time
-from urllib.parse import urlparse
 
 from dateutil import parser
 
-from .enrich import Enrich
+from .enrich import Enrich, metadata
 
 from .utils import get_time_diff_days
 
 class BugzillaEnrich(Enrich):
 
-    def __init__(self, bugzilla, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.perceval_backend = bugzilla
-        self.elastic = None
+    roles = ['assigned_to', 'reporter', 'qa_contact']
 
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "delta_ts"
+    def get_field_author(self):
+        return "reporter"
 
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "reporter_uuid"]
@@ -55,8 +47,7 @@ class BugzillaEnrich(Enrich):
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
-    @classmethod
-    def get_sh_identity(cls, user):
+    def get_sh_identity(self, item, identity_field=None):
         """ Return a Sorting Hat identity using bugzilla user data """
 
         def fill_list_identity(identity, user_list_data):
@@ -72,97 +63,45 @@ class BugzillaEnrich(Enrich):
         for field in ['name', 'email', 'username']:
             # Basic fields in Sorting Hat
             identity[field] = None
-        if 'reporter' in user:
-            identity = fill_list_identity(identity, user['reporter'])
-        if 'assigned_to' in user:
-            identity = fill_list_identity(identity, user['assigned_to'])
-        if 'who' in user:
-            identity = fill_list_identity(identity, user['who'])
-        if 'Who' in user:
-            identity['username'] = user['Who']
-            if '@' in identity['username']:
-                identity['email'] = identity['username']
-        if 'qa_contact' in user:
-            identity = fill_list_identity(identity, user['qa_contact'])
-        if 'changed_by' in user:
-            identity['name'] = user['changed_by']
+
+        user = item  # by default a specific user dict is used
+        if 'data' in item and type(item) == dict:
+            user = item['data'][identity_field]
+
+        identity = fill_list_identity(identity, user)
 
         return identity
 
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields """
-        eitem = {}  # Item enriched
-
-        # Sorting Hat integration: reporter and assigned_to uuids
-        if 'assigned_to' in item['data']:
-            identity = BugzillaEnrich.get_sh_identity({'assigned_to':item["data"]['assigned_to']})
-            eitem['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
-            eitem['assigned_to_name'] = identity['name']
-            item_date = item['data'][self.get_field_date()][0]['__text__']
-            item_date_dt = parser.parse(item_date)
-            item_date_utc = (item_date_dt-item_date_dt.utcoffset()).replace(tzinfo=None)
-            eitem["assigned_to_org_name"] = self.get_enrollment(eitem['assigned_to_uuid'], item_date_utc)
-            eitem["assigned_to_domain"] = self.get_domain(identity)
-            eitem["assigned_to_bot"] = self.is_bot(eitem['assigned_to_uuid'])
-        if 'reporter' in item['data']:
-            identity = BugzillaEnrich.get_sh_identity({'reporter':item["data"]['reporter']})
-            eitem['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
-            eitem['reporter_name'] = identity['name']
-            item_date = item['data'][self.get_field_date()][0]['__text__']
-            item_date_dt = parser.parse(item_date)
-            item_date_utc = (item_date_dt-item_date_dt.utcoffset()).replace(tzinfo=None)
-            eitem["reporter_org_name"] = self.get_enrollment(eitem['reporter_uuid'], item_date_utc)
-            eitem["reporter_domain"] = self.get_domain(identity)
-            eitem["reporter_bot"] = self.is_bot(eitem['reporter_uuid'])
-
-        # Unify fields name
-        eitem["author_uuid"] = eitem["reporter_uuid"]
-        eitem["author_name"] = eitem["reporter_name"]
-        eitem["author_org_name"] = eitem["reporter_org_name"]
-        eitem["author_domain"] = eitem["reporter_domain"]
-
-        return eitem
-
-    def get_item_project(self, item):
-        """ Get project mapping enrichment field """
-        ds_name = "its"  # data source name in projects map
-        url = item['origin']
-        # https://bugs.eclipse.org/bugs/buglist.cgi?product=Mylyn%20Tasks
-        product = item['data']['product'][0]['__text__']
-        repo = url+"/buglist.cgi?product="+product
-        try:
-            project = (self.prjs_map[ds_name][repo])
-        except KeyError:
-            # logging.warning("Project not found for repository %s" % (repo))
-            project = None
-        return {"project": project}
+    def get_project_repository(self, eitem):
+        repo = eitem['origin']
+        product = eitem['product']
+        repo += "buglist.cgi?product="+product
+        return repo
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
 
         identities = []
 
+        for rol in self.roles:
+            if rol in item['data']:
+                identities.append(self.get_sh_identity(item["data"][rol]))
+
         if 'activity' in item["data"]:
             for event in item["data"]['activity']:
-                identities.append(self.get_sh_identity(event))
+                event_user = [{"__text__":event['Who']}]
+                identities.append(self.get_sh_identity(event_user))
         if 'long_desc' in item["data"]:
             for comment in item["data"]['long_desc']:
-                identities.append(self.get_sh_identity(comment))
-        elif 'assigned_to' in item["data"]:
-            identities.append(self.get_sh_identity({'assigned_to':
-                                                    item["data"]['assigned_to']}))
-        elif 'reporter' in item["data"]:
-            identities.append(self.get_sh_identity({'reporter':
-                                                    item["data"]['reporter']}))
-        elif 'qa_contact' in item["data"]:
-            identities.append(self.get_sh_identity({'qa_contact':
-                                                    item['qa_contact']}))
+                identities.append(self.get_sh_identity(comment['who']))
+
         return identities
 
-    def enrich_issue(self, item):
+    @metadata
+    def get_rich_item(self, item):
 
         if 'bug_id' not in item['data']:
-            logging.warning("Dropped bug without bug_id %s", issue)
+            logging.warning("Dropped bug without bug_id %s", item)
             return None
 
         eitem = {}
@@ -244,81 +183,11 @@ class BugzillaEnrich(Enrich):
             get_time_diff_days(eitem['creation_date'], datetime.utcnow())
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, self.roles))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(eitem['creation_date'],"bug"))
 
         return eitem
-
-
-    def enrich_items(self, items):
-#         if self.perceval_backend.detail == "list":
-#             self.issues_list_to_es(items)
-#         else:
-#             self.issues_to_es(items)
-        self.issues_to_es(items)
-
-    def issues_list_to_es(self, items):
-
-        elastic_type = "issues_list"
-
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        total = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        # In this client, we will publish all data in Elastic Search
-        for issue in items:
-            if current >= max_items:
-                task_init = time()
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                total += current
-                current = 0
-                logging.debug("bulk packet sent (%.2f sec, %i total)"
-                              % (time()-task_init, total))
-            data_json = json.dumps(issue)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        task_init = time()
-        total += current
-        self.requests.put(url, data=bulk_json)
-        logging.debug("bulk packet sent (%.2f sec, %i total)"
-                      % (time()-task_init, total))
-
-
-    def issues_to_es(self, items):
-
-        elastic_type = "items"
-
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/' + elastic_type + '/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for issue in items:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-            eitem = self.enrich_issue(issue)
-            if not eitem:
-                continue
-            data_json = json.dumps(eitem)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (eitem[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data=bulk_json)
-
-        logging.debug("Adding issues to ES Done")

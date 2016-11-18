@@ -26,26 +26,18 @@ import json
 import logging
 
 from datetime import datetime
-from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
+
+from .utils import unixtime_to_datetime
 
 class StackExchangeEnrich(Enrich):
 
-    def __init__(self, stackexchange, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = stackexchange
-        self.index_stackexchange = "stackexchange"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
     def get_field_unique_id(self):
         return "question_id"
+
+    def get_field_author(self):
+        return "owner"
 
     def get_elastic_mappings(self):
 
@@ -63,18 +55,36 @@ class StackExchangeEnrich(Enrich):
                 "answer_tags_analyzed": {
                     "type": "string",
                     "index":"analyzed"
+                },
+                "question_tags_custom_analyzed" : {
+                  "type" : "string",
+                  "analyzer" : "comma"
                 }
            }
         } """
 
+        # For ES 5
+        # "question_tags_custom_analyzed_5" : {
+        #   "type" : "string",
+        #   "analyzer" : "comma",
+        #   "fielddata" : "true" }
+
+
         return {"items":mapping}
 
-    def get_sh_identity(self, owner):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
 
-        identity['username'] = owner['display_name']
+        user = item
+        if 'data' in item and type(item) == dict:
+            user = item['data'][identity_field]
+        elif identity_field in item:
+            # for answers
+            user = item[identity_field]
+
+        identity['username'] = user['display_name']
         identity['email'] = None
-        identity['name'] = owner['display_name']
+        identity['name'] = user['display_name']
 
         return identity
 
@@ -94,21 +104,7 @@ class StackExchangeEnrich(Enrich):
                     identities.append(user)
         return identities
 
-    def get_item_sh(self, item, identity_field):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-
-        update_date = datetime.fromtimestamp(item["last_activity_date"])
-
-        # Add Sorting Hat fields
-        if identity_field not in item:
-            return eitem
-        identity  = self.get_sh_identity(item[identity_field])
-        eitem = self.get_item_sh_fields(identity, update_date)
-
-        return eitem
-
+    @metadata
     def get_rich_item(self, item, kind='question', question_tags = None):
         eitem = {}
 
@@ -147,6 +143,7 @@ class StackExchangeEnrich(Enrich):
 
             eitem["question_tags"] = ",".join(question['tags'])
             eitem["question_tags_analyzed"] = ",".join(question['tags'])
+            eitem["question_tags_custom_analyzed"] = ",".join(question['tags'])
 
             # Fields which names are translated
             map_fields = {"title": "question_title"
@@ -154,12 +151,12 @@ class StackExchangeEnrich(Enrich):
             for fn in map_fields:
                 eitem[map_fields[fn]] = question[fn]
 
-            creation_date = datetime.fromtimestamp(question["creation_date"]).isoformat()
+            creation_date = unixtime_to_datetime(question["creation_date"]).isoformat()
             eitem['creation_date'] = creation_date
             eitem.update(self.get_grimoire_fields(creation_date, "question"))
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(question, "owner"))
+                eitem.update(self.get_item_sh(item))
 
         elif kind == 'answer':
             answer = item
@@ -191,18 +188,22 @@ class StackExchangeEnrich(Enrich):
             for fn in map_fields:
                 eitem[map_fields[fn]] = answer[fn]
 
-            creation_date = datetime.fromtimestamp(answer["creation_date"]).isoformat()
+            creation_date = unixtime_to_datetime(answer["creation_date"]).isoformat()
             eitem['creation_date'] = creation_date
             eitem.update(self.get_grimoire_fields(creation_date, "answer"))
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(answer, "owner"))
+                # date field must be the same than in question to share code
+                answer[self.get_field_date()] = eitem['creation_date']
+                eitem[self.get_field_date()] = eitem['creation_date']
+                eitem.update(self.get_item_sh(answer))
 
         return eitem
 
     def enrich_items(self, items):
         max_items = self.elastic.max_items_bulk
         current = 0
+        total = 0
         bulk_json = ""
 
         url = self.elastic.index_url+'/items/_bulk'
@@ -221,6 +222,7 @@ class StackExchangeEnrich(Enrich):
                 (rich_item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
+            total += 1
             # Time to enrich also de answers
             if 'answers' in item['data']:
                 for answer in item['data']['answers']:
@@ -231,5 +233,8 @@ class StackExchangeEnrich(Enrich):
                          rich_answer['answer_id'])
                     bulk_json += data_json +"\n"  # Bulk document
                     current += 1
+                    total += 1
 
         self.requests.put(url, data = bulk_json)
+
+        return total

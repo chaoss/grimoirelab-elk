@@ -27,24 +27,12 @@ import logging
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class SupybotEnrich(Enrich):
 
-    def __init__(self, supybot, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = supybot
-        self.index_supybot = "supybot"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
+    def get_field_author(self):
+        return "nick"
 
     def get_elastic_mappings(self):
 
@@ -68,16 +56,25 @@ class SupybotEnrich(Enrich):
         identities.append(user)
         return identities
 
-    def get_sh_identity(self, nick):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
         identity['username'] = None
         identity['email'] = None
         identity['name'] = None
-        if nick:
-            identity['username'] = nick
-            identity['name'] = nick
+
+        if not item:
+            return identity
+
+        nick = item
+        if 'data' in item and type(item) == dict:
+            nick = item['data'][identity_field]
+
+        identity['username'] = nick
+        identity['name'] = nick
+
         return identity
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 
@@ -108,53 +105,6 @@ class SupybotEnrich(Enrich):
         eitem["channel"] = eitem["origin"]
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, "nick"))
+            eitem.update(self.get_item_sh(item))
 
         return eitem
-
-    def enrich_items(self, items):
-
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-
-            rich_item = self.get_rich_item(item)
-            data_json = json.dumps(rich_item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data = bulk_json)
-
-    def enrich_events(self, items):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            rich_item_reviews = self.get_rich_item_reviews(item)
-            for enrich_review in rich_item_reviews:
-                if current >= max_items:
-                    self.requests.put(url, data=bulk_json)
-                    bulk_json = ""
-                    current = 0
-                data_json = json.dumps(enrich_review)
-                bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                    (enrich_review[self.get_field_unique_id_review()])
-                bulk_json += data_json +"\n"  # Bulk document
-                current += 1
-        self.requests.put(url, data = bulk_json)

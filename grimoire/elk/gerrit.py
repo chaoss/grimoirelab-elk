@@ -30,48 +30,34 @@ import logging
 import time
 
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class GerritEnrich(Enrich):
 
-    def __init__(self, gerrit, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.gerrit = gerrit
-        self.type_name = "items"  # type inside the index to store items enriched
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
+    def get_field_author(self):
+        return "owner"
 
     def get_fields_uuid(self):
         return ["review_uuid", "patchSet_uuid", "approval_uuid"]
 
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
         for field in ['name', 'email', 'username']:
             identity[field] = None
+
+        user = item  # by default a specific user dict is expected
+        if 'data' in item and type(item) == dict:
+            user = item['data'][identity_field]
+
         if 'name' in user: identity['name'] = user['name']
         if 'email' in user: identity['email'] = user['email']
         if 'username' in user: identity['username'] = user['username']
         return identity
 
-    def get_item_project(self, item):
-        """ Get project mapping enrichment field """
-        ds_name = "scr"  # data source name in projects map
-        url = item['origin']
-        repo = url+"_"+item['data']['project']
-        try:
-            project = (self.prjs_map[ds_name][repo])
-        except KeyError:
-            # logging.warning("Project not found for repository %s" % (repo))
-            project = None
-        return {"project": project}
+    def get_project_repository(self, eitem):
+        repo = eitem['origin']
+        repo += "_" + eitem['repository']
+        return repo
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
@@ -157,7 +143,8 @@ class GerritEnrich(Enrich):
         return {"items":mapping}
 
 
-    def review_item(self, item):
+    @metadata
+    def get_rich_item(self, item):
         eitem = {}  # Item enriched
 
         # metadata fields to copy
@@ -211,48 +198,11 @@ class GerritEnrich(Enrich):
         eitem["timeopen"] =  '%.2f' % timeopen
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, "owner"))
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(review['createdOn'], "review"))
 
-        bulk_json = '{"index" : {"_id" : "%s" } }\n' % (eitem[self.get_field_unique_id()])  # Bulk operation
-        bulk_json += json.dumps(eitem)+"\n"
-
-        return bulk_json
-
-
-    def enrich_items(self, items):
-        """ Fetch in ES patches and comments (events) as documents """
-
-        def send_bulk_json(bulk_json, current):
-            url_bulk = self.elastic.index_url+'/'+self.type_name+'/_bulk'
-            try:
-                task_init = time.time()
-                self.requests.put(url_bulk, data=bulk_json)
-                logging.debug("bulk packet sent (%.2f sec, %i items)"
-                              % (time.time()-task_init, current))
-            except UnicodeEncodeError:
-                # Why is requests encoding the POST data as ascii?
-                logging.error("Unicode error for events in review: " + review['id'])
-                safe_json = str(bulk_json.encode('ascii', 'ignore'),'ascii')
-                self.requests.put(url_bulk, data=safe_json)
-                # Continue with execution.
-
-        bulk_json = ""  # json data added in bulk operations
-        total = 0
-        current = 0
-
-        for review in items:
-            if current >= self.elastic.max_items_bulk:
-                send_bulk_json(bulk_json, current)
-                total += current
-                current = 0
-                bulk_json = ""
-            # data_json = self.review_events(review)
-            data_json = self.review_item(review)
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        send_bulk_json(bulk_json, current)
+        return eitem

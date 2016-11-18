@@ -27,27 +27,15 @@ import logging
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 from .utils import get_time_diff_days
 
 
 class KitsuneEnrich(Enrich):
 
-    def __init__(self, jenkins, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = jenkins
-        self.index_jenkins = "jenkins"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
-    def get_field_unique_id(self):
-        return "question_id"
+    def get_field_author(self):
+        return "creator"
 
     def get_elastic_mappings(self):
 
@@ -68,14 +56,21 @@ class KitsuneEnrich(Enrich):
         return {"items":mapping}
 
 
-    def get_sh_identity(self, owner):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
 
-        identity['username'] = owner['username']
+        user = item
+        if 'data' in item and type(item) == dict:
+            user = item['data'][identity_field]
+        elif identity_field in item:
+            # for answers
+            user = item[identity_field]
+
+        identity['username'] = user['username']
         identity['email'] = None
-        identity['name'] = owner['username']
-        if owner['display_name']:
-            identity['name'] = owner['display_name']
+        identity['name'] = user['username']
+        if user['display_name']:
+            identity['name'] = user['display_name']
 
         return identity
 
@@ -90,27 +85,14 @@ class KitsuneEnrich(Enrich):
             if identity in item and item[identity]:
                 user = self.get_sh_identity(item[identity])
                 identities.append(user)
-            if 'answers_date' in item:
-                for answer in item['answers']:
+            if 'answers_data' in item:
+                for answer in item['answers_data']:
                     user = self.get_sh_identity(answer[identity])
                     identities.append(user)
         return identities
 
-    def get_item_sh(self, item, identity_field):
-        """ Add sorting hat enrichment fields for the author of the item """
 
-        eitem = {}  # Item enriched
-
-        update_date = parser.parse(item["updated"])
-
-        # Add Sorting Hat fields
-        if identity_field not in item:
-            return eitem
-        identity  = self.get_sh_identity(item[identity_field])
-        eitem = self.get_item_sh_fields(identity, update_date)
-
-        return eitem
-
+    @metadata
     def get_rich_item(self, item, kind='question'):
         eitem = {}
 
@@ -120,7 +102,7 @@ class KitsuneEnrich(Enrich):
         if kind == 'question':
             eitem['type'] = kind
             # metadata fields to copy
-            copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
+            copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin","offset"]
             for f in copy_fields:
                 if f in item:
                     eitem[f] = item[f]
@@ -168,7 +150,7 @@ class KitsuneEnrich(Enrich):
                 eitem['author'] = question['creator']['display_name']
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(question, "creator"))
+                eitem.update(self.get_item_sh(item))
 
         elif kind == 'answer':
             answer = item
@@ -210,7 +192,10 @@ class KitsuneEnrich(Enrich):
                 eitem['author'] = answer['creator']['display_name']
 
             if self.sortinghat:
-                eitem.update(self.get_item_sh(answer, "creator"))
+                # date field must be the same than in question to share code
+                answer[self.get_field_date()] = answer['updated']
+                eitem[self.get_field_date()] = answer[self.get_field_date()]
+                eitem.update(self.get_item_sh(answer))
 
         return eitem
 
@@ -218,6 +203,7 @@ class KitsuneEnrich(Enrich):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
+        total = 0
 
         url = self.elastic.index_url+'/items/_bulk'
 
@@ -232,9 +218,10 @@ class KitsuneEnrich(Enrich):
             rich_item = self.get_rich_item(item)
             data_json = json.dumps(rich_item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_item[self.get_field_unique_id()])
+                (item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
+            total += 1
             # Time to enrich also de answers
             if 'answers_data' in item['data']:
                 for answer in item['data']['answers_data']:
@@ -245,10 +232,13 @@ class KitsuneEnrich(Enrich):
                         answer['solution'] = 1
                     rich_answer = self.get_rich_item(answer, kind='answer')
                     data_json = json.dumps(rich_answer)
-                    bulk_json += '{"index" : {"_id" : "%i_%i" } }\n' % \
-                        (rich_answer[self.get_field_unique_id()],
+                    bulk_json += '{"index" : {"_id" : "%s_%i" } }\n' % \
+                        (item[self.get_field_unique_id()],
                          rich_answer['answer_id'])
                     bulk_json += data_json +"\n"  # Bulk document
                     current += 1
+                    total += 1
 
         self.requests.put(url, data = bulk_json)
+
+        return total

@@ -28,21 +28,12 @@ import logging
 from dateutil import parser
 import email.utils
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class MBoxEnrich(Enrich):
 
-    def __init__(self, mbox, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = mbox
-        self.index_mbox = "mbox"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
+    def get_field_author(self):
+        return "From"
 
     def get_field_unique_id(self):
         return "ocean-unique-id"
@@ -75,10 +66,14 @@ class MBoxEnrich(Enrich):
                 identities.append(user)
         return identities
 
-    def get_sh_identity(self, from_data):
+    def get_sh_identity(self, item, identity_field=None):
         # "From": "hwalsh at wikiledia.net (Heat Walsh)"
 
         identity = {}
+
+        from_data = item
+        if 'data' in item and type(item) == dict:
+            from_data = item['data'][identity_field]
 
         # First desofuscate the email
         EMAIL_OBFUSCATION_PATTERNS = [' at ', '_at_', ' en ']
@@ -95,24 +90,14 @@ class MBoxEnrich(Enrich):
             identity['name'] = identity['email'].split('@')[0]
         return identity
 
-
-    def get_item_project(self, item):
-        """ Get project mapping enrichment field """
-        # "origin": "dltk-commits"
-        # /mnt/mailman_archives/dltk-dev.mbox/dltk-dev.mbox
-        ds_name = "mls"  # data source name in projects map
-        mls_list = item['origin']
+    def get_project_repository(self, eitem):
+        mls_list = eitem['origin']
         # Eclipse specific yet
-        path = "/mnt/mailman_archives/"
-        path += mls_list+".mbox/"+mls_list+".mbox"
+        repo = "/mnt/mailman_archives/"
+        repo += mls_list+".mbox/"+mls_list+".mbox"
+        return repo
 
-        try:
-            project = (self.prjs_map[ds_name][path])
-        except KeyError:
-            # logging.warning("Project not found for list %s" % (mls_list))
-            project = None
-        return {"project": project}
-
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 
@@ -166,18 +151,29 @@ class MBoxEnrich(Enrich):
             eitem["tz"]  = None
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item,"From"))
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(message['Date'], "message"))
 
         return eitem
 
     def enrich_items(self, items):
+        # Use standard method and if fails, use the old one with Unicode control
+        total = 0
+        try:
+            total = super(MBoxEnrich, self).enrich_items(items)
+        except UnicodeEncodeError:
+            total = self.enrich_items_old(items)
+
+        return total
+
+    def enrich_items_old(self, items):
         max_items = self.elastic.max_items_bulk
         current = 0
+        total = 0
         bulk_json = ""
 
         url = self.elastic.index_url+'/items/_bulk'
@@ -196,6 +192,7 @@ class MBoxEnrich(Enrich):
                 (rich_item[self.get_field_unique_id()])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
+            total += 1
         try:
             self.requests.put(url, data = bulk_json)
         except UnicodeEncodeError:
@@ -203,3 +200,5 @@ class MBoxEnrich(Enrich):
             logging.error("Encoding error ... converting bulk to iso-8859-1")
             bulk_json = bulk_json.encode('iso-8859-1','ignore')
             self.requests.put(url, data=bulk_json)
+
+        return total

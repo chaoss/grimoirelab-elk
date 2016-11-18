@@ -32,6 +32,7 @@ import logging
 import requests
 
 from datetime import datetime
+from grimoire.elk.utils import unixtime_to_datetime
 
 
 class ElasticOcean(object):
@@ -49,11 +50,12 @@ class ElasticOcean(object):
                             help="Host with elastic search and enriched indexes")
 
     def __init__(self, perceval_backend, from_date=None, fetch_cache=False,
-                 project=None, insecure=True):
+                 project=None, insecure=True, offset=None):
 
         self.perceval_backend = perceval_backend
         self.last_update = None  # Last update in ocean items index for feed
         self.from_date = from_date  # fetch from_date
+        self.offset = offset  # fetch from offset
         self.fetch_cache = fetch_cache  # fetch from cache
         self.project = project  # project to be used for this data source
 
@@ -80,6 +82,11 @@ class ElasticOcean(object):
 
         return {"items":mapping}
 
+    def get_elastic_analyzers(self):
+        """ Custom analyzers for our indexes  """
+
+        return None
+
     def get_last_update_from_es(self, _filter = None):
         last_update = self.elastic.get_last_date(self.get_field_date(), _filter)
 
@@ -100,52 +107,72 @@ class ElasticOcean(object):
 
     def add_update_date(self, item):
         """ All item['updated_on'] from perceval is epoch """
-        updated = datetime.fromtimestamp(item['updated_on'])
-        timestamp = datetime.fromtimestamp(item['timestamp'])
+        updated = unixtime_to_datetime(item['updated_on'])
+        timestamp = unixtime_to_datetime(item['timestamp'])
         item['metadata__updated_on'] = updated.isoformat()
         # Also add timestamp used in incremental enrichment
         item['metadata__timestamp'] = timestamp.isoformat()
 
-    def feed(self, from_date=None, offset=None):
+    def feed(self, from_date=None, from_offset=None, category=None):
         """ Feed data in Elastic from Perceval """
 
-        # Always filter by origin to support multi origin indexes
-        filter_ = {"name":"origin",
-                   "value":self.perceval_backend.origin}
-        self.last_update = self.get_last_update_from_es(filter_)
-        last_update = self.last_update
-        # last_update = '2015-12-28 18:02:00'
-        if from_date:
-            # Forced from backend command line.
-            last_update = from_date
-
-        logging.info("Incremental from: %s", last_update)
+        if from_date and from_offset:
+            raise RuntimeError("Can't not feed using from_date and from_offset.")
 
         # Check if backend supports from_date
         signature = inspect.signature(self.perceval_backend.fetch)
 
-        if 'from_date' not in signature.parameters:
-            last_update = None
-            logging.debug("Fetch method does not use 'from_date' parameter")
+
+        last_update = None
+        if 'from_date' in signature.parameters:
+            if from_date:
+                last_update = from_date
+            else:
+                # Always filter by origin to support multi origin indexes
+                filter_ = {"name":"origin",
+                           "value":self.perceval_backend.origin}
+                self.last_update = self.get_last_update_from_es(filter_)
+                last_update = self.last_update
+
+            logging.info("Incremental from: %s", last_update)
+
+        offset = None
+        if 'offset' in signature.parameters:
+            if from_offset:
+                offset = from_offset
+            else:
+                # Always filter by origin to support multi origin indexes
+                filter_ = {"name":"origin",
+                           "value":self.perceval_backend.origin}
+                offset = self.elastic.get_last_offset("offset", filter_)
+
+            logging.info("Incremental from: %i offset", offset)
 
         task_init = datetime.now()
 
         items_pack = []  # to feed item in packs
         drop = 0
+        added = 0
         if self.fetch_cache:
             items = self.perceval_backend.fetch_from_cache()
         else:
-            if last_update and not offset:
+            if last_update:
                 # if offset used for incremental do not use date
                 # Perceval backend from_date must not include timezone
                 # It always uses the server datetime
                 last_update = last_update.replace(tzinfo=None)
-                items = self.perceval_backend.fetch(from_date=last_update)
-            else:
-                if offset:
-                    items = self.perceval_backend.fetch(offset=offset)
+                if category:
+                    items = self.perceval_backend.fetch(from_date=last_update, category=category)
                 else:
-                    items = self.perceval_backend.fetch()
+                    items = self.perceval_backend.fetch(from_date=last_update)
+            elif offset:
+                if category:
+                    items = self.perceval_backend.fetch(offset=offset, category=category)
+                else:
+                    items = self.perceval_backend.fetch(offset=offset)
+            else:
+                items = self.perceval_backend.fetch()
+
         for item in items:
             # print("%s %s" % (item['url'], item['lastUpdated_date']))
             # Add date field for incremental analysis if needed
@@ -158,6 +185,7 @@ class ElasticOcean(object):
                 items_pack = []
             if not self.drop_item(item):
                 items_pack.append(item)
+                added += 1
             else:
                 drop +=1
         self._items_to_es(items_pack)
@@ -165,6 +193,7 @@ class ElasticOcean(object):
 
         total_time_min = (datetime.now()-task_init).total_seconds()/60
 
+        logging.debug("Added %i items to ocean", added)
         logging.debug("Dropped %i items using drop_item filter" % (drop))
         logging.info("Finished in %.2f min" % (total_time_min))
 
@@ -191,7 +220,8 @@ class ElasticOcean(object):
         url = self.elastic.index_url
         # 1 minute to process the results of size items
         # In gerrit enrich with 500 items per page we need >1 min
-        max_process_items_pack_time = "3m"  # 3 minutes
+        # In Mozilla ES in Amazon we need 10m
+        max_process_items_pack_time = "10m"  # 10 minutes
         url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
                                                self.elastic_page)
 
@@ -223,6 +253,13 @@ class ElasticOcean(object):
                         {"%s": {"gte": "%s"}}
                     }
                 ''' % (date_field, from_date)
+            elif self.offset:
+                filters += '''
+                    , {"range":
+                        {"offset": {"gte": %i}}
+                    }
+                ''' % (self.offset)
+
 
             order_field = 'metadata__updated_on'
             order_query = ''
@@ -240,7 +277,7 @@ class ElasticOcean(object):
             }
             """ % (filters, order_query)
 
-            # logging.debug("%s %s", url, query)
+            logging.debug("%s %s", url, query)
 
             r = self.requests.post(url, data=query)
 
@@ -248,8 +285,8 @@ class ElasticOcean(object):
         try:
             rjson = r.json()
         except:
-            logging.warning("No JSON found in %s" % (r.text))
-            logging.warning("No results found from %s" % (url))
+            logging.error("No JSON found in %s" % (r.text))
+            logging.error("No results found from %s" % (url))
 
         if rjson and "_scroll_id" in rjson:
             self.elastic_scroll_id = rjson["_scroll_id"]
@@ -260,7 +297,7 @@ class ElasticOcean(object):
             for hit in rjson["hits"]["hits"]:
                 items.append(hit['_source'])
         else:
-            logging.warning("No results found from %s" % (url))
+            logging.error("No results found from %s" % (url))
 
         return items
 

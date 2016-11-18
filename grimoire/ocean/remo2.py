@@ -24,7 +24,7 @@
 from grimoire.ocean.elastic import ElasticOcean
 
 class ReMoOcean(ElasticOcean):
-    """ReMo Ocean feeder"""
+    """ReMo API v2 Ocean feeder"""
 
     def _fix_item(self, item):
-        item["ocean-unique-id"] = item["data"]["resource_uri"]
+        item["ocean-unique-id"] = item["data"]["remo_url"]

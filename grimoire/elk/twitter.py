@@ -22,23 +22,14 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
-import logging
-
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class TwitterEnrich(Enrich):
 
-    def __init__(self, twitter, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = twitter
-        self.index_twitter = "twitter"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
+    def get_field_author(self):
+        return  "user"
 
     def get_field_date(self):
         return "created_at"
@@ -67,15 +58,15 @@ class TwitterEnrich(Enrich):
 
         return {"items":mapping}
 
-    def get_sh_identity(self, item):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
         identity['username'] = None
         identity['email'] = None
         identity['name'] = None
 
-        if 'user' in item:
-            identity['username'] = item['user']['screen_name']
-            identity['name'] = item['user']['name']
+        if identity_field in item:
+            identity['username'] = item[identity_field]['screen_name']
+            identity['name'] = item[identity_field]['name']
         return identity
 
     def get_identities(self, item):
@@ -87,6 +78,7 @@ class TwitterEnrich(Enrich):
 
         return identities
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 
@@ -139,31 +131,8 @@ class TwitterEnrich(Enrich):
         eitem['user_url_twitter'] = "http://twitter.com/"+tweet['user']['screen_name']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(tweet, "user"))
+            eitem.update(self.get_item_sh(tweet))
 
         eitem.update(self.get_grimoire_fields(tweet["created_at"], "twitter"))
 
         return eitem
-
-    def enrich_items(self, items):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-
-            rich_item = self.get_rich_item(item)
-            data_json = json.dumps(rich_item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data = bulk_json)

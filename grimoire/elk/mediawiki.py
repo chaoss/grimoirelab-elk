@@ -27,24 +27,9 @@ import logging
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class MediaWikiEnrich(Enrich):
-
-    def __init__(self, mediawiki, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = mediawiki
-        self.index_mediawiki = "mediawiki"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
-    def get_field_unique_id(self):
-        return "pageid"
 
     def get_field_unique_id_review(self):
         return "revision_revid"
@@ -75,29 +60,25 @@ class MediaWikiEnrich(Enrich):
             identities.append(user)
         return identities
 
-    def get_sh_identity(self, revision):
+    def get_field_author(self):
+        return 'user'
+
+    def get_sh_identity(self, item, identity_field=None):
+
+        revision = item
+
+        if 'data' in item and type(item) == dict:
+            revision = item['data']['revisions'][0]
+
         identity = {}
         identity['username'] = None
         identity['email'] = None
         identity['name'] = None
-        if 'user' in revision:
-            identity['username'] = revision['user']
-            identity['name'] = revision['user']
+
+        if  identity_field in revision:
+            identity['username'] = revision[identity_field]
+            identity['name'] = revision[identity_field]
         return identity
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-        if not len(item['data']['revisions']) > 0:
-            return eitem
-
-        first_revision = item['data']['revisions'][0]
-
-        identity  = self.get_sh_identity(first_revision)
-        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
-
-        return eitem
 
     def get_review_sh(self, revision, item):
         """ Add sorting hat enrichment fields for the author of the revision """
@@ -158,7 +139,7 @@ class MediaWikiEnrich(Enrich):
 
         return erevisions
 
-
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 
@@ -199,37 +180,18 @@ class MediaWikiEnrich(Enrich):
         return eitem
 
     def enrich_items(self, items):
-
         if True:
-            self.enrich_events(items)
-            return
+            # Hack: by default we use events in MediaWiki
+            return self.enrich_events(items)
+        else:
+            super(MediaWikiEnrich, self).enrich_items(items)
 
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-
-            rich_item = self.get_rich_item(item)
-            data_json = json.dumps(rich_item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data = bulk_json)
 
     def enrich_events(self, items):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
+        total = 0
 
         url = self.elastic.index_url+'/items/_bulk'
 
@@ -247,4 +209,7 @@ class MediaWikiEnrich(Enrich):
                     (enrich_review[self.get_field_unique_id_review()])
                 bulk_json += data_json +"\n"  # Bulk document
                 current += 1
+                total += 1
         self.requests.put(url, data = bulk_json)
+
+        return total

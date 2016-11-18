@@ -22,29 +22,16 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
-import logging
+from dateutil import parser
 
-from datetime import datetime
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
+
 
 class TelegramEnrich(Enrich):
 
-    def __init__(self, telegram, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = telegram
-        self.index_telegram = "telegram"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
+    def get_field_author(self):
+        return "from"
 
     def get_elastic_mappings(self):
 
@@ -60,8 +47,12 @@ class TelegramEnrich(Enrich):
 
         return {"items":mapping}
 
-    def get_sh_identity(self, from_):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
+
+        from_ = item
+        if 'data' in item and type(item) == dict:
+            from_ = item['data']['message'][identity_field]
 
         identity['username'] = from_['username']
         identity['email'] = None
@@ -71,9 +62,11 @@ class TelegramEnrich(Enrich):
         return identity
 
 
-    def get_identities(self, message):
+    def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
+
+        message = item['data']['message']
 
         identity = self.get_sh_identity(message['from'])
 
@@ -81,17 +74,8 @@ class TelegramEnrich(Enrich):
 
         return identities
 
-    def get_item_sh(self, message, field):
-        """ Add sorting hat enrichment fields for the author of the item """
 
-        eitem = {}  # Item enriched
-
-        identity  = self.get_sh_identity(message[field])
-        update = datetime.fromtimestamp(message['date'])
-        eitem = self.get_item_sh_fields(identity, update)
-
-        return eitem
-
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 
@@ -161,31 +145,8 @@ class TelegramEnrich(Enrich):
 
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(message, "from"))
+            eitem.update(self.get_item_sh(item))
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "telegram"))
 
         return eitem
-
-    def enrich_items(self, items):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-
-            rich_item = self.get_rich_item(item)
-            data_json = json.dumps(rich_item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data = bulk_json)

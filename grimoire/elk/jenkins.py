@@ -27,24 +27,9 @@ import logging
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class JenkinsEnrich(Enrich):
-
-    def __init__(self, jenkins, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = jenkins
-        self.index_jenkins = "jenkins"
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
-
-    def get_field_date(self):
-        return "metadata__updated_on"
-
-    def get_field_unique_id(self):
-        return "url"
 
     def get_elastic_mappings(self):
 
@@ -120,6 +105,11 @@ class JenkinsEnrich(Enrich):
 
         return extra_fields
 
+    def get_item_sh_from_id(self, eitem, roles):
+        # No SH support
+        return {}
+
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 
@@ -167,26 +157,3 @@ class JenkinsEnrich(Enrich):
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "job"))
 
         return eitem
-
-    def enrich_items(self, items):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            if current >= max_items:
-                self.requests.put(url, data=bulk_json)
-                bulk_json = ""
-                current = 0
-
-            rich_item = self.get_rich_item(item)
-            data_json = json.dumps(rich_item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
-            current += 1
-        self.requests.put(url, data = bulk_json)

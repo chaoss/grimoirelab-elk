@@ -33,6 +33,10 @@ from time import time, sleep
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+from .utils import unixtime_to_datetime
+
+WAIT_INDEX_CREATION = 2  # number of seconds to wait for index creation
+
 class ElasticConnectException(Exception):
     message = "Can't connect to ElasticSearch"
 
@@ -46,7 +50,8 @@ class ElasticSearch(object):
         """ Return a valid elastic index generated from unique_id """
         return unique_id.replace("/","_").lower()
 
-    def __init__(self, url, index, mappings = None, clean = False, insecure=True):
+    def __init__(self, url, index, mappings = None, clean = False,
+                 insecure=True, analyzers=None):
         ''' clean: remove already existing index
             insecure: support https with invalid certificates
         '''
@@ -71,21 +76,22 @@ class ElasticSearch(object):
 
         if r.status_code != 200:
             # Index does no exists
-            r = self.requests.post(self.index_url)
+            r = self.requests.put(self.index_url)
             if r.status_code != 200:
-                logging.info("Can't create index %s (%s)" %
-                             (self.index_url, r.status_code))
+                logging.error("Can't create index %s (%s)",
+                              self.index_url, r.status_code)
                 raise ElasticWriteException()
             else:
                 logging.info("Created index " + self.index_url)
         else:
             if clean:
                 self.requests.delete(self.index_url)
-                self.requests.post(self.index_url)
+                self.requests.put(self.index_url)
                 logging.info("Deleted and created index " + self.index_url)
+        if analyzers:
+            self.create_custom_analyzers(analyzers)
         if mappings:
             self.create_mappings(mappings)
-
 
     def _safe_put_bulk(self, url, bulk_json):
         """ Bulk PUT controlling unicode issues """
@@ -160,16 +166,34 @@ class ElasticSearch(object):
                 logging.debug("Probably %i item updates" % (total-total_search))
                 break
 
+    def create_custom_analyzers(self, analyzers):
+        # Close the index
+        # Wait until the creation is finished
+        sleep(WAIT_INDEX_CREATION)
+        r = self.requests.post(self.index_url + "/_close")
+        if r.status_code != 200:
+            logging.error("Error closing index %s", r.text)
+        # Add the custom analyzers
+        r = self.requests.put(self.index_url+"/_settings", data=analyzers)
+        if r.status_code != 200:
+            logging.error("Error creating custom analyzers %s", r.text)
+        # Open the index
+        r = self.requests.post(self.index_url + "/_open")
+        if r.status_code != 200:
+            logging.error("Error opening index %s", r.text)
+        logging.debug("Index custom analyzers created")
 
     def create_mappings(self, mappings):
 
         for _type in mappings:
-            # First create the manual mappings
-            url_map = self.index_url + "/"+_type+"/_mapping"
-            r = self.requests.put(url_map, data=mappings[_type])
 
-            if r.status_code != 200:
-                logging.error("Error creating ES mappings %s" % (r.text))
+            url_map = self.index_url + "/"+_type+"/_mapping"
+
+            # First create the manual mappings
+            if mappings[_type] != '{}':
+                r = self.requests.put(url_map, data=mappings[_type])
+                if r.status_code != 200:
+                    logging.error("Error creating ES mappings %s", r.text)
 
             # By default all strings are not analyzed
             not_analyze_strings = """
@@ -201,22 +225,41 @@ class ElasticSearch(object):
             } """
             r = self.requests.put(url_map, data=disable_dynamic)
 
-
-
-
     def get_last_date(self, field, _filter = None):
         '''
             :field: field with the data
             :_filter: additional filter to find the date
         '''
 
-        last_date = None
+        last_date = self.__get_last_item_field(field, _filter=_filter)
+
+        return last_date
+
+    def get_last_offset(self, field, _filter = None):
+        '''
+            :field: field with the data
+            :_filter: additional filter to find the date
+        '''
+
+        offset = self.__get_last_item_field(field, _filter=_filter, offset=True)
+
+        return offset
+
+    def __get_last_item_field(self, field, _filter = None, offset = False):
+        '''
+            :field: field with the data
+            :_filter: additional filter to find the date
+            :offset: Return offset field insted of date field
+        '''
+
+        last_value = None
 
         url = self.index_url
         url += "/_search"
 
         if _filter:
             data_query = '''
+                "size": 0,
                 "query" : {
                     "term" : { "%s" : "%s"  }
                  },
@@ -239,17 +282,19 @@ class ElasticSearch(object):
         { %s  %s
         } ''' % (data_query, data_agg)
 
-        # logging.debug("%s %s" % (url, data_json))
+        logging.debug("%s %s", url, data_json)
         res = self.requests.post(url, data=data_json)
         res_json = res.json()
 
         if 'aggregations' in res_json:
-            if "value_as_string" in res_json["aggregations"]["1"]:
-                last_date = res_json["aggregations"]["1"]["value_as_string"]
-                last_date = parser.parse(last_date)
-            else:
-                last_date = res_json["aggregations"]["1"]["value"]
-                if last_date:
-                    last_date = datetime.fromtimestamp(last_date)
+            last_value = res_json["aggregations"]["1"]["value"]
 
-        return last_date
+            if not offset:
+                if "value_as_string" in res_json["aggregations"]["1"]:
+                    last_value = res_json["aggregations"]["1"]["value_as_string"]
+                    last_value = parser.parse(last_value)
+                else:
+                    last_value = res_json["aggregations"]["1"]["value"]
+                    if last_value:
+                        last_value = unixtime_to_datetime(last_value)
+        return last_value

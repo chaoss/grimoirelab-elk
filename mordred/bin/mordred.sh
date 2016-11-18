@@ -20,6 +20,10 @@ function log_result {
 }
 
 function check_enriched_vars {
+    if [ -z $MEDIAWIKI_ENRICHED_INDEX ]
+        then
+        MEDIAWIKI_ENRICHED_INDEX=$MEDIAWIKI_INDEX"_enriched"
+    fi
     if [ -z $JIRA_ENRICHED_INDEX ]
         then
         JIRA_ENRICHED_INDEX=$JIRA_INDEX"_enriched"
@@ -129,6 +133,11 @@ function check_enabled_vars {
     if [ -z $JIRA_ENABLED ]
         then
         JIRA_ENABLED=0
+    fi
+
+    if [ -z $MEDIAWIKI_ENABLED ]
+        then
+        MEDIAWIKI_ENABLED=0
     fi
 }
 
@@ -403,12 +412,19 @@ function retrieve_data {
         jira_retrieval
         log_result "[jira] Retrieval finished" "[jira] ERROR: Something went wrong with the retrieval"
     fi
+
+    if [ $MEDIAWIKI_ENABLED -eq 1 ]
+        then
+        log "[mediawiki] Retrieving data"
+        mediawiki_retrieval
+        log_result "[mediawiki] Retrieval finished" "[mediawiki] ERROR: Something went wrong with the retrieval"
+    fi
 }
 
 function git_retrieval {
-    REPOS=`get_repo_list source_repo`
+    REPOS=`get_repo_list git`
 
-    nrepos=`get_repo_list source_repo|wc -w`
+    nrepos=`get_repo_list git|wc -w`
     cd ~/GrimoireELK/utils
     counter=0
     for r in $REPOS
@@ -434,7 +450,7 @@ function github_retrieval {
 
 function gerrit_retrieval {
     cd ~/GrimoireELK/utils
-    ./p2o.py -e $ES_URI -g --index $GERRIT_INDEX gerrit --user $GERRIT_USER $GERRIT_EXTRA_PARAM $FROM_DATE_STRING $FROM_DATE $GERRIT_URL >> $LOGS_DIR"/gerrit-collection.log" 2>&1
+    ./p2o.py -e $ES_URI -g --index $GERRIT_INDEX gerrit --user $GERRIT_USER $GERRIT_EXTRA_PARAM $FROM_DATE_STRING $FROM_DATE -- $GERRIT_URL >> $LOGS_DIR"/gerrit-collection.log" 2>&1
 }
 
 function bugzilla_retrieval {
@@ -452,11 +468,14 @@ function supybot_retrieval {
     TMP_SUPYBOT_LIST=`mktemp`
     compose_repo_list $TMP_SUPYBOT_PROJECT_LIST $TMP_SUPYBOT_LIST supybot
     cd ~/GrimoireELK/utils/
+    IFS=$'\n'
     for url in $(cat $TMP_SUPYBOT_LIST);
     do
-        SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
+        SUPYBOT_URL=`echo $url | cut -d \' -f 2`
+        SUPYBOT_PATH=`echo $url | cut -d \' -f 4`
         ./p2o.py -e $ES_URI -g --index $SUPYBOT_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/irc-collection.log" 2>&1
     done
+    unset IFS
     rm $TMP_SUPYBOT_PROJECT_LIST
     rm $TMP_SUPYBOT_LIST
 }
@@ -495,7 +514,7 @@ function stackexchange_retrieval {
         echo "--------------" >> $LOGS_DIR"/stackoverflow-collection.log"
         echo "Retrieval for $t" >> $LOGS_DIR"/stackoverflow-collection.log"
         ORG="$STACKEXCHANGE_URL/$t"
-        ./p2o.py -e $ES_URI -g --index $STACKEXCHANGE_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/stackoverflow-collection.log" 2>&1
+        ./p2o.py -e $ES_URI -g --index $STACKEXCHANGE_INDEX stackexchange --site $STACKEXCHANGE_SITE --tag $ORG --tagged $t --token $STACKEXCHANGE_TOKEN $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/stackoverflow-collection.log" 2>&1
     done
 }
 
@@ -505,8 +524,30 @@ function confluence_retrieval {
 }
 
 function jira_retrieval {
+    REPOS=`get_repo_list jira`
+
+    nrepos=`get_repo_list jira|wc -w`
+    cd ~/GrimoireELK/utils
+    counter=0
+    for r in $REPOS
+    do
+      ROOT_URL=`echo $r|awk -F'/browse/' '{print $1}'`
+      PROJECT=`echo $r|awk -F'/browse/' '{print $2}'`
+      if [ -z "$PROJECT" ]; then
+        ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $ROOT_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+      else
+        ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $ROOT_URL --project $PROJECT $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+      fi
+      counter=$((counter+1))
+      if [ $(( $counter % 100 )) -eq 0 ]; then
+          log_result "[jira]  $counter/$nrepos projects collected"
+      fi
+    done
+}
+
+function mediawiki_retrieval {
     cd ~/GrimoireELK/utils/
-    ./p2o.py -e $ES_URI -g --index $JIRA_INDEX jira $JIRA_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/jira-collection.log" 2>&1
+    ./p2o.py -e $ES_URI -g --index $MEDIAWIKI_INDEX mediawiki $MEDIAWIKI_URL $FROM_DATE_STRING $FROM_DATE >> $LOGS_DIR"/mediawiki-collection.log" 2>&1
 }
 
 function enrich_studies {
@@ -608,6 +649,13 @@ function enrich_data {
         jira_enrichment $1
         log_result "[jira] p2o finished" "[jira] ERROR: Something went wrong with p2o"
     fi
+
+    if [ $MEDIAWIKI_ENABLED -eq 1 ]
+        then
+        log "[mediawiki] Mediawiki p2o starts"
+        mediawiki_enrichment $1
+        log_result "[mediawiki] p2o finished" "[mediawiki] ERROR: Something went wrong with p2o"
+    fi
 }
 
 function git_enrichment {
@@ -618,14 +666,14 @@ function git_enrichment {
         GITHUB_PARAMETER="--github-token $GITHUB_TOKEN"
     fi
 
-    REPOS=`get_repo_list source_repo`
+    REPOS=`get_repo_list git`
 
     if [ $ENR_EXTRA_FLAG == '--only-studies' ]; then
 	# when we execute studies, we want it without going repo by repo
         REPOS="''"
     fi
 
-    nrepos=`get_repo_list source_repo|wc -w`
+    nrepos=`get_repo_list git|wc -w`
     cd ~/GrimoireELK/utils
     counter=0
     for r in $REPOS
@@ -674,11 +722,14 @@ function supybot_enrichment {
     ENR_EXTRA_FLAG=$1
     compose_repo_list $TMP_SUPYBOT_PROJECT_LIST $TMP_SUPYBOT_LIST supybot
     cd ~/GrimoireELK/utils/
+    IFS=$'\n'
     for url in $(cat $TMP_SUPYBOT_LIST);
     do
-        SUPYBOT_URL=`echo $url | cut -d \' -f 2`; SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
+        SUPYBOT_URL=`echo $url | cut -d \' -f 2`
+        SUPYBOT_PATH=`echo $url | cut -d \' -f 4`;
         ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $SUPYBOT_INDEX --index-enrich $SUPYBOT_ENRICHED_INDEX supybot $SUPYBOT_URL $SUPYBOT_PATH >> $LOGS_DIR"/irc-enrichment.log" 2>&1
     done
+    unset IFS
     rm $TMP_SUPYBOT_PROJECT_LIST
     rm $TMP_SUPYBOT_LIST
 }
@@ -724,7 +775,7 @@ function stackexchange_enrichment {
         echo "--------------" >> $LOGS_DIR"/stackoverflow-enrichment.log"
         echo "ENRICHMENT for $t" >> $LOGS_DIR"/stackoverflow-enrichment.log"
         ORG="$STACKEXCHANGE_URL/$t"
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $STACKEXCHANGE_INDEX --index-enrich $STACKEXCHANGE_ENRICHED_INDEX stackexchange --site $STACKEXCHANGE_SITE --origin $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $STACKEXCHANGE_INDEX --index-enrich $STACKEXCHANGE_ENRICHED_INDEX stackexchange --site $STACKEXCHANGE_SITE --tag $ORG --tagged $t --token $STACKEXCHANGE_TOKEN >> $LOGS_DIR"/stackoverflow-enrichment.log" 2>&1
     done
 }
 
@@ -734,8 +785,38 @@ function confluence_enrichment {
 }
 
 function jira_enrichment {
+    ENR_EXTRA_FLAG=$1
+
+    REPOS=`get_repo_list jira`
+    nrepos=`get_repo_list jira|wc -w`
+    cd ~/GrimoireELK/utils
+    counter=0
+    for r in $REPOS
+    do
+        ROOT_URL=`echo $r|awk -F'/browse/' '{print $1}'`
+        PROJECT=`echo $r|awk -F'/browse/' '{print $2}'`
+        if [ -z "$PROJECT" ]; then
+          ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $ROOT_URL >> $LOGS_DIR"/jira-enrichment.log" 2>&1
+        else
+          ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $ROOT_URL --project $PROJECT >> $LOGS_DIR"/jira-enrichment.log" 2>&1
+        fi
+        counter=$((counter+1))
+        if [ $(( $counter % 100 )) -eq 0 ]; then
+            log_result "[jira]  $counter/$nrepos projects enriched"
+        fi
+    done
+
+
+
+
+
     cd ~/GrimoireELK/utils/
     ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $JIRA_INDEX --index-enrich $JIRA_ENRICHED_INDEX jira $JIRA_URL >> $LOGS_DIR"/jira-enrichment.log" 2>&1
+}
+
+function mediawiki_enrichment {
+    cd ~/GrimoireELK/utils/
+    ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $MEDIAWIKI_INDEX --index-enrich $MEDIAWIKI_ENRICHED_INDEX mediawiki $MEDIAWIKI_URL >> $LOGS_DIR"/mediawiki-enrichment.log" 2>&1
 }
 
 function sortinghat_unify {

@@ -33,7 +33,9 @@ from datetime import datetime
 if not '..' in sys.path:
     sys.path.insert(0, '..')
 
+from grimoire.arthur import load_identities
 from grimoire.utils import get_connectors, get_elastic
+
 
 CONFIG_FILE = 'tests.conf'
 NUMBER_BACKENDS = 20
@@ -136,15 +138,16 @@ class TestBackends(unittest.TestCase):
             ocean_backend.set_elastic(elastic_ocean)
             clean = True
             if not sortinghat and not projects:
-                enrich_backend = connectors[con][2](perceval_backend)
+                enrich_backend = connectors[con][2]()
             elif sortinghat and not projects:
-                enrich_backend = connectors[con][2](perceval_backend,
-                                                    db_sortinghat=DB_SORTINGHAT)
+                enrich_backend = connectors[con][2](db_sortinghat=DB_SORTINGHAT)
             elif not sortinghat and projects:
-                enrich_backend = connectors[con][2](perceval_backend,
-                                                    db_projects_map=DB_PROJECTS)
+                enrich_backend = connectors[con][2](db_projects_map=DB_PROJECTS)
             elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
             enrich_backend.set_elastic(elastic_enrich)
+            if sortinghat:
+                # Load SH identities
+                load_identities(ocean_backend, enrich_backend)
             enrich_count = self.__enrich_items(ocean_backend, enrich_backend)
             logging.info("Total items enriched %i ", enrich_count)
 
@@ -158,7 +161,67 @@ class TestBackends(unittest.TestCase):
 
         self.test_enrich(projects=True)
 
+    def __refresh_identities(self, enrich_backend):
+        total = 0
+
+        for eitem in enrich_backend.fetch():
+            roles = None
+            try:
+                roles = enrich_backend.roles
+            except AttributeError:
+                pass
+            new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
+            eitem.update(new_identities)
+            total += 1
+        logging.info("Identities refreshed for %i eitems", total)
+
+    def test_refresh_identities(self):
+        """Test refresh identities for all sources"""
+        # self.test_enrich_sh() # Load the identities in ES
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE)
+        es_con = dict(config.items('ElasticSearch'))['url']
+        logging.info("Refreshing data in: %s", es_con)
+        connectors = get_connectors()
+        for con in sorted(connectors.keys()):
+            enrich_index = "test_"+con+"_enrich"
+            enrich_backend = connectors[con][2](db_sortinghat=DB_SORTINGHAT)
+            clean = False
+            elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
+            enrich_backend.set_elastic(elastic_enrich)
+            logging.info("Refreshing identities fields in enriched index %s", elastic_enrich.index_url)
+            self.__refresh_identities(enrich_backend)
+
+    def __refresh_projects(self, enrich_backend):
+        total = 0
+
+        for eitem in enrich_backend.fetch():
+            new_project = enrich_backend.get_item_project(eitem)
+            eitem.update(new_project)
+            total += 1
+
+        logging.info("Project refreshed for %i eitems", total)
+
+    def test_refresh_project(self):
+        """Test refresh project field for all sources"""
+        # self.test_enrich_sh() # Load the identities in ES
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE)
+        es_con = dict(config.items('ElasticSearch'))['url']
+        logging.info("Refreshing data in: %s", es_con)
+        connectors = get_connectors()
+        for con in sorted(connectors.keys()):
+            enrich_index = "test_"+con+"_enrich"
+            enrich_backend = connectors[con][2](db_projects_map=DB_PROJECTS)
+            clean = False
+            elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
+            enrich_backend.set_elastic(elastic_enrich)
+            logging.info("Refreshing projects fields in enriched index %s", elastic_enrich.index_url)
+            self.__refresh_projects(enrich_backend)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("requests").setLevel(logging.WARNING)
     unittest.main()
