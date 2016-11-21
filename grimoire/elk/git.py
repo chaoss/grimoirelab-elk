@@ -24,6 +24,7 @@
 
 import json
 import logging
+import re
 import time
 
 import requests
@@ -96,7 +97,8 @@ class GitEnrich(Enrich):
             """ Add a new github identity to SH if it does not exists """
             github_repo = None
             if GITHUB in item['origin']:
-                github_repo = item['origin'].replace(GITHUB,'').replace('.git','')
+                github_repo = item['origin'].replace(GITHUB,'')
+                github_repo = re.sub('.git$', '', github_repo)
             if not github_repo:
                 return
 
@@ -289,7 +291,8 @@ class GitEnrich(Enrich):
 
         # If it is a github repo, include just the repo string
         if GITHUB in item['origin']:
-            eitem['github_repo'] = item['origin'].replace(GITHUB,'').replace('.git','')
+            eitem['github_repo'] = item['origin'].replace(GITHUB,'')
+            eitem['github_repo'] = re.sub('.git$', '', eitem['github_repo'])
             eitem["url_id"] = eitem['github_repo']+"/commit/"+eitem['hash']
 
         if 'project' in item:
