@@ -29,12 +29,6 @@ from grimoire.elk.enrich import Enrich
 
 class MozillaClubEnrich(Enrich):
 
-    def __init__(self, mozillaclub, db_sortinghat=None, db_projects_map = None):
-        super().__init__(db_sortinghat, db_projects_map)
-        self.elastic = None
-        self.perceval_backend = mozillaclub
-        self.index_mozillaclub = "mozillaclub"
-
     def set_elastic(self, elastic):
         self.elastic = elastic
 
@@ -111,7 +105,7 @@ class MozillaClubEnrich(Enrich):
 
         # Transform numeric fields
         eitem['Attendance'] = int(eitem['Attendance'])
-        
+
         if self.sortinghat:
             eitem.update(self.get_item_sh(item,"Your Name"))
 
