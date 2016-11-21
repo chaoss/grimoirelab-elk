@@ -328,8 +328,11 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental):
 
     return ocean_backend
 
-def do_studies(enrich_backend):
-    last_enrich = get_last_enrich(None, enrich_backend)
+def do_studies(enrich_backend, no_incremental=False):
+    if no_incremental:
+        last_enrich = None
+    else:
+        last_enrich = get_last_enrich(None, enrich_backend)
 
     try:
         for study in enrich_backend.studies:
@@ -396,7 +399,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
         if only_studies:
             logging.info("Running only studies (no SH and no enrichment)")
-            do_studies(enrich_backend)
+            do_studies(enrich_backend, no_incremental)
         elif do_refresh_projects:
             logging.info("Refreshing project field in enriched index")
             field_id = enrich_backend.get_field_unique_id()
