@@ -95,7 +95,10 @@ class RedmineEnrich(Enrich):
         ticket = item['data']
 
         # data fields to copy
-        copy_fields = ["subject","description","created_on","updated_on"]
+        copy_fields = ["subject","description","updated_on",
+                       "due_date", "estimated_hours", "done_ratio",
+                       "id", "spent_hours", "start_date", "subject",
+                       "last_update"]
         for f in copy_fields:
             if f in ticket:
                 eitem[f] = ticket[f]
@@ -103,27 +106,40 @@ class RedmineEnrich(Enrich):
                 eitem[f] = None
         eitem['description_analyzed'] = eitem['description']
         # Fields which names are translated
-        map_fields = {}
+        map_fields = {"due_date": "estimated_closing_date",
+                      "created_on":"creation_date",
+                      "closed_on": "closing_date"}
         for fn in map_fields:
-            eitem[map_fields[fn]] = ticket[fn]
+            if fn in ticket:
+                eitem[map_fields[fn]] = ticket[fn]
+        # Common format
+        common = ['category', 'fixed_version', 'priority', 'project', 'status',
+                  'tracker', 'author', 'assigned_to']
+        for f in common:
+            if f+"_id" in ticket:
+                eitem[f+'_id'] = ticket[f]['id']
+                eitem[f+'_name'] = ticket[f]['name']
 
-        # People
-        eitem['author_id'] = ticket['author']['id']
-        eitem['author_name'] = ticket['author']['name']
-        if 'assigned_to' in ticket:
-            eitem['assigned_to_id'] = ticket['assigned_to']['id']
-            eitem['assigned_to_name'] = ticket['assigned_to']['name']
+        len_fields = ['attachments', 'changesets', 'journals', 'relations']
+        for f in len_fields:
+            if f in ticket:
+                eitem[f] = len(ticket[f])
 
+        if 'parent' in ticket:
+            eitem['parent_id'] = ticket['parent']['id']
 
         # Time to
-        eitem['resolution_days'] = \
-            get_time_diff_days(eitem['created_on'], eitem['updated_on'])
-        eitem['timeopen_days'] = \
-            get_time_diff_days(eitem['created_on'], datetime.utcnow())
+        if "closed_on" in eitem:
+            eitem['timeopen_days'] = \
+                get_time_diff_days(eitem['creation_date'], eitem['closing_date'])
+            eitem['timeworking_days'] = \
+                get_time_diff_days(eitem['start_date'], eitem['closing_date'])
+        else:
+            eitem['timeopen_days'] = \
+                get_time_diff_days(eitem['creation_date'], datetime.utcnow())
+            eitem['timeworking_days'] = \
+                get_time_diff_days(eitem['start_date'], datetime.utcnow())
 
-        # Enrich dates
-        eitem["created_on"] = parser.parse(eitem["created_on"]).isoformat()
-        eitem["updated_on"] = parser.parse(eitem["updated_on"]).isoformat()
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "job"))
 
