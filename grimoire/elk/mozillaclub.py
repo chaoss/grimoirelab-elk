@@ -75,17 +75,16 @@ class MozillaClubEnrich(Enrich):
 
         identities = []
 
-        item = item['data']
-        identities.append(self.get_sh_identity(item["Your Name"]))
+        identities.append(self.get_sh_identity(item, self.get_field_author()))
 
         return identities
 
-    def get_sh_identity(self, owner_name):
+    def get_sh_identity(self, item, identity_field):
         identity = {}
 
-        identity['username'] = owner_name
+        identity['username'] = item['data'][identity_field]
         identity['email'] = None
-        identity['name'] = owner_name
+        identity['name'] = item['data'][identity_field]
 
         return identity
 
