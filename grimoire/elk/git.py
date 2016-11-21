@@ -41,6 +41,7 @@ except ImportError:
 
 GITHUB = 'https://github.com/'
 SH_GIT_COMMIT = 'github-commit'
+DEMOGRAPHY_COMMIT_MIN_DATE='1980-01-01'
 
 class GitEnrich(Enrich):
 
@@ -313,24 +314,32 @@ class GitEnrich(Enrich):
         if from_date:
             logging.debug("Demography since: %s" % (from_date))
 
-        query = ''
+        date_field = self.get_field_date()
+
+        # Don't use commits before DEMOGRAPHY_COMMIT_MIN_DATE
+        filters = '''
+        {"range":
+            {"%s": {"gte": "%s"}}
+        }
+        ''' % (date_field, DEMOGRAPHY_COMMIT_MIN_DATE)
+
         if from_date:
-            date_field = self.get_field_date()
             from_date = from_date.isoformat()
 
-            filters = '''
+            filters += '''
+            ,
             {"range":
                 {"%s": {"gte": "%s"}}
             }
             ''' % (date_field, from_date)
 
-            query = """
-            "query": {
-                "bool": {
-                    "must": [%s]
-                }
-            },
-            """ % (filters)
+        query = """
+        "query": {
+            "bool": {
+                "must": [%s]
+            }
+        },
+        """ % (filters)
 
 
         # First, get the min and max commit date for all the authors
