@@ -61,8 +61,15 @@ class DiscourseEnrich(Enrich):
     @metadata
     def get_rich_item(self, item):
         eitem = {}
-        eitem["metadata__updated_on"] = item["metadata__updated_on"]
-        eitem["ocean-unique-id"] = item["ocean-unique-id"]
+
+        copy_fields = ["metadata__updated_on", "metadata__timestamp",
+                       "ocean-unique-id", "origin"]
+        for f in copy_fields:
+            if f in item:
+                eitem[f] = item[f]
+            else:
+                eitem[f] = None
+
         topic = item['data']
 
         # Fields that are the same in item and eitem
