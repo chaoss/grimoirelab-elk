@@ -32,6 +32,9 @@ class MozillaClubEnrich(Enrich):
     def set_elastic(self, elastic):
         self.elastic = elastic
 
+    def get_field_author(self):
+        return "Your Name"
+
     def get_field_date(self):
         return "metadata__updated_on"
 
