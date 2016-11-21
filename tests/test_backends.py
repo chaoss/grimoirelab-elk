@@ -71,6 +71,9 @@ class TestBackends(unittest.TestCase):
         if 'updated_on' in item:
             updated = datetime.fromtimestamp(item['updated_on'])
             item['metadata__updated_on'] = updated.isoformat()
+        if 'timestamp' in item:
+            ts = datetime.fromtimestamp(item['timestamp'])
+            item['metadata__timestamp'] = ts.isoformat()
         return item
 
     def __data2es(self, items, ocean):
