@@ -175,8 +175,8 @@ class ReMoEnrich(Enrich):
             eitem['mentor'] = activity['mentor']['first_name']+" "+activity['mentor']['last_name']
 
         # geolocation
-        if -90<int(eitem['lat'])<90 and \
-            -180<int(eitem['lon'])<180:
+        if -90<int(eitem['latitude'])<90 and \
+            -180<int(eitem['longitude'])<180:
             eitem['geolocation'] = {
                 "lat": eitem['latitude'],
                 "lon": eitem['longitude'],
