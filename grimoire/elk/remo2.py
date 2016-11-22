@@ -51,7 +51,11 @@ class ReMoEnrich(Enrich):
                 },
                 "functional_areas": {
                   "type": "string",
-                  "index":"analyzed"
+                  "analyzer": "comma"
+                  },
+                "categories": {
+                  "type": "string",
+                  "analyzer": "comma"
                   }
            }
         } """
@@ -227,6 +231,11 @@ class ReMoEnrich(Enrich):
             "lat": eitem['lat'],
             "lon": eitem['lon'],
         }
+
+        eitem['categories'] = ''
+        for cat in event['categories']:
+            eitem['categories'] += "," + cat['name']
+        eitem['categories'] = eitem['categories'][1:]  # remove first comma
 
         if self.sortinghat:
             self.author = 'owner'
