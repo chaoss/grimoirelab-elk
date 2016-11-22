@@ -138,7 +138,8 @@ class ReMoEnrich(Enrich):
 
         eitem = {}
 
-        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin","offset"]
+        copy_fields = ["metadata__updated_on", "metadata__timestamp",
+                       "ocean-unique-id", "origin", "offset"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]
@@ -174,10 +175,12 @@ class ReMoEnrich(Enrich):
             eitem['mentor'] = activity['mentor']['first_name']+" "+activity['mentor']['last_name']
 
         # geolocation
-        eitem['geolocation'] = {
-            "lat": eitem['latitude'],
-            "lon": eitem['longitude'],
-        }
+        if -90<int(eitem['lat'])<90 and \
+            -180<int(eitem['lon'])<180:
+            eitem['geolocation'] = {
+                "lat": eitem['latitude'],
+                "lon": eitem['longitude'],
+            }
 
         eitem['functional_areas'] = ''
         for area in eitem['functional_areas']:
