@@ -31,3 +31,16 @@ class GitHubOcean(ElasticOcean):
 
     def _fix_item(self, item):
         item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
+
+    @classmethod
+    def get_perceval_params_from_url(cls, url):
+        """ Get the perceval params given a URL for the data source """
+        params = []
+
+        owner = url.split('/')[-2]
+        repo = url.split('/')[-1]
+        params.append('--owner')
+        params.append(owner)
+        params.append('--repository')
+        params.append(repo)
+        return params

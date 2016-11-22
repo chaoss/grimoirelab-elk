@@ -31,3 +31,19 @@ class StackExchangeOcean(ElasticOcean):
 
     def _fix_item(self, item):
         item["ocean-unique-id"] = str(item["data"]["question_id"])+"_"+item['origin']
+
+    @classmethod
+    def get_perceval_params_from_url(cls, url):
+        params = []
+
+        tokens = url.replace('https://','').replace('http://','').split('/')
+        tag = tokens[-1]
+        site = tokens[0]
+        params.append('--site')
+        params.append(site)
+        params.append('--tagged')
+        params.append(tag)
+        params.append('--tag') #this is the origin we record in our DB
+        params.append(url)
+
+        return params

@@ -97,6 +97,11 @@ class ElasticOcean(object):
         from ..utils import get_connector_name
         return get_connector_name(type(self))
 
+    @classmethod
+    def get_perceval_params_from_url(cls, url):
+        """ Get the perceval params given a URL for the data source """
+        return [url]
+
     def drop_item(self, item):
         """ Drop items not to be inserted in Elastic """
         return False
