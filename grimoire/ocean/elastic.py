@@ -151,7 +151,10 @@ class ElasticOcean(object):
                            "value":self.perceval_backend.origin}
                 offset = self.elastic.get_last_offset("offset", filter_)
 
-            logging.info("Incremental from: %i offset", offset)
+            if offset:
+                logging.info("Incremental from: %i offset", offset)
+            else:
+                logging.info("Not incremental")
 
         task_init = datetime.now()
 
