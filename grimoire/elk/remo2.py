@@ -227,10 +227,12 @@ class ReMoEnrich(Enrich):
             eitem['owner'] = event['owner']['display_name']
 
         # geolocation
-        eitem['geolocation'] = {
-            "lat": eitem['lat'],
-            "lon": eitem['lon'],
-        }
+        if -90<int(eitem['lat'])<90 and \
+            -180<int(eitem['lon'])<180:
+            eitem['geolocation'] = {
+                "lat": eitem['lat'],
+                "lon": eitem['lon'],
+            }
 
         eitem['categories'] = ''
         for cat in event['categories']:
