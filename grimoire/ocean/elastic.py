@@ -127,7 +127,6 @@ class ElasticOcean(object):
         # Check if backend supports from_date
         signature = inspect.signature(self.perceval_backend.fetch)
 
-
         last_update = None
         if 'from_date' in signature.parameters:
             if from_date:
@@ -179,7 +178,10 @@ class ElasticOcean(object):
                 else:
                     items = self.perceval_backend.fetch(offset=offset)
             else:
-                items = self.perceval_backend.fetch()
+                if category:
+                    items = self.perceval_backend.fetch(category=category)
+                else:
+                    items = self.perceval_backend.fetch()
 
         for item in items:
             # print("%s %s" % (item['url'], item['lastUpdated_date']))
