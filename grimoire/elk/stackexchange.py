@@ -179,7 +179,8 @@ class StackExchangeEnrich(Enrich):
 
             eitem["question_tags"] = question_tags
             eitem["question_tags_analyzed"] = question_tags
-            eitem["answer_tags"] = ",".join(answer['tags'])
+            if 'tags' in answer:
+                eitem["answer_tags"] = ",".join(answer['tags'])
             eitem["answer_tags_analyzed"] = ",".join(answer['tags'])
 
             # Fields which names are translated
