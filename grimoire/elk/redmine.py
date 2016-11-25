@@ -116,7 +116,7 @@ class RedmineEnrich(Enrich):
         common = ['category', 'fixed_version', 'priority', 'project', 'status',
                   'tracker', 'author', 'assigned_to']
         for f in common:
-            if f+"_id" in ticket:
+            if f in ticket:
                 eitem[f+'_id'] = ticket[f]['id']
                 eitem[f+'_name'] = ticket[f]['name']
 
