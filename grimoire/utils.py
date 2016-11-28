@@ -74,25 +74,25 @@ from grimoire.elk.telegram import TelegramEnrich
 from grimoire.elk.twitter import TwitterEnrich
 
 # Connectors for Perceval
-from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
-from perceval.backends.bugzillarest import BugzillaREST, BugzillaRESTCommand
-from perceval.backends.discourse import Discourse, DiscourseCommand
-from perceval.backends.confluence import Confluence, ConfluenceCommand
-from perceval.backends.gerrit import Gerrit, GerritCommand
-from perceval.backends.git import Git, GitCommand
-from perceval.backends.github import GitHub, GitHubCommand
-from perceval.backends.gmane import Gmane, GmaneCommand
-from perceval.backends.jenkins import Jenkins, JenkinsCommand
-from perceval.backends.jira import Jira, JiraCommand
-from perceval.backends.kitsune import Kitsune, KitsuneCommand
-from perceval.backends.mbox import MBox, MBoxCommand
-from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
-from perceval.backends.phabricator import Phabricator, PhabricatorCommand
-from perceval.backends.pipermail import Pipermail, PipermailCommand
-from perceval.backends.remo2 import ReMo, ReMoCommand
-from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
-from perceval.backends.supybot import Supybot, SupybotCommand
-from perceval.backends.telegram import Telegram, TelegramCommand
+from perceval.backends.core.bugzilla import Bugzilla, BugzillaCommand
+from perceval.backends.core.bugzillarest import BugzillaREST, BugzillaRESTCommand
+from perceval.backends.core.discourse import Discourse, DiscourseCommand
+from perceval.backends.core.confluence import Confluence, ConfluenceCommand
+from perceval.backends.core.gerrit import Gerrit, GerritCommand
+from perceval.backends.core.git import Git, GitCommand
+from perceval.backends.core.github import GitHub, GitHubCommand
+from perceval.backends.core.gmane import Gmane, GmaneCommand
+from perceval.backends.core.jenkins import Jenkins, JenkinsCommand
+from perceval.backends.core.jira import Jira, JiraCommand
+from perceval.backends.mozilla.kitsune import Kitsune, KitsuneCommand
+from perceval.backends.core.mbox import MBox, MBoxCommand
+from perceval.backends.core.mediawiki import MediaWiki, MediaWikiCommand
+from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
+from perceval.backends.core.pipermail import Pipermail, PipermailCommand
+from perceval.backends.mozilla.remo import ReMo, ReMoCommand
+from perceval.backends.core.stackexchange import StackExchange, StackExchangeCommand
+from perceval.backends.core.supybot import Supybot, SupybotCommand
+from perceval.backends.core.telegram import Telegram, TelegramCommand
 
 
 from grimoire.elk.elastic import ElasticSearch
