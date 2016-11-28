@@ -31,6 +31,7 @@ import sys
 from grimoire.ocean.elastic import ElasticOcean
 
 # Connectors for Ocean
+from grimoire.ocean.askbot import AskbotOcean
 from grimoire.ocean.bugzilla import BugzillaOcean
 from grimoire.ocean.bugzillarest import BugzillaRESTOcean
 from grimoire.ocean.confluence import ConfluenceOcean
@@ -52,6 +53,7 @@ from grimoire.ocean.twitter import TwitterOcean
 
 
 # Connectors for EnrichOcean
+from grimoire.elk.askbot import AskbotEnrich
 from grimoire.elk.bugzilla import BugzillaEnrich
 from grimoire.elk.bugzillarest import BugzillaRESTEnrich
 from grimoire.elk.confluence import ConfluenceEnrich
@@ -74,6 +76,7 @@ from grimoire.elk.telegram import TelegramEnrich
 from grimoire.elk.twitter import TwitterEnrich
 
 # Connectors for Perceval
+from perceval.backends.core.askbot import Askbot, AskbotCommand
 from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
 from perceval.backends.bugzillarest import BugzillaREST, BugzillaRESTCommand
 from perceval.backends.discourse import Discourse, DiscourseCommand
@@ -125,7 +128,8 @@ def get_connector_name(cls):
 
 def get_connectors():
 
-    return {"bugzilla":[Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
+    return {"askbot":[Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
+            "bugzilla":[Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
             "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
             "confluence":[Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
             "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
