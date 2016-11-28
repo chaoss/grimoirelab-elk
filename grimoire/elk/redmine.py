@@ -128,8 +128,10 @@ class RedmineEnrich(Enrich):
         if 'parent' in ticket:
             eitem['parent_id'] = ticket['parent']['id']
 
+        eitem['url'] = eitem['origin']+"/issues/"+str(eitem['id'])
+
         # Time to
-        if "closed_on" in eitem:
+        if "closing_date" in eitem:
             eitem['timeopen_days'] = \
                 get_time_diff_days(eitem['creation_date'], eitem['closing_date'])
             eitem['timeworking_days'] = \
