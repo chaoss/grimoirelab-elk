@@ -44,6 +44,7 @@ from grimoire.ocean.kitsune import KitsuneOcean
 from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
 from grimoire.ocean.phabricator import PhabricatorOcean
+from grimoire.ocean.redmine import RedmineOcean
 from grimoire.ocean.remo2 import ReMoOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.supybot import SupybotOcean
@@ -66,6 +67,8 @@ from grimoire.elk.kitsune import KitsuneEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
 from grimoire.elk.phabricator import PhabricatorEnrich
+from grimoire.elk.redmine import RedmineEnrich
+# from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.remo2 import ReMoEnrich
 from grimoire.elk.pipermail import PipermailEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
@@ -89,6 +92,8 @@ from perceval.backends.mbox import MBox, MBoxCommand
 from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
 from perceval.backends.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.pipermail import Pipermail, PipermailCommand
+from perceval.backends.redmine import Redmine, RedmineCommand
+# from perceval.backends.remo import ReMo, ReMoCommand
 from perceval.backends.remo2 import ReMo, ReMoCommand
 from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
 from perceval.backends.supybot import Supybot, SupybotCommand
@@ -141,6 +146,7 @@ def get_connectors():
             "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
             "pipermail":[Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
+            "redmine":[Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
