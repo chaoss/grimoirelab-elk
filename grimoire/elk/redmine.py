@@ -61,6 +61,9 @@ class RedmineEnrich(Enrich):
 
         return identities
 
+    def get_field_author(self):
+        return "author"
+
     def get_sh_identity(self, data, rol):
         identity = {}
         identity['email'] = None
