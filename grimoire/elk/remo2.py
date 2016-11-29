@@ -51,7 +51,11 @@ class ReMoEnrich(Enrich):
                 },
                 "functional_areas": {
                   "type": "string",
-                  "index":"analyzed"
+                  "analyzer": "comma"
+                  },
+                "categories": {
+                  "type": "string",
+                  "analyzer": "comma"
                   }
            }
         } """
@@ -134,7 +138,8 @@ class ReMoEnrich(Enrich):
 
         eitem = {}
 
-        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin","offset"]
+        copy_fields = ["metadata__updated_on", "metadata__timestamp",
+                       "ocean-unique-id", "origin", "offset"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]
@@ -170,10 +175,12 @@ class ReMoEnrich(Enrich):
             eitem['mentor'] = activity['mentor']['first_name']+" "+activity['mentor']['last_name']
 
         # geolocation
-        eitem['geolocation'] = {
-            "lat": eitem['latitude'],
-            "lon": eitem['longitude'],
-        }
+        if -90<int(eitem['latitude'])<90 and \
+            -180<int(eitem['longitude'])<180:
+            eitem['geolocation'] = {
+                "lat": eitem['latitude'],
+                "lon": eitem['longitude'],
+            }
 
         eitem['functional_areas'] = ''
         for area in eitem['functional_areas']:
@@ -223,10 +230,17 @@ class ReMoEnrich(Enrich):
             eitem['owner'] = event['owner']['display_name']
 
         # geolocation
-        eitem['geolocation'] = {
-            "lat": eitem['lat'],
-            "lon": eitem['lon'],
-        }
+        if -90<int(eitem['lat'])<90 and \
+            -180<int(eitem['lon'])<180:
+            eitem['geolocation'] = {
+                "lat": eitem['lat'],
+                "lon": eitem['lon'],
+            }
+
+        eitem['categories'] = ''
+        for cat in event['categories']:
+            eitem['categories'] += "," + cat['name']
+        eitem['categories'] = eitem['categories'][1:]  # remove first comma
 
         if self.sortinghat:
             self.author = 'owner'

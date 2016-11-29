@@ -49,7 +49,7 @@ class DiscourseEnrich(Enrich):
 
         user = item  # by default a specific user dict is expected
         if 'data' in item and type(item) == dict:
-            user = item['data']['details']['participants'][identity_field]
+            user = item['data']['details'][identity_field]
         identity['username'] = user['username']
         identity['email'] = None
         identity['name'] = user['username']
@@ -58,11 +58,28 @@ class DiscourseEnrich(Enrich):
     def get_field_author(self):
         return 'created_by'
 
+    def get_users_data(self, item):
+        """ If user fields are inside the global item dict """
+        if 'data' in item:
+            users_data = item['data']['details']
+        else:
+            # the item is directly the data (kitsune answer)
+            users_data = item
+
+        return users_data
+
     @metadata
     def get_rich_item(self, item):
         eitem = {}
-        eitem["metadata__updated_on"] = item["metadata__updated_on"]
-        eitem["ocean-unique-id"] = item["ocean-unique-id"]
+
+        copy_fields = ["metadata__updated_on", "metadata__timestamp",
+                       "ocean-unique-id", "origin"]
+        for f in copy_fields:
+            if f in item:
+                eitem[f] = item[f]
+            else:
+                eitem[f] = None
+
         topic = item['data']
 
         # Fields that are the same in item and eitem

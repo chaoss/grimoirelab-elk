@@ -33,12 +33,12 @@ from datetime import datetime
 if not '..' in sys.path:
     sys.path.insert(0, '..')
 
-from grimoire.arthur import enrich_sortinghat
+from grimoire.arthur import load_identities
 from grimoire.utils import get_connectors, get_elastic
 
 
 CONFIG_FILE = 'tests.conf'
-NUMBER_BACKENDS = 20
+NUMBER_BACKENDS = 21
 DB_SORTINGHAT = "test_sh"
 DB_PROJECTS = "test_projects"
 
@@ -71,6 +71,9 @@ class TestBackends(unittest.TestCase):
         if 'updated_on' in item:
             updated = datetime.fromtimestamp(item['updated_on'])
             item['metadata__updated_on'] = updated.isoformat()
+        if 'timestamp' in item:
+            ts = datetime.fromtimestamp(item['timestamp'])
+            item['metadata__timestamp'] = ts.isoformat()
         return item
 
     def __data2es(self, items, ocean):
@@ -147,7 +150,7 @@ class TestBackends(unittest.TestCase):
             enrich_backend.set_elastic(elastic_enrich)
             if sortinghat:
                 # Load SH identities
-                enrich_sortinghat(ocean_backend, enrich_backend)
+                load_identities(ocean_backend, enrich_backend)
             enrich_count = self.__enrich_items(ocean_backend, enrich_backend)
             logging.info("Total items enriched %i ", enrich_count)
 

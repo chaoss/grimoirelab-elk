@@ -24,6 +24,7 @@
 
 import json
 import logging
+import re
 import time
 
 import requests
@@ -40,6 +41,7 @@ except ImportError:
 
 GITHUB = 'https://github.com/'
 SH_GIT_COMMIT = 'github-commit'
+DEMOGRAPHY_COMMIT_MIN_DATE='1980-01-01'
 
 class GitEnrich(Enrich):
 
@@ -96,7 +98,8 @@ class GitEnrich(Enrich):
             """ Add a new github identity to SH if it does not exists """
             github_repo = None
             if GITHUB in item['origin']:
-                github_repo = item['origin'].replace(GITHUB,'').replace('.git','')
+                github_repo = item['origin'].replace(GITHUB,'')
+                github_repo = re.sub('.git$', '', github_repo)
             if not github_repo:
                 return
 
@@ -163,18 +166,20 @@ class GitEnrich(Enrich):
             commit_url = GITHUB_API_URL+"/repos/%s/commits/%s" % (repo, commit_hash)
             headers = {'Authorization': 'token ' + self.github_token}
 
-            r = requests.get(commit_url, headers=headers)
+            r = self.requests.get(commit_url, headers=headers)
 
             self.rate_limit = int(r.headers['X-RateLimit-Remaining'])
             self.rate_limit_reset_ts = int(r.headers['X-RateLimit-Reset'])
             logging.debug("Rate limit pending: %s", self.rate_limit)
             if self.rate_limit <= self.min_rate_to_sleep:
                 seconds_to_reset = self.rate_limit_reset_ts - int(time.time()) + 1
+                if seconds_to_reset < 0:
+                    seconds_to_reset = 0
                 cause = "GitHub rate limit exhausted."
                 logging.info("%s Waiting %i secs for rate limit reset.", cause, seconds_to_reset)
                 time.sleep(seconds_to_reset)
                 # Retry once we have rate limit
-                r = requests.get(commit_url, headers=headers)
+                r = self.requests.get(commit_url, headers=headers)
 
             try:
                 r.raise_for_status()
@@ -287,7 +292,8 @@ class GitEnrich(Enrich):
 
         # If it is a github repo, include just the repo string
         if GITHUB in item['origin']:
-            eitem['github_repo'] = item['origin'].replace(GITHUB,'').replace('.git','')
+            eitem['github_repo'] = item['origin'].replace(GITHUB,'')
+            eitem['github_repo'] = re.sub('.git$', '', eitem['github_repo'])
             eitem["url_id"] = eitem['github_repo']+"/commit/"+eitem['hash']
 
         if 'project' in item:
@@ -308,24 +314,32 @@ class GitEnrich(Enrich):
         if from_date:
             logging.debug("Demography since: %s" % (from_date))
 
-        query = ''
+        date_field = self.get_field_date()
+
+        # Don't use commits before DEMOGRAPHY_COMMIT_MIN_DATE
+        filters = '''
+        {"range":
+            {"%s": {"gte": "%s"}}
+        }
+        ''' % (date_field, DEMOGRAPHY_COMMIT_MIN_DATE)
+
         if from_date:
-            date_field = self.get_field_date()
             from_date = from_date.isoformat()
 
-            filters = '''
+            filters += '''
+            ,
             {"range":
                 {"%s": {"gte": "%s"}}
             }
             ''' % (date_field, from_date)
 
-            query = """
-            "query": {
-                "bool": {
-                    "must": [%s]
-                }
-            },
-            """ % (filters)
+        query = """
+        "query": {
+            "bool": {
+                "must": [%s]
+            }
+        },
+        """ % (filters)
 
 
         # First, get the min and max commit date for all the authors
@@ -358,7 +372,14 @@ class GitEnrich(Enrich):
         }
         """ % (query)
 
-        r = requests.post(self.elastic.index_url+"/_search", data=es_query, verify=False)
+        r = self.requests.post(self.elastic.index_url+"/_search", data=es_query, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logging.error("Error getting authors mix and max date. Demography aborted.")
+            logging.error(ex)
+            return
+
         authors = r.json()['aggregations']['author']['buckets']
 
         author_items = []  # items from author with new date fields added
@@ -385,7 +406,7 @@ class GitEnrich(Enrich):
             # Time to add all the commits (items) from this author
             author_query_json['query']['bool']['must'][0]['term']['Author'] = author['key']
             author_query_str = json.dumps(author_query_json)
-            r = requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str, verify=False)
+            r = self.requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str, verify=False)
 
             if "hits" not in r.json():
                 logging.error("Can't find commits for %s" % (author['key']))
