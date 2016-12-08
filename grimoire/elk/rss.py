@@ -91,7 +91,7 @@ class RSSEnrich(Enrich):
         entry = item['data']
 
         # data fields to copy
-        copy_fields = ["title", "summary", "author", "avatar", "published"]
+        copy_fields = ["title", "summary", "author", "avatar", "published", "link"]
         for f in copy_fields:
             if f in entry:
                 eitem[f] = entry[f]
