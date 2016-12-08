@@ -46,6 +46,7 @@ from grimoire.ocean.mediawiki import MediaWikiOcean
 from grimoire.ocean.phabricator import PhabricatorOcean
 from grimoire.ocean.redmine import RedmineOcean
 from grimoire.ocean.remo2 import ReMoOcean
+from grimoire.ocean.rss import RSSOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.supybot import SupybotOcean
 from grimoire.ocean.telegram import TelegramOcean
@@ -70,6 +71,7 @@ from grimoire.elk.phabricator import PhabricatorEnrich
 from grimoire.elk.redmine import RedmineEnrich
 # from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.remo2 import ReMoEnrich
+from grimoire.elk.rss import RSSEnrich
 from grimoire.elk.pipermail import PipermailEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
 from grimoire.elk.supybot import SupybotEnrich
@@ -94,6 +96,7 @@ from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.core.pipermail import Pipermail, PipermailCommand
 from perceval.backends.core.redmine import Redmine, RedmineCommand
 from perceval.backends.mozilla.remo import ReMo, ReMoCommand
+from perceval.backends.core.rss import RSS, RSSCommand
 from perceval.backends.core.stackexchange import StackExchange, StackExchangeCommand
 from perceval.backends.core.supybot import Supybot, SupybotCommand
 from perceval.backends.core.telegram import Telegram, TelegramCommand
@@ -147,6 +150,7 @@ def get_connectors():
             "pipermail":[Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
             "redmine":[Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
+            "rss":[RSS, RSSOcean, RSSEnrich, RSSCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
              "supybot":[Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
