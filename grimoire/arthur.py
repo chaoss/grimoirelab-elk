@@ -277,8 +277,8 @@ def get_last_enrich(backend_cmd, enrich_backend):
         # Only supported in data retrieved from a perceval backend
         # Always filter by origin to support multi origin indexes
 
-        filter_ = {"name":"origin",
-                   "value":backend.origin}
+        filter_ = {"name": "origin",
+                   "value": backend.origin}
         # Check if backend supports from_date
         signature = inspect.signature(backend.fetch)
 

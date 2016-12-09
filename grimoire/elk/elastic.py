@@ -238,16 +238,18 @@ class ElasticSearch(object):
         url = self.index_url
         url += "/_search"
 
-        if _filter:
-            data_query = '''
-                "size": 0,
-                "query" : {
-                    "term" : { "%s" : "%s"  }
-                 },
-            ''' % (_filter['name'], _filter['value'])
+        data_query = ''
 
-        else:
-            data_query = ''
+        if _filter:
+            # if value is '' don't filter anything. Useful for working with
+            # all the items in an enriched index
+            if _filter['value'] != '':
+                data_query = '''
+                    "size": 0,
+                    "query" : {
+                        "term" : { "%s" : "%s"  }
+                     },
+                ''' % (_filter['name'], _filter['value'])
 
         data_agg = '''
             "aggs": {
