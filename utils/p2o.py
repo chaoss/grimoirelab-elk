@@ -138,7 +138,7 @@ if __name__ == '__main__':
                                args.elastic_url_enrich, args.events_enrich,
                                args.db_user, args.db_password, args.db_host,
                                args.refresh_projects, args.refresh_identities,
-                               args.author_id)
+                               args.author_id, args.author_uuid)
                 logging.info("Enrich backend completed")
             elif args.events_enrich:
                 logging.info("Enrich option is needed for events_enrich")

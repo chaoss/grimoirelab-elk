@@ -354,7 +354,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    url_enrich=None, events_enrich=False,
                    db_user=None, db_password=None, db_host=None,
                    do_refresh_projects=False, do_refresh_identities=False,
-                   author_id=None):
+                   author_id=None, author_uuid=None):
     """ Enrich Ocean index """
 
 
@@ -415,6 +415,10 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                 query_string = {}
                 query_string["fields"] = 'author_id'
                 query_string["query"] = author_id
+            elif author_uuid:
+                query_string = {}
+                query_string["fields"] = 'author_uuid'
+                query_string["query"] = author_uuid
 
             logger.info("Refreshing identities fields in enriched index")
             field_id = enrich_backend.get_field_unique_id()
