@@ -231,6 +231,7 @@ def get_params_parser():
     parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('--only-identities', action='store_true', help="Only add identities to SortingHat DB")
     parser.add_argument('--refresh-identities', action='store_true', help="Refresh identities in enriched items")
+    parser.add_argument('--author_id', help="Field author_id to be refreshed")
     parser.add_argument('--github-token', help="If provided, github usernames will be retrieved in git enrich.")
     parser.add_argument('--studies', action='store_true', help="Execute studies after enrichment.")
     parser.add_argument('--only-studies', action='store_true', help="Execute only studies.")
