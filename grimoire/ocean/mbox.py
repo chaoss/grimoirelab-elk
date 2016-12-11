@@ -37,3 +37,10 @@ class MBoxOcean(ElasticOcean):
         else:
             logging.warning("No Message-ID in %s %s" % (item["data"]["Subject"], item['origin']))
             item["ocean-unique-id"] = "NONE_"+item['origin']
+
+    @classmethod
+    def get_perceval_params_from_url(cls, url):
+        # In the url the uri and the data dir are included
+        params = url.split()
+
+        return params
