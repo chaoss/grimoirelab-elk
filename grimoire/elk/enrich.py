@@ -291,7 +291,8 @@ class Enrich(object):
         for item in items:
             if current >= max_items:
                 try:
-                    self.requests.put(url, data=bulk_json)
+                    r = self.requests.put(url, data=bulk_json)
+                    r.raise_for_status()
                     logging.debug("Added %i items to %s", total, url)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
@@ -320,7 +321,8 @@ class Enrich(object):
                     bulk_json += data_json +"\n"  # Bulk document
                     current += 1
                     total += 1
-        self.requests.put(url, data = bulk_json)
+        r = self.requests.put(url, data=bulk_json)
+        r.raise_for_status()
 
         return total
 
