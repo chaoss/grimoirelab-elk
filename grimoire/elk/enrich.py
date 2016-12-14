@@ -790,5 +790,6 @@ class Enrich(object):
         except Exception as ex:
             logger.error("Unknown error adding sorting hat identity %s", ex)
             logger.error(identity)
+            logger.error(ex)
 
         return sh_ids
