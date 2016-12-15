@@ -82,6 +82,8 @@ def metadata(func):
 
 class Enrich(object):
 
+    sh_db = None
+
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host='', insecure=True):
         self.sortinghat = False
@@ -91,7 +93,8 @@ class Enrich(object):
             raise RuntimeError("Sorting hat configured but libraries not available.")
         if db_sortinghat:
             # self.sh_db = Database("root", "", db_sortinghat, "mariadb")
-            self.sh_db = Database(db_user, db_password, db_sortinghat, db_host)
+            if not Enrich.sh_db:
+                Enrich.sh_db = Database(db_user, db_password, db_sortinghat, db_host)
             self.sortinghat = True
 
         self.prjs_map = None  # mapping beetween repositories and projects
