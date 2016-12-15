@@ -291,7 +291,8 @@ class Enrich(object):
         for item in items:
             if current >= max_items:
                 try:
-                    self.requests.put(url, data=bulk_json)
+                    r = self.requests.put(url, data=bulk_json)
+                    r.raise_for_status()
                     logging.debug("Added %i items to %s", total, url)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
@@ -320,7 +321,8 @@ class Enrich(object):
                     bulk_json += data_json +"\n"  # Bulk document
                     current += 1
                     total += 1
-        self.requests.put(url, data = bulk_json)
+        r = self.requests.put(url, data=bulk_json)
+        r.raise_for_status()
 
         return total
 
@@ -426,7 +428,7 @@ class Enrich(object):
         }
 
     # Get items for the generator: initial scroll query
-    def __get_elastic_items(self, elastic_scroll_id=None):
+    def __get_elastic_items(self, elastic_scroll_id=None, query_string=None):
         """ Get the items from the enriched index related to the backend """
 
         elastic_page = 1000
@@ -446,14 +448,26 @@ class Enrich(object):
             }
             r = self.requests.post(url, data=json.dumps(scroll_data))
         else:
-            filters = """
-            {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
-            }
-            """
+
+            if query_string:
+                filters = """
+                {
+                "query_string": {
+                    "fields" : ["%s"],
+                    "query": "%s"
+                    }
+                }
+                """ % (query_string['fields'], query_string['query'])
+            else:
+
+                filters = """
+                {
+                "query_string": {
+                    "analyze_wildcard": true,
+                    "query": "*"
+                    }
+                }
+                """
             order_field = self.get_field_date()
             order_query = ''
             order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
@@ -483,13 +497,13 @@ class Enrich(object):
 
 
     # Enriched items generator
-    def fetch(self):
+    def fetch(self, query_string = None):
         logging.debug("Creating enriched items generator.")
 
         elastic_scroll_id = None
 
         while True:
-            rjson = self.__get_elastic_items(elastic_scroll_id)
+            rjson = self.__get_elastic_items(elastic_scroll_id, query_string)
 
             if rjson and "_scroll_id" in rjson:
                 elastic_scroll_id = rjson["_scroll_id"]
@@ -503,7 +517,6 @@ class Enrich(object):
             else:
                 logging.error("No results found from %s", self.elastic.index_url)
                 break
-
         return
 
     # Project field enrichment
@@ -777,5 +790,6 @@ class Enrich(object):
         except Exception as ex:
             logger.error("Unknown error adding sorting hat identity %s", ex)
             logger.error(identity)
+            logger.error(ex)
 
         return sh_ids
