@@ -76,7 +76,7 @@ class ElasticSearch(object):
 
         if r.status_code != 200:
             # Index does no exists
-            r = self.requests.put(self.index_url)
+            r = self.requests.put(self.index_url, data=analyzers)
             if r.status_code != 200:
                 logging.error("Can't create index %s (%s)",
                               self.index_url, r.status_code)
@@ -86,10 +86,8 @@ class ElasticSearch(object):
         else:
             if clean:
                 self.requests.delete(self.index_url)
-                self.requests.put(self.index_url)
+                self.requests.put(self.index_url, data=analyzers)
                 logging.info("Deleted and created index " + self.index_url)
-        if analyzers:
-            self.create_custom_analyzers(analyzers)
         if mappings:
             self.create_mappings(mappings)
 
@@ -166,23 +164,6 @@ class ElasticSearch(object):
                 logging.debug("Probably %i item updates" % (total-total_search))
                 break
 
-    def create_custom_analyzers(self, analyzers):
-        # Close the index
-        # Wait until the creation is finished
-        sleep(WAIT_INDEX_CREATION)
-        r = self.requests.post(self.index_url + "/_close")
-        if r.status_code != 200:
-            logging.error("Error closing index %s", r.text)
-        # Add the custom analyzers
-        r = self.requests.put(self.index_url+"/_settings", data=analyzers)
-        if r.status_code != 200:
-            logging.error("Error creating custom analyzers %s", r.text)
-        # Open the index
-        r = self.requests.post(self.index_url + "/_open")
-        if r.status_code != 200:
-            logging.error("Error opening index %s", r.text)
-        logging.debug("Index custom analyzers created")
-
     def create_mappings(self, mappings):
 
         for _type in mappings:
@@ -231,7 +212,7 @@ class ElasticSearch(object):
             :_filter: additional filter to find the date
         '''
 
-        last_date = self.__get_last_item_field(field, _filter=_filter)
+        last_date = self.get_last_item_field(field, _filter=_filter)
 
         return last_date
 
@@ -241,11 +222,11 @@ class ElasticSearch(object):
             :_filter: additional filter to find the date
         '''
 
-        offset = self.__get_last_item_field(field, _filter=_filter, offset=True)
+        offset = self.get_last_item_field(field, _filter=_filter, offset=True)
 
         return offset
 
-    def __get_last_item_field(self, field, _filter = None, offset = False):
+    def get_last_item_field(self, field, _filter = None, offset = False):
         '''
             :field: field with the data
             :_filter: additional filter to find the date
@@ -257,16 +238,18 @@ class ElasticSearch(object):
         url = self.index_url
         url += "/_search"
 
-        if _filter:
-            data_query = '''
-                "size": 0,
-                "query" : {
-                    "term" : { "%s" : "%s"  }
-                 },
-            ''' % (_filter['name'], _filter['value'])
+        data_query = ''
 
-        else:
-            data_query = ''
+        if _filter:
+            # if value is '' don't filter anything. Useful for working with
+            # all the items in an enriched index
+            if _filter['value'] != '':
+                data_query = '''
+                    "size": 0,
+                    "query" : {
+                        "term" : { "%s" : "%s"  }
+                     },
+                ''' % (_filter['name'], _filter['value'])
 
         data_agg = '''
             "aggs": {

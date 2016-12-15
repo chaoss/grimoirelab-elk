@@ -35,6 +35,8 @@ from grimoire.ocean.conf import ConfOcean
 from grimoire.utils import get_elastic
 from grimoire.utils import get_connectors, get_connector_from_name
 
+logger = logging.getLogger(__name__)
+
 def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None):
     """ Feed Ocean with backend data """
@@ -58,7 +60,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
         backend = backend_cmd.backend
         ocean_backend = connector[1](backend, fetch_cache=fetch_cache, project=project)
 
-        logging.info("Feeding Ocean from %s (%s)", backend_name, backend.origin)
+        logger.info("Feeding Ocean from %s (%s)", backend_name, backend.origin)
 
         if not es_index:
             es_index = backend_name + "_" + backend.origin
@@ -103,12 +105,12 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
 
     except Exception as ex:
         if backend:
-            logging.error("Error feeding ocean from %s (%s): %s" %
+            logger.error("Error feeding ocean from %s (%s): %s" %
                           (backend_name, backend.origin, ex))
             # this print makes blackbird fails
             traceback.print_exc()
         else:
-            logging.error("Error feeding ocean %s" % ex)
+            logger.error("Error feeding ocean %s" % ex)
 
         repo['success'] = False
         repo['error'] = str(ex)
@@ -124,10 +126,10 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
         unique_id = es_index+"_"+backend.origin
         ConfOcean.add_repo(unique_id, repo)
     else:
-        logging.debug("Repository not added to Ocean because errors.")
-        logging.debug(backend_params)
+        logger.debug("Repository not added to Ocean because errors.")
+        logger.debug(backend_params)
 
-    logging.info("Done %s " % (backend_name))
+    logger.info("Done %s " % (backend_name))
 
 
 def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
@@ -175,7 +177,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
             items_ids.append(item_id)
 
     # Time to get the items
-    logging.debug ("Items to be renriched for merged uuids: %s" % (",".join(items_ids)))
+    logger.debug ("Items to be renriched for merged uuids: %s" % (",".join(items_ids)))
 
     url_mget = ocean_backend.elastic.index_url+"/_mget"
 
@@ -199,7 +201,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     return items
 
 def refresh_projects(enrich_backend):
-    logging.debug("Refreshing project field in %s", enrich_backend.elastic.index_url)
+    logger.debug("Refreshing project field in %s", enrich_backend.elastic.index_url)
     total = 0
 
     eitems = enrich_backend.fetch()
@@ -209,13 +211,14 @@ def refresh_projects(enrich_backend):
         yield eitem
         total += 1
 
-    logging.info("Total eitems refreshed for project field %i", total)
+    logger.info("Total eitems refreshed for project field %i", total)
 
-def refresh_identities(enrich_backend):
-    logging.debug("Refreshing identities fields from %s", enrich_backend.elastic.index_url)
+def refresh_identities(enrich_backend, query_string=None):
+    logger.debug("Refreshing identities fields from %s", enrich_backend.elastic.index_url)
     total = 0
 
-    for eitem in enrich_backend.fetch():
+    for eitem in enrich_backend.fetch(query_string):
+        #logger.info(eitem)
         roles = None
         try:
             roles = enrich_backend.roles
@@ -226,13 +229,13 @@ def refresh_identities(enrich_backend):
         yield eitem
         total += 1
 
-    logging.info("Total eitems refreshed for identities fields %i", total)
+    logger.info("Total eitems refreshed for identities fields %i", total)
 
 def load_identities(ocean_backend, enrich_backend):
     try:
         from grimoire.elk.sortinghat import SortingHat
     except ImportError:
-        logging.warning("SortingHat not available.")
+        logger.warning("SortingHat not available.")
 
     # First we add all new identities to SH
     items_count = 0
@@ -246,11 +249,11 @@ def load_identities(ocean_backend, enrich_backend):
             if identity not in new_identities:
                 new_identities.append(identity)
         if items_count % 100 == 0:
-            logging.debug("Processed %i items identities (%i identities)",
+            logger.debug("Processed %i items identities (%i identities)",
                           items_count, len(new_identities))
-    logging.debug("TOTAL ITEMS: %i", items_count)
+    logger.debug("TOTAL ITEMS: %i", items_count)
 
-    logging.info("Total new identities to be checked %i", len(new_identities))
+    logger.info("Total new identities to be checked %i", len(new_identities))
 
     SortingHat.add_identities(enrich_backend.sh_db, new_identities,
                               enrich_backend.get_connector_name())
@@ -275,8 +278,8 @@ def get_last_enrich(backend_cmd, enrich_backend):
         # Only supported in data retrieved from a perceval backend
         # Always filter by origin to support multi origin indexes
 
-        filter_ = {"name":"origin",
-                   "value":backend.origin}
+        filter_ = {"name": "origin",
+                   "value": backend.origin}
         # Check if backend supports from_date
         signature = inspect.signature(backend.fetch)
 
@@ -305,7 +308,7 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental):
     else:
         last_enrich = get_last_enrich(backend_cmd, enrich_backend)
 
-    logging.debug("Last enrichment: %s", last_enrich)
+    logger.debug("Last enrichment: %s", last_enrich)
 
     backend = None
 
@@ -328,15 +331,18 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental):
 
     return ocean_backend
 
-def do_studies(enrich_backend):
-    last_enrich = get_last_enrich(None, enrich_backend)
+def do_studies(enrich_backend, no_incremental=False):
+    if no_incremental:
+        last_enrich = None
+    else:
+        last_enrich = get_last_enrich(None, enrich_backend)
 
     try:
         for study in enrich_backend.studies:
-            logging.info("Starting study: %s (from %s)", study, last_enrich)
+            logger.info("Starting study: %s (from %s)", study, last_enrich)
             study(from_date=last_enrich)
     except Exception as e:
-        logging.error("Problem executing study %s", study)
+        logger.error("Problem executing study %s", study)
         traceback.print_exc()
 
 def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
@@ -347,7 +353,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    github_token=None, studies=False, only_studies=False,
                    url_enrich=None, events_enrich=False,
                    db_user=None, db_password=None, db_host=None,
-                   do_refresh_projects=False, do_refresh_identities=False):
+                   do_refresh_projects=False, do_refresh_identities=False,
+                   author_id=None, author_uuid=None):
     """ Enrich Ocean index """
 
 
@@ -395,52 +402,63 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         ocean_backend = get_ocean_backend(backend_cmd, enrich_backend, no_incremental)
 
         if only_studies:
-            logging.info("Running only studies (no SH and no enrichment)")
-            do_studies(enrich_backend)
+            logger.info("Running only studies (no SH and no enrichment)")
+            do_studies(enrich_backend, no_incremental)
         elif do_refresh_projects:
-            logging.info("Refreshing project field in enriched index")
+            logger.info("Refreshing project field in enriched index")
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_projects(enrich_backend)
             enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
         elif do_refresh_identities:
-            logging.info("Refreshing identities fields in enriched index")
+
+            if author_id:
+                query_string = {}
+                query_string["fields"] = 'author_id'
+                query_string["query"] = author_id
+            elif author_uuid:
+                query_string = {}
+                query_string["fields"] = 'author_uuid'
+                query_string["query"] = author_uuid
+
+            logger.info("Refreshing identities fields in enriched index")
             field_id = enrich_backend.get_field_unique_id()
-            eitems = refresh_identities(enrich_backend)
+            logger.info(field_id)
+            eitems = refresh_identities(enrich_backend, query_string)
             enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
         else:
             clean = False  # Don't remove ocean index when enrich
             elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
             ocean_backend.set_elastic(elastic_ocean)
 
-            logging.info("Adding enrichment data to %s", enrich_backend.elastic.index_url)
+            logger.info("Adding enrichment data to %s", enrich_backend.elastic.index_url)
 
             if db_sortinghat:
                 # FIXME: This step won't be done from enrich in the future
                 total_ids = load_identities(ocean_backend, enrich_backend)
-                logging.info("Total identities loaded %i ", total_ids)
+                logger.info("Total identities loaded %i ", total_ids)
 
             if only_identities:
-                logging.info("Only SH identities added. Enrich not done!")
+                logger.info("Only SH identities added. Enrich not done!")
 
             else:
                 # Enrichment for the new items once SH update is finished
                 if not events_enrich:
                     enrich_count = enrich_items(ocean_backend, enrich_backend)
                     if enrich_count:
-                        logging.info("Total items enriched %i ", enrich_count)
+                        logger.info("Total items enriched %i ", enrich_count)
                 else:
                     enrich_count = enrich_items(ocean_backend, enrich_backend, events=True)
                     if enrich_count:
-                        logging.info("Total events enriched %i ", enrich_count)
+                        logger.info("Total events enriched %i ", enrich_count)
                 if studies:
                     do_studies(enrich_backend)
 
     except Exception as ex:
         traceback.print_exc()
         if backend:
-            logging.error("Error enriching ocean from %s (%s): %s",
+            logger.error("Error enriching ocean from %s (%s): %s",
                           backend_name, backend.origin, ex)
         else:
-            logging.error("Error enriching ocean %s", ex)
+            logger.error("Error enriching ocean %s", ex)
 
-    logging.info("Done %s ", backend_name)
+    logger.info("Done %s ", backend_name)

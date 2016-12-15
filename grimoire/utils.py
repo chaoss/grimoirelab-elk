@@ -45,6 +45,7 @@ from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
 from grimoire.ocean.mozillaclub import MozillaClubOcean
 from grimoire.ocean.phabricator import PhabricatorOcean
+from grimoire.ocean.redmine import RedmineOcean
 from grimoire.ocean.remo2 import ReMoOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.supybot import SupybotOcean
@@ -68,6 +69,8 @@ from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
 from grimoire.elk.mozillaclub import MozillaClubEnrich
 from grimoire.elk.phabricator import PhabricatorEnrich
+from grimoire.elk.redmine import RedmineEnrich
+# from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.remo2 import ReMoEnrich
 from grimoire.elk.pipermail import PipermailEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
@@ -76,26 +79,27 @@ from grimoire.elk.telegram import TelegramEnrich
 from grimoire.elk.twitter import TwitterEnrich
 
 # Connectors for Perceval
-from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
-from perceval.backends.bugzillarest import BugzillaREST, BugzillaRESTCommand
-from perceval.backends.discourse import Discourse, DiscourseCommand
-from perceval.backends.confluence import Confluence, ConfluenceCommand
-from perceval.backends.gerrit import Gerrit, GerritCommand
-from perceval.backends.git import Git, GitCommand
-from perceval.backends.github import GitHub, GitHubCommand
-from perceval.backends.gmane import Gmane, GmaneCommand
-from perceval.backends.jenkins import Jenkins, JenkinsCommand
-from perceval.backends.jira import Jira, JiraCommand
-from perceval.backends.kitsune import Kitsune, KitsuneCommand
-from perceval.backends.mbox import MBox, MBoxCommand
-from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
-from perceval.backends.mozillaclub import MozillaClub, MozillaClubCommand
-from perceval.backends.phabricator import Phabricator, PhabricatorCommand
-from perceval.backends.pipermail import Pipermail, PipermailCommand
-from perceval.backends.remo2 import ReMo, ReMoCommand
-from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
-from perceval.backends.supybot import Supybot, SupybotCommand
-from perceval.backends.telegram import Telegram, TelegramCommand
+from perceval.backends.core.bugzilla import Bugzilla, BugzillaCommand
+from perceval.backends.core.bugzillarest import BugzillaREST, BugzillaRESTCommand
+from perceval.backends.core.discourse import Discourse, DiscourseCommand
+from perceval.backends.core.confluence import Confluence, ConfluenceCommand
+from perceval.backends.core.gerrit import Gerrit, GerritCommand
+from perceval.backends.core.git import Git, GitCommand
+from perceval.backends.core.github import GitHub, GitHubCommand
+from perceval.backends.core.gmane import Gmane, GmaneCommand
+from perceval.backends.core.jenkins import Jenkins, JenkinsCommand
+from perceval.backends.core.jira import Jira, JiraCommand
+from perceval.backends.mozilla.kitsune import Kitsune, KitsuneCommand
+from perceval.backends.core.mbox import MBox, MBoxCommand
+from perceval.backends.core.mediawiki import MediaWiki, MediaWikiCommand
+from perceval.backends.core.mozillaclub import MozillaClub, MozillaClubCommand
+from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
+from perceval.backends.core.pipermail import Pipermail, PipermailCommand
+from perceval.backends.core.redmine import Redmine, RedmineCommand
+from perceval.backends.mozilla.remo import ReMo, ReMoCommand
+from perceval.backends.core.stackexchange import StackExchange, StackExchangeCommand
+from perceval.backends.core.supybot import Supybot, SupybotCommand
+from perceval.backends.core.telegram import Telegram, TelegramCommand
 
 
 from grimoire.elk.elastic import ElasticSearch
@@ -145,6 +149,7 @@ def get_connectors():
             "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
             "pipermail":[Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
+            "redmine":[Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
@@ -230,6 +235,8 @@ def get_params_parser():
     parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('--only-identities', action='store_true', help="Only add identities to SortingHat DB")
     parser.add_argument('--refresh-identities', action='store_true', help="Refresh identities in enriched items")
+    parser.add_argument('--author_id', help="Field author_id to be refreshed")
+    parser.add_argument('--author_uuid', help="Field author_uuid to be refreshed")
     parser.add_argument('--github-token', help="If provided, github usernames will be retrieved in git enrich.")
     parser.add_argument('--studies', action='store_true', help="Execute studies after enrichment.")
     parser.add_argument('--only-studies', action='store_true', help="Execute only studies.")

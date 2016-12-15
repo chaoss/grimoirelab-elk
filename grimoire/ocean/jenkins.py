@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# StackExchange Ocean feeder
+# RSS Ocean feeder
 #
 # Copyright (C) 2015 Bitergia
 #

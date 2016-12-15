@@ -24,6 +24,7 @@
 
 import json
 import logging
+import re
 import time
 
 import requests
@@ -40,6 +41,7 @@ except ImportError:
 
 GITHUB = 'https://github.com/'
 SH_GIT_COMMIT = 'github-commit'
+DEMOGRAPHY_COMMIT_MIN_DATE='1980-01-01'
 
 class GitEnrich(Enrich):
 
@@ -96,7 +98,8 @@ class GitEnrich(Enrich):
             """ Add a new github identity to SH if it does not exists """
             github_repo = None
             if GITHUB in item['origin']:
-                github_repo = item['origin'].replace(GITHUB,'').replace('.git','')
+                github_repo = item['origin'].replace(GITHUB,'')
+                github_repo = re.sub('.git$', '', github_repo)
             if not github_repo:
                 return
 
@@ -289,7 +292,8 @@ class GitEnrich(Enrich):
 
         # If it is a github repo, include just the repo string
         if GITHUB in item['origin']:
-            eitem['github_repo'] = item['origin'].replace(GITHUB,'').replace('.git','')
+            eitem['github_repo'] = item['origin'].replace(GITHUB,'')
+            eitem['github_repo'] = re.sub('.git$', '', eitem['github_repo'])
             eitem["url_id"] = eitem['github_repo']+"/commit/"+eitem['hash']
 
         if 'project' in item:
@@ -306,28 +310,39 @@ class GitEnrich(Enrich):
         return eitem
 
     def enrich_demography(self, from_date=None):
-        logging.debug("Doing demography enrich from %s" % (self.elastic.index_url))
-        if from_date:
-            logging.debug("Demography since: %s" % (from_date))
+        logging.debug("Doing demography enrich from %s", self.elastic.index_url)
 
-        query = ''
         if from_date:
-            date_field = self.get_field_date()
+            # The from_date must be max author_max_date
+            from_date = self.elastic.get_last_item_field("author_max_date")
+            logging.debug("Demography since: %s", from_date)
+
+        date_field = self.get_field_date()
+
+        # Don't use commits before DEMOGRAPHY_COMMIT_MIN_DATE
+        filters = '''
+        {"range":
+            {"%s": {"gte": "%s"}}
+        }
+        ''' % (date_field, DEMOGRAPHY_COMMIT_MIN_DATE)
+
+        if from_date:
             from_date = from_date.isoformat()
 
-            filters = '''
+            filters += '''
+            ,
             {"range":
                 {"%s": {"gte": "%s"}}
             }
             ''' % (date_field, from_date)
 
-            query = """
-            "query": {
-                "bool": {
-                    "must": [%s]
-                }
-            },
-            """ % (filters)
+        query = """
+        "query": {
+            "bool": {
+                "must": [%s]
+            }
+        },
+        """ % (filters)
 
 
         # First, get the min and max commit date for all the authors
@@ -359,6 +374,8 @@ class GitEnrich(Enrich):
           }
         }
         """ % (query)
+
+        logging.debug(es_query)
 
         r = self.requests.post(self.elastic.index_url+"/_search", data=es_query, verify=False)
         try:
