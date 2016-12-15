@@ -332,7 +332,8 @@ class PhabricatorEnrich(Enrich):
                     eitem['time_to_assign_days'] = get_time_diff_days(eitem['creation_date'], change_date)
                     first_assignee_phid = change['newValue']
                     first_assignee_date = change_date
-                if change['authorData']['userName'] not in changes_assignee_list:
+                if 'userName' in change['authorData'] and \
+                    change['authorData']['userName'] not in changes_assignee_list:
                     changes_assignee_list.append(change['authorData']['userName'])
                 eitem['changes_assignment'] += 1
             if not eitem['time_to_attend_days'] and first_assignee_phid:

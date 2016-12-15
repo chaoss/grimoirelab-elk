@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# StackExchange Ocean feeder
+# RSS Ocean feeder
 #
-# Copyright (C) 2015 Bitergia
+# Copyright (C) 2016 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,15 +25,8 @@
 
 from grimoire.ocean.elastic import ElasticOcean
 
-class SupybotOcean(ElasticOcean):
-    """MediaWiki Ocean feeder"""
+class RSSOcean(ElasticOcean):
+    """RSS Ocean feeder"""
 
     def _fix_item(self, item):
-        item["ocean-unique-id"] = item["uuid"]
-
-    @classmethod
-    def get_perceval_params_from_url(cls, url):
-        # In the url the uri and the data dir are included
-        params = url.split()
-
-        return params
+        item["ocean-unique-id"] = item["data"]["link"]
