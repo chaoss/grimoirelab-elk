@@ -60,7 +60,11 @@ class MeetupEnrich(Enrich):
         identities = []
         item = item['data']
 
+        identities = []
+
         # Creators
+        user = self.get_sh_identity(item['event_hosts'][0])
+        identities.append(user)
 
         # rsvps
 
@@ -68,12 +72,6 @@ class MeetupEnrich(Enrich):
 
 
     def get_sh_identity(self, item, identity_field=None):
-		# "owner": {
-        #             "first_name": "Huda",
-        #             "last_name": "Sarfraz",
-        #             "_url": "https://reps.mozilla.org/api/beta/users/959/",
-        #             "display_name": "huda_sarfraz"
-        #          },
         identity = {'username':None, 'email':None, 'name':None}
 
         if not item:
@@ -105,9 +103,7 @@ class MeetupEnrich(Enrich):
         event = item['data']
 
         # data fields to copy
-        copy_fields = ["description", "duration", "how_to_find_us", "name",
-                       "rsvp_limit", "visibility", "waitlist_count",
-                       "yes_rsvp_count", "status"]
+        copy_fields = ["id", "how_to_find_us"]
         for f in copy_fields:
             if f in event:
                 eitem[f] = event[f]
@@ -116,14 +112,64 @@ class MeetupEnrich(Enrich):
 
         # Fields which names are translated
         map_fields = {
-            "link": "url"
+            "link": "url",
+            "rsvp_limit": "rsvps_limit"
         }
         for fn in map_fields:
-            eitem[map_fields[fn]] = event[fn]
+            if fn in event:
+                eitem[map_fields[fn]] = event[fn]
+            else:
+                eitem[f] = None
 
-        eitem['description_analyzed'] = eitem['description']
 
-        eitem['author'] = event['event_hosts'][0]["name"]
+        # event host fields: author of the event
+        host = event['event_hosts'][0]
+        eitem['member_photo_url'] = host['photo']['photo_link']
+        eitem['member_photo_id'] = host['photo']['id']
+        eitem['member_photo_type'] = host['photo']['type']
+        eitem['member_is_host'] = True
+        eitem['member_id'] = host['id']
+        eitem['member_name'] = host['name']
+        eitem['member_url'] = "https://www.meetup.com/members/" + str(host['id'])
+        eitem['author'] = host["name"]
+
+        eitem['event_url'] = event['link']
+
+        # data fields to copy with meetup`prefix
+        copy_fields = ["description", "plain_text_description",
+                       "created", "name", "status",
+                       "time", "updated", "utc_offset", "visibility",
+                       "waitlist_count", "yes_rsvp_count", "duration",
+                       "featured", "rsvpable"]
+        for f in copy_fields:
+            if f in event:
+                eitem["meetup_"+f] = event[f]
+            else:
+                eitem[f] = None
+
+        eitem['num_rsvps'] = len(event['rsvps'])
+        eitem['num_comments'] = len(event['comments'])
+
+        if 'venue' in event:
+            venue = event['venue']
+            copy_fields = ["id", "name", "city", "state", "zip", "country",
+                           "localized_country_name", "repinned", "address_1"]
+            for f in copy_fields:
+                if f in event:
+                    eitem["venue_"+f] = venue[f]
+                else:
+                    eitem[f] = None
+
+            eitem['venue_geolocation'] = {
+                "lat": event['venue']['lat'],
+                "lon": event['venue']['lon'],
+            }
+
+        if 'series' in event:
+            eitem['series_id'] = event['series']['id']
+            eitem['series_description'] = event['series']['description']
+            eitem['series_start_date'] = event['series']['start_date']
+
 
         eitem['group'] = event['group']["name"]
         eitem['group_url'] = event['group']["urlname"]
@@ -132,15 +178,25 @@ class MeetupEnrich(Enrich):
             "lon": event['group']['lon'],
         }
 
-        eitem['geolocation'] = {
-            "lat": event['venue']['lat'],
-            "lon": event['venue']['lon'],
-        }
+        if 'group' in event:
+            group = event['group']
+            copy_fields = ["id", "created", "join_mode", "name", "url_name",
+                           "who", "topics", "members"]
+            for f in copy_fields:
+                if f in group:
+                    eitem["group_"+f] = group[f]
+                else:
+                    eitem[f] = None
 
-        # Dates from timestamp
-        eitem['time'] = unixtime_to_datetime(event['time']/1000).isoformat()
-        eitem['updated'] = unixtime_to_datetime(event['updated']/1000).isoformat()
-        eitem['created'] = unixtime_to_datetime(event['created']/1000).isoformat()
+            eitem['group_geolocation'] = {
+                "lat": group['lat'],
+                "lon": group['lon'],
+            }
+
+
+        created = unixtime_to_datetime(event['created']/1000).isoformat()
+        eitem['type'] = "meetup"
+        eitem.update(self.get_grimoire_fields(created, eitem['type']))
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
