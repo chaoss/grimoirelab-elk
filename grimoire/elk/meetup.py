@@ -22,6 +22,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import json
 import logging
 
 from grimoire.elk.enrich import Enrich, metadata
@@ -48,6 +49,14 @@ class MeetupEnrich(Enrich):
                 },
                 "group_geolocation": {
                    "type": "geo_point"
+                },
+                "group_topics" : {
+                    "type" : "string",
+                    "analyzer" : "comma"
+                },
+                "group_topics_keys" : {
+                    "type" : "string",
+                    "analyzer" : "comma"
                 }
            }
         } """
@@ -131,7 +140,6 @@ class MeetupEnrich(Enrich):
         eitem['member_id'] = host['id']
         eitem['member_name'] = host['name']
         eitem['member_url'] = "https://www.meetup.com/members/" + str(host['id'])
-        eitem['author'] = host["name"]
 
         eitem['event_url'] = event['link']
 
@@ -171,17 +179,10 @@ class MeetupEnrich(Enrich):
             eitem['series_start_date'] = event['series']['start_date']
 
 
-        eitem['group'] = event['group']["name"]
-        eitem['group_url'] = event['group']["urlname"]
-        eitem['group_geolocation'] = {
-            "lat": event['group']['lat'],
-            "lon": event['group']['lon'],
-        }
-
         if 'group' in event:
             group = event['group']
             copy_fields = ["id", "created", "join_mode", "name", "url_name",
-                           "who", "topics", "members"]
+                           "who"]
             for f in copy_fields:
                 if f in group:
                     eitem["group_"+f] = group[f]
@@ -192,7 +193,13 @@ class MeetupEnrich(Enrich):
                 "lat": group['lat'],
                 "lon": group['lon'],
             }
+            group_topics = [topic['name'] for topic in group['topics']]
+            group_topics_keys = [topic['urlkey'] for topic in group['topics']]
+            eitem['group_topics'] = ",".join(group_topics)
+            eitem['group_topics_keys'] = ",".join(group_topics_keys)
 
+        if len(event['rsvps']) > 0:
+            eitem['group_members'] = event['rsvps'][0]['group']['members']
 
         created = unixtime_to_datetime(event['created']/1000).isoformat()
         eitem['type'] = "meetup"
@@ -202,3 +209,122 @@ class MeetupEnrich(Enrich):
             eitem.update(self.get_item_sh(item))
 
         return eitem
+
+
+    def get_rich_item_comments(self, item):
+        comments_enrich = []
+        if 'comments' in item['data']:
+            for comment in item['data']['comments']:
+                ecomment = self.get_rich_item(item)  # reuse all fields from item
+                created = unixtime_to_datetime(comment['created']/1000).isoformat()
+                ecomment['url'] = comment['link']
+                ecomment['id'] = comment['id']
+                ecomment['comment'] = comment['comment']
+                ecomment['like_count'] = comment['like_count']
+                ecomment['type'] = 'comment'
+                ecomment.update(self.get_grimoire_fields(created, ecomment['type']))
+                # event host fields: author of the event
+                member = comment['member']
+                if 'photo' in member:
+                    ecomment['member_photo_url'] = member['photo']['photo_link']
+                    ecomment['member_photo_id'] = member['photo']['id']
+                    ecomment['member_photo_type'] = member['photo']['type']
+                ecomment['member_is_host'] = member['event_context']['host']
+                ecomment['member_id'] = member['id']
+                ecomment['member_name'] = member['name']
+                ecomment['member_url'] = "https://www.meetup.com/members/" + str(member['id'])
+                comments_enrich.append(ecomment)
+
+                if self.sortinghat:
+                    ecomment.update(self.get_item_sh(ecomment))
+
+        return comments_enrich
+
+    def get_field_unique_id_comment(self):
+        return "id"
+
+    def get_rich_item_rsvps(self, item):
+        rsvps_enrich = []
+        if 'rsvps' in item['data']:
+            for rsvp in item['data']['rsvps']:
+                ersvp = self.get_rich_item(item)  # reuse all fields from item
+                ersvp['type'] = 'rsvp'
+                created = unixtime_to_datetime(rsvp['created']/1000).isoformat()
+                ersvp.update(self.get_grimoire_fields(created, ersvp['type']))
+                # event host fields: author of the event
+                member = rsvp['member']
+                if 'photo' in member:
+                    ersvp['member_photo_url'] = member['photo']['photo_link']
+                    ersvp['member_photo_id'] = member['photo']['id']
+                    ersvp['member_photo_type'] = member['photo']['type']
+                ersvp['member_is_host'] = member['event_context']['host']
+                ersvp['member_id'] = member['id']
+                ersvp['member_name'] = member['name']
+                ersvp['member_url'] = "https://www.meetup.com/members/" + str(member['id'])
+
+                ersvp['id'] = ersvp['id'] + "_" + str(member['id'])
+                ersvp['url'] = "https://www.meetup.com/members/" + str(member['id'])
+
+                ersvp['rsvps_guests'] = rsvp['guests']
+                ersvp['rsvps_updated'] = rsvp['updated']
+                ersvp['rsvps_response']	= rsvp['response']
+
+                if self.sortinghat:
+                    ersvp.update(self.get_item_sh(ersvp))
+
+                rsvps_enrich.append(ersvp)
+
+        return rsvps_enrich
+
+    def get_field_unique_id_rsvps(self):
+        return "id"
+
+    def enrich_items(self, items):
+        super(MeetupEnrich, self).enrich_items(items)
+
+        # And now for each item we want also the rsvps and comments items
+        ncom = 0
+        nrsvps = 0
+        rich_item_comments = []
+        rich_item_rsvps = []
+
+        for item in items:
+            rich_item_comments += self.get_rich_item_comments(item)
+            rich_item_rsvps += self.get_rich_item_rsvps(item)
+
+        if rich_item_comments:
+            ncom += self.elastic.bulk_upload(rich_item_comments,
+                                             self.get_field_unique_id_comment())
+        if rich_item_rsvps:
+            nrsvps += self.elastic.bulk_upload(rich_item_rsvps,
+                                               self.get_field_unique_id_rsvps())
+
+        logging.info("Total comments enriched: %i", ncom)
+        logging.info("Total nrsvps enriched: %i", nrsvps)
+
+    def enrich_events(self, items):
+        max_items = self.elastic.max_items_bulk
+        current = 0
+        bulk_json = ""
+        total = 0
+
+        url = self.elastic.index_url+'/items/_bulk'
+
+        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+
+        for item in items:
+            rich_item_reviews = self.get_rich_item_reviews(item)
+            for enrich_review in rich_item_reviews:
+                if current >= max_items:
+                    self.requests.put(url, data=bulk_json)
+                    bulk_json = ""
+                    current = 0
+                data_json = json.dumps(enrich_review)
+                bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
+                    (enrich_review[self.get_field_unique_id_review()])
+                bulk_json += data_json +"\n"  # Bulk document
+                current += 1
+                total += 1
+        self.requests.put(url, data = bulk_json)
+
+        return total
