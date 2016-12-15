@@ -92,7 +92,7 @@ from perceval.backends.core.jira import Jira, JiraCommand
 from perceval.backends.mozilla.kitsune import Kitsune, KitsuneCommand
 from perceval.backends.core.mbox import MBox, MBoxCommand
 from perceval.backends.core.mediawiki import MediaWiki, MediaWikiCommand
-from perceval.backends.core.mozillaclub import MozillaClub, MozillaClubCommand
+from perceval.backends.mozilla.mozillaclub import MozillaClub, MozillaClubCommand
 from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.core.pipermail import Pipermail, PipermailCommand
 from perceval.backends.core.redmine import Redmine, RedmineCommand
