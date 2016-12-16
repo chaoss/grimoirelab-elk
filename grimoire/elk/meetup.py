@@ -22,7 +22,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
+
 import logging
 
 from grimoire.elk.enrich import Enrich, metadata
@@ -76,7 +76,13 @@ class MeetupEnrich(Enrich):
         identities.append(user)
 
         # rsvps
-
+        for rsvp in item['rsvps']:
+            user = self.get_sh_identity(rsvp['member'])
+            identities.append(user)
+        # Comments
+        for comment in item['comments']:
+            user = self.get_sh_identity(comment['member'])
+            identities.append(user)
         return identities
 
 
@@ -90,7 +96,7 @@ class MeetupEnrich(Enrich):
         if 'data' in item and type(item) == dict:
             user = item['data'][identity_field]
 
-        identity['username'] = user["name"]
+        identity['username'] = user["id"]
         identity['email'] = None
         identity['name'] = user["name"]
 
@@ -206,10 +212,26 @@ class MeetupEnrich(Enrich):
         eitem.update(self.get_grimoire_fields(created, eitem['type']))
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(event))
 
         return eitem
 
+
+    def get_item_sh(self, item):
+        """ Add sorting hat enrichment fields  """
+
+        # Not shared common get_item_sh because it is pretty specific
+        if 'member' in item:
+            # comment and rsvp
+            identity  = self.get_sh_identity(item['member'])
+        elif 'event_hosts' in item:
+            # meetup event
+            identity  = self.get_sh_identity(item['event_hosts'][0])
+
+        created = unixtime_to_datetime(item['created']/1000)
+        sh_fields = self.get_item_sh_fields(identity, created)
+
+        return sh_fields
 
     def get_rich_item_comments(self, item):
         comments_enrich = []
@@ -236,7 +258,7 @@ class MeetupEnrich(Enrich):
                 comments_enrich.append(ecomment)
 
                 if self.sortinghat:
-                    ecomment.update(self.get_item_sh(ecomment))
+                    ecomment.update(self.get_item_sh(comment))
 
         return comments_enrich
 
@@ -270,7 +292,7 @@ class MeetupEnrich(Enrich):
                 ersvp['rsvps_response']	= rsvp['response']
 
                 if self.sortinghat:
-                    ersvp.update(self.get_item_sh(ersvp))
+                    ersvp.update(self.get_item_sh(rsvp))
 
                 rsvps_enrich.append(ersvp)
 
@@ -301,30 +323,3 @@ class MeetupEnrich(Enrich):
 
         logging.info("Total comments enriched: %i", ncom)
         logging.info("Total nrsvps enriched: %i", nrsvps)
-
-    def enrich_events(self, items):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
-        total = 0
-
-        url = self.elastic.index_url+'/items/_bulk'
-
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
-
-        for item in items:
-            rich_item_reviews = self.get_rich_item_reviews(item)
-            for enrich_review in rich_item_reviews:
-                if current >= max_items:
-                    self.requests.put(url, data=bulk_json)
-                    bulk_json = ""
-                    current = 0
-                data_json = json.dumps(enrich_review)
-                bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                    (enrich_review[self.get_field_unique_id_review()])
-                bulk_json += data_json +"\n"  # Bulk document
-                current += 1
-                total += 1
-        self.requests.put(url, data = bulk_json)
-
-        return total
