@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# StackExchange Ocean feeder
+# Redmine Ocean feeder
 #
 # Copyright (C) 2015 Bitergia
 #
@@ -25,15 +25,8 @@
 
 from grimoire.ocean.elastic import ElasticOcean
 
-class SupybotOcean(ElasticOcean):
-    """MediaWiki Ocean feeder"""
+class RedmineOcean(ElasticOcean):
+    """Redmine Ocean feeder"""
 
     def _fix_item(self, item):
-        item["ocean-unique-id"] = item["uuid"]
-
-    @classmethod
-    def get_perceval_params_from_url(cls, url):
-        # In the url the uri and the data dir are included
-        params = url.split()
-
-        return params
+        item["ocean-unique-id"] = item["origin"]+"_"+str(item["data"]["id"])

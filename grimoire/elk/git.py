@@ -310,9 +310,12 @@ class GitEnrich(Enrich):
         return eitem
 
     def enrich_demography(self, from_date=None):
-        logging.debug("Doing demography enrich from %s" % (self.elastic.index_url))
+        logging.debug("Doing demography enrich from %s", self.elastic.index_url)
+
         if from_date:
-            logging.debug("Demography since: %s" % (from_date))
+            # The from_date must be max author_max_date
+            from_date = self.elastic.get_last_item_field("author_max_date")
+            logging.debug("Demography since: %s", from_date)
 
         date_field = self.get_field_date()
 
@@ -371,6 +374,8 @@ class GitEnrich(Enrich):
           }
         }
         """ % (query)
+
+        logging.debug(es_query)
 
         r = self.requests.post(self.elastic.index_url+"/_search", data=es_query, verify=False)
         try:

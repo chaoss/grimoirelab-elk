@@ -45,7 +45,9 @@ from grimoire.ocean.kitsune import KitsuneOcean
 from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
 from grimoire.ocean.phabricator import PhabricatorOcean
+from grimoire.ocean.redmine import RedmineOcean
 from grimoire.ocean.remo2 import ReMoOcean
+from grimoire.ocean.rss import RSSOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.supybot import SupybotOcean
 from grimoire.ocean.telegram import TelegramOcean
@@ -68,7 +70,10 @@ from grimoire.elk.kitsune import KitsuneEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
 from grimoire.elk.phabricator import PhabricatorEnrich
+from grimoire.elk.redmine import RedmineEnrich
+# from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.remo2 import ReMoEnrich
+from grimoire.elk.rss import RSSEnrich
 from grimoire.elk.pipermail import PipermailEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
 from grimoire.elk.supybot import SupybotEnrich
@@ -92,7 +97,9 @@ from perceval.backends.core.mbox import MBox, MBoxCommand
 from perceval.backends.core.mediawiki import MediaWiki, MediaWikiCommand
 from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.core.pipermail import Pipermail, PipermailCommand
+from perceval.backends.core.redmine import Redmine, RedmineCommand
 from perceval.backends.mozilla.remo import ReMo, ReMoCommand
+from perceval.backends.core.rss import RSS, RSSCommand
 from perceval.backends.core.stackexchange import StackExchange, StackExchangeCommand
 from perceval.backends.core.supybot import Supybot, SupybotCommand
 from perceval.backends.core.telegram import Telegram, TelegramCommand
@@ -145,7 +152,9 @@ def get_connectors():
             "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
             "pipermail":[Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
+            "redmine":[Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
+            "rss":[RSS, RSSOcean, RSSEnrich, RSSCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
              "supybot":[Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
@@ -230,6 +239,8 @@ def get_params_parser():
     parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('--only-identities', action='store_true', help="Only add identities to SortingHat DB")
     parser.add_argument('--refresh-identities', action='store_true', help="Refresh identities in enriched items")
+    parser.add_argument('--author_id', help="Field author_id to be refreshed")
+    parser.add_argument('--author_uuid', help="Field author_uuid to be refreshed")
     parser.add_argument('--github-token', help="If provided, github usernames will be retrieved in git enrich.")
     parser.add_argument('--studies', action='store_true', help="Execute studies after enrichment.")
     parser.add_argument('--only-studies', action='store_true', help="Execute only studies.")
