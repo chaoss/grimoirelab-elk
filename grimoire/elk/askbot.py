@@ -58,15 +58,32 @@ class AskbotEnrich(Enrich):
     def get_field_author(self):
         return 'created_by'
 
-    def get_users_data(self, item):
-        """ If user fields are inside the global item dict """
-        if 'data' in item:
-            users_data = item['data']['details']
-        else:
-            # the item is directly the data (kitsune answer)
-            users_data = item
+    def get_elastic_mappings(self):
 
-        return users_data
+        mapping = """
+        {
+            "properties": {
+                "author_badges": {
+                  "type": "string",
+                  "index":"analyzed"
+                },
+                "summary": {
+                  "type": "string",
+                  "index":"analyzed"
+                },
+                "question_tags": {
+                    "type": "string",
+                    "index":"analyzed",
+                    "analyzer" : "comma"
+                },
+                "question_answer_ids": {
+                    "type": "string",
+                    "index":"analyzed",
+                    "analyzer" : "comma"
+                }
+           }
+        } """
+        return {"items":mapping}
 
     @metadata
     def get_rich_item(self, item):
@@ -117,10 +134,12 @@ class AskbotEnrich(Enrich):
         eitem['question_last_activity_by_id'] = question['last_activity_by']['id']
         eitem['question_last_activity_by_username'] = question['last_activity_by']['username']
         # Analyzed
-        eitem['question_tags'] = question['tags']
-        eitem['question_answer_ids'] = question['answer_ids']
+        eitem['question_tags'] = ",".join([tag for tag in question['tags']])
+        eitem['question_answer_ids'] = ",".join([str(aid) for aid in question['answer_ids']])
 
-        eitem['comment_count'] = None #um(len (a.comments) for a in data.answers)
+        eitem['comment_count'] = 0
+        if 'answers' in question:
+            eitem['comment_count'] = sum([len (a['comments']) if 'comments' in a else 0 for a in question['answers']])
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
