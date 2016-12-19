@@ -37,11 +37,15 @@ class AskbotEnrich(Enrich):
         """ Return the identities from an item """
         identities = []
 
-        participants = item['data']['details']['participants']
+        # question
+        user = self.get_sh_identity(item, self.get_field_author())
+        identities.append(user)
 
-        for identity in participants:
-            user = self.get_sh_identity(identity)
-            identities.append(user)
+        # answers
+        if 'answers' in item['data']:
+            for answer in item['data']['answers']:
+                user = self.get_sh_identity(answer['answered_by'])
+                identities.append(user)
         return identities
 
     def get_sh_identity(self, item, identity_field=None):
@@ -49,14 +53,14 @@ class AskbotEnrich(Enrich):
 
         user = item  # by default a specific user dict is expected
         if 'data' in item and type(item) == dict:
-            user = item['data']['details'][identity_field]
+            user = item['data'][identity_field]
         identity['username'] = user['username']
         identity['email'] = None
         identity['name'] = user['username']
         return identity
 
     def get_field_author(self):
-        return 'created_by'
+        return 'author'
 
     def get_elastic_mappings(self):
 
@@ -123,7 +127,7 @@ class AskbotEnrich(Enrich):
         if 'answers' in question:
             # answers ordered by time
             first_answer_time = unixtime_to_datetime(float(question['answers'][0]["added_at"]))
-            eitem['time_from_question'] = get_time_diff_days(added_at, firt_answer_time)
+            eitem['time_from_question'] = get_time_diff_days(added_at, first_answer_time)
 
         eitem['author_user_name'] = question['author']['username']
         eitem['author_id'] = question['author']['id']
