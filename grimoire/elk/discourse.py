@@ -78,7 +78,7 @@ class DiscourseEnrich(Enrich):
             eanswer['url'] += "/" + str(answer['topic_id']) + "/" + str(answer['post_number'])
             eanswer['type'] = 'answer'
             eanswer.update(self.get_grimoire_fields(answer['created_at'], eanswer['type']))
-            eanswer['is_discource_question'] = 0
+            eanswer['is_discourse_question'] = 0
             eanswer['display_username'] = answer['display_username']
             eanswer['username'] = answer['username']
             eanswer['author_id'] = answer['user_id']
