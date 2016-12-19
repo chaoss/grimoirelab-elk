@@ -699,7 +699,7 @@ class Enrich(object):
 
         return users_data
 
-    def get_item_sh(self, item, roles=None):
+    def get_item_sh(self, item, roles=None, date_field=None):
         """
         Add sorting hat enrichment fields for different roles
 
@@ -714,7 +714,10 @@ class Enrich(object):
         if not roles:
             roles = [author_field]
 
-        item_date = parser.parse(item[self.get_field_date()])
+        if not date_field:
+            item_date = parser.parse(item[self.get_field_date()])
+        else:
+            item_date = parser.parse(item[date_field])
 
         users_data = self.get_users_data(item)
 
