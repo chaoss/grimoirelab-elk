@@ -83,32 +83,44 @@ class DiscourseEnrich(Enrich):
         topic = item['data']
 
         # Fields that are the same in item and eitem
-        copy_fields = ["created_at", "like_count", "reply_count", "word_count", "posts_count",
-                       "id", "participant_count", "views", "pinned",
-                       "created_at", "last_posted_at", "title"]
+        copy_fields = ["id"]
         for f in copy_fields:
             if f in topic:
                 eitem[f] = topic[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"slug": "topic_slug"}
+        map_fields = {"question_like_count": "like_count",
+                      "question_posts_count": "posts_count",
+                      "question_participants": "participant_count",
+                      "question_pinned_at": "pinned_at",
+                      "question_pinned_globally": "pinned_globally",
+                      "question_pinned_until": "pinned_until",
+                      "question_pinned": "pinned",
+                      "question_title": "fancy_title",
+                      "question_views": "views",
+                      "question_replies": "reply_count"
+                      }
         for fn in map_fields:
             if fn in topic:
                 eitem[map_fields[fn]] = topic[fn]
             else:
                 eitem[map_fields[fn]] = None
 
-        eitem['username'] = topic['details']['created_by']['username']
+        if 'question_replies' in eitem:
+            eitem['question_replies'] -= 1  # index enrich spec
 
-        # First post has the topic contents
-        eitem['description'] = topic['post_stream']['posts'][0]['cooked']
-
-        # Topic URL
-        eitem['topic_url'] = item["origin"] + '/t/' + str(topic['id'])
+        # The first post is the first published
+        posts = topic['post_stream']['posts'][0]
+        eitem['url'] = eitem['origin'] + "/t/" + posts['topic_slug']
+        eitem['url'] += "/" + str(posts['topic_id']) + "/" + str(posts['post_number'])
+        eitem['author_user_name'] = posts['display_username']
+        eitem['author_id'] = posts['user_id']
+        eitem['reads'] = posts['reads']
+        eitem['reply_count'] = posts['reply_count']
 
         # First reply time
-        eitem['first_reply_time'] = None
+        eitem['time_from_question'] = None
         firt_post_time = None
         if len(topic['post_stream']['posts'])>1:
             firt_post_time = topic['post_stream']['posts'][0]['created_at']
@@ -118,6 +130,7 @@ class DiscourseEnrich(Enrich):
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
 
-        eitem.update(self.get_grimoire_fields(firt_post_time, "topic"))
+        eitem['type'] = 'question'
+        eitem.update(self.get_grimoire_fields(topic["created_at"], eitem['type']))
 
         return eitem
