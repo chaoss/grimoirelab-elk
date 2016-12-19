@@ -78,6 +78,7 @@ class DiscourseEnrich(Enrich):
             eanswer['url'] += "/" + str(answer['topic_id']) + "/" + str(answer['post_number'])
             eanswer['type'] = 'answer'
             eanswer.update(self.get_grimoire_fields(answer['created_at'], eanswer['type']))
+            eanswer['is_discource_question'] = 0
             eanswer['display_username'] = answer['display_username']
             eanswer['username'] = answer['username']
             eanswer['author_id'] = answer['user_id']
@@ -90,7 +91,6 @@ class DiscourseEnrich(Enrich):
             answers_enrich.append(eanswer)
 
             if self.sortinghat:
-                print(self.get_item_sh(answer, date_field="created_at"))
                 eanswer.update(self.get_item_sh(answer, date_field="created_at"))
 
             nanswers += 1
@@ -161,7 +161,6 @@ class DiscourseEnrich(Enrich):
             eitem['first_reply_time'] = get_time_diff_days(firt_post_time, second_post_time)
 
         if self.sortinghat:
-            print(self.get_item_sh(first_post, date_field="created_at"))
             eitem.update(self.get_item_sh(first_post, date_field="created_at"))
 
         eitem['type'] = 'question'
