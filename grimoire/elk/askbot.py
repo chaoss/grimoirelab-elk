@@ -46,6 +46,9 @@ class AskbotEnrich(Enrich):
             for answer in item['data']['answers']:
                 user = self.get_sh_identity(answer['answered_by'])
                 identities.append(user)
+                if 'comments' in answer:
+                    for comment in answer['comments']:
+                        identities.append(self.get_sh_identity(comment))
         return identities
 
     def get_sh_identity(self, item, identity_field=None):
@@ -54,6 +57,8 @@ class AskbotEnrich(Enrich):
         user = item  # by default a specific user dict is expected
         if 'data' in item and type(item) == dict:
             user = item['data'][identity_field]
+        elif 'author' in item:
+            user = item['author']
         identity['username'] = user['username']
         identity['email'] = None
         identity['name'] = user['username']
@@ -151,3 +156,104 @@ class AskbotEnrich(Enrich):
         eitem.update(self.get_grimoire_fields(added_at.isoformat(), eitem["type"]))
 
         return eitem
+
+    def get_field_unique_id_comment(self):
+        return "id"
+
+    def get_field_unique_id_answer(self):
+        return "id"
+
+    def get_rich_comment(self, item, answer, comment):
+        ecomment = self.get_rich_item(item)  # reuse all fields from item
+        ecomment['id'] = comment['id']
+        ecomment['url'] = item['data']['url']+"/?answer="
+        ecomment['url'] += answer['id']+'#post-id-'+answer['id']
+        ecomment['author_user_name'] = comment['author']['username']
+        ecomment['author_id'] = comment['author']['id']
+        ecomment['summary'] = comment['summary']
+        ecomment['score'] = comment['score']
+
+        if self.sortinghat:
+            comment['added_at_date'] = unixtime_to_datetime(float(comment["added_at"])).isoformat()
+            ecomment.update(self.get_item_sh(comment, date_field="added_at_date"))
+
+        comment_at = unixtime_to_datetime(float(comment["added_at"]))
+        added_at = unixtime_to_datetime(float(item['data']["added_at"]))
+        ecomment['time_from_question'] = get_time_diff_days(added_at, comment_at)
+        ecomment['type'] = 'comment'
+        ecomment.update(self.get_grimoire_fields(comment_at.isoformat(), ecomment['type']))
+        ecomment['is_askbot_question'] = 0
+
+        return ecomment
+
+    def get_rich_answer(self, item, answer):
+        eanswer = self.get_rich_item(item)  # reuse all fields from item
+        eanswer['id'] = answer['id']
+        eanswer['url'] = item['data']['url']+"/?answer="
+        eanswer['url'] += answer['id']+'#post-id-'+answer['id']
+        eanswer['author_user_name'] = answer['answered_by']['username']
+        eanswer['author_id'] = answer['answered_by']['id']
+        eanswer['author_badges'] = answer['answered_by']['badges']
+        eanswer['author_reputation'] = answer['answered_by']['reputation']
+        eanswer['summary'] = answer['summary']
+        eanswer['score'] = answer['score']
+        if 'is_correct' in answer:
+            eanswer['is_correct'] = 1
+
+        if self.sortinghat:
+            answer['added_at_date'] = unixtime_to_datetime(float(answer["added_at"])).isoformat()
+            eanswer.update(self.get_item_sh(answer, date_field="added_at_date"))
+
+        answer_at = unixtime_to_datetime(float(answer["added_at"]))
+        added_at = unixtime_to_datetime(float(item['data']["added_at"]))
+        eanswer['time_from_question'] = get_time_diff_days(added_at, answer_at)
+        eanswer['type'] = 'answer'
+        eanswer.update(self.get_grimoire_fields(answer_at.isoformat(), eanswer['type']))
+        eanswer['is_askbot_question'] = 0
+
+        return eanswer
+
+    def get_rich_item_answers_comments(self, item):
+        answers_enrich = []
+        comments_enrich = []
+
+        if 'answers' not in item['data']:
+            return (answers_enrich, comments_enrich)
+
+        for answer in item['data']['answers']:
+            eanswer = self.get_rich_answer(item, answer)
+            if not answers_enrich:
+                eanswer['first_answer'] = 1
+            answers_enrich.append(eanswer)
+
+            # And now time to process the comments
+            if 'comments' in answer:
+                for comment in answer['comments']:
+                    ecomment = self.get_rich_comment(item, answer, comment)
+                    comments_enrich.append(ecomment)
+
+        return (answers_enrich, comments_enrich)
+
+    def enrich_items(self, items):
+        nitems = super(AskbotEnrich, self).enrich_items(items)
+        logging.info("Total questions enriched: %i", nitems)
+
+        # And now for each item we want also the answers (tops)
+        nanswers = 0
+        ncomments = 0
+        rich_item_answers = []
+        rich_item_comments = []
+
+        for item in items:
+            (answers, comments) = self.get_rich_item_answers_comments(item)
+            rich_item_answers += answers
+            rich_item_comments += comments
+
+        if rich_item_answers:
+            nanswers = self.elastic.bulk_upload(rich_item_answers,
+                                                self.get_field_unique_id_answer())
+        if rich_item_comments:
+            ncomments += self.elastic.bulk_upload(rich_item_comments,
+                                                  self.get_field_unique_id_comment())
+        logging.info("Total answers enriched: %i", nanswers)
+        logging.info("Total comments enriched: %i", ncomments)
