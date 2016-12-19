@@ -172,8 +172,8 @@ class DiscourseEnrich(Enrich):
         return "id"
 
     def enrich_items(self, items):
-        # nitems = super(DiscourseEnrich, self).enrich_items(items)
-        # logging.info("Total questions enriched: %i", nitems)
+        nitems = super(DiscourseEnrich, self).enrich_items(items)
+        logging.info("Total questions enriched: %i", nitems)
 
         # And now for each item we want also the answers (tops)
         nanswers = 0
