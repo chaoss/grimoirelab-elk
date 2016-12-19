@@ -122,7 +122,7 @@ class AskbotEnrich(Enrich):
         eitem['time_from_question'] = None
         if 'answers' in question:
             # answers ordered by time
-            firt_answer_time = unixtime_to_datetime(float(question['answers'][0]["added_at"]))
+            first_answer_time = unixtime_to_datetime(float(question['answers'][0]["added_at"]))
             eitem['time_from_question'] = get_time_diff_days(added_at, firt_answer_time)
 
         eitem['author_user_name'] = question['author']['username']
@@ -144,6 +144,6 @@ class AskbotEnrich(Enrich):
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
         eitem["type"] = "question"
-        eitem.update(self.get_grimoire_fields(added_at, eitem["type"]))
+        eitem.update(self.get_grimoire_fields(added_at.isoformat(), eitem["type"]))
 
         return eitem
