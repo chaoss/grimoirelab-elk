@@ -82,7 +82,10 @@ class DiscourseEnrich(Enrich):
             eanswer['display_username'] = answer['display_username']
             eanswer['username'] = answer['username']
             eanswer['author_id'] = answer['user_id']
+            eanswer['author_trust_level'] = answer['trust_level']
+            eanswer['author_url'] = eanswer['origin'] + "/users/" + str(eanswer['author_id'])
             eanswer['reads'] = answer['reads']
+            eanswer['score'] = answer['score']
             eanswer['reply_count'] = answer['reply_count']
             eanswer['time_from_question'] = None
             post_time = answer['created_at']
@@ -139,9 +142,6 @@ class DiscourseEnrich(Enrich):
             else:
                 eitem[map_fields[fn]] = None
 
-        if 'question_replies' in eitem:
-            eitem['question_replies'] -= 1  # index enrich spec
-
         # The first post is the first published, and it is the question
         first_post = topic['post_stream']['posts'][0]
         eitem['url'] = eitem['origin'] + "/t/" + first_post['topic_slug']
@@ -149,7 +149,10 @@ class DiscourseEnrich(Enrich):
         eitem['display_username'] = first_post['display_username']
         eitem['username'] = first_post['username']
         eitem['author_id'] = first_post['user_id']
+        eitem['author_trust_level'] = first_post['trust_level']
+        eitem['author_url'] = eitem['origin'] + "/users/" + str(eitem['author_id'])
         eitem['reads'] = first_post['reads']
+        eitem['score'] = first_post['score']
         eitem['reply_count'] = first_post['reply_count']
 
         # First reply time
