@@ -137,7 +137,7 @@ class AskbotEnrich(Enrich):
         eitem['author_user_name'] = question['author']['username']
         eitem['author_id'] = question['author']['id']
         eitem['author_badges'] = question['author']['badges']
-        eitem['author_reputation'] = question['author']['reputation']
+        eitem['author_reputation'] = int(question['author']['reputation'])
 
         eitem['question_last_activity_at'] = unixtime_to_datetime(float(question['last_activity_at'])).isoformat()
         eitem['question_last_activity_by_id'] = question['last_activity_by']['id']
@@ -200,7 +200,7 @@ class AskbotEnrich(Enrich):
         eanswer['author_user_name'] = answer['answered_by']['username']
         eanswer['author_id'] = answer['answered_by']['id']
         eanswer['author_badges'] = answer['answered_by']['badges']
-        eanswer['author_reputation'] = answer['answered_by']['reputation']
+        eanswer['author_reputation'] = int(answer['answered_by']['reputation'])
         eanswer['summary'] = answer['summary']
         eanswer['score'] = answer['score']
         if 'is_correct' in answer:
