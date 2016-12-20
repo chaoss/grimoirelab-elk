@@ -169,7 +169,7 @@ class MeetupEnrich(Enrich):
             copy_fields = ["id", "name", "city", "state", "zip", "country",
                            "localized_country_name", "repinned", "address_1"]
             for f in copy_fields:
-                if f in event:
+                if f in venue:
                     eitem["venue_"+f] = venue[f]
                 else:
                     eitem[f] = None
@@ -245,6 +245,7 @@ class MeetupEnrich(Enrich):
                 ecomment['like_count'] = comment['like_count']
                 ecomment['type'] = 'comment'
                 ecomment.update(self.get_grimoire_fields(created, ecomment['type']))
+                ecomment.pop('is_meetup_meetup')
                 # event host fields: author of the event
                 member = comment['member']
                 if 'photo' in member:
@@ -273,6 +274,7 @@ class MeetupEnrich(Enrich):
                 ersvp['type'] = 'rsvp'
                 created = unixtime_to_datetime(rsvp['created']/1000).isoformat()
                 ersvp.update(self.get_grimoire_fields(created, ersvp['type']))
+                ersvp.pop('is_meetup_meetup')
                 # event host fields: author of the event
                 member = rsvp['member']
                 if 'photo' in member:
