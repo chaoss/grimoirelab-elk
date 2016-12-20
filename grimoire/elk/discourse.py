@@ -78,7 +78,7 @@ class DiscourseEnrich(Enrich):
             eanswer['url'] += "/" + str(answer['topic_id']) + "/" + str(answer['post_number'])
             eanswer['type'] = 'answer'
             eanswer.update(self.get_grimoire_fields(answer['created_at'], eanswer['type']))
-            eanswer['is_discourse_question'] = 0
+            eanswer.pop('is_discourse_question')
             eanswer['display_username'] = answer['display_username']
             eanswer['username'] = answer['username']
             eanswer['author_id'] = answer['user_id']
@@ -122,16 +122,16 @@ class DiscourseEnrich(Enrich):
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"question_like_count": "like_count",
-                      "question_posts_count": "posts_count",
-                      "question_participants": "participant_count",
-                      "question_pinned_at": "pinned_at",
-                      "question_pinned_globally": "pinned_globally",
-                      "question_pinned_until": "pinned_until",
-                      "question_pinned": "pinned",
-                      "question_title": "fancy_title",
-                      "question_views": "views",
-                      "question_replies": "reply_count"
+        map_fields = {"like_count": "question_like_count",
+                      "posts_count": "question_posts_count",
+                      "participant_count": "question_participants",
+                      "pinned_at": "question_pinned_at",
+                      "pinned_globally": "question_pinned_globally",
+                      "pinned_until": "question_pinned_until",
+                      "pinned": "question_pinned",
+                      "fancy_title": "question_title",
+                      "views": "question_views",
+                      "reply_count": "question_replies"
                       }
         for fn in map_fields:
             if fn in topic:
