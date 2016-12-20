@@ -128,11 +128,11 @@ class AskbotEnrich(Enrich):
 
         # First answer time
         added_at = unixtime_to_datetime(float(question["added_at"]))
-        eitem['time_from_question'] = None
+        eitem['time_to_reply'] = None
         if 'answers' in question:
             # answers ordered by time
             first_answer_time = unixtime_to_datetime(float(question['answers'][0]["added_at"]))
-            eitem['time_from_question'] = get_time_diff_days(added_at, first_answer_time)
+            eitem['time_to_reply'] = get_time_diff_days(added_at, first_answer_time)
 
         eitem['author_user_name'] = question['author']['username']
         eitem['author_id'] = question['author']['id']
@@ -182,7 +182,13 @@ class AskbotEnrich(Enrich):
         ecomment['time_from_question'] = get_time_diff_days(added_at, comment_at)
         ecomment['type'] = 'comment'
         ecomment.update(self.get_grimoire_fields(comment_at.isoformat(), ecomment['type']))
-        ecomment['is_askbot_question'] = 0
+
+        # Clean items fields not valid in comments
+        ecomment.pop('is_askbot_question')
+        ecomment.pop('author_reputation')
+        ecomment.pop('author_badges')
+        ecomment.pop('is_correct', None)
+        ecomment.pop('comment_count')
 
         return ecomment
 
@@ -209,7 +215,9 @@ class AskbotEnrich(Enrich):
         eanswer['time_from_question'] = get_time_diff_days(added_at, answer_at)
         eanswer['type'] = 'answer'
         eanswer.update(self.get_grimoire_fields(answer_at.isoformat(), eanswer['type']))
-        eanswer['is_askbot_question'] = 0
+
+        # Clean items fields not valid in comments
+        eanswer.pop('is_askbot_question')
 
         return eanswer
 
