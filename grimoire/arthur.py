@@ -269,7 +269,7 @@ def enrich_items(items, enrich_backend, events=False):
         total = enrich_backend.enrich_events(items)
     return total
 
-def get_last_enrich(backend_cmd, enrich_backend):
+def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
     last_enrich = None
 
     if backend_cmd:
@@ -287,26 +287,26 @@ def get_last_enrich(backend_cmd, enrich_backend):
             if backend_cmd.from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
                 last_enrich = backend_cmd.from_date
             else:
-                last_enrich = enrich_backend.get_last_update_from_es(filter_)
+                last_enrich = enrich_backend.get_last_update_from_es([filter_, filter_raw])
 
         elif 'offset' in signature.parameters:
             if backend_cmd.offset and backend_cmd.offset != 0:
                 last_enrich = backend_cmd.offset
             else:
-                last_enrich = enrich_backend.get_last_offset_from_es(filter_)
+                last_enrich = enrich_backend.get_last_offset_from_es([filter_, filter_raw])
     else:
         last_enrich = enrich_backend.get_last_update_from_es()
 
     return last_enrich
 
 
-def get_ocean_backend(backend_cmd, enrich_backend, no_incremental):
+def get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw=None):
     """ Get the ocean backend configured to start from the last enriched date """
 
     if no_incremental:
         last_enrich = None
     else:
-        last_enrich = get_last_enrich(backend_cmd, enrich_backend)
+        last_enrich = get_last_enrich(backend_cmd, enrich_backend, filter_raw)
 
     logger.debug("Last enrichment: %s", last_enrich)
 
@@ -328,6 +328,9 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental):
             ocean_backend = connector[1](backend, from_date=last_enrich)
         else:
             ocean_backend = connector[1](backend)
+
+    if filter_raw:
+        ocean_backend.set_filter_raw(filter_raw)
 
     return ocean_backend
 
@@ -399,7 +402,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if github_token and backend_name == "git":
             enrich_backend.set_github_token(github_token)
 
-        ocean_backend = get_ocean_backend(backend_cmd, enrich_backend, no_incremental)
 
         # filter_raw must be converted from the string param to a dict
         filter_raw_dict = {}
@@ -407,8 +409,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             filter_raw_dict['name'] = filter_raw.split(":")[0].replace('"','')
             filter_raw_dict['value'] = filter_raw.split(":")[1].replace('"','')
 
-        if filter_raw:
-            ocean_backend.set_filter_raw(filter_raw_dict)
+        ocean_backend = get_ocean_backend(backend_cmd, enrich_backend,
+                                          no_incremental, filter_raw_dict)
 
         if only_studies:
             logger.info("Running only studies (no SH and no enrichment)")

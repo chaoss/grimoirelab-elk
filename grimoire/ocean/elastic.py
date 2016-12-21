@@ -136,7 +136,7 @@ class ElasticOcean(object):
                 # Always filter by origin to support multi origin indexes
                 filter_ = {"name":"origin",
                            "value":self.perceval_backend.origin}
-                self.last_update = self.get_last_update_from_es(filter_)
+                self.last_update = self.get_last_update_from_es([filter_])
                 last_update = self.last_update
 
             logging.info("Incremental from: %s", last_update)

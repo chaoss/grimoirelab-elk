@@ -212,7 +212,7 @@ class ElasticSearch(object):
             :_filter: additional filter to find the date
         '''
 
-        last_date = self.__get_last_item_field(field, _filters=_filters)
+        last_date = self.get_last_item_field(field, _filters=_filters)
 
         return last_date
 
@@ -222,11 +222,11 @@ class ElasticSearch(object):
             :_filter: additional filter to find the date
         '''
 
-        offset = self.__get_last_item_field(field, _filters=_filters, offset=True)
+        offset = self.get_last_item_field(field, _filters=_filters, offset=True)
 
         return offset
 
-    def __get_last_item_field(self, field, _filters = [], offset = False):
+    def get_last_item_field(self, field, _filters = [], offset = False):
         '''
             :field: field with the data
             :_filters: additional filters to find the date
