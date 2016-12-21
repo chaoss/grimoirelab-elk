@@ -23,23 +23,23 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
+
 import logging
 
 from datetime import datetime
-from time import time
-from urllib.parse import urlparse
 
 from dateutil import parser
 
-from .enrich import Enrich
+from .enrich import Enrich, metadata
 
 from .utils import get_time_diff_days
 
 class BugzillaEnrich(Enrich):
 
-    def get_field_date(self):
-        return "delta_ts"
+    roles = ['assigned_to', 'reporter', 'qa_contact']
+
+    def get_field_author(self):
+        return "reporter"
 
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "reporter_uuid"]
@@ -47,8 +47,7 @@ class BugzillaEnrich(Enrich):
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
-    @classmethod
-    def get_sh_identity(cls, user):
+    def get_sh_identity(self, item, identity_field=None):
         """ Return a Sorting Hat identity using bugzilla user data """
 
         def fill_list_identity(identity, user_list_data):
@@ -64,60 +63,18 @@ class BugzillaEnrich(Enrich):
         for field in ['name', 'email', 'username']:
             # Basic fields in Sorting Hat
             identity[field] = None
-        if 'reporter' in user:
-            identity = fill_list_identity(identity, user['reporter'])
-        if 'assigned_to' in user:
-            identity = fill_list_identity(identity, user['assigned_to'])
-        if 'who' in user:
-            identity = fill_list_identity(identity, user['who'])
-        if 'Who' in user:
-            identity['username'] = user['Who']
-            if '@' in identity['username']:
-                identity['email'] = identity['username']
-        if 'qa_contact' in user:
-            identity = fill_list_identity(identity, user['qa_contact'])
-        if 'changed_by' in user:
-            identity['name'] = user['changed_by']
+
+        user = item  # by default a specific user dict is used
+        if 'data' in item and type(item) == dict:
+            user = item['data'][identity_field]
+
+        identity = fill_list_identity(identity, user)
 
         return identity
 
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields """
-        eitem = {}  # Item enriched
-
-        # Sorting Hat integration: reporter and assigned_to uuids
-        if 'assigned_to' in item['data']:
-            identity = BugzillaEnrich.get_sh_identity({'assigned_to':item["data"]['assigned_to']})
-            eitem['assigned_to_uuid'] = self.get_uuid(identity, self.get_connector_name())
-            eitem['assigned_to_name'] = identity['name']
-            item_date = item['data'][self.get_field_date()][0]['__text__']
-            item_date_dt = parser.parse(item_date)
-            item_date_utc = (item_date_dt-item_date_dt.utcoffset()).replace(tzinfo=None)
-            eitem["assigned_to_org_name"] = self.get_enrollment(eitem['assigned_to_uuid'], item_date_utc)
-            eitem["assigned_to_domain"] = self.get_domain(identity)
-            eitem["assigned_to_bot"] = self.is_bot(eitem['assigned_to_uuid'])
-        if 'reporter' in item['data']:
-            identity = BugzillaEnrich.get_sh_identity({'reporter':item["data"]['reporter']})
-            eitem['reporter_uuid'] = self.get_uuid(identity, self.get_connector_name())
-            eitem['reporter_name'] = identity['name']
-            item_date = item['data'][self.get_field_date()][0]['__text__']
-            item_date_dt = parser.parse(item_date)
-            item_date_utc = (item_date_dt-item_date_dt.utcoffset()).replace(tzinfo=None)
-            eitem["reporter_org_name"] = self.get_enrollment(eitem['reporter_uuid'], item_date_utc)
-            eitem["reporter_domain"] = self.get_domain(identity)
-            eitem["reporter_bot"] = self.is_bot(eitem['reporter_uuid'])
-
-        # Unify fields name
-        eitem["author_uuid"] = eitem["reporter_uuid"]
-        eitem["author_name"] = eitem["reporter_name"]
-        eitem["author_org_name"] = eitem["reporter_org_name"]
-        eitem["author_domain"] = eitem["reporter_domain"]
-
-        return eitem
-
-    def get_project_repository(self, item):
-        repo = item['origin']
-        product = item['data']['product'][0]['__text__']
+    def get_project_repository(self, eitem):
+        repo = eitem['origin']
+        product = eitem['product']
         repo += "buglist.cgi?product="+product
         return repo
 
@@ -126,23 +83,21 @@ class BugzillaEnrich(Enrich):
 
         identities = []
 
+        for rol in self.roles:
+            if rol in item['data']:
+                identities.append(self.get_sh_identity(item["data"][rol]))
+
         if 'activity' in item["data"]:
             for event in item["data"]['activity']:
-                identities.append(self.get_sh_identity(event))
+                event_user = [{"__text__":event['Who']}]
+                identities.append(self.get_sh_identity(event_user))
         if 'long_desc' in item["data"]:
             for comment in item["data"]['long_desc']:
-                identities.append(self.get_sh_identity(comment))
-        elif 'assigned_to' in item["data"]:
-            identities.append(self.get_sh_identity({'assigned_to':
-                                                    item["data"]['assigned_to']}))
-        elif 'reporter' in item["data"]:
-            identities.append(self.get_sh_identity({'reporter':
-                                                    item["data"]['reporter']}))
-        elif 'qa_contact' in item["data"]:
-            identities.append(self.get_sh_identity({'qa_contact':
-                                                    item['qa_contact']}))
+                identities.append(self.get_sh_identity(comment['who']))
+
         return identities
 
+    @metadata
     def get_rich_item(self, item):
 
         if 'bug_id' not in item['data']:
@@ -228,10 +183,10 @@ class BugzillaEnrich(Enrich):
             get_time_diff_days(eitem['creation_date'], datetime.utcnow())
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, self.roles))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(eitem['creation_date'],"bug"))
 

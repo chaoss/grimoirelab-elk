@@ -24,9 +24,18 @@
 
 import logging
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class ReMoEnrich(Enrich):
+
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                 db_user='', db_password='', db_host=''):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+                         db_user, db_password, db_host)
+        self.author = "user"  # changes if we are generating events
+
+    def get_field_author(self):
+        return self.author
 
     def get_elastic_mappings(self):
 
@@ -42,7 +51,11 @@ class ReMoEnrich(Enrich):
                 },
                 "functional_areas": {
                   "type": "string",
-                  "index":"analyzed"
+                  "analyzer": "comma"
+                  },
+                "categories": {
+                  "type": "string",
+                  "analyzer": "comma"
                   }
            }
         } """
@@ -63,7 +76,7 @@ class ReMoEnrich(Enrich):
 
         return identities
 
-    def get_sh_identity(self, owner):
+    def get_sh_identity(self, item, identity_field=None):
 		# "owner": {
         #             "first_name": "Huda",
         #             "last_name": "Sarfraz",
@@ -72,11 +85,16 @@ class ReMoEnrich(Enrich):
         #          },
         identity = {'username':None, 'email':None, 'name':None}
 
-        if not owner:
-           return identity
-        identity['username'] = owner["display_name"]
+        if not item:
+            return identity
+
+        user = item
+        if 'data' in item and type(item) == dict:
+            user = item['data'][identity_field]
+
+        identity['username'] = user["display_name"]
         identity['email'] = None
-        identity['name'] = owner["first_name"]+" "+owner["last_name"]
+        identity['name'] = user["first_name"]+" "+user["last_name"]
 
         return identity
 
@@ -97,6 +115,7 @@ class ReMoEnrich(Enrich):
 
         return category
 
+    @metadata
     def get_rich_item(self, item):
         # We need to detect the category of item: activities (report), events or users
         eitem = {}
@@ -119,7 +138,8 @@ class ReMoEnrich(Enrich):
 
         eitem = {}
 
-        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin","offset"]
+        copy_fields = ["metadata__updated_on", "metadata__timestamp",
+                       "ocean-unique-id", "origin", "offset"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]
@@ -155,17 +175,20 @@ class ReMoEnrich(Enrich):
             eitem['mentor'] = activity['mentor']['first_name']+" "+activity['mentor']['last_name']
 
         # geolocation
-        eitem['geolocation'] = {
-            "lat": eitem['latitude'],
-            "lon": eitem['longitude'],
-        }
+        if -90<int(eitem['latitude'])<90 and \
+            -180<int(eitem['longitude'])<180:
+            eitem['geolocation'] = {
+                "lat": eitem['latitude'],
+                "lon": eitem['longitude'],
+            }
 
         eitem['functional_areas'] = ''
         for area in eitem['functional_areas']:
             eitem['functional_areas'] += "," + area['name']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, "user"))
+            self.author = "user"
+            eitem.update(self.get_item_sh(item))
 
         return eitem
 
@@ -207,12 +230,20 @@ class ReMoEnrich(Enrich):
             eitem['owner'] = event['owner']['display_name']
 
         # geolocation
-        eitem['geolocation'] = {
-            "lat": eitem['lat'],
-            "lon": eitem['lon'],
-        }
+        if -90<int(eitem['lat'])<90 and \
+            -180<int(eitem['lon'])<180:
+            eitem['geolocation'] = {
+                "lat": eitem['lat'],
+                "lon": eitem['lon'],
+            }
+
+        eitem['categories'] = ''
+        for cat in event['categories']:
+            eitem['categories'] += "," + cat['name']
+        eitem['categories'] = eitem['categories'][1:]  # remove first comma
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, "owner"))
+            self.author = 'owner'
+            eitem.update(self.get_item_sh(item))
 
         return eitem

@@ -30,25 +30,33 @@ import logging
 import time
 
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class GerritEnrich(Enrich):
+
+    def get_field_author(self):
+        return "owner"
 
     def get_fields_uuid(self):
         return ["review_uuid", "patchSet_uuid", "approval_uuid"]
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
         for field in ['name', 'email', 'username']:
             identity[field] = None
+
+        user = item  # by default a specific user dict is expected
+        if 'data' in item and type(item) == dict:
+            user = item['data'][identity_field]
+
         if 'name' in user: identity['name'] = user['name']
         if 'email' in user: identity['email'] = user['email']
         if 'username' in user: identity['username'] = user['username']
         return identity
 
-    def get_project_repository(self, item):
-        repo = item['origin']
-        repo += "_" + item['data']['project']
+    def get_project_repository(self, eitem):
+        repo = eitem['origin']
+        repo += "_" + eitem['repository']
         return repo
 
     def get_identities(self, item):
@@ -135,6 +143,7 @@ class GerritEnrich(Enrich):
         return {"items":mapping}
 
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}  # Item enriched
 
@@ -189,10 +198,10 @@ class GerritEnrich(Enrich):
         eitem["timeopen"] =  '%.2f' % timeopen
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, "owner"))
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(review['createdOn'], "review"))
 

@@ -27,7 +27,7 @@ import logging
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class MediaWikiEnrich(Enrich):
 
@@ -60,29 +60,25 @@ class MediaWikiEnrich(Enrich):
             identities.append(user)
         return identities
 
-    def get_sh_identity(self, revision):
+    def get_field_author(self):
+        return 'user'
+
+    def get_sh_identity(self, item, identity_field=None):
+
+        revision = item
+
+        if 'data' in item and type(item) == dict:
+            revision = item['data']['revisions'][0]
+
         identity = {}
         identity['username'] = None
         identity['email'] = None
         identity['name'] = None
-        if 'user' in revision:
-            identity['username'] = revision['user']
-            identity['name'] = revision['user']
+
+        if  identity_field in revision:
+            identity['username'] = revision[identity_field]
+            identity['name'] = revision[identity_field]
         return identity
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-        if not len(item['data']['revisions']) > 0:
-            return eitem
-
-        first_revision = item['data']['revisions'][0]
-
-        identity  = self.get_sh_identity(first_revision)
-        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
-
-        return eitem
 
     def get_review_sh(self, revision, item):
         """ Add sorting hat enrichment fields for the author of the revision """
@@ -143,7 +139,7 @@ class MediaWikiEnrich(Enrich):
 
         return erevisions
 
-
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 

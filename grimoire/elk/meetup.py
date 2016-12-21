@@ -1,0 +1,327 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+#
+#
+# Copyright (C) 2015 Bitergia
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# Authors:
+#   Alvaro del Castillo San Felix <acs@bitergia.com>
+#
+
+
+import logging
+
+from grimoire.elk.enrich import Enrich, metadata
+
+from .utils import unixtime_to_datetime
+
+class MeetupEnrich(Enrich):
+
+
+    def get_field_author(self):
+        return "author"
+
+    def get_elastic_mappings(self):
+
+        mapping = """
+        {
+            "properties": {
+                "description_analyzed": {
+                  "type": "string",
+                  "index":"analyzed"
+                  },
+                "geolocation": {
+                   "type": "geo_point"
+                },
+                "group_geolocation": {
+                   "type": "geo_point"
+                },
+                "group_topics" : {
+                    "type" : "string",
+                    "analyzer" : "comma"
+                },
+                "group_topics_keys" : {
+                    "type" : "string",
+                    "analyzer" : "comma"
+                }
+           }
+        } """
+
+        return {"items":mapping}
+
+    def get_identities(self, item):
+        ''' Return the identities from an item '''
+
+        identities = []
+        item = item['data']
+
+        identities = []
+
+        # Creators
+        user = self.get_sh_identity(item['event_hosts'][0])
+        identities.append(user)
+
+        # rsvps
+        for rsvp in item['rsvps']:
+            user = self.get_sh_identity(rsvp['member'])
+            identities.append(user)
+        # Comments
+        for comment in item['comments']:
+            user = self.get_sh_identity(comment['member'])
+            identities.append(user)
+        return identities
+
+
+    def get_sh_identity(self, item, identity_field=None):
+        identity = {'username':None, 'email':None, 'name':None}
+
+        if not item:
+            return identity
+
+        user = item
+        if 'data' in item and type(item) == dict:
+            user = item['data'][identity_field]
+
+        identity['username'] = user["id"]
+        identity['email'] = None
+        identity['name'] = user["name"]
+
+        return identity
+
+    @metadata
+    def get_rich_item(self, item):
+        # We need to detect the category of item: activities (report), events or users
+        eitem = {}
+
+        copy_fields = ["metadata__updated_on", "metadata__timestamp",
+                       "ocean-unique-id", "origin"]
+        for f in copy_fields:
+            if f in item:
+                eitem[f] = item[f]
+            else:
+                eitem[f] = None
+
+        event = item['data']
+
+        # data fields to copy
+        copy_fields = ["id", "how_to_find_us"]
+        for f in copy_fields:
+            if f in event:
+                eitem[f] = event[f]
+            else:
+                eitem[f] = None
+
+        # Fields which names are translated
+        map_fields = {
+            "link": "url",
+            "rsvp_limit": "rsvps_limit"
+        }
+        for fn in map_fields:
+            if fn in event:
+                eitem[map_fields[fn]] = event[fn]
+            else:
+                eitem[f] = None
+
+
+        # event host fields: author of the event
+        host = event['event_hosts'][0]
+        eitem['member_photo_url'] = host['photo']['photo_link']
+        eitem['member_photo_id'] = host['photo']['id']
+        eitem['member_photo_type'] = host['photo']['type']
+        eitem['member_is_host'] = True
+        eitem['member_id'] = host['id']
+        eitem['member_name'] = host['name']
+        eitem['member_url'] = "https://www.meetup.com/members/" + str(host['id'])
+
+        eitem['event_url'] = event['link']
+
+        # data fields to copy with meetup`prefix
+        copy_fields = ["description", "plain_text_description",
+                       "created", "name", "status",
+                       "time", "updated", "utc_offset", "visibility",
+                       "waitlist_count", "yes_rsvp_count", "duration",
+                       "featured", "rsvpable"]
+        for f in copy_fields:
+            if f in event:
+                eitem["meetup_"+f] = event[f]
+            else:
+                eitem[f] = None
+
+        eitem['num_rsvps'] = len(event['rsvps'])
+        eitem['num_comments'] = len(event['comments'])
+
+        if 'venue' in event:
+            venue = event['venue']
+            copy_fields = ["id", "name", "city", "state", "zip", "country",
+                           "localized_country_name", "repinned", "address_1"]
+            for f in copy_fields:
+                if f in venue:
+                    eitem["venue_"+f] = venue[f]
+                else:
+                    eitem[f] = None
+
+            eitem['venue_geolocation'] = {
+                "lat": event['venue']['lat'],
+                "lon": event['venue']['lon'],
+            }
+
+        if 'series' in event:
+            eitem['series_id'] = event['series']['id']
+            eitem['series_description'] = event['series']['description']
+            eitem['series_start_date'] = event['series']['start_date']
+
+
+        if 'group' in event:
+            group = event['group']
+            copy_fields = ["id", "created", "join_mode", "name", "url_name",
+                           "who"]
+            for f in copy_fields:
+                if f in group:
+                    eitem["group_"+f] = group[f]
+                else:
+                    eitem[f] = None
+
+            eitem['group_geolocation'] = {
+                "lat": group['lat'],
+                "lon": group['lon'],
+            }
+            group_topics = [topic['name'] for topic in group['topics']]
+            group_topics_keys = [topic['urlkey'] for topic in group['topics']]
+            eitem['group_topics'] = ",".join(group_topics)
+            eitem['group_topics_keys'] = ",".join(group_topics_keys)
+
+        if len(event['rsvps']) > 0:
+            eitem['group_members'] = event['rsvps'][0]['group']['members']
+
+        created = unixtime_to_datetime(event['created']/1000).isoformat()
+        eitem['type'] = "meetup"
+        eitem.update(self.get_grimoire_fields(created, eitem['type']))
+
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(event))
+
+        return eitem
+
+
+    def get_item_sh(self, item):
+        """ Add sorting hat enrichment fields  """
+
+        # Not shared common get_item_sh because it is pretty specific
+        if 'member' in item:
+            # comment and rsvp
+            identity  = self.get_sh_identity(item['member'])
+        elif 'event_hosts' in item:
+            # meetup event
+            identity  = self.get_sh_identity(item['event_hosts'][0])
+
+        created = unixtime_to_datetime(item['created']/1000)
+        sh_fields = self.get_item_sh_fields(identity, created)
+
+        return sh_fields
+
+    def get_rich_item_comments(self, item):
+        comments_enrich = []
+        if 'comments' in item['data']:
+            for comment in item['data']['comments']:
+                ecomment = self.get_rich_item(item)  # reuse all fields from item
+                created = unixtime_to_datetime(comment['created']/1000).isoformat()
+                ecomment['url'] = comment['link']
+                ecomment['id'] = comment['id']
+                ecomment['comment'] = comment['comment']
+                ecomment['like_count'] = comment['like_count']
+                ecomment['type'] = 'comment'
+                ecomment.update(self.get_grimoire_fields(created, ecomment['type']))
+                ecomment.pop('is_meetup_meetup')
+                # event host fields: author of the event
+                member = comment['member']
+                if 'photo' in member:
+                    ecomment['member_photo_url'] = member['photo']['photo_link']
+                    ecomment['member_photo_id'] = member['photo']['id']
+                    ecomment['member_photo_type'] = member['photo']['type']
+                ecomment['member_is_host'] = member['event_context']['host']
+                ecomment['member_id'] = member['id']
+                ecomment['member_name'] = member['name']
+                ecomment['member_url'] = "https://www.meetup.com/members/" + str(member['id'])
+                comments_enrich.append(ecomment)
+
+                if self.sortinghat:
+                    ecomment.update(self.get_item_sh(comment))
+
+        return comments_enrich
+
+    def get_field_unique_id_comment(self):
+        return "id"
+
+    def get_rich_item_rsvps(self, item):
+        rsvps_enrich = []
+        if 'rsvps' in item['data']:
+            for rsvp in item['data']['rsvps']:
+                ersvp = self.get_rich_item(item)  # reuse all fields from item
+                ersvp['type'] = 'rsvp'
+                created = unixtime_to_datetime(rsvp['created']/1000).isoformat()
+                ersvp.update(self.get_grimoire_fields(created, ersvp['type']))
+                ersvp.pop('is_meetup_meetup')
+                # event host fields: author of the event
+                member = rsvp['member']
+                if 'photo' in member:
+                    ersvp['member_photo_url'] = member['photo']['photo_link']
+                    ersvp['member_photo_id'] = member['photo']['id']
+                    ersvp['member_photo_type'] = member['photo']['type']
+                ersvp['member_is_host'] = member['event_context']['host']
+                ersvp['member_id'] = member['id']
+                ersvp['member_name'] = member['name']
+                ersvp['member_url'] = "https://www.meetup.com/members/" + str(member['id'])
+
+                ersvp['id'] = ersvp['id'] + "_" + str(member['id'])
+                ersvp['url'] = "https://www.meetup.com/members/" + str(member['id'])
+
+                ersvp['rsvps_guests'] = rsvp['guests']
+                ersvp['rsvps_updated'] = rsvp['updated']
+                ersvp['rsvps_response']	= rsvp['response']
+
+                if self.sortinghat:
+                    ersvp.update(self.get_item_sh(rsvp))
+
+                rsvps_enrich.append(ersvp)
+
+        return rsvps_enrich
+
+    def get_field_unique_id_rsvps(self):
+        return "id"
+
+    def enrich_items(self, items):
+        super(MeetupEnrich, self).enrich_items(items)
+
+        # And now for each item we want also the rsvps and comments items
+        ncom = 0
+        nrsvps = 0
+        rich_item_comments = []
+        rich_item_rsvps = []
+
+        for item in items:
+            rich_item_comments += self.get_rich_item_comments(item)
+            rich_item_rsvps += self.get_rich_item_rsvps(item)
+
+        if rich_item_comments:
+            ncom += self.elastic.bulk_upload(rich_item_comments,
+                                             self.get_field_unique_id_comment())
+        if rich_item_rsvps:
+            nrsvps += self.elastic.bulk_upload(rich_item_rsvps,
+                                               self.get_field_unique_id_rsvps())
+
+        logging.info("Total comments enriched: %i", ncom)
+        logging.info("Total nrsvps enriched: %i", nrsvps)

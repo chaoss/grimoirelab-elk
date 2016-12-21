@@ -28,14 +28,14 @@ from dateutil import parser
 import json
 import logging
 
-from .enrich import Enrich
+from .enrich import Enrich, metadata
 
 from .utils import get_time_diff_days
 
 class BugzillaRESTEnrich(Enrich):
 
-    def get_field_date(self):
-        return "metadata__updated_on"
+    def get_field_author(self):
+        return 'creator_detail'
 
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "creator_uuid"]
@@ -55,30 +55,25 @@ class BugzillaRESTEnrich(Enrich):
             identities.append(user)
         return identities
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
+
+        user = item  # by default a specific user dict is used
+        if 'data' in item and type(item) == dict:
+            user = item['data'][identity_field]
+
         identity['username'] = user['name']
         identity['email'] = user['email']
         identity['name'] = user['real_name']
         return identity
 
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-        data = item['data']['creator_detail']
-
-        identity  = self.get_sh_identity(data)
-        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
-
-        return eitem
-
-    def get_project_repository(self, item):
-        repo = item['origin']
-        product = item['data']['product']
+    def get_project_repository(self, eitem):
+        repo = eitem['origin']
+        product = eitem['product']
         repo += "/buglist.cgi?product="+product
         return repo
 
+    @metadata
     def get_rich_item(self, item):
 
         if 'id' not in item['data']:
@@ -134,6 +129,6 @@ class BugzillaRESTEnrich(Enrich):
             eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         return eitem

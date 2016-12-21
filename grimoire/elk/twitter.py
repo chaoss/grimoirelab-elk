@@ -24,9 +24,12 @@
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class TwitterEnrich(Enrich):
+
+    def get_field_author(self):
+        return  "user"
 
     def get_field_date(self):
         return "created_at"
@@ -55,15 +58,15 @@ class TwitterEnrich(Enrich):
 
         return {"items":mapping}
 
-    def get_sh_identity(self, item):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
         identity['username'] = None
         identity['email'] = None
         identity['name'] = None
 
-        if 'user' in item:
-            identity['username'] = item['user']['screen_name']
-            identity['name'] = item['user']['name']
+        if identity_field in item:
+            identity['username'] = item[identity_field]['screen_name']
+            identity['name'] = item[identity_field]['name']
         return identity
 
     def get_identities(self, item):
@@ -75,6 +78,7 @@ class TwitterEnrich(Enrich):
 
         return identities
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 
@@ -127,7 +131,7 @@ class TwitterEnrich(Enrich):
         eitem['user_url_twitter'] = "http://twitter.com/"+tweet['user']['screen_name']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(tweet, "user"))
+            eitem.update(self.get_item_sh(tweet))
 
         eitem.update(self.get_grimoire_fields(tweet["created_at"], "twitter"))
 

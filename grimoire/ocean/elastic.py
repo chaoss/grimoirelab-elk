@@ -98,6 +98,11 @@ class ElasticOcean(object):
         from ..utils import get_connector_name
         return get_connector_name(type(self))
 
+    @classmethod
+    def get_perceval_params_from_url(cls, url):
+        """ Get the perceval params given a URL for the data source """
+        return [url]
+
     def drop_item(self, item):
         """ Drop items not to be inserted in Elastic """
         return False
@@ -123,7 +128,6 @@ class ElasticOcean(object):
         # Check if backend supports from_date
         signature = inspect.signature(self.perceval_backend.fetch)
 
-
         last_update = None
         if 'from_date' in signature.parameters:
             if from_date:
@@ -147,12 +151,16 @@ class ElasticOcean(object):
                            "value":self.perceval_backend.origin}
                 offset = self.elastic.get_last_offset("offset", filter_)
 
-            logging.info("Incremental from: %i offset", offset)
+            if offset:
+                logging.info("Incremental from: %i offset", offset)
+            else:
+                logging.info("Not incremental")
 
         task_init = datetime.now()
 
         items_pack = []  # to feed item in packs
         drop = 0
+        added = 0
         if self.fetch_cache:
             items = self.perceval_backend.fetch_from_cache()
         else:
@@ -171,7 +179,10 @@ class ElasticOcean(object):
                 else:
                     items = self.perceval_backend.fetch(offset=offset)
             else:
-                items = self.perceval_backend.fetch()
+                if category:
+                    items = self.perceval_backend.fetch(category=category)
+                else:
+                    items = self.perceval_backend.fetch()
 
         for item in items:
             # print("%s %s" % (item['url'], item['lastUpdated_date']))
@@ -185,6 +196,7 @@ class ElasticOcean(object):
                 items_pack = []
             if not self.drop_item(item):
                 items_pack.append(item)
+                added += 1
             else:
                 drop +=1
         self._items_to_es(items_pack)
@@ -192,6 +204,7 @@ class ElasticOcean(object):
 
         total_time_min = (datetime.now()-task_init).total_seconds()/60
 
+        logging.debug("Added %i items to ocean", added)
         logging.debug("Dropped %i items using drop_item filter" % (drop))
         logging.info("Finished in %.2f min" % (total_time_min))
 

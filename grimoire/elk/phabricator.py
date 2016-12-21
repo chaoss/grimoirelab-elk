@@ -28,7 +28,7 @@ from datetime import datetime
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 from .utils import get_time_diff_days, unixtime_to_datetime
 
@@ -38,15 +38,19 @@ TASK_CLOSED_STATUS = 'resolved'
 
 class PhabricatorEnrich(Enrich):
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None, insecure=True):
-        super().__init__(db_sortinghat, db_projects_map, json_projects_map, insecure)
+    roles = ['authorData', 'ownerData']
 
-        self.tasks_closed = 0
-        self.tasks_opened = 0
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                     db_user='', db_password='', db_host=''):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map, db_user, db_password, db_host)
+
         self.phab_ids_names = {}  # To convert from phab ids to phab names
 
     def get_field_event_unique_id(self):
         return "transactionID"
+
+    def get_field_author(self):
+        return "authorData"
 
     def get_elastic_mappings(self):
 
@@ -88,43 +92,38 @@ class PhabricatorEnrich(Enrich):
         identities = []
 
         if 'authorData' in item['data']['fields']:
+            print(item['data']['fields']['authorData'])
             user = self.get_sh_identity(item['data']['fields']['authorData'])
             identities.append(user)
 
         if 'ownerData' in item['data']['fields']:
+            print(item['data']['fields']['ownerData'])
             user = self.get_sh_identity(item['data']['fields']['ownerData'])
             identities.append(user)
 
         return identities
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
+
+        user = item
+        if 'data' in item and type(item) == dict:
+            user = item['data']['fields'][identity_field]
+
         identity['email'] = None
         identity['username'] = user['userName']
         identity['name'] = user['realName']
 
         return identity
 
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-
-        if 'authorData' in item['data']['fields']:
-            identity  = self.get_sh_identity(item['data']['fields']['authorData'])
-            eitem.update(self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()])))
-        if 'ownerData' in item['data']['fields']:
-            identity  = self.get_sh_identity(item['data']['fields']['ownerData'])
-            assigned_to = {}
-            assigned_to["assigned_to_name"] = identity['name']
-            assigned_to["assigned_to_user_name"] = identity['username']
-            assigned_to["assigned_to_uuid"] = self.get_uuid(identity, self.get_connector_name())
-            assigned_to["assigned_to_org_name"] = self.get_enrollment(assigned_to["assigned_to_uuid"], parser.parse(item[self.get_field_date()]))
-            assigned_to["assigned_to_bot"] = self.is_bot(assigned_to['assigned_to_uuid'])
-            assigned_to["assigned_to_domain"] = self.get_identity_domain(identity)
-            eitem.update(assigned_to)
-
-        return eitem
+    def get_users_data(self, item):
+        """ If user fields are inside the global item dict """
+        if 'data' in item:
+            users_data = item['data']['fields']
+        else:
+            # the item is directly the data (kitsune answer)
+            users_data = item
+        return users_data
 
     def get_rich_events(self, item):
         """
@@ -154,8 +153,6 @@ class PhabricatorEnrich(Enrich):
         task_change['tags_custom_analyzed'] = eitem['tags_custom_analyzed']
 
         # Events are in transactions field (changes in fields)
-        # We need to revert them to go from older to newer
-        item['data']['transactions'].reverse()
         transactions = item['data']['transactions']
         for t in transactions:
             event = {}
@@ -223,15 +220,6 @@ class PhabricatorEnrich(Enrich):
 
             for f in task_change:
                 event[f] = task_change[f]
-
-            # For the burn vis
-            if event['type'] in  ['core:create']:
-                self.tasks_opened += 1
-            if event['newValue'] in ['resolved']:
-                self.tasks_closed += 1
-            event['tasks_opened'] = self.tasks_opened
-            event['tasks_closed'] = self.tasks_closed
-            event['tasks_burn'] = self.tasks_opened-self.tasks_closed
 
             events.append(event)
 
@@ -311,11 +299,20 @@ class PhabricatorEnrich(Enrich):
         eitem['main_description_analyzed'] = eitem['main_description']
         eitem['url'] = eitem['origin']+"/T"+str(eitem['bug_id'])
 
-        eitem['timeopen_days'] = \
-            get_time_diff_days(eitem['creation_date'], eitem['update_date'])
-        if eitem['status'] == TASK_OPEN_STATUS:
-            eitem['timeopen_days'] = \
-                get_time_diff_days(eitem['creation_date'], datetime.utcnow())
+        # Time to assign (time to open -> time to assign)
+        eitem['time_to_assign_days'] = None
+        # Time to attend (time to assign-> time to first activity from assignee)
+        eitem['time_to_attend_days'] = None
+        # Time to close (time open -> time last updated for closed tasks)
+        # We can improve it later using events: time open event -> time resolved event
+        eitem['time_to_close_days'] = None
+        if eitem['status'] not in [TASK_OPEN_STATUS, 'spite', 'stalled']:
+            eitem['time_to_close_days'] = \
+                get_time_diff_days(eitem['creation_date'], eitem['update_date'])
+        # Time open (time to open -> now): with painless
+        # Time open using the enrich date. Field needed for filtering.
+        eitem['time_open_days_enrich'] = get_time_diff_days(eitem['creation_date'], datetime.utcnow())
+        # Time from last update (time last update -> now): with painless
 
         eitem['changes'] = len(phab_item['transactions'])
         # Number of assignments changes
@@ -324,11 +321,24 @@ class PhabricatorEnrich(Enrich):
         eitem['changes_assignee_number'] = 0
         # List the changes assignees
         changes_assignee_list = []
+        first_assignee_phid = None
+        first_assignee_date = None
+        # We need to revert them to go from older to newer
+        phab_item['transactions'].reverse()
         for change in phab_item['transactions']:
+            change_date = unixtime_to_datetime(float(change['dateCreated'])).isoformat()
             if change["transactionType"] == "reassign":
-                if change['authorData']['userName'] not in changes_assignee_list:
+                if not eitem['time_to_assign_days']:
+                    eitem['time_to_assign_days'] = get_time_diff_days(eitem['creation_date'], change_date)
+                    first_assignee_phid = change['newValue']
+                    first_assignee_date = change_date
+                if 'userName' in change['authorData'] and \
+                    change['authorData']['userName'] not in changes_assignee_list:
                     changes_assignee_list.append(change['authorData']['userName'])
                 eitem['changes_assignment'] += 1
+            if not eitem['time_to_attend_days'] and first_assignee_phid:
+                if change['authorData']['phid'] == first_assignee_phid:
+                    eitem['time_to_attend_days'] = get_time_diff_days(first_assignee_date, change_date)
         eitem['changes_assignee_number'] = len(changes_assignee_list)
         eitem['changes_assignee_list'] = ','.join(changes_assignee_list)
         eitem['comments'] = 0
@@ -346,7 +356,7 @@ class PhabricatorEnrich(Enrich):
         eitem['tags_custom_analyzed'] = eitem['tags']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, self.roles))
 
         eitem.update(self.get_grimoire_fields(eitem['creation_date'], "task"))
 

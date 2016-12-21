@@ -136,7 +136,9 @@ if __name__ == '__main__':
                                args.github_token,
                                args.studies, args.only_studies,
                                args.elastic_url_enrich, args.events_enrich,
-                               args.filter_raw)
+                               args.db_user, args.db_password, args.db_host,
+                               args.refresh_projects, args.refresh_identities,
+                               args.author_id, args.author_uuid, args.filter_raw)
                 logging.info("Enrich backend completed")
             elif args.events_enrich:
                 logging.info("Enrich option is needed for events_enrich")

@@ -31,6 +31,7 @@ import sys
 from grimoire.ocean.elastic import ElasticOcean
 
 # Connectors for Ocean
+from grimoire.ocean.askbot import AskbotOcean
 from grimoire.ocean.bugzilla import BugzillaOcean
 from grimoire.ocean.bugzillarest import BugzillaRESTOcean
 from grimoire.ocean.confluence import ConfluenceOcean
@@ -43,8 +44,11 @@ from grimoire.ocean.jira import JiraOcean
 from grimoire.ocean.kitsune import KitsuneOcean
 from grimoire.ocean.mbox import MBoxOcean
 from grimoire.ocean.mediawiki import MediaWikiOcean
+from grimoire.ocean.meetup import MeetupOcean
 from grimoire.ocean.phabricator import PhabricatorOcean
+from grimoire.ocean.redmine import RedmineOcean
 from grimoire.ocean.remo2 import ReMoOcean
+from grimoire.ocean.rss import RSSOcean
 from grimoire.ocean.stackexchange import StackExchangeOcean
 from grimoire.ocean.supybot import SupybotOcean
 from grimoire.ocean.telegram import TelegramOcean
@@ -52,6 +56,7 @@ from grimoire.ocean.twitter import TwitterOcean
 
 
 # Connectors for EnrichOcean
+from grimoire.elk.askbot import AskbotEnrich
 from grimoire.elk.bugzilla import BugzillaEnrich
 from grimoire.elk.bugzillarest import BugzillaRESTEnrich
 from grimoire.elk.confluence import ConfluenceEnrich
@@ -65,9 +70,12 @@ from grimoire.elk.jira import JiraEnrich
 from grimoire.elk.kitsune import KitsuneEnrich
 from grimoire.elk.mbox import MBoxEnrich
 from grimoire.elk.mediawiki import MediaWikiEnrich
+from grimoire.elk.meetup import MeetupEnrich
 from grimoire.elk.phabricator import PhabricatorEnrich
+from grimoire.elk.redmine import RedmineEnrich
 # from grimoire.elk.remo import ReMoEnrich
 from grimoire.elk.remo2 import ReMoEnrich
+from grimoire.elk.rss import RSSEnrich
 from grimoire.elk.pipermail import PipermailEnrich
 from grimoire.elk.stackexchange import StackExchangeEnrich
 from grimoire.elk.supybot import SupybotEnrich
@@ -75,26 +83,29 @@ from grimoire.elk.telegram import TelegramEnrich
 from grimoire.elk.twitter import TwitterEnrich
 
 # Connectors for Perceval
-from perceval.backends.bugzilla import Bugzilla, BugzillaCommand
-from perceval.backends.bugzillarest import BugzillaREST, BugzillaRESTCommand
-from perceval.backends.discourse import Discourse, DiscourseCommand
-from perceval.backends.confluence import Confluence, ConfluenceCommand
-from perceval.backends.gerrit import Gerrit, GerritCommand
-from perceval.backends.git import Git, GitCommand
-from perceval.backends.github import GitHub, GitHubCommand
-from perceval.backends.gmane import Gmane, GmaneCommand
-from perceval.backends.jenkins import Jenkins, JenkinsCommand
-from perceval.backends.jira import Jira, JiraCommand
-from perceval.backends.kitsune import Kitsune, KitsuneCommand
-from perceval.backends.mbox import MBox, MBoxCommand
-from perceval.backends.mediawiki import MediaWiki, MediaWikiCommand
-from perceval.backends.phabricator import Phabricator, PhabricatorCommand
-from perceval.backends.pipermail import Pipermail, PipermailCommand
-# from perceval.backends.remo import ReMo, ReMoCommand
-from perceval.backends.remo2 import ReMo, ReMoCommand
-from perceval.backends.stackexchange import StackExchange, StackExchangeCommand
-from perceval.backends.supybot import Supybot, SupybotCommand
-from perceval.backends.telegram import Telegram, TelegramCommand
+from perceval.backends.core.askbot import Askbot, AskbotCommand
+from perceval.backends.core.bugzilla import Bugzilla, BugzillaCommand
+from perceval.backends.core.bugzillarest import BugzillaREST, BugzillaRESTCommand
+from perceval.backends.core.discourse import Discourse, DiscourseCommand
+from perceval.backends.core.confluence import Confluence, ConfluenceCommand
+from perceval.backends.core.gerrit import Gerrit, GerritCommand
+from perceval.backends.core.git import Git, GitCommand
+from perceval.backends.core.github import GitHub, GitHubCommand
+from perceval.backends.core.gmane import Gmane, GmaneCommand
+from perceval.backends.core.jenkins import Jenkins, JenkinsCommand
+from perceval.backends.core.jira import Jira, JiraCommand
+from perceval.backends.mozilla.kitsune import Kitsune, KitsuneCommand
+from perceval.backends.core.mbox import MBox, MBoxCommand
+from perceval.backends.core.mediawiki import MediaWiki, MediaWikiCommand
+from perceval.backends.core.meetup import Meetup, MeetupCommand
+from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
+from perceval.backends.core.pipermail import Pipermail, PipermailCommand
+from perceval.backends.core.redmine import Redmine, RedmineCommand
+from perceval.backends.mozilla.remo import ReMo, ReMoCommand
+from perceval.backends.core.rss import RSS, RSSCommand
+from perceval.backends.core.stackexchange import StackExchange, StackExchangeCommand
+from perceval.backends.core.supybot import Supybot, SupybotCommand
+from perceval.backends.core.telegram import Telegram, TelegramCommand
 
 
 from grimoire.elk.elastic import ElasticSearch
@@ -127,7 +138,8 @@ def get_connector_name(cls):
 
 def get_connectors():
 
-    return {"bugzilla":[Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
+    return {"askbot":[Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
+            "bugzilla":[Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
             "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
             "confluence":[Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
             "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
@@ -140,10 +152,13 @@ def get_connectors():
             "kitsune":[Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
             "mbox":[MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
             "mediawiki":[MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
+            "meetup":[Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
             "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
             "pipermail":[Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
+            "redmine":[Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
+            "rss":[RSS, RSSOcean, RSSEnrich, RSSCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
              "supybot":[Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
@@ -203,9 +218,6 @@ def get_params_parser():
                         help="don't use last state for data source")
     parser.add_argument("--fetch_cache",  action='store_true',
                         help="Use cache for item retrieval")
-
-    parser.add_argument("--loop",  action='store_true',
-                        help="loop the ocean update until process termination")
     parser.add_argument("--redis",  default="redis",
                         help="url for the redis server")
     parser.add_argument("--enrich",  action='store_true',
@@ -220,11 +232,21 @@ def get_params_parser():
                         help="Enrich events in items")
     parser.add_argument('--index', help="Ocean index name")
     parser.add_argument('--index-enrich', dest="index_enrich", help="Ocean enriched index name")
+    parser.add_argument('--db-user', help="User for db connection (default to root)",
+                        default="root")
+    parser.add_argument('--db-password', help="Password for db connection (default empty)",
+                        default="")
+    parser.add_argument('--db-host', help="Host for db connection (default to mariadb)",
+                        default="mariadb")
     parser.add_argument('--db-projects-map', help="Projects Mapping DB")
     parser.add_argument('--json-projects-map', help="Projects Mapping JSON file")
     parser.add_argument('--project', help="Project for the repository (origin)")
+    parser.add_argument('--refresh-projects', action='store_true', help="Refresh projects in enriched items")
     parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('--only-identities', action='store_true', help="Only add identities to SortingHat DB")
+    parser.add_argument('--refresh-identities', action='store_true', help="Refresh identities in enriched items")
+    parser.add_argument('--author_id', help="Field author_id to be refreshed")
+    parser.add_argument('--author_uuid', help="Field author_uuid to be refreshed")
     parser.add_argument('--github-token', help="If provided, github usernames will be retrieved in git enrich.")
     parser.add_argument('--studies', action='store_true', help="Execute studies after enrichment.")
     parser.add_argument('--only-studies', action='store_true', help="Execute only studies.")

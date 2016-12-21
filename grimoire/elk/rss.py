@@ -29,17 +29,14 @@ from dateutil import parser
 
 from grimoire.elk.enrich import Enrich, metadata
 
-class ConfluenceEnrich(Enrich):
-
-    def get_field_author(self):
-        return 'by'
+class RSSEnrich(Enrich):
 
     def get_elastic_mappings(self):
 
         mapping = """
         {
             "properties": {
-                "title_analyzed": {
+                "summary_analyzed": {
                   "type": "string",
                   "index":"analyzed"
                   }
@@ -48,84 +45,72 @@ class ConfluenceEnrich(Enrich):
 
         return {"items":mapping}
 
+
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
 
-        field = self.get_field_author()
-        identities.append(self.get_sh_identity(item, field))
+        user = self.get_sh_identity(item, self.get_field_author())
+        identities.append(user)
 
         return identities
 
-    def get_users_data(self, item):
-        """ If user fields are inside the global item dict """
-        if 'data' in item:
-            users_data = item['data']['version']
-        else:
-            # the item is directly the data (kitsune answer)
-            users_data = item
-        return users_data
+    def get_field_author(self):
+        return 'author'
 
     def get_sh_identity(self, item, identity_field=None):
-        identity = {}
 
-        user = item  # by default a specific user dict is expected
+        entry = item
+
         if 'data' in item and type(item) == dict:
-            user = item['data']['version'][identity_field]
+            entry = item['data']
 
-        identity['username'] = user['username']
+        identity = {}
+        identity['username'] = None
         identity['email'] = None
-        identity['name'] = user['displayName']
+        identity['name'] = None
 
+        if  identity_field in entry:
+            identity['username'] = entry[identity_field]
+            identity['name'] = entry[identity_field]
         return identity
+
 
     @metadata
     def get_rich_item(self, item):
         eitem = {}
 
         # metadata fields to copy
-        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
+        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id", "origin"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]
             else:
                 eitem[f] = None
         # The real data
-        page = item['data']
+        entry = item['data']
 
         # data fields to copy
-        copy_fields = ["type", "id", "status", "title"]
+        copy_fields = ["title", "summary", "author", "avatar", "published", "link"]
         for f in copy_fields:
-            if f in page:
-                eitem[f] = page[f]
+            if f in entry:
+                eitem[f] = entry[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"title": "title_analyzed"}
-        for fn in map_fields:
-            eitem[map_fields[fn]] = page[fn]
+        map_fields = {"summary": "summary_analyzed"
+                      }
+        for f in map_fields:
+            if f in entry:
+                eitem[map_fields[f]] = entry[f]
 
-        version = page['version']
-
-        if 'username' in version['by']:
-            eitem['author_name'] = version['by']['username']
-        else:
-            eitem['author_name'] = version['by']['displayName']
-
-        eitem['message'] = None
-        if 'message' in version:
-            eitem['message'] = version['message']
-        eitem['version'] = version['number']
-        eitem['date'] = version['when']
-        eitem['url'] =  page['_links']['base'] + page['_links']['webui']
-
-        # Specific enrichment
-        if page['type'] == 'page':
-            if page['version']['number'] == 1:
-                eitem['type'] = 'new_page'
-        eitem['is_'+eitem['type']] = 1
+        # Enrich dates
+        eitem["publish_date"] = parser.parse(eitem["published"]).isoformat()
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
+
+
+        eitem.update(self.get_grimoire_fields(eitem["publish_date"], "entry"))
 
         return eitem

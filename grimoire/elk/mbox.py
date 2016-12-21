@@ -28,9 +28,12 @@ import logging
 from dateutil import parser
 import email.utils
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 class MBoxEnrich(Enrich):
+
+    def get_field_author(self):
+        return "From"
 
     def get_field_unique_id(self):
         return "ocean-unique-id"
@@ -63,10 +66,14 @@ class MBoxEnrich(Enrich):
                 identities.append(user)
         return identities
 
-    def get_sh_identity(self, from_data):
+    def get_sh_identity(self, item, identity_field=None):
         # "From": "hwalsh at wikiledia.net (Heat Walsh)"
 
         identity = {}
+
+        from_data = item
+        if 'data' in item and type(item) == dict:
+            from_data = item['data'][identity_field]
 
         # First desofuscate the email
         EMAIL_OBFUSCATION_PATTERNS = [' at ', '_at_', ' en ']
@@ -83,13 +90,14 @@ class MBoxEnrich(Enrich):
             identity['name'] = identity['email'].split('@')[0]
         return identity
 
-    def get_project_repository(self, item):
-        mls_list = item['origin']
+    def get_project_repository(self, eitem):
+        mls_list = eitem['origin']
         # Eclipse specific yet
         repo = "/mnt/mailman_archives/"
         repo += mls_list+".mbox/"+mls_list+".mbox"
         return repo
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 
@@ -143,10 +151,10 @@ class MBoxEnrich(Enrich):
             eitem["tz"]  = None
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item,"From"))
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
-            eitem.update(self.get_item_project(item))
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(message['Date'], "message"))
 

@@ -25,6 +25,7 @@
 
 import json
 import logging
+import re
 
 from datetime import datetime
 
@@ -32,14 +33,18 @@ from dateutil import parser
 
 from .utils import get_time_diff_days
 
-from grimoire.elk.enrich import Enrich
+from grimoire.elk.enrich import Enrich, metadata
 
 GITHUB = 'https://github.com/'
 
 class GitHubEnrich(Enrich):
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None):
-        super().__init__(db_sortinghat, db_projects_map, json_projects_map)
+    roles = ['assignee_data', 'user_data']
+
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                 db_user='', db_password='', db_host=''):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+                         db_user, db_password, db_host)
         self.users = {}  # cache users
         self.location = {}  # cache users location
         self.location_not_found = []  # location not found in map api
@@ -49,8 +54,8 @@ class GitHubEnrich(Enrich):
         # Recover cache data from Elastic
         self.geolocations = self.geo_locations_from_es()
 
-    def get_field_date(self):
-        return "updated_at"
+    def get_field_author(self):
+        return "user_data"
 
     def get_fields_uuid(self):
         return ["assignee_uuid", "user_uuid"]
@@ -65,11 +70,20 @@ class GitHubEnrich(Enrich):
             if item[identity]:
                 # In user_data we have the full user data
                 user = self.get_sh_identity(item[identity+"_data"])
-                identities.append(user)
+                if user:
+                    identities.append(user)
         return identities
 
-    def get_sh_identity(self, user):
+    def get_sh_identity(self, item, identity_field=None):
         identity = {}
+
+        user = item  # by default a specific user dict is expected
+        if 'data' in item and type(item) == dict:
+            user = item['data'][identity_field]
+
+        if not user:
+            return identity
+
         identity['username'] = user['login']
         identity['email'] = None
         identity['name'] = None
@@ -78,48 +92,6 @@ class GitHubEnrich(Enrich):
         if 'name' in user:
             identity['name'] = user['name']
         return identity
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields """
-        eitem = {}  # Item enriched
-
-        data = item['data']
-        eitem['user_uuid'] = None
-        user = data['user_data']
-        if user is not None:
-            identity = self.get_sh_identity(user)
-            eitem["user_uuid"] = \
-                self.get_uuid(identity, self.get_connector_name())
-            eitem['user_name'] = identity['name']
-            update = None
-            if self.get_field_date() in item:
-                 update = parser.parse(item[self.get_field_date()])
-            eitem["user_org_name"] = self.get_enrollment(eitem['user_uuid'], update)
-            eitem["user_domain"] = self.get_domain(identity)
-            eitem["user_bot"] = self.is_bot(eitem['user_uuid'])
-
-        eitem["assignee_uuid"] = None
-        assignee = data['assignee_data']
-        if assignee:
-            identity = self.get_sh_identity(assignee)
-            eitem["assignee_uuid"] =  \
-                self.get_uuid(identity, self.get_connector_name())
-            eitem['assignee_name'] = identity['name']
-            update = None
-            if self.get_field_date() in item:
-                 update = parser.parse(item[self.get_field_date()])
-            eitem["assignee_org_name"] = self.get_enrollment(eitem['assignee_uuid'], update)
-            eitem["assignee_domain"] = self.get_domain(identity)
-            eitem["assignee_bot"] = self.is_bot(eitem['assignee_uuid'])
-
-        # Unify fields for SH filtering
-        eitem["author_uuid"] = eitem["user_uuid"]
-        eitem["author_name"] = eitem["user_name"]
-        eitem["author_org_name"] = eitem["user_org_name"]
-        eitem["author_domain"] = eitem["user_domain"]
-
-        return eitem
-
 
     def get_geo_point(self, location):
         geo_point = geo_code = None
@@ -256,10 +228,11 @@ class GitHubEnrich(Enrich):
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
-    def get_project_repository(self, item):
-        repo = item['origin']
+    def get_project_repository(self, eitem):
+        repo = eitem['origin']
         return repo
 
+    @metadata
     def get_rich_item(self, item):
         rich_issue = {}
 
@@ -350,14 +323,15 @@ class GitHubEnrich(Enrich):
             rich_issue['pull_request'] = False
             rich_issue['item_type'] = 'issue'
 
-        rich_issue['github_repo'] = item['origin'].replace(GITHUB,'').replace('.git','')
+        rich_issue['github_repo'] = item['origin'].replace(GITHUB,'')
+        rich_issue['github_repo'] = re.sub('.git$', '', rich_issue['github_repo'])
         rich_issue["url_id"] = rich_issue['github_repo']+"/issues/"+rich_issue['id_in_repo']
 
         if self.prjs_map:
-            rich_issue.update(self.get_item_project(item))
+            rich_issue.update(self.get_item_project(rich_issue))
 
         if self.sortinghat:
-            rich_issue.update(self.get_item_sh(item))
+            rich_issue.update(self.get_item_sh(item, self.roles))
 
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], "issue"))
 
@@ -365,10 +339,12 @@ class GitHubEnrich(Enrich):
         return rich_issue
 
     def enrich_items(self, items):
-        super(GitHubEnrich, self).enrich_items(items)
+        total = super(GitHubEnrich, self).enrich_items(items)
 
         logging.debug("Updating GitHub users geolocations in Elastic")
         self.geo_locations_to_es() # Update geolocations in Elastic
+
+        return total
 
 
 class GitHubUser(object):

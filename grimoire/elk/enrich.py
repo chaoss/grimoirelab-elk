@@ -24,9 +24,14 @@
 #
 
 import json
+import functools
 import logging
+import subprocess
 
 import requests
+
+from datetime import datetime as dt
+from os import path
 
 from dateutil import parser
 from functools import lru_cache
@@ -42,24 +47,54 @@ except ImportError:
 
 try:
     from sortinghat.db.database import Database
-    from sortinghat import api
+    from sortinghat import api, utils
     from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
+
+    from grimoire.elk.sortinghat import SortingHat
+
     SORTINGHAT_LIBS = True
 except ImportError:
     logger.info("SortingHat not available")
     SORTINGHAT_LIBS = False
 
 DEFAULT_PROJECT = 'Main'
+DEFAULT_DB_USER = 'root'
+
+def metadata(func):
+    """Add metadata to an item.
+
+    Decorator that adds metadata to a given item such as
+    the gelk revision used.
+
+    """
+    @functools.wraps(func)
+    def decorator(self, *args, **kwargs):
+        eitem = func(self, *args, **kwargs)
+        metadata = {
+            'metadata__gelk_version': self.gelk_version,
+            'metadata__gelk_backend_name' : self.__class__.__name__,
+            'metadata__enriched_on' : dt.utcnow().isoformat()
+        }
+        eitem.update(metadata)
+        return eitem
+    return decorator
+
 
 class Enrich(object):
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None, insecure=True):
+    sh_db = None
 
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                 db_user='', db_password='', db_host='', insecure=True):
         self.sortinghat = False
+        if db_user == '':
+            db_user = DEFAULT_DB_USER
         if db_sortinghat and not SORTINGHAT_LIBS:
             raise RuntimeError("Sorting hat configured but libraries not available.")
         if db_sortinghat:
-            self.sh_db = Database("root", "", db_sortinghat, "mariadb")
+            # self.sh_db = Database("root", "", db_sortinghat, "mariadb")
+            if not Enrich.sh_db:
+                Enrich.sh_db = Database(db_user, db_password, db_sortinghat, db_host)
             self.sortinghat = True
 
         self.prjs_map = None  # mapping beetween repositories and projects
@@ -74,12 +109,16 @@ class Enrich(object):
             if db_projects_map and not MYSQL_LIBS:
                 raise RuntimeError("Projects configured but MySQL libraries not available.")
             if  db_projects_map and not json_projects:
-                self.prjs_map = self.__get_projects_map(db_projects_map)
+                self.prjs_map = self.__get_projects_map(db_projects_map,
+                                                        db_user, db_password,
+                                                        db_host)
 
         if self.prjs_map and json_projects:
             # logging.info("Comparing db and json projects")
             # self.__compare_projects_map(self.prjs_map, self.json_projects)
             pass
+
+        self.studies = []
 
         self.requests = requests.Session()
         if insecure:
@@ -88,6 +127,16 @@ class Enrich(object):
 
         self.elastic = None
         self.type_name = "items"  # type inside the index to store items enriched
+
+        # To add the gelk version to enriched items
+        try:
+            # gelk is executed directly from a git clone
+            git_path = path.dirname(__file__)
+            self.gelk_version = subprocess.check_output(["git", "-C", git_path, "describe"]).strip()
+            self.gelk_version = self.gelk_version.decode("utf-8")
+        except subprocess.CalledProcessError:
+            logging.warning("Can't get the gelk version. %s", __file__)
+            self.gelk_version = 'Unknown'
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -180,12 +229,12 @@ class Enrich(object):
         logging.debug("Number of db projects: %i", len(db_projects))
         logging.debug("Number of json projects: %i (>=%i)", len(json.keys()), len(db_projects))
 
-    def __get_projects_map(self, db_projects_map):
+    def __get_projects_map(self, db_projects_map, db_user=None, db_password=None, db_host=None):
         # Read the repo to project mapping from a database
         ds_repo_to_prj = {}
 
-        db = MySQLdb.connect(user="root", passwd="", host="mariadb",
-                             db = db_projects_map)
+        db = MySQLdb.connect(user=db_user, passwd=db_password, host=db_host,
+                             db=db_projects_map)
         cursor = db.cursor()
 
         query = """
@@ -217,6 +266,7 @@ class Enrich(object):
         """ Field in the rich event with the unique id """
         raise NotImplementedError
 
+    @metadata
     def get_rich_item(self, item):
         """ Create a rich item from the raw item """
         raise NotImplementedError
@@ -244,7 +294,8 @@ class Enrich(object):
         for item in items:
             if current >= max_items:
                 try:
-                    self.requests.put(url, data=bulk_json)
+                    r = self.requests.put(url, data=bulk_json)
+                    r.raise_for_status()
                     logging.debug("Added %i items to %s", total, url)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
@@ -273,7 +324,8 @@ class Enrich(object):
                     bulk_json += data_json +"\n"  # Bulk document
                     current += 1
                     total += 1
-        self.requests.put(url, data = bulk_json)
+        r = self.requests.put(url, data=bulk_json)
+        r.raise_for_status()
 
         return total
 
@@ -281,6 +333,10 @@ class Enrich(object):
         """ Find the name for the current connector """
         from ..utils import get_connector_name
         return get_connector_name(type(self))
+
+    def get_field_author(self):
+        """ Field with the author information """
+        raise NotImplementedError
 
     def get_field_date(self):
         """ Field with the date in the JSON enriched items """
@@ -374,20 +430,112 @@ class Enrich(object):
             name: 1
         }
 
-    # Project field enrichment
+    # Get items for the generator: initial scroll query
+    def __get_elastic_items(self, elastic_scroll_id=None, query_string=None):
+        """ Get the items from the enriched index related to the backend """
 
-    def get_project_repository(self, item):
+        elastic_page = 1000
+        url = self.elastic.index_url
+        max_process_items_pack_time = "10m"  # 10 minutes
+        url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
+                                               elastic_page)
+        res_json = None # query results in JSON format
+
+        if elastic_scroll_id:
+            """ Just continue with the scrolling """
+            url = self.elastic.url
+            url += "/_search/scroll"
+            scroll_data = {
+                "scroll" : max_process_items_pack_time,
+                "scroll_id" : elastic_scroll_id
+            }
+            r = self.requests.post(url, data=json.dumps(scroll_data))
+        else:
+
+            if query_string:
+                filters = """
+                {
+                "query_string": {
+                    "fields" : ["%s"],
+                    "query": "%s"
+                    }
+                }
+                """ % (query_string['fields'], query_string['query'])
+            else:
+
+                filters = """
+                {
+                "query_string": {
+                    "analyze_wildcard": true,
+                    "query": "*"
+                    }
+                }
+                """
+            order_field = self.get_field_date()
+            order_query = ''
+            order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
+
+            query = """
+            {
+                "query": {
+                    "bool": {
+                        "must": [%s]
+                    }
+                } %s
+            }
+            """ % (filters, order_query)
+
+            logging.debug("%s %s", url, query)
+
+            r = self.requests.post(url, data=query)
+
+        try:
+            res_json = r.json()
+        except Exception as e:
+            print(e)
+            logging.error("No JSON found in %s", r.text)
+            logging.error("No results found from %s", url)
+
+        return res_json
+
+
+    # Enriched items generator
+    def fetch(self, query_string = None):
+        logging.debug("Creating enriched items generator.")
+
+        elastic_scroll_id = None
+
+        while True:
+            rjson = self.__get_elastic_items(elastic_scroll_id, query_string)
+
+            if rjson and "_scroll_id" in rjson:
+                elastic_scroll_id = rjson["_scroll_id"]
+
+            if rjson and "hits" in rjson:
+                if len(rjson["hits"]["hits"]) == 0:
+                    break
+                for hit in rjson["hits"]["hits"]:
+                    eitem = hit['_source']
+                    yield eitem
+            else:
+                logging.error("No results found from %s", self.elastic.index_url)
+                break
+        return
+
+    # Project field enrichment
+    def get_project_repository(self, eitem):
         """
-            Get the repository name used for mapping to project name
+            Get the repository name used for mapping to project name from
+            the enriched item.
             To be implemented for each data source
         """
         return ''
 
-    def get_item_project(self, item):
+    def get_item_project(self, eitem):
         """ Get project mapping enrichment field """
-        item_project = {}
+        eitem_project = {}
         ds_name = self.get_connector_name()  # data source name in projects map
-        repository = self.get_project_repository(item)
+        repository = self.get_project_repository(eitem)
         try:
             project = (self.prjs_map[ds_name][repository])
             # logging.debug("Project FOUND for repository %s %s", repository, project)
@@ -395,27 +543,27 @@ class Enrich(object):
             # logging.warning("Project not found for repository %s (data source: %s)", repository, ds_name)
             project = None
             # Try to use always the origin in any case
-            if ds_name in self.prjs_map and item['origin'] in self.prjs_map[ds_name]:
-                project = self.prjs_map[ds_name][item['origin']]
+            if ds_name in self.prjs_map and eitem['origin'] in self.prjs_map[ds_name]:
+                project = self.prjs_map[ds_name][eitem['origin']]
 
         if project is None:
             project = DEFAULT_PROJECT
 
-        item_project = {"project": project}
+        eitem_project = {"project": project}
         # Time to add the project levels: eclipse.platform.releng.aggregator
-        item_path = ''
+        eitem_path = ''
         if project is not None:
             subprojects = project.split('.')
             for i in range(0, len(subprojects)):
                 if i > 0:
-                    item_path += "."
-                item_path += subprojects[i]
-                item_project['project_' + str(i+1)] = item_path
-        return item_project
+                    eitem_path += "."
+                eitem_path += subprojects[i]
+                eitem_project['project_' + str(i+1)] = eitem_path
+        return eitem_project
 
     # Sorting Hat stuff to be moved to SortingHat class
 
-    def get_sh_identity(self, identity):
+    def get_sh_identity(self, item, identity_field):
         """ Empty identity. Real implementation in each data source. """
         identity = {}
         for field in ['name', 'email', 'username']:
@@ -435,7 +583,7 @@ class Enrich(object):
 
     def is_bot(self, uuid):
         bot = False
-        u = self.get_unique_identities(uuid)[0]
+        u = self.get_unique_identity(uuid)
         if u.profile:
             bot = u.profile.is_bot
         return bot
@@ -458,73 +606,158 @@ class Enrich(object):
                     break
         return enroll
 
-    def get_item_sh_fields(self, identity, item_date):
+    def get_item_sh_fields(self, identity=None, item_date=None, sh_id=None,
+                           rol='author'):
         """ Get standard SH fields from a SH identity """
-        eitem = {}  # Item enriched
+        eitem_sh = {}  # Item enriched
 
-        eitem["author_uuid"] = self.get_uuid(identity, self.get_connector_name())
-        # Always try to use first the data from SH
-        identity_sh = self.get_identity_sh(eitem["author_uuid"])
-
-        if identity_sh:
-            eitem["author_name"] = identity_sh['name']
-            eitem["author_user_name"] = identity_sh['username']
-            eitem["author_domain"] = self.get_identity_domain(identity_sh)
+        if identity:
+            # Use the identity to get the SortingHat identity
+            sh_ids = self.get_sh_ids(identity, self.get_connector_name())
+            eitem_sh[rol+"_id"] = sh_ids['id']
+            eitem_sh[rol+"_uuid"] = sh_ids['uuid']
+        elif sh_id:
+            # Use the SortingHat id to get the identity
+            eitem_sh[rol+"_id"] = sh_id
+            eitem_sh[rol+"_uuid"] = self.get_uuid_from_id(sh_id)
         else:
-            eitem["author_name"] = identity['name']
-            eitem["author_user_name"] = identity['username']
-            eitem["author_domain"] = self.get_identity_domain(identity)
+            raise RuntimeError("identity or sh_id needed for sortinghat fields")
 
-        eitem["author_org_name"] = self.get_enrollment(eitem["author_uuid"], item_date)
-        eitem["author_bot"] = self.is_bot(eitem['author_uuid'])
-        return eitem
+        # Get the SH profile to use first this data
+        profile = self.get_profile_sh(eitem_sh[rol+"_uuid"])
 
-    def get_identity_sh(self, uuid):
-        identity = {}
+        if profile:
+            eitem_sh[rol+"_name"] = profile['name']
+            # username is not included in SH profile
+            eitem_sh[rol+"_user_name"] = None
+            if identity:
+                eitem_sh[rol+"_user_name"] = identity['username']
+            eitem_sh[rol+"_domain"] = self.get_identity_domain(profile)
+        elif not profile and sh_id:
+            logger.warning("Can't find SH identity: %s", sh_id)
+            return {}
+        else:
+            # Just use directly the data in the identity
+            eitem_sh[rol+"_name"] = identity['name']
+            eitem_sh[rol+"_user_name"] = identity['username']
+            eitem_sh[rol+"_domain"] = self.get_identity_domain(identity)
 
-        u = self.get_unique_identities(uuid)[0]
+        eitem_sh[rol+"_org_name"] = self.get_enrollment(eitem_sh[rol+"_uuid"], item_date)
+        eitem_sh[rol+"_bot"] = self.is_bot(eitem_sh[rol+'_uuid'])
+        return eitem_sh
+
+    def get_profile_sh(self, uuid):
+        profile = {}
+
+        u = self.get_unique_identity(uuid)
         if u.profile:
-            identity['name'] = u.profile.name
-            identity['username'] = None
-            identity['email'] = u.profile.email
+            profile['name'] = u.profile.name
+            profile['email'] = u.profile.email
 
-        return identity
+        return profile
 
-    def get_item_sh(self, item, identity_field):
-        """ Add sorting hat enrichment fields for the author of the item """
+    def get_item_sh_from_id(self, eitem, roles=None):
+        # Get the SH fields from the data in the enriched item
 
-        eitem = {}  # Item enriched
+        eitem_sh = {}  # Item enriched
+
+        author_field = self.get_field_author()
+        sh_id_author = None
+
+        if not roles:
+            roles = [author_field]
+
+        date = parser.parse(eitem[self.get_field_date()])
+
+        for rol in roles:
+            if rol+"_id" not in eitem:
+                logging.warning("Enriched index does not include SH ids for %s. Can not refresh it.", rol+"_id")
+                continue
+            sh_id = eitem[rol+"_id"]
+            if not sh_id:
+                logging.warning("%s_id is None", sh_id)
+                continue
+            if rol == author_field:
+                sh_id_author = sh_id
+            eitem_sh.update(self.get_item_sh_fields(sh_id=sh_id, item_date=date,
+                                                    rol=rol))
+
+        # Add the author field common in all data sources
+        rol_author = 'author'
+        if sh_id_author and author_field != rol_author:
+            eitem_sh.update(self.get_item_sh_fields(sh_id=sh_id_author,
+                                                    item_date=date, rol=rol_author))
+        return eitem_sh
+
+    def get_users_data(self, item):
+        """ If user fields are inside the global item dict """
         if 'data' in item:
-            # perceval data
-            data = item['data']
+            users_data = item['data']
         else:
-            data = item
+            # the item is directly the data (kitsune answer)
+            users_data = item
 
-        # Add Sorting Hat fields
-        if identity_field not in data:
-            return eitem
-        identity  = self.get_sh_identity(data[identity_field])
-        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
+        return users_data
 
-        return eitem
+    def get_item_sh(self, item, roles=None, date_field=None):
+        """
+        Add sorting hat enrichment fields for different roles
+
+        If there are no roles, just add the author fields.
+
+        """
+
+        eitem_sh = {}  # Item enriched
+
+        author_field = self.get_field_author()
+
+        if not roles:
+            roles = [author_field]
+
+        if not date_field:
+            item_date = parser.parse(item[self.get_field_date()])
+        else:
+            item_date = parser.parse(item[date_field])
+
+        users_data = self.get_users_data(item)
+
+        for rol in roles:
+            if rol in users_data:
+                identity = self.get_sh_identity(item, rol)
+                if not identity:
+                    continue
+                eitem_sh.update(self.get_item_sh_fields(identity, item_date, rol=rol))
+
+        # Add the author field common in all data sources
+        rol_author = 'author'
+        if author_field in users_data and author_field != rol_author:
+            identity = self.get_sh_identity(item, author_field)
+            eitem_sh.update(self.get_item_sh_fields(identity, item_date, rol=rol_author))
+
+        return eitem_sh
 
     @lru_cache()
     def get_enrollments(self, uuid):
         return api.enrollments(self.sh_db, uuid)
 
     @lru_cache()
-    def get_unique_identities(self, uuid):
-        return api.unique_identities(self.sh_db, uuid)
-
-    def get_uuid(self, identity, backend_name):
-        """ Return the Sorting Hat uuid for an identity """
-        # Convert the dict to tuple so it is hashable
-        identity_tuple = tuple(identity.items())
-        uuid = self.__get_uuid_cache(identity_tuple, backend_name)
-        return uuid
+    def get_unique_identity(self, uuid):
+        return api.unique_identities(self.sh_db, uuid)[0]
 
     @lru_cache()
-    def __get_uuid_cache(self, identity_tuple, backend_name):
+    def get_uuid_from_id(self, sh_id):
+        """ Get the SH identity uuid from the id """
+        return SortingHat.get_uuid_from_id(self.sh_db, sh_id)
+
+    def get_sh_ids(self, identity, backend_name):
+        """ Return the Sorting Hat id and uuid for an identity """
+        # Convert the dict to tuple so it is hashable
+        identity_tuple = tuple(identity.items())
+        sh_ids = self.__get_sh_ids_cache(identity_tuple, backend_name)
+        return sh_ids
+
+    @lru_cache()
+    def __get_sh_ids_cache(self, identity_tuple, backend_name):
 
         # Convert tuple to the original dict
         identity = dict((x, y) for x, y in identity_tuple)
@@ -533,7 +766,7 @@ class Enrich(object):
             raise RuntimeError("Sorting Hat not active during enrich")
 
         iden = {}
-        uuid = None
+        sh_ids = {"id": None, "uuid": None}
 
         for field in ['email', 'name', 'username']:
             iden[field] = None
@@ -548,21 +781,21 @@ class Enrich(object):
         except AlreadyExistsError as ex:
             uuid = ex.uuid
             u = api.unique_identities(self.sh_db, uuid)[0]
-            uuid = u.uuid
+            sh_ids['id'] = utils.uuid(backend_name, email=iden['email'],
+                                      name=iden['name'], username=iden['username'])
+            sh_ids['uuid'] = u.uuid
         except WrappedValueError:
             logger.error("None Identity found")
-            logger.error("%s %s" % (identity, uuid))
-            uuid = None
+            logger.error(identity)
         except NotFoundError:
-            logger.error("Identity found in Sorting Hat which is not unique")
-            logger.error("%s %s" % (identity, uuid))
-            uuid = None
+            logger.error("Identity not found in Sorting Hat")
+            logger.error(identity)
         except UnicodeEncodeError:
             logger.error("UnicodeEncodeError")
-            logger.error("%s %s" % (identity, uuid))
-            uuid = None
+            logger.error(identity)
         except Exception as ex:
-            logger.error("Unknown error adding sorting hat identity.")
-            logger.error("%s %s" % (identity, uuid))
-            uuid = None
-        return uuid
+            logger.error("Unknown error adding sorting hat identity %s", ex)
+            logger.error(identity)
+            logger.error(ex)
+
+        return sh_ids

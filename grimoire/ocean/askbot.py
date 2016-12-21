@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
+# StackExchange Ocean feeder
+#
 # Copyright (C) 2015 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
@@ -20,11 +22,11 @@
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
-
 from grimoire.ocean.elastic import ElasticOcean
 
-class ReMoOcean(ElasticOcean):
-    """ReMo Ocean feeder"""
+class AskbotOcean(ElasticOcean):
+    """Askbot Ocean feeder"""
 
     def _fix_item(self, item):
-        item["ocean-unique-id"] = item["data"]["resource_uri"]
+        # item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
+        item["ocean-unique-id"] = item["uuid"]

@@ -3,7 +3,7 @@
 #
 # Elastic Search basic utils
 #
-# Copyright (C) 2015 Bitergia
+# Copyright (C) 2016 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ class ElasticSearch(object):
 
         if r.status_code != 200:
             # Index does no exists
-            r = self.requests.put(self.index_url)
+            r = self.requests.put(self.index_url, data=analyzers)
             if r.status_code != 200:
                 logging.error("Can't create index %s (%s)",
                               self.index_url, r.status_code)
@@ -86,10 +86,8 @@ class ElasticSearch(object):
         else:
             if clean:
                 self.requests.delete(self.index_url)
-                self.requests.put(self.index_url)
+                self.requests.put(self.index_url, data=analyzers)
                 logging.info("Deleted and created index " + self.index_url)
-        if analyzers:
-            self.create_custom_analyzers(analyzers)
         if mappings:
             self.create_mappings(mappings)
 
@@ -165,22 +163,6 @@ class ElasticSearch(object):
                 logging.debug("Bulk data does not appear as NEW after %is" % (self.wait_bulk_seconds))
                 logging.debug("Probably %i item updates" % (total-total_search))
                 break
-
-    def create_custom_analyzers(self, analyzers):
-        # Close the index
-        # Wait until the creation is finished
-        sleep(WAIT_INDEX_CREATION)
-        r = self.requests.post(self.index_url + "/_close")
-        if r.status_code != 200:
-            logging.error("Error closing index %s", r.text)
-        # Add the custom analyzers
-        r = self.requests.put(self.index_url+"/_settings", data=analyzers)
-        if r.status_code != 200:
-            logging.error("Error creating custom analyzers %s", r.text)
-        # Open the index
-        r = self.requests.post(self.index_url + "/_open")
-        if r.status_code != 200:
-            logging.error("Error opening index %s", r.text)
 
     def create_mappings(self, mappings):
 

@@ -31,16 +31,21 @@ from time import time
 
 from dateutil import parser
 
-from .enrich import Enrich
+from .enrich import Enrich, metadata
 
 from .utils import get_time_diff_days
 
 class JiraEnrich(Enrich):
 
+    roles = ["assignee", "reporter", "creator"]
+
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "reporter_uuid"]
 
-    def get_sh_identity(self, user):
+    def get_field_author(self):
+        return "reporter"
+
+    def get_sh_identity(self, item, identity_field=None):
         """ Return a Sorting Hat identity using jira user data """
 
         identity = {}
@@ -49,7 +54,14 @@ class JiraEnrich(Enrich):
             # Basic fields in Sorting Hat
             identity[field] = None
 
-        if not user:
+        if item is None:
+            return identity
+
+        user = item
+        if 'data' in item and type(item) == dict:
+            user = item['data']['fields'][identity_field]
+
+        if user is None:
             return identity
 
         if 'displayName' in user:
@@ -60,30 +72,14 @@ class JiraEnrich(Enrich):
             identity['email'] = user['emailAddress']
         return identity
 
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields """
-        eitem = {}  # Item enriched
-
-        # Sorting Hat integration: reporter, assignee, creator uuids
-        for field in ["assignee","reporter","creator"]:
-            if field in item['data']['fields']:
-                identity = self.get_sh_identity(item['data']['fields'][field])
-                eitem[field+'_uuid'] = self.get_uuid(identity, self.get_connector_name())
-                eitem[field+'_name'] = identity['name']
-                eitem[field+"_org_name"] = self.get_enrollment(eitem[field+'_uuid'], parser.parse(item[self.get_field_date()]))
-                eitem[field+"_domain"] = self.get_domain(identity)
-                eitem[field+"_bot"] = self.is_bot(eitem[field+'_uuid'])
-
-
-        # Unify fields for SH filtering
-        if 'reporter' in item['data']['fields']:
-            eitem["author_uuid"] = eitem["reporter_uuid"]
-            eitem["author_name"] = eitem["reporter_name"]
-            eitem["author_org_name"] = eitem["reporter_org_name"]
-            eitem["author_domain"] = eitem["reporter_domain"]
-
-        return eitem
-
+    def get_users_data(self, item):
+        """ If user fields are inside the global item dict """
+        if 'data' in item:
+            users_data = item['data']['fields']
+        else:
+            # the item is directly the data (kitsune answer)
+            users_data = item
+        return users_data
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
@@ -98,12 +94,13 @@ class JiraEnrich(Enrich):
 
         return identities
 
+    @metadata
     def get_rich_item(self, item):
 
         eitem = {}
 
         # metadata fields to copy
-        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
+        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin","uuid"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]
@@ -198,7 +195,7 @@ class JiraEnrich(Enrich):
             get_time_diff_days(issue['fields']['created'], datetime.utcnow())
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, self.roles))
 
         eitem.update(self.get_grimoire_fields(issue['fields']['created'], "issue"))
 
