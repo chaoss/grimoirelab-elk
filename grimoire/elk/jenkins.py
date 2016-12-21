@@ -46,6 +46,10 @@ class JenkinsEnrich(Enrich):
         return {"items":mapping}
 
 
+    def get_field_author(self):
+        # In Jenkins there are no identities support
+        return None
+
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []

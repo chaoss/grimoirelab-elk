@@ -1,0 +1,1227 @@
+[{
+    "backend_name": "RSS",
+    "backend_version": "0.1.0",
+    "category": "entry",
+    "data": {
+        "author": "jsmanrique",
+        "author_detail": {
+            "name": "jsmanrique"
+        },
+        "authors": [
+            {}
+        ],
+        "comments": "https://blog.bitergia.com/2016/11/25/is-your-company-ready-for-inner-source/#respond",
+        "content": [
+            {
+                "base": "",
+                "language": null,
+                "type": "text/html",
+                "value": "<p><a href=\"https://blog.bitergia.com/2016/07/26/innersourcing-the-development-model-of-the-future/\">In past posts</a>, we talked about <strong>Inner Source</strong> and the benefits for your organization. Some large organizations, such <a href=\"https://paypal.github.io/InnerSourceCommons/\">Paypal</a> or <a href=\"https://github.com/zalando/zalando-howto-open-source/blob/master/innersource.md\">Zalando</a> started their own process to approach <strong>Inner Source</strong>; we can say without a doubt that each of them has taken their own path, because <strong>Inner Source is more related to a philosophy or enterprise culture than to a process or static methodology defining it</strong>.<a href=\"https://bitergia.files.wordpress.com/2016/11/cathedral-and-the-bazaar-book-cover-e1441060507349.jpg\"><img alt=\"The cathedral and the bazar\" class=\"alignright size-full wp-image-3156\" src=\"https://bitergia.files.wordpress.com/2016/11/cathedral-and-the-bazaar-book-cover-e1441060507349.jpg?w=480\" /></a></p>\n<p>During last <a href=\"http://librecon.io/\">LibreCon</a> we have been sharing some insights about it during our <a href=\"https://speakerdeck.com/bitergia/inner-sourcing-and-software-development-analytics\"><br />\nInner Sourcing and Software Development Analytics</a> talk, and next months we are going to collaborate with some companies in their <i>inner source approach</i>. So it seems the right momentum to start a set of posts about <strong>&#8220;Inner Source&#8221;</strong>, doesn&#8217;t it?</p>\n<p><span id=\"more-3155\"></span></p>\n<p><a href=\"https://www.infoq.com/author/Klaas~Jan-Stol%2C-Brian-Fitzgerald%2C\">Klaas-Jan Stol, Brian Fitzgerald</a> mentioned in <a href=\"https://www.infoq.com/articles/inner-source-open-source-development-practices\">their article</a> that you can view Inner Source as <em>a bazaar within a corporate cathedral</em>, referencing the two organizational models that <a href=\"https://es.wikipedia.org/wiki/Eric_S._Raymond\">Eric Raymond</a> describes in his famous book \u201c<a href=\"https://en.wikipedia.org/wiki/The_Cathedral_and_the_Bazaar\">The cathedral and the Bazar</a>\u201d.</p>\n<p>There are three dimensions where you have to pay attention when you are going to start the journey to Inner Source: product, development methodology and management system.</p>\n<p><b>Characteristics you\u2019re going to need to include in your management system.</b></p>\n<p><i><a href=\"https://bitergia.files.wordpress.com/2016/11/71guamyo4el.jpg\"><img alt=\"The wisdom of crows\" class=\" wp-image-3157 alignleft\" height=\"171\" src=\"https://bitergia.files.wordpress.com/2016/11/71guamyo4el.jpg?w=110&#038;h=171\" width=\"110\" /></a>&#8220;We know that the more power you give a single individual in the face of complexity and uncertainty, the more likely it is that bad decisions will get made.\u201d </i></p>\n<p style=\"text-align: right;\"><b><i>\u00a0</i></b><a href=\"https://www.goodreads.com/author/show/38391.James_Surowiecki\"><i>James Surowiecki</i></a><i>, </i><a href=\"https://www.goodreads.com/work/quotes/3250675\"><i>The Wisdom of Crowds</i></a></p>\n<p>Software communities run away from hierarchy and feel more comfortable on net structures hierarchy with certain values. They are:</p>\n<ul>\n<li><strong>Collaboration</strong>. Opening the one team\u2019s code to others, allows software reuse through applications and components are available for everyone in the the company. Moreover, \u201cGiven enough eyeballs, all bugs are shallow.\u201d, according to Linus law.</li>\n<li><strong>Self management</strong>. Everyone is allowed to make the decision they consider. Coordination emerge from each person\u2019s adaptation.</li>\n<li><strong>Transparency</strong>. there\u2019s no Inner Source without transparency. It\u2019s a no negociable value, because the most value of software communities is the strong sense of meritocracy. Moreover, transparency is the shortest path to reach common goals.</li>\n<li><strong>Confidence</strong>. The the underpillar for transparency and for make the things done quicker. You have to create an environment where failing is taking as a lesson and as a knowledge not as punishable.</li>\n<li><strong>Participation</strong>. It\u2019s important to fight against silos and encourage the participation between teams. Communities have also to take care about the landing of new members and promote respect between the member, in order to gain the most of the people\u2019s contribution.</li>\n<li><strong>Learning</strong>. Open communities are \u00a0competitive and encourage developers to be better at their work. Open communities stimulate and accelerate learning enabling the mobility across projects.</li>\n</ul>\n<p><b>Next steps.</b></p>\n<p><i>Open development teams</i> must be managed with different rules and values (governance); you need a new culture in your firm and it takes time to built it. Take it easy and in the meanwhile make your approach to new software development methodology and start thinking which project would be the right one to start <em>Inner Sourcing</em>&#8230; We will give you some clues in next posts.</p><br />  <a href=\"http://feeds.wordpress.com/1.0/gocomments/bitergia.wordpress.com/3155/\" rel=\"nofollow\"><img alt=\"\" border=\"0\" src=\"http://feeds.wordpress.com/1.0/comments/bitergia.wordpress.com/3155/\" /></a> <img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=3155&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+            }
+        ],
+        "guidislink": false,
+        "href": "",
+        "id": "http://blog.bitergia.com/?p=3155",
+        "link": "https://blog.bitergia.com/2016/11/25/is-your-company-ready-for-inner-source/",
+        "links": [
+            {
+                "href": "https://blog.bitergia.com/2016/11/25/is-your-company-ready-for-inner-source/",
+                "rel": "alternate",
+                "type": "text/html"
+            }
+        ],
+        "media_content": [
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/07/innersourcelogo.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://2.gravatar.com/avatar/2ed1be50dc4ce6c413a22a40d7192134?s=96&d=identicon&r=G"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/11/cathedral-and-the-bazaar-book-cover-e1441060507349.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/11/71guamyo4el.jpg?w=193"
+            }
+        ],
+        "media_thumbnail": [
+            {
+                "url": "https://bitergia.files.wordpress.com/2016/07/innersourcelogo.png"
+            }
+        ],
+        "published": "Fri, 25 Nov 2016 12:26:41 +0000",
+        "published_parsed": [
+            2016,
+            11,
+            25,
+            12,
+            26,
+            41,
+            4,
+            330,
+            0
+        ],
+        "slash_comments": "0",
+        "summary": "In past posts, we talked about Inner Source and the benefits for your organization. Some large organizations, such Paypal or Zalando started their own process to approach Inner Source; we can say without a doubt that each of them has &#8230; <a href=\"https://blog.bitergia.com/2016/11/25/is-your-company-ready-for-inner-source/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=3155&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />",
+        "summary_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/html",
+            "value": "In past posts, we talked about Inner Source and the benefits for your organization. Some large organizations, such Paypal or Zalando started their own process to approach Inner Source; we can say without a doubt that each of them has &#8230; <a href=\"https://blog.bitergia.com/2016/11/25/is-your-company-ready-for-inner-source/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=3155&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+        },
+        "tags": [
+            {
+                "label": null,
+                "scheme": null,
+                "term": "bitergia"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "inner source"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "inner sourcing"
+            }
+        ],
+        "title": "Is your company ready for Inner Source?",
+        "title_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/plain",
+            "value": "Is your company ready for Inner Source?"
+        },
+        "wfw_commentrss": "https://blog.bitergia.com/2016/11/25/is-your-company-ready-for-inner-source/feed/"
+    },
+    "origin": "https://blog.bitergia.com/feed/",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://blog.bitergia.com/feed/",
+    "timestamp": 1482310265.691126,
+    "updated_on": 1480076801.0,
+    "uuid": "083eef4834ae2cb5444ece3c5ef22dfe9418fbc9"
+},
+{
+    "backend_name": "RSS",
+    "backend_version": "0.1.0",
+    "category": "entry",
+    "data": {
+        "author": "jsmanrique",
+        "author_detail": {
+            "name": "jsmanrique"
+        },
+        "authors": [
+            {}
+        ],
+        "comments": "https://blog.bitergia.com/2016/11/08/some-metrics-of-open-source-development-in-the-cloud/#respond",
+        "content": [
+            {
+                "base": "",
+                "language": null,
+                "type": "text/html",
+                "value": "<p>Are you still waiting for &#8220;The Year of the Desktop&#8221;? Not sure when it will happen, but it is clear that the Open Source movement around &#8220;<a href=\"https://en.wikipedia.org/wiki/Cloud_computing\">Cloud Computing&#8221;</a> is growing and growing.</p>\n<p>The number of companies releasing Open Source code, contributing to Open Source <em>cloud</em> projects increases each month. A good example to see it is the &#8220;<em>under development</em>&#8221; <a href=\"http://cncf.biterg.io\" target=\"_blank\"><abbr title=\"Cloud Native Computing Foundation\">CNCF</abbr> Grimoire Dashboard</a>:</p>\n<div class=\"wp-caption alignnone\" id=\"attachment_3132\" style=\"width: 3146px;\"><img alt=\"Table and chart showing CNCF organizations diversity numbers and evolution\" class=\"alignnone size-full wp-image-3132\" src=\"https://bitergia.files.wordpress.com/2016/11/cncf-orgs-diversity.png?w=480\" /><p class=\"wp-caption-text\">CNCF organizations diversity numbers and evolution</p></div>\n<p>And during these days, in events like <a href=\"http://events.linuxfoundation.org/events/cloudnativecon\" target=\"_blank\">CloudNativeCon</a> and <a href=\"http://events.linuxfoundation.org/events/kubecon\" target=\"_blank\">KubeCon</a> we&#8217;ll see more data and insights about how big the <em>open cloud ecosystem</em> is becoming. Do you want a preview?</p>\n<p><span id=\"more-3067\"></span></p>\n<p>Another meeting that has shown the community behind a cloud open source project has been yesterday&#8217;s <a href=\"http://openshiftgathering.com/openshiftgathering#overview\" target=\"_blank\">OpenShift Commons Gathering</a>. The data shows that project is growing in diversity by simply measuring the number of different email domains used in contributions (from 4 in 2011 to 96 in 2016):</p>\n<div class=\"wp-caption alignnone\" id=\"attachment_3135\" style=\"width: 1210px;\"><img alt=\"Chart showing number of git contributors email domains growing\" class=\"alignnone size-full wp-image-3135\" src=\"https://bitergia.files.wordpress.com/2016/11/openshift-domains-evolution.png?w=480\" /><p class=\"wp-caption-text\">Git contributors email domains evolution</p></div>\n<p>Other metrics can be seen in the <em>beta</em> <a href=\"http://openshift.biterg.io\" target=\"_blank\">OpenShift Grimoire Dashboard</a>:</p>\n<div class=\"wp-caption alignnone\" id=\"attachment_3138\" style=\"width: 2410px;\"><img alt=\"OpenShift Grimoire Dashboard overview panel\" class=\"alignnone size-full wp-image-3138\" src=\"https://bitergia.files.wordpress.com/2016/11/openshift-overview-2.png?w=480\" /><p class=\"wp-caption-text\">OpenShift Grimoire Dashboard overview panel</p></div>\n<p>And containters? They seem to be the new mantra in software deployment, and projects like <a href=\"https://www.opencontainers.org/\" target=\"_blank\"><abbr title=\"Open Containers Initiative\">OCI</abbr></a> provide an open governance structure (project), formed under the auspices of the Linux Foundation, for the express purpose of creating open industry standards around container formats and runtime. And, again, <a href=\"http://oci.biterg.io\" target=\"_blank\">OCI Grimoire Dashboard data</a> shows the diversity of companies and organizations involved in such important project:</p>\n<div class=\"wp-caption alignnone\" id=\"attachment_3143\" style=\"width: 3210px;\"><img alt=\"Open Containers Initiative Grimoire Dashboard overview\" class=\"alignnone size-full wp-image-3143\" src=\"https://bitergia.files.wordpress.com/2016/11/screencapture-oci-biterg-io-app-kibana-1478632352477.png?w=480\" /><p class=\"wp-caption-text\">Open Containers Initiative Grimoire Dashboard overview</p></div>\n<p>Take these dashboards with care, because they might contain some erros, but they clearly show the <em>open cloud</em> ecosystem growing in terms of contributors and organizations. They will be improved during following months, because that&#8217;s our job for our customers involved here: OCI, CNCF and Red Hat. Thanks them for supporting us on working in Open Source transparency through metrics and open analytics.</p>\n<p>During these weeks we have also set up some <em>demo</em> (they might be not maintained after they are released, and affiliation information is provided by a third party) dashboards for <a href=\"http://thenewstack.io/\" target=\"_blank\">The Newstack</a>:</p>\n<ul>\n<li><a href=\"http://demo-oci.biterg.io\">OCI demo Grimoire Dashboard</a></li>\n<li><a href=\"http://demo-kubernetes.biterg.io\">Kubernetes demo Grimoire Dashboard</a></li>\n</ul>\n<p>If you are interested in running such analysis for you, <a href=\"https://bitergia.com/contact/\">let us know</a> or come to our <a href=\"http://grimoirelab.github.io\"><b>GrimoireCon</b></a> meeting in Brussels, close to FOSDEM!</p><br />  <a href=\"http://feeds.wordpress.com/1.0/gocomments/bitergia.wordpress.com/3067/\" rel=\"nofollow\"><img alt=\"\" border=\"0\" src=\"http://feeds.wordpress.com/1.0/comments/bitergia.wordpress.com/3067/\" /></a> <img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=3067&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+            }
+        ],
+        "guidislink": false,
+        "href": "",
+        "id": "http://blog.bitergia.com/?p=3067",
+        "link": "https://blog.bitergia.com/2016/11/08/some-metrics-of-open-source-development-in-the-cloud/",
+        "links": [
+            {
+                "href": "https://blog.bitergia.com/2016/11/08/some-metrics-of-open-source-development-in-the-cloud/",
+                "rel": "alternate",
+                "type": "text/html"
+            }
+        ],
+        "media_content": [
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/11/screencapture-oci-biterg-io-app-kibana-1478632352477.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://2.gravatar.com/avatar/2ed1be50dc4ce6c413a22a40d7192134?s=96&d=identicon&r=G"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/11/cncf-orgs-diversity.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/11/openshift-domains-evolution.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/11/openshift-overview-2.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/11/screencapture-oci-biterg-io-app-kibana-1478632352477.png"
+            }
+        ],
+        "media_thumbnail": [
+            {
+                "url": "https://bitergia.files.wordpress.com/2016/11/screencapture-oci-biterg-io-app-kibana-1478632352477.png"
+            }
+        ],
+        "published": "Tue, 08 Nov 2016 19:40:57 +0000",
+        "published_parsed": [
+            2016,
+            11,
+            8,
+            19,
+            40,
+            57,
+            1,
+            313,
+            0
+        ],
+        "slash_comments": "0",
+        "summary": "Are you still waiting for &#8220;The Year of the Desktop&#8221;? Not sure when it will happen, but it is clear that the Open Source movement around &#8220;Cloud Computing&#8221; is growing and growing. The number of companies releasing Open Source code, &#8230; <a href=\"https://blog.bitergia.com/2016/11/08/some-metrics-of-open-source-development-in-the-cloud/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=3067&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />",
+        "summary_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/html",
+            "value": "Are you still waiting for &#8220;The Year of the Desktop&#8221;? Not sure when it will happen, but it is clear that the Open Source movement around &#8220;Cloud Computing&#8221; is growing and growing. The number of companies releasing Open Source code, &#8230; <a href=\"https://blog.bitergia.com/2016/11/08/some-metrics-of-open-source-development-in-the-cloud/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=3067&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+        },
+        "tags": [
+            {
+                "label": null,
+                "scheme": null,
+                "term": "community"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "grimoirelib"
+            }
+        ],
+        "title": "Some metrics of Open Source development in \u201cthe Cloud\u201d",
+        "title_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/plain",
+            "value": "Some metrics of Open Source development in \u201cthe Cloud\u201d"
+        },
+        "wfw_commentrss": "https://blog.bitergia.com/2016/11/08/some-metrics-of-open-source-development-in-the-cloud/feed/"
+    },
+    "origin": "https://blog.bitergia.com/feed/",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://blog.bitergia.com/feed/",
+    "timestamp": 1482310265.692255,
+    "updated_on": 1478634057.0,
+    "uuid": "106dd04163e76c22627bc477b10ad81f265a0c39"
+},
+{
+    "backend_name": "RSS",
+    "backend_version": "0.1.0",
+    "category": "entry",
+    "data": {
+        "author": "jsmanrique",
+        "author_detail": {
+            "name": "jsmanrique"
+        },
+        "authors": [
+            {}
+        ],
+        "comments": "https://blog.bitergia.com/2016/10/11/gender-diversity-analysis-of-the-linux-kernel-technical-contributions/#respond",
+        "content": [
+            {
+                "base": "",
+                "language": null,
+                "type": "text/html",
+                "value": "<p>On the 8<sup>th</sup> of October we joined LinuxCon to share our <strong>Gender Diversity Analysis of technical contributions to the Linux Kernel</strong>.</p>\n<p>We are aware of the diversity gap in the tech industry and the efforts of some institutions, like Linux Foundation, are doing to solve it. So, we decided to add our five cents, working over the weeks to bring some stats about women&#8217;s contribution to Linux Kernel.</p>\n<p>Before diving deep into our results, let\u2019s take a look at some data we already have from the tech sector. Women represent:</p>\n<p><span id=\"more-2960\"></span></p>\n<ul>\n<li>30-40% of tech companies workforce</li>\n<li>10-20% of tech teams</li>\n<li>5% of CEO positions</li>\n<li>21% of middle level/roles</li>\n<li>32% of junior roles</li>\n<li>11% of OpenStack population, <a href=\"https://blog.bitergia.com/2016/04/25/openstack-genderdiversity-technical-contributions-analysis/\">according to our previous analysis</a></li>\n</ul>\n<p><strong>Women&#8217;s contribution to Linux Kernel</strong></p>\n<p>Analyzing git activity and population, <strong>women are 9,9% of the population and responsable for 6,8% of the activity</strong>. But last year, despite the woman population has increased by 2 points, the contribution has only boosted 1,5 more.</p>\n<div class=\"wp-caption alignnone\" id=\"attachment_3011\" style=\"width: 1792px;\"><img alt=\"Women git committers evolution\" class=\"alignnone size-full wp-image-3011\" src=\"https://bitergia.files.wordpress.com/2016/10/git-authors-women-in-linux.jpg?w=480\" /><p class=\"wp-caption-text\">Evolution of women committers to Linux git</p></div>\n<div class=\"wp-caption alignnone\" id=\"attachment_3014\" style=\"width: 1764px;\"><img alt=\"Commits by women to Linux git\" class=\"alignnone size-full wp-image-3014\" src=\"https://bitergia.files.wordpress.com/2016/10/git-commits-women-in-linux.jpg?w=480\" /><p class=\"wp-caption-text\">Evolution of commits done by women to Linux git</p></div>\n<p>Trend evolution has maintained over the years, but there are two peaks in 2014 and 2016. We are still looking for a reason.</p>\n<blockquote class=\"twitter-tweet\">\n<p dir=\"ltr\" lang=\"en\">Pondering 2014, and what worked well that year&#8230;. hmm. More of it certainly needed. Thank you for this analysis <a href=\"https://twitter.com/Bitergia\">@Bitergia</a> ! <a href=\"https://t.co/PHHez66CRy\">https://t.co/PHHez66CRy</a></p>\n<p>\u2014 Kate Stewart (@_kate_stewart) <a href=\"https://twitter.com/_kate_stewart/status/784204217464590336\">7 de octubre de 2016</a></p></blockquote>\n<p>We have analyzed the mailing lists activity, looking for code review related emails, finding that the <strong>commits reviewed by women are between 4% and 6%. Merging code reviews are acked by women in a 3%-10%</strong>.</p>\n<p>Woman population in Linux Kernel was boosted by 110 developers in 2014 and 2015.</p>\n<p>We have also analysed community demography (how contributors join and leave), especially women. In fact, we have discovered that <strong>in 2013, 64 developers did their first commit to the Linux Kernel project, but 35 left during following semester</strong>, and just 12 are still contributing. It\u2019s a good idea to build a kinder environment in developers communities in order to retain more people, especially women.</p>\n<div class=\"wp-caption alignnone\" id=\"attachment_3018\" style=\"width: 1436px;\"><img alt=\"Women doing 1st commit to Linux Kernel by semester\" class=\"alignnone size-full wp-image-3018\" src=\"https://bitergia.files.wordpress.com/2016/10/first-commit-authors-women-in-linux.jpg?w=480\" /><p class=\"wp-caption-text\">Women doing 1st commit to Linux Kernel by semester</p></div>\n<p><strong>Conclusions and Potential Actions.</strong></p>\n<p><strong>Diversity is important</strong>. There are several reasons for that, as <a href=\"https://twitter.com/nithyaruff\">Nithya Ruff</a>\u00a0said in LinuxCon:</p>\n<ul>\n<li>It\u2019s a <a href=\"https://www.humanrights.gov.au/sites/default/files/content/sex_discrimination/publication/CEDAW/CEDAW_complete.pdf\">Human Rights question</a>. Technology assumption allows empowerment and reduce the gender tech gap. Technology is running the world and is unfair to exclude any part of the population, such as women.</li>\n<li>Diversity brings better economic results to firms. As many studies have published, diversity is correlated to better benefit results.</li>\n</ul>\n<p>We have discovered so many threads during the research, finding a correlation between gender initiatives in tech industries and the growing number of women.</p>\n<p>To close the article, we would encourage Linux Foundation in all gender initiatives which they are performing, with the strong believe that they are building a better world.</p>\n<p>You can join the <a href=\"https://speakerdeck.com/bitergia/gender-diversity-analysis-of-the-linux-kernel-technical-contributions\">full presentation</a> that Daniel Izquierdo performed, and <strong>if you are interested in running or sponsoring similar analysis for other communities or projects, just <a href=\"mailto:info@bitergia.com\">let us know</a>!</strong></p><br />  <a href=\"http://feeds.wordpress.com/1.0/gocomments/bitergia.wordpress.com/2960/\" rel=\"nofollow\"><img alt=\"\" border=\"0\" src=\"http://feeds.wordpress.com/1.0/comments/bitergia.wordpress.com/2960/\" /></a> <img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2960&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+            }
+        ],
+        "guidislink": false,
+        "href": "",
+        "id": "http://blog.bitergia.com/?p=2960",
+        "link": "https://blog.bitergia.com/2016/10/11/gender-diversity-analysis-of-the-linux-kernel-technical-contributions/",
+        "links": [
+            {
+                "href": "https://blog.bitergia.com/2016/10/11/gender-diversity-analysis-of-the-linux-kernel-technical-contributions/",
+                "rel": "alternate",
+                "type": "text/html"
+            }
+        ],
+        "media_content": [
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/10/first-commit-authors-women-in-linux.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://2.gravatar.com/avatar/2ed1be50dc4ce6c413a22a40d7192134?s=96&d=identicon&r=G"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/10/git-authors-women-in-linux.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/10/git-commits-women-in-linux.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/10/first-commit-authors-women-in-linux.jpg"
+            }
+        ],
+        "media_thumbnail": [
+            {
+                "url": "https://bitergia.files.wordpress.com/2016/10/first-commit-authors-women-in-linux.jpg"
+            }
+        ],
+        "published": "Tue, 11 Oct 2016 14:15:22 +0000",
+        "published_parsed": [
+            2016,
+            10,
+            11,
+            14,
+            15,
+            22,
+            1,
+            285,
+            0
+        ],
+        "slash_comments": "0",
+        "summary": "On the 8th of October we joined LinuxCon to share our Gender Diversity Analysis of technical contributions to the Linux Kernel. We are aware of the diversity gap in the tech industry and the efforts of some institutions, like Linux &#8230; <a href=\"https://blog.bitergia.com/2016/10/11/gender-diversity-analysis-of-the-linux-kernel-technical-contributions/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2960&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />",
+        "summary_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/html",
+            "value": "On the 8th of October we joined LinuxCon to share our Gender Diversity Analysis of technical contributions to the Linux Kernel. We are aware of the diversity gap in the tech industry and the efforts of some institutions, like Linux &#8230; <a href=\"https://blog.bitergia.com/2016/10/11/gender-diversity-analysis-of-the-linux-kernel-technical-contributions/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2960&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+        },
+        "tags": [
+            {
+                "label": null,
+                "scheme": null,
+                "term": "diversity"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "reports"
+            }
+        ],
+        "title": "Gender-diversity Analysis of the Linux Kernel Technical Contributions",
+        "title_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/plain",
+            "value": "Gender-diversity Analysis of the Linux Kernel Technical Contributions"
+        },
+        "wfw_commentrss": "https://blog.bitergia.com/2016/10/11/gender-diversity-analysis-of-the-linux-kernel-technical-contributions/feed/"
+    },
+    "origin": "https://blog.bitergia.com/feed/",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://blog.bitergia.com/feed/",
+    "timestamp": 1482310265.692881,
+    "updated_on": 1476195322.0,
+    "uuid": "c01ad1dbb6a232a0227b9a1253852ca4734db928"
+},
+{
+    "backend_name": "RSS",
+    "backend_version": "0.1.0",
+    "category": "entry",
+    "data": {
+        "author": "jsmanrique",
+        "author_detail": {
+            "name": "jsmanrique"
+        },
+        "authors": [
+            {}
+        ],
+        "comments": "https://blog.bitergia.com/2016/09/28/how-to-recruit-the-best-open-source-development-talent/#respond",
+        "content": [
+            {
+                "base": "",
+                "language": null,
+                "type": "text/html",
+                "value": "<p><strong>Software development is eating up the labor market</strong></p>\n<p>More than 20 years after the crash of the 1990&#8217;s dot-com bubble, <abbr title=\"Information Technologies\">IT</abbr> has transformed business. Today, the majority of businesses are software companies. Netflix is not a film company, Amazon is not an online ebook company, Spotify is not a music company, Pixar is far from being an animation studio, and Groupon is not just a marketplace. There are more than 330K active organizations in GitHub. We are living in the <a href=\"https://en.wikipedia.org/wiki/Digital_transformation\" target=\"_blank\">Digital Transformation</a> <em>buzzword era</em>.</p>\n<div class=\"wp-caption alignnone\" id=\"attachment_2909\" style=\"width: 1210px;\"><img alt=\"opnfv git organizations diversity\" class=\"alignnone size-full wp-image-2909\" src=\"https://bitergia.files.wordpress.com/2016/09/git-opnfv-diversity.jpg?w=480\" /><p class=\"wp-caption-text\">OPNFV Organizations diversity</p></div>\n<p>A lot of these companies are using <em>Open Source</em> technologies and they demand experts in many application fields (Cloud, Web Development, etc.). Open source\u2019s talent has a strong pro demand. Managers are always looking for experienced developers. According to the\u00a0<a target=\"_blank\">2016 Open Source Jobs Report</a>:</p>\n<ul>\n<li><strong>87% of hiring managers say it is difficult to find open source talent</strong>\u00a0and 79% have even increased incentives to retain\u00a0their current open source professionals.</li>\n<li>58% of hiring managers are looking for DevOps talent, making <strong>DevOps the most in-demand role in open source today</strong>.</li>\n<li>For jobs seekers, even though 86% of tech professionals say open source has advanced their careers, only 2% say money and perks are the best part of their job.</li>\n</ul>\n<p>Having\u00a0a solid strategy in attracting and retaining <abbr>IT</abbr> talent is crucial for the future of companies. How could <em>Software Development Analytics</em> help them?</p>\n<p><span id=\"more-2779\"></span></p>\n<p><strong>Strategies to attract talent</strong></p>\n<p>Getting the right talent to do the right job is not an easy task. The use of bots to do research and to send messages are two practices not overly valued by developers.</p>\n<p>GitHub, StackOverflow and LinkedIn are the most popular resources for tech recruiters nowadays. Despite them being great sources of information, recruiters don\u2019t know how to use them and have a lot of difficulties capturing the\u00a0developers attention.</p>\n<p>One of the most common\u00a0mistakes is to try to measure someone\u2019s knowledge by using simple metrics like the number of contributions, lines of code, etc., that they have in projects, or their <em>karma</em> in StackOverflow.</p>\n<p>Beyond GitHub and StackOverflow, there are many other tools like Bugzilla, Gerrit, Jira, etc., used by a lot of projects to manage their development and recruiters are losing out on its potential use for improving their talent search.</p>\n<p>Moreover, developers stay updated by reading books and free online tutorials, training through online courses, engaging social and professional networks, participating in open meet-ups and attending conferences. This kind of activity describes what skills a developer has and what kind of technologies they are interested in.</p>\n<p>When a software project manager or recruiter is looking for a developer, it\u2019s not only about the technology they manage, it\u2019s also about the the resilience, critical thought, and problem solving orientation.</p>\n<p><strong>Coders searching for coders</strong></p>\n<p><a href=\"https://bitergia.com/products/dashboards/\">Bitergia Dashboards</a> presents an up to date, high level, quantitative panoramic view of the ecosystem involved in project development, with the ability to drill into data and metrics what matter most for the user.</p>\n<p>In terms of <em>talent search</em> and <em>talent retention</em>, Bitergia customizes the dashboard for recruiters and <abbr title=\"Human Resources\">HR</abbr> managers to provide specific metrics and queries.</p>\n<p>Let&#8217;s say company <em>ACME</em> is using <abbr title=\"Software Defined Network\">SDN</abbr> technologies and it is looking for developers for its <abbr>IT</abbr> team, so, where could they look ? How?</p>\n<p>Based on custom queries like:</p>\n<ul>\n<li>Who is still active in the project?</li>\n<li>Whose patchsets are merged faster? Who is not auto-reviewing him/herself?</li>\n<li>Whose commits are around average size for project&#8217;s commit size (<abbr title=\"Lines of code\">LoC)</abbr>?</li>\n<li>Who is answering questions in StackOverflow and also contributing actively to the project? Who is discussing in the tickets?</li>\n<li>Who is participating in meet-ups related with the projects and forking or starting to particpate in the project?</li>\n<li>etc.</li>\n</ul>\n<p>Bitergia could build a custom dashboard for <em>ACME</em>, aggregating activity information from several projects like OpenStack, OPNFV, OpenDayLight, etc. with profiling metrics and data about people contributing and participating in these projects based on the aggregation of activity from all the data repositories that define those project&#8217;s ecosystems (git, gerrit, github, mailing lists, stackoverflow, jira, etc.).</p>\n<p><img alt=\"git_and_gerrit\" class=\"alignnone size-full wp-image-2889\" src=\"https://bitergia.files.wordpress.com/2016/09/git_and_gerrit.jpg?w=480\" /></p>\n<p>If you are looking to hire developers and IT professionals, we can help you to get the right person for your project. We\u2019ll sit down with you to understand your business, development workflow, define with you a complete profile, and build a perfect research recruitment tool to suit your needs. <a href=\"https://bitergia.com/contact/\">Just ask</a></p><br />  <a href=\"http://feeds.wordpress.com/1.0/gocomments/bitergia.wordpress.com/2779/\" rel=\"nofollow\"><img alt=\"\" border=\"0\" src=\"http://feeds.wordpress.com/1.0/comments/bitergia.wordpress.com/2779/\" /></a> <img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2779&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+            }
+        ],
+        "guidislink": false,
+        "href": "",
+        "id": "http://blog.bitergia.com/?p=2779",
+        "link": "https://blog.bitergia.com/2016/09/28/how-to-recruit-the-best-open-source-development-talent/",
+        "links": [
+            {
+                "href": "https://blog.bitergia.com/2016/09/28/how-to-recruit-the-best-open-source-development-talent/",
+                "rel": "alternate",
+                "type": "text/html"
+            }
+        ],
+        "media_content": [
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/09/git_and_gerrit.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://2.gravatar.com/avatar/2ed1be50dc4ce6c413a22a40d7192134?s=96&d=identicon&r=G"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/09/git-opnfv-diversity.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/09/git_and_gerrit.jpg"
+            }
+        ],
+        "media_thumbnail": [
+            {
+                "url": "https://bitergia.files.wordpress.com/2016/09/git_and_gerrit.jpg"
+            }
+        ],
+        "published": "Wed, 28 Sep 2016 21:10:48 +0000",
+        "published_parsed": [
+            2016,
+            9,
+            28,
+            21,
+            10,
+            48,
+            2,
+            272,
+            0
+        ],
+        "slash_comments": "0",
+        "summary": "Software development is eating up the labor market More than 20 years after the crash of the 1990&#8217;s dot-com bubble, IT has transformed business. Today, the majority of businesses are software companies. Netflix is not a film company, Amazon is &#8230; <a href=\"https://blog.bitergia.com/2016/09/28/how-to-recruit-the-best-open-source-development-talent/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2779&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />",
+        "summary_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/html",
+            "value": "Software development is eating up the labor market More than 20 years after the crash of the 1990&#8217;s dot-com bubble, IT has transformed business. Today, the majority of businesses are software companies. Netflix is not a film company, Amazon is &#8230; <a href=\"https://blog.bitergia.com/2016/09/28/how-to-recruit-the-best-open-source-development-talent/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2779&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+        },
+        "tags": [
+            {
+                "label": null,
+                "scheme": null,
+                "term": "bitergia"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "business"
+            }
+        ],
+        "title": "How to Recruit the Best Open Source Development Talent",
+        "title_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/plain",
+            "value": "How to Recruit the Best Open Source Development Talent"
+        },
+        "wfw_commentrss": "https://blog.bitergia.com/2016/09/28/how-to-recruit-the-best-open-source-development-talent/feed/"
+    },
+    "origin": "https://blog.bitergia.com/feed/",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://blog.bitergia.com/feed/",
+    "timestamp": 1482310265.693486,
+    "updated_on": 1475097048.0,
+    "uuid": "bfb1ee9ac06247b0099eb384b20a75c902e4863d"
+},
+{
+    "backend_name": "RSS",
+    "backend_version": "0.1.0",
+    "category": "entry",
+    "data": {
+        "author": "Jesus M. Gonzalez-Barahona",
+        "author_detail": {
+            "name": "Jesus M. Gonzalez-Barahona"
+        },
+        "authors": [
+            {}
+        ],
+        "comments": "https://blog.bitergia.com/2016/08/24/dashboard-celebrating-25-years-of-linux-development/#respond",
+        "content": [
+            {
+                "base": "",
+                "language": null,
+                "type": "text/html",
+                "value": "<p>To celebrate 25 years of Linux kernel development, we at <a href=\"http://bitergia.com\">Bitergia</a> have produced the <a href=\"http://linux.biterg.io\">Linux development history dashboard</a>. This dashboard visualizes the current Linux git repository from two points of view: the history of all commits (changes to the source code) up to now, and the history of all lines in the current version. The dashboard visualizes the main parameters about the development (the who, when and what) are visualized, and allows for drilling down in the data, for example finding the specific commits that lead to a specific part of the code.</p>\n<p><img alt=\"linux-dashboard-blame\" class=\"alignnone size-full wp-image-2732\" src=\"https://bitergia.files.wordpress.com/2016/08/linux-dashboard-blame.png?w=480\" /></p>\n<p>Do you want to learn about when the lines in the current kernel were authored? Who has participated in specific areas of the kernel? How many files have remain untouched for more than 10 years? Play with the dashboard and find your own interesting details!</p>\n<p>The dashboard was produced using only free, open source software tools (among them, <a href=\"http://grimoirelab.github.io\">GrimoireLab</a>, our tookit for software development analytics). If you want to learn more details, check the <a href=\"https://speakerdeck.com/jgbarah/authorship-dashboard-for-the-linux-kernel\">slides I intended to use for my presentation at LinuxCon</a>, which unfortunately I couldn&#8217;t attend. Those provide some more insight about how it was produced, some examples about how it can be used, and some curiosities found by exploring it.</p>\n<p><span id=\"more-2717\"></span></p>\n<p>Playing with the dashboard is easy. Click almost anywhere, and you get a filter for that parameter. For example, if you click on the name of a developer, you get a filter which will produce only lines authored by that person. The filter is a green button, on the top right, which can be applied, negated, or deleted. Or combined with further filters, just by clicking on new parameters.</p>\n<p>For facilitating the analysis of the history of the current Linux kernel, we have prepared three panels, based on visualizing the output of the &#8220;git blame&#8221; command:</p>\n<ul>\n<li>The Git Blame basic panel, which shows mainly tables with different views of the lines in the current kernel (authors, files, commits, directories, file extensions, time zones), any of which can be used as a filter. Using it, for example, you can explore in which directories a certain developer has contributed, and with which specific pattern. For example, the next screenshot shows the results of this panel after filtering the activity of a single developer (just by clicking on his name in the authors table).</li>\n</ul>\n<p><img alt=\"Selection_026\" class=\"alignnone size-full wp-image-2753\" src=\"https://bitergia.files.wordpress.com/2016/08/selection_026.png?w=480\" /></p>\n<ul>\n<li>Git Blame (Files). The basic Git Blame panel was oriented to lines, while this panel is oriented to files. Here you can find information about when files were last edited, when the first line in the current version of the kernel was authored, or for how long a file has been evolving. For example, the screenshot below shows the number of files according to certain time parameters (such as the number of years since the first line still remaining in the file, or since the last change to the file).</li>\n</ul>\n<p><img alt=\"Selection_028\" class=\"alignnone size-full wp-image-2770\" src=\"https://bitergia.files.wordpress.com/2016/08/selection_028.png?w=480\" /></p>\n<ul>\n<li>Git Blame (Charts). Shows a summary of the information, but using charts instead of tables. The next screenshot shows, as an example, the result of filtering the files with extension &#8220;.c&#8221; in the directory net/bluetooth</li>\n</ul>\n<p><img alt=\"Selection_027\" class=\"alignnone size-full wp-image-2764\" src=\"https://bitergia.files.wordpress.com/2016/08/selection_027.png?w=480\" /></p>\n<p>Then, we provide also more classical panels with the commits history (visualizations of the &#8220;git log&#8221; output), which can be explored as well to learn about how the Linux kernel development has evolved over time.</p>\n<p>This is a brief description of our present to anyone interested in how Linux was produced. We&#8217;re still fixing and improving the data, let us know if you find any bug, or know about how to improve it!</p><br />  <a href=\"http://feeds.wordpress.com/1.0/gocomments/bitergia.wordpress.com/2717/\" rel=\"nofollow\"><img alt=\"\" border=\"0\" src=\"http://feeds.wordpress.com/1.0/comments/bitergia.wordpress.com/2717/\" /></a> <img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2717&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+            }
+        ],
+        "guidislink": false,
+        "href": "",
+        "id": "http://blog.bitergia.com/?p=2717",
+        "link": "https://blog.bitergia.com/2016/08/24/dashboard-celebrating-25-years-of-linux-development/",
+        "links": [
+            {
+                "href": "https://blog.bitergia.com/2016/08/24/dashboard-celebrating-25-years-of-linux-development/",
+                "rel": "alternate",
+                "type": "text/html"
+            }
+        ],
+        "media_content": [
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/08/selection_027.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://2.gravatar.com/avatar/b7081d0131ad47821467b8e81434cf7a?s=96&d=identicon&r=G"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/08/linux-dashboard-blame.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/08/selection_026.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/08/selection_028.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/08/selection_027.png"
+            }
+        ],
+        "media_thumbnail": [
+            {
+                "url": "https://bitergia.files.wordpress.com/2016/08/selection_027.png"
+            }
+        ],
+        "published": "Tue, 23 Aug 2016 22:10:51 +0000",
+        "published_parsed": [
+            2016,
+            8,
+            23,
+            22,
+            10,
+            51,
+            1,
+            236,
+            0
+        ],
+        "slash_comments": "0",
+        "summary": "To celebrate 25 years of Linux kernel development, we at Bitergia have produced the Linux development history dashboard. This dashboard visualizes the current Linux git repository from two points of view: the history of all commits (changes to the source &#8230; <a href=\"https://blog.bitergia.com/2016/08/24/dashboard-celebrating-25-years-of-linux-development/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2717&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />",
+        "summary_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/html",
+            "value": "To celebrate 25 years of Linux kernel development, we at Bitergia have produced the Linux development history dashboard. This dashboard visualizes the current Linux git repository from two points of view: the history of all commits (changes to the source &#8230; <a href=\"https://blog.bitergia.com/2016/08/24/dashboard-celebrating-25-years-of-linux-development/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2717&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+        },
+        "tags": [
+            {
+                "label": null,
+                "scheme": null,
+                "term": "community"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "grimoirelab"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "Metrics"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "opensource"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "tools"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "viz"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "dashboard"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "linux"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "software development"
+            }
+        ],
+        "title": "Dashboard celebrating 25 years of Linux development",
+        "title_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/plain",
+            "value": "Dashboard celebrating 25 years of Linux development"
+        },
+        "wfw_commentrss": "https://blog.bitergia.com/2016/08/24/dashboard-celebrating-25-years-of-linux-development/feed/"
+    },
+    "origin": "https://blog.bitergia.com/feed/",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://blog.bitergia.com/feed/",
+    "timestamp": 1482310265.694081,
+    "updated_on": 1471990251.0,
+    "uuid": "803ca857cac7b4a8f4a10249d138d2ee3a853c74"
+},
+{
+    "backend_name": "RSS",
+    "backend_version": "0.1.0",
+    "category": "entry",
+    "data": {
+        "author": "jsmanrique",
+        "author_detail": {
+            "name": "jsmanrique"
+        },
+        "authors": [
+            {}
+        ],
+        "comments": "https://blog.bitergia.com/2016/07/26/innersourcing-the-development-model-of-the-future/#comments",
+        "content": [
+            {
+                "base": "",
+                "language": null,
+                "type": "text/html",
+                "value": "<p><strong>Inner Source</strong> (or <em>Inner Sourcing</em>) is a term coined by Tim O\u2019Reilly in 2001 that referenced to the, <q>\u201cuse of open source techniques within the corporation\u201d</q>.</p>\n<p>Although more that 25% of the deployee code in the most influential <abbr title=\"Information Technology\">IT</abbr> companies was Open Source in 2015, <abbr title=\"Information Technology\">IT</abbr> departments didn\u2019t show much interest in collaboration or innovation process. (Gartner, 2015).</p>\n<p>But recently there are so many mainstream <abbr title=\"Information Technology\">IT</abbr> firms that are allocating resources to Open Source contributions, not only for the benefits of the code, but the benefits of the methodology brought to the organization such as collaborations, innovation and quality control.</p>\n<p><img alt=\"inner_source_graphic\" class=\"alignnone size-full wp-image-2630\" src=\"https://bitergia.files.wordpress.com/2016/06/inner_source_graphic.png?w=480\" /></p>\n<p><strong>Inner Source</strong> takes the lessons learned from developing <strong>Open Source</strong> software and applies them to <a href=\"http://paypal.github.io/InnerSourceCommons/\" target=\"_blank\">the processes that companies follow to develop software internally.</a></p>\n<p><strong>Innersourcing\u2019s benefits for the company</strong></p>\n<p><span id=\"more-2610\"></span></p>\n<p>So many authors talk about the benefits of built <em>open source structures</em> in <abbr title=\"Information Technology\">IT</abbr> departments. Here are some of them:</p>\n<ul>\n<li><strong>Faster development</strong>, using test and continuous integration to fix bugs. A larger <em>community</em> support the code, explore vulnerabilities and find solutions.</li>\n<li><strong>Documentation</strong>. All the code has good documentation that allows all companies to have the same insights and reduce the curve adoption.</li>\n<li><strong>Code Re-use.</strong> All people across the organization know the architecture developed by other teams and how to apply it.</li>\n<li><strong>Collaboration across teams</strong> is welcome and doesn\u2019t cause\u00a0stringency, as the metodology is designed for this reason.</li>\n<li><strong>Encourage innovation</strong>, as the whole company is focus on the same goals. Innovation is everyone\u2019s concern.</li>\n<li><strong>Improves meritocracy and healthy competition</strong> that promotes the growth of knowledge and the <em>\u201chacker ethic\u201d</em> (<a href=\"https://en.wikipedia.org/wiki/The_Hacker_Ethic_and_the_Spirit_of_the_Information_Age\" target=\"_blank\">Himanen terms</a>).</li>\n</ul>\n<p><strong>Inner Sourcing\u2019s characteristics</strong></p>\n<p>Move your company into Inner Source techniques can be triky. It\u2019s important to learn how to manage <abbr title=\"Open Source Software\">OSS</abbr> development.</p>\n<ul>\n<li>Developers share their work across world wide communities, not just their team or departments. In <abbr title=\"Open Source Software\">OSS</abbr> projects anyone can comment the code, and make pull requests to submit changes to customize\u00a0 for ad hoc reasons or improvement.</li>\n<li>Everyone can create a new repository and adapt it to their project. So, you have to create or adapt <abbr title=\"Open Source Software\">OSS</abbr> rules to support different branches of your projects.</li>\n<li>You have to be able to work remotely, because the contributions to your projects come all over the world.</li>\n<li>Unit Testing is a must. In Open Source and inner source, testing is done constantly, as changes are checked in, this protects against failures during production runs.</li>\n</ul>\n<p><strong>How to measure it</strong></p>\n<p><strong>Inner Source</strong> rise up the quality of your code and there are some metrics you can use to know <strong>how healthy your Inner Source project is</strong> beyond code\u2019s qualitative analysis.</p>\n<p>To know how many contributors you have, how many commits and how often it is updated will help you feel confident with your inner sourcing techniques.</p>\n<p><img alt=\"coreos-development-overview\" class=\"alignnone size-full wp-image-2680\" src=\"https://bitergia.files.wordpress.com/2016/07/coreos-development-overview.png?w=480\" /></p>\n<p>You can also measure who is contributing, their productivity, their commitment to the project and how each project attracts and retains talent/contributors over time..</p>\n<p><img alt=\"CoreOS git demography panel\" class=\"alignnone size-full wp-image-2686\" src=\"https://bitergia.files.wordpress.com/2016/07/coreos-git-demography.png?w=480\" /></p>\n<p><strong><a href=\"http://bitergia.com\" target=\"_blank\">Bitergia</a> has the expertise to measure <abbr title=\"Open Source Sofwtare\">OSS</abbr> health projects</strong>. If you are considering investing in <strong>Inner Source</strong>, we have <a href=\"http://grimoirelab.github.io/\" target=\"_blank\">free, open source software tools to to it</a> and <strong>we will be very happy to help</strong>.</p><br />  <a href=\"http://feeds.wordpress.com/1.0/gocomments/bitergia.wordpress.com/2610/\" rel=\"nofollow\"><img alt=\"\" border=\"0\" src=\"http://feeds.wordpress.com/1.0/comments/bitergia.wordpress.com/2610/\" /></a> <img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2610&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+            }
+        ],
+        "guidislink": false,
+        "href": "",
+        "id": "http://blog.bitergia.com/?p=2610",
+        "link": "https://blog.bitergia.com/2016/07/26/innersourcing-the-development-model-of-the-future/",
+        "links": [
+            {
+                "href": "https://blog.bitergia.com/2016/07/26/innersourcing-the-development-model-of-the-future/",
+                "rel": "alternate",
+                "type": "text/html"
+            }
+        ],
+        "media_content": [
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/07/innersourcelogo.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://2.gravatar.com/avatar/2ed1be50dc4ce6c413a22a40d7192134?s=96&d=identicon&r=G"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/inner_source_graphic.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/07/coreos-development-overview.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/07/coreos-git-demography.png"
+            }
+        ],
+        "media_thumbnail": [
+            {
+                "url": "https://bitergia.files.wordpress.com/2016/07/innersourcelogo.png"
+            }
+        ],
+        "published": "Tue, 26 Jul 2016 08:52:36 +0000",
+        "published_parsed": [
+            2016,
+            7,
+            26,
+            8,
+            52,
+            36,
+            1,
+            208,
+            0
+        ],
+        "slash_comments": "1",
+        "summary": "Inner Source (or Inner Sourcing) is a term coined by Tim O\u2019Reilly in 2001 that referenced to the, \u201cuse of open source techniques within the corporation\u201d. Although more that 25% of the deployee code in the most influential IT companies &#8230; <a href=\"https://blog.bitergia.com/2016/07/26/innersourcing-the-development-model-of-the-future/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2610&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />",
+        "summary_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/html",
+            "value": "Inner Source (or Inner Sourcing) is a term coined by Tim O\u2019Reilly in 2001 that referenced to the, \u201cuse of open source techniques within the corporation\u201d. Although more that 25% of the deployee code in the most influential IT companies &#8230; <a href=\"https://blog.bitergia.com/2016/07/26/innersourcing-the-development-model-of-the-future/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2610&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+        },
+        "tags": [
+            {
+                "label": null,
+                "scheme": null,
+                "term": "grimoirelab"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "opensource"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "inner source"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "inner sourcing"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "metrics"
+            }
+        ],
+        "title": "InnerSourcing: the development model of the future?",
+        "title_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/plain",
+            "value": "InnerSourcing: the development model of the future?"
+        },
+        "wfw_commentrss": "https://blog.bitergia.com/2016/07/26/innersourcing-the-development-model-of-the-future/feed/"
+    },
+    "origin": "https://blog.bitergia.com/feed/",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://blog.bitergia.com/feed/",
+    "timestamp": 1482310265.69476,
+    "updated_on": 1469523156.0,
+    "uuid": "09d43361d5b1964049e0bacaf1a3a9ce89e99bfd"
+},
+{
+    "backend_name": "RSS",
+    "backend_version": "0.1.0",
+    "category": "entry",
+    "data": {
+        "author": "Daniel Izquierdo Cort\u00e1zar",
+        "author_detail": {
+            "name": "Daniel Izquierdo Cort\u00e1zar"
+        },
+        "authors": [
+            {}
+        ],
+        "comments": "https://blog.bitergia.com/2016/07/15/getting-your-project-backlog-with-grimoirelab-coreos-use-case/#respond",
+        "content": [
+            {
+                "base": "",
+                "language": null,
+                "type": "text/html",
+                "value": "<p>One of the first tasks done by a developer during the day is to choose where to go and what to fix. Backlogs are quite useful for this purpose, either using Kanban and directly having a look at the open issues waiting lists project by project as in the case of GitHub, or using any other manual or automated method.</p>\n<p>For this engineering focus we have started to produce some panels whose main purpose is to help developers to make decisions. As this is still in its first stages there is room for improvement, but this hopefully shows how powerful this could be. The displayed panel is part of the <a href=\"https://dashboard.bitergia.com/coreos/\">open analytics panel</a> produced for the <a href=\"https://github.com/coreos/\">CoreOS community</a>.</p>\n<div class=\"wp-caption aligncenter\" id=\"attachment_2584\" style=\"width: 490px;\"><a href=\"https://blog.bitergia.com/?attachment_id=2584#main\" rel=\"attachment wp-att-2584\"><img alt=\"backlog_panel_coreos\" class=\"wp-image-2584 size-large\" height=\"231\" src=\"https://bitergia.files.wordpress.com/2016/07/backlog_panel_coreos.png?w=480&#038;h=231\" width=\"480\" /></a><p class=\"wp-caption-text\">CoreOS Pull Requests / Issues Backlog panel</p></div>\n<p>This panel aims at providing information at three main levels:</p>\n<p><span id=\"more-2583\"></span></p>\n<ul>\n<li><strong>Current situation of the backlog</strong>. This can be mainly visualized in the top two tables working as a summary for the pull requests and issues in GitHub together with the big table that contains information about each of the open issues. The links to the actual ticket in the various GitHub repositories can also be seen. This example displays aggregated information for all of the projects found in GitHub for the CoreOS organization. That means that you do not need to navigate through all of the projects to have an aggregated view of the entire project. Indeed, it is possible to filter by project, submitter, period of time or even type of community (CoreOS or Community in this case) to drill down to the required project or community member.</li>\n</ul>\n<div class=\"wp-caption aligncenter\" id=\"attachment_2586\" style=\"width: 490px;\"><a href=\"https://blog.bitergia.com/?attachment_id=2586#main\" rel=\"attachment wp-att-2586\"><img alt=\"detail_backlog_coreos\" class=\"wp-image-2586 size-large\" height=\"299\" src=\"https://bitergia.files.wordpress.com/2016/07/detail_backlog_coreos.png?w=480&#038;h=299\" width=\"480\" /></a><p class=\"wp-caption-text\">Detail of the CoreOS backlog</p></div>\n<ul>\n<li><strong>Technical debt</strong> (let me extrapolate this concept!) in terms of the accumulated time that the issues or pull requests have remained open in the project. The two bar charts in the top right display the same history, but with a different metric. The first table at the top shows information about the current backlog of open issues and pull requests (this can also be filtered thanks to Kibana capabilities). And this is counting issues per period of time. The second bar chart displays the accumulated time for all of the issues still open in that activity timeframe. Having this in mind helps to understand why there are peaks in the second bar chart: the older a pull request or an issue is, the more time they accumulate without being closed.</li>\n</ul>\n<div class=\"wp-caption aligncenter\" id=\"attachment_2588\" style=\"width: 490px;\"><a href=\"https://blog.bitergia.com/?attachment_id=2588#main\" rel=\"attachment wp-att-2588\"><img alt=\"detail_backlog_acc_time\" class=\"wp-image-2588 size-large\" height=\"262\" src=\"https://bitergia.files.wordpress.com/2016/07/detail_backlog_acc_time.png?w=480&#038;h=262\" width=\"480\" /></a><p class=\"wp-caption-text\">Detail on the current situation of the backlog (top) and accumulated open time (down)</p></div>\n<ul>\n<li><strong>The community behind such backlog</strong> as submitters and assigned organizations. The two remaining charts, the table and the pie chart at the bottom right of the panel displays information about the submitters and the organizations assigned to fix those issues and pull requests. This helps to make a difference when working with communities oriented to non-hired developers, helping them to progress in the project as soon as possible.</li>\n</ul>\n<div class=\"wp-caption aligncenter\" id=\"attachment_2589\" style=\"width: 490px;\"><a href=\"https://blog.bitergia.com/?attachment_id=2589#main\" rel=\"attachment wp-att-2589\"><img alt=\"detail_backlog_community_coreos\" class=\"wp-image-2589 size-large\" height=\"196\" src=\"https://bitergia.files.wordpress.com/2016/07/detail_backlog_community_coreos.png?w=480&#038;h=196\" width=\"480\" /></a><p class=\"wp-caption-text\">Detail of the community around the backlog</p></div>\n<p>As a summary, this panel helps to understand the current backlog through three main concepts: <strong>the community, the accumulated open time of the issues and the list of open issues and pull requests</strong>. As mentioned, this was done for the CoreOS community, but we&#8217;re also working on adding other data sources. Jira and Bugzilla are two of those that are already supported and with their own panels to display this very same information.</p>\n<p>The panels displayed in the CoreOS dashboard are available in the <a href=\"https://github.com/grimoirelab/panels\">panels project</a> under the <a href=\"https://github.com/grimoirelab\">GrimoireLab</a> organization in GitHub.</p>\n<p>As usual, feedback is more than welcome!</p><br />  <a href=\"http://feeds.wordpress.com/1.0/gocomments/bitergia.wordpress.com/2583/\" rel=\"nofollow\"><img alt=\"\" border=\"0\" src=\"http://feeds.wordpress.com/1.0/comments/bitergia.wordpress.com/2583/\" /></a> <img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2583&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+            }
+        ],
+        "guidislink": false,
+        "href": "",
+        "id": "http://blog.bitergia.com/?p=2583",
+        "link": "https://blog.bitergia.com/2016/07/15/getting-your-project-backlog-with-grimoirelab-coreos-use-case/",
+        "links": [
+            {
+                "href": "https://blog.bitergia.com/2016/07/15/getting-your-project-backlog-with-grimoirelab-coreos-use-case/",
+                "rel": "alternate",
+                "type": "text/html"
+            }
+        ],
+        "media_content": [
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/07/backlog_panel_coreos.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://0.gravatar.com/avatar/f9c5dc9a66e146cd2d44b5aa6600e1cb?s=96&d=identicon&r=G"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/07/backlog_panel_coreos.png?w=480"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/07/detail_backlog_coreos.png?w=480"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/07/detail_backlog_acc_time.png?w=480"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/07/detail_backlog_community_coreos.png?w=480"
+            }
+        ],
+        "media_thumbnail": [
+            {
+                "url": "https://bitergia.files.wordpress.com/2016/07/backlog_panel_coreos.png"
+            }
+        ],
+        "published": "Fri, 15 Jul 2016 08:49:05 +0000",
+        "published_parsed": [
+            2016,
+            7,
+            15,
+            8,
+            49,
+            5,
+            4,
+            197,
+            0
+        ],
+        "slash_comments": "0",
+        "summary": "How to get your pendding issues and pull requests with GrimoireLab? Showing a real use case from CoreOS open source projects <a href=\"https://blog.bitergia.com/2016/07/15/getting-your-project-backlog-with-grimoirelab-coreos-use-case/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2583&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />",
+        "summary_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/html",
+            "value": "How to get your pendding issues and pull requests with GrimoireLab? Showing a real use case from CoreOS open source projects <a href=\"https://blog.bitergia.com/2016/07/15/getting-your-project-backlog-with-grimoirelab-coreos-use-case/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2583&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+        },
+        "tags": [
+            {
+                "label": null,
+                "scheme": null,
+                "term": "grimoirelab"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "Metrics"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "opensource"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "backlog"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "community"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "coreos"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "github"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "issues"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "pull requets"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "technical debt"
+            }
+        ],
+        "title": "Getting your project backlog with GrimoireLab. CoreOS use case",
+        "title_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/plain",
+            "value": "Getting your project backlog with GrimoireLab. CoreOS use case"
+        },
+        "wfw_commentrss": "https://blog.bitergia.com/2016/07/15/getting-your-project-backlog-with-grimoirelab-coreos-use-case/feed/"
+    },
+    "origin": "https://blog.bitergia.com/feed/",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://blog.bitergia.com/feed/",
+    "timestamp": 1482310265.695398,
+    "updated_on": 1468572545.0,
+    "uuid": "669f5b8152fca30ea9bfa7420e2e51e46cbd8811"
+},
+{
+    "backend_name": "RSS",
+    "backend_version": "0.1.0",
+    "category": "entry",
+    "data": {
+        "author": "jsmanrique",
+        "author_detail": {
+            "name": "jsmanrique"
+        },
+        "authors": [
+            {}
+        ],
+        "comments": "https://blog.bitergia.com/2016/06/17/adding-jenkins-activity-metrics-early-preview/#respond",
+        "content": [
+            {
+                "base": "",
+                "language": null,
+                "type": "text/html",
+                "value": "<p>On Monday, June 20<sup>th</sup>, our colleague Jes\u00fas will be in Berlin for <a href=\"http://events.linuxfoundation.org/events/opnfv-summit/extend-the-experience/opnfv-design-summit\" target=\"_blank\"><abbr title=\"Open Platform for Network Functions Virtualization\">OPNFV</abbr> Design Summit</a> to present <strong>The Quantitative State of <abbr>OPNFV</abbr></strong>.[<b>Update</b>]: <a href=\"https://speakerdeck.com/jgbarah/the-quantitative-state-of-opnfv\" target=\"_blank\">slides available</a>, Jun, 20th, 2016.</p>\n<p><abbr>OPNFV</abbr> is one of the open source projects hosted by Linux Foundation and we have been working for them for almost a year, deploying and maintaining a <a href=\"http://projects.bitergia.com/opnfv/browser/\">Metrics Grimoire based Bitergia Dashbobard</a> and <a href=\"https://wiki.opnfv.org/display/DEV/Quarterly+Reports\">detailed quarterly reports</a>. But, meanwhile, we have been developing the new <a href=\"http://grimoirelab.github.io/\">GrimoireLab toolkit</a>, so we have some new things to show in Berlin for our <abbr>OPNFV</abbr> friends&#8230;</p>\n<div class=\"wp-caption alignnone\" id=\"attachment_2544\" style=\"width: 2410px;\"><img alt=\"OPNFV MetricsGrimoire and GrimoireLab based dashboards\" class=\"alignnone size-full wp-image-2544\" src=\"https://bitergia.files.wordpress.com/2016/06/opnfv-metricsgrimoire-grimoirelab-dashboards.jpg?w=480\" /><p class=\"wp-caption-text\">OPNFV MetricsGrimoire and GrimoireLab based dashboards</p></div>\n<p>We have built a <a href=\"http://dashboard.bitergia.com/opnfv\">GrimoireLab based dashboard for <abbr>OPNFV</abbr></a>, but with some extra goodies!</p>\n<p><span id=\"more-2512\"></span></p>\n<p>As we have done for <a href=\"https://blog.bitergia.com/2016/06/07/landing-the-new-eclipse-open-analytics-dashboard/\">Eclipse Foundation</a>, since <abbr>OPNFV</abbr> uses Gerrit for code review we have added, beyond a basic panel with Gerrit activity data, one panel focus on <strong>Gerrit Backlog to help engineering teams to manage their current backlog for contributions reviews</strong>.</p>\n<div class=\"wp-caption alignnone\" id=\"attachment_2552\" style=\"width: 2410px;\"><img alt=\"Gerrit Backlog panel for OPNFV\" class=\"alignnone size-full wp-image-2552\" src=\"https://bitergia.files.wordpress.com/2016/06/gerrit-backlog-grimoirelab-panel-dashboard.jpg?w=480\" /><p class=\"wp-caption-text\">Gerrit Backlog panel for OPNFV</p></div>\n<p>And as an specific request from <abbr>OPNFV</abbr> managers, given the importance of <abbr title=\"Continuous Integration\">CI</abbr> process on <abbr>OPNFV</abbr> releases building, we have added Jenkins acitivity metrics. It is still <abbr title=\"Work in Progress\">WiP</abbr>, and we have to learn a lot about builds, jobs, and continous integration related staff, but the first step to have detailed <abbr>CI</abbr> panel in <a href=\"https://bitergia.com/products/dashboards/\">our dashboards</a> is done.</p>\n<div class=\"wp-caption alignnone\" id=\"attachment_2560\" style=\"width: 2410px;\"><img alt=\"Initial preview of Jenkins panel for OPNFV on GgrimoireLab dashboard\" class=\"alignnone size-full wp-image-2560\" src=\"https://bitergia.files.wordpress.com/2016/06/jenkins-panel-grimoirelab-dashboard.jpg?w=480\" /><p class=\"wp-caption-text\">Initial preview of Jenkins panel for OPNFV on GgrimoireLab dashboard</p></div>\n<p>There are many improvements to be made, so, try again on Monday, 20<sup>th</sup>. I a sure it will look much better, but let&#8217;s publish this early preview today, and ask for feedback!</p><br />  <a href=\"http://feeds.wordpress.com/1.0/gocomments/bitergia.wordpress.com/2512/\" rel=\"nofollow\"><img alt=\"\" border=\"0\" src=\"http://feeds.wordpress.com/1.0/comments/bitergia.wordpress.com/2512/\" /></a> <img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2512&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+            }
+        ],
+        "guidislink": false,
+        "href": "",
+        "id": "http://blog.bitergia.com/?p=2512",
+        "link": "https://blog.bitergia.com/2016/06/17/adding-jenkins-activity-metrics-early-preview/",
+        "links": [
+            {
+                "href": "https://blog.bitergia.com/2016/06/17/adding-jenkins-activity-metrics-early-preview/",
+                "rel": "alternate",
+                "type": "text/html"
+            }
+        ],
+        "media_content": [
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/jenkins-panel-grimoirelab-dashboard.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://2.gravatar.com/avatar/2ed1be50dc4ce6c413a22a40d7192134?s=96&d=identicon&r=G"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/opnfv-metricsgrimoire-grimoirelab-dashboards.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/gerrit-backlog-grimoirelab-panel-dashboard.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/jenkins-panel-grimoirelab-dashboard.jpg"
+            }
+        ],
+        "media_thumbnail": [
+            {
+                "url": "https://bitergia.files.wordpress.com/2016/06/jenkins-panel-grimoirelab-dashboard.jpg"
+            }
+        ],
+        "published": "Fri, 17 Jun 2016 14:58:44 +0000",
+        "published_parsed": [
+            2016,
+            6,
+            17,
+            14,
+            58,
+            44,
+            4,
+            169,
+            0
+        ],
+        "slash_comments": "0",
+        "summary": "On Monday, June 20th, our colleague Jes\u00fas will be in Berlin for OPNFV Design Summit to present The Quantitative State of OPNFV.[Update]: slides available, Jun, 20th, 2016. OPNFV is one of the open source projects hosted by Linux Foundation and &#8230; <a href=\"https://blog.bitergia.com/2016/06/17/adding-jenkins-activity-metrics-early-preview/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2512&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />",
+        "summary_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/html",
+            "value": "On Monday, June 20th, our colleague Jes\u00fas will be in Berlin for OPNFV Design Summit to present The Quantitative State of OPNFV.[Update]: slides available, Jun, 20th, 2016. OPNFV is one of the open source projects hosted by Linux Foundation and &#8230; <a href=\"https://blog.bitergia.com/2016/06/17/adding-jenkins-activity-metrics-early-preview/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2512&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+        },
+        "tags": [
+            {
+                "label": null,
+                "scheme": null,
+                "term": "bitergia"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "business"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "grimoirelab"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "Metrics"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "tools"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "jenkins"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "opnfv"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "summit"
+            }
+        ],
+        "title": "Adding Jenkins activity metrics. Early preview",
+        "title_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/plain",
+            "value": "Adding Jenkins activity metrics. Early preview"
+        },
+        "wfw_commentrss": "https://blog.bitergia.com/2016/06/17/adding-jenkins-activity-metrics-early-preview/feed/"
+    },
+    "origin": "https://blog.bitergia.com/feed/",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://blog.bitergia.com/feed/",
+    "timestamp": 1482310265.696087,
+    "updated_on": 1466175524.0,
+    "uuid": "5b1eac5b08f1681aa4569c636ac1f92618835dea"
+},
+{
+    "backend_name": "RSS",
+    "backend_version": "0.1.0",
+    "category": "entry",
+    "data": {
+        "author": "jsmanrique",
+        "author_detail": {
+            "name": "jsmanrique"
+        },
+        "authors": [
+            {}
+        ],
+        "comments": "https://blog.bitergia.com/2016/06/17/5-reasons-to-have-a-software-development-community-dashboard/#comments",
+        "content": [
+            {
+                "base": "",
+                "language": null,
+                "type": "text/html",
+                "value": "<p>Community managers spend their time in numerous community activities related with his/her main role: to get people to talk and contribute, react to the community managed, keep people engaged, etc. Key Performance Indicators (<abbr>KPIs</abbr>) should be set for each community based on its goals. It\u2019s part of the job to elaborate reports with multiple metrics on community health for example. But, measuring should be an effective task.</p>\n<p>Keeping this in mind, I\u2019d like to share with you 5 reasons about why community managers or <a href=\"https://blog.bitergia.com/2016/06/08/turning-metrics-and-insights-into-relevant-information-not-only-for-community-managers/\">any other professional related with software development</a> should have a dashboard that provides all the data about the community or project that she/he manages:</p>\n<p><span id=\"more-2369\"></span></p>\n<ol>\n<li><strong>You don\u2019t want to <em>waste</em> your time on gathering and processing data.</strong>\n<p>If your role is to manage a community, your main activities should be related with <a href=\"https://opensource.com/business/16/3/why-community-managers-must-wade-not-dive-communities\" target=\"_blank\">wading (not diving) into community</a>: listen and talk to the community and get it engaged, not to spend too much time trying to get data from several data sources, but taking decisions based on the data. Getting <strong>a tool can help you to minimize the time wasted on collecting all the data and to be focus</strong> on your activity.</li>\n<li><strong>All community data in one place.</strong>\n<p>Sofwtare development communities use a bunch of different tools, and <strong>it&#8217;s hard to get valuable aggregated metrics from many of them</strong>. There are <a href=\"https://bitergia.com/products/dashboards/\">open source analytic tools in the market</a> to help companies and communities to put all the data in one place, so everyday you can take a look and have an overview on the big numbers on basic metrics (like <a href=\"https://opensource.com/business/15/12/top-5-open-source-community-metrics-track\" target=\"_blank\">size, demographics, performance, activity, diversity</a>). A dashboard that shows activity and metrics about source code, tickets/issues, code review, discussions, chats, continuous integration, and downloads, provides a first view of how much the community is doing, and can be used to track different kinds of activity, and allow you to drill down into the details.</p>\n<p><div class=\"wp-caption alignnone\" id=\"attachment_1832\" style=\"width: 524px;\"><img alt=\"bitergia-data-sources\" class=\"alignnone size-full wp-image-1832\" src=\"https://bitergia.files.wordpress.com/2016/02/bitergia-data-sources.png?w=480\" /><p class=\"wp-caption-text\">Some development communities tools</p></div></li>\n<li><strong>Profile your community participants and contributors.</strong>Having a dashboard where you can get quickly metrics related with community growth, community attraction, engagement,&#8230; is an <strong>easy way to identify who is joining, and key and emerging contributors</strong>.\n<p>But <strong>it also shows who is participating less</strong> before he/she leaves the community. Maybe you want to send an email to ask if everything is ok and try to find out why the participation is decreasing, it could be personal reasons or something that had that person stacked at some point. But <strong>you need the data in advance to anticipate any issue</strong>.</p>\n<p><div class=\"wp-caption alignnone\" id=\"attachment_2486\" style=\"width: 2410px;\"><img alt=\"Community git Contributions\" class=\"alignnone size-full wp-image-2486\" src=\"https://bitergia.files.wordpress.com/2016/06/community-git-contributions.jpg?w=480\" /><p class=\"wp-caption-text\">Community git contributions</p></div></li>\n<li><strong>Overall processes performance of the community. Measure quantity and quality.</strong>It highlights issues and bottlenecks, allowing them to be resolved before they grow or spread. You can analyze how processes are performing. For example, you can measure how long processes take to finish; time to resolve or close tickets shows how the project is reacting to new information that requires action; time spent in code review.\n<p>Not all is about if a number grows, probably you want to have insights on contributors&#8217; profiling and quality participation, and that is revealed in the sum-total of other metrics and data.</p>\n<p><div class=\"wp-caption alignnone\" id=\"attachment_2346\" style=\"width: 3202px;\"><img alt=\"Last 2 years Gerrit backlog, from one of our WiP projects\" class=\"alignnone size-full wp-image-2346\" src=\"https://bitergia.files.wordpress.com/2016/06/gerrit-backlog.jpg?w=480\" /><p class=\"wp-caption-text\">Last 2 years Gerrit backlog, from one of our WiP projects</p></div></li>\n<li><strong>Trends over the time.</strong>It&#8217;s not only what is happening today, it is what is happening over the time and the evolution of your community. Which was the diversity of the community two years ago compared with last month on the code review process? The answers to that kind of question provides important information about the evolution and work done in the community. But not only that, people evolve over the time and contributors do it too. We can closely see how a contributor changes his/her role over the time, for example, from active code contributor to a management profile, but only if you have data from several source that allows you to do that analysis.</li>\n</ol>\n<p>All these things are easier if you have a <a href=\"https://bitergia.com/products/dashboards/\">dashboard</a> that provides all that data aggregated that let you filter and drill down into details. It would let you focus in your job: to manage the community and stay connected to them, and <strong>don\u2019t waste time trying to gather all the data</strong>. Check an example of the <a href=\"http://dashboard.bitergia.com/eclipse\">Eclipse Foundation community activity</a>.</p><br />  <a href=\"http://feeds.wordpress.com/1.0/gocomments/bitergia.wordpress.com/2369/\" rel=\"nofollow\"><img alt=\"\" border=\"0\" src=\"http://feeds.wordpress.com/1.0/comments/bitergia.wordpress.com/2369/\" /></a> <img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2369&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+            }
+        ],
+        "guidislink": false,
+        "href": "",
+        "id": "http://blog.bitergia.com/?p=2369",
+        "link": "https://blog.bitergia.com/2016/06/17/5-reasons-to-have-a-software-development-community-dashboard/",
+        "links": [
+            {
+                "href": "https://blog.bitergia.com/2016/06/17/5-reasons-to-have-a-software-development-community-dashboard/",
+                "rel": "alternate",
+                "type": "text/html"
+            }
+        ],
+        "media_content": [
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/community-git-contributions.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://2.gravatar.com/avatar/2ed1be50dc4ce6c413a22a40d7192134?s=96&d=identicon&r=G"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/02/bitergia-data-sources.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/community-git-contributions.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/gerrit-backlog.jpg"
+            }
+        ],
+        "media_thumbnail": [
+            {
+                "url": "https://bitergia.files.wordpress.com/2016/06/community-git-contributions.jpg"
+            }
+        ],
+        "published": "Fri, 17 Jun 2016 12:01:38 +0000",
+        "published_parsed": [
+            2016,
+            6,
+            17,
+            12,
+            1,
+            38,
+            4,
+            169,
+            0
+        ],
+        "slash_comments": "1",
+        "summary": "Community managers spend their time in numerous community activities related with his/her main role: to get people to talk and contribute, react to the community managed, keep people engaged, etc. Key Performance Indicators (KPIs) should be set for each community based on its goals. It\u2019s part of the job to elaborate reports with multiple metrics on community health for example. But, measuring should be an effective task. <a href=\"https://blog.bitergia.com/2016/06/17/5-reasons-to-have-a-software-development-community-dashboard/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2369&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />",
+        "summary_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/html",
+            "value": "Community managers spend their time in numerous community activities related with his/her main role: to get people to talk and contribute, react to the community managed, keep people engaged, etc. Key Performance Indicators (KPIs) should be set for each community based on its goals. It\u2019s part of the job to elaborate reports with multiple metrics on community health for example. But, measuring should be an effective task. <a href=\"https://blog.bitergia.com/2016/06/17/5-reasons-to-have-a-software-development-community-dashboard/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=2369&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+        },
+        "tags": [
+            {
+                "label": null,
+                "scheme": null,
+                "term": "bitergia"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "community"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "tools"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "community metrics"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "dashboard"
+            }
+        ],
+        "title": "5 reasons to have a Software Development Community Dashboard",
+        "title_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/plain",
+            "value": "5 reasons to have a Software Development Community Dashboard"
+        },
+        "wfw_commentrss": "https://blog.bitergia.com/2016/06/17/5-reasons-to-have-a-software-development-community-dashboard/feed/"
+    },
+    "origin": "https://blog.bitergia.com/feed/",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://blog.bitergia.com/feed/",
+    "timestamp": 1482310265.696728,
+    "updated_on": 1466164898.0,
+    "uuid": "fc469b6363c915a48fb35c6efdb9b4ad310d4a0c"
+},
+{
+    "backend_name": "RSS",
+    "backend_version": "0.1.0",
+    "category": "entry",
+    "data": {
+        "author": "jsmanrique",
+        "author_detail": {
+            "name": "jsmanrique"
+        },
+        "authors": [
+            {}
+        ],
+        "comments": "https://blog.bitergia.com/2016/06/08/turning-metrics-and-insights-into-relevant-information-not-only-for-community-managers/#comments",
+        "content": [
+            {
+                "base": "",
+                "language": null,
+                "type": "text/html",
+                "value": "<p>Bitergia gathers data from almost the entirety of the set of tools associated with collaborative software development, providing useful information, metrics and insights for different profiles.</p>\n<p><a href=\"http://bitergia.com/#services\" target=\"_blank\"><img alt=\"bitergia-data-sources\" class=\"  wp-image-1832 aligncenter\" height=\"367\" src=\"https://bitergia.files.wordpress.com/2016/02/bitergia-data-sources.png?w=367&#038;h=367\" width=\"367\" /></a></p>\n<p>It seems that the first person that needs this kind of information is the community manager. But, there are other profiles that can get advantage of tracking projects and understanding the details to answer specific questions.</p>\n<p>Which are <strong>other profiles that could be interested in metrics</strong>, and the information they can get from that data?</p>\n<p><span id=\"more-1826\"></span></p>\n<p><!-- more --></p>\n<ul>\n<li>As mentioned, <strong>community managers</strong> is one of the first profiles that need to add data from multiple sources in one <strong><a href=\"https://bitergia.com/products/dashboards/\" target=\"_blank\">dashboard</a></strong> to assess the health of the <strong>development community</strong> that manages. Some of the data and information they require is related with <strong>community activity and size overview, community demography (retention rate, newcomers), gamification, contributors profiling</strong>, etc.</li>\n</ul>\n<div class=\"wp-caption alignnone\" id=\"attachment_2343\" style=\"width: 3198px;\"><img alt=\"Community posting issues, map and activity status\" class=\"alignnone size-full wp-image-2343\" src=\"https://bitergia.files.wordpress.com/2016/06/community-map-issues.jpg?w=480\" /><p class=\"wp-caption-text\">Community posting issues, map and activity status, as seen in cauldron.io</p></div>\n<ul>\n<li><strong>Project managers, engineering teams, and development teams</strong>: To know the status of the development of your team or teams saves time and costs, by providing information such as <strong>coding activity, issues, code review and pull requests backlogs and performance, bottlenecks identification, issues solving efficiency</strong>, etc. Identify issues and having a detailed insight on the <strong>performance and inner life</strong> of the analyzed project are going to help to solve problems effectively.</li>\n</ul>\n<div class=\"wp-caption alignnone\" id=\"attachment_2346\" style=\"width: 3202px;\"><img alt=\"Last 2 years Gerrit backlog, from one of our WiP projects\" class=\"alignnone size-full wp-image-2346\" src=\"https://bitergia.files.wordpress.com/2016/06/gerrit-backlog.jpg?w=480\" /><p class=\"wp-caption-text\">Last 2 years Gerrit backlog, from one of our WiP projects</p></div>\n<ul>\n<li>In a competitive world like today, talent acquisition for companies is very important. Developers metrics can help <strong>Human Resources managers, recruitment teams &amp; talent managers</strong> to identify the right person for a particular position, and to keep persons at the company.\u00a0To study <strong>contributors competencies, developers contributions review metrics, activity by company, activity from outside the company, projects contributions</strong>, etc. are just some of the relevant insights we can provide in our reports.</li>\n<li><strong>Business and Marketing managers</strong> also have the opportunity to leverage data communication development and positioning of the company in the market.\u00a0Project <strong>maturity level analysis</strong>, community health, companies <strong>benchmarking</strong>, <strong>company positioning</strong>, etc, <a href=\"http://bitergia.com/projects.html\" target=\"_blank\">reports</a> are a good tool to provide detailed independent information.</li>\n</ul>\n<div class=\"wp-caption alignnone\" id=\"attachment_2352\" style=\"width: 3202px;\"><img alt=\"Organizations contributions for last 5 years in Eclipse Foundation projects\" class=\"alignnone size-full wp-image-2352\" src=\"https://bitergia.files.wordpress.com/2016/06/eclipse-organizations-git.jpg?w=480\" /><p class=\"wp-caption-text\">Organizations contributions for last 5 years in Eclipse Foundation projects</p></div>\n<p>But not only <em>inside company</em> information, other areas interested in <strong><a href=\"https://bitergia.com/bitergia/#solutions\" target=\"_blank\">Software Development Analytics</a></strong> are project consultants and business analysts working on:</p>\n<ul>\n<li>Project and/or companies <strong>transparency</strong> analysis</li>\n<li><strong>Due diligence</strong> reports, understanding activity and its value</li>\n<li><strong>Auditing</strong>, certifying participation, experience, etc.</li>\n<li>Project <strong>neutrality</strong>, fair treatment between <em><a href=\"https://en.wikipedia.org/wiki/Coopetition\">coopetitors</a></em></li>\n</ul>\n<p>Do you use these kind of metrics and for what\u00a0purpose?</p>\n<p>If you want to <strong>discover\u00a0the power of metrics</strong>, you can try <a href=\"https://cauldron.io/\" target=\"_blank\">Cauldron.io</a> for free using the invitation code <code>OSCON16</code> still valid<img alt=\"\ud83d\ude09\" class=\"wp-smiley\" src=\"https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f609.png\" style=\"height: 1em;\" /></p>\n<p><a href=\"https://cauldron.io/\" target=\"_blank\"><img alt=\"cauldron\" class=\"  wp-image-2302 aligncenter\" height=\"142\" src=\"https://bitergia.files.wordpress.com/2016/06/cauldron.png?w=161&#038;h=142\" width=\"161\" /></a></p><br />  <a href=\"http://feeds.wordpress.com/1.0/gocomments/bitergia.wordpress.com/1826/\" rel=\"nofollow\"><img alt=\"\" border=\"0\" src=\"http://feeds.wordpress.com/1.0/comments/bitergia.wordpress.com/1826/\" /></a> <img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=1826&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+            }
+        ],
+        "guidislink": false,
+        "href": "",
+        "id": "http://blog.bitergia.com/?p=1826",
+        "link": "https://blog.bitergia.com/2016/06/08/turning-metrics-and-insights-into-relevant-information-not-only-for-community-managers/",
+        "links": [
+            {
+                "href": "https://blog.bitergia.com/2016/06/08/turning-metrics-and-insights-into-relevant-information-not-only-for-community-managers/",
+                "rel": "alternate",
+                "type": "text/html"
+            }
+        ],
+        "media_content": [
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/metrics-profiles.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://2.gravatar.com/avatar/2ed1be50dc4ce6c413a22a40d7192134?s=96&d=identicon&r=G"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/02/bitergia-data-sources.png"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/community-map-issues.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/gerrit-backlog.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/eclipse-organizations-git.jpg"
+            },
+            {
+                "medium": "image",
+                "url": "http://bitergia.files.wordpress.com/2016/06/cauldron.png"
+            }
+        ],
+        "media_thumbnail": [
+            {
+                "url": "https://bitergia.files.wordpress.com/2016/06/metrics-profiles.png"
+            }
+        ],
+        "published": "Wed, 08 Jun 2016 13:34:33 +0000",
+        "published_parsed": [
+            2016,
+            6,
+            8,
+            13,
+            34,
+            33,
+            2,
+            160,
+            0
+        ],
+        "slash_comments": "1",
+        "summary": "Bitergia gathers data from almost the entirety of the set of tools associated with collaborative software development, providing useful information, metrics and insights for different profiles. It seems that the first person that needs this kind of information is the &#8230; <a href=\"https://blog.bitergia.com/2016/06/08/turning-metrics-and-insights-into-relevant-information-not-only-for-community-managers/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=1826&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />",
+        "summary_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/html",
+            "value": "Bitergia gathers data from almost the entirety of the set of tools associated with collaborative software development, providing useful information, metrics and insights for different profiles. It seems that the first person that needs this kind of information is the &#8230; <a href=\"https://blog.bitergia.com/2016/06/08/turning-metrics-and-insights-into-relevant-information-not-only-for-community-managers/\">Continue reading <span class=\"meta-nav\">&#8594;</span></a><img alt=\"\" border=\"0\" height=\"1\" src=\"https://pixel.wp.com/b.gif?host=blog.bitergia.com&#038;blog=32615158&#038;post=1826&#038;subd=bitergia&#038;ref=&#038;feed=1\" width=\"1\" />"
+        },
+        "tags": [
+            {
+                "label": null,
+                "scheme": null,
+                "term": "Metrics"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "metrics"
+            },
+            {
+                "label": null,
+                "scheme": null,
+                "term": "profiles"
+            }
+        ],
+        "title": "Turning metrics and insights into relevant information not only for community managers",
+        "title_detail": {
+            "base": "",
+            "language": null,
+            "type": "text/plain",
+            "value": "Turning metrics and insights into relevant information not only for community managers"
+        },
+        "wfw_commentrss": "https://blog.bitergia.com/2016/06/08/turning-metrics-and-insights-into-relevant-information-not-only-for-community-managers/feed/"
+    },
+    "origin": "https://blog.bitergia.com/feed/",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://blog.bitergia.com/feed/",
+    "timestamp": 1482310265.697358,
+    "updated_on": 1465392873.0,
+    "uuid": "74a5eccca8f5aa3ab7dd5a0f0fc4c0ceae1f05fa"
+}]
