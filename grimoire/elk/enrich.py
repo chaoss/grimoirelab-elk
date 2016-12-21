@@ -662,6 +662,8 @@ class Enrich(object):
         eitem_sh = {}  # Item enriched
 
         author_field = self.get_field_author()
+        if not author_field:
+            return eitem_sh
         sh_id_author = None
 
         if not roles:
