@@ -44,24 +44,32 @@ class AskbotEnrich(Enrich):
         # answers
         if 'answers' in item['data']:
             for answer in item['data']['answers']:
-                user = self.get_sh_identity(answer['answered_by'])
-                identities.append(user)
+                # avoid "answered_by" : "This post is a wiki" corner case
+                if type(answer['answered_by']) is dict:
+                    user = self.get_sh_identity(answer['answered_by'])
+                    identities.append(user)
                 if 'comments' in answer:
                     for comment in answer['comments']:
                         identities.append(self.get_sh_identity(comment))
         return identities
 
     def get_sh_identity(self, item, identity_field=None):
-        identity = {}
+        identity = {key: None for key in ['username', 'name', 'email']}
 
         user = item  # by default a specific user dict is expected
         if 'data' in item and type(item) == dict:
             user = item['data'][identity_field]
         elif 'author' in item:
             user = item['author']
-        identity['username'] = user['username']
-        identity['email'] = None
-        identity['name'] = user['username']
+
+        if user is None:
+            return identity
+
+        if 'username' in user:
+            identity['username'] = user['username']
+        elif 'user_display_name' in user:
+            identity['username'] = user['user_display_name']
+        identity['name'] = identity['username']
         return identity
 
     def get_field_author(self):
@@ -134,10 +142,11 @@ class AskbotEnrich(Enrich):
             first_answer_time = unixtime_to_datetime(float(question['answers'][0]["added_at"]))
             eitem['time_to_reply'] = get_time_diff_days(added_at, first_answer_time)
 
-        eitem['author_user_name'] = question['author']['username']
-        eitem['author_id'] = question['author']['id']
-        eitem['author_badges'] = question['author']['badges']
-        eitem['author_reputation'] = int(question['author']['reputation'])
+        if question['author'] and type(question['author']) is dict:
+            eitem['author_user_name'] = question['author']['username']
+            eitem['author_id'] = question['author']['id']
+            eitem['author_badges'] = question['author']['badges']
+            eitem['author_reputation'] = int(question['author']['reputation'])
 
         eitem['question_last_activity_at'] = unixtime_to_datetime(float(question['last_activity_at'])).isoformat()
         eitem['question_last_activity_by_id'] = question['last_activity_by']['id']
@@ -168,27 +177,38 @@ class AskbotEnrich(Enrich):
         ecomment['id'] = comment['id']
         ecomment['url'] = item['data']['url']+"/?answer="
         ecomment['url'] += answer['id']+'#post-id-'+answer['id']
-        ecomment['author_user_name'] = comment['author']['username']
-        ecomment['author_id'] = comment['author']['id']
-        ecomment['summary'] = comment['summary']
+        if 'author' in comment:
+            ecomment['author_user_name'] = comment['author']['username']
+            ecomment['author_id'] = comment['author']['id']
+        if 'summary' in comment:
+            ecomment['summary'] = comment['summary']
         ecomment['score'] = comment['score']
 
+        dfield = 'added_at'
+        if 'comment_added_at' in comment:
+            dfield = 'comment_added_at'
+
         if self.sortinghat:
-            comment['added_at_date'] = unixtime_to_datetime(float(comment["added_at"])).isoformat()
+            if dfield == 'added_at':
+                comment['added_at_date'] = unixtime_to_datetime(float(comment[dfield])).isoformat()
+            else:
+                comment['added_at_date'] = comment[dfield]
             ecomment.update(self.get_item_sh(comment, date_field="added_at_date"))
 
-        comment_at = unixtime_to_datetime(float(comment["added_at"]))
+        if dfield == 'added_at':
+            comment_at = unixtime_to_datetime(float(comment[dfield]))
+        else:
+            comment_at = parser.parse(comment[dfield])
+
         added_at = unixtime_to_datetime(float(item['data']["added_at"]))
         ecomment['time_from_question'] = get_time_diff_days(added_at, comment_at)
         ecomment['type'] = 'comment'
         ecomment.update(self.get_grimoire_fields(comment_at.isoformat(), ecomment['type']))
 
         # Clean items fields not valid in comments
-        ecomment.pop('is_askbot_question')
-        ecomment.pop('author_reputation')
-        ecomment.pop('author_badges')
-        ecomment.pop('is_correct', None)
-        ecomment.pop('comment_count')
+        for f in ['is_askbot_question', 'author_reputation', 'author_badges', 'is_correct', 'comment_count']:
+            if f in ecomment:
+                ecomment.pop(f)
 
         return ecomment
 
@@ -197,10 +217,11 @@ class AskbotEnrich(Enrich):
         eanswer['id'] = answer['id']
         eanswer['url'] = item['data']['url']+"/?answer="
         eanswer['url'] += answer['id']+'#post-id-'+answer['id']
-        eanswer['author_user_name'] = answer['answered_by']['username']
-        eanswer['author_id'] = answer['answered_by']['id']
-        eanswer['author_badges'] = answer['answered_by']['badges']
-        eanswer['author_reputation'] = int(answer['answered_by']['reputation'])
+        if type(answer['answered_by']) is dict:
+            eanswer['author_user_name'] = answer['answered_by']['username']
+            eanswer['author_id'] = answer['answered_by']['id']
+            eanswer['author_badges'] = answer['answered_by']['badges']
+            eanswer['author_reputation'] = int(answer['answered_by']['reputation'])
         eanswer['summary'] = answer['summary']
         eanswer['score'] = answer['score']
         if 'is_correct' in answer:
