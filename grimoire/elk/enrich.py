@@ -324,6 +324,11 @@ class Enrich(object):
                     bulk_json += data_json +"\n"  # Bulk document
                     current += 1
                     total += 1
+
+        if total == 0:
+            # No items enriched, nothing to upload to ES
+            return total
+
         r = self.requests.put(url, data=bulk_json)
         r.raise_for_status()
 
