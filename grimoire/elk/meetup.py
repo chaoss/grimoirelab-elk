@@ -72,8 +72,9 @@ class MeetupEnrich(Enrich):
         identities = []
 
         # Creators
-        user = self.get_sh_identity(item['event_hosts'][0])
-        identities.append(user)
+        if 'event_hosts' in item:
+            user = self.get_sh_identity(item['event_hosts'][0])
+            identities.append(user)
 
         # rsvps
         for rsvp in item['rsvps']:
@@ -138,14 +139,15 @@ class MeetupEnrich(Enrich):
 
 
         # event host fields: author of the event
-        host = event['event_hosts'][0]
-        eitem['member_photo_url'] = host['photo']['photo_link']
-        eitem['member_photo_id'] = host['photo']['id']
-        eitem['member_photo_type'] = host['photo']['type']
-        eitem['member_is_host'] = True
-        eitem['member_id'] = host['id']
-        eitem['member_name'] = host['name']
-        eitem['member_url'] = "https://www.meetup.com/members/" + str(host['id'])
+        if 'event_hosts' in event:
+            host = event['event_hosts'][0]
+            eitem['member_photo_url'] = host['photo']['photo_link']
+            eitem['member_photo_id'] = host['photo']['id']
+            eitem['member_photo_type'] = host['photo']['type']
+            eitem['member_is_host'] = True
+            eitem['member_id'] = host['id']
+            eitem['member_name'] = host['name']
+            eitem['member_url'] = "https://www.meetup.com/members/" + str(host['id'])
 
         eitem['event_url'] = event['link']
 
