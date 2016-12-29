@@ -32,7 +32,7 @@ import logging
 import requests
 
 from datetime import datetime
-from grimoire.elk.utils import unixtime_to_datetime
+from ..elk.utils import unixtime_to_datetime
 
 
 class ElasticOcean(object):

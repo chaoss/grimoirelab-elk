@@ -31,9 +31,9 @@ import traceback
 from datetime import datetime
 from dateutil import parser
 
-from grimoire.ocean.conf import ConfOcean
-from grimoire.utils import get_elastic
-from grimoire.utils import get_connectors, get_connector_from_name
+from .ocean.conf import ConfOcean
+from .utils import get_elastic
+from .utils import get_connectors, get_connector_from_name
 
 logger = logging.getLogger(__name__)
 
@@ -233,7 +233,7 @@ def refresh_identities(enrich_backend, query_string=None):
 
 def load_identities(ocean_backend, enrich_backend):
     try:
-        from grimoire.elk.sortinghat import SortingHat
+        from .elk.sortinghat import SortingHat
     except ImportError:
         logger.warning("SortingHat not available.")
 

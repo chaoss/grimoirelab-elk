@@ -26,7 +26,8 @@
 import datetime
 from dateutil import parser
 import logging
-from grimoire.ocean.elastic import ElasticOcean
+
+from .elastic import ElasticOcean
 
 class MBoxOcean(ElasticOcean):
     """MBox Ocean feeder"""

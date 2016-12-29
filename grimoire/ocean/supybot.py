@@ -23,7 +23,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from grimoire.ocean.elastic import ElasticOcean
+from .elastic import ElasticOcean
 
 class SupybotOcean(ElasticOcean):
     """MediaWiki Ocean feeder"""

@@ -25,7 +25,7 @@
 
 '''Gerrit Ocean feeder'''
 
-from grimoire.ocean.elastic import ElasticOcean
+from .elastic import ElasticOcean
 
 class BugzillaRESTOcean(ElasticOcean):
 

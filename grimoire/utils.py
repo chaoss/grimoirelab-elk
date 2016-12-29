@@ -28,59 +28,58 @@ from dateutil import parser
 import logging
 import sys
 
-from grimoire.ocean.elastic import ElasticOcean
+from .ocean.elastic import ElasticOcean
 
 # Connectors for Ocean
-from grimoire.ocean.askbot import AskbotOcean
-from grimoire.ocean.bugzilla import BugzillaOcean
-from grimoire.ocean.bugzillarest import BugzillaRESTOcean
-from grimoire.ocean.confluence import ConfluenceOcean
-from grimoire.ocean.discourse import DiscourseOcean
-from grimoire.ocean.gerrit import GerritOcean
-from grimoire.ocean.git import GitOcean
-from grimoire.ocean.github import GitHubOcean
-from grimoire.ocean.jenkins import JenkinsOcean
-from grimoire.ocean.jira import JiraOcean
-from grimoire.ocean.kitsune import KitsuneOcean
-from grimoire.ocean.mbox import MBoxOcean
-from grimoire.ocean.mediawiki import MediaWikiOcean
-from grimoire.ocean.meetup import MeetupOcean
-from grimoire.ocean.phabricator import PhabricatorOcean
-from grimoire.ocean.redmine import RedmineOcean
-from grimoire.ocean.remo2 import ReMoOcean
-from grimoire.ocean.rss import RSSOcean
-from grimoire.ocean.stackexchange import StackExchangeOcean
-from grimoire.ocean.supybot import SupybotOcean
-from grimoire.ocean.telegram import TelegramOcean
-from grimoire.ocean.twitter import TwitterOcean
-
+from .ocean.askbot import AskbotOcean
+from .ocean.bugzilla import BugzillaOcean
+from .ocean.bugzillarest import BugzillaRESTOcean
+from .ocean.confluence import ConfluenceOcean
+from .ocean.discourse import DiscourseOcean
+from .ocean.gerrit import GerritOcean
+from .ocean.git import GitOcean
+from .ocean.github import GitHubOcean
+from .ocean.jenkins import JenkinsOcean
+from .ocean.jira import JiraOcean
+from .ocean.kitsune import KitsuneOcean
+from .ocean.mbox import MBoxOcean
+from .ocean.mediawiki import MediaWikiOcean
+from .ocean.meetup import MeetupOcean
+from .ocean.phabricator import PhabricatorOcean
+from .ocean.redmine import RedmineOcean
+from .ocean.remo2 import ReMoOcean
+from .ocean.rss import RSSOcean
+from .ocean.stackexchange import StackExchangeOcean
+from .ocean.supybot import SupybotOcean
+from .ocean.telegram import TelegramOcean
+from .ocean.twitter import TwitterOcean
 
 # Connectors for EnrichOcean
-from grimoire.elk.askbot import AskbotEnrich
-from grimoire.elk.bugzilla import BugzillaEnrich
-from grimoire.elk.bugzillarest import BugzillaRESTEnrich
-from grimoire.elk.confluence import ConfluenceEnrich
-from grimoire.elk.discourse import DiscourseEnrich
-from grimoire.elk.git import GitEnrich
-from grimoire.elk.github import GitHubEnrich
-from grimoire.elk.gerrit import GerritEnrich
-from grimoire.elk.gmane import GmaneEnrich
-from grimoire.elk.jenkins import JenkinsEnrich
-from grimoire.elk.jira import JiraEnrich
-from grimoire.elk.kitsune import KitsuneEnrich
-from grimoire.elk.mbox import MBoxEnrich
-from grimoire.elk.mediawiki import MediaWikiEnrich
-from grimoire.elk.meetup import MeetupEnrich
-from grimoire.elk.phabricator import PhabricatorEnrich
-from grimoire.elk.redmine import RedmineEnrich
-# from grimoire.elk.remo import ReMoEnrich
-from grimoire.elk.remo2 import ReMoEnrich
-from grimoire.elk.rss import RSSEnrich
-from grimoire.elk.pipermail import PipermailEnrich
-from grimoire.elk.stackexchange import StackExchangeEnrich
-from grimoire.elk.supybot import SupybotEnrich
-from grimoire.elk.telegram import TelegramEnrich
-from grimoire.elk.twitter import TwitterEnrich
+from .elk.askbot import AskbotEnrich
+from .elk.bugzilla import BugzillaEnrich
+from .elk.bugzillarest import BugzillaRESTEnrich
+from .elk.confluence import ConfluenceEnrich
+from .elk.discourse import DiscourseEnrich
+from .elk.git import GitEnrich
+from .elk.github import GitHubEnrich
+from .elk.gerrit import GerritEnrich
+from .elk.gmane import GmaneEnrich
+from .elk.jenkins import JenkinsEnrich
+from .elk.jira import JiraEnrich
+from .elk.kitsune import KitsuneEnrich
+from .elk.mbox import MBoxEnrich
+from .elk.mediawiki import MediaWikiEnrich
+from .elk.meetup import MeetupEnrich
+from .elk.phabricator import PhabricatorEnrich
+from .elk.redmine import RedmineEnrich
+# from .elk.remo import ReMoEnrich
+from .elk.remo2 import ReMoEnrich
+from .elk.rss import RSSEnrich
+from .elk.pipermail import PipermailEnrich
+from .elk.stackexchange import StackExchangeEnrich
+from .elk.supybot import SupybotEnrich
+from .elk.telegram import TelegramEnrich
+from .elk.twitter import TwitterEnrich
 
 # Connectors for Perceval
 from perceval.backends.core.askbot import Askbot, AskbotCommand
@@ -108,8 +107,8 @@ from perceval.backends.core.supybot import Supybot, SupybotCommand
 from perceval.backends.core.telegram import Telegram, TelegramCommand
 
 
-from grimoire.elk.elastic import ElasticSearch
-from grimoire.elk.elastic import ElasticConnectException
+from .elk.elastic import ElasticSearch
+from .elk.elastic import ElasticConnectException
 
 def get_connector_from_name(name):
     found = None

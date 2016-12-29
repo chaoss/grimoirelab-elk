@@ -27,7 +27,7 @@
 
 from datetime import datetime
 
-from grimoire.ocean.elastic import ElasticOcean
+from .elastic import ElasticOcean
 
 class GerritOcean(ElasticOcean):
 

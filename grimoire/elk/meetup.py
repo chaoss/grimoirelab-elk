@@ -25,7 +25,7 @@
 
 import logging
 
-from grimoire.elk.enrich import Enrich, metadata
+from .enrich import Enrich, metadata
 
 from .utils import unixtime_to_datetime
 

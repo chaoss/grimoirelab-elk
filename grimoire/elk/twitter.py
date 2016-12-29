@@ -24,7 +24,7 @@
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich, metadata
+from .enrich import Enrich, metadata
 
 class TwitterEnrich(Enrich):
 

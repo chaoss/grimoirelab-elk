@@ -31,10 +31,10 @@ import requests
 
 from dateutil import parser
 
-from grimoire.elk.enrich import Enrich, metadata
+from .enrich import Enrich, metadata
 
 try:
-    from grimoire.elk.sortinghat import SortingHat
+    from .sortinghat import SortingHat
     SORTINGHAT_LIBS = True
 except ImportError:
     SORTINGHAT_LIBS = False

@@ -33,7 +33,7 @@ from dateutil import parser
 
 from .utils import get_time_diff_days
 
-from grimoire.elk.enrich import Enrich, metadata
+from .enrich import Enrich, metadata
 
 GITHUB = 'https://github.com/'
 

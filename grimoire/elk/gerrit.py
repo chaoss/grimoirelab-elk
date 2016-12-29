@@ -30,7 +30,7 @@ import logging
 import time
 
 
-from grimoire.elk.enrich import Enrich, metadata
+from .enrich import Enrich, metadata
 
 class GerritEnrich(Enrich):
 

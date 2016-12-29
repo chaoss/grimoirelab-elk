@@ -24,7 +24,8 @@
 #
 
 from dateutil import parser
-from grimoire.ocean.elastic import ElasticOcean
+
+from .elastic import ElasticOcean
 
 class GitOcean(ElasticOcean):
     """Git Ocean feeder"""

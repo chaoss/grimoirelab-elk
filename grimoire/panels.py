@@ -30,7 +30,7 @@ from os import sys
 
 import requests
 
-from grimoire.elk.elastic import ElasticSearch
+from .elk.elastic import ElasticSearch
 
 
 def get_dashboard_json(elastic, dashboard):

@@ -23,7 +23,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from grimoire.elk.database import Database
+from .database import Database
 
 class GrimoireLibProjects(object):
 

@@ -50,7 +50,7 @@ try:
     from sortinghat import api, utils
     from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
 
-    from grimoire.elk.sortinghat import SortingHat
+    from .sortinghat import SortingHat
 
     SORTINGHAT_LIBS = True
 except ImportError:

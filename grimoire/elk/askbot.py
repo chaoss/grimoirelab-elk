@@ -29,7 +29,7 @@ from dateutil import parser
 
 from .utils import get_time_diff_days, unixtime_to_datetime
 
-from grimoire.elk.enrich import Enrich, metadata
+from .enrich import Enrich, metadata
 
 class AskbotEnrich(Enrich):
 

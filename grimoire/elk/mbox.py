@@ -28,7 +28,7 @@ import logging
 from dateutil import parser
 import email.utils
 
-from grimoire.elk.enrich import Enrich, metadata
+from .enrich import Enrich, metadata
 
 class MBoxEnrich(Enrich):
 

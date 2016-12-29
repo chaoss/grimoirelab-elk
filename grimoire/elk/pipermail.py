@@ -22,7 +22,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from grimoire.elk.mbox import MBoxEnrich
+from .mbox import MBoxEnrich
 
 class PipermailEnrich(MBoxEnrich):
 

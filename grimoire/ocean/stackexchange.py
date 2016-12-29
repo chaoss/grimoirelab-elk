@@ -24,7 +24,7 @@
 #
 
 import datetime
-from grimoire.ocean.elastic import ElasticOcean
+from .elastic import ElasticOcean
 
 class StackExchangeOcean(ElasticOcean):
     """StackExchange Ocean feeder"""
