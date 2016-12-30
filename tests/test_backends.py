@@ -33,8 +33,8 @@ from datetime import datetime
 if not '..' in sys.path:
     sys.path.insert(0, '..')
 
-from grimoire.arthur import load_identities
-from grimoire.utils import get_connectors, get_elastic
+from grimoire_elk.arthur import load_identities
+from grimoire_elk.utils import get_connectors, get_elastic
 
 
 CONFIG_FILE = 'tests.conf'

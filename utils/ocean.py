@@ -29,9 +29,9 @@ import logging
 import requests
 import sys
 
-from grimoire.elk.elastic import ElasticSearch, ElasticConnectException, ElasticWriteException
-from grimoire.ocean.elastic import ElasticOcean
-from grimoire.ocean.conf import ConfOcean
+from grimoire_elk.elk.elastic import ElasticSearch, ElasticConnectException, ElasticWriteException
+from grimoire_elk.ocean.elastic import ElasticOcean
+from grimoire_elk.ocean.conf import ConfOcean
 
 def get_elastic():
 
@@ -125,4 +125,3 @@ if __name__ == '__main__':
         list_repos()
     elif args.remove:
         remove_repo(args.remove)
-

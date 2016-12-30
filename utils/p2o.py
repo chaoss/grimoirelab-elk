@@ -28,12 +28,12 @@ import logging
 from os import sys
 from time import time, sleep
 
-from grimoire.arthur import feed_backend, enrich_backend
+from grimoire_elk.arthur import feed_backend, enrich_backend
 
-from grimoire.ocean.conf import ConfOcean
+from grimoire_elk.ocean.conf import ConfOcean
 
-from grimoire.utils import get_elastic
-from grimoire.utils import get_params_parser, config_logging
+from grimoire_elk.utils import get_elastic
+from grimoire_elk.utils import get_params_parser, config_logging
 
 def get_params():
     ''' Get params definition from ElasticOcean and from all the backends '''

@@ -28,9 +28,9 @@ import logging
 
 from os import sys
 
-from grimoire.ocean.elastic import ElasticOcean
-from grimoire.panels import create_dashboard
-from grimoire.utils import config_logging
+from grimoire_elk.ocean.elastic import ElasticOcean
+from grimoire_elk.panels import create_dashboard
+from grimoire_elk.utils import config_logging
 
 def get_params_parser_create_dash():
     """Parse command line arguments"""
