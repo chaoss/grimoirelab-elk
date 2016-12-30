@@ -222,6 +222,8 @@ class MeetupEnrich(Enrich):
     def get_item_sh(self, item):
         """ Add sorting hat enrichment fields  """
 
+        sh_fields = {}
+
         # Not shared common get_item_sh because it is pretty specific
         if 'member' in item:
             # comment and rsvp
@@ -229,6 +231,8 @@ class MeetupEnrich(Enrich):
         elif 'event_hosts' in item:
             # meetup event
             identity  = self.get_sh_identity(item['event_hosts'][0])
+        else:
+            return sh_fields
 
         created = unixtime_to_datetime(item['created']/1000)
         sh_fields = self.get_item_sh_fields(identity, created)
