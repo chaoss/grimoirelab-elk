@@ -325,6 +325,22 @@ def list_dashboards(elastic_url, es_index=None):
     for dash in res_json["hits"]["hits"]:
         print (dash["_id"])
 
+def get_dashboard_name(import_file):
+    """ Return the dashboard name included in a JSON file """
+
+    name = None
+
+    with open(import_file, 'r') as f:
+        try:
+            kibana = json.loads(f.read())
+        except ValueError:
+            logging.error("Wrong file format")
+
+        if 'dashboard' not in kibana:
+            logging.error("Wrong file format. Can't find 'dashboard' field.")
+        name = kibana['dashboard']['id']
+
+    return name
 
 def import_dashboard(elastic_url, import_file, es_index=None):
     logging.debug("Reading from %s the JSON for the dashboard to be imported",
