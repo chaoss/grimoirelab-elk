@@ -31,8 +31,8 @@ from redis import Redis
 from rq import Queue
 
 from flask import Flask, request, Response
-from grimoire.utils import get_params_parser, config_logging, get_connectors
-from grimoire.arthur import feed_backend, enrich_backend
+from grimoire_elk.utils import get_params_parser, config_logging, get_connectors
+from grimoire_elk.arthur import feed_backend, enrich_backend
 
 from e2k import create_dashboard, get_params_parser_create_dash
 

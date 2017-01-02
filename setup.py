@@ -30,7 +30,7 @@ from setuptools import setup
 
 here = os.path.abspath(os.path.dirname(__file__))
 readme_md = os.path.join(here, 'README.md')
-version_py = os.path.join(here, 'grimoire', '_version.py')
+version_py = os.path.join(here, 'grimoire_elk', '_version.py')
 
 # Pypi wants the description to be in reStrcuturedText, but
 # we have it in Markdown. So, let's convert formats.
@@ -49,8 +49,8 @@ with codecs.open(version_py, 'r', encoding='utf-8') as fd:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
                         fd.read(), re.MULTILINE).group(1)
 
-setup(name="grimoire",
-      description="Library to produce indexes in GrimoireLab",
+setup(name="grimoire-elk",
+      description="GrimoireLab library to produce indexes for ElasticSearch",
       long_description=long_description,
       url="https://github.com/grimoirelab/GrimoireELK",
       version=version,
@@ -65,10 +65,8 @@ setup(name="grimoire",
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4'],
       keywords="development repositories analytics",
-      packages=['grimoire', 'grimoire.elk', 'grimoire.ocean'],
-#      package_data={'sortinghat.templates' : ['*.tmpl'],
-#                    'sortinghat.data' : ['*'],},
-#      scripts=["bin/sortinghat", "bin/mg2sh", "bin/sh2mg"],
-      install_requires=['perceval'],
+      packages=['grimoire_elk', 'grimoire_elk.elk', 'grimoire_elk.ocean'],
+      scripts=["utils/p2o.py"],
+      install_requires=['perceval>=0.4'],
       zip_safe=False
     )

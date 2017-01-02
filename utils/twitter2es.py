@@ -30,7 +30,7 @@ import os
 
 from dateutil import parser
 
-from grimoire.elk.elastic import ElasticSearch
+from grimoire_elk.elk.elastic import ElasticSearch
 
 def get_params():
     parser = argparse.ArgumentParser(usage="usage: twitter2es [options]",
