@@ -99,6 +99,11 @@ class ElasticOcean(object):
         return get_connector_name(type(self))
 
     @classmethod
+    def get_p2o_params_from_url(cls, url):
+        """ Get the p2o params given a URL for the data source """
+        return {"url": url}
+
+    @classmethod
     def get_perceval_params_from_url(cls, url):
         """ Get the perceval params given a URL for the data source """
         return [url]
