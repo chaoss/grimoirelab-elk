@@ -193,19 +193,6 @@ class ElasticSearch(object):
             } """
             r = self.requests.put(url_map, data=not_analyze_strings)
 
-            # Disable dynamic mapping for raw data
-            disable_dynamic = """ {
-                "dynamic":true,
-                "properties": {
-                    "data": {
-                        "dynamic":false,
-                        "properties": {
-                        }
-                    }
-                }
-            } """
-            r = self.requests.put(url_map, data=disable_dynamic)
-
     def get_last_date(self, field, _filters = []):
         '''
             :field: field with the data
