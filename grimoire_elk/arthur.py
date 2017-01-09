@@ -80,13 +80,23 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
         signature = inspect.signature(backend.fetch)
 
         if 'from_date' in signature.parameters:
-            from_date = backend_cmd.from_date
+            try:
+                # Support perceval pre and post BackendCommand refactoring
+                from_date = backend_cmd.from_date
+            except AttributeError:
+                from_date = backend_cmd.parsed_args.from_date
 
         if 'offset' in signature.parameters:
-            offset = backend_cmd.offset
+            try:
+                offset = backend_cmd.offset
+            except AttributeError:
+                offset = backend_cmd.parsed_args.offset
 
         if 'category' in signature.parameters:
-            category = backend_cmd.category
+            try:
+                category = backend_cmd.category
+            except AttributeError:
+                category = backend_cmd.parsed_args.category
 
         # from_date param support
         if offset and category:
@@ -95,9 +105,9 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
             ocean_backend.feed(from_offset=offset)
         elif from_date and from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
             if category:
-                ocean_backend.feed(backend_cmd.from_date, category=category)
+                ocean_backend.feed(from_date, category=category)
             else:
-                ocean_backend.feed(backend_cmd.from_date)
+                ocean_backend.feed(from_date)
         elif category:
             ocean_backend.feed(category=category)
         else:
@@ -283,14 +293,30 @@ def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
         # Check if backend supports from_date
         signature = inspect.signature(backend.fetch)
 
+        from_date = None
         if 'from_date' in signature.parameters:
-            if backend_cmd.from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
+            try:
+                # Support perceval pre and post BackendCommand refactoring
+                from_date = backend_cmd.from_date
+            except AttributeError:
+                from_date = backend_cmd.parsed_args.from_date
+
+        offset = None
+        if 'offset' in signature.parameters:
+            try:
+                offset = backend_cmd.offset
+            except AttributeError:
+                offset = backend_cmd.parsed_args.offset
+
+
+        if from_date:
+            if from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
                 last_enrich = backend_cmd.from_date
             else:
                 last_enrich = enrich_backend.get_last_update_from_es([filter_, filter_raw])
 
-        elif 'offset' in signature.parameters:
-            if backend_cmd.offset and backend_cmd.offset != 0:
+        elif offset:
+            if offset != 0:
                 last_enrich = backend_cmd.offset
             else:
                 last_enrich = enrich_backend.get_last_offset_from_es([filter_, filter_raw])
