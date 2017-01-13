@@ -39,10 +39,10 @@ class BugzillaOcean(ElasticOcean):
     @classmethod
     def get_p2o_params_from_url(cls, url):
         # Bugzilla could include in the URL a filter-raw T1720
-        # https://bugzilla.redhat.com/ filter-raw=product:oVirt
+        # https://bugzilla.redhat.com/ filter-raw=product:OpenShift Origin
         params = {}
 
-        tokens = url.split()
+        tokens = url.split(' ', 1)  # Just split the URL not the filter
         params['url'] = tokens[0]
 
         if len(tokens) > 1:
