@@ -40,8 +40,8 @@ class GitHubOcean(ElasticOcean):
 
         owner = url.split('/')[-2]
         repo = url.split('/')[-1]
-        params.append('--owner')
+        # params.append('--owner')
         params.append(owner)
-        params.append('--repository')
+        # params.append('--repository')
         params.append(repo)
         return params
