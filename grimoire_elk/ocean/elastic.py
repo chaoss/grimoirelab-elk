@@ -154,7 +154,7 @@ class ElasticOcean(object):
                 # Always filter by origin to support multi origin indexes
                 filter_ = {"name":"origin",
                            "value":self.perceval_backend.origin}
-                offset = self.elastic.get_last_offset("offset", filter_)
+                offset = self.elastic.get_last_offset("offset", [filter_])
 
             if offset:
                 logging.info("Incremental from: %i offset", offset)
