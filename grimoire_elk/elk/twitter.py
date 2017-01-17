@@ -35,7 +35,7 @@ class TwitterEnrich(Enrich):
         return "created_at"
 
     def get_field_unique_id(self):
-        return "id"
+        return "id_str"
 
     def get_elastic_mappings(self):
 
@@ -86,7 +86,7 @@ class TwitterEnrich(Enrich):
         tweet = item
 
         # data fields to copy
-        copy_fields = ["id", "lang", "place", "retweet_count",
+        copy_fields = ["id", "id_str", "lang", "place", "retweet_count",
                        "text", "in_reply_to_user_id_str", "in_reply_to_screen_name"]
         for f in copy_fields:
             if f in tweet:
