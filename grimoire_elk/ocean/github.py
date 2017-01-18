@@ -34,14 +34,24 @@ class GitHubOcean(ElasticOcean):
         item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
 
     @classmethod
+    def get_arthur_params_from_url(cls, url):
+        """ Get the arthur params given a URL for the data source """
+        params = {}
+
+        owner = url.split('/')[-2]
+        repository = url.split('/')[-1]
+        # params.append('--owner')
+        params['owner'] = owner
+        # params.append('--repository')
+        params['repository'] = repository
+        return params
+
+    @classmethod
     def get_perceval_params_from_url(cls, url):
         """ Get the perceval params given a URL for the data source """
         params = []
 
-        owner = url.split('/')[-2]
-        repo = url.split('/')[-1]
-        # params.append('--owner')
-        params.append(owner)
-        # params.append('--repository')
-        params.append(repo)
+        dparam = cls.get_arthur_params_from_url(url)
+        params.append(dparam['owner'])
+        params.append(dparam['repository'])
         return params

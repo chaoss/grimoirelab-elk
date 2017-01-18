@@ -108,6 +108,11 @@ class ElasticOcean(object):
         """ Get the perceval params given a URL for the data source """
         return [url]
 
+    @classmethod
+    def get_arthur_params_from_url(cls, url):
+        """ Get the arthur params given a URL for the data source """
+        return {"uri": url}
+
     def drop_item(self, item):
         """ Drop items not to be inserted in Elastic """
         return False
