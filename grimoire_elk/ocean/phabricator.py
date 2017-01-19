@@ -28,3 +28,28 @@ class PhabricatorOcean(ElasticOcean):
 
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["uuid"]
+        # https://discuss.elastic.co/t/field-name-cannot-contain/33251/16
+        if 'custom.external_reference' in item["data"]['fields']:
+            item["data"]['fields']["custom_external_reference"] = item["data"]['fields'].pop("custom.external_reference")
+        if 'custom.security_topic' in item["data"]['fields']:
+            item["data"]['fields']["custom_security_topic"] = item["data"]['fields'].pop("custom.security_topic")
+
+    def get_elastic_mappings(self):
+        # This field data.transaction has string arrays and dicts arrays
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "transactions": {
+                                "dynamic":false,
+                                "properties": {}
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
+        return {"items":mapping}
