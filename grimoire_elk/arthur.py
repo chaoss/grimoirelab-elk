@@ -311,13 +311,13 @@ def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
 
         if from_date:
             if from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
-                last_enrich = backend_cmd.from_date
+                last_enrich = from_date
             else:
                 last_enrich = enrich_backend.get_last_update_from_es([filter_, filter_raw])
 
         elif offset:
             if offset != 0:
-                last_enrich = backend_cmd.offset
+                last_enrich = offset
             else:
                 last_enrich = enrich_backend.get_last_offset_from_es([filter_, filter_raw])
     else:
