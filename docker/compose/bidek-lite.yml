@@ -5,7 +5,8 @@ elasticsearch:
     - "9200:9200" 
 
 kibiter:
-  image: kibana:4.4
+  # image: kibana:4.4
+  image: bitergia/kibiter:4.4.1-public
   links:
     - elasticsearch
   ports:
