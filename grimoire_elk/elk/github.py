@@ -330,8 +330,8 @@ class GitHubEnrich(Enrich):
         if self.prjs_map:
             rich_issue.update(self.get_item_project(rich_issue))
 
-        if 'project' in issue:
-            rich_issue['project'] = issue['project']
+        if 'project' in item:
+            rich_issue['project'] = item['project']
 
         if self.sortinghat:
             rich_issue.update(self.get_item_sh(item, self.roles))
