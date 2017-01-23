@@ -73,9 +73,13 @@ class ConfluenceEnrich(Enrich):
         if 'data' in item and type(item) == dict:
             user = item['data']['version'][identity_field]
 
-        identity['username'] = user['username']
+        identity['username'] = None
         identity['email'] = None
-        identity['name'] = user['displayName']
+        identity['name'] = None
+        if 'username' in user:
+            identity['username'] = user['username']
+        if 'displayName' in user:
+            identity['name'] = user['displayName']
 
         return identity
 
