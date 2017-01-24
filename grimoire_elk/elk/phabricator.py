@@ -91,12 +91,10 @@ class PhabricatorEnrich(Enrich):
         identities = []
 
         if 'authorData' in item['data']['fields']:
-            print(item['data']['fields']['authorData'])
             user = self.get_sh_identity(item['data']['fields']['authorData'])
             identities.append(user)
 
         if 'ownerData' in item['data']['fields']:
-            print(item['data']['fields']['ownerData'])
             user = self.get_sh_identity(item['data']['fields']['ownerData'])
             identities.append(user)
 
