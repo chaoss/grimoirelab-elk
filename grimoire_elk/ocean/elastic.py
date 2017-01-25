@@ -78,7 +78,7 @@ class ElasticOcean(object):
         return "ocean-unique-id"
 
     def get_elastic_mappings(self):
-        """ origin used to filter in incremental updates """
+        """ specific mappings implemented in each data source """
         mapping = '{}'
 
         return {"items":mapping}
@@ -139,13 +139,14 @@ class ElasticOcean(object):
         signature = inspect.signature(self.perceval_backend.fetch)
 
         last_update = None
+        # Filter by tag to support multi tag indexes
+        filter_ = {"name": "tag",
+                   "value": self.perceval_backend.tag}
+
         if 'from_date' in signature.parameters:
             if from_date:
                 last_update = from_date
             else:
-                # Always filter by origin to support multi origin indexes
-                filter_ = {"name":"origin",
-                           "value":self.perceval_backend.origin}
                 self.last_update = self.get_last_update_from_es([filter_])
                 last_update = self.last_update
 
@@ -156,9 +157,6 @@ class ElasticOcean(object):
             if from_offset:
                 offset = from_offset
             else:
-                # Always filter by origin to support multi origin indexes
-                filter_ = {"name":"origin",
-                           "value":self.perceval_backend.origin}
                 offset = self.elastic.get_last_offset("offset", [filter_])
 
             if offset:
@@ -257,13 +255,13 @@ class ElasticOcean(object):
             r = self.requests.post(url, data=json.dumps(scroll_data))
         else:
             filters = "{}"
-            # If origin Always filter by origin to support multi origin indexes
-            if self.perceval_backend and self.perceval_backend.origin:
+            # If using a perceval backends always filter by tag to support multi tag
+            if self.perceval_backend and self.perceval_backend.tag:
                 filters = '''
                     {"term":
-                        { "origin" : "%s"  }
+                        { "tag" : "%s"  }
                     }
-                ''' % (self.perceval_backend.origin)
+                ''' % (self.perceval_backend.tag)
 
             if self.filter_raw:
                 filters += '''
@@ -289,7 +287,8 @@ class ElasticOcean(object):
                 ''' % (self.offset)
 
 
-            order_field = 'metadata__updated_on'
+            # order_field = 'metadata__updated_on'
+            order_field = 'metadata__timestamp'  # to avoid holes
             order_query = ''
             if self.perceval_backend:
                 # logstash backends does not have the order_field

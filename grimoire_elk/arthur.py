@@ -60,10 +60,10 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
         backend = backend_cmd.backend
         ocean_backend = connector[1](backend, fetch_cache=fetch_cache, project=project)
 
-        logger.info("Feeding Ocean from %s (%s)", backend_name, backend.origin)
+        logger.info("Feeding Ocean from %s (%s)", backend_name, backend.tag)
 
         if not es_index:
-            es_index = backend_name + "_" + backend.origin
+            es_index = backend_name + "_" + backend.tag
         elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
 
         ocean_backend.set_elastic(elastic_ocean)
@@ -116,7 +116,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
     except Exception as ex:
         if backend:
             logger.error("Error feeding ocean from %s (%s): %s" %
-                          (backend_name, backend.origin, ex))
+                          (backend_name, backend.tag, ex))
             # this print makes blackbird fails
             traceback.print_exc()
         else:
@@ -133,7 +133,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
     repo['project'] = project
 
     if es_index:
-        unique_id = es_index+"_"+backend.origin
+        unique_id = es_index+"_"+backend.tag
         ConfOcean.add_repo(unique_id, repo)
     else:
         logger.debug("Repository not added to Ocean because errors.")
@@ -286,10 +286,10 @@ def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
         backend = backend_cmd.backend
 
         # Only supported in data retrieved from a perceval backend
-        # Always filter by origin to support multi origin indexes
+        # Always filter by tag to support multi tag indexes
 
-        filter_ = {"name": "origin",
-                   "value": backend.origin}
+        filter_ = {"name": "tag",
+                   "value": backend.tag}
         # Check if backend supports from_date
         signature = inspect.signature(backend.fetch)
 
@@ -413,7 +413,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             enrich_index = ocean_index_enrich
         else:
             if not ocean_index:
-                ocean_index = backend_name + "_" + backend.origin
+                ocean_index = backend_name + "_" + backend.tag
             enrich_index = ocean_index+"_enrich"
         if events_enrich:
             enrich_index += "_events"
@@ -495,7 +495,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         traceback.print_exc()
         if backend:
             logger.error("Error enriching ocean from %s (%s): %s",
-                          backend_name, backend.origin, ex)
+                          backend_name, backend.tag, ex)
         else:
             logger.error("Error enriching ocean %s", ex)
 
