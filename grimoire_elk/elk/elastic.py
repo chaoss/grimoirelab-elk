@@ -263,5 +263,9 @@ class ElasticSearch(object):
                 else:
                     last_value = res_json["aggregations"]["1"]["value"]
                     if last_value:
-                        last_value = unixtime_to_datetime(last_value)
+                        try:
+                            last_value = unixtime_to_datetime(last_value)
+                        except ValueError:
+                            # last_value is in microsecs
+                            last_value = unixtime_to_datetime(last_value/1000)
         return last_value
