@@ -29,7 +29,7 @@ import re
 from setuptools import setup
 
 here = os.path.abspath(os.path.dirname(__file__))
-readme_md = os.path.join(here, 'README.md')
+readme_md = os.path.join(here, 'README_kidash.md')
 version_py = os.path.join(here, 'grimoire_elk', '_version.py')
 
 # Pypi wants the description to be in reStrcuturedText, but
@@ -49,8 +49,8 @@ with codecs.open(version_py, 'r', encoding='utf-8') as fd:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
                         fd.read(), re.MULTILINE).group(1)
 
-setup(name="grimoire-elk",
-      description="GrimoireLab library to produce indexes for ElasticSearch",
+setup(name="grimoire-kidash",
+      description="GrimoireLab to manage Kibana dashboards from the command line",
       long_description=long_description,
       url="https://github.com/grimoirelab/GrimoireELK",
       version=version,
@@ -65,8 +65,10 @@ setup(name="grimoire-elk",
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4'],
       keywords="development repositories analytics",
-      packages=['grimoire_elk', 'grimoire_elk.elk', 'grimoire_elk.ocean'],
-      scripts=["utils/p2o.py"],
-      install_requires=['perceval>=0.5', 'perceval-mozilla'],
+      scripts=["utils/kidash.py"],
+      install_requires=['python-dateutil',
+            'perceval>=0.5',
+            'grimoire-elk==' + version
+            ],
       zip_safe=False
     )
