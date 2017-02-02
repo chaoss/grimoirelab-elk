@@ -168,6 +168,13 @@ class GitEnrich(Enrich):
 
             r = self.requests.get(commit_url, headers=headers)
 
+            try:
+                r.raise_for_status()
+            except requests.exceptions.ConnectionError as ex:
+                # Connection error
+                logging.error("Can't get github login for %s in %s because a connection error ", repo, commit_hash)
+                return login
+
             self.rate_limit = int(r.headers['X-RateLimit-Remaining'])
             self.rate_limit_reset_ts = int(r.headers['X-RateLimit-Reset'])
             logging.debug("Rate limit pending: %s", self.rate_limit)
