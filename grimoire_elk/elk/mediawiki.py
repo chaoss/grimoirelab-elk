@@ -99,22 +99,20 @@ class MediaWikiEnrich(Enrich):
         # Revisions
         for rev in item["data"]["revisions"]:
             erevision = {}
-            # Metadata needed for enrichment
-            copy_fields_item = ["origin","metadata__updated_on","metadata__timestamp"]
-            for f in copy_fields_item:
+            for f in self.RAW_FIELDS_COPY:
                 if f in eitem:
                     erevision[f] = eitem[f]
                 else:
                     erevision[f] = None
             # Metadata related to the page according to the enrichment specification
-            copy_fields_item = ["origin","metadata__updated_on","metadata__timestamp","pageid","title"]
+            copy_fields_item = ["origin", "metadata__updated_on", "metadata__timestamp", "pageid", "title"]
             for f in copy_fields_item:
                 if f in eitem:
                     erevision["page_"+f] = eitem[f]
                 else:
                     erevision["page_"+f] = None
             # Copy fields from the review
-            copy_fields = ["revid","user","parentid","timestamp","comment"]
+            copy_fields = ["revid", "user", "parentid", "timestamp", "comment"]
             for f in copy_fields:
                 if f in rev:
                     erevision["revision_"+f] = rev[f]
@@ -143,9 +141,7 @@ class MediaWikiEnrich(Enrich):
     def get_rich_item(self, item):
         eitem = {}
 
-        # metadata fields to copy
-        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
-        for f in copy_fields:
+        for f in self.RAW_FIELDS_COPY:
             if f in item:
                 eitem[f] = item[f]
             else:

@@ -115,9 +115,7 @@ class StackExchangeEnrich(Enrich):
                          "last_activity_date", "link", "score", "tags"]
 
         if kind == 'question':
-            # metadata fields to copy, only in question (perceval item)
-            copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin"]
-            for f in copy_fields:
+            for f in self.RAW_FIELDS_COPY:
                 if f in item:
                     eitem[f] = item[f]
                 else:

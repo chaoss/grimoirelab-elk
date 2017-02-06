@@ -99,9 +99,7 @@ class JiraEnrich(Enrich):
 
         eitem = {}
 
-        # metadata fields to copy
-        copy_fields = ["metadata__updated_on","metadata__timestamp","ocean-unique-id","origin","uuid"]
-        for f in copy_fields:
+        for f in self.RAW_FIELDS_COPY:
             if f in item:
                 eitem[f] = item[f]
             else:
