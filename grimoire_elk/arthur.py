@@ -286,10 +286,10 @@ def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
         backend = backend_cmd.backend
 
         # Only supported in data retrieved from a perceval backend
-        # Always filter by tag to support multi tag indexes
+        # Always filter by origin to support multi origin indexes
 
-        filter_ = {"name": "tag",
-                   "value": backend.tag}
+        filter_ = {"name": "origin",
+                   "value": backend.origin}
         # Check if backend supports from_date
         signature = inspect.signature(backend.fetch)
 
@@ -495,7 +495,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         traceback.print_exc()
         if backend:
             logger.error("Error enriching ocean from %s (%s): %s",
-                          backend_name, backend.tag, ex)
+                          backend_name, backend.origin, ex)
         else:
             logger.error("Error enriching ocean %s", ex)
 
