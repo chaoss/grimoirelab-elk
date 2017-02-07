@@ -22,7 +22,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
+import csv
 import logging
 
 from dateutil import parser
@@ -30,6 +30,30 @@ from dateutil import parser
 from .enrich import Enrich, metadata
 
 class JenkinsEnrich(Enrich):
+
+    NODES_RENAME_FILE = 'jenkins_nodes.csv'
+    NODES_RENAME = {}
+
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                 db_user='', db_password='', db_host=''):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+                         db_user, db_password, db_host)
+        self.__load_node_renames()
+
+    def __load_node_renames(self):
+        # In OPNFV nodes could be renamed
+        try:
+            with open(self.NODES_RENAME_FILE, 'r') as csvfile:
+                nodes = csv.reader(csvfile, delimiter=',')
+                for node in nodes:
+                    name = node[0]
+                    action = node[1]
+                    rename = action.split("merge into ")
+                    if len(rename) > 1:
+                        self.NODES_RENAME[name] = rename[1]
+        except FileNotFoundError:
+            logging.info("Jenkis node rename file not found %s",
+                         self.NODES_RENAME_FILE)
 
     def get_elastic_mappings(self):
 
@@ -122,12 +146,15 @@ class JenkinsEnrich(Enrich):
         build = item['data']
 
         # data fields to copy
-        copy_fields = ["fullDisplayName","url","result","duration","builtOn"]
+        copy_fields = ["fullDisplayName", "url", "result", "duration", "builtOn"]
         for f in copy_fields:
             if f in build:
                 eitem[f] = build[f]
             else:
                 eitem[f] = None
+        # Nodes renaming
+        if eitem["builtOn"] in self.NODES_RENAME:
+            eitem["builtOn"] = self.NODES_RENAME[eitem["builtOn"]]
         # Fields which names are translated
         map_fields = {"fullDisplayName": "fullDisplayName_analyzed",
                       "number": "build"
