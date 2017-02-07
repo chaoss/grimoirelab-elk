@@ -87,7 +87,8 @@ class TwitterEnrich(Enrich):
 
         # data fields to copy
         copy_fields = ["id", "id_str", "lang", "place", "retweet_count",
-                       "text", "in_reply_to_user_id_str", "in_reply_to_screen_name"]
+                       "text", "in_reply_to_user_id_str",
+                       "in_reply_to_screen_name", "metadata__timestamp"]
         for f in copy_fields:
             if f in tweet:
                 eitem[f] = tweet[f]
