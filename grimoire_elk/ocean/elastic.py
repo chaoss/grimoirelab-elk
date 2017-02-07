@@ -32,7 +32,7 @@ import logging
 import requests
 
 from datetime import datetime
-from ..elk.utils import unixtime_to_datetime
+from ..elk.utils import unixtime_to_datetime, get_repository_filter
 
 
 class ElasticOcean(object):
@@ -129,6 +129,14 @@ class ElasticOcean(object):
         # Also add timestamp used in incremental enrichment
         item['metadata__timestamp'] = timestamp.isoformat()
 
+    def get_repository_filter_raw(self, term=False):
+        """ Returns the filter to be used in queries in a repository items """
+        perceval_backend = self.perceval_backend
+        perceval_backend_name = self.get_connector_name()
+        f = get_repository_filter(perceval_backend, perceval_backend_name, term)
+
+        return f
+
     def feed(self, from_date=None, from_offset=None, category=None):
         """ Feed data in Elastic from Perceval """
 
@@ -139,9 +147,8 @@ class ElasticOcean(object):
         signature = inspect.signature(self.perceval_backend.fetch)
 
         last_update = None
-        # Filter by tag to support multi tag indexes
-        filter_ = {"name": "tag",
-                   "value": self.perceval_backend.tag}
+        # Filter to support multi repository indexes
+        filter_ = self.get_repository_filter_raw()
 
         if 'from_date' in signature.parameters:
             if from_date:
@@ -254,14 +261,9 @@ class ElasticOcean(object):
                 }
             r = self.requests.post(url, data=json.dumps(scroll_data))
         else:
-            filters = "{}"
-            # If using a perceval backends always filter by tag to support multi tag
-            if self.perceval_backend and self.perceval_backend.tag:
-                filters = '''
-                    {"term":
-                        { "tag" : "%s"  }
-                    }
-                ''' % (self.perceval_backend.tag)
+            # If using a perceval backends always filter by repository
+            # to support multi repository indexes
+            filters = self.get_repository_filter_raw(term=True)
 
             if self.filter_raw:
                 filters += '''

@@ -26,6 +26,37 @@
 import datetime
 from dateutil import parser, tz
 
+def get_repository_filter(perceval_backend, perceval_backend_name,
+                          term=False):
+    """ Get the filter needed for get the items in a repository """
+    filter_ = {}
+
+    if not perceval_backend:
+        return filter_
+
+    field = 'origin'
+    value = perceval_backend.origin
+
+    if perceval_backend_name == "stackexchange":
+        # Until tag is supported in all raw and enriched indexes
+        # we should use origin. But stackexchange won't work with origin
+        # because the tag must be included in the filter.
+        field = 'tag'
+        value = perceval_backend.tag
+
+    if perceval_backend:
+        if not term:
+            filter_ = {"name": field,
+                       "value": value}
+        else:
+            filter_ = '''
+                {"term":
+                    { "%s" : "%s"  }
+                }
+            ''' % (field, value)
+
+    return filter_
+
 def get_time_diff_days(start, end):
     ''' Number of days between two dates in UTC format  '''
 
