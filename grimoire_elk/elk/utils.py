@@ -55,6 +55,10 @@ def get_repository_filter(perceval_backend, perceval_backend_name,
                 }
             ''' % (field, value)
 
+    if value == '':
+        # Support for getting all items from a multiorigin index
+        filter_ = {}
+
     return filter_
 
 def get_time_diff_days(start, end):
