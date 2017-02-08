@@ -42,6 +42,9 @@ except ImportError:
 GITHUB = 'https://github.com/'
 SH_GIT_COMMIT = 'github-commit'
 DEMOGRAPHY_COMMIT_MIN_DATE='1980-01-01'
+# REGEX to extract authors from a multi author commit: several authors present
+# in the Author field in the commit. Used in CloudFoundry
+AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) and (?P<last_author>.* .*) (?P<email>.*)')
 
 class GitEnrich(Enrich):
 
@@ -83,11 +86,26 @@ class GitEnrich(Enrich):
                "message_analyzed": {
                   "type": "string",
                   "index":"analyzed"
-               }
+               },
+               "Signed-off-by_analized_custom" : {
+                  "type" : "string",
+                  "analyzer" : "comma"
+                }
+
            }
-       }"""
+        }"""
 
         return {"items":mapping}
+
+    def __get_authors(self, authors_str):
+        # Extract the authors from a multiauthor
+
+        m = AUTHOR_P2P_REGEX.match(authors_str)
+        if m:
+            authors = m.group('first_authors').split(",")
+            authors =[author.strip() for author in authors]
+            authors += [m.group('last_author')]
+        return authors
 
     def get_identities(self, item):
         """ Return the identities from an item.
@@ -123,15 +141,28 @@ class GitEnrich(Enrich):
         commit_hash = item['data']['commit']
 
         if item['data']['Author']:
-            user = self.get_sh_identity(item['data']["Author"])
-            identities.append(user)
-            if self.github_token:
-                add_sh_github_identity(user, 'Author', 'author')
+            # Check multi authors commits
+            m = AUTHOR_P2P_REGEX.match(item['data']["Author"])
+            if m:
+                authors = self.__get_authors(item['data']["Author"])
+                for author in authors:
+                    user = self.get_sh_identity(author)
+                    identities.append(user)
+            else:
+                user = self.get_sh_identity(item['data']["Author"])
+                identities.append(user)
+                if self.github_token:
+                    add_sh_github_identity(user, 'Author', 'author')
         if item['data']['Commit']:
             user = self.get_sh_identity(item['data']['Commit'])
             identities.append(user)
             if self.github_token:
                 add_sh_github_identity(user, 'Commit', 'committer')
+        if 'Signed-off-by' in item['data']:
+            signers = item['data']["Signed-off-by"]
+            for signer in signers:
+                user = self.get_sh_identity(signer)
+                identities.append(user)
 
         return identities
 
@@ -143,9 +174,12 @@ class GitEnrich(Enrich):
         if 'data' in item and type(item) == dict:
             git_user = item['data'][identity_field]
 
-        name = git_user.split("<")[0]
+        fields = git_user.split("<")
+        name = fields[0]
         name = name.strip()  # Remove space between user and email
-        email = git_user.split("<")[1][:-1]
+        email = None
+        if len(fields) > 1:
+            email = git_user.split("<")[1][:-1]
         identity['username'] = None
         identity['email'] = email
         identity['name'] = name
@@ -312,7 +346,123 @@ class GitEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
 
+        # Multi author support
+        eitem['is_git_commit_multi_author'] = 0
+        if 'is_git_commit_multi_author' in commit:
+            eitem['is_git_commit_multi_author'] = commit['is_git_commit_multi_author']
+        if 'authors' in commit:
+            eitem['authors'] = commit['authors']
+
+        # Pair Programming support
+        eitem['Signed-off-by_number'] = 0
+        eitem['is_git_commit_signed_off'] = 0
+        if 'Signed-off-by' in commit:
+            if 'is_git_commit_signed_off' in commit:
+                # Commits generated for signed_off people
+                eitem['is_git_commit_signed_off'] = commit['is_git_commit_signed_off']
+            eitem['Signed-off-by'] = commit['Signed-off-by']
+            eitem['Signed-off-by_analized_custom'] = commit['Signed-off-by']
+            eitem['Signed-off-by_number'] = len(commit['Signed-off-by'])
         return eitem
+
+    def enrich_items(self, items, events=False):
+        """ Implementation supporting signed-off commits.
+            Only active for CloudFoundry git repositories
+        """
+
+        CLOUDFOUNDRY_URL = 'https://github.com/cloudfoundry/'
+
+        max_items = self.elastic.max_items_bulk
+        current = 0
+        total = 0
+        total_signed_off = 0
+        total_multi_author = 0
+        bulk_json = ""
+
+        url = self.elastic.index_url+'/items/_bulk'
+
+        logging.debug("Adding items to %s (in %i packs)", url, max_items)
+
+        for item in items:
+            # Check multi author
+            m = AUTHOR_P2P_REGEX.match(item['data']['Author'])
+            if m:
+                logging.warning("Multiauthor detected. Creating one commit " +
+                                 "per author: %s", item['data']['Author'])
+                item['data']['authors'] = self.__get_authors(item['data']['Author'])
+                item['data']['Author'] = item['data']['authors'][0]
+            if current >= max_items:
+                try:
+                    r = self.requests.put(url, data=bulk_json)
+                    r.raise_for_status()
+                    logging.debug("Added %i items to %s", total, url)
+                except UnicodeEncodeError:
+                    # Why is requests encoding the POST data as ascii?
+                    logging.error("Unicode error in enriched items")
+                    logging.debug(bulk_json)
+                    safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
+                    self.requests.put(url, data=safe_json)
+                bulk_json = ""
+                current = 0
+
+            rich_item = self.get_rich_item(item)
+            data_json = json.dumps(rich_item)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
+                (item[self.get_field_unique_id()])
+            bulk_json += data_json +"\n"  # Bulk document
+            current += 1
+            total += 1
+
+            # Multi author support
+            if 'authors' in item['data']:
+                # First author already added in the above commit
+                authors = item['data']['authors']
+                for i in range(1, len(authors)):
+                    # logging.debug('Adding a new commit for %s', authors[i])
+                    item['data']['Author'] = authors[i]
+                    item['data']['is_git_commit_multi_author'] = 1
+                    rich_item = self.get_rich_item(item)
+                    commit_id = item[self.get_field_unique_id()] + "_" + str(i)
+                    data_json = json.dumps(rich_item)
+                    bulk_json += '{"index" : {"_id" : "%s" } }\n' % commit_id
+                    bulk_json += data_json +"\n"  # Bulk document
+                    current += 1
+                    total += 1
+                    total_multi_author += 1
+
+            if not CLOUDFOUNDRY_URL in item['origin']:
+                continue
+            # Signed-off commits support only for CloudFoundry repos
+            if rich_item['Signed-off-by_number'] > 0:
+                nsg = 0
+                for author in item['data']['Signed-off-by']:
+                    # logging.debug('Adding a new commit for %s', author)
+                    # Change the Author in the original commit and generate
+                    # a new enriched item with it
+                    item['data']['Author'] = author
+                    item['data']['is_git_commit_signed_off'] = 1
+                    rich_item = self.get_rich_item(item)
+                    commit_id = item[self.get_field_unique_id()] + "_" + str(nsg)
+                    data_json = json.dumps(rich_item)
+                    bulk_json += '{"index" : {"_id" : "%s" } }\n' % commit_id
+                    bulk_json += data_json +"\n"  # Bulk document
+                    current += 1
+                    total += 1
+                    total_signed_off += 1
+                    nsg += 1
+
+        if total == 0:
+            # No items enriched, nothing to upload to ES
+            return total
+
+        r = self.requests.put(url, data=bulk_json)
+        r.raise_for_status()
+
+        logging.info("Signed-off commits generated: %i", total_signed_off)
+        logging.info("Multi author commits generated: %i", total_multi_author)
+
+        return total
+
 
     def enrich_demography(self, from_date=None):
         logging.debug("Doing demography enrich from %s", self.elastic.index_url)
