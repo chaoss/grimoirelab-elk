@@ -263,7 +263,9 @@ class ElasticOcean(object):
         else:
             # If using a perceval backends always filter by repository
             # to support multi repository indexes
+            # We need the filter dict as a string to join with the rest
             filters = self.get_repository_filter_raw(term=True)
+            filters = json.dumps(filters)
 
             if self.filter_raw:
                 filters += '''
