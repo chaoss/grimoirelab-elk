@@ -92,7 +92,8 @@ class MozillaClubEnrich(Enrich):
         eitem = {}
 
         # metadata fields to copy
-        copy_fields = ["metadata__updated_on", "metadata__timestamp", "ocean-unique-id", "origin"]
+        copy_fields = ["metadata__updated_on", "metadata__timestamp",
+                       "ocean-unique-id", "origin", "uuid"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]
@@ -101,15 +102,22 @@ class MozillaClubEnrich(Enrich):
         # The real data
         event = item['data']
 
-        # just copy all fields
+        # just copy all fields converting in field names spaces to _
         for f in event:
-            eitem[f] = event[f]
+            eitem[f.replace(" ","_")] = event[f]
+
+        # Use the unique id from perceval
+        eitem['id'] = eitem['uuid']
+        # There is no url
+        eitem['url'] = None
 
         # Transform numeric fields
         eitem['Attendance'] = int(eitem['Attendance'])
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item,"Your Name"))
+
+        eitem.update(self.get_grimoire_fields(event["Timestamp"], "event"))
 
         return eitem
 
