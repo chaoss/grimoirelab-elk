@@ -105,6 +105,9 @@ class GitEnrich(Enrich):
             authors = m.group('first_authors').split(",")
             authors =[author.strip() for author in authors]
             authors += [m.group('last_author')]
+        # Remove duplicates
+        authors = list(set(authors))
+
         return authors
 
     def get_identities(self, item):
@@ -435,7 +438,11 @@ class GitEnrich(Enrich):
             # Signed-off commits support only for CloudFoundry repos
             if rich_item['Signed-off-by_number'] > 0:
                 nsg = 0
-                for author in item['data']['Signed-off-by']:
+                # Remove duplicates and the already added Author if exists
+                authors = list(set(item['data']['Signed-off-by']))
+                if item['data']['Author'] in authors:
+                    authors.remove(item['data']['Author'])
+                for author in authors:
                     # logging.debug('Adding a new commit for %s', author)
                     # Change the Author in the original commit and generate
                     # a new enriched item with it
