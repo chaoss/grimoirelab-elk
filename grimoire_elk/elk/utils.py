@@ -24,6 +24,8 @@
 #
 
 import datetime
+import json
+
 from dateutil import parser, tz
 
 def get_repository_filter(perceval_backend, perceval_backend_name,
@@ -54,6 +56,8 @@ def get_repository_filter(perceval_backend, perceval_backend_name,
                     { "%s" : "%s"  }
                 }
             ''' % (field, value)
+            # Filters are always a dict
+            filter_ = json.loads(filter_)
 
     return filter_
 
