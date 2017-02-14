@@ -103,7 +103,7 @@ class GitEnrich(Enrich):
         m = AUTHOR_P2P_REGEX.match(authors_str)
         if m:
             authors = m.group('first_authors').split(",")
-            authors =[author.strip() for author in authors]
+            authors = [author.strip() for author in authors]
             authors += [m.group('last_author')]
         # Remove duplicates
         authors = list(set(authors))
@@ -157,10 +157,17 @@ class GitEnrich(Enrich):
                 if self.github_token:
                     add_sh_github_identity(user, 'Author', 'author')
         if item['data']['Commit']:
-            user = self.get_sh_identity(item['data']['Commit'])
-            identities.append(user)
-            if self.github_token:
-                add_sh_github_identity(user, 'Commit', 'committer')
+            m = AUTHOR_P2P_REGEX.match(item['data']["Commit"])
+            if m:
+                committers = self.__get_authors(item['data']['Commit'])
+                for committer in committers:
+                    user = self.get_sh_identity(committer)
+                    identities.append(user)
+            else:
+                user = self.get_sh_identity(item['data']['Commit'])
+                identities.append(user)
+                if self.github_token:
+                    add_sh_github_identity(user, 'Commit', 'committer')
         if 'Signed-off-by' in item['data']:
             signers = item['data']["Signed-off-by"]
             for signer in signers:
@@ -394,6 +401,11 @@ class GitEnrich(Enrich):
                                  "per author: %s", item['data']['Author'])
                 item['data']['authors'] = self.__get_authors(item['data']['Author'])
                 item['data']['Author'] = item['data']['authors'][0]
+            m = AUTHOR_P2P_REGEX.match(item['data']['Commit'])
+            if m:
+                logging.warning("Multicommitter detected: using just the first committer")
+                item['data']['committers'] = self.__get_authors(item['data']['Commit'])
+                item['data']['Commit'] = item['data']['committers'][0]
             if current >= max_items:
                 try:
                     r = self.requests.put(url, data=bulk_json)
