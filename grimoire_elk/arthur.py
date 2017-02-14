@@ -449,6 +449,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
         elif do_refresh_identities:
 
+            query_string = None
             if author_id:
                 query_string = {}
                 query_string["fields"] = 'author_id'
