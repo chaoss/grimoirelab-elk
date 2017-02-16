@@ -440,15 +440,17 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             filter_raw_dict['value'] = filter_raw.split(":")[1].replace('"','')
         # filters_raw_prefix must be converted from the list param to
         # DSL query format for a should filter inside a boolean filter
-        filter_raw_should = {"should": []}
-        for filter_prefix in filters_raw_prefix:
-            fname = filter_prefix.split(":")[0].replace('"','')
-            fvalue = filter_prefix.split(":")[1].replace('"','')
-            filter_raw_should["should"].append(
-                {
-                "prefix" : { fname : fvalue }
-                }
-            )
+        filter_raw_should = None
+        if filters_raw_prefix:
+            filter_raw_should = {"should": []}
+            for filter_prefix in filters_raw_prefix:
+                fname = filter_prefix.split(":")[0].replace('"','')
+                fvalue = filter_prefix.split(":")[1].replace('"','')
+                filter_raw_should["should"].append(
+                    {
+                    "prefix" : { fname : fvalue }
+                    }
+                )
 
         ocean_backend = get_ocean_backend(backend_cmd, enrich_backend,
                                           no_incremental, filter_raw_dict,

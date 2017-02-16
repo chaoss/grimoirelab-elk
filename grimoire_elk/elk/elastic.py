@@ -226,6 +226,7 @@ class ElasticSearch(object):
         url += "/_search"
 
         data_query = ''
+        if _filters is None: _filters = []
         for _filter in _filters:
             if not _filter:
                 continue
