@@ -28,12 +28,12 @@ import logging
 from os import sys
 from time import time, sleep
 
-from grimoire.arthur import feed_backend, enrich_backend
+from grimoire_elk.arthur import feed_backend, enrich_backend
 
-from grimoire.ocean.conf import ConfOcean
+from grimoire_elk.ocean.conf import ConfOcean
 
-from grimoire.utils import get_elastic
-from grimoire.utils import get_params_parser, config_logging
+from grimoire_elk.utils import get_elastic
+from grimoire_elk.utils import get_params_parser, config_logging
 
 def get_params():
     ''' Get params definition from ElasticOcean and from all the backends '''
@@ -109,8 +109,6 @@ if __name__ == '__main__':
 
     args = get_params()
 
-    async_ = False  # Use RQ or not
-
     config_logging(args.debug)
 
     url = args.elastic_url
@@ -138,7 +136,8 @@ if __name__ == '__main__':
                                args.elastic_url_enrich, args.events_enrich,
                                args.db_user, args.db_password, args.db_host,
                                args.refresh_projects, args.refresh_identities,
-                               args.author_id, args.author_uuid)
+                               args.author_id, args.author_uuid,
+                               args.filter_raw, args.filters_raw_prefix)
                 logging.info("Enrich backend completed")
             elif args.events_enrich:
                 logging.info("Enrich option is needed for events_enrich")

@@ -28,9 +28,9 @@ import logging
 import os
 import sys
 
-from grimoire.ocean.elastic import ElasticOcean
-from grimoire.utils import config_logging
-from grimoire.panels import import_dashboard, export_dashboard, list_dashboards
+from grimoire_elk.ocean.elastic import ElasticOcean
+from grimoire_elk.utils import config_logging
+from grimoire_elk.panels import import_dashboard, export_dashboard, list_dashboards
 
 
 def get_params_parser_create_dash():

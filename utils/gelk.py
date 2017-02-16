@@ -28,18 +28,18 @@ from datetime import datetime
 import logging
 from os import sys
 
-from grimoire.elk.elastic import ElasticSearch
-from grimoire.elk.elastic import ElasticConnectException
+from grimoire_elk.elk.elastic import ElasticSearch
+from grimoire_elk.elk.elastic import ElasticConnectException
 
-from grimoire.elk.bugzilla import BugzillaEnrich
-from grimoire.elk.gerrit import GerritEnrich
-from grimoire.elk.github import GitHubEnrich
-from grimoire.elk.sortinghat import SortingHat
+from grimoire_elk.elk.bugzilla import BugzillaEnrich
+from grimoire_elk.elk.gerrit import GerritEnrich
+from grimoire_elk.elk.github import GitHubEnrich
+from grimoire_elk.elk.sortinghat import SortingHat
 
-from grimoire.ocean.bugzilla import BugzillaOcean
-from grimoire.ocean.gerrit import GerritOcean
-from grimoire.ocean.github import GitHubOcean
-from grimoire.ocean.elastic import ElasticOcean
+from grimoire_elk.ocean.bugzilla import BugzillaOcean
+from grimoire_elk.ocean.gerrit import GerritOcean
+from grimoire_elk.ocean.github import GitHubOcean
+from grimoire_elk.ocean.elastic import ElasticOcean
 
 from perceval.backends.bugzilla import Bugzilla
 from perceval.backends.github import GitHub

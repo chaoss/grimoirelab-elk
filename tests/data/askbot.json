@@ -1,0 +1,294 @@
+[{
+    "backend_name": "Askbot",
+    "backend_version": "0.2.0",
+    "category": "question",
+    "data": {
+        "added_at": "1480074918",
+        "answer_count": 1,
+        "answer_ids": [
+            1253
+        ],
+        "answers": [
+            {
+                "added_at": "1480936205.0",
+                "answered_by": {
+                    "badges": "vvenkat has 2 gold badges, 2 silver badges and 4 bronze badges",
+                    "id": "353",
+                    "reputation": "1",
+                    "username": "vvenkat"
+                },
+                "id": "1253",
+                "score": "0",
+                "summary": "I got this solved by installing CentOS on the Host machine and run virt manager ....Added the network adapter during VM launch on the CentOS os Machine by adding two bridges br0(adding eth0) and br1(adding eth1).I could see both the ethernets in the Fuel menu and configureThanks"
+            }
+        ],
+        "author": {
+            "badges": "vvenkat has 2 gold badges, 2 silver badges and 4 bronze badges",
+            "id": "353",
+            "reputation": "1",
+            "username": "vvenkat"
+        },
+        "id": 1249,
+        "last_activity_at": "1480936205",
+        "last_activity_by": {
+            "id": 353,
+            "username": "vvenkat"
+        },
+        "score": 0,
+        "summary": "<p><a href=\"http://artifacts.opnfv.org/fuel/colorado/2.0/docs/installationprocedure/index.html#references\">http://artifacts.opnfv.org/fuel/color...</a></p>\n\n<p>I tried installing the Colorado 2.0 release on a Intel machine using Fuel.\nWhen it reaches to 5th step-Network Setup in \"Install Fuel Master\"(See above link) I don't see more than one ethernet interface, though I have both the ethernet interfaces enabled in hardware. </p>\n\n<p>This is on Windows 7 using VMWare Player ( I chose this for now after several experiments on other VMs).\nBut when I try to install a ubuntu<em>.iso, after the installation \"ifconfig\" shows both the interfaces. \nWhereas Colorado opnfv</em>.iso is not detecting the second interface. I checked at Shell login (at 5th Step-Network Setup) and tried ifconfig, there also it shows only one interface(eth0).</p>\n\n<p>Please help if you have seen such issue and resolved it.</p>\n\n<p>Thanks</p>\n",
+        "tags": [
+            "Fuel",
+            "Installation",
+            "Ethernet",
+            "Network",
+            "interface"
+        ],
+        "title": "More than one Ethernet interface is not visible during Fuel Installation",
+        "url": "https://ask.opnfv.org/question/1249/more-than-one-ethernet-interface-is-not-visible-during-fuel-installation/",
+        "view_count": 7
+    },
+    "origin": "https://ask.opnfv.org",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://ask.opnfv.org",
+    "timestamp": 1482308807.861499,
+    "updated_on": 1480936205.0,
+    "uuid": "093da39ee0eef5c6fb41a922b26ec83b93a3bb1c"
+},
+{
+    "backend_name": "Askbot",
+    "backend_version": "0.2.0",
+    "category": "question",
+    "data": {
+        "added_at": "1479835062",
+        "answer_count": 2,
+        "answer_ids": [
+            1241,
+            1247
+        ],
+        "answers": [
+            {
+                "added_at": "1479922140.0",
+                "answered_by": {
+                    "badges": "ashleyd has one silver badge and 2 bronze badges",
+                    "id": "357",
+                    "reputation": "1",
+                    "username": "ashleyd"
+                },
+                "id": "1241",
+                "score": "0",
+                "summary": "You shouldn't see \"install CentOS or check media & install CentOS\"  it should dump you straight to the fuel setup screen as described in the install docs, That being said I spent about two weeks trying to get an install to work via usb, I ended up giving up and install centOS with virtlib and then installing fuel as a VM, I used the following to help in the installhttps://wiki.opnfv.org/display/bgs/Ju..."
+            },
+            {
+                "added_at": "1479987266.0",
+                "answered_by": {
+                    "badges": "vvenkat has 2 gold badges, 2 silver badges and 4 bronze badges",
+                    "id": "353",
+                    "reputation": "1",
+                    "username": "vvenkat"
+                },
+                "id": "1247",
+                "score": "0",
+                "summary": "I proceeded with the thread \"More than one Ethernet interface is not visible during Fuel Installation [closed]\"",
+                "updated_at": "1480936341.0"
+            }
+        ],
+        "author": {
+            "badges": "vvenkat has 2 gold badges, 2 silver badges and 4 bronze badges",
+            "id": "353",
+            "reputation": "1",
+            "username": "vvenkat"
+        },
+        "id": 1237,
+        "last_activity_at": "1480936341",
+        "last_activity_by": {
+            "id": 353,
+            "username": "vvenkat"
+        },
+        "score": 0,
+        "summary": "<p>Hi,</p>\n\n<p>I am using USB by making it bootable using arm*.iso from Colorado 1.0 release. As soon as I select, install CentOS or check media &amp; install CentOS, I get below error and finally launching a Emergency shell( dracut:/#)...</p>\n\n<p><strong>tsc : Fast TSC calibration failed\ntpm_tis 00:0d: A TPM error(7) occurred attempting to read a pcr</strong></p>\n\n<p>then it keeps printing the below message :</p>\n\n<p><strong><em>dracut-initqueue[600]: Warning: dracut-initqueue timeout - starting timeout scripts</em></strong></p>\n\n<p>Did someone try to boot arm*.iso from Colorado release ? Please let me know if you have already solved this.</p>\n\n<p>Thanks\nVenkat</p>\n",
+        "tags": [
+            "usb",
+            "Booting",
+            "Colorado1.0",
+            "ARM",
+            "ISO"
+        ],
+        "title": "Colorado release 1.0 ARM ISO not booting using USB",
+        "url": "https://ask.opnfv.org/question/1237/colorado-release-10-arm-iso-not-booting-using-usb/",
+        "view_count": 27
+    },
+    "origin": "https://ask.opnfv.org",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://ask.opnfv.org",
+    "timestamp": 1482308813.403266,
+    "updated_on": 1480936341.0,
+    "uuid": "fc7e185889087c462a3eeab09cea5744ac4c1de6"
+},
+{
+    "backend_name": "Askbot",
+    "backend_version": "0.2.0",
+    "category": "question",
+    "data": {
+        "added_at": "1480945503",
+        "answer_count": 0,
+        "answer_ids": [],
+        "author": {
+            "badges": "vvenkat has 2 gold badges, 2 silver badges and 4 bronze badges",
+            "id": "353",
+            "reputation": "1",
+            "username": "vvenkat"
+        },
+        "id": 1255,
+        "last_activity_at": "1480945503",
+        "last_activity_by": {
+            "id": 353,
+            "username": "vvenkat"
+        },
+        "score": 0,
+        "summary": "<p>Hi ,</p>\n\n<p>Can someone let me know what is the linux kernel version used in Colorado 1.0 release ?</p>\n\n<p>Thanks\n-Venkat</p>\n",
+        "tags": [
+            "LinuxKernel",
+            "Version",
+            "Colorado.1.0"
+        ],
+        "title": "Linux Kernel version used in Colorado 1.0 release",
+        "url": "https://ask.opnfv.org/question/1255/linux-kernel-version-used-in-colorado-10-release/",
+        "view_count": 6
+    },
+    "origin": "https://ask.opnfv.org",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://ask.opnfv.org",
+    "timestamp": 1482308816.5356,
+    "updated_on": 1480945503.0,
+    "uuid": "b92be586643b91e8d79080d5315b7d4cfc3efa9c"
+},
+{
+    "backend_name": "Askbot",
+    "backend_version": "0.2.0",
+    "category": "question",
+    "data": {
+        "added_at": "1481122499",
+        "answer_count": 0,
+        "answer_ids": [],
+        "author": {
+            "badges": "",
+            "id": "389",
+            "reputation": "1",
+            "username": "karra"
+        },
+        "id": 1257,
+        "last_activity_at": "1481122499",
+        "last_activity_by": {
+            "id": 389,
+            "username": "karra"
+        },
+        "score": 0,
+        "summary": "<p>I am trying to install colorado release through fuel. I have successfully got the opnfv iso file(opnfv-P0000.iso). And I am trying to install it on \"VirtualBox\" where I have selected the initial option \"static ip\" but after that its getting stuck at one point. </p>\n\n<p>The document says it will take at least 30 mins but its been more than 40 mins and nothing has happened. </p>\n\n<p>Has any one tried installing on virtualbox ? At least the previous releases ? </p>\n",
+        "tags": [
+            "colorado",
+            "virtualbox"
+        ],
+        "title": "Trying to install colorado on virtualbox",
+        "url": "https://ask.opnfv.org/question/1257/trying-to-install-colorado-on-virtualbox/",
+        "view_count": 14
+    },
+    "origin": "https://ask.opnfv.org",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://ask.opnfv.org",
+    "timestamp": 1482308819.517912,
+    "updated_on": 1481122499.0,
+    "uuid": "52ab55a8f104188aad5d47e8a2b58d92cbd8d5b2"
+},
+{
+    "backend_name": "Askbot",
+    "backend_version": "0.2.0",
+    "category": "question",
+    "data": {
+        "added_at": "1481188912",
+        "answer_count": 0,
+        "answer_ids": [],
+        "author": {
+            "badges": "vvenkat has 2 gold badges, 2 silver badges and 4 bronze badges",
+            "id": "353",
+            "reputation": "1",
+            "username": "vvenkat"
+        },
+        "id": 1259,
+        "last_activity_at": "1481188912",
+        "last_activity_by": {
+            "id": 353,
+            "username": "vvenkat"
+        },
+        "score": 0,
+        "summary": "<p>I am getting the below error when I try to build the ISO for armband. </p>\n\n<p>Error: Could not open local rpm file: /tmp/fuel-main/local<em>mirror/mos-centos//Packages/mysql-wsrep-test-5.6-5.6.23</em>wsrep<em>25.10-25.10.el7~mos7.x86</em>64.rpm: RPM Error opening Package</p>\n\n<p>Can anyone answer this please ?</p>\n",
+        "tags": [
+            "RPMError",
+            "Build",
+            "Colorado.1.0"
+        ],
+        "title": "Building Colorado ISO for armband",
+        "url": "https://ask.opnfv.org/question/1259/building-colorado-iso-for-armband/",
+        "view_count": 4
+    },
+    "origin": "https://ask.opnfv.org",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://ask.opnfv.org",
+    "timestamp": 1482308822.879903,
+    "updated_on": 1481188912.0,
+    "uuid": "c2177aaf56c6c95bd88dc93c5a71ae4b5a565826"
+},
+{
+    "backend_name": "Askbot",
+    "backend_version": "0.2.0",
+    "category": "question",
+    "data": {
+        "added_at": "1481884777",
+        "answer_count": 1,
+        "answer_ids": [
+            1263
+        ],
+        "answers": [
+            {
+                "added_at": "1481898440.0",
+                "answered_by": {
+                    "badges": "johscheuer has one bronze badge",
+                    "id": "391",
+                    "reputation": "1",
+                    "username": "johscheuer"
+                },
+                "id": "1263",
+                "score": "0",
+                "summary": "So in the first place I just needed to use the right docker container tag (maybe we should add this in the documentation?):TAG=colorado.3.0; docker run --privileged=true --net=host -ti -e INSTALLER_TYPE=fuel -e INSTALLER_IP=10.20.0.2 -e DEPLOY_SCENARIO=os-odl_l2-sfc-noha -e CI_DEBUG=true --name sfc opnfv/functest:${TAG:-latest} /bin/bashIn the next step I needed to adjust two filesserver_presetup_CI.bashandcompute_presetup_CI.bash, you can find my adjustments ongithub. After this I finally could run the SFC test case but some of the test cases are failing (I will have a deeper look into this, it looks like everything gets directed through the SF). Also the test case doesn't clean up after running."
+            }
+        ],
+        "author": {
+            "badges": "johscheuer has one bronze badge",
+            "id": "391",
+            "reputation": "1",
+            "username": "johscheuer"
+        },
+        "id": 1261,
+        "last_activity_at": "1481898440",
+        "last_activity_by": {
+            "id": 391,
+            "username": "johscheuer"
+        },
+        "score": 0,
+        "summary": "<p>Hi there,</p>\n\n<p>I'm trying to run thew <a href=\"https://wiki.opnfv.org/display/sfc/Functest+SFC-ODL+-+Test+1\">ODL_SFC</a> Test Case 1 to verify my OPNFV Setup. I used fuel to install OPNFV (Colorado 3.0) and added the OVS, ODL and Tacker Plugin. </p>\n\n<p>Now I wanted to start the SFC Test Case 1 with the following command ( I added the <code>--net=host</code> because I don't wanted to modify my iptables rules):</p>\n\n<p><code>\ndocker run --privileged=true --net=host -ti -e INSTALLER_TYPE=fuel -e INSTALLER_IP=10.20.0.2 -e DEPLOY_SCENARIO=os-odl_l2-sfc-noha -e CI_DEBUG=true --name sfc opnfv/functest /bin/bash\n</code></p>\n\n<p>But the test setup fails at the <code>openstack_snapshot - INFO - Generating OpenStack snapshot...</code> step with the following command: <code>TypeError: __init__() got an unexpected keyword argument 'endpoint_type'</code></p>\n\n<p>I uploaded the complete output <a href=\"http://pastebin.com/LCB06VR5\">here</a></p>\n\n<p>After Some debugging I did the following:</p>\n\n<p>Printing the credentials in <code>/usr/local/lib/python2.7/dist-packages/functest/utils/openstack_utils.py</code>:\n<code>{'username': 'admin', 'endpoint_type': 'internalURL', 'auth_url': 'http://172.16.0.3:5000/v2.0', 'region_name': 'RegionOne', 'tenant_name': 'admin', 'password': 'admin'}</code></p>\n\n<p> and in  <a href=\"https://github.com/openstack/keystoneauth/blob/master/keystoneauth1/identity/generic/base.py#L35\">https://github.com/openstack/keystone...</a>  there is no  <code>endpoint_type</code> and <code>region_name</code> so I added the following two lines after fetching creds (  know probably not the best idea):</p>\n\n<p><code>creds.pop(\"endpoint_type\", None)</code></p>\n\n<p><code>creds.pop(\"region_name\", None)</code></p>\n\n<p>Now I ran into some new errors:</p>\n\n<p><code>\n2016-12-16 11:13:41,617 - openstack_snapshot - DEBUG - NOTE: These objects will NOT be deleted after running the test.\n2016-12-16 11:13:41,838 - functest_utils - DEBUG - Executing command: 'cd /home/opnfv/repos/sfc/tests/functest &amp;&amp; python ./run_tests.py'\n2016-12-16 11:13:41,864 - functest_utils - ERROR - The command 'cd /home/opnfv/repos/sfc/tests/functest &amp;&amp; python ./run_tests.py' failed.\n2016-12-16 11:13:41,867 - sfc - INFO - sfc FAILED\n2016-12-16 11:13:41,868 - functest_utils - ERROR - Unable to retrieve the POD name from environment. Using pod name 'unknown-pod'\n2016-12-16 11:13:41,868 - functest_utils - ERROR - Impossible to retrieve the build tag\n2016-12-16 11:13:41,869 - functest_utils - ERROR - Impossible to retrieve the build tag\n</code></p>\n\n<p>and like the line <code>ERROR - The command 'cd /home/opnfv/repos/sfc/tests/functest &amp;&amp; python ./run_tests.py' failed.</code> said: executing <code>ls -lah /home/opnfv/repos/sfc/tests/functest</code> returns \n<code>ls: cannot access /home/opnfv/repos/sfc/tests/functest: No such file or directory</code> so there are no test files...</p>\n\n<p>Thanks!</p>\n",
+        "tags": [
+            "SFC",
+            "containers",
+            "Fuel",
+            "ODL"
+        ],
+        "title": "ODL-SFC Testcase",
+        "url": "https://ask.opnfv.org/question/1261/odl-sfc-testcase/",
+        "view_count": 6
+    },
+    "origin": "https://ask.opnfv.org",
+    "perceval_version": "0.5.0.dev3",
+    "tag": "https://ask.opnfv.org",
+    "timestamp": 1482308828.530869,
+    "updated_on": 1481898440.0,
+    "uuid": "519daf3eebac711a589b955c3b8672050f58239f"
+}]

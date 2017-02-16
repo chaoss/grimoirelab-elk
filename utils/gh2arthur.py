@@ -38,8 +38,8 @@ from dateutil import parser
 
 from time import sleep
 
-from grimoire.elk.elastic import ElasticSearch, ElasticConnectException
-from grimoire.utils import config_logging
+from grimoire_elk.elk.elastic import ElasticSearch, ElasticConnectException
+from grimoire_elk.utils import config_logging
 
 
 GITHUB_URL = "https://github.com/"

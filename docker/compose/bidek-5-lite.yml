@@ -1,0 +1,26 @@
+elasticsearch:
+  image: elasticsearch:5.1.1
+  command: elasticsearch -E network.bind_host=0.0.0.0
+  ports:
+    - "9200:9200"
+  environment:
+    - ES_JAVA_OPTS=-Xms2g -Xmx2g
+
+kibiter:
+  # image: bitergia/kibiter:5.1.1-public
+  image: bitergia/kibiter:5.1.1
+  # image: kibana:5.1.1
+  # image: kibana:5.0.0
+  links:
+    - elasticsearch
+  ports:
+    - "5601:5601"
+  environment:
+    - ELASTICSEARCH_URL=http://elasticsearch:9200 
+    - PROJECT_NAME=Test20
+    - NODE_OPTIONS=--max-old-space-size=600
+
+# gelk-lite:
+#     image: bitergia/gelk-lite
+#     links:
+#         - elasticsearch
