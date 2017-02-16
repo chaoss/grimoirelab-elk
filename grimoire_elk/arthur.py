@@ -280,12 +280,11 @@ def enrich_items(items, enrich_backend, events=False):
         total = enrich_backend.enrich_events(items)
     return total
 
-def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
+def get_last_enrich(backend_cmd, enrich_backend):
     last_enrich = None
 
     if backend_cmd:
         backend = backend_cmd.backend
-
         # Only supported in data retrieved from a perceval backend
         # Always filter by repository to support multi repository indexes
         backend_name = enrich_backend.get_connector_name()
@@ -314,26 +313,27 @@ def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
             if from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
                 last_enrich = from_date
             else:
-                last_enrich = enrich_backend.get_last_update_from_es([filter_, filter_raw])
+                last_enrich = enrich_backend.get_last_update_from_es([filter_])
 
         elif offset:
             if offset != 0:
                 last_enrich = offset
             else:
-                last_enrich = enrich_backend.get_last_offset_from_es([filter_, filter_raw])
+                last_enrich = enrich_backend.get_last_offset_from_es([filter_])
     else:
         last_enrich = enrich_backend.get_last_update_from_es()
 
     return last_enrich
 
 
-def get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw=None):
+def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
+                      filter_raw=None, filter_raw_should=None):
     """ Get the ocean backend configured to start from the last enriched date """
 
     if no_incremental:
         last_enrich = None
     else:
-        last_enrich = get_last_enrich(backend_cmd, enrich_backend, filter_raw)
+        last_enrich = get_last_enrich(backend_cmd, enrich_backend)
 
     logger.debug("Last enrichment: %s", last_enrich)
 
@@ -358,6 +358,8 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw=No
 
     if filter_raw:
         ocean_backend.set_filter_raw(filter_raw)
+    if filter_raw_should:
+        ocean_backend.set_filter_raw_should(filter_raw_should)
 
     return ocean_backend
 
@@ -384,7 +386,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    url_enrich=None, events_enrich=False,
                    db_user=None, db_password=None, db_host=None,
                    do_refresh_projects=False, do_refresh_identities=False,
-                   author_id=None, author_uuid=None, filter_raw=None):
+                   author_id=None, author_uuid=None, filter_raw=None,
+                   filters_raw_prefix=None):
     """ Enrich Ocean index """
 
 
@@ -435,9 +438,21 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         if filter_raw:
             filter_raw_dict['name'] = filter_raw.split(":")[0].replace('"','')
             filter_raw_dict['value'] = filter_raw.split(":")[1].replace('"','')
+        # filters_raw_prefix must be converted from the list param to
+        # DSL query format for a should filter inside a boolean filter
+        filter_raw_should = {"should": []}
+        for filter_prefix in filters_raw_prefix:
+            fname = filter_prefix.split(":")[0].replace('"','')
+            fvalue = filter_prefix.split(":")[1].replace('"','')
+            filter_raw_should["should"].append(
+                {
+                "prefix" : { fname : fvalue }
+                }
+            )
 
         ocean_backend = get_ocean_backend(backend_cmd, enrich_backend,
-                                          no_incremental, filter_raw_dict)
+                                          no_incremental, filter_raw_dict,
+                                          filter_raw_should)
 
         if only_studies:
             logger.info("Running only studies (no SH and no enrichment)")
