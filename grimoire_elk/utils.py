@@ -217,16 +217,16 @@ def get_params_parser():
                         help="don't use last state for data source")
     parser.add_argument("--fetch_cache",  action='store_true',
                         help="Use cache for item retrieval")
-    parser.add_argument("--redis",  default="redis",
-                        help="url for the redis server")
     parser.add_argument("--enrich",  action='store_true',
                         help="Enrich items after retrieving")
     parser.add_argument("--enrich_only",  action='store_true',
                         help="Only enrich items (DEPRECATED, use --only-enrich)")
     parser.add_argument("--only-enrich",  dest='enrich_only', action='store_true',
-                        help="Only enrich items (DEPRECATED, use --only-enrich)")
+                        help="Only enrich items")
     parser.add_argument("--filter-raw",  dest='filter_raw',
                         help="Filter raw items. Format: field:value")
+    parser.add_argument("--filters-raw-prefix",  nargs='*',
+                        help="Filter raw items with prefix filter. Format: field:value field:value ...")
     parser.add_argument("--events-enrich",  dest='events_enrich', action='store_true',
                         help="Enrich events in items")
     parser.add_argument('--index', help="Ocean index name")
