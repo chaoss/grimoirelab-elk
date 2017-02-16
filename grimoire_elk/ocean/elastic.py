@@ -59,6 +59,7 @@ class ElasticOcean(object):
         self.fetch_cache = fetch_cache  # fetch from cache
         self.project = project  # project to be used for this data source
         self.filter_raw = None  # to filter raw items from Ocean
+        self.filter_raw_should = None  # to filter raw items from Ocean
 
         self.requests = requests.Session()
         if insecure:
@@ -147,14 +148,11 @@ class ElasticOcean(object):
         signature = inspect.signature(self.perceval_backend.fetch)
 
         last_update = None
-        # Filter to support multi repository indexes
-        filter_ = self.get_repository_filter_raw()
-
         if 'from_date' in signature.parameters:
             if from_date:
                 last_update = from_date
             else:
-                self.last_update = self.get_last_update_from_es([filter_])
+                self.last_update = self.get_last_update_from_es()
                 last_update = self.last_update
 
             logging.info("Incremental from: %s", last_update)
@@ -164,7 +162,7 @@ class ElasticOcean(object):
             if from_offset:
                 offset = from_offset
             else:
-                offset = self.elastic.get_last_offset("offset", [filter_])
+                offset = self.elastic.get_last_offset("offset")
 
             if offset:
                 logging.info("Incremental from: %i offset", offset)
@@ -298,6 +296,13 @@ class ElasticOcean(object):
                 # logstash backends does not have the order_field
                 order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
 
+            filters_should = ''
+            if self.filter_raw_should:
+                filters_should = json.dumps(self.filter_raw_should)[1:-1]
+                # We need to add a bool should query to the outer must query
+                query_should = '{"bool": {%s}}' % filters_should
+                filters += ", " + query_should
+
             query = """
             {
                 "query": {
@@ -308,8 +313,7 @@ class ElasticOcean(object):
             }
             """ % (filters, order_query)
 
-            logging.debug("%s %s", url, query)
-
+            logging.debug("%s\n%s", url, json.dumps(json.loads(query), indent=4))
             r = self.requests.post(url, data=query)
 
         items = []
@@ -334,8 +338,11 @@ class ElasticOcean(object):
 
     def set_filter_raw(self, filter_raw):
         """ Filter to be used when getting items from Ocean index """
-
         self.filter_raw = filter_raw
+
+    def set_filter_raw_should(self, filter_raw_should):
+        """ Bool filter should to be used when getting items from Ocean index """
+        self.filter_raw_should = filter_raw_should
 
 
     def __iter__(self):
