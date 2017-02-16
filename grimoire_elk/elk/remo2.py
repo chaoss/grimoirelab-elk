@@ -45,18 +45,10 @@ class ReMoEnrich(Enrich):
                 "description_analyzed": {
                   "type": "string",
                   "index":"analyzed"
-                  },
-                "geolocation": {
-                   "type": "geo_point"
                 },
-                "functional_areas": {
-                  "type": "string",
-                  "analyzer": "comma"
-                  },
-                "categories": {
-                  "type": "string",
-                  "analyzer": "comma"
-                  }
+                "geolocation": {
+                    "type": "geo_point"
+                }
            }
         } """
 
@@ -155,9 +147,9 @@ class ReMoEnrich(Enrich):
 
 
         # data fields to copy
-        copy_fields = ["initiative","location","activity","link",
-                       "activity_description","remo_url",
-                       "external_link","latitude","longitude", "report_date"]
+        copy_fields = ["activity", "activity_description", "external_link",
+                       "functional_areas", "initiative", "link", "location",
+                       "remo_url", "report_date"]
         for f in copy_fields:
             if f in activity:
                 eitem[f] = activity[f]
@@ -173,16 +165,12 @@ class ReMoEnrich(Enrich):
             eitem['mentor'] = activity['mentor']['first_name']+" "+activity['mentor']['last_name']
 
         # geolocation
-        if -90<int(eitem['latitude'])<90 and \
-            -180<int(eitem['longitude'])<180:
+        if -90 < int(activity['latitude']) < 90 and \
+           -180 < int(activity['longitude']) < 180:
             eitem['geolocation'] = {
-                "lat": eitem['latitude'],
-                "lon": eitem['longitude'],
+                "lat": activity['latitude'],
+                "lon": activity['longitude'],
             }
-
-        eitem['functional_areas'] = ''
-        for area in eitem['functional_areas']:
-            eitem['functional_areas'] += "," + area['name']
 
         if self.sortinghat:
             self.author = "user"
@@ -202,9 +190,9 @@ class ReMoEnrich(Enrich):
         event = item['data']
 
         # data fields to copy
-        copy_fields = ["initiative","city","country",
+        copy_fields = ["initiative", "categories", "city","country",
                        "description","estimated_attendance","remo_url",
-                       "external_link","lat","lon", "region","timezone",
+                       "external_link", "region","timezone",
                        "planning_pad_url","hashtag"]
         for f in copy_fields:
             if f in event:
@@ -228,17 +216,12 @@ class ReMoEnrich(Enrich):
             eitem['owner'] = event['owner']['display_name']
 
         # geolocation
-        if -90<int(eitem['lat'])<90 and \
-            -180<int(eitem['lon'])<180:
+        if -90<int(event['lat'])<90 and \
+            -180<int(event['lon'])<180:
             eitem['geolocation'] = {
-                "lat": eitem['lat'],
-                "lon": eitem['lon'],
+                "lat": event['lat'],
+                "lon": event['lon'],
             }
-
-        eitem['categories'] = ''
-        for cat in event['categories']:
-            eitem['categories'] += "," + cat['name']
-        eitem['categories'] = eitem['categories'][1:]  # remove first comma
 
         if self.sortinghat:
             self.author = 'owner'
