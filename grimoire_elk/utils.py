@@ -45,6 +45,7 @@ from .ocean.kitsune import KitsuneOcean
 from .ocean.mbox import MBoxOcean
 from .ocean.mediawiki import MediaWikiOcean
 from .ocean.meetup import MeetupOcean
+from .ocean.mozillaclub import MozillaClubOcean
 from .ocean.phabricator import PhabricatorOcean
 from .ocean.redmine import RedmineOcean
 from .ocean.remo2 import ReMoOcean
@@ -70,6 +71,7 @@ from .elk.kitsune import KitsuneEnrich
 from .elk.mbox import MBoxEnrich
 from .elk.mediawiki import MediaWikiEnrich
 from .elk.meetup import MeetupEnrich
+from .elk.mozillaclub import MozillaClubEnrich
 from .elk.phabricator import PhabricatorEnrich
 from .elk.redmine import RedmineEnrich
 # from .elk.remo import ReMoEnrich
