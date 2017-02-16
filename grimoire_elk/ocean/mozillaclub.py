@@ -21,7 +21,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from grimoire.ocean.elastic import ElasticOcean
+from grimoire_elk.ocean.elastic import ElasticOcean
 
 class MozillaClubOcean(ElasticOcean):
     """MozillaClub Ocean feeder"""

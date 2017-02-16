@@ -25,7 +25,7 @@
 import json
 import logging
 
-from grimoire.elk.enrich import Enrich
+from grimoire_elk.elk.enrich import Enrich
 
 class MozillaClubEnrich(Enrich):
 
