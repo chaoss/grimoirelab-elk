@@ -46,6 +46,7 @@ from .ocean.mbox import MBoxOcean
 from .ocean.mediawiki import MediaWikiOcean
 from .ocean.meetup import MeetupOcean
 from .ocean.mozillaclub import MozillaClubOcean
+from .ocean.nntp import NNTPOcean
 from .ocean.phabricator import PhabricatorOcean
 from .ocean.redmine import RedmineOcean
 from .ocean.remo2 import ReMoOcean
@@ -72,6 +73,7 @@ from .elk.mbox import MBoxEnrich
 from .elk.mediawiki import MediaWikiEnrich
 from .elk.meetup import MeetupEnrich
 from .elk.mozillaclub import MozillaClubEnrich
+from .elk.nntp import NNTPEnrich
 from .elk.phabricator import PhabricatorEnrich
 from .elk.redmine import RedmineEnrich
 # from .elk.remo import ReMoEnrich
@@ -98,6 +100,7 @@ from perceval.backends.core.jira import Jira, JiraCommand
 from perceval.backends.core.mbox import MBox, MBoxCommand
 from perceval.backends.core.mediawiki import MediaWiki, MediaWikiCommand
 from perceval.backends.core.meetup import Meetup, MeetupCommand
+from perceval.backends.core.nntp import NNTP, NNTPCommand
 from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.core.pipermail import Pipermail, PipermailCommand
 from perceval.backends.core.redmine import Redmine, RedmineCommand
@@ -156,8 +159,8 @@ def get_connectors():
             "mediawiki":[MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
             "meetup":[Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
             "mozillaclub":[MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
+            "nntp":[NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
             "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
-            "pipermail":[Pipermail, MBoxOcean, MBoxEnrich, PipermailCommand],
             "pipermail":[Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
             "redmine":[Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
