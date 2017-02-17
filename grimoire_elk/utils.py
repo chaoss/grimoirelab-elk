@@ -97,6 +97,7 @@ from perceval.backends.core.github import GitHub, GitHubCommand
 from perceval.backends.core.gmane import Gmane, GmaneCommand
 from perceval.backends.core.jenkins import Jenkins, JenkinsCommand
 from perceval.backends.core.jira import Jira, JiraCommand
+from perceval.backends.core.hyperkitty import HyperKitty, HyperKittyCommand
 from perceval.backends.core.mbox import MBox, MBoxCommand
 from perceval.backends.core.mediawiki import MediaWiki, MediaWikiCommand
 from perceval.backends.core.meetup import Meetup, MeetupCommand
@@ -152,6 +153,7 @@ def get_connectors():
             "git":[Git, GitOcean, GitEnrich, GitCommand],
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
             "gmane":[Gmane, MBoxOcean, GmaneEnrich, GmaneCommand],
+            "hyperkitty":[HyperKitty, MBoxOcean, MBoxEnrich, HyperKittyCommand],
             "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
             "kitsune":[Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
