@@ -308,14 +308,13 @@ def get_last_enrich(backend_cmd, enrich_backend):
             except AttributeError:
                 offset = backend_cmd.parsed_args.offset
 
-
         if from_date:
             if from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
                 last_enrich = from_date
             else:
                 last_enrich = enrich_backend.get_last_update_from_es([filter_])
 
-        elif offset:
+        elif offset is not None:
             if offset != 0:
                 last_enrich = offset
             else:

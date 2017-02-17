@@ -257,7 +257,9 @@ class ElasticSearch(object):
         if 'aggregations' in res_json:
             last_value = res_json["aggregations"]["1"]["value"]
 
-            if not offset:
+            if offset:
+                last_value = int(last_value)
+            else:
                 if "value_as_string" in res_json["aggregations"]["1"]:
                     last_value = res_json["aggregations"]["1"]["value_as_string"]
                     last_value = parser.parse(last_value)
