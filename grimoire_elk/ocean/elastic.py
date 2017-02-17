@@ -144,6 +144,11 @@ class ElasticOcean(object):
         if from_date and from_offset:
             raise RuntimeError("Can't not feed using from_date and from_offset.")
 
+        # We need to filter by repository to support several repositories
+        # in the same raw index
+        _filters = [get_repository_filter(self.perceval_backend,
+                    self.get_connector_name())]
+
         # Check if backend supports from_date
         signature = inspect.signature(self.perceval_backend.fetch)
 
@@ -152,7 +157,7 @@ class ElasticOcean(object):
             if from_date:
                 last_update = from_date
             else:
-                self.last_update = self.get_last_update_from_es()
+                self.last_update = self.get_last_update_from_es(_filters)
                 last_update = self.last_update
 
             logging.info("Incremental from: %s", last_update)
@@ -162,7 +167,7 @@ class ElasticOcean(object):
             if from_offset:
                 offset = from_offset
             else:
-                offset = self.elastic.get_last_offset("offset")
+                offset = self.elastic.get_last_offset("offset", _filters)
 
             if offset:
                 logging.info("Incremental from: %i offset", offset)
