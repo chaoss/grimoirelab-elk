@@ -84,7 +84,7 @@ class Enrich(object):
 
     sh_db = None
     RAW_FIELDS_COPY = ["metadata__updated_on", "metadata__timestamp",
-                       "ocean-unique-id", "origin", "tag"]
+                       "ocean-unique-id", "offset", "origin", "tag"]
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host='', insecure=True):
