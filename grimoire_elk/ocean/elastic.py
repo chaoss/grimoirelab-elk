@@ -76,7 +76,10 @@ class ElasticOcean(object):
         return "metadata__updated_on"
 
     def get_field_unique_id(self):
-        return "ocean-unique-id"
+        # field = "ocean-unique-id"
+        # Use the unique id provided by perceval
+        field = "uuid"
+        return field
 
     def get_elastic_mappings(self):
         """ specific mappings implemented in each data source """

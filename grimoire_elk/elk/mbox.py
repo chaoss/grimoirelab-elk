@@ -35,9 +35,6 @@ class MBoxEnrich(Enrich):
     def get_field_author(self):
         return "From"
 
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def get_fields_uuid(self):
         return ["from_uuid"]
 
