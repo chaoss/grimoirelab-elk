@@ -350,6 +350,14 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
         else:
             ocean_backend = connector[1](backend)
     else:
+        # We can have params for non perceval backends also
+        params = enrich_backend.backend_params
+        if params:
+            try:
+                date_pos = params.index('--from-date')
+                last_enrich = parser.parse(params[date_pos + 1])
+            except ValueError:
+                pass
         if last_enrich:
             ocean_backend = connector[1](backend, from_date=last_enrich)
         else:
@@ -423,6 +431,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
         enrich_backend = connector[2](db_sortinghat, db_projects_map, json_projects_map,
                                       db_user, db_password, db_host)
+        enrich_backend.set_params(backend_params)
         if url_enrich:
             elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend)
         else:
@@ -430,7 +439,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         enrich_backend.set_elastic(elastic_enrich)
         if github_token and backend_name == "git":
             enrich_backend.set_github_token(github_token)
-
 
         # filter_raw must be converted from the string param to a dict
         filter_raw_dict = {}

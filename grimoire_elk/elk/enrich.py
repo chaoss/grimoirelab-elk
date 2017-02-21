@@ -140,8 +140,16 @@ class Enrich(object):
             logging.warning("Can't get the gelk version. %s", __file__)
             self.gelk_version = 'Unknown'
 
+        # params used to configure the backend
+        # in perceval backends managed directly inside the backend
+        # in twitter and others managed in arthur logic
+        self.backend_params = None
+
     def set_elastic(self, elastic):
         self.elastic = elastic
+
+    def set_params(self, params):
+        self.backend_params = params
 
     def __convert_json_to_projects_map(self, json):
         """ Convert JSON format to the projects map format
