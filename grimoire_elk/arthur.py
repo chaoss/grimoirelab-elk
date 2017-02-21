@@ -100,9 +100,9 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
                 category = backend_cmd.parsed_args.category
 
         # from_date param support
-        if offset and category:
+        if offset is not None and category:
             ocean_backend.feed(from_offset=offset, category=category)
-        elif offset:
+        elif offset is not None:
             ocean_backend.feed(from_offset=offset)
         elif from_date and from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
             if category:

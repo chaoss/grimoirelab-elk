@@ -172,7 +172,7 @@ class ElasticOcean(object):
             else:
                 offset = self.elastic.get_last_offset("offset", _filters)
 
-            if offset:
+            if offset is not None:
                 logging.info("Incremental from: %i offset", offset)
             else:
                 logging.info("Not incremental")
@@ -194,7 +194,7 @@ class ElasticOcean(object):
                     items = self.perceval_backend.fetch(from_date=last_update, category=category)
                 else:
                     items = self.perceval_backend.fetch(from_date=last_update)
-            elif offset:
+            elif offset is not None:
                 if category:
                     items = self.perceval_backend.fetch(offset=offset, category=category)
                 else:
