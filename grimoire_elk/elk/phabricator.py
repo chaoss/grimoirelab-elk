@@ -234,7 +234,7 @@ class PhabricatorEnrich(Enrich):
             val = item['fields']['priority']['value']
             self.phab_ids_names[str(val)] = item['fields']['priority']['name']
         for t in item['transactions']:
-            if 'userName' in t['authorData']:
+            if 'authorData' in t and 'userName' in t['authorData']:
                 self.phab_ids_names[t['authorData']['phid']] = t['authorData']['userName']
             elif 'name' in t['authorData']:
                 # Herald
