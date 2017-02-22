@@ -32,6 +32,24 @@ from .elastic import ElasticOcean
 class MBoxOcean(ElasticOcean):
     """MBox Ocean feeder"""
 
+    def get_elastic_mappings(self):
+        # This field data.transaction has string arrays and dicts arrays
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "body": {
+                                "dynamic":false,
+                                "properties": {}
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
     def _fix_item(self, item):
         if "Message-ID" in item["data"] and item["data"]["Message-ID"]:
             item["ocean-unique-id"] = item["data"]["Message-ID"]+"_"+item['origin']
