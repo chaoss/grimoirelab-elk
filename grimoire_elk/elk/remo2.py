@@ -176,6 +176,8 @@ class ReMoEnrich(Enrich):
             self.author = "user"
             eitem.update(self.get_item_sh(item))
 
+        eitem.update(self.get_grimoire_fields(activity["report_date"], "activity"))
+
         return eitem
 
     def __get_rich_item_users(self, item):
@@ -226,5 +228,8 @@ class ReMoEnrich(Enrich):
         if self.sortinghat:
             self.author = 'owner'
             eitem.update(self.get_item_sh(item))
+
+        eitem.update(self.get_grimoire_fields(event["start"], "event"))
+
 
         return eitem
