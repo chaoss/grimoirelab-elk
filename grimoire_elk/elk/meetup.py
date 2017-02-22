@@ -202,6 +202,7 @@ class MeetupEnrich(Enrich):
             }
             group_topics = [topic['name'] for topic in group['topics']]
             group_topics_keys = [topic['urlkey'] for topic in group['topics']]
+            eitem['group_topics_raw'] = group_topics
             eitem['group_topics'] = ",".join(group_topics)
             eitem['group_topics_keys'] = ",".join(group_topics_keys)
 
