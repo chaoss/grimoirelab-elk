@@ -94,6 +94,9 @@ class StackExchangeEnrich(Enrich):
 
         item = item['data']
 
+        if 'owner' not in identity:
+            return identities
+
         for identity in ['owner']:
             if identity in item and item[identity]:
                 user = self.get_sh_identity(item[identity])
@@ -124,12 +127,17 @@ class StackExchangeEnrich(Enrich):
             question = item['data']
 
             eitem["type"] = 'question'
-            eitem["author"] = question['owner']['display_name']
-            eitem["author_link"] = None
-            if 'link' in question['owner']:
-                eitem["author_link"] = question['owner']['link']
-            if 'reputation' in question['owner']:
-                eitem["author_reputation"] = question['owner']['reputation']
+            eitem["author"] = None
+            if 'owner' in question:
+                eitem["author"] = question['owner']['display_name']
+                eitem["author_link"] = None
+                if 'link' in question['owner']:
+                    eitem["author_link"] = question['owner']['link']
+                eitem["reputation"] = None
+                if 'reputation' in question['owner']:
+                    eitem["author_reputation"] = question['owner']['reputation']
+            else:
+                logging.warning("question without owner: ", question['question_id'])
 
             # data fields to copy
             copy_fields = common_fields + ['answer_count']
