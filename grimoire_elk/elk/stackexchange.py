@@ -94,9 +94,6 @@ class StackExchangeEnrich(Enrich):
 
         item = item['data']
 
-        if 'owner' not in identity:
-            return identities
-
         for identity in ['owner']:
             if identity in item and item[identity]:
                 user = self.get_sh_identity(item[identity])
