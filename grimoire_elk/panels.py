@@ -65,7 +65,7 @@ def get_search_json(elastic, search_id):
 
     search_json = r.json()
     if "_source" not in search_json:
-        logging.error("Can not find search: %s (%s)", search_json_url)
+        logging.error("Can not find search: %s", search_json_url)
         return
     return search_json['_source']
 
@@ -422,6 +422,12 @@ def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
                 index_ids_done.append(index_pattern_id)
                 kibana["index_patterns"].append({"id":index_pattern_id,
                                                  "value":get_index_pattern_json(elastic, index_pattern_id)})
+        elif panel['type'] in ['search']:
+            # A search could be directly visualized inside a panel
+            search_id = panel['id']
+            kibana["searches"].append({"id":search_id,
+                                       "value":get_search_json(elastic, search_id)})
+
     logging.debug("Done")
 
     with open(export_file, 'w') as f:
