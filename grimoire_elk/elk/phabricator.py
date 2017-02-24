@@ -103,6 +103,9 @@ class PhabricatorEnrich(Enrich):
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
 
+        if item is None:
+            return identity
+
         user = item
         if 'data' in item and type(item) == dict:
             user = item['data']['fields'][identity_field]
