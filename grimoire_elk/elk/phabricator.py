@@ -103,6 +103,10 @@ class PhabricatorEnrich(Enrich):
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
 
+        identity['email'] = None
+        identity['username'] = None
+        identity['name'] = None
+
         if item is None:
             return identity
 
@@ -110,7 +114,6 @@ class PhabricatorEnrich(Enrich):
         if 'data' in item and type(item) == dict:
             user = item['data']['fields'][identity_field]
 
-        identity['email'] = None
         identity['username'] = user['userName']
         identity['name'] = user['realName']
 
@@ -237,9 +240,9 @@ class PhabricatorEnrich(Enrich):
             val = item['fields']['priority']['value']
             self.phab_ids_names[str(val)] = item['fields']['priority']['name']
         for t in item['transactions']:
-            if 'authorData' in t and 'userName' in t['authorData']:
+            if 'authorData' in t and t['authorData'] and 'userName' in t['authorData']:
                 self.phab_ids_names[t['authorData']['phid']] = t['authorData']['userName']
-            elif 'name' in t['authorData']:
+            elif t['authorData'] and 'name' in t['authorData']:
                 # Herald
                 self.phab_ids_names[t['authorData']['phid']] = t['authorData']['name']
 
