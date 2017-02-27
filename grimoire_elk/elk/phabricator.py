@@ -61,17 +61,9 @@ class PhabricatorEnrich(Enrich):
                   "type": "string",
                   "index":"analyzed"
                 },
-                "author_roles_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
-                },
                 "assigned_to_roles_analyzed": {
                   "type": "string",
                   "index":"analyzed"
-                 },
-                "author_roles_analyzed": {
-                   "type": "string",
-                   "index":"analyzed"
                  },
                 "tags_analyzed": {
                    "type": "string",
@@ -114,8 +106,13 @@ class PhabricatorEnrich(Enrich):
         if 'data' in item and type(item) == dict:
             user = item['data']['fields'][identity_field]
 
-        identity['username'] = user['userName']
-        identity['name'] = user['realName']
+        if user is None:
+            return identity
+
+        if 'userName' in user:
+            identity['username'] = user['userName']
+        if 'realName' in user:
+            identity['name'] = user['realName']
 
         return identity
 
@@ -233,6 +230,8 @@ class PhabricatorEnrich(Enrich):
         """ Get mappings between phab ids and names """
         for p in item['projects']:
             self.phab_ids_names[p['phid']] = p['name']
+        if 'authorData' not in item['fields'] or not item['fields']['authorData']:
+            return
         self.phab_ids_names[item['fields']['authorData']['phid']] = item['fields']['authorData']['userName']
         if 'ownerData' in item['fields']:
             self.phab_ids_names[item['fields']['ownerData']['phid']] = item['fields']['ownerData']['userName']
@@ -278,14 +277,13 @@ class PhabricatorEnrich(Enrich):
 
         eitem['num_changes'] = len(phab_item['transactions'])
 
-        if 'authorData' in phab_item['fields']:
-            eitem['author_roles'] = ",".join(phab_item['fields']['authorData']['roles'])
-            eitem['author_roles_analyzed'] = eitem['author_roles']
+        if 'authorData' in phab_item['fields'] and phab_item['fields']['authorData']:
+            # eitem['author_roles'] = ",".join(phab_item['fields']['authorData']['roles'])
+            eitem['author_roles'] = phab_item['fields']['authorData']['roles']
             eitem['author_userName'] = phab_item['fields']['authorData']['userName']
             eitem['author_realName'] = phab_item['fields']['authorData']['realName']
-        if 'ownerData' in phab_item['fields']:
-            eitem['assigned_to_roles'] = ",".join(phab_item['fields']['ownerData']['roles'])
-            eitem['assigned_to_roles_analyzed'] = eitem['assigned_to_roles']
+        if 'ownerData' in phab_item['fields'] and  phab_item['fields']['ownerData']:
+            eitem['assigned_to_roles'] = phab_item['fields']['ownerData']['roles']
             eitem['assigned_to_userName'] = phab_item['fields']['ownerData']['userName']
             eitem['assigned_to_realName'] = phab_item['fields']['ownerData']['realName']
 
@@ -333,12 +331,12 @@ class PhabricatorEnrich(Enrich):
                     eitem['time_to_assign_days'] = get_time_diff_days(eitem['creation_date'], change_date)
                     first_assignee_phid = change['newValue']
                     first_assignee_date = change_date
-                if 'userName' in change['authorData'] and \
+                if 'authorData' in change and change['authorData'] and 'userName' in change['authorData'] and \
                     change['authorData']['userName'] not in changes_assignee_list:
                     changes_assignee_list.append(change['authorData']['userName'])
                 eitem['changes_assignment'] += 1
             if not eitem['time_to_attend_days'] and first_assignee_phid:
-                if change['authorData']['phid'] == first_assignee_phid:
+                if 'authorData' in change and change['authorData'] and change['authorData']['phid'] == first_assignee_phid:
                     eitem['time_to_attend_days'] = get_time_diff_days(first_assignee_date, change_date)
         eitem['changes_assignee_number'] = len(changes_assignee_list)
         eitem['changes_assignee_list'] = ','.join(changes_assignee_list)
