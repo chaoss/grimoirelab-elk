@@ -178,6 +178,13 @@ class ReMoEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(activity["report_date"], "activity"))
 
+        eitem["is_attendee"] = 0
+        eitem["is_organizer"] = 0
+        if eitem["activity"] == "Attended an Event":
+            eitem["is_attendee"] = 1
+        elif eitem["activity"] == "Organized an Event":
+            eitem["is_organizer"] = 1
+
         return eitem
 
     def __get_rich_item_users(self, item):
