@@ -299,6 +299,7 @@ class GitHubEnrich(Enrich):
 
         rich_issue['id'] = issue['id']
         rich_issue['id_in_repo'] = issue['html_url'].split("/")[-1]
+        rich_issue['repository'] = issue['html_url'].rsplit("/", 2)[0]
         rich_issue['title'] = issue['title']
         rich_issue['title_analyzed'] = issue['title']
         rich_issue['state'] = issue['state']
@@ -313,7 +314,6 @@ class GitHubEnrich(Enrich):
         if labels != '':
             labels[:-2]
         rich_issue['labels'] = labels
-        rich_issue['repository'] = rich_issue['origin']
 
         rich_issue['pull_request'] = True
         rich_issue['item_type'] = 'pull request'
@@ -321,7 +321,7 @@ class GitHubEnrich(Enrich):
             rich_issue['pull_request'] = False
             rich_issue['item_type'] = 'issue'
 
-        rich_issue['github_repo'] = item['origin'].replace(GITHUB,'')
+        rich_issue['github_repo'] = rich_issue['repository'].replace(GITHUB,'')
         rich_issue['github_repo'] = re.sub('.git$', '', rich_issue['github_repo'])
         rich_issue["url_id"] = rich_issue['github_repo']+"/issues/"+rich_issue['id_in_repo']
 
