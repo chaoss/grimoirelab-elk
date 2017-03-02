@@ -256,6 +256,7 @@ def get_params_parser():
     parser.add_argument('--author_id', help="Field author_id to be refreshed")
     parser.add_argument('--author_uuid', help="Field author_uuid to be refreshed")
     parser.add_argument('--github-token', help="If provided, github usernames will be retrieved in git enrich.")
+    parser.add_argument('--jenkins-rename-file', help="CSV mapping file with nodes renamed schema.")
     parser.add_argument('--studies', action='store_true', help="Execute studies after enrichment.")
     parser.add_argument('--only-studies', action='store_true', help="Execute only studies.")
     parser.add_argument('backend', help=argparse.SUPPRESS)

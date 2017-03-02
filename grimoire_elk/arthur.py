@@ -394,7 +394,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    db_user=None, db_password=None, db_host=None,
                    do_refresh_projects=False, do_refresh_identities=False,
                    author_id=None, author_uuid=None, filter_raw=None,
-                   filters_raw_prefix=None):
+                   filters_raw_prefix=None, jenkins_rename_file=None):
     """ Enrich Ocean index """
 
 
@@ -439,6 +439,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         enrich_backend.set_elastic(elastic_enrich)
         if github_token and backend_name == "git":
             enrich_backend.set_github_token(github_token)
+        if jenkins_rename_file and backend_name == "jenkins":
+            enrich_backend.set_jenkins_rename_file(jenkins_rename_file)
 
         # filter_raw must be converted from the string param to a dict
         filter_raw_dict = {}

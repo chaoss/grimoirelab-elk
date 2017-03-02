@@ -31,29 +31,45 @@ from .enrich import Enrich, metadata
 
 class JenkinsEnrich(Enrich):
 
-    NODES_RENAME_FILE = 'jenkins_nodes.csv'
-    NODES_RENAME = {}
-
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
+        self.nodes_rename_file = None
+        self.nodes_rename = {}
+
+    def set_jenkins_rename_file(self, nodes_rename_file):
+        """ File with nodes renaming mapping:
+
+        Node,Comment
+        arm-build1,remove
+        arm-build2,keep
+        ericsson-build3,merge into ericsson-build1
+        ....
+
+        Once set in the next enrichment the rename will be done
+        """
+        self.nodes_rename_file = nodes_rename_file
         self.__load_node_renames()
+        logging.info("Jenkis node rename file active: %s", nodes_rename_file)
 
     def __load_node_renames(self):
         # In OPNFV nodes could be renamed
+        if not self.nodes_rename_file:
+            logging.debug("Jenkis node rename file not defined.")
+            return
         try:
-            with open(self.NODES_RENAME_FILE, 'r') as csvfile:
+            with open(self.nodes_rename_file, 'r') as csvfile:
                 nodes = csv.reader(csvfile, delimiter=',')
                 for node in nodes:
                     name = node[0]
                     action = node[1]
                     rename = action.split("merge into ")
                     if len(rename) > 1:
-                        self.NODES_RENAME[name] = rename[1]
+                        self.nodes_rename[name] = rename[1]
         except FileNotFoundError:
             logging.info("Jenkis node rename file not found %s",
-                         self.NODES_RENAME_FILE)
+                         self.nodes_rename_file)
 
     def get_elastic_mappings(self):
 
@@ -153,8 +169,8 @@ class JenkinsEnrich(Enrich):
             else:
                 eitem[f] = None
         # Nodes renaming
-        if eitem["builtOn"] in self.NODES_RENAME:
-            eitem["builtOn"] = self.NODES_RENAME[eitem["builtOn"]]
+        if eitem["builtOn"] in self.nodes_rename:
+            eitem["builtOn"] = self.nodes_rename[eitem["builtOn"]]
         # Fields which names are translated
         map_fields = {"fullDisplayName": "fullDisplayName_analyzed",
                       "number": "build"
