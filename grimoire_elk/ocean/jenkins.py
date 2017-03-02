@@ -30,3 +30,26 @@ class JenkinsOcean(ElasticOcean):
 
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["data"]["url"]
+
+    def get_elastic_mappings(self):
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "runs": {
+                                "dynamic":false,
+                                "properties": {}
+                            },
+                            "actions": {
+                                "dynamic":false,
+                                "properties": {}
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
+        return {"items":mapping}
