@@ -125,6 +125,7 @@ class ConfluenceEnrich(Enrich):
         if page['type'] == 'page':
             if page['version']['number'] == 1:
                 eitem['type'] = 'new_page'
+        eitem['is_blogpost'] = 0
         eitem['is_'+eitem['type']] = 1
 
         if self.sortinghat:
