@@ -31,6 +31,10 @@ from .enrich import Enrich, metadata
 
 from .utils import unixtime_to_datetime
 
+
+logger = logging.getLogger(__name__)
+
+
 class StackExchangeEnrich(Enrich):
 
     def get_field_unique_id(self):
@@ -134,7 +138,7 @@ class StackExchangeEnrich(Enrich):
                 if 'reputation' in question['owner']:
                     eitem["author_reputation"] = question['owner']['reputation']
             else:
-                logging.warning("question without owner: ", question['question_id'])
+                logger.warning("question without owner: ", question['question_id'])
 
             # data fields to copy
             copy_fields = common_fields + ['answer_count']
@@ -212,7 +216,7 @@ class StackExchangeEnrich(Enrich):
 
         url = self.elastic.index_url+'/items/_bulk'
 
-        logging.debug("Adding items to %s (in %i packs)", url, max_items)
+        logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
         for item in items:
             if current >= max_items:

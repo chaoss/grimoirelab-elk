@@ -35,6 +35,9 @@ from datetime import datetime
 from ..elk.utils import unixtime_to_datetime, get_repository_filter
 
 
+logger = logging.getLogger(__name__)
+
+
 class ElasticOcean(object):
 
     @classmethod
@@ -163,7 +166,7 @@ class ElasticOcean(object):
                 self.last_update = self.get_last_update_from_es(_filters)
                 last_update = self.last_update
 
-            logging.info("Incremental from: %s", last_update)
+            logger.info("Incremental from: %s", last_update)
 
         offset = None
         if 'offset' in signature.parameters:
@@ -173,9 +176,9 @@ class ElasticOcean(object):
                 offset = self.elastic.get_last_offset("offset", _filters)
 
             if offset is not None:
-                logging.info("Incremental from: %i offset", offset)
+                logger.info("Incremental from: %i offset", offset)
             else:
-                logging.info("Not incremental")
+                logger.info("Not incremental")
 
         task_init = datetime.now()
 
@@ -225,9 +228,9 @@ class ElasticOcean(object):
 
         total_time_min = (datetime.now()-task_init).total_seconds()/60
 
-        logging.debug("Added %i items to ocean", added)
-        logging.debug("Dropped %i items using drop_item filter" % (drop))
-        logging.info("Finished in %.2f min" % (total_time_min))
+        logger.debug("Added %i items to ocean", added)
+        logger.debug("Dropped %i items using drop_item filter" % (drop))
+        logger.info("Finished in %.2f min" % (total_time_min))
 
         return self
 
@@ -238,7 +241,7 @@ class ElasticOcean(object):
         if len(json_items) == 0:
             return
 
-        logging.info("Adding items to Ocean for %s (%i items)" %
+        logger.info("Adding items to Ocean for %s (%i items)" %
                       (self, len(json_items)))
 
         field_id = self.get_field_unique_id()
@@ -321,15 +324,15 @@ class ElasticOcean(object):
             }
             """ % (filters, order_query)
 
-            logging.debug("%s\n%s", url, json.dumps(json.loads(query), indent=4))
+            logger.debug("%s\n%s", url, json.dumps(json.loads(query), indent=4))
             r = self.requests.post(url, data=query)
 
         items = []
         try:
             rjson = r.json()
         except:
-            logging.error("No JSON found in %s" % (r.text))
-            logging.error("No results found from %s" % (url))
+            logger.error("No JSON found in %s" % (r.text))
+            logger.error("No results found from %s" % (url))
 
         if rjson and "_scroll_id" in rjson:
             self.elastic_scroll_id = rjson["_scroll_id"]
@@ -340,7 +343,7 @@ class ElasticOcean(object):
             for hit in rjson["hits"]["hits"]:
                 items.append(hit['_source'])
         else:
-            logging.error("No results found from %s" % (url))
+            logger.error("No results found from %s" % (url))
 
         return items
 

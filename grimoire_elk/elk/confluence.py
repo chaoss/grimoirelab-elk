@@ -29,6 +29,10 @@ from dateutil import parser
 
 from .enrich import Enrich, metadata
 
+
+logger = logging.getLogger(__name__)
+
+
 class ConfluenceEnrich(Enrich):
 
     def get_field_author(self):

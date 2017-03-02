@@ -35,7 +35,9 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from .utils import unixtime_to_datetime
 
-WAIT_INDEX_CREATION = 2  # number of seconds to wait for index creation
+
+logger = logging.getLogger(__name__)
+
 
 class ElasticConnectException(Exception):
     message = "Can't connect to ElasticSearch"
@@ -71,23 +73,23 @@ class ElasticSearch(object):
         try:
             r = self.requests.get(self.index_url)
         except requests.exceptions.ConnectionError as ex:
-            logging.error(ex)
+            logger.error(ex)
             raise ElasticConnectException()
 
         if r.status_code != 200:
             # Index does no exists
             r = self.requests.put(self.index_url, data=analyzers)
             if r.status_code != 200:
-                logging.error("Can't create index %s (%s)",
+                logger.error("Can't create index %s (%s)",
                               self.index_url, r.status_code)
                 raise ElasticWriteException()
             else:
-                logging.info("Created index " + self.index_url)
+                logger.info("Created index " + self.index_url)
         else:
             if clean:
                 self.requests.delete(self.index_url)
                 self.requests.put(self.index_url, data=analyzers)
-                logging.info("Deleted and created index " + self.index_url)
+                logger.info("Deleted and created index " + self.index_url)
         if mappings:
             self.create_mappings(mappings)
 
@@ -98,7 +100,7 @@ class ElasticSearch(object):
             self.requests.put(url, data=bulk_json)
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
-            logging.error("Encondig error ... converting bulk to iso-8859-1")
+            logger.error("Encondig error ... converting bulk to iso-8859-1")
             bulk_json = bulk_json.encode('iso-8859-1','ignore')
             self.requests.put(url, data=bulk_json)
 
@@ -112,7 +114,7 @@ class ElasticSearch(object):
 
         url = self.index_url+'/items/_bulk'
 
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+        logger.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
         for item in items:
             if current >= max_items:
@@ -121,7 +123,7 @@ class ElasticSearch(object):
                 bulk_json = ""
                 new_items += current
                 current = 0
-                logging.debug("bulk packet sent (%.2f sec, %i total)"
+                logger.debug("bulk packet sent (%.2f sec, %i total)"
                               % (time()-task_init, new_items))
             data_json = json.dumps(item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
@@ -130,7 +132,7 @@ class ElasticSearch(object):
         task_init = time()
         self._safe_put_bulk(url, bulk_json)
         new_items += current
-        logging.debug("bulk packet sent (%.2f sec prev, %i total)"
+        logger.debug("bulk packet sent (%.2f sec prev, %i total)"
                       % (time()-task_init, new_items))
 
         return new_items
@@ -160,8 +162,8 @@ class ElasticSearch(object):
             r = self.requests.get(self.index_url+'/_search?size=1')
             total_search = r.json()['hits']['total']
             if (datetime.now()-search_start).total_seconds() > self.wait_bulk_seconds:
-                logging.debug("Bulk data does not appear as NEW after %is" % (self.wait_bulk_seconds))
-                logging.debug("Probably %i item updates" % (total-total_search))
+                logger.debug("Bulk data does not appear as NEW after %is" % (self.wait_bulk_seconds))
+                logger.debug("Probably %i item updates" % (total-total_search))
                 break
 
     def create_mappings(self, mappings):
@@ -174,7 +176,7 @@ class ElasticSearch(object):
             if mappings[_type] != '{}':
                 r = self.requests.put(url_map, data=mappings[_type])
                 if r.status_code != 200:
-                    logging.error("Error creating ES mappings %s", r.text)
+                    logger.error("Error creating ES mappings %s", r.text)
 
             # By default all strings are not analyzed
             not_analyze_strings = """
@@ -250,7 +252,7 @@ class ElasticSearch(object):
         { "size": 0, %s  %s
         } ''' % (data_query, data_agg)
 
-        logging.debug("%s %s", url, data_json)
+        logger.debug("%s %s", url, data_json)
         res = self.requests.post(url, data=data_json)
         res_json = res.json()
 

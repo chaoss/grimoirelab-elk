@@ -35,6 +35,10 @@ from .enrich import Enrich, metadata
 
 from .utils import get_time_diff_days
 
+
+logger = logging.getLogger(__name__)
+
+
 class JiraEnrich(Enrich):
 
     roles = ["assignee", "reporter", "creator"]

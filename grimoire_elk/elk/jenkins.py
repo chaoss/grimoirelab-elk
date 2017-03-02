@@ -29,6 +29,10 @@ from dateutil import parser
 
 from .enrich import Enrich, metadata
 
+
+logger = logging.getLogger(__name__)
+
+
 class JenkinsEnrich(Enrich):
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
@@ -51,12 +55,12 @@ class JenkinsEnrich(Enrich):
         """
         self.nodes_rename_file = nodes_rename_file
         self.__load_node_renames()
-        logging.info("Jenkis node rename file active: %s", nodes_rename_file)
+        logger.info("Jenkis node rename file active: %s", nodes_rename_file)
 
     def __load_node_renames(self):
         # In OPNFV nodes could be renamed
         if not self.nodes_rename_file:
-            logging.debug("Jenkis node rename file not defined.")
+            logger.debug("Jenkis node rename file not defined.")
             return
         try:
             with open(self.nodes_rename_file, 'r') as csvfile:
@@ -68,7 +72,7 @@ class JenkinsEnrich(Enrich):
                     if len(rename) > 1:
                         self.nodes_rename[name] = rename[1]
         except FileNotFoundError:
-            logging.info("Jenkis node rename file not found %s",
+            logger.info("Jenkis node rename file not found %s",
                          self.nodes_rename_file)
 
     def get_elastic_mappings(self):
@@ -144,8 +148,8 @@ class JenkinsEnrich(Enrich):
             extra_fields['loop'] = components[-2]
             extra_fields['branch'] = components[-1]
         except IndexError as ex:
-            logging.error('Problems parsing job name %s', job_name)
-            logging.error(ex)
+            logger.error('Problems parsing job name %s', job_name)
+            logger.error(ex)
 
         return extra_fields
 

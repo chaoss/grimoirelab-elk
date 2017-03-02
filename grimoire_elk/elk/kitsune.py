@@ -32,6 +32,9 @@ from .enrich import Enrich, metadata
 from .utils import get_time_diff_days
 
 
+logger = logging.getLogger(__name__)
+
+
 class KitsuneEnrich(Enrich):
 
     def get_field_author(self):
@@ -205,7 +208,7 @@ class KitsuneEnrich(Enrich):
 
         url = self.elastic.index_url+'/items/_bulk'
 
-        logging.debug("Adding items to %s (in %i packs)", url, max_items)
+        logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
         for item in items:
             if current >= max_items:

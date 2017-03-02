@@ -29,6 +29,10 @@ from dateutil import parser
 
 from .enrich import Enrich, metadata
 
+
+logger = logging.getLogger(__name__)
+
+
 class RSSEnrich(Enrich):
 
     def get_elastic_mappings(self):

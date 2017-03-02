@@ -29,6 +29,10 @@ from .enrich import Enrich, metadata
 
 from .utils import unixtime_to_datetime
 
+
+logger = logging.getLogger(__name__)
+
+
 class MeetupEnrich(Enrich):
 
 
@@ -330,5 +334,5 @@ class MeetupEnrich(Enrich):
             nrsvps += self.elastic.bulk_upload(rich_item_rsvps,
                                                self.get_field_unique_id_rsvps())
 
-        logging.info("Total comments enriched: %i", ncom)
-        logging.info("Total nrsvps enriched: %i", nrsvps)
+        logger.info("Total comments enriched: %i", ncom)
+        logger.info("Total nrsvps enriched: %i", nrsvps)

@@ -30,6 +30,10 @@ import email.utils
 
 from .enrich import Enrich, metadata
 
+
+logger = logging.getLogger(__name__)
+
+
 class MBoxEnrich(Enrich):
 
     def get_field_author(self):
@@ -173,7 +177,7 @@ class MBoxEnrich(Enrich):
 
         url = self.elastic.index_url+'/items/_bulk'
 
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+        logger.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
         for item in items:
             if current >= max_items:
@@ -192,7 +196,7 @@ class MBoxEnrich(Enrich):
             self.requests.put(url, data = bulk_json)
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
-            logging.error("Encoding error ... converting bulk to iso-8859-1")
+            logger.error("Encoding error ... converting bulk to iso-8859-1")
             bulk_json = bulk_json.encode('iso-8859-1','ignore')
             self.requests.put(url, data=bulk_json)
 

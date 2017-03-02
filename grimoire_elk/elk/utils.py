@@ -25,8 +25,14 @@
 
 import datetime
 import json
+import logging
 
 from dateutil import parser, tz
+
+
+logger = logging.getLogger(__name__)
+
+
 
 def get_repository_filter(perceval_backend, perceval_backend_name,
                           term=False):

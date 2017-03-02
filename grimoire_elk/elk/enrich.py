@@ -36,8 +36,6 @@ from os import path
 from dateutil import parser
 from functools import lru_cache
 
-logger = logging.getLogger(__name__)
-
 try:
     import MySQLdb
     MYSQL_LIBS = True
@@ -57,8 +55,11 @@ except ImportError:
     logger.info("SortingHat not available")
     SORTINGHAT_LIBS = False
 
+
 DEFAULT_PROJECT = 'Main'
 DEFAULT_DB_USER = 'root'
+logger = logging.getLogger(__name__)
+
 
 def metadata(func):
     """Add metadata to an item.
@@ -116,7 +117,7 @@ class Enrich(object):
                                                         db_host)
 
         if self.prjs_map and json_projects:
-            # logging.info("Comparing db and json projects")
+            # logger.info("Comparing db and json projects")
             # self.__compare_projects_map(self.prjs_map, self.json_projects)
             pass
 
@@ -137,7 +138,7 @@ class Enrich(object):
             self.gelk_version = subprocess.check_output(["git", "-C", git_path, "describe"]).strip()
             self.gelk_version = self.gelk_version.decode("utf-8")
         except subprocess.CalledProcessError:
-            logging.warning("Can't get the gelk version. %s", __file__)
+            logger.warning("Can't get the gelk version. %s", __file__)
             self.gelk_version = 'Unknown'
 
         # params used to configure the backend
@@ -171,10 +172,10 @@ class Enrich(object):
                 for repo in json[project][ds]:
                     if repo in ds_repo_to_prj[ds]:
                         if project == ds_repo_to_prj[ds][repo]:
-                            logging.debug("Duplicated repo: %s %s %s", ds, repo, project)
+                            logger.debug("Duplicated repo: %s %s %s", ds, repo, project)
                         else:
                             if len(project.split(".")) > len(ds_repo_to_prj[ds][repo].split(".")):
-                                logging.debug("Changed repo project because we found a leaf: %s leaf vs %s (%s, %s)",
+                                logger.debug("Changed repo project because we found a leaf: %s leaf vs %s (%s, %s)",
                                               project, ds_repo_to_prj[ds][repo], repo, ds)
                                 ds_repo_to_prj[ds][repo] = project
                     else:
@@ -204,7 +205,7 @@ class Enrich(object):
                 if project not in db_projects:
                     db_projects.append(project)
                 if project not in json:
-                    logging.error("Project not found in JSON ", project)
+                    logger.error("Project not found in JSON ", project)
                     raise
                 else:
                     if ds == 'mls':
@@ -212,13 +213,13 @@ class Enrich(object):
                         repo_mls = repo_mls.replace(".mbox", "")
                         repository = 'https://dev.eclipse.org/mailman/listinfo/' + repo_mls
                     if ds_map_db[ds] not in json[project]:
-                        logging.error("db repository not found in json %s", repository)
+                        logger.error("db repository not found in json %s", repository)
                     elif repository not in json[project][ds_map_db[ds]]:
-                        logging.error("db repository not found in json %s", repository)
+                        logger.error("db repository not found in json %s", repository)
 
         for project in json.keys():
             if project not in db_projects:
-                logging.debug("JSON project %s not found in db" % project)
+                logger.debug("JSON project %s not found in db" % project)
 
         # Check that all JSON data is in the database
         for project in json:
@@ -234,10 +235,10 @@ class Enrich(object):
                         # print("Found ", repo, ds)
                         pass
                     else:
-                        logging.debug("Not found repository in db %s %s", repo, ds)
+                        logger.debug("Not found repository in db %s %s", repo, ds)
 
-        logging.debug("Number of db projects: %i", len(db_projects))
-        logging.debug("Number of json projects: %i (>=%i)", len(json.keys()), len(db_projects))
+        logger.debug("Number of db projects: %i", len(db_projects))
+        logger.debug("Number of json projects: %i (>=%i)", len(json.keys()), len(db_projects))
 
     def __get_projects_map(self, db_projects_map, db_user=None, db_password=None, db_host=None):
         # Read the repo to project mapping from a database
@@ -296,21 +297,21 @@ class Enrich(object):
 
         url = self.elastic.index_url+'/items/_bulk'
 
-        logging.debug("Adding items to %s (in %i packs)", url, max_items)
+        logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
         if events:
-            logging.debug("Adding events items")
+            logger.debug("Adding events items")
 
         for item in items:
             if current >= max_items:
                 try:
                     r = self.requests.put(url, data=bulk_json)
                     r.raise_for_status()
-                    logging.debug("Added %i items to %s", total, url)
+                    logger.debug("Added %i items to %s", total, url)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
-                    logging.error("Unicode error in enriched items")
-                    logging.debug(bulk_json)
+                    logger.error("Unicode error in enriched items")
+                    logger.debug(bulk_json)
                     safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
                     self.requests.put(url, data=safe_json)
                 bulk_json = ""
@@ -370,7 +371,7 @@ class Enrich(object):
         try:
             domain = email.split("@")[1]
         except IndexError:
-            # logging.warning("Bad email format: %s" % (identity['email']))
+            # logger.warning("Bad email format: %s" % (identity['email']))
             pass
         return domain
 
@@ -500,7 +501,7 @@ class Enrich(object):
             }
             """ % (filters, order_query)
 
-            logging.debug("%s %s", url, query)
+            logger.debug("%s %s", url, query)
 
             r = self.requests.post(url, data=query)
 
@@ -508,15 +509,15 @@ class Enrich(object):
             res_json = r.json()
         except Exception as e:
             print(e)
-            logging.error("No JSON found in %s", r.text)
-            logging.error("No results found from %s", url)
+            logger.error("No JSON found in %s", r.text)
+            logger.error("No results found from %s", url)
 
         return res_json
 
 
     # Enriched items generator
     def fetch(self, query_string = None):
-        logging.debug("Creating enriched items generator.")
+        logger.debug("Creating enriched items generator.")
 
         elastic_scroll_id = None
 
@@ -533,7 +534,7 @@ class Enrich(object):
                     eitem = hit['_source']
                     yield eitem
             else:
-                logging.error("No results found from %s", self.elastic.index_url)
+                logger.error("No results found from %s", self.elastic.index_url)
                 break
         return
 
@@ -553,9 +554,9 @@ class Enrich(object):
         repository = self.get_project_repository(eitem)
         try:
             project = (self.prjs_map[ds_name][repository])
-            # logging.debug("Project FOUND for repository %s %s", repository, project)
+            # logger.debug("Project FOUND for repository %s %s", repository, project)
         except KeyError:
-            # logging.warning("Project not found for repository %s (data source: %s)", repository, ds_name)
+            # logger.warning("Project not found for repository %s (data source: %s)", repository, ds_name)
             project = None
             # Try to use always the origin in any case
             if ds_name in self.prjs_map and eitem['origin'] in self.prjs_map[ds_name]:
@@ -592,7 +593,7 @@ class Enrich(object):
             try:
                 domain = identity['email'].split("@")[1]
             except IndexError:
-                # logging.warning("Bad email format: %s" % (identity['email']))
+                # logger.warning("Bad email format: %s" % (identity['email']))
                 pass
         return domain
 
@@ -688,11 +689,11 @@ class Enrich(object):
 
         for rol in roles:
             if rol+"_id" not in eitem:
-                logging.warning("Enriched index does not include SH ids for %s. Can not refresh it.", rol+"_id")
+                logger.warning("Enriched index does not include SH ids for %s. Can not refresh it.", rol+"_id")
                 continue
             sh_id = eitem[rol+"_id"]
             if not sh_id:
-                logging.warning("%s_id is None", sh_id)
+                logger.warning("%s_id is None", sh_id)
                 continue
             if rol == author_field:
                 sh_id_author = sh_id

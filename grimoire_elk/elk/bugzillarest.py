@@ -32,6 +32,10 @@ from .enrich import Enrich, metadata
 
 from .utils import get_time_diff_days
 
+
+logger = logging.getLogger(__name__)
+
+
 class BugzillaRESTEnrich(Enrich):
 
     def get_field_author(self):
@@ -77,7 +81,7 @@ class BugzillaRESTEnrich(Enrich):
     def get_rich_item(self, item):
 
         if 'id' not in item['data']:
-            logging.warning("Dropped bug without bug_id %s" % (item))
+            logger.warning("Dropped bug without bug_id %s" % (item))
             return None
 
         eitem = {}

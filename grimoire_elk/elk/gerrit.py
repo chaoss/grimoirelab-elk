@@ -29,8 +29,11 @@ import json
 import logging
 import time
 
-
 from .enrich import Enrich, metadata
+
+
+logger = logging.getLogger(__name__)
+
 
 class GerritEnrich(Enrich):
 

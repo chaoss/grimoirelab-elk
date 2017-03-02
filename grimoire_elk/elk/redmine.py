@@ -33,6 +33,10 @@ from .enrich import Enrich
 from .utils import get_time_diff_days
 
 
+logger = logging.getLogger(__name__)
+
+
+
 class RedmineEnrich(Enrich):
 
     def get_elastic_mappings(self):

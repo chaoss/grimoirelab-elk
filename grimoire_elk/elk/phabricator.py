@@ -35,6 +35,8 @@ from .utils import get_time_diff_days, unixtime_to_datetime
 
 TASK_OPEN_STATUS = 'open'
 TASK_CLOSED_STATUS = 'resolved'
+logger = logging.getLogger(__name__)
+
 
 class PhabricatorEnrich(Enrich):
 
@@ -192,7 +194,7 @@ class PhabricatorEnrich(Enrich):
             elif event['type'] == 'core:subscribers':
                 event['newValue']= ",".join(t['newValue'])
             else:
-                # logging.debug("Event type %s old to new value not supported", t['transactionType'])
+                # logger.debug("Event type %s old to new value not supported", t['transactionType'])
                 pass
 
             for f in task_fields_nochange:

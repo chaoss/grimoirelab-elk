@@ -29,6 +29,10 @@ from dateutil import parser
 
 from .enrich import Enrich, metadata
 
+
+logger = logging.getLogger(__name__)
+
+
 class MediaWikiEnrich(Enrich):
 
     def get_field_unique_id_review(self):
@@ -191,7 +195,7 @@ class MediaWikiEnrich(Enrich):
 
         url = self.elastic.index_url+'/items/_bulk'
 
-        logging.debug("Adding items to %s (in %i packs)" % (url, max_items))
+        logger.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
         for item in items:
             rich_item_reviews = self.get_rich_item_reviews(item)

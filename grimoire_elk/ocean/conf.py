@@ -29,6 +29,10 @@ import json
 import logging
 import requests
 
+
+logger = logging.getLogger(__name__)
+
+
 class ConfOcean(object):
 
     conf_index = "conf"
@@ -54,7 +58,7 @@ class ConfOcean(object):
         r = cls.requests_session.get(url)
         if r.status_code != 200:
             cls.requests_session.post(url)
-            logging.info("Creating OceanConf index " + url)
+            logger.info("Creating OceanConf index " + url)
 
 
     @classmethod
@@ -62,13 +66,13 @@ class ConfOcean(object):
         ''' Add a new perceval repository with its arguments '''
 
         if cls.elastic is None:
-            logging.error("Can't add repo to conf. Ocean elastic is not configured")
+            logger.error("Can't add repo to conf. Ocean elastic is not configured")
             return
 
         url = cls.elastic.url + "/" + cls.conf_repos + "/"
         url += cls.elastic.safe_index(unique_id)
 
-        logging.debug("Adding repo to Ocean %s %s" % (url, repo))
+        logger.debug("Adding repo to Ocean %s %s" % (url, repo))
 
         cls.requests_session.post(url, data = json.dumps(repo))
 
@@ -79,7 +83,7 @@ class ConfOcean(object):
         repos = []
 
         if cls.elastic is None:
-            logging.error("Can't get repos. Ocean elastic is not configured")
+            logger.error("Can't get repos. Ocean elastic is not configured")
             return
 
         # TODO: use scrolling API for getting all repos
@@ -102,7 +106,7 @@ class ConfOcean(object):
         repos_ids = []
 
         if cls.elastic is None:
-            logging.error("Can't get repos. Ocean elastic is not configured")
+            logger.error("Can't get repos. Ocean elastic is not configured")
             return
 
         url = cls.elastic.url + "/" + cls.conf_repos + "/_search"

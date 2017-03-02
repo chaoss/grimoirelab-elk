@@ -45,6 +45,7 @@ DEMOGRAPHY_COMMIT_MIN_DATE='1980-01-01'
 # REGEX to extract authors from a multi author commit: several authors present
 # in the Author field in the commit. Used in CloudFoundry
 AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) and (?P<last_author>.* .*) (?P<email>.*)')
+logger = logging.getLogger(__name__)
 
 class GitEnrich(Enrich):
 
@@ -131,14 +132,14 @@ class GitEnrich(Enrich):
                 # Get the usename from GitHub
                 gh_username = self.get_github_login(user_data, rol, commit_hash, github_repo)
                 # Create a new SH identity with name, email from git and username from github
-                logging.debug("Adding new identity %s to SH %s: %s", gh_username, SH_GIT_COMMIT, user)
+                logger.debug("Adding new identity %s to SH %s: %s", gh_username, SH_GIT_COMMIT, user)
                 user = self.get_sh_identity(user_data)
                 user['username'] = gh_username
                 SortingHat.add_identity(self.sh_db, user, SH_GIT_COMMIT)
             else:
                 if user_data not in self.github_logins:
                     self.github_logins[user_data] = sh_identity['username']
-                    logging.debug("GitHub-commit exists. username:%s user:%s",
+                    logger.debug("GitHub-commit exists. username:%s user:%s",
                                   sh_identity['username'], user_data)
 
         commit_hash = item['data']['commit']
@@ -216,18 +217,18 @@ class GitEnrich(Enrich):
                 r.raise_for_status()
             except requests.exceptions.ConnectionError as ex:
                 # Connection error
-                logging.error("Can't get github login for %s in %s because a connection error ", repo, commit_hash)
+                logger.error("Can't get github login for %s in %s because a connection error ", repo, commit_hash)
                 return login
 
             self.rate_limit = int(r.headers['X-RateLimit-Remaining'])
             self.rate_limit_reset_ts = int(r.headers['X-RateLimit-Reset'])
-            logging.debug("Rate limit pending: %s", self.rate_limit)
+            logger.debug("Rate limit pending: %s", self.rate_limit)
             if self.rate_limit <= self.min_rate_to_sleep:
                 seconds_to_reset = self.rate_limit_reset_ts - int(time.time()) + 1
                 if seconds_to_reset < 0:
                     seconds_to_reset = 0
                 cause = "GitHub rate limit exhausted."
-                logging.info("%s Waiting %i secs for rate limit reset.", cause, seconds_to_reset)
+                logger.info("%s Waiting %i secs for rate limit reset.", cause, seconds_to_reset)
                 time.sleep(seconds_to_reset)
                 # Retry once we have rate limit
                 r = self.requests.get(commit_url, headers=headers)
@@ -236,7 +237,7 @@ class GitEnrich(Enrich):
                 r.raise_for_status()
             except requests.exceptions.HTTPError as ex:
                 # commit not found probably or rate limit exhausted
-                logging.error("Can't find commit %s %s", commit_url, ex)
+                logger.error("Can't find commit %s %s", commit_url, ex)
                 return login
 
             commit_json = r.json()
@@ -257,11 +258,11 @@ class GitEnrich(Enrich):
             elif rol == "committer":
                 login = user_login
             else:
-                logging.error("Wrong rol: %s" % (rol))
+                logger.error("Wrong rol: %s" % (rol))
                 raise RuntimeError
 
             self.github_logins[user] = login
-            logging.debug("%s is %s in github (not found %i authors %i committers )", user, login,
+            logger.debug("%s is %s in github (not found %i authors %i committers )", user, login,
                           self.github_logins_author_not_found,
                           self.github_logins_committer_not_found)
 
@@ -317,7 +318,7 @@ class GitEnrich(Enrich):
                     lines_added += int(cfile["added"])
                     lines_removed += int(cfile["removed"])
                 except ValueError:
-                    # logging.warning(cfile)
+                    # logger.warning(cfile)
                     continue
         eitem["lines_added"] = lines_added
         eitem["lines_removed"] = lines_removed
@@ -391,30 +392,30 @@ class GitEnrich(Enrich):
 
         url = self.elastic.index_url+'/items/_bulk'
 
-        logging.debug("Adding items to %s (in %i packs)", url, max_items)
+        logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
         for item in items:
             # Check multi author
             m = AUTHOR_P2P_REGEX.match(item['data']['Author'])
             if m:
-                logging.warning("Multiauthor detected. Creating one commit " +
+                logger.warning("Multiauthor detected. Creating one commit " +
                                  "per author: %s", item['data']['Author'])
                 item['data']['authors'] = self.__get_authors(item['data']['Author'])
                 item['data']['Author'] = item['data']['authors'][0]
             m = AUTHOR_P2P_REGEX.match(item['data']['Commit'])
             if m:
-                logging.warning("Multicommitter detected: using just the first committer")
+                logger.warning("Multicommitter detected: using just the first committer")
                 item['data']['committers'] = self.__get_authors(item['data']['Commit'])
                 item['data']['Commit'] = item['data']['committers'][0]
             if current >= max_items:
                 try:
                     r = self.requests.put(url, data=bulk_json)
                     r.raise_for_status()
-                    logging.debug("Added %i items to %s", total, url)
+                    logger.debug("Added %i items to %s", total, url)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
-                    logging.error("Unicode error in enriched items")
-                    logging.debug(bulk_json)
+                    logger.error("Unicode error in enriched items")
+                    logger.debug(bulk_json)
                     safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
                     self.requests.put(url, data=safe_json)
                 bulk_json = ""
@@ -433,7 +434,7 @@ class GitEnrich(Enrich):
                 # First author already added in the above commit
                 authors = item['data']['authors']
                 for i in range(1, len(authors)):
-                    # logging.debug('Adding a new commit for %s', authors[i])
+                    # logger.debug('Adding a new commit for %s', authors[i])
                     item['data']['Author'] = authors[i]
                     item['data']['is_git_commit_multi_author'] = 1
                     rich_item = self.get_rich_item(item)
@@ -455,7 +456,7 @@ class GitEnrich(Enrich):
                 if item['data']['Author'] in authors:
                     authors.remove(item['data']['Author'])
                 for author in authors:
-                    # logging.debug('Adding a new commit for %s', author)
+                    # logger.debug('Adding a new commit for %s', author)
                     # Change the Author in the original commit and generate
                     # a new enriched item with it
                     item['data']['Author'] = author
@@ -477,19 +478,19 @@ class GitEnrich(Enrich):
         r = self.requests.put(url, data=bulk_json)
         r.raise_for_status()
 
-        logging.info("Signed-off commits generated: %i", total_signed_off)
-        logging.info("Multi author commits generated: %i", total_multi_author)
+        logger.info("Signed-off commits generated: %i", total_signed_off)
+        logger.info("Multi author commits generated: %i", total_multi_author)
 
         return total
 
 
     def enrich_demography(self, from_date=None):
-        logging.debug("Doing demography enrich from %s", self.elastic.index_url)
+        logger.debug("Doing demography enrich from %s", self.elastic.index_url)
 
         if from_date:
             # The from_date must be max author_max_date
             from_date = self.elastic.get_last_item_field("author_max_date")
-            logging.debug("Demography since: %s", from_date)
+            logger.debug("Demography since: %s", from_date)
 
         date_field = self.get_field_date()
 
@@ -549,14 +550,14 @@ class GitEnrich(Enrich):
         }
         """ % (query)
 
-        logging.debug(es_query)
+        logger.debug(es_query)
 
         r = self.requests.post(self.elastic.index_url+"/_search", data=es_query, verify=False)
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
-            logging.error("Error getting authors mix and max date. Demography aborted.")
-            logging.error(ex)
+            logger.error("Error getting authors mix and max date. Demography aborted.")
+            logger.error(ex)
             return
 
         authors = r.json()['aggregations']['author']['buckets']
@@ -588,7 +589,7 @@ class GitEnrich(Enrich):
             r = self.requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str, verify=False)
 
             if "hits" not in r.json():
-                logging.error("Can't find commits for %s" % (author['key']))
+                logger.error("Can't find commits for %s" % (author['key']))
                 print(r.json())
                 print(author_query)
                 continue
@@ -605,8 +606,8 @@ class GitEnrich(Enrich):
                 author_items = []
 
             nauthors_done += 1
-            logging.info("Authors processed %i/%i" % (nauthors_done, len(authors)))
+            logger.info("Authors processed %i/%i" % (nauthors_done, len(authors)))
 
         self.elastic.bulk_upload(author_items, "ocean-unique-id")
 
-        logging.debug("Completed demography enrich from %s" % (self.elastic.index_url))
+        logger.debug("Completed demography enrich from %s" % (self.elastic.index_url))

@@ -26,6 +26,10 @@ import logging
 
 from .enrich import Enrich, metadata
 
+
+logger = logging.getLogger(__name__)
+
+
 class ReMoEnrich(Enrich):
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
@@ -103,7 +107,7 @@ class ReMoEnrich(Enrich):
         elif 'first_name' in item:
             category = 'users'
         else:
-            logging.error("Can not detect category in item %s", item)
+            logger.error("Can not detect category in item %s", item)
 
         return category
 

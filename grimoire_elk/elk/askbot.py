@@ -31,6 +31,9 @@ from .utils import get_time_diff_days, unixtime_to_datetime
 
 from .enrich import Enrich, metadata
 
+logger = logging.getLogger(__name__)
+
+
 class AskbotEnrich(Enrich):
 
     def get_identities(self, item):
@@ -263,7 +266,7 @@ class AskbotEnrich(Enrich):
 
     def enrich_items(self, items):
         nitems = super(AskbotEnrich, self).enrich_items(items)
-        logging.info("Total questions enriched: %i", nitems)
+        logger.info("Total questions enriched: %i", nitems)
 
         # And now for each item we want also the answers (tops)
         nanswers = 0
@@ -282,5 +285,5 @@ class AskbotEnrich(Enrich):
         if rich_item_comments:
             ncomments += self.elastic.bulk_upload(rich_item_comments,
                                                   self.get_field_unique_id_comment())
-        logging.info("Total answers enriched: %i", nanswers)
-        logging.info("Total comments enriched: %i", ncomments)
+        logger.info("Total answers enriched: %i", nanswers)
+        logger.info("Total comments enriched: %i", ncomments)

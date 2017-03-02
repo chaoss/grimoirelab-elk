@@ -32,7 +32,9 @@ from sortinghat.db.model import Identity, UniqueIdentity
 from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
 from sortinghat.matcher import create_identity_matcher
 
+
 logger = logging.getLogger(__name__)
+
 
 class SortingHat(object):
 
@@ -83,13 +85,13 @@ class SortingHat(object):
         except AlreadyExistsError as ex:
             uuid = ex.uuid
         except WrappedValueError as ex:
-            logging.warning("Trying to add a None identity. Ignoring it.")
+            logger.warning("Trying to add a None identity. Ignoring it.")
         except UnicodeEncodeError as ex:
-            logging.warning("UnicodeEncodeError. Ignoring it. %s %s %s",
+            logger.warning("UnicodeEncodeError. Ignoring it. %s %s %s",
                             identity['email'], identity['name'],
                             identity['username'])
         except Exception as ex:
-            logging.warning("Unknown exception adding identity. Ignoring it. %s %s %s",
+            logger.warning("Unknown exception adding identity. Ignoring it. %s %s %s",
                             identity['email'], identity['name'],
                             identity['username'])
             traceback.print_exc()
@@ -118,4 +120,4 @@ class SortingHat(object):
             cls.add_identity(db, identity, backend)
             total +=1
 
-        logging.info("Total identities added to SH: %i", total)
+        logger.info("Total identities added to SH: %i", total)

@@ -22,10 +22,15 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import logging
+
 from dateutil import parser
 
-
 from .enrich import Enrich, metadata
+
+
+logger = logging.getLogger(__name__)
+
 
 
 class TelegramEnrich(Enrich):

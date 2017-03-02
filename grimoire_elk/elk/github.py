@@ -35,7 +35,10 @@ from .utils import get_time_diff_days
 
 from .enrich import Enrich, metadata
 
+
 GITHUB = 'https://github.com/'
+logger = logging.getLogger(__name__)
+
 
 class GitHubEnrich(Enrich):
 
@@ -116,12 +119,12 @@ class GitHubEnrich(Enrich):
             r = self.requests.get(url, params=params)
 
             try:
-                logging.debug("Using Maps API to find %s" % (location))
+                logger.debug("Using Maps API to find %s" % (location))
                 r_json = r.json()
                 geo_code = r_json['results'][0]['geometry']['location']
             except:
                 if location not in self.location_not_found:
-                    logging.debug("Can't find geocode for " + location)
+                    logger.debug("Can't find geocode for " + location)
                     self.location_not_found.append(location)
 
             if geo_code:
@@ -150,7 +153,7 @@ class GitHubEnrich(Enrich):
         type_items = r.json()
 
         if 'hits' not in type_items:
-            logging.info("No github %s data in ES" % (kind))
+            logger.info("No github %s data in ES" % (kind))
 
         else:
             while len(type_items['hits']['hits']) > 0:
@@ -176,7 +179,7 @@ class GitHubEnrich(Enrich):
 
         url = self.elastic.url + "/github/geolocations/_bulk"
 
-        logging.debug("Adding geoloc to %s (in %i packs)" % (url, max_items))
+        logger.debug("Adding geoloc to %s (in %i packs)" % (url, max_items))
 
 
         for loc in self.geolocations:
@@ -200,7 +203,7 @@ class GitHubEnrich(Enrich):
 
         self.requests.put(url, data = bulk_json)
 
-        logging.debug("Adding geoloc to ES Done")
+        logger.debug("Adding geoloc to ES Done")
 
 
     def get_elastic_mappings(self):
@@ -342,7 +345,7 @@ class GitHubEnrich(Enrich):
     def enrich_items(self, items):
         total = super(GitHubEnrich, self).enrich_items(items)
 
-        logging.debug("Updating GitHub users geolocations in Elastic")
+        logger.debug("Updating GitHub users geolocations in Elastic")
         self.geo_locations_to_es() # Update geolocations in Elastic
 
         return total

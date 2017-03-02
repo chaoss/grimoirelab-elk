@@ -23,7 +23,13 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import logging
+
 from .database import Database
+
+
+logger = logging.getLogger(__name__)
+
 
 class GrimoireLibProjects(object):
 

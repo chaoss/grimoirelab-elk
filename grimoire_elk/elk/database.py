@@ -26,6 +26,10 @@
 import logging
 import MySQLdb
 
+
+logger = logging.getLogger(__name__)
+
+
 # https://github.com/jgbarah/Grimoire-demo/blob/master/grimoire-ng-data.py#L338
 class Database:
     """To work with a database (likely including several schemas).
@@ -52,7 +56,7 @@ class Database:
                                  use_unicode = True)
             return db, db.cursor()
         except:
-            logging.error("Database connection error")
+            logger.error("Database connection error")
             raise
 
     def execute(self, query):

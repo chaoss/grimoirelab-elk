@@ -27,6 +27,10 @@ import logging
 
 from grimoire_elk.elk.enrich import Enrich
 
+
+logger = logging.getLogger(__name__)
+
+
 class MozillaClubEnrich(Enrich):
 
     def set_elastic(self, elastic):
@@ -128,7 +132,7 @@ class MozillaClubEnrich(Enrich):
 
         url = self.elastic.index_url+'/items/_bulk'
 
-        logging.debug("Adding items to %s (in %i packs)", url, max_items)
+        logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
         for item in items:
             if current >= max_items:

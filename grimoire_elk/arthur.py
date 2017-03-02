@@ -36,7 +36,9 @@ from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
 from .elk.utils import get_repository_filter
 
+
 logger = logging.getLogger(__name__)
+
 
 def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None):
@@ -146,7 +148,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
 def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     """ Get all items that include uuid """
 
-    # logging.debug("Getting items for merged uuid %s "  % (uuid))
+    # logger.debug("Getting items for merged uuid %s "  % (uuid))
 
     uuid_fields = enrich_backend.get_fields_uuid()
 
@@ -176,7 +178,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     eitems = r.json()['hits']['hits']
 
     if len(eitems) == 0:
-        # logging.warning("No enriched items found for uuid: %s " % (uuid))
+        # logger.warning("No enriched items found for uuid: %s " % (uuid))
         return []
 
     items_ids = []

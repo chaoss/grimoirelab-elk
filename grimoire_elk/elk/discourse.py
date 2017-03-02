@@ -31,6 +31,10 @@ from .utils import get_time_diff_days
 
 from .enrich import Enrich, metadata
 
+
+logger = logging.getLogger(__name__)
+
+
 class DiscourseEnrich(Enrich):
 
     def get_identities(self, item):
@@ -174,7 +178,7 @@ class DiscourseEnrich(Enrich):
 
     def enrich_items(self, items):
         nitems = super(DiscourseEnrich, self).enrich_items(items)
-        logging.info("Total questions enriched: %i", nitems)
+        logger.info("Total questions enriched: %i", nitems)
 
         # And now for each item we want also the answers (tops)
         nanswers = 0
@@ -186,4 +190,4 @@ class DiscourseEnrich(Enrich):
         if rich_item_answers:
             nanswers += self.elastic.bulk_upload(rich_item_answers,
                                                  self.get_field_unique_id_answer())
-        logging.info("Total answers enriched: %i", nanswers)
+        logger.info("Total answers enriched: %i", nanswers)

@@ -117,6 +117,10 @@ from perceval.backends.mozilla.remo import ReMo, ReMoCommand
 from .elk.elastic import ElasticSearch
 from .elk.elastic import ElasticConnectException
 
+
+logger = logging.getLogger(__name__)
+
+
 def get_connector_from_name(name):
     found = None
     connectors = get_connectors()
@@ -186,7 +190,7 @@ def get_elastic(url, es_index, clean = None, backend = None):
         elastic = ElasticSearch(url, es_index, mapping, clean, insecure, analyzers)
 
     except ElasticConnectException:
-        logging.error("Can't connect to Elastic Search. Is it running?")
+        logger.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
 
     return elastic

@@ -29,6 +29,10 @@ import logging
 
 from .elastic import ElasticOcean
 
+
+logger = logging.getLogger(__name__)
+
+
 class MBoxOcean(ElasticOcean):
     """MBox Ocean feeder"""
 
@@ -54,7 +58,7 @@ class MBoxOcean(ElasticOcean):
         if "Message-ID" in item["data"] and item["data"]["Message-ID"]:
             item["ocean-unique-id"] = item["data"]["Message-ID"]+"_"+item['origin']
         else:
-            logging.warning("No Message-ID in %s %s" % (item["data"]["Subject"], item['origin']))
+            logger.warning("No Message-ID in %s %s" % (item["data"]["Subject"], item['origin']))
             item["ocean-unique-id"] = "NONE_"+item['origin']
 
     @classmethod

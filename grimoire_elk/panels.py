@@ -33,6 +33,9 @@ import requests
 from .elk.elastic import ElasticSearch
 
 
+logger = logging.getLogger(__name__)
+
+
 def get_dashboard_json(elastic, dashboard):
     dash_json_url = elastic.index_url+"/dashboard/"+dashboard
 
@@ -40,7 +43,7 @@ def get_dashboard_json(elastic, dashboard):
 
     dash_json = r.json()
     if "_source" not in dash_json:
-        logging.error("Can not find dashboard: %s", dashboard)
+        logger.error("Can not find dashboard: %s", dashboard)
         print (dash_json_url)
         sys.exit(1)
 
@@ -53,7 +56,7 @@ def get_vis_json(elastic, vis):
 
     vis_json = r.json()
     if "_source" not in vis_json:
-        logging.error("Can not find vis: %s (%s)", vis, vis_json_url)
+        logger.error("Can not find vis: %s (%s)", vis, vis_json_url)
         return
 
     return vis_json['_source']
@@ -65,7 +68,7 @@ def get_search_json(elastic, search_id):
 
     search_json = r.json()
     if "_source" not in search_json:
-        logging.error("Can not find search: %s", search_json_url)
+        logger.error("Can not find search: %s", search_json_url)
         return
     return search_json['_source']
 
@@ -76,7 +79,7 @@ def get_index_pattern_json(elastic, index_pattern):
 
     index_pattern_json = r.json()
     if "_source" not in index_pattern_json:
-        logging.error("Can not find index_pattern_json: %s", index_pattern_json_url)
+        logger.error("Can not find index_pattern_json: %s", index_pattern_json_url)
         return
     return index_pattern_json['_source']
 
@@ -110,13 +113,13 @@ def create_search(elastic_url, dashboard, index_pattern, es_index=None):
 
     # First vis
     if "panelsJSON" not in dash_data:
-        logging.error("Can not find vis in dashboard: %s", dashboard)
+        logger.error("Can not find vis in dashboard: %s", dashboard)
         raise
 
     # Get the search from the first vis in the panel
     for panel in json.loads(dash_data["panelsJSON"]):
         panel_id = panel["id"]
-        logging.debug("Checking search in %s vis", panel_id)
+        logger.debug("Checking search in %s vis", panel_id)
 
         search_id = get_search_from_vis(elastic, panel_id)
         if search_id:
@@ -124,10 +127,10 @@ def create_search(elastic_url, dashboard, index_pattern, es_index=None):
 
     # And now time to create the search found
     if not search_id:
-        logging.info("Can't find search  %s", dashboard)
+        logger.info("Can't find search  %s", dashboard)
         return
 
-    logging.debug("Found template search %s", search_id)
+    logger.debug("Found template search %s", search_id)
 
     search_json = get_search_json(elastic, search_id)
     search_source = search_json['kibanaSavedObjectMeta']['searchSourceJSON']
@@ -142,7 +145,7 @@ def create_search(elastic_url, dashboard, index_pattern, es_index=None):
     url = elastic.index_url+"/search/"+new_search_id
     requests.post(url, data = json.dumps(search_json), verify=False)
 
-    logging.debug("New search created: %s", url)
+    logger.debug("New search created: %s", url)
 
     return new_search_id
 
@@ -192,14 +195,14 @@ def create_index_pattern(elastic_url, dashboard, enrich_index, es_index=None):
 
     # First vis
     if "panelsJSON" not in dash_data:
-        logging.error("Can not find vis in dashboard: %s", dashboard)
+        logger.error("Can not find vis in dashboard: %s", dashboard)
         raise
 
     # Get the index pattern from the first vis in the panel
     # that as index pattern data
     for panel in json.loads(dash_data["panelsJSON"]):
         panel_id = panel["id"]
-        logging.debug("Checking index pattern in %s vis", panel_id)
+        logger.debug("Checking index pattern in %s vis", panel_id)
 
         index_pattern = get_index_pattern_from_vis(elastic, panel_id)
         if index_pattern:
@@ -207,10 +210,10 @@ def create_index_pattern(elastic_url, dashboard, enrich_index, es_index=None):
 
     # And now time to create the index pattern found
     if not index_pattern:
-        logging.error("Can't find index pattern for %s", dashboard)
+        logger.error("Can't find index pattern for %s", dashboard)
         raise
 
-    logging.debug("Found %s template index pattern", index_pattern)
+    logger.debug("Found %s template index pattern", index_pattern)
 
 
     new_index_pattern_json = get_index_pattern_json(elastic, index_pattern)
@@ -219,7 +222,7 @@ def create_index_pattern(elastic_url, dashboard, enrich_index, es_index=None):
     url = elastic.index_url+"/index-pattern/"+enrich_index
     requests.post(url, data = json.dumps(new_index_pattern_json), verify=False)
 
-    logging.debug("New index pattern created: %s", url)
+    logger.debug("New index pattern created: %s", url)
 
     return enrich_index
 
@@ -263,7 +266,7 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
             if vis['_id'] in dash_vis_ids:
                 visualizations.append(vis)
 
-        logging.info("Total template vis found: %i", len(visualizations))
+        logger.info("Total template vis found: %i", len(visualizations))
 
         for vis in visualizations:
             vis_data = vis['_source']
@@ -279,7 +282,7 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
             url = item_template_url+"/"+vis_id
 
             r = requests.post(url, data = json.dumps(vis_data), verify=False)
-            logging.debug("Created new vis %s", url)
+            logger.debug("Created new vis %s", url)
 
     if not es_index:
         es_index = ".kibana"
@@ -319,7 +322,7 @@ def list_dashboards(elastic_url, es_index=None):
     res_json = r.json()
 
     if "hits" not in res_json:
-        logging.error("Can't find dashboards")
+        logger.error("Can't find dashboards")
         raise RuntimeError("Can't find dashboards")
 
     for dash in res_json["hits"]["hits"]:
@@ -334,27 +337,27 @@ def get_dashboard_name(import_file):
         try:
             kibana = json.loads(f.read())
         except ValueError:
-            logging.error("Wrong file format")
+            logger.error("Wrong file format")
 
         if 'dashboard' not in kibana:
-            logging.error("Wrong file format. Can't find 'dashboard' field.")
+            logger.error("Wrong file format. Can't find 'dashboard' field.")
         name = kibana['dashboard']['id']
 
     return name
 
 def import_dashboard(elastic_url, import_file, es_index=None):
-    logging.debug("Reading from %s the JSON for the dashboard to be imported",
+    logger.debug("Reading from %s the JSON for the dashboard to be imported",
                   import_file)
 
     with open(import_file, 'r') as f:
         try:
             kibana = json.loads(f.read())
         except ValueError:
-            logging.error("Wrong file format")
+            logger.error("Wrong file format")
             sys.exit(1)
 
         if 'dashboard' not in kibana:
-            logging.error("Wrong file format. Can't find 'dashboard' field.")
+            logger.error("Wrong file format. Can't find 'dashboard' field.")
             sys.exit(1)
 
         if not es_index:
@@ -379,7 +382,7 @@ def import_dashboard(elastic_url, import_file, es_index=None):
                 url = elastic.index_url+"/visualization"+"/"+vis['id']
                 requests.post(url, data = json.dumps(vis['value']), verify=False)
 
-        logging.debug("Done")
+        logger.debug("Done")
 
 
 def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
@@ -394,7 +397,7 @@ def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
     search_ids_done = []
     index_ids_done = []
 
-    logging.debug("Exporting dashboard %s to %s", dash_id, export_file)
+    logger.debug("Exporting dashboard %s to %s", dash_id, export_file)
     if not es_index:
         es_index = ".kibana"
 
@@ -428,7 +431,7 @@ def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
             kibana["searches"].append({"id":search_id,
                                        "value":get_search_json(elastic, search_id)})
 
-    logging.debug("Done")
+    logger.debug("Done")
 
     with open(export_file, 'w') as f:
         f.write(json.dumps(kibana, indent=4, sort_keys=True))
