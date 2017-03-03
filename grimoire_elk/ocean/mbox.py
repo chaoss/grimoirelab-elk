@@ -54,6 +54,8 @@ class MBoxOcean(ElasticOcean):
         }
         '''
 
+        return {"items":mapping}
+
     def _fix_item(self, item):
         if "Message-ID" in item["data"] and item["data"]["Message-ID"]:
             item["ocean-unique-id"] = item["data"]["Message-ID"]+"_"+item['origin']
