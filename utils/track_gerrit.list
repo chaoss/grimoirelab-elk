@@ -1,0 +1,24 @@
+# Upstream contributions, bitergia will crawl this and extract the relevant information
+# system is one of Gerrit, Bugzilla, Launchpad (insert more)
+---
+-
+  url: https://review.openstack.org/169836
+  system: Gerrit
+-
+  url: https://review.openstack.org/184086
+  system: Gerrit
+-
+  url: https://review.openstack.org/185279
+  system: Gerrit
+-
+  url: https://review.openstack.org/185280
+  system: Gerrit
+-
+  url: https://review.openstack.org/197063
+  system: Gerrit
+-
+  url: https://review.openstack.org/184086
+  system: Gerrit
+-
+  url: https://review.openstack.org/209766
+  system: Gerrit
