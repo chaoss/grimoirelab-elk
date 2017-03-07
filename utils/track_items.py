@@ -172,10 +172,6 @@ def enrich_gerrit_items(es, gerrit_numbers):
     # Then enrich
 
     for review in reviews:
-        # Add ocean metadata to the review
-        # print(json.dumps(review, indent=True))
-        # raise
-        ElasticOcean.add_update_date(review)
         enriched_items.append(enricher.get_rich_item(review))
 
     return enriched_items
