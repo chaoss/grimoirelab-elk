@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-#
-# Copyright (C) 2016 Bitergia
+# Copyright (C) 2017 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +22,7 @@
 #
 
 import argparse
+import json
 import logging
 
 import requests
@@ -126,8 +126,8 @@ def get_gerrit_origin(gerrit_uri):
 def get_gerrit_numbers(gerrit_uris):
     # uuid to search the gerrit review in ElasticSearch
     numbers = []
-    for item_uri in item_uris:
-        gerrit_number = get_gerrit_number(item_uri)
+    for gerrit_uri in gerrit_uris:
+        gerrit_number = get_gerrit_number(gerrit_uri)
         numbers.append(gerrit_number)
 
     return numbers
@@ -135,29 +135,26 @@ def get_gerrit_numbers(gerrit_uris):
 def get_commits_from_gerrit(es, gerrit_numbers):
     # Get the gerrit reviews from ES and extract the commits sha
 
-    def get_query(number):
-        query = """
-            {
+    def get_query(numbers):
+        query = {
               "query": {
-                "term" : { "data.number" : "%s" }
+                "terms" : { "data.number" : gerrit_numbers}
               }
             }
-        """ % (number)
         return query
 
 
     numbers_found = 0
     commits_sha = []
 
-    for gerrit_number in gerrit_numbers:
-        r = requests.post(es + "/" + es_index + "/_search",
-                          data=get_query(gerrit_number))
-        r.raise_for_status()
-        numbers_found += r.json()["hits"]["total"]
+    r = requests.post(es + "/" + es_index + "/_search",
+                      data=json.dumps(get_query(gerrit_numbers)))
+    r.raise_for_status()
+    numbers_found += r.json()["hits"]["total"]
 
-        for review in r.json()["hits"]["hits"]:
-            for patch in review['_source']['data']['patchSets']:
-                commits_sha.append(patch['revision'])
+    for review in r.json()["hits"]["hits"]:
+        for patch in review['_source']['data']['patchSets']:
+            commits_sha.append(patch['revision'])
 
     logging.info("Total gerrit track items found upstream: %i", numbers_found)
 
@@ -174,8 +171,8 @@ if __name__ == '__main__':
 
     total = 0
 
-    item_uris = fetch_track_items(args.upstream_url, "Gerrit")
-    gerrit_numbers = get_gerrit_numbers(item_uris)
+    gerrit_uris = fetch_track_items(args.upstream_url, "Gerrit")
+    gerrit_numbers = get_gerrit_numbers(gerrit_uris)
 
     # TODO: testing with gerrit uuids already downloaded
     gerrit_numbers = GERRIT_NUMBERS_TEST
@@ -185,7 +182,7 @@ if __name__ == '__main__':
     logging.info("Total commit track items to be imported: %i", len(commits_sha))
 
 
-    # Now we need to enrich all gerrit and commits raw items and publish
+    # Now we need to enrich all gerrit and commits track raw items and publish
     # them to the OPNFV ES enriched indexes for gerrit and git
 
     # total = elastic.bulk_upload(tweets, "id_str")
