@@ -37,3 +37,25 @@ class SupybotOcean(ElasticOcean):
         params = url.split()
 
         return params
+
+    def get_elastic_mappings(self):
+        # immense term in field="message"
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "body": {
+                                "type":"string"
+                            },
+                            "message": {
+                                "type":"string"
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
+        return {"items":mapping}

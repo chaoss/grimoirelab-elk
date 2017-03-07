@@ -33,3 +33,22 @@ class GerritOcean(ElasticOcean):
 
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["data"]["number"]+"_"+item['origin']
+
+    def get_elastic_mappings(self):
+        # immense term in field="data.commitMessage"
+        mapping = '''
+         {
+            "dynamic":true,
+            "properties": {
+                "data": {
+                    "properties": {
+                        "commitMessage": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+        '''
+
+        return {"items":mapping}
