@@ -23,26 +23,57 @@
 #
 
 import argparse
-import hashlib
-import json
 import logging
 
 import requests
 
-from grimoire_elk.elk.elastic import ElasticSearch
+# Logging formats
+LOG_FORMAT = "[%(asctime)s] - %(message)s"
+DEBUG_LOG_FORMAT = "[%(asctime)s - %(name)s - %(levelname)s] - %(message)s"
 
-from perceval.backends.core.gerrit import Gerrit
+OPNFV_UPSTREAM_FILE='https://git.opnfv.org/doctor/plain/UPSTREAM'
+# numbers for already downloaded gerrit reviews fo test with
+GERRIT_NUMBERS_TEST = [
+    "242602",
+    "437760",
+    "442063",
+    "442115",
+    "442143",
+    "438979",
+    "439058",
+    "442111",
+    "441435",
+    "442142"
+]
+
+def configure_logging(debug=False):
+    """Configure logging
+    The function configures log messages. By default, log messages
+    are sent to stderr. Set the parameter `debug` to activate the
+    debug mode.
+    :param debug: set the debug mode
+    """
+    if not debug:
+        logging.basicConfig(level=logging.INFO,
+                            format=LOG_FORMAT)
+        logging.getLogger('requests').setLevel(logging.WARNING)
+        logging.getLogger('urrlib3').setLevel(logging.WARNING)
+    else:
+        logging.basicConfig(level=logging.DEBUG,
+                            format=DEBUG_LOG_FORMAT)
+
 
 def get_params():
     args_parser = argparse.ArgumentParser(usage="usage: track_items [options]",
                                      description="Track items from different data sources.")
     args_parser.add_argument("-e", "--elastic-url", required=True,
                              help="ElasticSearch URL with raw indexes wich includes the items to track")
-    args_parser.add_argument("-f", "--file", required=True, help="File with the items to track")
+    args_parser.add_argument("-u", "--upstream-url", default=OPNFV_UPSTREAM_FILE,
+                             help="URL with upstream file with the items to track")
     args_parser.add_argument('-g', '--debug', dest='debug', action='store_true')
     return args_parser.parse_args()
 
-def fetch_track_items(items_file_path, data_source):
+def fetch_track_items(upstream_file_url, data_source):
     """ The file format is:
 
     # Upstream contributions, bitergia will crawl this and extract the relevant information
@@ -54,106 +85,107 @@ def fetch_track_items(items_file_path, data_source):
     """
 
     track_uris = []
-    with open(items_file_path) as f:
-        for line in f:
-            if 'url: ' in line:
-                ds = next(f).split('system: ')[1].strip('\n')
-                if ds == data_source:
-                    track_uris.append(line.split('url: ')[1].strip('\n'))
+    r = requests.get(upstream_file_url)
+    r.raise_for_status()
+    lines = iter(r.text.split("\n"))
+    for line in lines:
+        if 'url: ' in line:
+            ds = next(lines).split('system: ')[1].strip('\n')
+            if ds == data_source:
+                track_uris.append(line.split('url: ')[1].strip('\n'))
     return track_uris
 
-# TODO: find the best way to reuse uuid from perceval
-def uuid(*args):
-    """Generate a UUID based on the given parameters.
-    The UUID will be the SHA1 of the concatenation of the values
-    from the list. The separator bewteedn these values is ':'.
-    Each value must be a non-empty string, otherwise, the function
-    will raise an exception.
-    :param *args: list of arguments used to generate the UUID
-    :returns: a universal unique identifier
-    :raises ValueError: when anyone of the values is not a string,
-        is empty or `None`.
-    """
-    def check_value(v):
-        if not isinstance(v, str):
-            raise ValueError("%s value is not a string instance" % str(v))
-        elif not v:
-            raise ValueError("value cannot be None or empty")
-        else:
-            return v
+def get_gerrit_number(gerrit_uri):
+    # Get the uuid for this item_uri. Possible formats
+    # https://review.openstack.org/424868/
+    # https://review.openstack.org/#/c/430428
+    # https://review.openstack.org/314915
 
-    s = ':'.join(map(check_value, args))
+    if gerrit_uri[-1] == "/":
+        gerrit_uri = gerrit_uri[:-1]
 
-    sha1 = hashlib.sha1(s.encode('utf-8'))
-    uuid_sha1 = sha1.hexdigest()
+    number = gerrit_uri.rsplit("/", 1)[1]
 
-    return uuid_sha1
+    return number
 
-    s = ':'.join(map(check_value, args))
+def get_gerrit_origin(gerrit_uri):
+    # Get the uuid for this item_uri. Possible formats
+    # https://review.openstack.org/424868/
+    # https://review.openstack.org/#/c/430428
+    # https://review.openstack.org/314915
+    # https://review.openstack.org/314915 redirects to https://review.openstack.org/#/c/314915
 
-    sha1 = hashlib.sha1(s.encode('utf-8'))
-    uuid_sha1 = sha1.hexdigest()
+    if gerrit_uri[-1] == "/":
+        gerrit_uri = gerrit_uri[:-1]
 
-    return uuid_sha1
+    gerrit_uri = gerrit_uri.replace('#/c/','')
+    origin = gerrit_uri.rsplit("/", 1)[0]
+
+    return origin
+
+def get_gerrit_numbers(gerrit_uris):
+    # uuid to search the gerrit review in ElasticSearch
+    numbers = []
+    for item_uri in item_uris:
+        gerrit_number = get_gerrit_number(item_uri)
+        numbers.append(gerrit_number)
+
+    return numbers
+
+def get_commits_from_gerrit(es, gerrit_numbers):
+    # Get the gerrit reviews from ES and extract the commits sha
+
+    def get_query(number):
+        query = """
+            {
+              "query": {
+                "term" : { "data.number" : "%s" }
+              }
+            }
+        """ % (number)
+        return query
+
+
+    numbers_found = 0
+    commits_sha = []
+
+    for gerrit_number in gerrit_numbers:
+        r = requests.post(es + "/" + es_index + "/_search",
+                          data=get_query(gerrit_number))
+        r.raise_for_status()
+        numbers_found += r.json()["hits"]["total"]
+
+        for review in r.json()["hits"]["hits"]:
+            for patch in review['_source']['data']['patchSets']:
+                commits_sha.append(patch['revision'])
+
+    logging.info("Total gerrit track items found upstream: %i", numbers_found)
+
+    return commits_sha
 
 if __name__ == '__main__':
 
     args = get_params()
+    configure_logging(args.debug)
 
-    if args.debug:
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
-        logging.debug("Debug mode activated")
-    else:
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-
-    logging.info("Importing track items from %s ", args.file)
+    logging.info("Importing track items from %s ", args.upstream_url)
 
     es_index = "gerrit_openstack"
-    elastic = ElasticSearch(args.elastic_url, es_index)
 
     total = 0
 
-    item_uris = fetch_track_items(args.file, "Gerrit")
-    item_uuids = []
-    commits_sha = []
+    item_uris = fetch_track_items(args.upstream_url, "Gerrit")
+    gerrit_numbers = get_gerrit_numbers(item_uris)
 
-    for item_uri in item_uris:
-        # Get the uuid for this item_uri
-        gerrit_number = item_uri.rsplit("/", 1)[1]
-        origin = item_uri.rsplit("/", 1)[0]
-        item_uuids.append(uuid(origin, gerrit_number))
-
-    # Now we need for each gerrit review to find all related commits
     # TODO: testing with gerrit uuids already downloaded
-    item_uuids_fake = [
-        "f5f081e6d77cca2171cc08af6bbc8607974fda44",
-        "fa2b18fc9a7a3f0e979122f324436b898f98bfaf",
-        "b2d835892375a8fbce63c91534bcbaa2e41314bb",
-        "82e51e6e6492955a36e9fe70c1c995c40040dedc",
-        "53ec066614e15e5286a2b7b910824c7bc8b59d27",
-        "b167be227a8c149f4eefed4c959908fa404e557c",
-        "0e32134839a806d1d61468b02b073cc46a4ee787",
-        "fc40b795bb4dcea0d3317ad6af31ca735cf9084d",
-        "f37b8491a569127d0111d92c6b2774877f16767a",
-        "26cc781cb1b6f9acaaa975f51b93a085a49bf695"
-    ]
+    gerrit_numbers = GERRIT_NUMBERS_TEST
+    logging.info("Total gerrit track items to be imported: %i", len(gerrit_numbers))
 
-    logging.info("Total track items to be imported: %i", len(item_uris))
+    commits_sha = get_commits_from_gerrit(args.elastic_url, gerrit_numbers)
+    logging.info("Total commit track items to be imported: %i", len(commits_sha))
+
 
     # Now we need to enrich all gerrit and commits raw items and publish
     # them to the OPNFV ES enriched indexes for gerrit and git
 
     # total = elastic.bulk_upload(tweets, "id_str")
-    r = requests.post(args.elastic_url + "/" + es_index + "/_mget",
-                      data = json.dumps({"ids": item_uuids_fake}))
-    r.raise_for_status()
-    logging.info("Total track items to be imported: %i", len(item_uuids_fake))
-    logging.info("Total track items found upstream: %i", len(r.json()["docs"]))
-
-    for review in r.json()["docs"]:
-        for patch in review['_source']['data']['patchSets']:
-            commits_sha.append(patch['revision'])
-
-    logging.info("Total commits to track %i", len(commits_sha))
-
-    logging.info("Total track items imported: %i", total)
