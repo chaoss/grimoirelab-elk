@@ -29,9 +29,8 @@ import requests
 
 from grimoire_elk.arthur import load_identities
 from grimoire_elk.elk.gerrit import GerritEnrich
+from grimoire_elk.elk.git import GitEnrich
 from grimoire_elk.elk.elastic import ElasticSearch
-from grimoire_elk.ocean.elastic import ElasticOcean
-
 
 # Logging formats
 LOG_FORMAT = "[%(asctime)s] - %(message)s"
@@ -53,6 +52,23 @@ GERRIT_NUMBERS_TEST = [
     "441435",
     "442142"
 ]
+# numbers for already downloaded GIT reviews fo test with
+GIT_INDEX_RAW = 'git_openstack'
+GIT_INDEX_ENRICH = 'git_openstack_enrich'
+GIT_COMMITS_SHA_TEST = [
+    "ceb6642235c3ad084954e55fc89fc53eaffe3889",
+    "8bdb511230b679a847708ee3d63b5a53481348f5",
+    "cd62577c66f76368ab3b54c5f8a93b7ae4fa53a6",
+    "179e22065287b5b7197c158c691d193ee848f135",
+    "0f670fb799a9df1174dc501d09610d506ffecba7",
+    "f5ee1bc45d46c0439830b4410ad1e6bed51eedda",
+    "0f03c25b556b6c285e14e702ef5904d013f2cdef",
+    "cdbceeaee485a5095a59cc7f05470a440065832e",
+    "fff8aad420967488c67f9402fbdb872c4c41e4e2",
+    "83f8a20c82434fb4b90c2e0c30779a361f2c7944"
+]
+
+
 
 def configure_logging(debug=False):
     """Configure logging
@@ -74,8 +90,10 @@ def configure_logging(debug=False):
 def get_params():
     args_parser = argparse.ArgumentParser(usage="usage: track_items [options]",
                                      description="Track items from different data sources.")
-    args_parser.add_argument("-e", "--elastic-url", required=True,
+    args_parser.add_argument("-e", "--elastic-url-raw", required=True,
                              help="ElasticSearch URL with raw indexes wich includes the items to track")
+    args_parser.add_argument("--elastic-url-enrich", required=True,
+                             help="ElasticSearch URL for enriched track items")
     args_parser.add_argument("-u", "--upstream-url", default=OPNFV_UPSTREAM_FILE,
                              help="URL with upstream file with the items to track")
     args_parser.add_argument('-g', '--debug', dest='debug', action='store_true')
@@ -165,14 +183,46 @@ def enrich_gerrit_items(es, gerrit_numbers):
     enricher = GerritEnrich(db_sortinghat='opnfv_track_sh',
                             db_user='root', db_host='localhost')
 
-
     # First load identities
     load_identities(reviews, enricher)
 
     # Then enrich
-
     for review in reviews:
         enriched_items.append(enricher.get_rich_item(review))
+
+    return enriched_items
+
+def get_git_commits(es,  commits_sha):
+    # Get gerrit raw items
+    query = {
+          "query": {
+            "terms" : { "data.commit" : commits_sha}
+          }
+        }
+
+    r = requests.post(es + "/" + GIT_INDEX_RAW + "/_search?limit=10000",
+                      data=json.dumps(query))
+    r.raise_for_status()
+    commits_es = r.json()["hits"]["hits"]
+    commits = []
+    for commit in commits_es:
+        commits.append(commit['_source'])
+    return commits
+
+def enrich_git_items(es, commits_sha):
+    commits = get_git_commits(es, commits_sha)
+    logging.info("Total git track items to be enriched: %i", len(commits))
+
+    enriched_items = []
+    enricher = GitEnrich(db_sortinghat='opnfv_track_sh',
+                         db_user='root', db_host='localhost')
+
+    # First load identities
+    load_identities(commits, enricher)
+
+    # Then enrich
+    for commit in commits:
+        enriched_items.append(enricher.get_rich_item(commit))
 
     return enriched_items
 
@@ -201,21 +251,24 @@ if __name__ == '__main__':
     #
     # Gerrit Reviews
     #
-
     gerrit_uris = fetch_track_items(args.upstream_url, "Gerrit")
     gerrit_numbers = get_gerrit_numbers(gerrit_uris)
-
-    # TODO: testing with gerrit uuids already downloaded
+    # TODO: testing with gerrit numbers already downloaded
     gerrit_numbers = GERRIT_NUMBERS_TEST
     logging.info("Total gerrit track items to be imported: %i", len(gerrit_numbers))
-    enriched_items = enrich_gerrit_items(args.elastic_url, gerrit_numbers)
+    enriched_items = enrich_gerrit_items(args.elastic_url_raw, gerrit_numbers)
     logging.info("Total gerrit track items enriched: %i", len(enriched_items))
-    elastic = ElasticSearch(args.elastic_url, GERRIT_INDEX_ENRICH)
+    elastic = ElasticSearch(args.elastic_url_enrich, GERRIT_INDEX_ENRICH)
     total = elastic.bulk_upload(enriched_items, "uuid")
 
     #
     # Git Commits
     #
-
-    commits_sha = get_commits_from_gerrit(args.elastic_url, gerrit_numbers)
-    logging.info("Total commit track items to be imported: %i", len(commits_sha))
+    commits_sha = get_commits_from_gerrit(args.elastic_url_raw, gerrit_numbers)
+    # TODO: testing with git commits sha already downloaded
+    commits_sha = GIT_COMMITS_SHA_TEST
+    logging.info("Total git track items to be imported: %i", len(commits_sha))
+    enriched_items = enrich_git_items(args.elastic_url_raw, commits_sha)
+    logging.info("Total git track items enriched: %i", len(enriched_items))
+    elastic = ElasticSearch(args.elastic_url_enrich, GIT_INDEX_ENRICH)
+    total = elastic.bulk_upload(enriched_items, "uuid")
