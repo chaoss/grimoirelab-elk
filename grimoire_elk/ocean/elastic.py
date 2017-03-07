@@ -328,6 +328,7 @@ class ElasticOcean(object):
             r = self.requests.post(url, data=query)
 
         items = []
+        rjson = None
         try:
             rjson = r.json()
         except:
