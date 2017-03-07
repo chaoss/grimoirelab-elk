@@ -27,12 +27,20 @@ import logging
 
 import requests
 
+from grimoire_elk.arthur import load_identities
+from grimoire_elk.elk.gerrit import GerritEnrich
+from grimoire_elk.elk.elastic import ElasticSearch
+from grimoire_elk.ocean.elastic import ElasticOcean
+
+
 # Logging formats
 LOG_FORMAT = "[%(asctime)s] - %(message)s"
 DEBUG_LOG_FORMAT = "[%(asctime)s - %(name)s - %(levelname)s] - %(message)s"
 
 OPNFV_UPSTREAM_FILE='https://git.opnfv.org/doctor/plain/UPSTREAM'
 # numbers for already downloaded gerrit reviews fo test with
+GERRIT_INDEX_RAW = 'gerrit_openstack'
+GERRIT_INDEX_ENRICH = 'gerrit_openstack_enrich'
 GERRIT_NUMBERS_TEST = [
     "242602",
     "437760",
@@ -132,31 +140,56 @@ def get_gerrit_numbers(gerrit_uris):
 
     return numbers
 
+def get_gerrit_reviews(es,  gerrit_numbers):
+    # Get gerrit raw items
+    query = {
+          "query": {
+            "terms" : { "data.number" : gerrit_numbers}
+          }
+        }
+
+    r = requests.post(es + "/" + GERRIT_INDEX_RAW + "/_search?limit=10000",
+                      data=json.dumps(query))
+    r.raise_for_status()
+    reviews_es = r.json()["hits"]["hits"]
+    reviews = []
+    for review in reviews_es:
+        reviews.append(review['_source'])
+    return reviews
+
+def enrich_gerrit_items(es, gerrit_numbers):
+    reviews = get_gerrit_reviews(es, gerrit_numbers)
+    logging.info("Total gerrit track items to be enriched: %i", len(reviews))
+
+    enriched_items = []
+    enricher = GerritEnrich(db_sortinghat='opnfv_track_sh',
+                            db_user='root', db_host='localhost')
+
+
+    # First load identities
+    load_identities(reviews, enricher)
+
+    # Then enrich
+
+    for review in reviews:
+        # Add ocean metadata to the review
+        # print(json.dumps(review, indent=True))
+        # raise
+        ElasticOcean.add_update_date(review)
+        enriched_items.append(enricher.get_rich_item(review))
+
+    return enriched_items
+
 def get_commits_from_gerrit(es, gerrit_numbers):
     # Get the gerrit reviews from ES and extract the commits sha
-
-    def get_query(numbers):
-        query = {
-              "query": {
-                "terms" : { "data.number" : gerrit_numbers}
-              }
-            }
-        return query
-
-
-    numbers_found = 0
     commits_sha = []
 
-    r = requests.post(es + "/" + es_index + "/_search",
-                      data=json.dumps(get_query(gerrit_numbers)))
-    r.raise_for_status()
-    numbers_found += r.json()["hits"]["total"]
+    reviews = get_gerrit_reviews(es, gerrit_numbers)
+    logging.info("Total gerrit track items found upstream: %i", len(reviews))
 
-    for review in r.json()["hits"]["hits"]:
-        for patch in review['_source']['data']['patchSets']:
+    for review in reviews:
+        for patch in review['data']['patchSets']:
             commits_sha.append(patch['revision'])
-
-    logging.info("Total gerrit track items found upstream: %i", numbers_found)
 
     return commits_sha
 
@@ -167,9 +200,11 @@ if __name__ == '__main__':
 
     logging.info("Importing track items from %s ", args.upstream_url)
 
-    es_index = "gerrit_openstack"
-
     total = 0
+
+    #
+    # Gerrit Reviews
+    #
 
     gerrit_uris = fetch_track_items(args.upstream_url, "Gerrit")
     gerrit_numbers = get_gerrit_numbers(gerrit_uris)
@@ -177,12 +212,14 @@ if __name__ == '__main__':
     # TODO: testing with gerrit uuids already downloaded
     gerrit_numbers = GERRIT_NUMBERS_TEST
     logging.info("Total gerrit track items to be imported: %i", len(gerrit_numbers))
+    enriched_items = enrich_gerrit_items(args.elastic_url, gerrit_numbers)
+    logging.info("Total gerrit track items enriched: %i", len(enriched_items))
+    elastic = ElasticSearch(args.elastic_url, GERRIT_INDEX_ENRICH)
+    total = elastic.bulk_upload(enriched_items, "uuid")
+
+    #
+    # Git Commits
+    #
 
     commits_sha = get_commits_from_gerrit(args.elastic_url, gerrit_numbers)
     logging.info("Total commit track items to be imported: %i", len(commits_sha))
-
-
-    # Now we need to enrich all gerrit and commits track raw items and publish
-    # them to the OPNFV ES enriched indexes for gerrit and git
-
-    # total = elastic.bulk_upload(tweets, "id_str")
