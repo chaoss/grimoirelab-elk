@@ -148,8 +148,9 @@ class JenkinsEnrich(Enrich):
             extra_fields['loop'] = components[-2]
             extra_fields['branch'] = components[-1]
         except IndexError as ex:
-            logger.error('Problems parsing job name %s', job_name)
-            logger.error(ex)
+            # Just DEBUG level because it is just for OPNFV
+            logger.debug('Problems parsing job name %s', job_name)
+            logger.debug(ex)
 
         return extra_fields
 
