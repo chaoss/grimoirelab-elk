@@ -65,12 +65,14 @@ class JenkinsEnrich(Enrich):
         try:
             with open(self.nodes_rename_file, 'r') as csvfile:
                 nodes = csv.reader(csvfile, delimiter=',')
+                logger.debug("Total node renames lines: %i", len(nodes))
                 for node in nodes:
                     name = node[0]
                     action = node[1]
                     rename = action.split("merge into ")
                     if len(rename) > 1:
                         self.nodes_rename[name] = rename[1]
+                logger.debug("Total node renames: %i", len(self.nodes_rename.keys()))
         except FileNotFoundError:
             logger.info("Jenkis node rename file not found %s",
                          self.nodes_rename_file)
