@@ -51,6 +51,7 @@ from .ocean.phabricator import PhabricatorOcean
 from .ocean.redmine import RedmineOcean
 from .ocean.remo2 import ReMoOcean
 from .ocean.rss import RSSOcean
+from .ocean.slack import SlackOcean
 from .ocean.stackexchange import StackExchangeOcean
 from .ocean.supybot import SupybotOcean
 from .ocean.telegram import TelegramOcean
@@ -80,6 +81,7 @@ from .elk.redmine import RedmineEnrich
 from .elk.remo2 import ReMoEnrich
 from .elk.rss import RSSEnrich
 from .elk.pipermail import PipermailEnrich
+from .elk.slack import SlackEnrich
 from .elk.stackexchange import StackExchangeEnrich
 from .elk.supybot import SupybotEnrich
 from .elk.telegram import TelegramEnrich
@@ -106,6 +108,7 @@ from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.core.pipermail import Pipermail, PipermailCommand
 from perceval.backends.core.redmine import Redmine, RedmineCommand
 from perceval.backends.core.rss import RSS, RSSCommand
+from perceval.backends.core.slack import Slack, SlackCommand
 from perceval.backends.core.stackexchange import StackExchange, StackExchangeCommand
 from perceval.backends.core.supybot import Supybot, SupybotCommand
 from perceval.backends.core.telegram import Telegram, TelegramCommand
@@ -171,6 +174,7 @@ def get_connectors():
             "redmine":[Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "rss":[RSS, RSSOcean, RSSEnrich, RSSCommand],
+            "slack":[Slack, SlackOcean, SlackEnrich, SlackCommand],
             "stackexchange":[StackExchange, StackExchangeOcean,
                              StackExchangeEnrich, StackExchangeCommand],
              "supybot":[Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
