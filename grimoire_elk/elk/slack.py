@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 class SlackEnrich(Enrich):
 
     def get_field_author(self):
-        return "from"
+        return "user_data"
 
     def get_elastic_mappings(self):
 
@@ -53,27 +53,33 @@ class SlackEnrich(Enrich):
         return {"items":mapping}
 
     def get_sh_identity(self, item, identity_field=None):
-        identity = {}
+        identity = {
+            'username': None,
+            'name': None,
+            'email': None
+        }
 
         from_ = item
         if 'data' in item and type(item) == dict:
-            from_ = item['data']['message'][identity_field]
+            if self.get_field_author() not in item['data']:
+                # Message from bot
+                identity['username'] = item['data']['bot_id']
+                return identity
+            from_ = item['data'][self.get_field_author()]
 
-        identity['username'] = from_['username']
-        identity['email'] = None
-        identity['name'] = from_['username']
-        if 'first_name' in from_:
-            identity['name'] = from_['first_name']
+        identity['username'] = from_['name']
+        identity['name'] = from_['real_name']
+        if 'profile' in from_:
+            identity['email'] = from_['profile']['email']
         return identity
-
 
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
 
-        message = item['data']['message']
+        print(item['data'].keys())
 
-        identity = self.get_sh_identity(message['from'])
+        identity = self.get_sh_identity(item)
 
         identities.append(identity)
 
@@ -90,62 +96,21 @@ class SlackEnrich(Enrich):
             else:
                 eitem[f] = None
 
-
-        eitem['update_id'] = item['data']['update_id']
-
         # The real data
-        message = item['data']['message']
+        message = item['data']
 
         # data fields to copy
-        copy_fields = ["message_id", "sticker"]
+        copy_fields = ["text", "type", "reply_count", "subscribed",
+                       "unread_count", "user"]
         for f in copy_fields:
             if f in message:
                 eitem[f] = message[f]
             else:
                 eitem[f] = None
-        # Fields which names are translated
-        map_fields = {"text": "message",
-                      "date": "sent_date,"
-                      }
-        for f in map_fields:
-            if f in message:
-                eitem[map_fields[f]] = message[f]
-            else:
-                eitem[map_fields[f]] = None
 
-        if "text" in message:
-            eitem["text_analyzed"] = message["text"]
-
-        eitem['chat_id'] = message['chat']['id']
-        if 'title' in message['chat']:
-            eitem['chat_title'] = message['chat']['title']
-        eitem['chat_type'] = message['chat']['type']
-
-        eitem['from_id'] = message['from']['id']
-        eitem['author'] = message['from']['first_name']
-        eitem['author_id'] = message['from']['id']
-        if 'last_name' in message['from']:
-            eitem['author_last_name'] = message['from']['last_name']
-        if 'username' in message['from']:
-            eitem['username'] = message['from']['username']
-
-        if 'reply_to_message' in message:
-            eitem['reply_to_message_id'] = message['reply_to_message']['message_id']
-            eitem['reply_to_sent_date'] = message['reply_to_message']['date']
-            if 'text' in message['reply_to_message']:
-                eitem['reply_to_message'] = message['reply_to_message']['text']
-            elif 'sticker' in message['reply_to_message']:
-                eitem['reply_to_message'] = message['reply_to_message']['sticker']
-            eitem['reply_to_chat_id'] = message['reply_to_message']['chat']['id']
-            eitem['reply_to_chat_title'] = message['reply_to_message']['chat']['title']
-            eitem['reply_to_chat_type'] = message['reply_to_message']['chat']['type']
-            eitem['reply_to_author_id'] = message['reply_to_message']['from']['id']
-            eitem['reply_to_author'] = message['reply_to_message']['from']['first_name']
-            if 'last_name' in message['reply_to_message']['from']:
-                eitem['reply_to_author_last_name'] = message['reply_to_message']['from']['last_name']
-            if 'username' in message['reply_to_message']['from']:
-                eitem['reply_to_username'] = message['reply_to_message']['from']['username']
-
+        eitem['number_attachs'] = 0
+        if 'attachments' in message:
+            eitem['number_attachs'] = len(message['attachments'])
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
