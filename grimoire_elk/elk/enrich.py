@@ -36,6 +36,8 @@ from os import path
 from dateutil import parser
 from functools import lru_cache
 
+logger = logging.getLogger(__name__)
+
 try:
     import MySQLdb
     MYSQL_LIBS = True
@@ -58,7 +60,6 @@ except ImportError:
 
 DEFAULT_PROJECT = 'Main'
 DEFAULT_DB_USER = 'root'
-logger = logging.getLogger(__name__)
 
 
 def metadata(func):
