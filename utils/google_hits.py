@@ -53,16 +53,22 @@ def get_hits(keyword):
     Get the Google Hits for a keyword
     """
     params = {'q': keyword}
+
     # Make the request
     req = requests.get(GOOGLE_SEARCH_URL, params=params)
+
     # Create the soup and get the desired div
     bs_result = bs4.BeautifulSoup(req.text, 'html.parser')
     hit_string = bs_result.find("div", id="resultStats").text
+
     # Remove commas or dots
     hit_string = hit_string.replace(',', u'')
     hit_string = hit_string.replace('.', u'')
+
     # Strip the hits
-    hits = re.search('\d+', hit_string).group(0)
+    str_hits = re.search('\d+', hit_string).group(0)
+    hits = int(str_hits)
+
     keyword_json = {
                 "hits": hits,
                 "type": "googleSearchHits",
