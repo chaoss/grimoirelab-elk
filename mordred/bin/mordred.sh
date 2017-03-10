@@ -668,7 +668,7 @@ function git_enrichment {
 
     REPOS=`get_repo_list git`
 
-    if [ $ENR_EXTRA_FLAG == '--only-studies' ]; then
+    if [ "$ENR_EXTRA_FLAG" == "--only-studies" ]; then
 	# when we execute studies, we want it without going repo by repo
         REPOS="''"
     fi
@@ -694,7 +694,7 @@ function github_enrichment {
     do
         ORG=`echo $repo|awk -F'/' {'print $4'}`
         REP=`echo $repo|awk -F'/' {'print $5'} |cut -f1 -d'.'`
-        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich  $ENR_EXTRA_FLAG --index $GITHUB_INDEX --index-enrich $GITHUB_ENRICHED_INDEX github --owner $ORG --repository $REP  >> $LOGS_DIR"/github-enrichment.log" 2>&1
+        ./p2o.py --db-sortinghat $DB_SH --db-projects-map $DB_PRO -e $ES_URI -g --only-enrich $ENR_EXTRA_FLAG --index $GITHUB_INDEX --index-enrich $GITHUB_ENRICHED_INDEX github --owner $ORG --repository $REP  >> $LOGS_DIR"/github-enrichment.log" 2>&1
     done
 }
 
