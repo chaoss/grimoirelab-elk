@@ -361,4 +361,14 @@ class PhabricatorEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(eitem['creation_date'], "task"))
 
+        # Support old fields used in maniphest panel T2305
+        eitem['timeopen_days'] = eitem['time_open_days_enrich']
+        assigned_to = {}
+        for f in eitem.keys():
+            if 'ownerData' in f:
+                # Copy all ownerData data fields to assigned_to fields
+                of = f.split('ownerData')[1]
+                assigned_to['assigned_to' + of] = eitem[f]
+        eitem.update(assigned_to)
+
         return eitem
