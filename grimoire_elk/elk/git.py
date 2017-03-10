@@ -87,12 +87,7 @@ class GitEnrich(Enrich):
                "message_analyzed": {
                   "type": "string",
                   "index":"analyzed"
-               },
-               "Signed-off-by_analized_custom" : {
-                  "type" : "string",
-                  "analyzer" : "comma"
-                }
-
+               }
            }
         }"""
 
@@ -270,6 +265,19 @@ class GitEnrich(Enrich):
 
     @metadata
     def get_rich_item(self, item):
+
+        def get_pair_programming_metrics(eitem, nauthors):
+            metrics = {}
+            ladded = eitem['lines_added']
+            lremoved = eitem['lines_removed']
+            lchanged = eitem['lines_changed']
+            metrics['pair_programming_commit'] = round(1.0 / nauthors, 1)
+            metrics["pair_programming_lines_added"] = round(ladded / nauthors, 1)
+            metrics["pair_programming_lines_removed"] = round(lremoved / nauthors, 1)
+            metrics["pair_programming_lines_changed"] = round(lchanged / nauthors, 1)
+
+            return metrics
+
         eitem = {}
         for f in self.RAW_FIELDS_COPY:
             if f in item:
@@ -363,6 +371,9 @@ class GitEnrich(Enrich):
             eitem['is_git_commit_multi_author'] = commit['is_git_commit_multi_author']
         if 'authors' in commit:
             eitem['authors'] = commit['authors']
+            nauthors = len(commit['authors'])
+            eitem.update(get_pair_programming_metrics(eitem, nauthors))
+
 
         # Pair Programming support
         eitem['Signed-off-by_number'] = 0
@@ -372,8 +383,9 @@ class GitEnrich(Enrich):
                 # Commits generated for signed_off people
                 eitem['is_git_commit_signed_off'] = commit['is_git_commit_signed_off']
             eitem['Signed-off-by'] = commit['Signed-off-by']
-            eitem['Signed-off-by_analized_custom'] = commit['Signed-off-by']
             eitem['Signed-off-by_number'] = len(commit['Signed-off-by'])
+            nauthors = len(commit['Signed-off-by']) + 1  # +1: commit author
+            eitem.update(get_pair_programming_metrics(eitem, nauthors))
         return eitem
 
     def enrich_items(self, items, events=False):
@@ -398,13 +410,13 @@ class GitEnrich(Enrich):
             # Check multi author
             m = AUTHOR_P2P_REGEX.match(item['data']['Author'])
             if m:
-                logger.warning("Multiauthor detected. Creating one commit " +
-                                 "per author: %s", item['data']['Author'])
+                logger.debug("Multiauthor detected. Creating one commit " +
+                             "per author: %s", item['data']['Author'])
                 item['data']['authors'] = self.__get_authors(item['data']['Author'])
                 item['data']['Author'] = item['data']['authors'][0]
             m = AUTHOR_P2P_REGEX.match(item['data']['Commit'])
             if m:
-                logger.warning("Multicommitter detected: using just the first committer")
+                logger.debug("Multicommitter detected: using just the first committer")
                 item['data']['committers'] = self.__get_authors(item['data']['Commit'])
                 item['data']['Commit'] = item['data']['committers'][0]
             if current >= max_items:
