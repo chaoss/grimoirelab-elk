@@ -65,7 +65,6 @@ class JenkinsEnrich(Enrich):
         try:
             with open(self.nodes_rename_file, 'r') as csvfile:
                 nodes = csv.reader(csvfile, delimiter=',')
-                logger.debug("Total node renames lines: %i", len(nodes))
                 for node in nodes:
                     name = node[0]
                     action = node[1]
