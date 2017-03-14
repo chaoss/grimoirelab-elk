@@ -300,11 +300,15 @@ class ElasticOcean(object):
                 ''' % (self.offset)
 
 
-            # order_field = 'metadata__updated_on'
-            order_field = 'metadata__timestamp'  # to avoid holes
+            # Order the raw items from the old ones to the new so if the
+            # enrich process fails, it could be resume incrementally
             order_query = ''
+            order_field = None
             if self.perceval_backend:
-                # logstash backends does not have the order_field
+                order_field = 'metadata__timestamp'
+            elif self.get_connector_name() == 'twitter':
+                order_field = '@timestamp'
+            if order_field is not None:
                 order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
 
             filters_should = ''
