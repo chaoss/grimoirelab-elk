@@ -77,8 +77,6 @@ class SlackEnrich(Enrich):
         """ Return the identities from an item """
         identities = []
 
-        print(item['data'].keys())
-
         identity = self.get_sh_identity(item)
 
         identities.append(identity)
@@ -100,7 +98,7 @@ class SlackEnrich(Enrich):
         message = item['data']
 
         # data fields to copy
-        copy_fields = ["text", "type", "reply_count", "subscribed",
+        copy_fields = ["text", "type", "reply_count", "subscribed", "subtype",
                        "unread_count", "user"]
         for f in copy_fields:
             if f in message:
@@ -112,9 +110,47 @@ class SlackEnrich(Enrich):
         if 'attachments' in message:
             eitem['number_attachs'] = len(message['attachments'])
 
+        eitem['reaction_count'] = 0
+        if 'reactions' in message:
+            eitem['reaction_count'] = len(message['reactions'])
+            eitem['reactions'] = []
+            for rdata in message['reactions']:
+                # {
+                #         "count": 2,
+                #         "users": [
+                #            "U38J51N7J",
+                #            "U3Q0VLHU3"
+                #         ],
+                #         "name": "+1"
+                # }
+                for i in range(0, rdata['count']):
+                    eitem['reactions'].append(rdata["name"])
+
+        if 'file' in message:
+            eitem['file_type'] = message['file']['pretty_type']
+            eitem['file_title'] = message['file']['title']
+            eitem['file_size'] = message['file']['size']
+            eitem['file_name'] = message['file']['name']
+            eitem['file_mode'] = message['file']['mode']
+            eitem['file_is_public'] = message['file']['is_public']
+            eitem['file_is_external'] = message['file']['is_external']
+            eitem['file_id'] = message['file']['id']
+            eitem['file_is_editable'] = message['file']['editable']
+
+        if 'user_data' in message:
+            eitem['team_id'] = message['user_data']['team_id']
+            eitem['tz'] = message['user_data']['tz_offset']
+            eitem['is_admin'] = message['user_data']['is_admin']
+            eitem['is_owner'] = message['user_data']['is_owner']
+            eitem['is_primary_owner'] = message['user_data']['is_primary_owner']
+            if 'profile' in message['user_data']:
+                if 'title' in message['user_data']['profile']:
+                    eitem['profile_title'] = message['user_data']['profile']['title']
+                eitem['avatar'] = message['user_data']['profile']['image_32']
+
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
 
-        eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "Slack"))
+        eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "message"))
 
         return eitem
