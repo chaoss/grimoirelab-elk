@@ -71,6 +71,7 @@ class JenkinsEnrich(Enrich):
                     rename = action.split("merge into ")
                     if len(rename) > 1:
                         self.nodes_rename[name] = rename[1]
+                logger.debug("Total node renames: %i", len(self.nodes_rename.keys()))
         except FileNotFoundError:
             logger.info("Jenkis node rename file not found %s",
                          self.nodes_rename_file)
