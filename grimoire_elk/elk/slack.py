@@ -153,4 +153,21 @@ class SlackEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "message"))
 
+        # Channel info
+        channel = message['channel_info']
+        eitem['channel_name'] = channel['name']
+        eitem['channel_id'] = channel['id']
+        eitem['channel_created'] = channel['created']
+        eitem['channel_member_count'] = len(channel['members'])
+        if 'topic' in channel:
+            eitem['channel_topic'] = channel['topic']
+        if 'purpose' in channel:
+            eitem['channel_purpose'] = channel['purpose']
+        channel_bool_fields = ['is_archived', 'is_general', 'is_starred']
+        for field in channel_bool_fields:
+            eitem['channel_' + field] = 0
+            if field in channel and channel[field]:
+                eitem['channel_' + field] = 1
+
+
         return eitem
