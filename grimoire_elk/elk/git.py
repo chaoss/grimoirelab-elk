@@ -268,10 +268,12 @@ class GitEnrich(Enrich):
 
         def get_pair_programming_metrics(eitem, nauthors):
             metrics = {}
+            files = eitem['files']
             ladded = eitem['lines_added']
             lremoved = eitem['lines_removed']
             lchanged = eitem['lines_changed']
             metrics['pair_programming_commit'] = round(1.0 / nauthors, 1)
+            metrics['pair_programming_files'] = round(files / nauthors, 1)
             metrics["pair_programming_lines_added"] = round(ladded / nauthors, 1)
             metrics["pair_programming_lines_removed"] = round(lremoved / nauthors, 1)
             metrics["pair_programming_lines_changed"] = round(lchanged / nauthors, 1)
@@ -365,6 +367,9 @@ class GitEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
 
+        # Include pair programming metrics in all cases. In general, 1 author.
+        eitem.update(get_pair_programming_metrics(eitem, 1))
+
         # Multi author support
         eitem['is_git_commit_multi_author'] = 0
         if 'is_git_commit_multi_author' in commit:
@@ -373,7 +378,6 @@ class GitEnrich(Enrich):
             eitem['authors'] = commit['authors']
             nauthors = len(commit['authors'])
             eitem.update(get_pair_programming_metrics(eitem, nauthors))
-
 
         # Pair Programming support
         eitem['Signed-off-by_number'] = 0

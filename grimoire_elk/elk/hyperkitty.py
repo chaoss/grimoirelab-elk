@@ -24,10 +24,7 @@
 
 from .mbox import MBoxEnrich
 
-class NNTPEnrich(MBoxEnrich):
+class HyperKittyEnrich(MBoxEnrich):
 
     def get_project_repository(self, eitem):
-        # origin: news.mozilla.org-mozilla.community.drumbeat
-        # projects repo: news.mozilla.org mozilla.community.drumbeat
-
-        return eitem['origin'].replace("-"," ")
+        return eitem['origin']

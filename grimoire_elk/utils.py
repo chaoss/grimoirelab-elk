@@ -67,6 +67,7 @@ from .elk.git import GitEnrich
 from .elk.github import GitHubEnrich
 from .elk.gerrit import GerritEnrich
 from .elk.gmane import GmaneEnrich
+from .elk.hyperkitty import HyperKittyEnrich
 from .elk.jenkins import JenkinsEnrich
 from .elk.jira import JiraEnrich
 from .elk.kitsune import KitsuneEnrich
@@ -160,7 +161,7 @@ def get_connectors():
             "git":[Git, GitOcean, GitEnrich, GitCommand],
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
             "gmane":[Gmane, MBoxOcean, GmaneEnrich, GmaneCommand],
-            "hyperkitty":[HyperKitty, MBoxOcean, MBoxEnrich, HyperKittyCommand],
+            "hyperkitty":[HyperKitty, MBoxOcean, HyperKittyEnrich, HyperKittyCommand],
             "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
             "kitsune":[Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
