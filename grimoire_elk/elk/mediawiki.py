@@ -57,6 +57,9 @@ class MediaWikiEnrich(Enrich):
         """ Return the identities from an item """
         identities = []
 
+        if 'revisions' not in item['data']:
+            return identities
+
         revisions = item['data']['revisions']
 
         for revision in revisions:
@@ -71,13 +74,16 @@ class MediaWikiEnrich(Enrich):
 
         revision = item
 
-        if 'data' in item and type(item) == dict:
-            revision = item['data']['revisions'][0]
-
         identity = {}
         identity['username'] = None
         identity['email'] = None
         identity['name'] = None
+
+        if 'data' in item and type(item) == dict:
+            if 'revisions' not in item['data']:
+                return identity
+            revision = item['data']['revisions'][0]
+
 
         if  identity_field in revision:
             identity['username'] = revision[identity_field]
@@ -101,6 +107,9 @@ class MediaWikiEnrich(Enrich):
         eitem = self.get_rich_item(item)
 
         # Revisions
+        if "revisions" not in item["data"]:
+            return erevisions
+
         for rev in item["data"]["revisions"]:
             erevision = {}
             for f in self.RAW_FIELDS_COPY:
@@ -169,10 +178,12 @@ class MediaWikiEnrich(Enrich):
         eitem["update_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
         # Revisions
         eitem["last_edited_date"] = None
-        eitem["nrevisions"] = len(page["revisions"])
-        if len(page["revisions"])>0:
-            eitem["first_editor"] = page["revisions"][0]["user"]
-            eitem["last_edited_date"] = page["revisions"][-1]["timestamp"]
+        eitem["nrevisions"] = 0
+        if "revisions" in page:
+            eitem["nrevisions"] = len(page["revisions"])
+            if len(page["revisions"])>0:
+                eitem["first_editor"] = page["revisions"][0]["user"]
+                eitem["last_edited_date"] = page["revisions"][-1]["timestamp"]
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
