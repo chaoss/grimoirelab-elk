@@ -37,7 +37,7 @@ class MBoxOcean(ElasticOcean):
     """MBox Ocean feeder"""
 
     def get_elastic_mappings(self):
-        # This field data.transaction has string arrays and dicts arrays
+        # immense term in field="body"
         mapping = '''
          {
             "dynamic":true,

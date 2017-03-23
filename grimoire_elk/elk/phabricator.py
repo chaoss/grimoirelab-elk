@@ -33,8 +33,8 @@ from .enrich import Enrich, metadata
 from .utils import get_time_diff_days, unixtime_to_datetime
 
 
-TASK_OPEN_STATUS = 'open'
-TASK_CLOSED_STATUS = 'resolved'
+TASK_OPEN_STATUS = 'Open'
+TASK_CLOSED_STATUS = 'Resolved'
 logger = logging.getLogger(__name__)
 
 
@@ -291,7 +291,7 @@ class PhabricatorEnrich(Enrich):
 
         eitem['priority'] = phab_item['fields']['priority'] ['name']
         eitem['priority_value'] = phab_item['fields']['priority']['value']
-        eitem['status'] = phab_item['fields']['status']['value']
+        eitem['status'] = phab_item['fields']['status']['name']
         eitem['creation_date'] = unixtime_to_datetime(phab_item['fields']['dateCreated']).isoformat()
         eitem['modification_date'] = unixtime_to_datetime(phab_item['fields']['dateModified']).isoformat()
         eitem['update_date'] = unixtime_to_datetime(item['updated_on']).isoformat()
@@ -307,7 +307,7 @@ class PhabricatorEnrich(Enrich):
         # Time to close (time open -> time last updated for closed tasks)
         # We can improve it later using events: time open event -> time resolved event
         eitem['time_to_close_days'] = None
-        if eitem['status'] not in [TASK_OPEN_STATUS, 'spite', 'stalled']:
+        if eitem['status'] not in [TASK_OPEN_STATUS, 'Spite', 'Stalled']:
             eitem['time_to_close_days'] = \
                 get_time_diff_days(eitem['creation_date'], eitem['update_date'])
         # Time open (time to open -> now): with painless
@@ -360,5 +360,15 @@ class PhabricatorEnrich(Enrich):
             eitem.update(self.get_item_sh(item, self.roles))
 
         eitem.update(self.get_grimoire_fields(eitem['creation_date'], "task"))
+
+        # Support old fields used in maniphest panel T2305
+        eitem['timeopen_days'] = eitem['time_open_days_enrich']
+        assigned_to = {}
+        for f in eitem.keys():
+            if 'ownerData' in f:
+                # Copy all ownerData data fields to assigned_to fields
+                of = f.split('ownerData')[1]
+                assigned_to['assigned_to' + of] = eitem[f]
+        eitem.update(assigned_to)
 
         return eitem

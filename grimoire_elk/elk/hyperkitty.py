@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# Gerrit Ocean feeder
 #
 # Copyright (C) 2015 Bitergia
 #
@@ -23,32 +22,9 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-'''Gerrit Ocean feeder'''
+from .mbox import MBoxEnrich
 
-from datetime import datetime
+class HyperKittyEnrich(MBoxEnrich):
 
-from .elastic import ElasticOcean
-
-class GerritOcean(ElasticOcean):
-
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = item["data"]["number"]+"_"+item['origin']
-
-    def get_elastic_mappings(self):
-        # immense term in field="data.commitMessage"
-        mapping = '''
-         {
-            "dynamic":true,
-            "properties": {
-                "data": {
-                    "properties": {
-                        "commitMessage": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        }
-        '''
-
-        return {"items":mapping}
+    def get_project_repository(self, eitem):
+        return eitem['origin']

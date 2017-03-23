@@ -35,6 +35,8 @@ logger = logging.getLogger(__name__)
 
 class JenkinsEnrich(Enrich):
 
+    MAIN_NODE_NAME = "main"
+
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
@@ -71,6 +73,7 @@ class JenkinsEnrich(Enrich):
                     rename = action.split("merge into ")
                     if len(rename) > 1:
                         self.nodes_rename[name] = rename[1]
+                logger.debug("Total node renames: %i", len(self.nodes_rename.keys()))
         except FileNotFoundError:
             logger.info("Jenkis node rename file not found %s",
                          self.nodes_rename_file)
@@ -148,8 +151,9 @@ class JenkinsEnrich(Enrich):
             extra_fields['loop'] = components[-2]
             extra_fields['branch'] = components[-1]
         except IndexError as ex:
-            logger.error('Problems parsing job name %s', job_name)
-            logger.error(ex)
+            # Just DEBUG level because it is just for OPNFV
+            logger.debug('Problems parsing job name %s', job_name)
+            logger.debug(ex)
 
         return extra_fields
 
@@ -172,6 +176,9 @@ class JenkinsEnrich(Enrich):
                 eitem[f] = build[f]
             else:
                 eitem[f] = None
+        # main node names
+        if not eitem["builtOn"]:
+            eitem["builtOn"] = self.MAIN_NODE_NAME
         # Nodes renaming
         if eitem["builtOn"] in self.nodes_rename:
             eitem["builtOn"] = self.nodes_rename[eitem["builtOn"]]
