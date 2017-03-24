@@ -611,10 +611,9 @@ class GitEnrich(Enrich):
                 continue
             for item in r.json()["hits"]["hits"]:
                 new_item = item['_source']
-                new_item.update(
-                    {"author_min_date":author['min']['value_as_string'],
-                     "author_max_date":author['max']['value_as_string']}
-                )
+                new_item["author_max_date"] = author['max']['value_as_string']
+                if "author_min_date" not in new_item:
+                    new_item["author_min_date"] = author['min']['value_as_string']
                 author_items.append(new_item)
 
             if len(author_items) >= self.elastic.max_items_bulk:
@@ -622,7 +621,7 @@ class GitEnrich(Enrich):
                 author_items = []
 
             nauthors_done += 1
-            logger.info("Authors processed %i/%i" % (nauthors_done, len(authors)))
+            logger.info("Authors processed %i/%i", nauthors_done, len(authors))
 
         self.elastic.bulk_upload(author_items, "ocean-unique-id")
 
