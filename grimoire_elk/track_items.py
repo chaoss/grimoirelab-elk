@@ -34,61 +34,7 @@ from grimoire_elk.elk.gerrit import GerritEnrich
 from grimoire_elk.elk.git import GitEnrich
 from grimoire_elk.elk.elastic import ElasticSearch
 
-
-# Logging formats
-LOG_FORMAT = "[%(asctime)s] - %(message)s"
-DEBUG_LOG_FORMAT = "[%(asctime)s - %(name)s - %(levelname)s] - %(message)s"
-
-# Default values that can be changed from command line
-GERRIT_INDEX_ENRICH = 'gerrit_opnfv_170207_enriched_170306'
-GERRIT_INDEX_RAW = 'gerrit_openstack_170322'
-GIT_INDEX_ENRICH = 'git_openstack_170313_enriched_170313'
-GIT_INDEX_RAW = 'git_openstack_170313'
-OPNFV_UPSTREAM_FILE = 'https://git.opnfv.org/doctor/plain/UPSTREAM'
-PROJECT_NAME = 'openstack'  # upstream project name
-
 logger = logging.getLogger(__name__)
-
-def configure_logging(debug=False):
-    """Configure logging
-    The function configures log messages. By default, log messages
-    are sent to stderr. Set the parameter `debug` to activate the
-    debug mode.
-    :param debug: set the debug mode
-    """
-    if not debug:
-        logging.basicConfig(level=logging.INFO,
-                            format=LOG_FORMAT)
-        logging.getLogger('requests').setLevel(logging.WARNING)
-        logging.getLogger('urrlib3').setLevel(logging.WARNING)
-    else:
-        logging.basicConfig(level=logging.DEBUG,
-                            format=DEBUG_LOG_FORMAT)
-
-
-def get_params():
-    args_parser = argparse.ArgumentParser(usage="usage: track_items [options]",
-                                          description="Track items from different data sources.")
-    args_parser.add_argument("-e", "--elastic-url-raw", required=True,
-                             help="ElasticSearch URL with raw indexes wich includes the items to track")
-    args_parser.add_argument("--elastic-url-enrich", required=True,
-                             help="ElasticSearch URL for enriched track items")
-    args_parser.add_argument("-u", "--upstream-url", default=OPNFV_UPSTREAM_FILE,
-                             help="URL with upstream file with the items to track")
-    args_parser.add_argument('-g', '--debug', dest='debug', action='store_true')
-    args_parser.add_argument("--index-gerrit-raw", default=GERRIT_INDEX_RAW,
-                             help="ES index with gerrit raw items")
-    args_parser.add_argument("--index-gerrit-enrich", default=GERRIT_INDEX_ENRICH,
-                             help="ES index with gerrit enriched items")
-    args_parser.add_argument("--index-git-raw", default=GIT_INDEX_RAW,
-                             help="ES index with git raw items")
-    args_parser.add_argument("--index-git-enrich", default=GIT_INDEX_ENRICH,
-                             help="ES index with git enriched items")
-    args_parser.add_argument("--project", default=PROJECT_NAME,
-                             help="project to be used in enriched items")
-
-
-    return args_parser.parse_args()
 
 def fetch_track_items(upstream_file_url, data_source):
     """ The file format is:
@@ -264,38 +210,3 @@ def get_commits_from_gerrit(es, index_gerrit_raw, gerrit_numbers):
                 commits_sha.append(patch['revision'])
 
     return commits_sha
-
-if __name__ == '__main__':
-
-    args = get_params()
-    configure_logging(args.debug)
-
-    logger.info("Importing track items from %s ", args.upstream_url)
-
-    total = 0
-
-    #
-    # Gerrit Reviews
-    #
-    gerrit_uris = fetch_track_items(args.upstream_url, "Gerrit")
-    gerrit_numbers = get_gerrit_numbers(gerrit_uris)
-    logger.info("Total gerrit track items to be imported: %i", len(gerrit_numbers))
-    enriched_items = enrich_gerrit_items(args.elastic_url_raw,
-                                         args.index_gerrit_raw, gerrit_numbers,
-                                         args.project)
-    logger.info("Total gerrit track items enriched: %i", len(enriched_items))
-    elastic = ElasticSearch(args.elastic_url_enrich, args.index_gerrit_enrich)
-    total = elastic.bulk_upload(enriched_items, "uuid")
-
-    #
-    # Git Commits
-    #
-    commits_sha = get_commits_from_gerrit(args.elastic_url_raw,
-                                          args.index_gerrit_raw, gerrit_numbers)
-    logger.info("Total git track items to be imported: %i", len(commits_sha))
-    enriched_items = enrich_git_items(args.elastic_url_raw,
-                                      args.index_git_raw, commits_sha,
-                                      args.project)
-    logger.info("Total git track items enriched: %i", len(enriched_items))
-    elastic = ElasticSearch(args.elastic_url_enrich, args.index_git_enrich)
-    total = elastic.bulk_upload(enriched_items, "uuid")
