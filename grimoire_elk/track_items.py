@@ -58,7 +58,75 @@ def fetch_track_items(upstream_file_url, data_source):
                 track_uris.append(line.split('url: ')[1].strip('\n'))
     return track_uris
 
-def get_gerrit_number(gerrit_uri):
+def get_gerrit_numbers(gerrit_uris):
+    # uuid to search the gerrit review in ElasticSearch
+    numbers = []
+    for gerrit_uri in gerrit_uris:
+        gerrit_number = _get_gerrit_number(gerrit_uri)
+        numbers.append(gerrit_number)
+
+    return numbers
+
+def enrich_gerrit_items(es, index_gerrit_raw, gerrit_numbers, project):
+    reviews = _get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers)
+    projects_file_path = _create_projects_file(project, "gerrit", reviews)
+    logger.info("Total gerrit track items to be enriched: %i", len(reviews))
+
+    enriched_items = []
+    enricher = GerritEnrich(db_sortinghat='opnfv_track_sh',
+                            db_user='root', db_host='localhost',
+                            json_projects_map=projects_file_path)
+
+    # First load identities
+    load_identities(reviews, enricher)
+
+    # Then enrich
+    for review in reviews:
+        enriched_items.append(enricher.get_rich_item(review))
+
+    os.unlink(projects_file_path)
+
+    return enriched_items
+
+def get_commits_from_gerrit(es, index_gerrit_raw, gerrit_numbers):
+    # Get the gerrit reviews from ES and extract the commits sha
+    commits_sha = []
+
+    reviews = _get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers)
+    logger.info("Total gerrit track items found upstream: %i", len(reviews))
+
+    for review in reviews:
+        for patch in review['data']['patchSets']:
+            if patch['revision'] not in commits_sha:
+                commits_sha.append(patch['revision'])
+
+    return commits_sha
+
+def enrich_git_items(es, index_git_raw, commits_sha_list, project):
+    commits = _get_git_commits(es, index_git_raw, commits_sha_list)
+    projects_file_path = _create_projects_file(project, "git", commits)
+    logger.info("Total git track items to be enriched: %i", len(commits))
+
+    enriched_items = []
+    enricher = GitEnrich(db_sortinghat='opnfv_track_sh',
+                         db_user='root', db_host='localhost',
+                         json_projects_map=projects_file_path)
+
+    # First load identities
+    load_identities(commits, enricher)
+
+    # Then enrich
+    for commit in commits:
+        enriched_items.append(enricher.get_rich_item(commit))
+
+    os.unlink(projects_file_path)
+
+    return enriched_items
+
+
+# PRIVATE METHODS
+
+def _get_gerrit_number(gerrit_uri):
     # Get the uuid for this item_uri. Possible formats
     # https://review.openstack.org/424868/
     # https://review.openstack.org/#/c/430428
@@ -71,7 +139,7 @@ def get_gerrit_number(gerrit_uri):
 
     return number
 
-def get_gerrit_origin(gerrit_uri):
+def _get_gerrit_origin(gerrit_uri):
     # Get the uuid for this item_uri. Possible formats
     # https://review.openstack.org/424868/
     # https://review.openstack.org/#/c/430428
@@ -86,16 +154,8 @@ def get_gerrit_origin(gerrit_uri):
 
     return origin
 
-def get_gerrit_numbers(gerrit_uris):
-    # uuid to search the gerrit review in ElasticSearch
-    numbers = []
-    for gerrit_uri in gerrit_uris:
-        gerrit_number = get_gerrit_number(gerrit_uri)
-        numbers.append(gerrit_number)
 
-    return numbers
-
-def get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers):
+def _get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers):
     # Get gerrit raw items
     query = {
         "query": {
@@ -112,7 +172,7 @@ def get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers):
         reviews.append(review['_source'])
     return reviews
 
-def create_projects_file(project_name, data_source, items):
+def _create_projects_file(project_name, data_source, items):
     """ Create a projects file from the items origin data """
 
     repositories = []
@@ -133,28 +193,7 @@ def create_projects_file(project_name, data_source, items):
     return projects_file_path
 
 
-def enrich_gerrit_items(es, index_gerrit_raw, gerrit_numbers, project):
-    reviews = get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers)
-    projects_file_path = create_projects_file(project, "gerrit", reviews)
-    logger.info("Total gerrit track items to be enriched: %i", len(reviews))
-
-    enriched_items = []
-    enricher = GerritEnrich(db_sortinghat='opnfv_track_sh',
-                            db_user='root', db_host='localhost',
-                            json_projects_map=projects_file_path)
-
-    # First load identities
-    load_identities(reviews, enricher)
-
-    # Then enrich
-    for review in reviews:
-        enriched_items.append(enricher.get_rich_item(review))
-
-    os.unlink(projects_file_path)
-
-    return enriched_items
-
-def get_git_commits(es, index_git_raw, commits_sha_list):
+def _get_git_commits(es, index_git_raw, commits_sha_list):
     # Get gerrit raw items
     query = {
         "query": {
@@ -175,38 +214,3 @@ def get_git_commits(es, index_git_raw, commits_sha_list):
     logger.debug("Review commits not found upstream %i: %s",
                  len(commits_not_found), commits_not_found)
     return commits
-
-def enrich_git_items(es, index_git_raw, commits_sha_list, project):
-    commits = get_git_commits(es, index_git_raw, commits_sha_list)
-    projects_file_path = create_projects_file(project, "git", commits)
-    logger.info("Total git track items to be enriched: %i", len(commits))
-
-    enriched_items = []
-    enricher = GitEnrich(db_sortinghat='opnfv_track_sh',
-                         db_user='root', db_host='localhost',
-                         json_projects_map=projects_file_path)
-
-    # First load identities
-    load_identities(commits, enricher)
-
-    # Then enrich
-    for commit in commits:
-        enriched_items.append(enricher.get_rich_item(commit))
-
-    os.unlink(projects_file_path)
-
-    return enriched_items
-
-def get_commits_from_gerrit(es, index_gerrit_raw, gerrit_numbers):
-    # Get the gerrit reviews from ES and extract the commits sha
-    commits_sha = []
-
-    reviews = get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers)
-    logger.info("Total gerrit track items found upstream: %i", len(reviews))
-
-    for review in reviews:
-        for patch in review['data']['patchSets']:
-            if patch['revision'] not in commits_sha:
-                commits_sha.append(patch['revision'])
-
-    return commits_sha
