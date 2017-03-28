@@ -210,7 +210,8 @@ def _get_git_commits(es, index_git_raw, commits_sha_list):
     for commit in commits_es:
         commits.append(commit['_source'])
         commits_sha_list_found.append(commit['_source']['data']['commit'])
-    commits_not_found = set(commits_sha_list) - set(commits_sha_list_found)
-    logger.debug("Review commits not found upstream %i: %s",
-                 len(commits_not_found), commits_not_found)
+    # It is normal that patchSets commits are not upstream once review is merged
+    # commits_not_found = set(commits_sha_list) - set(commits_sha_list_found)
+    # logger.debug("Review commits not found upstream %i: %s",
+    #             len(commits_not_found), commits_not_found)
     return commits
