@@ -146,6 +146,8 @@ class Enrich(object):
         # in perceval backends managed directly inside the backend
         # in twitter and others managed in arthur logic
         self.backend_params = None
+        # Label used during enrichment for identities without a known affiliation
+        self.unaffiliated_group = 'Unknown'
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -612,7 +614,7 @@ class Enrich(object):
             item_date = (item_date-item_date.utcoffset()).replace(tzinfo=None)
 
         enrollments = self.get_enrollments(uuid)
-        enroll = 'Unknown'
+        enroll = self.unaffiliated_group
         if len(enrollments) > 0:
             for enrollment in enrollments:
                 if not item_date:
