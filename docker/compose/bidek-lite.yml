@@ -6,7 +6,8 @@ elasticsearch:
 
 kibiter:
   # image: kibana:4.4
-  image: bitergia/kibiter:4.4.1-public
+  # image: bitergia/kibiter:4.4.1-public
+  image: bitergia/kibiter:4.4.1
   links:
     - elasticsearch
   ports:
