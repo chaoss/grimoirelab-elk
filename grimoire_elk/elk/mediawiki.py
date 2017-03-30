@@ -57,6 +57,8 @@ class MediaWikiEnrich(Enrich):
         """ Return the identities from an item """
         identities = []
 
+        if 'data' not in item:
+            return identities
         if 'revisions' not in item['data']:
             return identities
 
@@ -82,8 +84,8 @@ class MediaWikiEnrich(Enrich):
         if 'data' in item and type(item) == dict:
             if 'revisions' not in item['data']:
                 return identity
+            # Use as identity the first reviewer for a page
             revision = item['data']['revisions'][0]
-
 
         if  identity_field in revision:
             identity['username'] = revision[identity_field]
