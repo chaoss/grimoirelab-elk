@@ -140,6 +140,8 @@ class SlackEnrich(Enrich):
         if 'user_data' in message:
             eitem['team_id'] = message['user_data']['team_id']
             eitem['tz'] = message['user_data']['tz_offset']
+            # tz must be in -12h to 12h interval, so seconds -> hours
+            eitem['tz'] = round(int(eitem['tz'])/(60*60))
             eitem['is_admin'] = message['user_data']['is_admin']
             eitem['is_owner'] = message['user_data']['is_owner']
             eitem['is_primary_owner'] = message['user_data']['is_primary_owner']
@@ -169,5 +171,17 @@ class SlackEnrich(Enrich):
             if field in channel and channel[field]:
                 eitem['channel_' + field] = 1
 
+        eitem = self.__convert_booleans(eitem)
 
         return eitem
+
+    def __convert_booleans(self, eitem):
+        """ Convert True/False to 1/0 for better kibana processing """
+
+        for field in eitem.keys():
+            if isinstance(eitem[field], bool):
+                if eitem[field]:
+                    eitem[field] = 1
+                else:
+                    eitem[field] = 0
+        return eitem  # not needed becasue we are modifying directly the dict
