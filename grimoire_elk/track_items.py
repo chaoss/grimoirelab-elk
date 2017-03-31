@@ -67,15 +67,18 @@ def get_gerrit_numbers(gerrit_uris):
 
     return numbers
 
-def enrich_gerrit_items(es, index_gerrit_raw, gerrit_numbers, project):
+def enrich_gerrit_items(es, index_gerrit_raw, gerrit_numbers, project, db_config):
     reviews = _get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers)
     projects_file_path = _create_projects_file(project, "gerrit", reviews)
     logger.info("Total gerrit track items to be enriched: %i", len(reviews))
 
     enriched_items = []
-    enricher = GerritEnrich(db_sortinghat='opnfv_track_sh',
-                            db_user='root', db_host='localhost',
+    enricher = GerritEnrich(db_sortinghat=db_config['database'],
+                            db_user=db_config['user'],
+                            db_password=db_config['password'],
+                            db_host=db_config['host'],
                             json_projects_map=projects_file_path)
+
 
     # First load identities
     load_identities(reviews, enricher)
@@ -102,14 +105,16 @@ def get_commits_from_gerrit(es, index_gerrit_raw, gerrit_numbers):
 
     return commits_sha
 
-def enrich_git_items(es, index_git_raw, commits_sha_list, project):
+def enrich_git_items(es, index_git_raw, commits_sha_list, project, db_config):
     commits = _get_git_commits(es, index_git_raw, commits_sha_list)
     projects_file_path = _create_projects_file(project, "git", commits)
     logger.info("Total git track items to be enriched: %i", len(commits))
 
     enriched_items = []
-    enricher = GitEnrich(db_sortinghat='opnfv_track_sh',
-                         db_user='root', db_host='localhost',
+    enricher = GitEnrich(db_sortinghat=db_config['database'],
+                         db_user=db_config['user'],
+                         db_password=db_config['password'],
+                         db_host=db_config['host'],
                          json_projects_map=projects_file_path)
 
     # First load identities
