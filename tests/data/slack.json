@@ -1,0 +1,99 @@
+[
+{
+    "backend_name": "Slack",
+    "backend_version": "0.2.0",
+    "category": "message",
+    "data": {
+        "channel_info": {
+            "created": 1480595743,
+            "creator": "U38J51N7J",
+            "id": "C38K1VD6K",
+            "is_archived": false,
+            "is_channel": true,
+            "is_general": true,
+            "is_member": true,
+            "is_read_only": false,
+            "last_read": "1489407934.141666",
+            "latest": {
+                "reactions": [
+                    {
+                        "count": 1,
+                        "name": "+1",
+                        "users": [
+                            "U38J51N7J"
+                        ]
+                    }
+                ],
+                "text": "Hi <@U38J51N7J>, hi everyone, Your proposal <@U38J51N7J> works for us, that is: SHALL support for Java and PHP, SHOULD support JavaScript, an option to experiment with C/C++ and MAY for other languages. Thumbs up for the PhD joining the team!",
+                "ts": "1490880518.527599",
+                "type": "message",
+                "user": "U41B9QT3K"
+            },
+            "members": [
+                "U41J51N7J",
+                "U41JXKU2C",
+                "U415YS2CQ",
+                "U41DMRB7H"
+            ],
+            "name": "general",
+            "name_normalized": "general",
+            "previous_names": [],
+            "purpose": {
+                "creator": "",
+                "last_set": 0,
+                "value": "This channel is for team-wide communication and announcements. All team members are in this channel."
+            },
+            "topic": {
+                "creator": "",
+                "last_set": 0,
+                "value": "Company-wide announcements and work-based matters"
+            },
+            "unread_count": 3,
+            "unread_count_display": 3
+        },
+        "text": "Hi .... ",
+        "ts": "1490878537.675168",
+        "type": "message",
+        "user": "U41J51N7J",
+        "user_data": {
+            "color": "9f69e7",
+            "deleted": false,
+            "id": "U41J51N7J",
+            "is_admin": true,
+            "is_bot": false,
+            "is_owner": true,
+            "is_primary_owner": true,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "name": "johny",
+            "profile": {
+                "avatar_hash": "g4c733f36a6a",
+                "email": "jj@test.com",
+                "first_name": "Jorgen",
+                "image_192": "https://...",
+                "image_24": "https://...",
+                "image_32": "https://...",
+                "image_48": "https://...",
+                "image_512": "https://...",
+                "image_72": "https://...",
+                "last_name": "Smoith",
+                "real_name": "JS",
+                "real_name_normalized": "JS"
+            },
+            "real_name": "JS",
+            "status": null,
+            "team_id": "T41C2F56Z",
+            "tz": "Europe/Amsterdam",
+            "tz_label": "Central European Summer Time",
+            "tz_offset": 7200,
+            "updated": 1480595743
+        }
+    },
+    "origin": "https://slack.com/C38K1VD6K",
+    "perceval_version": "0.8.0.dev0",
+    "tag": "https://slack.com/C38K1VD6K",
+    "timestamp": 1490878646.914155,
+    "updated_on": 1490878537.675168,
+    "uuid": "6b269178a090bc865f8803a9b7be1cbe37983239"
+}
+]
