@@ -271,7 +271,7 @@ def load_identities(ocean_backend, enrich_backend):
     SortingHat.add_identities(enrich_backend.sh_db, new_identities,
                               enrich_backend.get_connector_name())
 
-    return items_count
+    return len(new_identities)
 
 def enrich_items(items, enrich_backend, events=False):
     total = 0
