@@ -267,16 +267,17 @@ class GitEnrich(Enrich):
     def get_rich_item(self, item):
 
         def get_pair_programming_metrics(eitem, nauthors):
+            ndecimals = 2
             metrics = {}
             files = eitem['files']
             ladded = eitem['lines_added']
             lremoved = eitem['lines_removed']
             lchanged = eitem['lines_changed']
-            metrics['pair_programming_commit'] = round(1.0 / nauthors, 1)
-            metrics['pair_programming_files'] = round(files / nauthors, 1)
-            metrics["pair_programming_lines_added"] = round(ladded / nauthors, 1)
-            metrics["pair_programming_lines_removed"] = round(lremoved / nauthors, 1)
-            metrics["pair_programming_lines_changed"] = round(lchanged / nauthors, 1)
+            metrics['pair_programming_commit'] = round(1.0 / nauthors, ndecimals)
+            metrics['pair_programming_files'] = round(files / nauthors, ndecimals)
+            metrics["pair_programming_lines_added"] = round(ladded / nauthors, ndecimals)
+            metrics["pair_programming_lines_removed"] = round(lremoved / nauthors, ndecimals)
+            metrics["pair_programming_lines_changed"] = round(lchanged / nauthors, ndecimals)
 
             return metrics
 
