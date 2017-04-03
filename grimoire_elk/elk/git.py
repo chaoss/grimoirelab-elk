@@ -390,6 +390,8 @@ class GitEnrich(Enrich):
             eitem['Signed-off-by'] = commit['Signed-off-by']
             eitem['Signed-off-by_number'] = len(commit['Signed-off-by'])
             nauthors = len(commit['Signed-off-by']) + 1  # +1: commit author
+            if item['data']['Author'] in item['data']['Signed-off-by']:
+                nauthors -= 1
             eitem.update(get_pair_programming_metrics(eitem, nauthors))
         return eitem
 
