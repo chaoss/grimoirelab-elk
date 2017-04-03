@@ -106,6 +106,8 @@ class SlackEnrich(Enrich):
             else:
                 eitem[f] = None
 
+        eitem['text_analyzed'] = eitem['text']
+
         eitem['number_attachs'] = 0
         if 'attachments' in message:
             eitem['number_attachs'] = len(message['attachments'])
