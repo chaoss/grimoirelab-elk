@@ -380,7 +380,7 @@ class GitEnrich(Enrich):
             nauthors = len(commit['authors'])
             eitem.update(get_pair_programming_metrics(eitem, nauthors))
 
-        # Pair Programming support
+        # Pair Programming support using Signed-off
         eitem['Signed-off-by_number'] = 0
         eitem['is_git_commit_signed_off'] = 0
         if 'Signed-off-by' in commit:
@@ -389,9 +389,8 @@ class GitEnrich(Enrich):
                 eitem['is_git_commit_signed_off'] = commit['is_git_commit_signed_off']
             eitem['Signed-off-by'] = commit['Signed-off-by']
             eitem['Signed-off-by_number'] = len(commit['Signed-off-by'])
-            nauthors = len(commit['Signed-off-by']) + 1  # +1: commit author
-            if item['data']['Author'] in item['data']['Signed-off-by']:
-                nauthors -= 1
+            eitem['authors_signed_off'] = commit['authors_signed_off']
+            nauthors = len(commit['authors_signed_off'])
             eitem.update(get_pair_programming_metrics(eitem, nauthors))
         return eitem
 
@@ -414,6 +413,7 @@ class GitEnrich(Enrich):
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
         for item in items:
+            # First we need to add the authors field to all commits
             # Check multi author
             m = AUTHOR_P2P_REGEX.match(item['data']['Author'])
             if m:
@@ -426,6 +426,11 @@ class GitEnrich(Enrich):
                 logger.debug("Multicommitter detected: using just the first committer")
                 item['data']['committers'] = self.__get_authors(item['data']['Commit'])
                 item['data']['Commit'] = item['data']['committers'][0]
+            if CLOUDFOUNDRY_URL in item['origin']:
+                # Add the authors list using the original Author and the Signed-off list
+                if 'Signed-off-by' in item['data']:
+                    authors_all = item['data']['Signed-off-by']+[item['data']['Author']]
+                    item['data']['authors_signed_off'] = list(set(authors_all))
             if current >= max_items:
                 try:
                     r = self.requests.put(url, data=bulk_json)
