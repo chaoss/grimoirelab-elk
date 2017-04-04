@@ -462,7 +462,7 @@ class GitEnrich(Enrich):
                     item['data']['Author'] = authors[i]
                     item['data']['is_git_commit_multi_author'] = 1
                     rich_item = self.get_rich_item(item)
-                    commit_id = item[self.get_field_unique_id()] + "_" + str(i)
+                    commit_id = item[self.get_field_unique_id()] + "_" + str(i-1)
                     data_json = json.dumps(rich_item)
                     bulk_json += '{"index" : {"_id" : "%s" } }\n' % commit_id
                     bulk_json += data_json +"\n"  # Bulk document
@@ -622,15 +622,17 @@ class GitEnrich(Enrich):
                 new_item["author_max_date"] = author['max']['value_as_string']
                 if "author_min_date" not in new_item:
                     new_item["author_min_date"] = author['min']['value_as_string']
+                    # In p2p the ids are created during enrichment
+                    new_item["_item_id"] = item['_id']
                 author_items.append(new_item)
 
             if len(author_items) >= self.elastic.max_items_bulk:
-                self.elastic.bulk_upload(author_items, "ocean-unique-id")
+                self.elastic.bulk_upload(author_items, "_item_id")
                 author_items = []
 
             nauthors_done += 1
             logger.info("Authors processed %i/%i", nauthors_done, len(authors))
 
-        self.elastic.bulk_upload(author_items, "ocean-unique-id")
+        self.elastic.bulk_upload(author_items, "_item_id")
 
         logger.debug("Completed demography enrich from %s" % (self.elastic.index_url))
