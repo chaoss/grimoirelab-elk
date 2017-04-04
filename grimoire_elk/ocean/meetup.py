@@ -30,3 +30,15 @@ class MeetupOcean(ElasticOcean):
 
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["uuid"]
+
+    @classmethod
+    def get_perceval_params_from_url(cls, url):
+        params = []
+
+        # The URL is directly the meetup group so use it as the tag
+        params.append('--tag')
+        params.append(url)
+        # Add the group as the last param for perceval
+        params.append(url)
+
+        return params
