@@ -33,12 +33,13 @@ import requests
 
 from datetime import datetime
 from ..elk.utils import unixtime_to_datetime, get_repository_filter
+from ..elastic_items import ElasticItems
 
 
 logger = logging.getLogger(__name__)
 
 
-class ElasticOcean(object):
+class ElasticOcean(ElasticItems):
 
     @classmethod
     def add_params(cls, cmdline_parser):
@@ -55,19 +56,10 @@ class ElasticOcean(object):
     def __init__(self, perceval_backend, from_date=None, fetch_cache=False,
                  project=None, insecure=True, offset=None):
 
-        self.perceval_backend = perceval_backend
-        self.last_update = None  # Last update in ocean items index for feed
-        self.from_date = from_date  # fetch from_date
-        self.offset = offset  # fetch from offset
+        super().__init__(perceval_backend, from_date, insecure, offset)
+
         self.fetch_cache = fetch_cache  # fetch from cache
         self.project = project  # project to be used for this data source
-        self.filter_raw = None  # to filter raw items from Ocean
-        self.filter_raw_should = None  # to filter raw items from Ocean
-
-        self.requests = requests.Session()
-        if insecure:
-            requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-            self.requests.verify = False
 
 
     def set_elastic(self, elastic):
@@ -135,14 +127,6 @@ class ElasticOcean(object):
         item['metadata__updated_on'] = updated.isoformat()
         # Also add timestamp used in incremental enrichment
         item['metadata__timestamp'] = timestamp.isoformat()
-
-    def get_repository_filter_raw(self, term=False):
-        """ Returns the filter to be used in queries in a repository items """
-        perceval_backend = self.perceval_backend
-        perceval_backend_name = self.get_connector_name()
-        f = get_repository_filter(perceval_backend, perceval_backend_name, term)
-
-        return f
 
     def feed(self, from_date=None, from_offset=None, category=None):
         """ Feed data in Elastic from Perceval """
@@ -247,138 +231,3 @@ class ElasticOcean(object):
         field_id = self.get_field_unique_id()
 
         self.elastic.bulk_upload_sync(json_items, field_id)
-
-    # Iterator
-    def _get_elastic_items(self):
-        """ Get the items from the index related to the backend """
-
-        url = self.elastic.index_url
-        # 1 minute to process the results of size items
-        # In gerrit enrich with 500 items per page we need >1 min
-        # In Mozilla ES in Amazon we need 10m
-        max_process_items_pack_time = "10m"  # 10 minutes
-        url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
-                                               self.elastic_page)
-
-        if self.elastic_scroll_id:
-            """ Just continue with the scrolling """
-            url = self.elastic.url
-            url += "/_search/scroll"
-            scroll_data = {
-                "scroll" : max_process_items_pack_time,
-                "scroll_id" : self.elastic_scroll_id
-                }
-            r = self.requests.post(url, data=json.dumps(scroll_data))
-        else:
-            # If using a perceval backends always filter by repository
-            # to support multi repository indexes
-            # We need the filter dict as a string to join with the rest
-            filters = self.get_repository_filter_raw(term=True)
-            filters = json.dumps(filters)
-
-            if self.filter_raw:
-                filters += '''
-                    , {"term":
-                        { "%s":"%s"  }
-                    }
-                ''' % (self.filter_raw['name'], self.filter_raw['value'])
-
-            if self.from_date:
-                date_field = self.get_field_date()
-                from_date = self.from_date.isoformat()
-
-                filters += '''
-                    , {"range":
-                        {"%s": {"gte": "%s"}}
-                    }
-                ''' % (date_field, from_date)
-            elif self.offset:
-                filters += '''
-                    , {"range":
-                        {"offset": {"gte": %i}}
-                    }
-                ''' % (self.offset)
-
-
-            # Order the raw items from the old ones to the new so if the
-            # enrich process fails, it could be resume incrementally
-            order_query = ''
-            order_field = None
-            if self.perceval_backend:
-                order_field = 'metadata__timestamp'
-            elif self.get_connector_name() == 'twitter':
-                order_field = '@timestamp'
-            if order_field is not None:
-                order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
-
-            filters_should = ''
-            if self.filter_raw_should:
-                filters_should = json.dumps(self.filter_raw_should)[1:-1]
-                # We need to add a bool should query to the outer must query
-                query_should = '{"bool": {%s}}' % filters_should
-                filters += ", " + query_should
-
-            query = """
-            {
-                "query": {
-                    "bool": {
-                        "must": [%s]
-                    }
-                } %s
-            }
-            """ % (filters, order_query)
-
-            logger.debug("%s\n%s", url, json.dumps(json.loads(query), indent=4))
-            r = self.requests.post(url, data=query)
-
-        items = []
-        rjson = None
-        try:
-            rjson = r.json()
-        except:
-            logger.error("No JSON found in %s" % (r.text))
-            logger.error("No results found from %s" % (url))
-
-        if rjson and "_scroll_id" in rjson:
-            self.elastic_scroll_id = rjson["_scroll_id"]
-        else:
-            self.elastic_scroll_id = None
-
-        if rjson and "hits" in rjson:
-            for hit in rjson["hits"]["hits"]:
-                items.append(hit['_source'])
-        else:
-            logger.error("No results found from %s" % (url))
-
-        return items
-
-    def set_filter_raw(self, filter_raw):
-        """ Filter to be used when getting items from Ocean index """
-        self.filter_raw = filter_raw
-
-    def set_filter_raw_should(self, filter_raw_should):
-        """ Bool filter should to be used when getting items from Ocean index """
-        self.filter_raw_should = filter_raw_should
-
-
-    def __iter__(self):
-
-        self.elastic_scroll_id = None
-        # In large projects like Eclipse commits, 100 is too much
-        self.elastic_page = 100
-        # self.elastic_page = 10
-        self.iter_items = self._get_elastic_items()
-
-        return self
-
-    def __next__(self):
-
-        if len(self.iter_items) > 0:
-            return self.iter_items.pop()
-        else:
-            if self.elastic_scroll_id:
-                self.iter_items = self._get_elastic_items()
-            if len(self.iter_items) > 0:
-                return self.__next__()
-            else:
-                raise StopIteration
