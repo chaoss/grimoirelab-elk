@@ -36,6 +36,8 @@ from os import path
 from dateutil import parser
 from functools import lru_cache
 
+from ..elastic_items import ElasticItems
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -82,7 +84,7 @@ def metadata(func):
     return decorator
 
 
-class Enrich(object):
+class Enrich(ElasticItems):
 
     sh_db = None
     RAW_FIELDS_COPY = ["metadata__updated_on", "metadata__timestamp",
@@ -90,6 +92,10 @@ class Enrich(object):
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host='', insecure=True):
+
+        perceval_backend = None
+        super().__init__(perceval_backend, insecure=True)
+
         self.sortinghat = False
         if db_user == '':
             db_user = DEFAULT_DB_USER
@@ -153,7 +159,17 @@ class Enrich(object):
         self.elastic = elastic
 
     def set_params(self, params):
+        from ..utils import get_connector_from_name
+
         self.backend_params = params
+        backend_name = self.get_connector_name()
+        # We can now create the perceval backend
+        if not get_connector_from_name(backend_name):
+            raise RuntimeError("Unknown backend %s" % backend_name)
+        connector = get_connector_from_name(backend_name)
+        klass = connector[3]  # BackendCmd for the connector
+        backend_cmd = klass(*self.backend_params)
+        self.perceval_backend = backend_cmd.backend
 
     def __convert_json_to_projects_map(self, json):
         """ Convert JSON format to the projects map format
@@ -449,86 +465,17 @@ class Enrich(object):
             name: 1
         }
 
-    # Get items for the generator: initial scroll query
-    def __get_elastic_items(self, elastic_scroll_id=None, query_string=None):
-        """ Get the items from the enriched index related to the backend """
-
-        elastic_page = 1000
-        url = self.elastic.index_url
-        max_process_items_pack_time = "10m"  # 10 minutes
-        url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
-                                               elastic_page)
-        res_json = None # query results in JSON format
-
-        if elastic_scroll_id:
-            """ Just continue with the scrolling """
-            url = self.elastic.url
-            url += "/_search/scroll"
-            scroll_data = {
-                "scroll" : max_process_items_pack_time,
-                "scroll_id" : elastic_scroll_id
-            }
-            r = self.requests.post(url, data=json.dumps(scroll_data))
-        else:
-
-            if query_string:
-                filters = """
-                {
-                "query_string": {
-                    "fields" : ["%s"],
-                    "query": "%s"
-                    }
-                }
-                """ % (query_string['fields'], query_string['query'])
-            else:
-
-                filters = """
-                {
-                "query_string": {
-                    "analyze_wildcard": true,
-                    "query": "*"
-                    }
-                }
-                """
-            order_field = self.get_field_date()
-            order_query = ''
-            order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
-
-            query = """
-            {
-                "query": {
-                    "bool": {
-                        "must": [%s]
-                    }
-                } %s
-            }
-            """ % (filters, order_query)
-
-            logger.debug("%s %s", url, query)
-
-            r = self.requests.post(url, data=query)
-
-        try:
-            res_json = r.json()
-        except Exception as e:
-            print(e)
-            logger.error("No JSON found in %s", r.text)
-            logger.error("No results found from %s", url)
-
-        return res_json
-
-
     # Enriched items generator
     def fetch(self, query_string = None):
         logger.debug("Creating enriched items generator.")
 
-        elastic_scroll_id = None
+        self.elastic_scroll_id = None
 
         while True:
-            rjson = self.__get_elastic_items(elastic_scroll_id, query_string)
+            rjson = self._get_elastic_items(query_string, raw=True)
 
             if rjson and "_scroll_id" in rjson:
-                elastic_scroll_id = rjson["_scroll_id"]
+                self.elastic_scroll_id = rjson["_scroll_id"]
 
             if rjson and "hits" in rjson:
                 if len(rjson["hits"]["hits"]) == 0:
