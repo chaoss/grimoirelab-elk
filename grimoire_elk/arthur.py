@@ -254,7 +254,7 @@ def load_identities(ocean_backend, enrich_backend):
     items_count = 0
     new_identities = []
 
-    for item in ocean_backend:
+    for item in ocean_backend.fetch():
         items_count += 1
         # Get identities from new items to be added to SortingHat
         identities = enrich_backend.get_identities(item)
@@ -514,11 +514,11 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             else:
                 # Enrichment for the new items once SH update is finished
                 if not events_enrich:
-                    enrich_count = enrich_items(ocean_backend, enrich_backend)
+                    enrich_count = enrich_items(ocean_backend.fetch(), enrich_backend)
                     if enrich_count is not None:
                         logger.info("Total items enriched %i ", enrich_count)
                 else:
-                    enrich_count = enrich_items(ocean_backend, enrich_backend, events=True)
+                    enrich_count = enrich_items(ocean_backend.fetch(), enrich_backend, events=True)
                     if enrich_count is not None:
                         logger.info("Total events enriched %i ", enrich_count)
                 if studies:

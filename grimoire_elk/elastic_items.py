@@ -50,11 +50,9 @@ class ElasticItems():
             self.requests.verify = False
 
         self.elastic = None
-        self.elastic_scroll_id = None
         # In large projects like Eclipse commits, 100 is too much
         self.elastic_page = 100
         # self.elastic_page = 10
-
 
     def get_repository_filter_raw(self, term=False):
         """ Returns the filter to be used in queries in a repository items """
@@ -66,8 +64,43 @@ class ElasticItems():
         """ Field with the update in the JSON items. Now the same in all. """
         return "metadata__updated_on"
 
-    # Iterator methods
-    def _get_elastic_items(self, query_string=None, raw=False):
+    def set_filter_raw(self, filter_raw):
+        """ Filter to be used when getting items from Ocean index """
+        self.filter_raw = filter_raw
+
+    def set_filter_raw_should(self, filter_raw_should):
+        """ Bool filter should to be used when getting items from Ocean index """
+        self.filter_raw_should = filter_raw_should
+
+    def get_connector_name(self):
+        """ Find the name for the current connector """
+        from .utils import get_connector_name
+        return get_connector_name(type(self))
+
+    # Items generator
+    def fetch(self, query_string=None):
+        logger.debug("Creating ocean items generator.")
+
+        elastic_scroll_id = None
+
+        while True:
+            rjson = self.get_elastic_items(elastic_scroll_id, query_string)
+
+            if rjson and "_scroll_id" in rjson:
+                elastic_scroll_id = rjson["_scroll_id"]
+
+            if rjson and "hits" in rjson:
+                if len(rjson["hits"]["hits"]) == 0:
+                    break
+                for hit in rjson["hits"]["hits"]:
+                    eitem = hit['_source']
+                    yield eitem
+            else:
+                logger.error("No results found from %s", self.elastic.index_url)
+                break
+        return
+
+    def get_elastic_items(self, elastic_scroll_id=None, query_string=None):
         """ Get the items from the index related to the backend """
 
         if not self.elastic:
@@ -80,13 +113,13 @@ class ElasticItems():
         url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
                                                self.elastic_page)
 
-        if self.elastic_scroll_id:
+        if elastic_scroll_id:
             """ Just continue with the scrolling """
             url = self.elastic.url
             url += "/_search/scroll"
             scroll_data = {
                 "scroll" : max_process_items_pack_time,
-                "scroll_id" : self.elastic_scroll_id
+                "scroll_id" : elastic_scroll_id
                 }
             r = self.requests.post(url, data=json.dumps(scroll_data))
         else:
@@ -168,48 +201,4 @@ class ElasticItems():
             logger.error("No JSON found in %s" % (r.text))
             logger.error("No results found from %s" % (url))
 
-        if rjson and "_scroll_id" in rjson:
-            self.elastic_scroll_id = rjson["_scroll_id"]
-        else:
-            self.elastic_scroll_id = None
-
-        if rjson and "hits" in rjson:
-            for hit in rjson["hits"]["hits"]:
-                items.append(hit['_source'])
-        else:
-            logger.error("No results found from %s" % (url))
-
-        if raw:
-            return rjson
-
-        return items
-
-    def set_filter_raw(self, filter_raw):
-        """ Filter to be used when getting items from Ocean index """
-        self.filter_raw = filter_raw
-
-    def set_filter_raw_should(self, filter_raw_should):
-        """ Bool filter should to be used when getting items from Ocean index """
-        self.filter_raw_should = filter_raw_should
-
-    def get_connector_name(self):
-        """ Find the name for the current connector """
-        from .utils import get_connector_name
-        return get_connector_name(type(self))
-
-    def __iter__(self):
-        logging.debug("Getting items ...")
-        self.elastic_scroll_id = None
-        self.iter_items = self._get_elastic_items()
-        return self
-
-    def __next__(self):
-        if len(self.iter_items) > 0:
-            return self.iter_items.pop()
-        else:
-            if self.elastic_scroll_id:
-                self.iter_items = self._get_elastic_items()
-            if len(self.iter_items) > 0:
-                return self.__next__()
-            else:
-                raise StopIteration
+        return rjson

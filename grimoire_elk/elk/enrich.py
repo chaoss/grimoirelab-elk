@@ -465,29 +465,6 @@ class Enrich(ElasticItems):
             name: 1
         }
 
-    # Enriched items generator
-    def fetch(self, query_string = None):
-        logger.debug("Creating enriched items generator.")
-
-        self.elastic_scroll_id = None
-
-        while True:
-            rjson = self._get_elastic_items(query_string, raw=True)
-
-            if rjson and "_scroll_id" in rjson:
-                self.elastic_scroll_id = rjson["_scroll_id"]
-
-            if rjson and "hits" in rjson:
-                if len(rjson["hits"]["hits"]) == 0:
-                    break
-                for hit in rjson["hits"]["hits"]:
-                    eitem = hit['_source']
-                    yield eitem
-            else:
-                logger.error("No results found from %s", self.elastic.index_url)
-                break
-        return
-
     # Project field enrichment
     def get_project_repository(self, eitem):
         """
