@@ -384,14 +384,14 @@ class GitEnrich(Enrich):
         eitem['Signed-off-by_number'] = 0
         eitem['is_git_commit_signed_off'] = 0
         if 'Signed-off-by' in commit:
+            eitem['Signed-off-by'] = commit['Signed-off-by']
+            eitem['Signed-off-by_number'] = len(commit['Signed-off-by'])
             if 'is_git_commit_signed_off' in commit:
                 # Commits generated for signed_off people
                 eitem['is_git_commit_signed_off'] = commit['is_git_commit_signed_off']
-            eitem['Signed-off-by'] = commit['Signed-off-by']
-            eitem['Signed-off-by_number'] = len(commit['Signed-off-by'])
-            eitem['authors_signed_off'] = commit['authors_signed_off']
-            nauthors = len(commit['authors_signed_off'])
-            eitem.update(get_pair_programming_metrics(eitem, nauthors))
+                eitem['authors_signed_off'] = commit['authors_signed_off']
+                nauthors = len(commit['authors_signed_off'])
+                eitem.update(get_pair_programming_metrics(eitem, nauthors))
         return eitem
 
     def enrich_items(self, items, events=False):
