@@ -92,7 +92,7 @@ class TestBackends(unittest.TestCase):
 
         items_pack = []
 
-        for item in items:
+        for item in items.fetch():
             item = self.__ocean_item(item)
             if len(items_pack) >= enrich_backend.elastic.max_items_bulk:
                 logging.info("Adding %i (%i done) enriched items to %s",
