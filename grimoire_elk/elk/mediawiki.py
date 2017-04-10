@@ -74,6 +74,9 @@ class MediaWikiEnrich(Enrich):
 
     def get_sh_identity(self, item, identity_field=None):
 
+        if identity_field is None:
+            identity_field = self.get_field_author()
+
         revision = item
 
         identity = {}
@@ -81,7 +84,7 @@ class MediaWikiEnrich(Enrich):
         identity['email'] = None
         identity['name'] = None
 
-        if 'data' in item and type(item) == dict:
+        if 'data' in item and isinstance(item, dict):
             if 'revisions' not in item['data']:
                 return identity
             # Use as identity the first reviewer for a page
@@ -90,6 +93,7 @@ class MediaWikiEnrich(Enrich):
         if  identity_field in revision:
             identity['username'] = revision[identity_field]
             identity['name'] = revision[identity_field]
+
         return identity
 
     def get_review_sh(self, revision, item):
