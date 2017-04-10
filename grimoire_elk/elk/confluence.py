@@ -100,7 +100,7 @@ class ConfluenceEnrich(Enrich):
         page = item['data']
 
         # data fields to copy
-        copy_fields = ["type", "id", "status", "title"]
+        copy_fields = ["type", "id", "status", "title", "content_url"]
         for f in copy_fields:
             if f in page:
                 eitem[f] = page[f]
