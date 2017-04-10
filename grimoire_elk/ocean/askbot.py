@@ -30,3 +30,19 @@ class AskbotOcean(ElasticOcean):
     def _fix_item(self, item):
         # item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
         item["ocean-unique-id"] = item["uuid"]
+
+    @classmethod
+    def get_p2o_params_from_url(cls, url):
+        # askbot could include in the URL a  filters-raw-prefix T1721
+        # "https://ask.openstack.org filter-raw=data.tags:rdo"
+        params = {}
+
+        tokens = url.split(' ', 1)  # Just split the URL not the filter
+        params['url'] = tokens[0]
+
+        if len(tokens) > 1:
+            filter_raw = tokens[1].split(" ", 1)[1]
+            # Create a filters array
+            params['filter-raw'] = filter_raw
+
+        return params
