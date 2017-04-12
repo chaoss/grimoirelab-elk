@@ -613,9 +613,9 @@ class GitEnrich(Enrich):
             r = self.requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str, verify=False)
 
             if "hits" not in r.json():
-                logger.error("Can't find commits for %s" % (author['key']))
-                print(r.json())
-                print(author_query)
+                logger.error("Can't find commits for %s", author['key'])
+                logger.error(r.json())
+                logger.error(author_query)
                 continue
             for item in r.json()["hits"]["hits"]:
                 new_item = item['_source']
@@ -631,6 +631,9 @@ class GitEnrich(Enrich):
                 author_items = []
 
             nauthors_done += 1
+            logger.debug("%s: %s %s", author['key'],
+                         author['min']['value_as_string'],
+                         author['max']['value_as_string'])
             logger.info("Authors processed %i/%i", nauthors_done, len(authors))
 
         self.elastic.bulk_upload(author_items, "_item_id")
