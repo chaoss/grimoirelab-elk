@@ -411,7 +411,6 @@ class GitEnrich(Enrich):
             eitem['authors_signed_off'] = commit['authors_signed_off']
             nauthors = len(commit['authors_signed_off'])
             eitem.update(get_pair_programming_metrics(eitem, nauthors))
-
         return eitem
 
     def enrich_items(self, items, events=False):
