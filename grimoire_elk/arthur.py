@@ -254,7 +254,13 @@ def load_identities(ocean_backend, enrich_backend):
     items_count = 0
     new_identities = []
 
-    for item in ocean_backend.fetch():
+    # Support that ocean_backend is a list of items (old API)
+    if isinstance(ocean_backend, list):
+        items = ocean_backend
+    else:
+        items = ocean_backend.fetch()
+
+    for item in items:
         items_count += 1
         # Get identities from new items to be added to SortingHat
         identities = enrich_backend.get_identities(item)
