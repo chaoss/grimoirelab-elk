@@ -42,12 +42,16 @@ except ImportError:
 GITHUB = 'https://github.com/'
 SH_GIT_COMMIT = 'github-commit'
 DEMOGRAPHY_COMMIT_MIN_DATE='1980-01-01'
-# REGEX to extract authors from a multi author commit: several authors present
-# in the Author field in the commit. Used in CloudFoundry
-AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) and (?P<last_author>.* .*) (?P<email>.*)')
 logger = logging.getLogger(__name__)
 
 class GitEnrich(Enrich):
+
+    # REGEX to extract authors from a multi author commit: several authors present
+    # in the Author field in the commit. Used if self.pair_programming is True
+    AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) and (?P<last_author>.* .*) (?P<email>.*)')
+    # Temporal hack to use pair programing only in CloudFoundry
+    CLOUDFOUNDRY_URL = 'https://github.com/cloudfoundry/'
+
 
     roles = ['Author', 'Commit']
 
@@ -66,6 +70,7 @@ class GitEnrich(Enrich):
         self.rate_limit = None
         self.rate_limit_reset_ts = None
         self.min_rate_to_sleep = 100  # if pending rate < 100 sleep
+        self.pair_programming = False
 
     def set_github_token(self, token):
         self.github_token = token
@@ -96,7 +101,7 @@ class GitEnrich(Enrich):
     def __get_authors(self, authors_str):
         # Extract the authors from a multiauthor
 
-        m = AUTHOR_P2P_REGEX.match(authors_str)
+        m = self.AUTHOR_P2P_REGEX.match(authors_str)
         if m:
             authors = m.group('first_authors').split(",")
             authors = [author.strip() for author in authors]
@@ -110,6 +115,10 @@ class GitEnrich(Enrich):
         """ Return the identities from an item.
             If the repo is in GitHub, get the usernames from GitHub. """
         identities = []
+
+        # Temporal hack until all is integrated in mordred and p2o
+        if self.CLOUDFOUNDRY_URL in item['origin']:
+            self.pair_programming = True
 
         def add_sh_github_identity(user, user_field, rol):
             """ Add a new github identity to SH if it does not exists """
@@ -141,8 +150,8 @@ class GitEnrich(Enrich):
 
         if item['data']['Author']:
             # Check multi authors commits
-            m = AUTHOR_P2P_REGEX.match(item['data']["Author"])
-            if m:
+            m = self.AUTHOR_P2P_REGEX.match(item['data']["Author"])
+            if m and self.pair_programming:
                 authors = self.__get_authors(item['data']["Author"])
                 for author in authors:
                     user = self.get_sh_identity(author)
@@ -153,8 +162,8 @@ class GitEnrich(Enrich):
                 if self.github_token:
                     add_sh_github_identity(user, 'Author', 'author')
         if item['data']['Commit']:
-            m = AUTHOR_P2P_REGEX.match(item['data']["Commit"])
-            if m:
+            m = self.AUTHOR_P2P_REGEX.match(item['data']["Commit"])
+            if m and self.pair_programming:
                 committers = self.__get_authors(item['data']['Commit'])
                 for committer in committers:
                     user = self.get_sh_identity(committer)
@@ -164,7 +173,7 @@ class GitEnrich(Enrich):
                 identities.append(user)
                 if self.github_token:
                     add_sh_github_identity(user, 'Commit', 'committer')
-        if 'Signed-off-by' in item['data']:
+        if 'Signed-off-by' in item['data'] and self.pair_programming:
             signers = item['data']["Signed-off-by"]
             for signer in signers:
                 user = self.get_sh_identity(signer)
@@ -266,21 +275,6 @@ class GitEnrich(Enrich):
     @metadata
     def get_rich_item(self, item):
 
-        def get_pair_programming_metrics(eitem, nauthors):
-            ndecimals = 2
-            metrics = {}
-            files = eitem['files']
-            ladded = eitem['lines_added']
-            lremoved = eitem['lines_removed']
-            lchanged = eitem['lines_changed']
-            metrics['pair_programming_commit'] = round(1.0 / nauthors, ndecimals)
-            metrics['pair_programming_files'] = round(files / nauthors, ndecimals)
-            metrics["pair_programming_lines_added"] = round(ladded / nauthors, ndecimals)
-            metrics["pair_programming_lines_removed"] = round(lremoved / nauthors, ndecimals)
-            metrics["pair_programming_lines_changed"] = round(lchanged / nauthors, ndecimals)
-
-            return metrics
-
         eitem = {}
         for f in self.RAW_FIELDS_COPY:
             if f in item:
@@ -368,6 +362,30 @@ class GitEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
 
+        if self.pair_programming:
+            eitem = self.__add_pair_programming_metrics(commit, eitem)
+
+        return eitem
+
+
+    def __add_pair_programming_metrics(self, commit, eitem):
+
+        def get_pair_programming_metrics(eitem, nauthors):
+            ndecimals = 2
+            metrics = {}
+            files = eitem['files']
+            ladded = eitem['lines_added']
+            lremoved = eitem['lines_removed']
+            lchanged = eitem['lines_changed']
+            metrics['pair_programming_commit'] = round(1.0 / nauthors, ndecimals)
+            metrics['pair_programming_files'] = round(files / nauthors, ndecimals)
+            metrics["pair_programming_lines_added"] = round(ladded / nauthors, ndecimals)
+            metrics["pair_programming_lines_removed"] = round(lremoved / nauthors, ndecimals)
+            metrics["pair_programming_lines_changed"] = round(lchanged / nauthors, ndecimals)
+
+            return metrics
+
+
         # Include pair programming metrics in all cases. In general, 1 author.
         eitem.update(get_pair_programming_metrics(eitem, 1))
 
@@ -389,48 +407,53 @@ class GitEnrich(Enrich):
             if 'is_git_commit_signed_off' in commit:
                 # Commits generated for signed_off people
                 eitem['is_git_commit_signed_off'] = commit['is_git_commit_signed_off']
-                eitem['authors_signed_off'] = commit['authors_signed_off']
-                nauthors = len(commit['authors_signed_off'])
-                eitem.update(get_pair_programming_metrics(eitem, nauthors))
+            # The commit for the original Author also needs this data
+            eitem['authors_signed_off'] = commit['authors_signed_off']
+            nauthors = len(commit['authors_signed_off'])
+            eitem.update(get_pair_programming_metrics(eitem, nauthors))
+
         return eitem
 
     def enrich_items(self, items, events=False):
-        """ Implementation supporting signed-off commits.
-            Only active for CloudFoundry git repositories
+        """ Implementation supporting signed-off and multiauthor/committer commits.
         """
-
-        CLOUDFOUNDRY_URL = 'https://github.com/cloudfoundry/'
 
         max_items = self.elastic.max_items_bulk
         current = 0
         total = 0
+        bulk_json = ""
+
         total_signed_off = 0
         total_multi_author = 0
-        bulk_json = ""
 
         url = self.elastic.index_url+'/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
         for item in items:
-            # First we need to add the authors field to all commits
-            # Check multi author
-            m = AUTHOR_P2P_REGEX.match(item['data']['Author'])
-            if m:
-                logger.debug("Multiauthor detected. Creating one commit " +
-                             "per author: %s", item['data']['Author'])
-                item['data']['authors'] = self.__get_authors(item['data']['Author'])
-                item['data']['Author'] = item['data']['authors'][0]
-            m = AUTHOR_P2P_REGEX.match(item['data']['Commit'])
-            if m:
-                logger.debug("Multicommitter detected: using just the first committer")
-                item['data']['committers'] = self.__get_authors(item['data']['Commit'])
-                item['data']['Commit'] = item['data']['committers'][0]
-            if CLOUDFOUNDRY_URL in item['origin']:
+
+            if self.CLOUDFOUNDRY_URL in item['origin']:
+                self.pair_programming = True
+
+            if self.pair_programming:
+                # First we need to add the authors field to all commits
+                # Check multi author
+                m = self.AUTHOR_P2P_REGEX.match(item['data']['Author'])
+                if m:
+                    logger.debug("Multiauthor detected. Creating one commit " +
+                                 "per author: %s", item['data']['Author'])
+                    item['data']['authors'] = self.__get_authors(item['data']['Author'])
+                    item['data']['Author'] = item['data']['authors'][0]
+                m = self.AUTHOR_P2P_REGEX.match(item['data']['Commit'])
+                if m:
+                    logger.debug("Multicommitter detected: using just the first committer")
+                    item['data']['committers'] = self.__get_authors(item['data']['Commit'])
+                    item['data']['Commit'] = item['data']['committers'][0]
                 # Add the authors list using the original Author and the Signed-off list
                 if 'Signed-off-by' in item['data']:
                     authors_all = item['data']['Signed-off-by']+[item['data']['Author']]
                     item['data']['authors_signed_off'] = list(set(authors_all))
+
             if current >= max_items:
                 try:
                     r = self.requests.put(url, data=bulk_json)
@@ -453,47 +476,45 @@ class GitEnrich(Enrich):
             current += 1
             total += 1
 
-            # Multi author support
-            if 'authors' in item['data']:
-                # First author already added in the above commit
-                authors = item['data']['authors']
-                for i in range(1, len(authors)):
-                    # logger.debug('Adding a new commit for %s', authors[i])
-                    item['data']['Author'] = authors[i]
-                    item['data']['is_git_commit_multi_author'] = 1
-                    rich_item = self.get_rich_item(item)
-                    commit_id = item[self.get_field_unique_id()] + "_" + str(i-1)
-                    data_json = json.dumps(rich_item)
-                    bulk_json += '{"index" : {"_id" : "%s" } }\n' % commit_id
-                    bulk_json += data_json +"\n"  # Bulk document
-                    current += 1
-                    total += 1
-                    total_multi_author += 1
+            if self.pair_programming:
+                # Multi author support
+                if 'authors' in item['data']:
+                    # First author already added in the above commit
+                    authors = item['data']['authors']
+                    for i in range(1, len(authors)):
+                        # logger.debug('Adding a new commit for %s', authors[i])
+                        item['data']['Author'] = authors[i]
+                        item['data']['is_git_commit_multi_author'] = 1
+                        rich_item = self.get_rich_item(item)
+                        commit_id = item[self.get_field_unique_id()] + "_" + str(i-1)
+                        data_json = json.dumps(rich_item)
+                        bulk_json += '{"index" : {"_id" : "%s" } }\n' % commit_id
+                        bulk_json += data_json +"\n"  # Bulk document
+                        current += 1
+                        total += 1
+                        total_multi_author += 1
 
-            if not CLOUDFOUNDRY_URL in item['origin']:
-                continue
-            # Signed-off commits support only for CloudFoundry repos
-            if rich_item['Signed-off-by_number'] > 0:
-                nsg = 0
-                # Remove duplicates and the already added Author if exists
-                authors = list(set(item['data']['Signed-off-by']))
-                if item['data']['Author'] in authors:
-                    authors.remove(item['data']['Author'])
-                for author in authors:
-                    # logger.debug('Adding a new commit for %s', author)
-                    # Change the Author in the original commit and generate
-                    # a new enriched item with it
-                    item['data']['Author'] = author
-                    item['data']['is_git_commit_signed_off'] = 1
-                    rich_item = self.get_rich_item(item)
-                    commit_id = item[self.get_field_unique_id()] + "_" + str(nsg)
-                    data_json = json.dumps(rich_item)
-                    bulk_json += '{"index" : {"_id" : "%s" } }\n' % commit_id
-                    bulk_json += data_json +"\n"  # Bulk document
-                    current += 1
-                    total += 1
-                    total_signed_off += 1
-                    nsg += 1
+                if rich_item['Signed-off-by_number'] > 0:
+                    nsg = 0
+                    # Remove duplicates and the already added Author if exists
+                    authors = list(set(item['data']['Signed-off-by']))
+                    if item['data']['Author'] in authors:
+                        authors.remove(item['data']['Author'])
+                    for author in authors:
+                        # logger.debug('Adding a new commit for %s', author)
+                        # Change the Author in the original commit and generate
+                        # a new enriched item with it
+                        item['data']['Author'] = author
+                        item['data']['is_git_commit_signed_off'] = 1
+                        rich_item = self.get_rich_item(item)
+                        commit_id = item[self.get_field_unique_id()] + "_" + str(nsg)
+                        data_json = json.dumps(rich_item)
+                        bulk_json += '{"index" : {"_id" : "%s" } }\n' % commit_id
+                        bulk_json += data_json +"\n"  # Bulk document
+                        current += 1
+                        total += 1
+                        total_signed_off += 1
+                        nsg += 1
 
         if total == 0:
             # No items enriched, nothing to upload to ES
@@ -502,8 +523,9 @@ class GitEnrich(Enrich):
         r = self.requests.put(url, data=bulk_json)
         r.raise_for_status()
 
-        logger.info("Signed-off commits generated: %i", total_signed_off)
-        logger.info("Multi author commits generated: %i", total_multi_author)
+        if self.pair_programming:
+            logger.info("Signed-off commits generated: %i", total_signed_off)
+            logger.info("Multi author commits generated: %i", total_multi_author)
 
         return total
 
