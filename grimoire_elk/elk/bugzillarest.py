@@ -66,7 +66,7 @@ class BugzillaRESTEnrich(Enrich):
         if 'data' in item and type(item) == dict:
             user = item['data'][identity_field]
 
-        identity['username'] = user['name']
+        identity['username'] = user['name'].split("@")[0]
         identity['email'] = user['email']
         identity['name'] = user['real_name']
         return identity
