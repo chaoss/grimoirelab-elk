@@ -160,6 +160,10 @@ class MBoxEnrich(Enrich):
         return eitem
 
     def enrich_items(self, items):
+        # items is a generator but we need to reuse it so we store all items
+        # from the generator in a list
+        items = list(items)
+
         # Use standard method and if fails, use the old one with Unicode control
         total = 0
         try:

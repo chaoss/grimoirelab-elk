@@ -315,6 +315,10 @@ class MeetupEnrich(Enrich):
         return "id"
 
     def enrich_items(self, items):
+        # items is a generator but we need to reuse it so we store all items
+        # from the generator in a list
+        items = list(items)
+
         super(MeetupEnrich, self).enrich_items(items)
 
         # And now for each item we want also the rsvps and comments items

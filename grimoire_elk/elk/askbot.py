@@ -265,6 +265,9 @@ class AskbotEnrich(Enrich):
         return (answers_enrich, comments_enrich)
 
     def enrich_items(self, items):
+        # items is a generator but we need to reuse it so we store all items
+        # from the generator in a list
+        items = list(items)
         nitems = super(AskbotEnrich, self).enrich_items(items)
         logger.info("Total questions enriched: %i", nitems)
 
