@@ -264,14 +264,13 @@ class AskbotEnrich(Enrich):
 
         return (answers_enrich, comments_enrich)
 
-    def enrich_items(self, items):
-        # items is a generator but we need to reuse it so we store all items
-        # from the generator in a list
-        items = list(items)
-        nitems = super(AskbotEnrich, self).enrich_items(items)
+    def enrich_items(self, ocean_backend):
+        items = ocean_backend.fetch()
+        nitems = super(AskbotEnrich, self).enrich_items(ocean_backend)
         logger.info("Total questions enriched: %i", nitems)
 
         # And now for each item we want also the answers (tops)
+        items = ocean_backend.fetch()
         nanswers = 0
         ncomments = 0
         rich_item_answers = []

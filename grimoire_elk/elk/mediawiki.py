@@ -204,7 +204,7 @@ class MediaWikiEnrich(Enrich):
             super(MediaWikiEnrich, self).enrich_items(items)
 
 
-    def enrich_events(self, items):
+    def enrich_events(self, ocean_backend):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
@@ -214,6 +214,7 @@ class MediaWikiEnrich(Enrich):
 
         logger.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
+        items = ocean_backend.fetch()
         for item in items:
             rich_item_reviews = self.get_rich_item_reviews(item)
             for enrich_review in rich_item_reviews:

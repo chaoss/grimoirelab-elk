@@ -413,7 +413,7 @@ class GitEnrich(Enrich):
             eitem.update(get_pair_programming_metrics(eitem, nauthors))
         return eitem
 
-    def enrich_items(self, items, events=False):
+    def enrich_items(self, ocean_backend, events=False):
         """ Implementation supporting signed-off and multiauthor/committer commits.
         """
 
@@ -428,6 +428,8 @@ class GitEnrich(Enrich):
         url = self.elastic.index_url+'/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
+
+        items = ocean_backend.fetch()
 
         for item in items:
 

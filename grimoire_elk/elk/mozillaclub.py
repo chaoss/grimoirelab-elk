@@ -125,7 +125,7 @@ class MozillaClubEnrich(Enrich):
 
         return eitem
 
-    def enrich_items(self, items):
+    def enrich_items(self, ocean_backend):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
@@ -134,6 +134,7 @@ class MozillaClubEnrich(Enrich):
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
+        items = ocean_backend.fetch()
         for item in items:
             if current >= max_items:
                 self.requests.put(url, data=bulk_json)

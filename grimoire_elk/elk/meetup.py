@@ -314,14 +314,13 @@ class MeetupEnrich(Enrich):
     def get_field_unique_id_rsvps(self):
         return "id"
 
-    def enrich_items(self, items):
-        # items is a generator but we need to reuse it so we store all items
-        # from the generator in a list
-        items = list(items)
+    def enrich_items(self, ocean_backend):
+        items = ocean_backend.fetch()
 
-        super(MeetupEnrich, self).enrich_items(items)
+        super(MeetupEnrich, self).enrich_items(ocean_backend)
 
         # And now for each item we want also the rsvps and comments items
+        items = ocean_backend.fetch()
         ncom = 0
         nrsvps = 0
         rich_item_comments = []

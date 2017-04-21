@@ -159,7 +159,7 @@ class MBoxEnrich(Enrich):
 
         return eitem
 
-    def enrich_items(self, items):
+    def enrich_items(self, ocean_backend):
         # items is a generator but we need to reuse it so we store all items
         # from the generator in a list
         # items = list(items)
@@ -167,11 +167,9 @@ class MBoxEnrich(Enrich):
         # Use standard method and if fails, use the old one with Unicode control
         total = 0
         try:
-            total = super(MBoxEnrich, self).enrich_items(items)
+            total = super(MBoxEnrich, self).enrich_items(ocean_backend)
         except UnicodeEncodeError:
-            # TODO: this is not working because the generator can not be restarted
-            raise
-            total = self.enrich_items_old(items)
+            total = self.enrich_items_old(ocean_backend.fetch())
 
         return total
 

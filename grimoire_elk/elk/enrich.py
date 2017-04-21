@@ -308,11 +308,13 @@ class Enrich(ElasticItems):
     def enrich_events(self, items):
         return self.enrich_items(items, events=True)
 
-    def enrich_items(self, items, events=False):
+    def enrich_items(self, ocean_backend, events=False):
         max_items = self.elastic.max_items_bulk
         current = 0
         total = 0
         bulk_json = ""
+
+        items = ocean_backend.fetch()
 
         url = self.elastic.index_url+'/items/_bulk'
 

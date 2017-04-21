@@ -279,13 +279,13 @@ def load_identities(ocean_backend, enrich_backend):
 
     return len(new_identities)
 
-def enrich_items(items, enrich_backend, events=False):
+def enrich_items(ocean_backend, enrich_backend, events=False):
     total = 0
 
     if not events:
-        total= enrich_backend.enrich_items(items)
+        total= enrich_backend.enrich_items(ocean_backend)
     else:
-        total = enrich_backend.enrich_events(items)
+        total = enrich_backend.enrich_events(ocean_backend)
     return total
 
 def get_last_enrich(backend_cmd, enrich_backend):
@@ -520,11 +520,11 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             else:
                 # Enrichment for the new items once SH update is finished
                 if not events_enrich:
-                    enrich_count = enrich_items(ocean_backend.fetch(), enrich_backend)
+                    enrich_count = enrich_items(ocean_backend, enrich_backend)
                     if enrich_count is not None:
                         logger.info("Total items enriched %i ", enrich_count)
                 else:
-                    enrich_count = enrich_items(ocean_backend.fetch(), enrich_backend, events=True)
+                    enrich_count = enrich_items(ocean_backend, enrich_backend, events=True)
                     if enrich_count is not None:
                         logger.info("Total events enriched %i ", enrich_count)
                 if studies:
