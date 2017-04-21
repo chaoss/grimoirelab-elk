@@ -87,25 +87,6 @@ class TestBackends(unittest.TestCase):
             items_pack.append(item)
         ocean._items_to_es(items_pack)
 
-    def __enrich_items(self, items, enrich_backend):
-        total = 0
-
-        items_pack = []
-
-        for item in items.fetch():
-            item = self.__ocean_item(item)
-            if len(items_pack) >= enrich_backend.elastic.max_items_bulk:
-                logging.info("Adding %i (%i done) enriched items to %s",
-                             enrich_backend.elastic.max_items_bulk, total,
-                             enrich_backend.elastic.index_url)
-                enrich_backend.enrich_items(items_pack)
-                items_pack = []
-            items_pack.append(item)
-            total += 1
-        enrich_backend.enrich_items(items_pack)
-
-        return total
-
     def test_data_load(self):
         """Test load all sources JSON data into ES"""
         config = configparser.ConfigParser()
@@ -151,7 +132,8 @@ class TestBackends(unittest.TestCase):
             if sortinghat:
                 # Load SH identities
                 load_identities(ocean_backend, enrich_backend)
-            enrich_count = self.__enrich_items(ocean_backend, enrich_backend)
+            enrich_count = enrich_backend.enrich_items(ocean_backend)
+
             logging.info("Total items enriched %i ", enrich_count)
 
     def test_enrich_sh(self):
