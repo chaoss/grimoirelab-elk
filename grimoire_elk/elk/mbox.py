@@ -162,13 +162,15 @@ class MBoxEnrich(Enrich):
     def enrich_items(self, items):
         # items is a generator but we need to reuse it so we store all items
         # from the generator in a list
-        items = list(items)
+        # items = list(items)
 
         # Use standard method and if fails, use the old one with Unicode control
         total = 0
         try:
             total = super(MBoxEnrich, self).enrich_items(items)
         except UnicodeEncodeError:
+            # TODO: this is not working because the generator can not be restarted
+            raise
             total = self.enrich_items_old(items)
 
         return total
