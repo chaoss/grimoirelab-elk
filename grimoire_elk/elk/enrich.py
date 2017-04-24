@@ -168,6 +168,9 @@ class Enrich(ElasticItems):
             raise RuntimeError("Unknown backend %s" % backend_name)
         connector = get_connector_from_name(backend_name)
         klass = connector[3]  # BackendCmd for the connector
+        if not klass:
+            # Non perceval backends can not be configured
+            return
         backend_cmd = klass(*self.backend_params)
         self.perceval_backend = backend_cmd.backend
 
