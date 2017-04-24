@@ -531,7 +531,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                     do_studies(enrich_backend)
 
     except Exception as ex:
-        traceback.print_exc()
+        logger.error("%s", traceback.format_exc())
         if backend:
             logger.error("Error enriching ocean from %s (%s): %s",
                           backend_name, backend.origin, ex)
