@@ -70,6 +70,9 @@ class TwitterEnrich(Enrich):
         identity['email'] = None
         identity['name'] = None
 
+        if identity_field is None:
+            identity_field = self.get_field_author()
+
         if identity_field in item:
             identity['username'] = item[identity_field]['screen_name']
             identity['name'] = item[identity_field]['name']
