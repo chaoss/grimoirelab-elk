@@ -268,8 +268,9 @@ def load_identities(ocean_backend, enrich_backend):
             if identity not in new_identities:
                 new_identities.append(identity)
         if items_count % 100 == 0:
-            logger.debug("Processed %i items identities (%i identities)",
-                          items_count, len(new_identities))
+            logger.debug("Processed %i items identities (%i identities) from %s",
+                          items_count, len(new_identities),
+                          enrich_backend.get_connector_name())
     logger.debug("TOTAL ITEMS: %i", items_count)
 
     logger.info("Total new identities to be checked %i", len(new_identities))
