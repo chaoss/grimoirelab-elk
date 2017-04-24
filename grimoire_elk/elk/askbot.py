@@ -72,7 +72,10 @@ class AskbotEnrich(Enrich):
             identity['username'] = user['username']
         elif 'user_display_name' in user:
             identity['username'] = user['user_display_name']
+        elif 'answered_by' in user:
+            identity['username'] = user['answered_by']['username']
         identity['name'] = identity['username']
+
         return identity
 
     def get_field_author(self):
@@ -144,8 +147,8 @@ class AskbotEnrich(Enrich):
             eitem['time_to_reply'] = get_time_diff_days(added_at, first_answer_time)
 
         if question['author'] and type(question['author']) is dict:
-            eitem['author_user_name'] = question['author']['username']
-            eitem['author_id'] = question['author']['id']
+            eitem['author_askbot_user_name'] = question['author']['username']
+            eitem['author_askbot_id'] = question['author']['id']
             eitem['author_badges'] = question['author']['badges']
             eitem['author_reputation'] = int(question['author']['reputation'])
 
@@ -173,14 +176,25 @@ class AskbotEnrich(Enrich):
     def get_field_unique_id_answer(self):
         return "id"
 
+    def get_users_data(self, askbot_item):
+        """ Adapt the data to be used with standard SH enrich API """
+        # askbot_item could be a raw question, answer or comment
+        poster = {}
+        poster[self.get_field_author()] = askbot_item
+        return poster
+
     def get_rich_comment(self, item, answer, comment):
         ecomment = self.get_rich_item(item)  # reuse all fields from item
         ecomment['id'] = comment['id']
         ecomment['url'] = item['data']['url']+"/?answer="
         ecomment['url'] += answer['id']+'#post-id-'+answer['id']
         if 'author' in comment:
-            ecomment['author_user_name'] = comment['author']['username']
-            ecomment['author_id'] = comment['author']['id']
+            # Not sure if this format is present in some version of askbot
+            ecomment['author_askbot_user_name'] = comment['author']['username']
+            ecomment['author_askbot_id'] = comment['author']['id']
+        elif 'user_display_name' in comment:
+            ecomment['author_askbot_user_name'] = comment['user_display_name']
+            ecomment['author_askbot_id'] = comment['user_id']
         if 'summary' in comment:
             ecomment['summary'] = comment['summary']
         ecomment['score'] = comment['score']
@@ -195,6 +209,9 @@ class AskbotEnrich(Enrich):
             else:
                 comment['added_at_date'] = comment[dfield]
             ecomment.update(self.get_item_sh(comment, date_field="added_at_date"))
+            if ecomment['author_user_name'] != ecomment['author_askbot_user_name']:
+                logger.warning('Bad SH identity in askbot comment. Found %s expecting %s',
+                               ecomment['author_user_name'], ecomment['author_askbot_user_name'])
 
         if dfield == 'added_at':
             comment_at = unixtime_to_datetime(float(comment[dfield]))
@@ -219,8 +236,8 @@ class AskbotEnrich(Enrich):
         eanswer['url'] = item['data']['url']+"/?answer="
         eanswer['url'] += answer['id']+'#post-id-'+answer['id']
         if type(answer['answered_by']) is dict:
-            eanswer['author_user_name'] = answer['answered_by']['username']
-            eanswer['author_id'] = answer['answered_by']['id']
+            eanswer['author_askbot_user_name'] = answer['answered_by']['username']
+            eanswer['author_askbot_id'] = answer['answered_by']['id']
             eanswer['author_badges'] = answer['answered_by']['badges']
             eanswer['author_reputation'] = int(answer['answered_by']['reputation'])
         eanswer['summary'] = answer['summary']
@@ -231,7 +248,9 @@ class AskbotEnrich(Enrich):
         if self.sortinghat:
             answer['added_at_date'] = unixtime_to_datetime(float(answer["added_at"])).isoformat()
             eanswer.update(self.get_item_sh(answer, date_field="added_at_date"))
-
+            if eanswer['author_user_name'] != eanswer['author_askbot_user_name']:
+                logger.warning('Bad SH identity in askbot answer. Found %s expecting %s',
+                               eanswer['author_user_name'], eanswer['author_askbot_user_name'])
         answer_at = unixtime_to_datetime(float(answer["added_at"]))
         added_at = unixtime_to_datetime(float(item['data']["added_at"]))
         eanswer['time_from_question'] = get_time_diff_days(added_at, answer_at)
