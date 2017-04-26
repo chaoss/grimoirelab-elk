@@ -49,8 +49,8 @@ class GitEnrich(Enrich):
     # REGEX to extract authors from a multi author commit: several authors present
     # in the Author field in the commit. Used if self.pair_programming is True
     AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) and (?P<last_author>.* .*) (?P<email>.*)')
-    # Temporal hack to use pair programing only in CloudFoundry
-    CLOUDFOUNDRY_URL = 'https://github.com/cloudfoundry/'
+    # Temporal hack to use pair programing only in CloudFoundry (cloudfoundry and cloudfoundry-incubator)
+    CLOUDFOUNDRY_URL = 'https://github.com/cloudfoundry'
 
 
     roles = ['Author', 'Commit']
