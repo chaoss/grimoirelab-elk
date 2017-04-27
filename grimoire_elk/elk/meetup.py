@@ -48,7 +48,7 @@ class MeetupEnrich(Enrich):
                   "type": "string",
                   "index":"analyzed"
                   },
-                "geolocation": {
+                "venue_geolocation": {
                    "type": "geo_point"
                 },
                 "group_geolocation": {
