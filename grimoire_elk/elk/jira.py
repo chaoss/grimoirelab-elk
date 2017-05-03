@@ -76,6 +76,13 @@ class JiraEnrich(Enrich):
             identity['email'] = user['emailAddress']
         return identity
 
+    def get_project_repository(self, eitem):
+        repo = eitem['origin']
+        if eitem['origin'][-1] != "/":
+            repo += "/"
+        repo += "projects/" + eitem['project_key']
+        return repo
+
     def get_users_data(self, item):
         """ If user fields are inside the global item dict """
         if 'data' in item:
@@ -201,6 +208,9 @@ class JiraEnrich(Enrich):
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item, self.roles))
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(issue['fields']['created'], "issue"))
 
