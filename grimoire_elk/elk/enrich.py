@@ -735,16 +735,16 @@ class Enrich(ElasticItems):
                                       name=iden['name'], username=iden['username'])
             sh_ids['uuid'] = u.uuid
         except WrappedValueError:
-            logger.error("None Identity found")
-            logger.error(identity)
+            logger.warning("None Identity found %s", backend_name)
+            logger.warning(identity)
         except NotFoundError:
-            logger.error("Identity not found in Sorting Hat")
+            logger.error("Identity not found in Sorting Hat %s", backend_name)
             logger.error(identity)
         except UnicodeEncodeError:
-            logger.error("UnicodeEncodeError")
+            logger.error("UnicodeEncodeError %s", backend_name)
             logger.error(identity)
         except Exception as ex:
-            logger.error("Unknown error adding sorting hat identity %s", ex)
+            logger.error("Unknown error adding sorting hat identity %s %s", ex, backend_name)
             logger.error(identity)
             logger.error(ex)
 
