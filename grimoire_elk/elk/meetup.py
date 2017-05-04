@@ -169,6 +169,8 @@ class MeetupEnrich(Enrich):
         eitem['num_rsvps'] = len(event['rsvps'])
         eitem['num_comments'] = len(event['comments'])
 
+        eitem['time_date'] = unixtime_to_datetime(event['time']/1000).isoformat()
+
         if 'venue' in event:
             venue = event['venue']
             copy_fields = ["id", "name", "city", "state", "zip", "country",
