@@ -209,6 +209,8 @@ def config_logging(debug):
         logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
+    # Per commit log is too verbose
+    logging.getLogger("perceval.backends.core.git").setLevel(logging.WARNING)
 
 ARTHUR_USAGE_MSG = ''
 ARTHUR_DESC_MSG = ''
