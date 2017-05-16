@@ -28,6 +28,7 @@ from dateutil import parser
 import json
 import logging
 import requests
+import sys
 
 from time import time, sleep
 
@@ -123,8 +124,9 @@ class ElasticSearch(object):
                 bulk_json = ""
                 new_items += current
                 current = 0
-                logger.debug("bulk packet sent (%.2f sec, %i total)"
-                              % (time()-task_init, new_items))
+                json_size = sys.getsizeof(bulk_json) / (1024*1024)
+                logger.debug("bulk packet sent (%.2f sec, %i total, %.2f MB)"
+                              % (time()-task_init, new_items, json_size))
             data_json = json.dumps(item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
             bulk_json += data_json +"\n"  # Bulk document
@@ -132,8 +134,9 @@ class ElasticSearch(object):
         task_init = time()
         self._safe_put_bulk(url, bulk_json)
         new_items += current
-        logger.debug("bulk packet sent (%.2f sec prev, %i total)"
-                      % (time()-task_init, new_items))
+        json_size = sys.getsizeof(bulk_json) / (1024*1024)
+        logger.debug("bulk packet sent (%.2f sec prev, %i total, %.2f MB)"
+                      % (time()-task_init, new_items, json_size))
 
         return new_items
 

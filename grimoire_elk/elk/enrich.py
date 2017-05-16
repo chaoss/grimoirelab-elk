@@ -27,6 +27,7 @@ import json
 import functools
 import logging
 import subprocess
+import sys
 
 import requests
 
@@ -331,7 +332,8 @@ class Enrich(ElasticItems):
                 try:
                     r = self.requests.put(url, data=bulk_json)
                     r.raise_for_status()
-                    logger.debug("Added %i items to %s", total, url)
+                    json_size = sys.getsizeof(bulk_json) / (1024*1024)
+                    logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
                     logger.error("Unicode error in enriched items")
