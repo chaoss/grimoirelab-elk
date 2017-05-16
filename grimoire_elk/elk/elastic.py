@@ -48,6 +48,8 @@ class ElasticWriteException(Exception):
 
 class ElasticSearch(object):
 
+    max_items_bulk = 1000
+
     @classmethod
     def safe_index(cls, unique_id):
         """ Return a valid elastic index generated from unique_id """
@@ -63,7 +65,6 @@ class ElasticSearch(object):
         # Valid index for elastic
         self.index = self.safe_index(index)
         self.index_url = self.url+"/"+self.index
-        self.max_items_bulk = 100
         self.wait_bulk_seconds = 2  # time to wait to complete a bulk operation
 
         self.requests = requests.Session()
@@ -108,17 +109,16 @@ class ElasticSearch(object):
     def bulk_upload(self, items, field_id):
         ''' Upload in controlled packs items to ES using bulk API '''
 
-        max_items = self.max_items_bulk
         current = 0
         new_items = 0  # total items added with bulk
         bulk_json = ""
 
         url = self.index_url+'/items/_bulk'
 
-        logger.debug("Adding items to %s (in %i packs)" % (url, max_items))
+        logger.debug("Adding items to %s (in %i packs)" % (url, self.max_items_bulk))
 
         for item in items:
-            if current >= max_items:
+            if current >= self.max_items_bulk:
                 task_init = time()
                 self._safe_put_bulk(url, bulk_json)
                 bulk_json = ""

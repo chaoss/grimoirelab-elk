@@ -35,6 +35,11 @@ logger = logging.getLogger(__name__)
 
 
 class ElasticItems():
+
+    # In large projects like Eclipse commits, 100 is too much
+    # Change it from p2o command line or mordred config
+    scroll_size = 100
+
     def __init__(self, perceval_backend, from_date=None, insecure=True, offset=None):
 
         self.perceval_backend = perceval_backend
@@ -50,9 +55,6 @@ class ElasticItems():
             self.requests.verify = False
 
         self.elastic = None
-        # In large projects like Eclipse commits, 100 is too much
-        self.elastic_page = 100
-        # self.elastic_page = 10
 
     def get_repository_filter_raw(self, term=False):
         """ Returns the filter to be used in queries in a repository items """
@@ -111,7 +113,7 @@ class ElasticItems():
         # In Mozilla ES in Amazon we need 10m
         max_process_items_pack_time = "10m"  # 10 minutes
         url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
-                                               self.elastic_page)
+                                               self.scroll_size)
 
         if elastic_scroll_id:
             """ Just continue with the scrolling """

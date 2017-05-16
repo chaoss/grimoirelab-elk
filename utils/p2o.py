@@ -29,8 +29,10 @@ from os import sys
 from time import time, sleep
 
 from grimoire_elk.arthur import feed_backend, enrich_backend
+from grimoire_elk.elastic_items import ElasticItems
 
 from grimoire_elk.ocean.conf import ConfOcean
+from grimoire_elk.elk.elastic import ElasticSearch
 
 from grimoire_elk.utils import get_elastic
 from grimoire_elk.utils import get_params_parser, config_logging
@@ -119,6 +121,11 @@ if __name__ == '__main__':
 
     try:
         if args.backend:
+            # Configure elastic bulk size and scrolling
+            if args.bulk_size:
+                ElasticSearch.max_items_bulk = args.bulk_size
+            if args.scroll_size:
+                ElasticItems.scroll_size = args.scroll_size
             if not args.enrich_only:
                 feed_backend(url, clean, args.fetch_cache,
                              args.backend, args.backend_args,
