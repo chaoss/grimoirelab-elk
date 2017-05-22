@@ -1,0 +1,29 @@
+elasticsearch:
+  image: bitergia/elasticsearch:5.4.0
+  # command: elasticsearch -E network.bind_host=0.0.0.0
+  command: /elasticsearch/bin/elasticsearch -E network.bind_host=0.0.0.0
+  ports:
+    - "9200:9200"
+  environment:
+    - ES_JAVA_OPTS=-Xms2g -Xmx2g
+  volumes:
+    - ./elasticsearch.yml:/elasticsearch/config/elasticsearch.yml
+
+kibiter:
+  # image: bitergia/kibiter:5.1.1-public
+  image: bitergia/kibiter:5.4.0
+  links:
+    - elasticsearch
+  ports:
+    - "5601:5601"
+  environment:
+    # - ELASTICSEARCH_URL=http://172.17.0.1:9200 
+    - ELASTICSEARCH_USER=bitergia
+    - ELASTICSEARCH_PASSWORD=bitergia
+    - PROJECT_NAME=Test20
+    - NODE_OPTIONS=--max-old-space-size=800
+
+# gelk-lite:
+#     image: bitergia/gelk-lite
+#     links:
+#         - elasticsearch
