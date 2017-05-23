@@ -70,7 +70,8 @@ class SlackEnrich(Enrich):
         identity['username'] = from_['name']
         identity['name'] = from_['real_name']
         if 'profile' in from_:
-            identity['email'] = from_['profile']['email']
+            if 'email' in from_['profile']:
+                identity['email'] = from_['profile']['email']
         return identity
 
     def get_identities(self, item):
