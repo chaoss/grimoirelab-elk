@@ -25,8 +25,6 @@
 import json
 import logging
 
-from datetime import datetime
-
 from .enrich import Enrich, metadata
 
 from .utils import unixtime_to_datetime
@@ -51,28 +49,9 @@ class StackExchangeEnrich(Enrich):
                 "title_analyzed": {
                   "type": "string",
                   "index":"analyzed"
-                },
-                "question_tags_analyzed": {
-                    "type": "string",
-                    "index":"analyzed"
-                },
-                "answer_tags_analyzed": {
-                    "type": "string",
-                    "index":"analyzed"
-                },
-                "question_tags_custom_analyzed" : {
-                  "type" : "string",
-                  "analyzer" : "comma"
                 }
            }
         } """
-
-        # For ES 5
-        # "question_tags_custom_analyzed_5" : {
-        #   "type" : "string",
-        #   "analyzer" : "comma",
-        #   "fielddata" : "true" }
-
 
         return {"items":mapping}
 
@@ -149,12 +128,11 @@ class StackExchangeEnrich(Enrich):
                     eitem[f] = None
 
             eitem["question_tags"] = ",".join(question['tags'])
-            eitem["question_tags_analyzed"] = ",".join(question['tags'])
-            eitem["question_tags_custom_analyzed"] = ",".join(question['tags'])
+            eitem["question_tags_analyzed"] = question['tags']
+            # eitem["question_tags_custom_analyzed"] = question['tags']
 
             # Fields which names are translated
-            map_fields = {"title": "question_title"
-                          }
+            map_fields = {"title": "question_title"}
             for fn in map_fields:
                 eitem[map_fields[fn]] = question[fn]
 
@@ -188,7 +166,7 @@ class StackExchangeEnrich(Enrich):
             eitem["question_tags_analyzed"] = question_tags
             if 'tags' in answer:
                 eitem["answer_tags"] = ",".join(answer['tags'])
-                eitem["answer_tags_analyzed"] = ",".join(answer['tags'])
+                eitem["answer_tags_analyzed"] = answer['tags']
 
             # Fields which names are translated
             map_fields = {"title": "question_title"
