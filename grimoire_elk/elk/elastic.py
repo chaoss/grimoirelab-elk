@@ -27,15 +27,11 @@ from datetime import datetime
 from dateutil import parser
 import json
 import logging
-import requests
 import sys
 
 from time import time, sleep
 
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from requests.packages.urllib3.util.retry import Retry
-
-from .utils import unixtime_to_datetime
+from .utils import unixtime_to_datetime, grimoire_con
 
 
 logger = logging.getLogger(__name__)
@@ -67,24 +63,10 @@ class ElasticSearch(object):
         self.index = self.safe_index(index)
         self.index_url = self.url+"/"+self.index
         self.wait_bulk_seconds = 2  # time to wait to complete a bulk operation
-        self.conn_retries = 8 # Number of connection retries (51s)
 
-        self.requests = requests.Session()
-        # Retry when there are errors in HTTP connections
-        retries = Retry(connect=self.conn_retries, read=8, redirect=5, backoff_factor=0.2, method_whitelist=False)
-        adapter = requests.adapters.HTTPAdapter(max_retries=retries)
-        self.requests.mount('http://', adapter)
-        self.requests.mount('https://', adapter)
+        self.requests = grimoire_con(insecure)
 
-        if insecure:
-            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-            self.requests.verify = False
-
-        try:
-            r = self.requests.get(self.index_url)
-        except requests.exceptions.ConnectionError as ex:
-            logger.error(ex)
-            raise ElasticConnectException()
+        r = self.requests.get(self.index_url)
 
         if r.status_code != 200:
             # Index does no exists

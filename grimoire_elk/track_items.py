@@ -27,24 +27,15 @@ import logging
 import os
 import tempfile
 
-import requests
-
 from grimoire_elk.arthur import load_identities
 from grimoire_elk.elk.gerrit import GerritEnrich
 from grimoire_elk.elk.git import GitEnrich
 from grimoire_elk.elk.elastic import ElasticSearch
+from grimoire_elk.elk.utils import grimoire_con
 
 logger = logging.getLogger(__name__)
 
-requests_ses = requests.Session()
-# Retry when there are errors in HTTP connections
-retries = requests.packages.urllib3.util.retry.Retry(connect=self.conn_retries, read=8, redirect=5, backoff_factor=0.2, method_whitelist=False)
-adapter = requests.adapters.HTTPAdapter(max_retries=retries)
-requests_ses.mount('http://', adapter)
-requests_ses.mount('https://', adapter)
-# Connect to insecure https sites
-requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-requests_ses.verify = False
+requests_ses = grimoire_con()
 
 def fetch_track_items(upstream_file_url, data_source):
     """ The file format is:

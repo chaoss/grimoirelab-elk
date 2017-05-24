@@ -25,7 +25,6 @@
 
 import inspect
 import logging
-import requests
 import traceback
 
 from datetime import datetime
@@ -34,22 +33,12 @@ from dateutil import parser
 from .ocean.conf import ConfOcean
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
-from .elk.utils import get_repository_filter
+from .elk.utils import get_repository_filter, grimoire_con
 
 
 logger = logging.getLogger(__name__)
 
-requests_ses = requests.Session()
-# Retry when there are errors in HTTP connections
-conn_retries = 8  # 51s
-retries = requests.packages.urllib3.util.retry.Retry(connect=conn_retries, read=8, redirect=5, backoff_factor=0.2, method_whitelist=False)
-adapter = requests.adapters.HTTPAdapter(max_retries=retries)
-requests_ses.mount('http://', adapter)
-requests_ses.mount('https://', adapter)
-# Connect to insecure https sites
-requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-requests_ses.verify = False
-
+requests_ses = grimoire_con()
 
 def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None):

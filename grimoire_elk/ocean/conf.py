@@ -27,7 +27,8 @@
 
 import json
 import logging
-import requests
+
+from grimoire_elk.elk.utils import grimoire_con
 
 
 logger = logging.getLogger(__name__)
@@ -38,19 +39,7 @@ class ConfOcean(object):
     conf_index = "conf"
     conf_repos = conf_index+"/repos"
     elastic = None
-    requests_ses = requests.Session()
-
-    # Retry when there are errors in HTTP connections
-    conn_retries = 8  # 51s
-    retries = requests.packages.urllib3.util.retry.Retry(connect=conn_retries, read=8, redirect=5, backoff_factor=0.2, method_whitelist=False)
-    adapter = requests.adapters.HTTPAdapter(max_retries=retries)
-    requests_ses.mount('http://', adapter)
-    requests_ses.mount('https://', adapter)
-
-    # Support working with https insecure
-    requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-    requests_ses.verify = False
-
+    requests_ses = grimoire_con()
 
     @classmethod
     def get_index(cls):

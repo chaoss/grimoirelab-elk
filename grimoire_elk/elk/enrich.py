@@ -29,8 +29,6 @@ import logging
 import subprocess
 import sys
 
-import requests
-
 from datetime import datetime as dt
 from os import path
 
@@ -38,6 +36,9 @@ from dateutil import parser
 from functools import lru_cache
 
 from ..elastic_items import ElasticItems
+
+from .utils import grimoire_con
+
 
 logger = logging.getLogger(__name__)
 
@@ -131,18 +132,7 @@ class Enrich(ElasticItems):
 
         self.studies = []
 
-        self.requests = requests.Session()
-        self.conn_retries = 8  # 51s
-        # Retry when there are errors in HTTP connections
-        retries = requests.packages.urllib3.util.retry.Retry(connect=self.conn_retries, read=8, redirect=5, backoff_factor=0.2, method_whitelist=False)
-        adapter = requests.adapters.HTTPAdapter(max_retries=retries)
-        self.requests.mount('http://', adapter)
-        self.requests.mount('https://', adapter)
-
-        if insecure:
-            requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-            self.requests.verify = False
-
+        self.requests = grimoire_con()
         self.elastic = None
         self.type_name = "items"  # type inside the index to store items enriched
 

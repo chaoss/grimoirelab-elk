@@ -27,6 +27,11 @@ import datetime
 import json
 import logging
 
+import requests
+
+from requests.packages.urllib3.util.retry import Retry
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 from dateutil import parser, tz
 
 
@@ -105,3 +110,19 @@ def unixtime_to_datetime(ut):
     dt = datetime.datetime.utcfromtimestamp(ut)
     dt = dt.replace(tzinfo=tz.tzutc())
     return dt
+
+def grimoire_con(insecure=True):
+    conn = requests.Session()
+    conn_retries = 8  # 51s
+    # Retry when there are errors in HTTP connections
+    retries = Retry(connect=conn_retries, read=8, redirect=5, backoff_factor=0.2,
+                    method_whitelist=False)
+    adapter = requests.adapters.HTTPAdapter(max_retries=retries)
+    conn.mount('http://', adapter)
+    conn.mount('https://', adapter)
+
+    if insecure:
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        conn.verify = False
+
+    return conn
