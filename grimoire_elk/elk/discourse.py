@@ -27,7 +27,7 @@ import logging
 
 from dateutil import parser
 
-from .utils import get_time_diff_days
+from .utils import get_time_diff_days, grimoire_con
 
 from .enrich import Enrich, metadata
 
@@ -36,6 +36,14 @@ logger = logging.getLogger(__name__)
 
 
 class DiscourseEnrich(Enrich):
+
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                 db_user='', db_password='', db_host=''):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+                         db_user, db_password, db_host)
+        self.categories = {}  # Map from category_id to category_name
+        self.categories_tree = {}  # Categories with subcategories
+
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -107,8 +115,44 @@ class DiscourseEnrich(Enrich):
 
         return answers_enrich
 
+    def __collect_categories(self, origin):
+        categories = {}
+        con = grimoire_con()
+        raw_site = con.get(origin + "/site.json")
+        for cat in raw_site.json()['categories']:
+            categories[cat['id']] = cat['name']
+        return categories
+
+    def __collect_categories_tree(self, origin):
+        tree = {}
+        con = grimoire_con()
+        raw = con.get(origin + "/categories.json")
+        categories = raw.json()["category_list"]['categories']
+        for cat in categories:
+            if 'subcategory_ids' in cat:
+                tree[cat['id']] = cat['subcategory_ids']
+        return tree
+
+    def __related_categories(self, category_id):
+        """ Get all related categories to a given one """
+        related = []
+        for cat in self.categories_tree:
+            if category_id in self.categories_tree[cat]:
+                related.append(self.categories[cat])
+        return related
+
     @metadata
     def get_rich_item(self, item):
+
+        # Get the categories name if not already done
+        if not self.categories:
+            logger.info("Getting the categories data from %s", item['origin'])
+            self.categories = self.__collect_categories(item['origin'])
+        # Get the categories tree if not already done
+        if not self.categories_tree:
+            logger.info("Getting the categories tree data from %s", item['origin'])
+            self.categories_tree = self.__collect_categories_tree(item['origin'])
+
         eitem = {}
 
         for f in self.RAW_FIELDS_COPY:
@@ -146,6 +190,10 @@ class DiscourseEnrich(Enrich):
 
         # The first post is the first published, and it is the question
         first_post = topic['post_stream']['posts'][0]
+        eitem['category_id'] = topic['category_id']
+        eitem['category_name'] = self.categories[topic['category_id']]
+        eitem['categories'] = self.__related_categories(topic['category_id'])
+        eitem['categories'] += [eitem['category_name']]
         eitem['url'] = eitem['origin'] + "/t/" + first_post['topic_slug']
         eitem['url'] += "/" + str(first_post['topic_id']) + "/" + str(first_post['post_number'])
         eitem['display_username'] = first_post['display_username']
