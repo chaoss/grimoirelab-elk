@@ -35,11 +35,21 @@ from .elk.elastic import ElasticSearch
 
 logger = logging.getLogger(__name__)
 
+requests_ses = requests.Session()
+# Retry when there are errors in HTTP connections
+retries = requests.packages.urllib3.util.retry.Retry(connect=8, read=8, redirect=5, backoff_factor=0.2, method_whitelist=False)
+adapter = requests.adapters.HTTPAdapter(max_retries=retries)
+requests_ses.mount('http://', adapter)
+requests_ses.mount('https://', adapter)
+# Connect to insecure https sites
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+requests_ses.verify = False
+
 
 def get_dashboard_json(elastic, dashboard):
     dash_json_url = elastic.index_url+"/dashboard/"+dashboard
 
-    r = requests.get(dash_json_url, verify=False)
+    r = requests_ses.get(dash_json_url, verify=False)
 
     dash_json = r.json()
     if "_source" not in dash_json:
@@ -52,7 +62,7 @@ def get_dashboard_json(elastic, dashboard):
 def get_vis_json(elastic, vis):
     vis_json_url = elastic.index_url+"/visualization/"+vis
 
-    r = requests.get(vis_json_url, verify=False)
+    r = requests_ses.get(vis_json_url, verify=False)
 
     vis_json = r.json()
     if "_source" not in vis_json:
@@ -64,7 +74,7 @@ def get_vis_json(elastic, vis):
 def get_search_json(elastic, search_id):
     search_json_url = elastic.index_url+"/search/"+search_id
 
-    r = requests.get(search_json_url, verify=False)
+    r = requests_ses.get(search_json_url, verify=False)
 
     search_json = r.json()
     if "_source" not in search_json:
@@ -75,7 +85,7 @@ def get_search_json(elastic, search_id):
 def get_index_pattern_json(elastic, index_pattern):
     index_pattern_json_url = elastic.index_url+"/index-pattern/"+index_pattern
 
-    r = requests.get(index_pattern_json_url, verify=False)
+    r = requests_ses.get(index_pattern_json_url, verify=False)
 
     index_pattern_json = r.json()
     if "_source" not in index_pattern_json:
@@ -143,7 +153,7 @@ def create_search(elastic_url, dashboard, index_pattern, es_index=None):
     new_search_id = search_id+"__"+index_pattern
 
     url = elastic.index_url+"/search/"+new_search_id
-    requests.post(url, data = json.dumps(search_json), verify=False)
+    requests_ses.post(url, data = json.dumps(search_json), verify=False)
 
     logger.debug("New search created: %s", url)
 
@@ -169,7 +179,7 @@ def get_index_pattern_from_vis(elastic, vis):
     # First search for it in saved search
     if "savedSearchId" in vis_json:
         search_json_url = elastic.index_url+"/search/"+vis_json["savedSearchId"]
-        search_json = requests.get(search_json_url, verify=False).json()["_source"]
+        search_json = requests_ses.get(search_json_url, verify=False).json()["_source"]
         index_pattern = get_index_pattern_from_meta(search_json["kibanaSavedObjectMeta"])
     elif "kibanaSavedObjectMeta" in vis_json:
         index_pattern = get_index_pattern_from_meta(vis_json["kibanaSavedObjectMeta"])
@@ -220,7 +230,7 @@ def create_index_pattern(elastic_url, dashboard, enrich_index, es_index=None):
 
     new_index_pattern_json['title'] = enrich_index
     url = elastic.index_url+"/index-pattern/"+enrich_index
-    requests.post(url, data = json.dumps(new_index_pattern_json), verify=False)
+    requests_ses.post(url, data = json.dumps(new_index_pattern_json), verify=False)
 
     logger.debug("New index pattern created: %s", url)
 
@@ -258,7 +268,7 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
         # Hack: Get all vis if they are <10000. Use scroll API to get all.
         # Better: use mget to get all vis in dash_vis_ids
         item_template_url_search = item_template_url+"/_search?size=10000"
-        r = requests.get(item_template_url_search, verify=False)
+        r = requests_ses.get(item_template_url_search, verify=False)
         all_visualizations =r.json()['hits']['hits']
 
         visualizations = []
@@ -281,7 +291,7 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
 
             url = item_template_url+"/"+vis_id
 
-            r = requests.post(url, data = json.dumps(vis_data), verify=False)
+            r = requests_ses.post(url, data = json.dumps(vis_data), verify=False)
             logger.debug("Created new vis %s", url)
 
     if not es_index:
@@ -302,7 +312,7 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
     dash_data['panelsJSON'] = json.dumps(new_panels(elastic, panels, search_id))
     dash_path = "/dashboard/"+dashboard+"__"+enrich_index
     url = elastic.index_url + dash_path
-    requests.post(url, data = json.dumps(dash_data), verify=False)
+    requests_ses.post(url, data = json.dumps(dash_data), verify=False)
 
     dash_url = kibana_host+"/app/kibana#"+dash_path
     return dash_url
@@ -317,7 +327,7 @@ def list_dashboards(elastic_url, es_index=None):
 
     print (dash_json_url)
 
-    r = requests.get(dash_json_url, verify=False)
+    r = requests_ses.get(dash_json_url, verify=False)
 
     res_json = r.json()
 
@@ -365,22 +375,22 @@ def import_dashboard(elastic_url, import_file, es_index=None):
         elastic = ElasticSearch(elastic_url, es_index)
 
         url = elastic.index_url+"/dashboard/"+kibana['dashboard']['id']
-        requests.post(url, data = json.dumps(kibana['dashboard']['value']), verify=False)
+        requests_ses.post(url, data = json.dumps(kibana['dashboard']['value']), verify=False)
 
         if 'searches' in kibana:
             for search in kibana['searches']:
                 url = elastic.index_url+"/search/"+search['id']
-                requests.post(url, data = json.dumps(search['value']), verify=False)
+                requests_ses.post(url, data = json.dumps(search['value']), verify=False)
 
         if 'index_patterns' in kibana:
             for index in kibana['index_patterns']:
                 url = elastic.index_url+"/index-pattern/"+index['id']
-                requests.post(url, data = json.dumps(index['value']), verify=False)
+                requests_ses.post(url, data = json.dumps(index['value']), verify=False)
 
         if 'visualizations' in kibana:
             for vis in kibana['visualizations']:
                 url = elastic.index_url+"/visualization"+"/"+vis['id']
-                requests.post(url, data = json.dumps(vis['value']), verify=False)
+                requests_ses.post(url, data = json.dumps(vis['value']), verify=False)
 
         logger.debug("Done")
 

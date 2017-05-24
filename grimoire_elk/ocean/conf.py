@@ -38,11 +38,18 @@ class ConfOcean(object):
     conf_index = "conf"
     conf_repos = conf_index+"/repos"
     elastic = None
-    requests_session = requests.Session()
+    requests_ses = requests.Session()
+
+    # Retry when there are errors in HTTP connections
+    conn_retries = 8  # 51s
+    retries = requests.packages.urllib3.util.retry.Retry(connect=conn_retries, read=8, redirect=5, backoff_factor=0.2, method_whitelist=False)
+    adapter = requests.adapters.HTTPAdapter(max_retries=retries)
+    requests_ses.mount('http://', adapter)
+    requests_ses.mount('https://', adapter)
 
     # Support working with https insecure
     requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-    requests_session.verify = False
+    requests_ses.verify = False
 
 
     @classmethod
@@ -55,9 +62,9 @@ class ConfOcean(object):
 
         # Check conf index
         url = elastic.url + "/" + cls.conf_index
-        r = cls.requests_session.get(url)
+        r = cls.requests_ses.get(url)
         if r.status_code != 200:
-            cls.requests_session.post(url)
+            cls.requests_ses.post(url)
             logger.info("Creating OceanConf index " + url)
 
 
@@ -74,7 +81,7 @@ class ConfOcean(object):
 
         logger.debug("Adding repo to Ocean %s %s" % (url, repo))
 
-        cls.requests_session.post(url, data = json.dumps(repo))
+        cls.requests_ses.post(url, data = json.dumps(repo))
 
     @classmethod
     def get_repos(cls):
@@ -89,7 +96,7 @@ class ConfOcean(object):
         # TODO: use scrolling API for getting all repos
         url = cls.elastic.url + "/" + cls.conf_repos + "/_search?size=9999"
 
-        r = cls.requests_session.get(url).json()
+        r = cls.requests_ses.get(url).json()
 
         if 'hits' in r:
 
@@ -111,7 +118,7 @@ class ConfOcean(object):
 
         url = cls.elastic.url + "/" + cls.conf_repos + "/_search"
 
-        r = cls.requests_session.get(url).json()
+        r = cls.requests_ses.get(url).json()
 
         if 'hits' in r:
             repos_raw = r['hits']['hits']  # Already existing items

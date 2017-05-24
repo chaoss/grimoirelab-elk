@@ -29,7 +29,6 @@
 import inspect
 import json
 import logging
-import requests
 
 from datetime import datetime
 from ..elk.utils import unixtime_to_datetime, get_repository_filter

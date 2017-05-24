@@ -36,6 +36,16 @@ from grimoire_elk.elk.elastic import ElasticSearch
 
 logger = logging.getLogger(__name__)
 
+requests_ses = requests.Session()
+# Retry when there are errors in HTTP connections
+retries = requests.packages.urllib3.util.retry.Retry(connect=self.conn_retries, read=8, redirect=5, backoff_factor=0.2, method_whitelist=False)
+adapter = requests.adapters.HTTPAdapter(max_retries=retries)
+requests_ses.mount('http://', adapter)
+requests_ses.mount('https://', adapter)
+# Connect to insecure https sites
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+requests_ses.verify = False
+
 def fetch_track_items(upstream_file_url, data_source):
     """ The file format is:
 
@@ -48,7 +58,7 @@ def fetch_track_items(upstream_file_url, data_source):
     """
 
     track_uris = []
-    req = requests.get(upstream_file_url)
+    req = requests_ses.get(upstream_file_url)
     req.raise_for_status()
     lines = iter(req.text.split("\n"))
     for line in lines:
@@ -168,8 +178,8 @@ def _get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers):
         }
     }
 
-    req = requests.post(es + "/" + index_gerrit_raw + "/_search?limit=10000",
-                        data=json.dumps(query))
+    req = requests_ses.post(es + "/" + index_gerrit_raw + "/_search?limit=10000",
+                            data=json.dumps(query))
     req.raise_for_status()
     reviews_es = req.json()["hits"]["hits"]
     reviews = []
@@ -206,8 +216,8 @@ def _get_git_commits(es, index_git_raw, commits_sha_list):
         }
     }
 
-    req = requests.post(es + "/" + index_git_raw + "/_search?limit=10000",
-                        data=json.dumps(query))
+    req = requests_ses.post(es + "/" + index_git_raw + "/_search?limit=10000",
+                            data=json.dumps(query))
     req.raise_for_status()
     commits_es = req.json()["hits"]["hits"]
     commits = []

@@ -39,6 +39,17 @@ from .elk.utils import get_repository_filter
 
 logger = logging.getLogger(__name__)
 
+requests_ses = requests.Session()
+# Retry when there are errors in HTTP connections
+conn_retries = 8  # 51s
+retries = requests.packages.urllib3.util.retry.Retry(connect=conn_retries, read=8, redirect=5, backoff_factor=0.2, method_whitelist=False)
+adapter = requests.adapters.HTTPAdapter(max_retries=retries)
+requests_ses.mount('http://', adapter)
+requests_ses.mount('https://', adapter)
+# Connect to insecure https sites
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+requests_ses.verify = False
+
 
 def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None):
@@ -173,7 +184,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     url_search = enrich_backend.elastic.index_url+"/_search"
     url_search +="?size=1000"  # TODO get all items
 
-    r = requests.post(url_search, data=query)
+    r = requests_ses.post(url_search, data=query)
 
     eitems = r.json()['hits']['hits']
 
@@ -202,7 +213,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     items_ids_query = items_ids_query[:-1]  # remove last , for last item
 
     query = '{"docs" : [%s]}' % (items_ids_query)
-    r = requests.post(url_mget, data=query)
+    r = requests_ses.post(url_mget, data=query)
 
     res_items = r.json()['docs']
 
