@@ -58,6 +58,10 @@ class MBoxEnrich(Enrich):
                  "Subject_analyzed": {
                    "type": "string",
                    "index":"analyzed"
+                 },
+                 "body": {
+                   "type": "string",
+                   "index":"analyzed"
                  }
            }
         } """
@@ -119,15 +123,16 @@ class MBoxEnrich(Enrich):
         message = item['data']
 
         # Fields that are the same in message and eitem
-        copy_fields = ["Date","From","Subject","Message-ID"]
+        copy_fields = ["Date", "From", "Subject", "Message-ID"]
         for f in copy_fields:
             if f in message:
                 eitem[f] = message[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"Subject": "Subject_analyzed"
-                      }
+        map_fields = {
+            "Subject": "Subject_analyzed"
+        }
         for fn in map_fields:
             if fn in message:
                 eitem[map_fields[fn]] = message[fn]
@@ -144,6 +149,8 @@ class MBoxEnrich(Enrich):
         else:
             eitem["root"] = True
 
+        # The body is needed in studies like kafka_kip
+        eitem["body"] = message['body']['plain']
         # Size of the message
         try:
             eitem["size"] = len(message['body']['plain'])
@@ -216,20 +223,29 @@ class MBoxEnrich(Enrich):
 
     def kafka_kip(self, from_date=None):
 
-        def extract_vote(body):
-            """ Extracts the vote for a KIP process included in message body """
+        def extract_vote_and_binding(body):
+            """ Extracts the vote and binding for a KIP process included in message body """
 
             vote = 0
-
-            return vote
-
-        def extract_binding(body):
-            """ Extracts the bindng for a vote for a KIP process included in message body """
-
             binding = False
 
-            return binding
+            for line in body.split("\n"):
+                if line.startswith("+1"):
+                    vote = 1
+                    if 'non-binding' in line:
+                        binding = False
+                    elif 'binding' in line:
+                        binding = True
+                    break
+                elif line.startswith("-1"):
+                    vote = -1
+                    if 'non-binding' in line:
+                        binding = False
+                    elif 'binding' in line:
+                        binding = True
+                    break
 
+            return (vote, binding)
 
         def extract_kip(subject):
             """ Extracts a KIP number from an email subject """
@@ -320,6 +336,13 @@ class MBoxEnrich(Enrich):
                     return kip
                 except ValueError:
                     pass
+                try:
+                    # [jira] [Updated] (KAFKA-5092) KIP 141- ProducerRecordBuilder
+                    str_kip = str_with_kip[1:].split("-")[0]
+                    kip = int(str_kip)
+                    return kip
+                except ValueError:
+                    pass
             elif str_with_kip[0] == ':':
                 try:
                     # Re: [VOTE] KIP:71 Enable log compaction and deletion to co-exist
@@ -339,30 +362,34 @@ class MBoxEnrich(Enrich):
 
             total = 0
 
-            kip_fields = {
-                "is_vote": False,
-                "is_discuss": False,
-                "is_discuss_start": False,
-                "vote": 0,
-                "binding": False,
-                "kip": 0
-            }
-
             for eitem in self.fetch():
+                kip_fields = {
+                    "is_vote": 0,
+                    "is_discuss": 0,
+                    "is_discuss_start": 0,
+                    "vote": 0,
+                    "binding": False,
+                    "kip": 0,
+                    "kip_type": "general"
+                }
+
                 kip = extract_kip(eitem['Subject'])
                 if not kip:
                     # It is not a KIP message
                     continue
                 # Analyze the subject to fill the kip fields
                 if '[discuss]' in eitem['Subject'].lower():
-                    kip_fields['is_discuss'] = True
+                    kip_fields['is_discuss'] = 1
+                    kip_fields['kip_type'] = "discuss"
                     kip_fields['kip'] = extract_kip(eitem['Subject'])
                 if '[vote]' in eitem['Subject'].lower():
-                    kip_fields['is_vote'] = True
+                    kip_fields['is_vote'] = 1
+                    kip_fields['kip_type'] = "vote"
                     kip_fields['kip'] = extract_kip(eitem['Subject'])
-                    if 'Body' in eitem:
-                        kip_fields['vote'] = extract_vote(eitem['Body'])
-                        kip_fields['binding'] = extract_binding(eitem['Body'])
+                    if 'body' in eitem:
+                        (vote, binding) = extract_vote_and_binding(eitem['body'])
+                        kip_fields['vote'] = vote
+                        kip_fields['binding'] = binding
                     else:
                         logger.debug("Message %s without body", eitem['Subject'])
 
