@@ -234,7 +234,6 @@ class MBoxEnrich(Enrich):
         def extract_kip(subject):
             """ Extracts a KIP number from an email subject """
 
-
             kip = None
 
             if 'KIP' not in subject:
@@ -253,11 +252,10 @@ class MBoxEnrich(Enrich):
             str_with_kip = kip_tokens[1]
 
             if not str_with_kip:
-                # Sample use case: Create a space template for KIP
+                # Sample use case subject: Create a space template for KIP
                 return kip
 
             if str_with_kip[0] == '-':
-                # Three cases with KIP-
                 try:
                     # KIP-120: Control
                     str_kip = str_with_kip[1:].split(":")[0]
@@ -279,11 +277,53 @@ class MBoxEnrich(Enrich):
                     return kip
                 except ValueError:
                     pass
-
+                try:
+                    # Bound fetch response size (KIP-74)
+                    str_kip = str_with_kip[1:].split(")")[0]
+                    kip = int(str_kip)
+                    return kip
+                except ValueError:
+                    pass
+                try:
+                    # KIP-31&
+                    str_kip = str_with_kip[1:].split("&")[0]
+                    kip = int(str_kip)
+                    return kip
+                except ValueError:
+                    pass
+                try:
+                    # KIP-31/
+                    str_kip = str_with_kip[1:].split("/")[0]
+                    kip = int(str_kip)
+                    return kip
+                except ValueError:
+                    pass
+                try:
+                    # Re: Copycat (KIP-26. PR-99) - plan on moving forward
+                    str_kip = str_with_kip[1:].split(".")[0]
+                    kip = int(str_kip)
+                    return kip
+                except ValueError:
+                    pass
             elif str_with_kip[0] == ' ':
                 try:
-                    str_kip = str_with_kip[1:].split(" ")[0]
                     # KIP 20 Enable
+                    str_kip = str_with_kip[1:].split(" ")[0]
+                    kip = int(str_kip)
+                    return kip
+                except ValueError:
+                    pass
+                try:
+                    # Re: [DISCUSS] KIP 88: DescribeGroups Protocol Update
+                    str_kip = str_with_kip[1:].split(":")[0]
+                    kip = int(str_kip)
+                    return kip
+                except ValueError:
+                    pass
+            elif str_with_kip[0] == ':':
+                try:
+                    # Re: [VOTE] KIP:71 Enable log compaction and deletion to co-exist
+                    str_kip = str_with_kip[1:].split(" ")[0]
                     kip = int(str_kip)
                     return kip
                 except ValueError:
