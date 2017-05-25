@@ -36,6 +36,14 @@ logger = logging.getLogger(__name__)
 
 class MBoxEnrich(Enrich):
 
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                 db_user='', db_password='', db_host=''):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+                         db_user, db_password, db_host)
+
+        self.studies = [self.kafka_kip]
+
+
     def get_field_author(self):
         return "From"
 
@@ -205,3 +213,126 @@ class MBoxEnrich(Enrich):
             self.requests.put(url, data=bulk_json)
 
         return total
+
+    def kafka_kip(self, from_date=None):
+
+        def extract_vote(body):
+            """ Extracts the vote for a KIP process included in message body """
+
+            vote = 0
+
+            return vote
+
+        def extract_binding(body):
+            """ Extracts the bindng for a vote for a KIP process included in message body """
+
+            binding = False
+
+            return binding
+
+
+        def extract_kip(subject):
+            """ Extracts a KIP number from an email subject """
+
+
+            kip = None
+
+            if 'KIP' not in subject:
+                return kip
+
+            kip_tokens = subject.split('KIP')
+            if len(kip_tokens) > 2:
+                # [KIP-DISCUSSION] KIP-7 Security
+                for token in kip_tokens:
+                    kip = extract_kip("KIP"+token)
+                    if kip:
+                        break
+                logger.debug("Several KIPs in %s. Found: %i", subject, kip)
+                return kip
+
+            str_with_kip = kip_tokens[1]
+
+            if not str_with_kip:
+                # Sample use case: Create a space template for KIP
+                return kip
+
+            if str_with_kip[0] == '-':
+                # Three cases with KIP-
+                try:
+                    # KIP-120: Control
+                    str_kip = str_with_kip[1:].split(":")[0]
+                    kip = int(str_kip)
+                    return kip
+                except ValueError:
+                    pass
+                try:
+                    # KIP-8 Add
+                    str_kip = str_with_kip[1:].split(" ")[0]
+                    kip = int(str_kip)
+                    return kip
+                except ValueError:
+                    pass
+                try:
+                    # KIP-11- Authorization
+                    str_kip = str_with_kip[1:].split("-")[0]
+                    kip = int(str_kip)
+                    return kip
+                except ValueError:
+                    pass
+
+            elif str_with_kip[0] == ' ':
+                try:
+                    str_kip = str_with_kip[1:].split(" ")[0]
+                    # KIP 20 Enable
+                    kip = int(str_kip)
+                    return kip
+                except ValueError:
+                    pass
+
+            if not kip:
+                logger.debug("Can not extract KIP from %s", subject)
+
+            return kip
+
+        def add_kip_fields(self):
+            """ Add extra fields needed for kip analysis"""
+
+            total = 0
+
+            kip_fields = {
+                "is_vote": False,
+                "is_discuss": False,
+                "is_discuss_start": False,
+                "vote": 0,
+                "binding": False,
+                "kip": 0
+            }
+
+            for eitem in self.fetch():
+                kip = extract_kip(eitem['Subject'])
+                if not kip:
+                    # It is not a KIP message
+                    continue
+                # Analyze the subject to fill the kip fields
+                if '[discuss]' in eitem['Subject'].lower():
+                    kip_fields['is_discuss'] = True
+                    kip_fields['kip'] = extract_kip(eitem['Subject'])
+                if '[vote]' in eitem['Subject'].lower():
+                    kip_fields['is_vote'] = True
+                    kip_fields['kip'] = extract_kip(eitem['Subject'])
+                    if 'Body' in eitem:
+                        kip_fields['vote'] = extract_vote(eitem['Body'])
+                        kip_fields['binding'] = extract_binding(eitem['Body'])
+                    else:
+                        logger.debug("Message %s without body", eitem['Subject'])
+
+                eitem.update(kip_fields)
+                yield eitem
+                total += 1
+
+            logger.info("Total eitems witk kafka kip fields %i", total)
+
+        logger.debug("Doing kafka_kip study from %s", self.elastic.index_url)
+
+        eitems = add_kip_fields(self)
+        self.elastic.bulk_upload_sync(eitems, self.get_field_unique_id())
