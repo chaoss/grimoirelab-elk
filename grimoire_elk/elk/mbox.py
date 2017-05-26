@@ -24,11 +24,14 @@
 
 import json
 import logging
+import pickle
+
 
 from dateutil import parser
 import email.utils
 
 from .enrich import Enrich, metadata
+from .utils import get_time_diff_days
 
 
 logger = logging.getLogger(__name__)
@@ -262,7 +265,7 @@ class MBoxEnrich(Enrich):
                     kip = extract_kip("KIP"+token)
                     if kip:
                         break
-                logger.debug("Several KIPs in %s. Found: %i", subject, kip)
+                # logger.debug("Several KIPs in %s. Found: %i", subject, kip)
                 return kip
 
             str_with_kip = kip_tokens[1]
@@ -353,22 +356,111 @@ class MBoxEnrich(Enrich):
                     pass
 
             if not kip:
-                logger.debug("Can not extract KIP from %s", subject)
+                # logger.debug("Can not extract KIP from %s", subject)
+                pass
 
             return kip
+
+        def add_kip_time_status_fields(self):
+            """ Add kip fields with final status and times """
+
+            total = 0
+
+            if self.debug_kip_second:
+                with open("kips_dates.pickle", "rb") as fpick:
+                    self.kips_dates = pickle.load(fpick)
+                with open("kips_scores.pickle", "rb") as fpick:
+                    self.kips_scores = pickle.load(fpick)
+
+            for eitem in self.fetch():
+                # kip_status: adopted (closed), discussion (open), voting (open),
+                #             inactive (open), discarded (closed)
+                kip_fields = {
+                    "kip_status": None,
+                    "kip_discuss_time_days": None,
+                    "kip_voting_time_days": None,
+                    "kip_is_first_discuss": 0,
+                    "kip_is_first_vote": 0,
+                    "kip_is_last_discuss": 0,
+                    "kip_is_last_vote": 0
+                }
+
+                if "kip" not in eitem:
+                    # It is not a KIP message
+                    continue
+                kip = eitem["kip"]
+                kip_date = parser.parse(eitem["email_date"])
+
+                if eitem['kip_is_discuss']:
+                    kip_fields["kip_discuss_time_days"] = \
+                        get_time_diff_days(self.kips_dates[kip]['kip_max_discuss'],
+                                           self.kips_dates[kip]['kip_min_discuss'])
+
+                    # Detect first and last discuss messages
+                    if kip_date == self.kips_dates[kip]['kip_min_discuss']:
+                        kip_fields['kip_is_first_discuss'] = 1
+                    elif kip_date == self.kips_dates[kip]['kip_max_discuss']:
+                        kip_fields['kip_is_last_discuss'] = 1
+
+                    # Detect discussion status
+                    if "kip_min_vote" not in self.kips_dates[kip]:
+                        kip_fields['kip_status'] = 'discussion'
+
+
+                if eitem['kip_is_vote']:
+                    kip_fields["kip_voting_time_days"] = \
+                        get_time_diff_days(self.kips_dates[kip]['kip_max_vote'],
+                                           self.kips_dates[kip]['kip_min_vote'])
+
+                    # Detect first and last discuss messages
+                    if kip_date == self.kips_dates[kip]['kip_min_vote']:
+                        kip_fields['kip_is_first_vote'] = 1
+                    elif kip_date == self.kips_dates[kip]['kip_max_vote']:
+                        kip_fields['kip_is_last_vote'] = 1
+
+                    # Detect discussion status
+                    kip_fields['kip_status'] = 'voting'
+
+                    # Now check if there is a result from self.kips_scores
+                    result_adopt = False
+
+                    if result_adopt:
+                        kip_fields['kip_status'] = 'adopted'
+
+                    # And now change the status inactive or discarded if
+                    # a condition could be defined
+
+                eitem.update(kip_fields)
+                yield eitem
+                total += 1
+
+            logger.info("Total eitems with kafka extra kip fields %i", total)
+
 
         def add_kip_fields(self):
             """ Add extra fields needed for kip analysis"""
 
             total = 0
 
+            self.kips_dates = {
+                0: {
+                    "kip_min_discuss": None,
+                    "kip_max_discuss": None,
+                    "kip_min_vote": None,
+                    "kip_max_vote": None,
+                }
+            }
+
+            self.kips_scores = {}
+
+            # First iteration
             for eitem in self.fetch():
                 kip_fields = {
-                    "is_vote": 0,
-                    "is_discuss": 0,
-                    "is_discuss_start": 0,
-                    "vote": 0,
-                    "binding": False,
+                    "kip_is_vote": 0,
+                    "kip_is_discuss": 0,
+                    "kip_is_discuss_start": 0,
+                    "kip_vote": 0,
+                    "kip_binding": False,
                     "kip": 0,
                     "kip_type": "general"
                 }
@@ -377,29 +469,73 @@ class MBoxEnrich(Enrich):
                 if not kip:
                     # It is not a KIP message
                     continue
+                if kip not in self.kips_dates:
+                    self.kips_dates[kip] = {}
+                if kip not in self.kips_scores:
+                    self.kips_scores[kip] = []
+
                 # Analyze the subject to fill the kip fields
                 if '[discuss]' in eitem['Subject'].lower():
-                    kip_fields['is_discuss'] = 1
+                    kip_fields['kip_is_discuss'] = 1
                     kip_fields['kip_type'] = "discuss"
                     kip_fields['kip'] = extract_kip(eitem['Subject'])
+                    kip_date = parser.parse(eitem["email_date"])
+                    # Update kip discuss dates
+                    if "kip_min_discuss" not in self.kips_dates[kip]:
+                        self.kips_dates[kip].update({
+                            "kip_min_discuss": kip_date,
+                            "kip_max_discuss": kip_date
+                        })
+                    else:
+                        if self.kips_dates[kip]["kip_min_discuss"] >= kip_date:
+                            self.kips_dates[kip]["kip_min_discuss"] = kip_date
+                        if self.kips_dates[kip]["kip_max_discuss"] <= kip_date:
+                            self.kips_dates[kip]["kip_max_discuss"] = kip_date
+
                 if '[vote]' in eitem['Subject'].lower():
-                    kip_fields['is_vote'] = 1
+                    kip_fields['kip_is_vote'] = 1
                     kip_fields['kip_type'] = "vote"
                     kip_fields['kip'] = extract_kip(eitem['Subject'])
                     if 'body' in eitem:
                         (vote, binding) = extract_vote_and_binding(eitem['body'])
-                        kip_fields['vote'] = vote
-                        kip_fields['binding'] = binding
+                        self.kips_scores[kip] += [(vote, binding)]
+                        kip_fields['kip_vote'] = vote
+                        kip_fields['kip_binding'] = binding
                     else:
                         logger.debug("Message %s without body", eitem['Subject'])
+                    # Update kip discuss dates
+                    if "kip_min_vote" not in self.kips_dates[kip]:
+                        self.kips_dates[kip].update({
+                            "kip_min_vote": kip_date,
+                            "kip_max_vote": kip_date
+                        })
+                    else:
+                        if self.kips_dates[kip]["kip_min_vote"] >= kip_date:
+                            self.kips_dates[kip]["kip_min_vote"] = kip_date
+                        if self.kips_dates[kip]["kip_max_vote"] <= kip_date:
+                            self.kips_dates[kip]["kip_max_vote"] = kip_date
+
 
                 eitem.update(kip_fields)
                 yield eitem
                 total += 1
 
-            logger.info("Total eitems witk kafka kip fields %i", total)
+            logger.info("Total eitems with kafka kip fields %i", total)
 
         logger.debug("Doing kafka_kip study from %s", self.elastic.index_url)
 
-        eitems = add_kip_fields(self)
+        self.debug_kip_second = False
+
+        # First iteration with the basic fields
+        if not self.debug_kip_second:
+            eitems = add_kip_fields(self)
+            self.elastic.bulk_upload_sync(eitems, self.get_field_unique_id())
+
+            with open("kips_dates.pickle", "wb") as fpick:
+                pickle.dump(self.kips_dates, fpick, protocol=pickle.HIGHEST_PROTOCOL)
+            with open("kips_scores.pickle", "wb") as fpick:
+                pickle.dump(self.kips_scores, fpick, protocol=pickle.HIGHEST_PROTOCOL)
+
+        # Second iteration with the final time and status fields
+        eitems = add_kip_time_status_fields(self)
         self.elastic.bulk_upload_sync(eitems, self.get_field_unique_id())
