@@ -479,7 +479,6 @@ class MBoxEnrich(Enrich):
                 kip_fields = {
                     "kip_is_vote": 0,
                     "kip_is_discuss": 0,
-                    "kip_is_discuss_start": 0,
                     "kip_vote": 0,
                     "kip_binding": 0,
                     "kip": 0,
@@ -495,12 +494,13 @@ class MBoxEnrich(Enrich):
                 if kip not in self.kips_scores:
                     self.kips_scores[kip] = []
 
+                kip_date = parser.parse(eitem["email_date"])
+
                 # Analyze the subject to fill the kip fields
                 if '[discuss]' in eitem['Subject'].lower():
                     kip_fields['kip_is_discuss'] = 1
                     kip_fields['kip_type'] = "discuss"
-                    kip_fields['kip'] = extract_kip(eitem['Subject'])
-                    kip_date = parser.parse(eitem["email_date"])
+                    kip_fields['kip'] = kip
                     # Update kip discuss dates
                     if "kip_min_discuss" not in self.kips_dates[kip]:
                         self.kips_dates[kip].update({
@@ -516,7 +516,7 @@ class MBoxEnrich(Enrich):
                 if '[vote]' in eitem['Subject'].lower():
                     kip_fields['kip_is_vote'] = 1
                     kip_fields['kip_type'] = "vote"
-                    kip_fields['kip'] = extract_kip(eitem['Subject'])
+                    kip_fields['kip'] = kip
                     if 'body' in eitem:
                         (vote, binding) = extract_vote_and_binding(eitem['body'])
                         self.kips_scores[kip] += [(vote, binding)]
