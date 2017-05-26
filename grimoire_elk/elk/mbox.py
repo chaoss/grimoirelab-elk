@@ -359,6 +359,37 @@ class MBoxEnrich(Enrich):
 
             return kip
 
+        def lazy_result(votes):
+            """ Compute the result of a votation using lazy consensus
+                which requires 3 binding +1 votes and no binding vetoes.
+            """
+            yes = 0
+            yes_binding = 0
+            veto = 0
+            veto_binding = 0
+
+            result = -1
+
+            for (vote, binding) in votes:
+                if vote == 1:
+                    if binding:
+                        yes_binding += 1
+                    else:
+                        yes += 1
+                if vote == -1:
+                    if binding:
+                        veto_binding += 1
+                    else:
+                        veto += 1
+
+            if veto_binding == 0 and yes_binding >= 3:
+                result = 1
+
+            return result
+
+
+
+
         def add_kip_time_status_fields(self):
             """ Add kip fields with final status and times """
 
@@ -374,7 +405,8 @@ class MBoxEnrich(Enrich):
                     "kip_is_first_discuss": 0,
                     "kip_is_first_vote": 0,
                     "kip_is_last_discuss": 0,
-                    "kip_is_last_vote": 0
+                    "kip_is_last_vote": 0,
+                    "kip_result": None,
                 }
 
                 if "kip" not in eitem:
@@ -385,8 +417,8 @@ class MBoxEnrich(Enrich):
 
                 if eitem['kip_is_discuss']:
                     kip_fields["kip_discuss_time_days"] = \
-                        get_time_diff_days(self.kips_dates[kip]['kip_max_discuss'],
-                                           self.kips_dates[kip]['kip_min_discuss'])
+                        get_time_diff_days(self.kips_dates[kip]['kip_min_discuss'],
+                                           self.kips_dates[kip]['kip_max_discuss'])
 
                     # Detect first and last discuss messages
                     if kip_date == self.kips_dates[kip]['kip_min_discuss']:
@@ -401,8 +433,8 @@ class MBoxEnrich(Enrich):
 
                 if eitem['kip_is_vote']:
                     kip_fields["kip_voting_time_days"] = \
-                        get_time_diff_days(self.kips_dates[kip]['kip_max_vote'],
-                                           self.kips_dates[kip]['kip_min_vote'])
+                        get_time_diff_days(self.kips_dates[kip]['kip_min_vote'],
+                                           self.kips_dates[kip]['kip_max_vote'])
 
                     # Detect first and last discuss messages
                     if kip_date == self.kips_dates[kip]['kip_min_vote']:
@@ -415,8 +447,9 @@ class MBoxEnrich(Enrich):
 
                     # Now check if there is a result from self.kips_scores
                     result_adopt = False
+                    kip_fields['kip_result'] = lazy_result(self.kips_scores[kip])
 
-                    if result_adopt:
+                    if kip_fields['kip_result']:
                         kip_fields['kip_status'] = 'adopted'
 
                     # And now change the status inactive or discarded if
