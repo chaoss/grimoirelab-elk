@@ -228,22 +228,22 @@ class MBoxEnrich(Enrich):
             """ Extracts the vote and binding for a KIP process included in message body """
 
             vote = 0
-            binding = False
+            binding = 0
 
             for line in body.split("\n"):
                 if line.startswith("+1"):
                     vote = 1
                     if 'non-binding' in line:
-                        binding = False
+                        binding = 0
                     elif 'binding' in line:
-                        binding = True
+                        binding = 1
                     break
                 elif line.startswith("-1"):
                     vote = -1
                     if 'non-binding' in line:
-                        binding = False
+                        binding = 0
                     elif 'binding' in line:
-                        binding = True
+                        binding = 1
                     break
 
             return (vote, binding)
@@ -387,9 +387,6 @@ class MBoxEnrich(Enrich):
 
             return result
 
-
-
-
         def add_kip_time_status_fields(self):
             """ Add kip fields with final status and times """
 
@@ -446,10 +443,9 @@ class MBoxEnrich(Enrich):
                     kip_fields['kip_status'] = 'voting'
 
                     # Now check if there is a result from self.kips_scores
-                    result_adopt = False
                     kip_fields['kip_result'] = lazy_result(self.kips_scores[kip])
 
-                    if kip_fields['kip_result']:
+                    if kip_fields['kip_result'] == 1:
                         kip_fields['kip_status'] = 'adopted'
 
                     # And now change the status inactive or discarded if
@@ -485,7 +481,7 @@ class MBoxEnrich(Enrich):
                     "kip_is_discuss": 0,
                     "kip_is_discuss_start": 0,
                     "kip_vote": 0,
-                    "kip_binding": False,
+                    "kip_binding": 0,
                     "kip": 0,
                     "kip_type": "general"
                 }
