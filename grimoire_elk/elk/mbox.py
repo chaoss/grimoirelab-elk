@@ -24,8 +24,6 @@
 
 import json
 import logging
-import pickle
-
 
 from dateutil import parser
 import email.utils
@@ -366,12 +364,6 @@ class MBoxEnrich(Enrich):
 
             total = 0
 
-            if self.debug_kip_second:
-                with open("kips_dates.pickle", "rb") as fpick:
-                    self.kips_dates = pickle.load(fpick)
-                with open("kips_scores.pickle", "rb") as fpick:
-                    self.kips_scores = pickle.load(fpick)
-
             for eitem in self.fetch():
                 # kip_status: adopted (closed), discussion (open), voting (open),
                 #             inactive (open), discarded (closed)
@@ -524,17 +516,9 @@ class MBoxEnrich(Enrich):
 
         logger.debug("Doing kafka_kip study from %s", self.elastic.index_url)
 
-        self.debug_kip_second = False
-
         # First iteration with the basic fields
-        if not self.debug_kip_second:
-            eitems = add_kip_fields(self)
-            self.elastic.bulk_upload_sync(eitems, self.get_field_unique_id())
-
-            with open("kips_dates.pickle", "wb") as fpick:
-                pickle.dump(self.kips_dates, fpick, protocol=pickle.HIGHEST_PROTOCOL)
-            with open("kips_scores.pickle", "wb") as fpick:
-                pickle.dump(self.kips_scores, fpick, protocol=pickle.HIGHEST_PROTOCOL)
+        eitems = add_kip_fields(self)
+        self.elastic.bulk_upload_sync(eitems, self.get_field_unique_id())
 
         # Second iteration with the final time and status fields
         eitems = add_kip_time_status_fields(self)
