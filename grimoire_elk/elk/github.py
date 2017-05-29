@@ -60,6 +60,10 @@ class GitHubEnrich(Enrich):
     def get_field_author(self):
         return "user_data"
 
+    def get_field_date(self):
+        """ Field with the date in the JSON enriched items """
+        return "grimoire_creation_date"
+
     def get_fields_uuid(self):
         return ["assignee_uuid", "user_uuid"]
 
@@ -334,11 +338,11 @@ class GitHubEnrich(Enrich):
         if 'project' in item:
             rich_issue['project'] = item['project']
 
-        if self.sortinghat:
-            rich_issue.update(self.get_item_sh(item, self.roles))
-
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], "issue"))
 
+        if self.sortinghat:
+            item[self.get_field_date()] = rich_issue[self.get_field_date()]
+            rich_issue.update(self.get_item_sh(item, self.roles))
 
         return rich_issue
 
