@@ -39,10 +39,22 @@ def kafka_kip(enrich):
 
         vote = 0
         binding = 0  # by default the votes are binding for +1
+        nlines = 0
+        max_lines_for_vote = 5
 
+        # TODO: use regexp to detect better +1 and -1
         for line in body.split("\n"):
+            if nlines > max_lines_for_vote:
+                # The vote must be in the first MAX_LINES_VOTE
+                break
             if line.startswith(">"):
                 # This line is from a previous email
+                continue
+            elif "+1" in line and "-1" in line:
+                # Report summary probably
+                continue
+            elif "to -1" in line or "sha-1" in line.lower() or "is -1" in line or \
+                 "= -1" in line or "-1 or" in line or '1-1' in line or 'Phase-1' in line:
                 continue
             elif "+1 " in line or line.endswith("+1") or "+1." in line or "+1," in line:
                 vote = 1
@@ -59,6 +71,7 @@ def kafka_kip(enrich):
                 elif 'binding' in line.lower():
                     binding = 1
                 break
+            nlines += 1
 
         return (vote, binding)
 
