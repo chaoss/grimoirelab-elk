@@ -80,6 +80,7 @@ def kafka_kip(enrich):
             # logger.debug("Several KIPs in %s. Found: %i", subject, kip)
             return kip
 
+
         str_with_kip = kip_tokens[1]
 
         if not str_with_kip:
@@ -317,7 +318,9 @@ def kafka_kip(enrich):
             kip_date = parser.parse(eitem["email_date"])
 
             # Analyze the subject to fill the kip fields
-            if '[discuss]' in eitem['Subject'].lower():
+            if '[discuss]' in eitem['Subject'].lower() or \
+               '[kip-discussion]'in eitem['Subject'].lower() or \
+               '[discussion]'in eitem['Subject'].lower():
                 kip_fields['kip_is_discuss'] = 1
                 kip_fields['kip_type'] = "discuss"
                 kip_fields['kip'] = kip
