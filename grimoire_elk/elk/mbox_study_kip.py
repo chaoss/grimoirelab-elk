@@ -24,6 +24,8 @@
 
 import logging
 
+from datetime import datetime
+
 from dateutil import parser
 
 from .utils import get_time_diff_days
@@ -42,7 +44,6 @@ def kafka_kip(enrich):
         nlines = 0
         max_lines_for_vote = 5
 
-        # TODO: use regexp to detect better +1 and -1
         for line in body.split("\n"):
             if nlines > max_lines_for_vote:
                 # The vote must be in the first MAX_LINES_VOTE
@@ -53,10 +54,10 @@ def kafka_kip(enrich):
             elif "+1" in line and "-1" in line:
                 # Report summary probably
                 continue
-            elif "to -1" in line or "sha-1" in line.lower() or "is -1" in line or \
-                 "= -1" in line or "-1 or" in line or '1-1' in line or 'Phase-1' in line:
+            elif "to -1" in line or "is -1" in line or "= -1" in line or "-1 or" in line:
                 continue
-            elif "+1 " in line or line.endswith("+1") or "+1." in line or "+1," in line:
+            elif line.startswith("+1") or " +1 " in line or line.endswith("+1") \
+                 or " +1." in line or " +1," in line:
                 vote = 1
                 binding = 1  # by default the votes are binding for +1
                 if 'non-binding' in line.lower():
@@ -64,7 +65,8 @@ def kafka_kip(enrich):
                 elif 'binding' in line.lower():
                     binding = 1
                 break
-            elif "-1 " in line or line.endswith("-1") or "-1." in line or "-1," in line:
+            elif line.startswith("-1") or line.endswith(" -1") or " -1 " in line \
+                 or " -1." in line or " -1," in line:
                 vote = -1
                 if 'non-binding' in line.lower():
                     binding = 0
@@ -219,6 +221,7 @@ def kafka_kip(enrich):
         """ Add kip fields with final status and times """
 
         total = 0
+        max_inactive_days = 90  # days
 
         for eitem in enrich.fetch():
             # kip_status: adopted (closed), discussion (open), voting (open),
@@ -227,7 +230,9 @@ def kafka_kip(enrich):
             kip_fields = {
                 "kip_status": None,
                 "kip_discuss_time_days": None,
+                "kip_discuss_inactive_days": None,
                 "kip_voting_time_days": None,
+                "kip_voting_inactive_days": None,
                 "kip_is_first_discuss": 0,
                 "kip_is_first_vote": 0,
                 "kip_is_last_discuss": 0,
@@ -258,6 +263,10 @@ def kafka_kip(enrich):
                 # Detect discussion status
                 if "kip_min_vote" not in enrich.kips_dates[kip]:
                     kip_fields['kip_status'] = 'discussion'
+                max_discuss_date = enrich.kips_dates[kip]['kip_max_discuss']
+                kip_fields['kip_discuss_inactive_days'] = \
+                    get_time_diff_days(max_discuss_date.replace(tzinfo=None),
+                                       datetime.utcnow())
 
             if eitem['kip_is_vote']:
                 kip_fields["kip_voting_time_days"] = \
@@ -272,8 +281,13 @@ def kafka_kip(enrich):
                     kip_fields['kip_is_last_vote'] = 1
                     kip_fields['kip_start_end'] = 'voting_end'
 
+
                 # Detect discussion status
                 kip_fields['kip_status'] = 'voting'
+                max_vote_date = enrich.kips_dates[kip]['kip_max_vote']
+                kip_fields['kip_voting_inactive_days'] = \
+                    get_time_diff_days(max_vote_date.replace(tzinfo=None),
+                                       datetime.utcnow())
 
                 # Now check if there is a result from enrich.kips_scores
                 kip_fields['kip_result'] = lazy_result(enrich.kips_scores[kip])
@@ -283,7 +297,16 @@ def kafka_kip(enrich):
                 elif kip_fields['kip_result'] == -1:
                     kip_fields['kip_status'] = 'discarded'
 
-                # And now change the status inactive
+            # And now change the status inactive
+            if kip_fields['kip_status'] not in ['adopted', 'discarded']:
+                inactive_days =  kip_fields['kip_discuss_inactive_days']
+
+                if inactive_days and inactive_days > max_inactive_days:
+                    kip_fields['kip_status'] = 'inactive'
+
+                inactive_days =  kip_fields['kip_voting_inactive_days']
+                if  inactive_days and inactive_days > max_inactive_days:
+                    kip_fields['kip_status'] = 'inactive'
 
             eitem.update(kip_fields)
             yield eitem
