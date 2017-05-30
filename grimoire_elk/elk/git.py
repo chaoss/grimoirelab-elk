@@ -82,6 +82,10 @@ class GitEnrich(Enrich):
     def get_fields_uuid(self):
         return ["author_uuid", "committer_uuid"]
 
+    def get_field_date(self):
+        """ Field with the date in the JSON enriched items """
+        return "grimoire_creation_date"
+
     def get_elastic_mappings(self):
 
         fielddata = ''
