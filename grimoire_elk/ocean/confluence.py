@@ -29,5 +29,4 @@ from .elastic import ElasticOcean
 class ConfluenceOcean(ElasticOcean):
     """Confluence Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = item["data"]["id"]
+    pass

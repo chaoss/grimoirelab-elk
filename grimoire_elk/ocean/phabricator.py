@@ -28,7 +28,6 @@ class PhabricatorOcean(ElasticOcean):
     """Phabricator Ocean feeder"""
 
     def _fix_item(self, item):
-        item["ocean-unique-id"] = item["uuid"]
         # https://discuss.elastic.co/t/field-name-cannot-contain/33251/16
         if 'custom.external_reference' in item["data"]['fields']:
             item["data"]['fields']["custom_external_reference"] = item["data"]['fields'].pop("custom.external_reference")

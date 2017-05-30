@@ -29,5 +29,4 @@ from .elastic import ElasticOcean
 class DiscourseOcean(ElasticOcean):
     """Discourse Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = str(item["data"]["id"]) + "_" + item['origin']
+    pass

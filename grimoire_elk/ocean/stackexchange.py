@@ -29,9 +29,6 @@ from .elastic import ElasticOcean
 class StackExchangeOcean(ElasticOcean):
     """StackExchange Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = str(item["data"]["question_id"]) + "_" + item['origin']
-
     @classmethod
     def get_perceval_params_from_url(cls, url):
         params = []

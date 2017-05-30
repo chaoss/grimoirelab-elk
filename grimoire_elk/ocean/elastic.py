@@ -72,8 +72,6 @@ class ElasticOcean(ElasticItems):
         return "metadata__updated_on"
 
     def get_field_unique_id(self):
-        # field = "ocean-unique-id"
-        # Use the unique id provided by perceval
         field = "uuid"
         return field
 

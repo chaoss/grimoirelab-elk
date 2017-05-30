@@ -31,8 +31,6 @@ from .elastic import ElasticOcean
 class BugzillaOcean(ElasticOcean):
 
     def _fix_item(self, item):
-        bug_id = item["data"]["bug_id"][0]['__text__']
-        item["ocean-unique-id"] = bug_id + "_" + item['origin']
         # Could be used for filtering
         product = item['data']['product'][0]['__text__']
         item['product'] = product

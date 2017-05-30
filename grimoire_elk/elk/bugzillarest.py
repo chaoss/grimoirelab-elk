@@ -47,9 +47,6 @@ class BugzillaRESTEnrich(Enrich):
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "creator_uuid"]
 
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
