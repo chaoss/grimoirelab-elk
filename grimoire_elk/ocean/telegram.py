@@ -27,5 +27,4 @@ from .elastic import ElasticOcean
 class TelegramOcean(ElasticOcean):
     """Telegram Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = item["uuid"]
+    pass

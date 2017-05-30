@@ -29,9 +29,6 @@ from .elastic import ElasticOcean
 class GitOcean(ElasticOcean):
     """Git Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = item["data"]["commit"] + "_" + item['origin']
-
     @classmethod
     def get_p2o_params_from_url(cls, url):
         # Git could include in the URL a  filters-raw-prefix T1722

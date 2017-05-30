@@ -97,7 +97,7 @@ class MozillaClubEnrich(Enrich):
 
         # metadata fields to copy
         copy_fields = ["metadata__updated_on", "metadata__timestamp",
-                       "ocean-unique-id", "origin", "uuid"]
+                       "origin", "uuid"]
         for f in copy_fields:
             if f in item:
                 eitem[f] = item[f]

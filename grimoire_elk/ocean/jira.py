@@ -49,5 +49,3 @@ class JiraOcean(ElasticOcean):
 
         return {"items": mapping}
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = str(item["data"]["id"]) + "_" + item['origin']

@@ -27,5 +27,4 @@ from .elastic import ElasticOcean
 class KitsuneOcean(ElasticOcean):
     """Kitsune Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = item["data"]["id"]
+    pass

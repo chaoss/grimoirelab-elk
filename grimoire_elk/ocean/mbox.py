@@ -54,13 +54,6 @@ class MBoxOcean(ElasticOcean):
 
         return {"items": mapping}
 
-    def _fix_item(self, item):
-        if "Message-ID" in item["data"] and item["data"]["Message-ID"]:
-            item["ocean-unique-id"] = item["data"]["Message-ID"] + "_" + item['origin']
-        else:
-            logger.warning("No Message-ID in %s %s" % (item["data"]["Subject"], item['origin']))
-            item["ocean-unique-id"] = "NONE_" + item['origin']
-
     @classmethod
     def get_perceval_params_from_url(cls, url):
         # In the url the uri and the data dir are included

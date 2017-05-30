@@ -224,9 +224,6 @@ class GitHubEnrich(Enrich):
 
         return {"items": mapping}
 
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def get_project_repository(self, eitem):
         repo = eitem['origin']
         return repo

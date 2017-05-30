@@ -29,9 +29,6 @@ from .elastic import ElasticOcean
 class MeetupOcean(ElasticOcean):
     """Git Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = item["uuid"]
-
     @classmethod
     def get_perceval_params_from_url(cls, url):
         params = []

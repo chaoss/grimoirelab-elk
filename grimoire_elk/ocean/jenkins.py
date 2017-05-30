@@ -29,9 +29,6 @@ from .elastic import ElasticOcean
 class JenkinsOcean(ElasticOcean):
     """Jenkins Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = item["data"]["url"]
-
     def get_elastic_mappings(self):
         mapping = '''
          {

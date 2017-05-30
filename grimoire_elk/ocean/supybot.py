@@ -29,9 +29,6 @@ from .elastic import ElasticOcean
 class SupybotOcean(ElasticOcean):
     """MediaWiki Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = item["uuid"]
-
     @classmethod
     def get_perceval_params_from_url(cls, url):
         # In the url the uri and the data dir are included

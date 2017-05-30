@@ -29,9 +29,6 @@ from .elastic import ElasticOcean
 class RedmineOcean(ElasticOcean):
     """Redmine Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = item["origin"] + "_" + str(item["data"]["id"])
-
     def get_elastic_mappings(self):
         # data.journals.notes
         mapping = '''
