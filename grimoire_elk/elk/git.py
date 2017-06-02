@@ -645,10 +645,10 @@ class GitEnrich(Enrich):
             for item in r.json()["hits"]["hits"]:
                 new_item = item['_source']
                 new_item["author_max_date"] = author['max']['value_as_string']
-                if "author_min_date" not in new_item:
+                if "author_min_date" not in new_item or not new_item['author_min_date']:
                     new_item["author_min_date"] = author['min']['value_as_string']
-                    # In p2p the ids are created during enrichment
-                    new_item["_item_id"] = item['_id']
+                # In p2p the ids are created during enrichment
+                new_item["_item_id"] = item['_id']
                 author_items.append(new_item)
 
             if len(author_items) >= self.elastic.max_items_bulk:
