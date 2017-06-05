@@ -42,7 +42,7 @@ def kafka_kip(enrich):
         vote = 0
         binding = 0  # by default the votes are binding for +1
         nlines = 0
-        max_lines_for_vote = 5
+        max_lines_for_vote = 10
 
         for line in body.split("\n"):
             if nlines > max_lines_for_vote:
@@ -217,11 +217,34 @@ def kafka_kip(enrich):
 
         return result
 
+    def add_kip_final_status_field(enrich):
+        """ Add kip final status field """
+
+        total = 0
+
+        for eitem in enrich.fetch():
+            if "kip" not in eitem:
+                # It is not a KIP message
+                continue
+
+            if eitem['kip'] in enrich.kips_final_status:
+                eitem.update({"kip_final_status":
+                              enrich.kips_final_status[eitem['kip']]})
+            else:
+                logger.warning("No final status for kip: %i", eitem['kip'])
+                eitem.update({"kip_final_status": None})
+            yield eitem
+            total += 1
+
+        logger.info("Total eitems with kafka final status kip field %i", total)
+
     def add_kip_time_status_fields(enrich):
         """ Add kip fields with final status and times """
 
         total = 0
         max_inactive_days = 90  # days
+
+        enrich.kips_final_status = {}  # final status for each kip
 
         for eitem in enrich.fetch():
             # kip_status: adopted (closed), discussion (open), voting (open),
@@ -281,7 +304,6 @@ def kafka_kip(enrich):
                     kip_fields['kip_is_last_vote'] = 1
                     kip_fields['kip_start_end'] = 'voting_end'
 
-
                 # Detect discussion status
                 kip_fields['kip_status'] = 'voting'
                 max_vote_date = enrich.kips_dates[kip]['kip_max_vote']
@@ -299,14 +321,24 @@ def kafka_kip(enrich):
 
             # And now change the status inactive
             if kip_fields['kip_status'] not in ['adopted', 'discarded']:
-                inactive_days =  kip_fields['kip_discuss_inactive_days']
+                inactive_days = kip_fields['kip_discuss_inactive_days']
 
                 if inactive_days and inactive_days > max_inactive_days:
                     kip_fields['kip_status'] = 'inactive'
 
-                inactive_days =  kip_fields['kip_voting_inactive_days']
+                inactive_days = kip_fields['kip_voting_inactive_days']
                 if  inactive_days and inactive_days > max_inactive_days:
                     kip_fields['kip_status'] = 'inactive'
+
+
+            # The final status is in the kip_is_last_discuss or kip_is_last_vote
+            # It will be filled in the next enrichment round
+            if eitem['kip'] not in enrich.kips_final_status:
+                enrich.kips_final_status[kip] = None
+            if eitem['kip_is_last_discuss'] and not enrich.kips_final_status[kip]:
+                enrich.kips_final_status[kip] = kip_fields['kip_status']
+            if eitem['kip_is_last_vote']:
+                enrich.kips_final_status[kip] = kip_fields['kip_status']
 
             eitem.update(kip_fields)
             yield eitem
@@ -395,7 +427,6 @@ def kafka_kip(enrich):
                     if enrich.kips_dates[kip]["kip_max_vote"] <= kip_date:
                         enrich.kips_dates[kip]["kip_max_vote"] = kip_date
 
-
             eitem.update(kip_fields)
             yield eitem
             total += 1
@@ -410,4 +441,8 @@ def kafka_kip(enrich):
 
     # Second iteration with the final time and status fields
     eitems = add_kip_time_status_fields(enrich)
+    enrich.elastic.bulk_upload_sync(eitems, enrich.get_field_unique_id())
+
+    # Third iteration to compute the end status field for all KIPs
+    eitems = add_kip_final_status_field(enrich)
     enrich.elastic.bulk_upload_sync(eitems, enrich.get_field_unique_id())
