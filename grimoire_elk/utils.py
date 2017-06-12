@@ -36,6 +36,7 @@ from .ocean.bugzilla import BugzillaOcean
 from .ocean.bugzillarest import BugzillaRESTOcean
 from .ocean.confluence import ConfluenceOcean
 from .ocean.discourse import DiscourseOcean
+from .ocean.dockerhub import DockerHubOcean
 from .ocean.gerrit import GerritOcean
 from .ocean.git import GitOcean
 from .ocean.github import GitHubOcean
@@ -62,6 +63,7 @@ from .elk.askbot import AskbotEnrich
 from .elk.bugzilla import BugzillaEnrich
 from .elk.bugzillarest import BugzillaRESTEnrich
 from .elk.confluence import ConfluenceEnrich
+from .elk.dockerhub import DockerHubEnrich
 from .elk.discourse import DiscourseEnrich
 from .elk.git import GitEnrich
 from .elk.github import GitHubEnrich
@@ -94,6 +96,7 @@ from perceval.backends.core.bugzilla import Bugzilla, BugzillaCommand
 from perceval.backends.core.bugzillarest import BugzillaREST, BugzillaRESTCommand
 from perceval.backends.core.discourse import Discourse, DiscourseCommand
 from perceval.backends.core.confluence import Confluence, ConfluenceCommand
+from perceval.backends.core.dockerhub import DockerHub, DockerHubCommand
 from perceval.backends.core.gerrit import Gerrit, GerritCommand
 from perceval.backends.core.git import Git, GitCommand
 from perceval.backends.core.github import GitHub, GitHubCommand
@@ -157,6 +160,7 @@ def get_connectors():
             "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
             "confluence":[Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
             "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
+            "dockerhub":[DockerHub, DockerHubOcean, DockerHubEnrich, DockerHubCommand],
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
