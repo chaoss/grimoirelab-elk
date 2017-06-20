@@ -553,6 +553,20 @@ class Enrich(ElasticItems):
                     break
         return enroll
 
+    def __get_item_sh_fields_empty(self, rol):
+        """ Return a SH identity with all fields to empty_field """
+        # If empty_field is None, the fields do not appear in index patterns
+        empty_field = ''
+        return {
+            rol+"_id": empty_field,
+            rol+"_uuid": empty_field,
+            rol+"_name": empty_field,
+            rol+"_user_name": empty_field,
+            rol+"_domain": empty_field,
+            rol+"_org_name": empty_field,
+            rol+"_bot": False
+        }
+
     def get_item_sh_fields(self, identity=None, item_date=None, sh_id=None,
                            rol='author'):
         """ Get standard SH fields from a SH identity """
@@ -568,7 +582,8 @@ class Enrich(ElasticItems):
             eitem_sh[rol+"_id"] = sh_id
             eitem_sh[rol+"_uuid"] = self.get_uuid_from_id(sh_id)
         else:
-            raise RuntimeError("identity or sh_id needed for sortinghat fields")
+            # No data to get a SH identity. Return an empty one.
+            return self.__get_item_sh_fields_empty(rol)
 
         # Get the SH profile to use first this data
         profile = self.get_profile_sh(eitem_sh[rol+"_uuid"])
@@ -620,7 +635,8 @@ class Enrich(ElasticItems):
 
         for rol in roles:
             if rol+"_id" not in eitem:
-                logger.warning("Enriched index does not include SH ids for %s. Can not refresh it.", rol+"_id")
+                # For example assignee in github it is usual that it does not appears
+                logger.debug("Enriched index does not include SH ids for %s. Can not refresh it.", rol+"_id")
                 continue
             sh_id = eitem[rol+"_id"]
             if not sh_id:
@@ -673,8 +689,6 @@ class Enrich(ElasticItems):
         for rol in roles:
             if rol in users_data:
                 identity = self.get_sh_identity(item, rol)
-                if not identity:
-                    continue
                 eitem_sh.update(self.get_item_sh_fields(identity, item_date, rol=rol))
 
         # Add the author field common in all data sources
