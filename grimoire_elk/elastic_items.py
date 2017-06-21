@@ -61,6 +61,12 @@ class ElasticItems():
         """ Field with the update in the JSON items. Now the same in all. """
         return "metadata__updated_on"
 
+    def get_incremental_date(self):
+        """
+        Field with the date used for incremental analysis.
+        """
+        return "metadata__timestamp"
+
     def set_filter_raw(self, filter_raw):
         """ Filter to be used when getting items from Ocean index """
         self.filter_raw = filter_raw
@@ -134,7 +140,7 @@ class ElasticItems():
                 ''' % (self.filter_raw['name'], self.filter_raw['value'])
 
             if self.from_date:
-                date_field = self.get_field_date()
+                date_field = self.get_incremental_date()
                 from_date = self.from_date.isoformat()
 
                 filters += '''
@@ -164,7 +170,7 @@ class ElasticItems():
             order_query = ''
             order_field = None
             if self.perceval_backend:
-                order_field = 'metadata__timestamp'
+                order_field = self.get_incremental_date()
             elif self.get_connector_name() == 'twitter':
                 order_field = '@timestamp'
             if order_field is not None:

@@ -534,14 +534,10 @@ class GitEnrich(Enrich):
 
 
     def enrich_demography(self, from_date=None):
-        logger.debug("Doing demography enrich from %s", self.elastic.index_url)
+        logger.info("Doing demography enrich from %s since %s",
+                    self.elastic.index_url, from_date)
 
-        if from_date:
-            # The from_date must be max author_max_date
-            from_date = self.elastic.get_last_item_field("author_max_date")
-            logger.debug("Demography since: %s", from_date)
-
-        date_field = self.get_field_date()
+        date_field = self.get_incremental_date()
 
         # Don't use commits before DEMOGRAPHY_COMMIT_MIN_DATE
         filters = '''
