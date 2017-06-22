@@ -640,7 +640,7 @@ class Enrich(ElasticItems):
                 continue
             sh_id = eitem[rol+"_id"]
             if not sh_id:
-                logger.warning("%s_id is None", sh_id)
+                logger.debug("%s_id is None", rol)
                 continue
             if rol == author_field:
                 sh_id_author = sh_id
