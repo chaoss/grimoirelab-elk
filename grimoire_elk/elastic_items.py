@@ -81,13 +81,16 @@ class ElasticItems():
         return get_connector_name(type(self))
 
     # Items generator
-    def fetch(self, query_string=None):
-        logger.debug("Creating ocean items generator.")
+    def fetch(self, _filter=None):
+        """ Fetch the items from raw or enriched index. An optional _filter
+        could be provided to filter the data collected """
+
+        logger.debug("Creating a elastic items generator.")
 
         elastic_scroll_id = None
 
         while True:
-            rjson = self.get_elastic_items(elastic_scroll_id, query_string)
+            rjson = self.get_elastic_items(elastic_scroll_id, _filter)
 
             if rjson and "_scroll_id" in rjson:
                 elastic_scroll_id = rjson["_scroll_id"]
@@ -103,8 +106,9 @@ class ElasticItems():
                 break
         return
 
-    def get_elastic_items(self, elastic_scroll_id=None, query_string=None):
-        """ Get the items from the index related to the backend """
+    def get_elastic_items(self, elastic_scroll_id=None, _filter=None):
+        """ Get the items from the index related to the backend applying and
+        optional _filter if provided"""
 
         if not self.elastic:
             return None
@@ -139,6 +143,16 @@ class ElasticItems():
                     }
                 ''' % (self.filter_raw['name'], self.filter_raw['value'])
 
+            if _filter:
+                filter_str = '''
+                    , {"terms":
+                        { "%s": %s }
+                    }
+                ''' % (_filter['name'], _filter['value'])
+                # List to string conversion uses ' that are not allowed in JSON
+                filter_str = filter_str.replace("'", "\"")
+                filters += filter_str
+
             if self.from_date:
                 date_field = self.get_incremental_date()
                 from_date = self.from_date.isoformat()
@@ -154,16 +168,6 @@ class ElasticItems():
                         {"offset": {"gte": %i}}
                     }
                 ''' % (self.offset)
-
-            if query_string:
-                filters += """
-                , { "query_string": {
-                    "fields" : ["%s"],
-                    "query": "%s"
-                    }
-                }
-                """ % (query_string['fields'], query_string['query'])
-
 
             # Order the raw items from the old ones to the new so if the
             # enrich process fails, it could be resume incrementally
