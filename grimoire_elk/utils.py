@@ -36,6 +36,7 @@ from .ocean.bugzilla import BugzillaOcean
 from .ocean.bugzillarest import BugzillaRESTOcean
 from .ocean.confluence import ConfluenceOcean
 from .ocean.discourse import DiscourseOcean
+from .ocean.functest import FunctestOcean
 from .ocean.gerrit import GerritOcean
 from .ocean.git import GitOcean
 from .ocean.github import GitHubOcean
@@ -63,6 +64,7 @@ from .elk.bugzilla import BugzillaEnrich
 from .elk.bugzillarest import BugzillaRESTEnrich
 from .elk.confluence import ConfluenceEnrich
 from .elk.discourse import DiscourseEnrich
+from .elk.functest import FunctestEnrich
 from .elk.git import GitEnrich
 from .elk.github import GitHubEnrich
 from .elk.gerrit import GerritEnrich
@@ -116,6 +118,7 @@ from perceval.backends.core.telegram import Telegram, TelegramCommand
 from perceval.backends.mozilla.kitsune import Kitsune, KitsuneCommand
 from perceval.backends.mozilla.mozillaclub import MozillaClub, MozillaClubCommand
 from perceval.backends.mozilla.remo import ReMo, ReMoCommand
+from perceval.backends.opnfv.functest import Functest, FunctestCommand
 
 
 from .elk.elastic import ElasticSearch
@@ -157,6 +160,7 @@ def get_connectors():
             "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
             "confluence":[Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
             "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
+            "functest":[Functest, FunctestOcean, FunctestEnrich, FunctestCommand],
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
