@@ -79,4 +79,6 @@ class FunctestEnrich(Enrich):
             if 'failures' in func_test['details']:
                 eitem['failures'] = func_test['details']['failures']
 
+        eitem.update(self.get_grimoire_fields(func_test['start_date'], "func_test"))
+
         return eitem
