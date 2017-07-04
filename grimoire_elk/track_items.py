@@ -169,7 +169,7 @@ def _get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers):
         }
     }
 
-    req = requests_ses.post(es + "/" + index_gerrit_raw + "/_search?limit=10000",
+    req = requests_ses.post(es + "/" + index_gerrit_raw + "/_search?size=10000",
                             data=json.dumps(query))
     req.raise_for_status()
     reviews_es = req.json()["hits"]["hits"]
@@ -207,7 +207,7 @@ def _get_git_commits(es, index_git_raw, commits_sha_list):
         }
     }
 
-    req = requests_ses.post(es + "/" + index_git_raw + "/_search?limit=10000",
+    req = requests_ses.post(es + "/" + index_git_raw + "/_search?size=10000",
                             data=json.dumps(query))
     req.raise_for_status()
     commits_es = req.json()["hits"]["hits"]

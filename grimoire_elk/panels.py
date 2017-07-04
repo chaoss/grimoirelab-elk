@@ -43,11 +43,25 @@ def get_dashboard_json(elastic, dashboard):
 
     dash_json = r.json()
     if "_source" not in dash_json:
-        logger.error("Can not find dashboard: %s", dashboard)
-        print (dash_json_url)
-        sys.exit(1)
+        logger.debug("Can not find dashboard: %s", dashboard)
+        dash_json = {}
+    else:
+        dash_json = dash_json['_source']
 
-    return dash_json['_source']
+    return dash_json
+
+def exists_dashboard(elastic_url, dash_id, es_index=None):
+    """ Check if a dashboard exists """
+    exists = False
+
+    if not es_index:
+        es_index = ".kibana"
+    elastic = ElasticSearch(elastic_url, es_index)
+    dash_data = get_dashboard_json(elastic, dash_id)
+    if 'panelsJSON' in dash_data:
+        exists = True
+
+    return exists
 
 def get_vis_json(elastic, vis):
     vis_json_url = elastic.index_url+"/visualization/"+vis
