@@ -26,10 +26,11 @@ import json
 import logging
 
 from dateutil import parser
+
 import email.utils
 
 from .enrich import Enrich, metadata
-from .mbox_study_kip import kafka_kip
+from .mbox_study_kip import kafka_kip, MAX_LINES_FOR_VOTE
 
 logger = logging.getLogger(__name__)
 
@@ -148,8 +149,8 @@ class MBoxEnrich(Enrich):
         else:
             eitem["root"] = True
 
-        # The body is needed in studies like kafka_kip
-        eitem["body"] = message['body']['plain']
+        # Part of the body is needed in studies like kafka_kip
+        eitem["body_extract"] = "\n".join(message['body']['plain'].split("\n")[:MAX_LINES_FOR_VOTE])
         # Size of the message
         try:
             eitem["size"] = len(message['body']['plain'])

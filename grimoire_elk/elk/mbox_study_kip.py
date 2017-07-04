@@ -32,6 +32,9 @@ from .utils import get_time_diff_days
 
 logger = logging.getLogger(__name__)
 
+MAX_LINES_FOR_VOTE = 10
+
+
 def kafka_kip(enrich):
 
     """ Kafka Improvement Proposals process study """
@@ -42,10 +45,9 @@ def kafka_kip(enrich):
         vote = 0
         binding = 0  # by default the votes are binding for +1
         nlines = 0
-        max_lines_for_vote = 10
 
         for line in body.split("\n"):
-            if nlines > max_lines_for_vote:
+            if nlines > MAX_LINES_FOR_VOTE:
                 # The vote must be in the first MAX_LINES_VOTE
                 break
             if line.startswith(">"):
@@ -333,6 +335,7 @@ def kafka_kip(enrich):
 
             # The final status is in the kip_is_last_discuss or kip_is_last_vote
             # It will be filled in the next enrichment round
+            eitem.update(kip_fields)
             if eitem['kip'] not in enrich.kips_final_status:
                 enrich.kips_final_status[kip] = None
             if eitem['kip_is_last_discuss'] and not enrich.kips_final_status[kip]:
@@ -340,7 +343,6 @@ def kafka_kip(enrich):
             if eitem['kip_is_last_vote']:
                 enrich.kips_final_status[kip] = kip_fields['kip_status']
 
-            eitem.update(kip_fields)
             yield eitem
             total += 1
 
@@ -408,8 +410,8 @@ def kafka_kip(enrich):
                 kip_fields['kip_is_vote'] = 1
                 kip_fields['kip_type'] = "vote"
                 kip_fields['kip'] = kip
-                if 'body' in eitem:
-                    (vote, binding) = extract_vote_and_binding(eitem['body'])
+                if 'body_extract' in eitem:
+                    (vote, binding) = extract_vote_and_binding(eitem['body_extract'])
                     enrich.kips_scores[kip] += [(vote, binding)]
                     kip_fields['kip_vote'] = vote
                     kip_fields['kip_binding'] = binding
