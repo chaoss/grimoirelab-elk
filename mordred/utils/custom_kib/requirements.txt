@@ -1,4 +1,0 @@
-gitpython>=2.0.2
-libcurl4-gnutls-dev>=7.38.0
-librtmp-dev>=2.4
-pycurl>=7.19.5
