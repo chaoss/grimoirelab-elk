@@ -68,7 +68,9 @@ class SlackEnrich(Enrich):
             from_ = item['data'][self.get_field_author()]
 
         identity['username'] = from_['name']
-        identity['name'] = from_['real_name']
+        identity['name'] = from_['name']
+        if 'real_name' in from_:
+            identity['name'] = from_['real_name']
         if 'profile' in from_:
             if 'email' in from_['profile']:
                 identity['email'] = from_['profile']['email']
