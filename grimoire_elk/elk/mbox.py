@@ -150,12 +150,12 @@ class MBoxEnrich(Enrich):
             eitem["root"] = True
 
         # Part of the body is needed in studies like kafka_kip
-        eitem["body_extract"] = "\n".join(message['body']['plain'].split("\n")[:MAX_LINES_FOR_VOTE])
+        eitem["body_extract"] = ""
         # Size of the message
-        try:
+        eitem["size"] = None
+        if 'plain' in message['body']:
+            eitem["body_extract"] = "\n".join(message['body']['plain'].split("\n")[:MAX_LINES_FOR_VOTE])
             eitem["size"] = len(message['body']['plain'])
-        except:
-            eitem["size"] = None
 
         # Time zone
         try:
