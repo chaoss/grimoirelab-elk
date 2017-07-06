@@ -36,6 +36,24 @@ class BugzillaOcean(ElasticOcean):
         product = item['data']['product'][0]['__text__']
         item['product'] = product
 
+    def get_elastic_mappings(self):
+        # data.long_desc.thetext.__text__
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "long_desc": {
+                                "dynamic":false,
+                                "properties": {}
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
     @classmethod
     def get_p2o_params_from_url(cls, url):
         # Bugzilla could include in the URL a filter-raw T1720

@@ -30,5 +30,24 @@ from .elastic import ElasticOcean
 class JiraOcean(ElasticOcean):
     """JIRA Ocean feeder"""
 
+    def get_elastic_mappings(self):
+        # data.renderedFields.description inmmense field
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "renderedFields": {
+                                "dynamic":false,
+                                "properties": {}
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
+
     def _fix_item(self, item):
         item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
