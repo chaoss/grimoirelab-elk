@@ -54,6 +54,8 @@ class BugzillaOcean(ElasticOcean):
         }
         '''
 
+        return {"items":mapping}
+
     @classmethod
     def get_p2o_params_from_url(cls, url):
         # Bugzilla could include in the URL a filter-raw T1720

@@ -48,3 +48,5 @@ class RedmineOcean(ElasticOcean):
                 }
         }
         '''
+
+        return {"items":mapping}

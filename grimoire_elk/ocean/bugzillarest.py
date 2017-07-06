@@ -50,3 +50,5 @@ class BugzillaRESTOcean(ElasticOcean):
                 }
         }
         '''
+
+        return {"items":mapping}

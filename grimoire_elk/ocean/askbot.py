@@ -54,6 +54,8 @@ class AskbotOcean(ElasticOcean):
         }
         '''
 
+        return {"items":mapping}
+
     @classmethod
     def get_p2o_params_from_url(cls, url):
         # askbot could include in the URL a  filters-raw-prefix T1721
