@@ -219,7 +219,7 @@ class MeetupEnrich(Enrich):
         eitem['type'] = "meetup"
         # time_date is when the meetup will take place, the needed one in this index
         # created is when the meetup entry was created and it is not the interesting date
-        eitem.update(self.get_grimoire_fields(time_date, eitem['type']))
+        eitem.update(self.get_grimoire_fields(eitem['time_date'], eitem['type']))
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(event))
