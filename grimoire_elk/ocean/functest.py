@@ -28,4 +28,29 @@ from .elastic import ElasticOcean
 class FunctestOcean(ElasticOcean):
     """Functest Ocean feeder"""
 
-    pass
+    def _fix_item(self, item):
+        if 'details' in item["data"]:
+            if isinstance(item["data"]["details"], str):
+                # Wrong format. This field is a dict with the details or
+                # and array with dicts
+                item["data"]["details"] = {}
+
+    def get_elastic_mappings(self):
+        # data.details has {} [] and "" values!
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "details": {
+                                "dynamic":false,
+                                "properties": {}
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
+        return {"items":mapping}
