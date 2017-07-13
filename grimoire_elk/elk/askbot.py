@@ -73,7 +73,11 @@ class AskbotEnrich(Enrich):
         elif 'user_display_name' in user:
             identity['username'] = user['user_display_name']
         elif 'answered_by' in user:
-            identity['username'] = user['answered_by']['username']
+            if 'username' in user['answered_by']:
+                identity['username'] = user['answered_by']['username']
+            else:
+                # "answered_by" : "This post is a wiki"
+                identity['username'] = user['answered_by']
         identity['name'] = identity['username']
 
         return identity
