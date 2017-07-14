@@ -105,9 +105,10 @@ class MBoxEnrich(Enrich):
 
     def get_project_repository(self, eitem):
         mls_list = eitem['origin']
-        # Eclipse specific yet
-        repo = "/mnt/mailman_archives/"
-        repo += mls_list+".mbox/"+mls_list+".mbox"
+        # This should be configurable
+        mboxes_dir = '/home/bitergia/mboxes/'
+        repo = mls_list + " " + mboxes_dir
+        repo += mls_list + ".mbox/" + mls_list + ".mbox"
         return repo
 
     @metadata
