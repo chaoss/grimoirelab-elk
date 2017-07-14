@@ -169,7 +169,12 @@ class MeetupEnrich(Enrich):
         eitem['num_rsvps'] = len(event['rsvps'])
         eitem['num_comments'] = len(event['comments'])
 
-        eitem['time_date'] = unixtime_to_datetime(event['time']/1000).isoformat()
+        try:
+            eitem['time_date'] = unixtime_to_datetime(event['time']/1000).isoformat()
+        except ValueError:
+            logger.error("Wrong datetime for %s: %s", eitem['url'], event['time'])
+            # If no datetime for the enriched item, it is useless for Kibana
+            return {}
 
         if 'venue' in event:
             venue = event['venue']
