@@ -79,6 +79,9 @@ class GitEnrich(Enrich):
     def get_field_author(self):
         return "Author"
 
+    def get_field_date(self):
+        return "grimoire_creation_date"
+
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
@@ -355,13 +358,15 @@ class GitEnrich(Enrich):
         if 'project' in item:
             eitem['project'] = item['project']
 
+        eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
+
         if self.sortinghat:
+            # grimoire_creation_date is needed in the item
+            item.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
             eitem.update(self.get_item_sh(item, self.roles))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
-
-        eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
 
         if self.pair_programming:
             eitem = self.__add_pair_programming_metrics(commit, eitem)
