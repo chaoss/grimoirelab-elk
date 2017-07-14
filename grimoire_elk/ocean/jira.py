@@ -48,4 +48,3 @@ class JiraOcean(ElasticOcean):
         '''
 
         return {"items": mapping}
-
