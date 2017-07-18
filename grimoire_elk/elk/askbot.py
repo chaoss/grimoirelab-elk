@@ -97,16 +97,6 @@ class AskbotEnrich(Enrich):
                 "summary": {
                   "type": "string",
                   "index":"analyzed"
-                },
-                "question_tags": {
-                    "type": "string",
-                    "index":"analyzed",
-                    "analyzer" : "comma"
-                },
-                "question_answer_ids": {
-                    "type": "string",
-                    "index":"analyzed",
-                    "analyzer" : "comma"
                 }
            }
         } """
@@ -161,9 +151,9 @@ class AskbotEnrich(Enrich):
         eitem['question_last_activity_at'] = unixtime_to_datetime(float(question['last_activity_at'])).isoformat()
         eitem['question_last_activity_by_id'] = question['last_activity_by']['id']
         eitem['question_last_activity_by_username'] = question['last_activity_by']['username']
-        # Analyzed
-        eitem['question_tags'] = ",".join([tag for tag in question['tags']])
-        eitem['question_answer_ids'] = ",".join([str(aid) for aid in question['answer_ids']])
+        # A list can be used directly to filter in kibana
+        eitem['question_tags'] = question['tags']
+        eitem['question_answer_ids'] = question['answer_ids']
 
         eitem['comment_count'] = 0
         if 'answers' in question:
