@@ -24,9 +24,14 @@
 #
 
 import argparse
-from dateutil import parser
 import logging
 import sys
+
+from urllib.parse import urljoin
+
+import requests
+
+from dateutil import parser
 
 from .ocean.elastic import ElasticOcean
 
@@ -127,6 +132,7 @@ from .elk.elastic import ElasticConnectException
 
 logger = logging.getLogger(__name__)
 
+kibiter_version = None
 
 def get_connector_from_name(name):
     found = None
@@ -190,6 +196,10 @@ def get_connectors():
 def get_elastic(url, es_index, clean = None, backend = None):
 
     mapping = None
+    global kibiter_version
+
+    if kibiter_version is None:
+        kibiter_version = get_kibiter_version(url)
 
     if backend:
         mapping = backend.get_elastic_mappings()
@@ -203,6 +213,22 @@ def get_elastic(url, es_index, clean = None, backend = None):
         sys.exit(1)
 
     return elastic
+
+def get_kibiter_version(url):
+    """
+        Return kibiter major number version
+
+        The url must point to the Elasticsearch used by Kibiter
+    """
+
+    config_url = '/.kibana/config/_search'
+    url = urljoin(url + "/", config_url)
+    r = requests.get(url)
+    r.raise_for_status()
+    version = r.json()['hits']['hits'][0]['_id']
+    # 5.4.0-SNAPSHOT
+    major_version = version.split(".", 1)[0]
+    return major_version
 
 def config_logging(debug):
 

@@ -40,17 +40,25 @@ class SupybotEnrich(Enrich):
 
     def get_elastic_mappings(self):
 
+        from grimoire_elk.utils import kibiter_version
+
+        fielddata = ''
+        if kibiter_version == '5':
+            fielddata = ', "fielddata": true'
+
         mapping = """
         {
             "properties": {
                 "body_analyzed": {
                   "type": "string",
                   "index":"analyzed"
+                  %s
                   }
            }
-        } """
+        } """ % fielddata
 
-        return {"items":mapping}
+
+        return {"items": mapping}
 
 
     def get_identities(self, item):
