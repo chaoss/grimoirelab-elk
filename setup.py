@@ -68,7 +68,7 @@ setup(name="grimoire-elk",
       keywords="development repositories analytics",
       packages=['grimoire_elk', 'grimoire_elk.elk', 'grimoire_elk.ocean'],
       scripts=["utils/p2o.py"],
-      install_requires=['perceval>=0.8', 'perceval-mozilla'],
+      install_requires=['perceval>=0.9', 'perceval-mozilla>=0.1.1', 'perceval-opnfv'],
       include_package_data=True,
       zip_safe=False
     )
