@@ -114,6 +114,7 @@ class SupybotEnrich(Enrich):
         eitem["update_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
         eitem["channel"] = eitem["origin"]
 
+        eitem.update(self.get_grimoire_fields(eitem["update_date"], "message"))
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
 
