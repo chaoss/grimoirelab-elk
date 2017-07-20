@@ -24,8 +24,7 @@
 
 import json
 import logging
-
-from dateutil import parser
+import sys
 
 from .enrich import Enrich, metadata
 
@@ -92,8 +91,82 @@ class DockerHubEnrich(Enrich):
             eitem[map_fields[fn]] = image[fn]
 
         eitem["id"] = image["name"] + '-' + image["namespace"]
+        eitem['is_event'] = 1
+        eitem['is_docker_image'] = 0
+
         eitem['last_updated'] = image['last_updated']
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "dockerhub"))
 
         return eitem
+
+    def enrich_items(self, ocean_backend, events=False):
+        """ A custom enrich items is needed because apart from the enriched
+        events from raw items, a image item with the last data for an image
+        must be created """
+
+        max_items = self.elastic.max_items_bulk
+        current = 0
+        total = 0
+        bulk_json = ""
+
+        items = ocean_backend.fetch()
+        images_items = {}
+
+        url = self.elastic.index_url+'/items/_bulk'
+
+        logger.debug("Adding items to %s (in %i packs)", url, max_items)
+
+        for item in items:
+            if current >= max_items:
+                r = self.requests.put(url, data=bulk_json)
+                r.raise_for_status()
+                json_size = sys.getsizeof(bulk_json) / (1024*1024)
+                logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
+                bulk_json = ""
+                current = 0
+
+            rich_item = self.get_rich_item(item)
+            data_json = json.dumps(rich_item)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
+                (item[self.get_field_unique_id()])
+            bulk_json += data_json +"\n"  # Bulk document
+            current += 1
+            total += 1
+
+            if rich_item['id'] not in images_items:
+                # Let's transform the rich_event in a rich_image
+                rich_item['is_docker_image'] = 1
+                rich_item['is_event'] = 0
+                images_items[rich_item['id']] = rich_item
+            else:
+                image_date = images_items[rich_item['id']]['last_updated']
+                if image_date <= rich_item['last_updated']:
+                    # This event is newer for the image
+                    rich_item['is_docker_image'] = 1
+                    rich_item['is_event'] = 0
+                    images_items[rich_item['id']] = rich_item
+
+
+        if total == 0:
+            # No items enriched, nothing to upload to ES
+            return total
+
+        r = self.requests.put(url, data=bulk_json)
+        r.raise_for_status()
+
+        # Time to upload the images enriched items. The id is uuid+"_image"
+        # Normally we are enriching events for a unique image so all images
+        # data can be upload in one query
+        for image in images_items:
+            data = images_items[image]
+            data_json = json.dumps(data)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
+                (data['id'] + "_image")
+            bulk_json += data_json +"\n"  # Bulk document
+            total += 1
+
+        r = self.requests.put(url, data=bulk_json)
+        r.raise_for_status()
+
+        return total
