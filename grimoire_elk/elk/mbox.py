@@ -26,15 +26,23 @@ import json
 import logging
 
 from dateutil import parser
+
 import email.utils
 
 from .enrich import Enrich, metadata
-
+from .mbox_study_kip import kafka_kip, MAX_LINES_FOR_VOTE
 
 logger = logging.getLogger(__name__)
 
 
 class MBoxEnrich(Enrich):
+
+    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+                 db_user='', db_password='', db_host=''):
+        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+                         db_user, db_password, db_host)
+
+        self.studies = [self.kafka_kip]
 
     def get_field_author(self):
         return "From"
@@ -48,6 +56,10 @@ class MBoxEnrich(Enrich):
         {
             "properties": {
                  "Subject_analyzed": {
+                   "type": "string",
+                   "index":"analyzed"
+                 },
+                 "body": {
                    "type": "string",
                    "index":"analyzed"
                  }
@@ -93,9 +105,10 @@ class MBoxEnrich(Enrich):
 
     def get_project_repository(self, eitem):
         mls_list = eitem['origin']
-        # Eclipse specific yet
-        repo = "/mnt/mailman_archives/"
-        repo += mls_list+".mbox/"+mls_list+".mbox"
+        # This should be configurable
+        mboxes_dir = '/home/bitergia/mboxes/'
+        repo = mls_list + " " + mboxes_dir
+        repo += mls_list + ".mbox/" + mls_list + ".mbox"
         return repo
 
     @metadata
@@ -111,15 +124,16 @@ class MBoxEnrich(Enrich):
         message = item['data']
 
         # Fields that are the same in message and eitem
-        copy_fields = ["Date","From","Subject","Message-ID"]
+        copy_fields = ["Date", "From", "Subject", "Message-ID"]
         for f in copy_fields:
             if f in message:
                 eitem[f] = message[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"Subject": "Subject_analyzed"
-                      }
+        map_fields = {
+            "Subject": "Subject_analyzed"
+        }
         for fn in map_fields:
             if fn in message:
                 eitem[map_fields[fn]] = message[fn]
@@ -136,11 +150,13 @@ class MBoxEnrich(Enrich):
         else:
             eitem["root"] = True
 
+        # Part of the body is needed in studies like kafka_kip
+        eitem["body_extract"] = ""
         # Size of the message
-        try:
+        eitem["size"] = None
+        if 'plain' in message['body']:
+            eitem["body_extract"] = "\n".join(message['body']['plain'].split("\n")[:MAX_LINES_FOR_VOTE])
             eitem["size"] = len(message['body']['plain'])
-        except:
-            eitem["size"] = None
 
         # Time zone
         try:
@@ -205,3 +221,6 @@ class MBoxEnrich(Enrich):
             self.requests.put(url, data=bulk_json)
 
         return total
+
+    def kafka_kip(self, from_date=None):
+        kafka_kip(self)

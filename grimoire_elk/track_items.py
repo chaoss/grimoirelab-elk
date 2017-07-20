@@ -27,10 +27,11 @@ import logging
 import os
 import tempfile
 
+import requests
+
 from grimoire_elk.arthur import load_identities
 from grimoire_elk.elk.gerrit import GerritEnrich
 from grimoire_elk.elk.git import GitEnrich
-from grimoire_elk.elk.elastic import ElasticSearch
 from grimoire_elk.elk.utils import grimoire_con
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,15 @@ def fetch_track_items(upstream_file_url, data_source):
 
     track_uris = []
     req = requests_ses.get(upstream_file_url)
-    req.raise_for_status()
+    try:
+        req.raise_for_status()
+    except requests.exceptions.HTTPError as ex:
+        logger.warning("Can't get gerrit reviews from %s", upstream_file_url)
+        logger.warning(ex)
+        return track_uris
+
+    logger.debug("Found reviews to be tracked in %s", upstream_file_url)
+
     lines = iter(req.text.split("\n"))
     for line in lines:
         if 'url: ' in line:

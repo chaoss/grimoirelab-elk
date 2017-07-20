@@ -24,9 +24,14 @@
 #
 
 import argparse
-from dateutil import parser
 import logging
 import sys
+
+from urllib.parse import urljoin
+
+import requests
+
+from dateutil import parser
 
 from .ocean.elastic import ElasticOcean
 
@@ -37,6 +42,7 @@ from .ocean.bugzillarest import BugzillaRESTOcean
 from .ocean.confluence import ConfluenceOcean
 from .ocean.discourse import DiscourseOcean
 from .ocean.dockerhub import DockerHubOcean
+from .ocean.functest import FunctestOcean
 from .ocean.gerrit import GerritOcean
 from .ocean.git import GitOcean
 from .ocean.github import GitHubOcean
@@ -65,6 +71,7 @@ from .elk.bugzillarest import BugzillaRESTEnrich
 from .elk.confluence import ConfluenceEnrich
 from .elk.dockerhub import DockerHubEnrich
 from .elk.discourse import DiscourseEnrich
+from .elk.functest import FunctestEnrich
 from .elk.git import GitEnrich
 from .elk.github import GitHubEnrich
 from .elk.gerrit import GerritEnrich
@@ -119,6 +126,7 @@ from perceval.backends.core.telegram import Telegram, TelegramCommand
 from perceval.backends.mozilla.kitsune import Kitsune, KitsuneCommand
 from perceval.backends.mozilla.mozillaclub import MozillaClub, MozillaClubCommand
 from perceval.backends.mozilla.remo import ReMo, ReMoCommand
+from perceval.backends.opnfv.functest import Functest, FunctestCommand
 
 
 from .elk.elastic import ElasticSearch
@@ -127,6 +135,7 @@ from .elk.elastic import ElasticConnectException
 
 logger = logging.getLogger(__name__)
 
+kibiter_version = None
 
 def get_connector_from_name(name):
     found = None
@@ -161,6 +170,7 @@ def get_connectors():
             "confluence":[Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
             "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
             "dockerhub":[DockerHub, DockerHubOcean, DockerHubEnrich, DockerHubCommand],
+            "functest":[Functest, FunctestOcean, FunctestEnrich, FunctestCommand],
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
@@ -190,6 +200,10 @@ def get_connectors():
 def get_elastic(url, es_index, clean = None, backend = None):
 
     mapping = None
+    global kibiter_version
+
+    if kibiter_version is None:
+        kibiter_version = get_kibiter_version(url)
 
     if backend:
         mapping = backend.get_elastic_mappings()
@@ -203,6 +217,22 @@ def get_elastic(url, es_index, clean = None, backend = None):
         sys.exit(1)
 
     return elastic
+
+def get_kibiter_version(url):
+    """
+        Return kibiter major number version
+
+        The url must point to the Elasticsearch used by Kibiter
+    """
+
+    config_url = '/.kibana/config/_search'
+    url += "/" + config_url
+    r = requests.get(url)
+    r.raise_for_status()
+    version = r.json()['hits']['hits'][0]['_id']
+    # 5.4.0-SNAPSHOT
+    major_version = version.split(".", 1)[0]
+    return major_version
 
 def config_logging(debug):
 
@@ -268,8 +298,8 @@ def get_params_parser():
     parser.add_argument('--db-sortinghat', help="SortingHat DB")
     parser.add_argument('--only-identities', action='store_true', help="Only add identities to SortingHat DB")
     parser.add_argument('--refresh-identities', action='store_true', help="Refresh identities in enriched items")
-    parser.add_argument('--author_id', help="Field author_id to be refreshed")
-    parser.add_argument('--author_uuid', help="Field author_uuid to be refreshed")
+    parser.add_argument('--author_id', nargs='*', help="Field author_ids to be refreshed")
+    parser.add_argument('--author_uuid', nargs='*', help="Field author_uuids to be refreshed")
     parser.add_argument('--github-token', help="If provided, github usernames will be retrieved in git enrich.")
     parser.add_argument('--jenkins-rename-file', help="CSV mapping file with nodes renamed schema.")
     parser.add_argument('--studies', action='store_true', help="Execute studies after enrichment.")

@@ -30,3 +30,23 @@ class RedmineOcean(ElasticOcean):
 
     def _fix_item(self, item):
         item["ocean-unique-id"] = item["origin"]+"_"+str(item["data"]["id"])
+
+    def get_elastic_mappings(self):
+        # data.journals.notes
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "journals": {
+                                "dynamic":false,
+                                "properties": {}
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
+        return {"items":mapping}

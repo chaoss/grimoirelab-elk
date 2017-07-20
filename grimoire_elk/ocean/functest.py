@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# Bugzilla Ocean feeder
+# StackExchange Ocean feeder
 #
-# Copyright (C) 2016 Bitergia
+# Copyright (C) 2015 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,28 +23,27 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-'''Bugzilla Ocean feeder'''
-
 from .elastic import ElasticOcean
 
-class BugzillaOcean(ElasticOcean):
+class FunctestOcean(ElasticOcean):
+    """Functest Ocean feeder"""
 
     def _fix_item(self, item):
-        bug_id = item["data"]["bug_id"][0]['__text__']
-        item["ocean-unique-id"] = bug_id+"_"+item['origin']
-        # Could be used for filtering
-        product = item['data']['product'][0]['__text__']
-        item['product'] = product
+        if 'details' in item["data"]:
+            if isinstance(item["data"]["details"], str):
+                # Wrong format. This field is a dict with the details or
+                # and array with dicts
+                item["data"]["details"] = {}
 
     def get_elastic_mappings(self):
-        # data.long_desc.thetext.__text__
+        # data.details has {} [] and "" values!
         mapping = '''
          {
             "dynamic":true,
                 "properties": {
                     "data": {
                         "properties": {
-                            "long_desc": {
+                            "details": {
                                 "dynamic":false,
                                 "properties": {}
                             }
@@ -55,18 +54,3 @@ class BugzillaOcean(ElasticOcean):
         '''
 
         return {"items":mapping}
-
-    @classmethod
-    def get_p2o_params_from_url(cls, url):
-        # Bugzilla could include in the URL a filter-raw T1720
-        # https://bugzilla.redhat.com/ filter-raw=product:OpenShift Origin
-        params = {}
-
-        tokens = url.split(' ', 1)  # Just split the URL not the filter
-        params['url'] = tokens[0]
-
-        if len(tokens) > 1:
-            f = tokens[1].split("=")[1]
-            params['filter-raw'] = f
-
-        return params

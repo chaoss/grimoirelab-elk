@@ -31,6 +31,31 @@ class AskbotOcean(ElasticOcean):
         # item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
         item["ocean-unique-id"] = item["uuid"]
 
+    def get_elastic_mappings(self):
+        # data.answers.answered_by
+        # data.author
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "answers": {
+                                "dynamic":false,
+                                "properties": {}
+                            },
+                            "author": {
+                                "dynamic":false,
+                                "properties": {}
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
+        return {"items":mapping}
+
     @classmethod
     def get_p2o_params_from_url(cls, url):
         # askbot could include in the URL a  filters-raw-prefix T1721

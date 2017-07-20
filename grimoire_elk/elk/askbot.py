@@ -73,7 +73,11 @@ class AskbotEnrich(Enrich):
         elif 'user_display_name' in user:
             identity['username'] = user['user_display_name']
         elif 'answered_by' in user:
-            identity['username'] = user['answered_by']['username']
+            if 'username' in user['answered_by']:
+                identity['username'] = user['answered_by']['username']
+            else:
+                # "answered_by" : "This post is a wiki"
+                identity['username'] = user['answered_by']
         identity['name'] = identity['username']
 
         return identity
@@ -93,16 +97,6 @@ class AskbotEnrich(Enrich):
                 "summary": {
                   "type": "string",
                   "index":"analyzed"
-                },
-                "question_tags": {
-                    "type": "string",
-                    "index":"analyzed",
-                    "analyzer" : "comma"
-                },
-                "question_answer_ids": {
-                    "type": "string",
-                    "index":"analyzed",
-                    "analyzer" : "comma"
                 }
            }
         } """
@@ -151,13 +145,15 @@ class AskbotEnrich(Enrich):
             eitem['author_askbot_id'] = question['author']['id']
             eitem['author_badges'] = question['author']['badges']
             eitem['author_reputation'] = int(question['author']['reputation'])
+            eitem['author_url'] = eitem['origin'] + '/users/'
+            eitem['author_url'] += question['author']['id'] + '/' + question['author']['username']
 
         eitem['question_last_activity_at'] = unixtime_to_datetime(float(question['last_activity_at'])).isoformat()
         eitem['question_last_activity_by_id'] = question['last_activity_by']['id']
         eitem['question_last_activity_by_username'] = question['last_activity_by']['username']
-        # Analyzed
-        eitem['question_tags'] = ",".join([tag for tag in question['tags']])
-        eitem['question_answer_ids'] = ",".join([str(aid) for aid in question['answer_ids']])
+        # A list can be used directly to filter in kibana
+        eitem['question_tags'] = question['tags']
+        eitem['question_answer_ids'] = question['answer_ids']
 
         eitem['comment_count'] = 0
         if 'answers' in question:
@@ -167,6 +163,7 @@ class AskbotEnrich(Enrich):
             eitem.update(self.get_item_sh(item))
         eitem["type"] = "question"
         eitem.update(self.get_grimoire_fields(added_at.isoformat(), eitem["type"]))
+
 
         return eitem
 
@@ -192,6 +189,9 @@ class AskbotEnrich(Enrich):
             # Not sure if this format is present in some version of askbot
             ecomment['author_askbot_user_name'] = comment['author']['username']
             ecomment['author_askbot_id'] = comment['author']['id']
+            ecomment['author_url'] = ecomment['origin'] + '/users/'
+            ecomment['author_url'] += comment['author']['id'] + '/' + comment['author']['username']
+
         elif 'user_display_name' in comment:
             ecomment['author_askbot_user_name'] = comment['user_display_name']
             ecomment['author_askbot_id'] = comment['user_id']
@@ -240,6 +240,10 @@ class AskbotEnrich(Enrich):
             eanswer['author_askbot_id'] = answer['answered_by']['id']
             eanswer['author_badges'] = answer['answered_by']['badges']
             eanswer['author_reputation'] = int(answer['answered_by']['reputation'])
+            eanswer['author_url'] = eanswer['origin'] + '/users/'
+            eanswer['author_url'] += answer['answered_by']['id'] + '/'
+            eanswer['author_url'] += answer['answered_by']['username']
+
         eanswer['summary'] = answer['summary']
         eanswer['score'] = answer['score']
         if 'is_correct' in answer:

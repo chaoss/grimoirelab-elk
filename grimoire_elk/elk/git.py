@@ -79,6 +79,9 @@ class GitEnrich(Enrich):
     def get_field_author(self):
         return "Author"
 
+    def get_field_date(self):
+        return "grimoire_creation_date"
+
     def get_field_unique_id(self):
         return "ocean-unique-id"
 
@@ -306,7 +309,7 @@ class GitEnrich(Enrich):
         eitem["commit_date"] = commit_date.replace(tzinfo=None).isoformat()
         eitem["utc_author"] = (author_date-author_date.utcoffset()).replace(tzinfo=None).isoformat()
         eitem["utc_commit"] = (commit_date-commit_date.utcoffset()).replace(tzinfo=None).isoformat()
-        eitem["tz"]  = int(commit_date.strftime("%z")[0:3])
+        eitem["tz"]  = int(author_date.strftime("%z")[0:3])
         # Other enrichment
         eitem["repo_name"] = item["origin"]
         # Number of files touched
@@ -355,13 +358,15 @@ class GitEnrich(Enrich):
         if 'project' in item:
             eitem['project'] = item['project']
 
+        eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
+
         if self.sortinghat:
+            # grimoire_creation_date is needed in the item
+            item.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
             eitem.update(self.get_item_sh(item, self.roles))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
-
-        eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
 
         if self.pair_programming:
             eitem = self.__add_pair_programming_metrics(commit, eitem)
@@ -534,14 +539,10 @@ class GitEnrich(Enrich):
 
 
     def enrich_demography(self, from_date=None):
-        logger.debug("Doing demography enrich from %s", self.elastic.index_url)
+        logger.info("Doing demography enrich from %s since %s",
+                    self.elastic.index_url, from_date)
 
-        if from_date:
-            # The from_date must be max author_max_date
-            from_date = self.elastic.get_last_item_field("author_max_date")
-            logger.debug("Demography since: %s", from_date)
-
-        date_field = self.get_field_date()
+        date_field = self.get_incremental_date()
 
         # Don't use commits before DEMOGRAPHY_COMMIT_MIN_DATE
         filters = '''

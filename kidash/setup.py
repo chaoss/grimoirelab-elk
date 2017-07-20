@@ -19,6 +19,7 @@
 #
 # Authors:
 #     Santiago Dueñas <sduenas@bitergia.com>
+#     Jesus M. Gonzalez-Barahona <jgb@bitergia.com>
 #
 
 import codecs
@@ -29,8 +30,8 @@ import re
 from setuptools import setup
 
 here = os.path.abspath(os.path.dirname(__file__))
-readme_md = os.path.join(here, 'README_kidash.md')
-version_py = os.path.join(here, 'grimoire_elk', '_version.py')
+readme_md = os.path.join(here, 'README.md')
+version_py = os.path.join(here, '_version.py')
 
 # Pypi wants the description to be in reStrcuturedText, but
 # we have it in Markdown. So, let's convert formats.
@@ -50,7 +51,7 @@ with codecs.open(version_py, 'r', encoding='utf-8') as fd:
                         fd.read(), re.MULTILINE).group(1)
 
 setup(name="grimoire-kidash",
-      description="GrimoireLab to manage Kibana dashboards from the command line",
+      description="GrimoireLab script to manage Kibana dashboards from the command line",
       long_description=long_description,
       url="https://github.com/grimoirelab/GrimoireELK",
       version=version,
@@ -63,12 +64,13 @@ setup(name="grimoire-kidash",
         'Topic :: Software Development',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4'],
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5'],
       keywords="development repositories analytics",
-      scripts=["utils/kidash.py"],
+      scripts=["kidash.py"],
       install_requires=['python-dateutil',
-            'perceval>=0.5',
-            'grimoire-elk==' + version
-            ],
+        'grimoire-elk==' + version
+        ],
+      include_package_data=True,
       zip_safe=False
     )

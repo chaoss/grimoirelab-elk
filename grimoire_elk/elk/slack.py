@@ -40,15 +40,23 @@ class SlackEnrich(Enrich):
 
     def get_elastic_mappings(self):
 
+        from grimoire_elk.utils import kibiter_version
+
+        fielddata = ''
+        if kibiter_version == '5':
+            fielddata = ', "fielddata": true'
+
+
         mapping = """
         {
             "properties": {
                 "text_analyzed": {
                   "type": "string",
                   "index":"analyzed"
+                   %s
                   }
            }
-        } """
+        } """  % fielddata
 
         return {"items":mapping}
 
@@ -68,7 +76,9 @@ class SlackEnrich(Enrich):
             from_ = item['data'][self.get_field_author()]
 
         identity['username'] = from_['name']
-        identity['name'] = from_['real_name']
+        identity['name'] = from_['name']
+        if 'real_name' in from_:
+            identity['name'] = from_['real_name']
         if 'profile' in from_:
             if 'email' in from_['profile']:
                 identity['email'] = from_['profile']['email']
@@ -142,12 +152,16 @@ class SlackEnrich(Enrich):
 
         if 'user_data' in message:
             eitem['team_id'] = message['user_data']['team_id']
-            eitem['tz'] = message['user_data']['tz_offset']
-            # tz must be in -12h to 12h interval, so seconds -> hours
-            eitem['tz'] = round(int(eitem['tz'])/(60*60))
-            eitem['is_admin'] = message['user_data']['is_admin']
-            eitem['is_owner'] = message['user_data']['is_owner']
-            eitem['is_primary_owner'] = message['user_data']['is_primary_owner']
+            if 'tz_offset' in message['user_data']:
+                eitem['tz'] = message['user_data']['tz_offset']
+                # tz must be in -12h to 12h interval, so seconds -> hours
+                eitem['tz'] = round(int(eitem['tz'])/(60*60))
+            if 'is_admin' in message['user_data']:
+                eitem['is_admin'] = message['user_data']['is_admin']
+            if 'is_owner' in message['user_data']:
+                eitem['is_owner'] = message['user_data']['is_owner']
+            if 'is_primary_owner' in message['user_data']:
+                eitem['is_primary_owner'] = message['user_data']['is_primary_owner']
             if 'profile' in message['user_data']:
                 if 'title' in message['user_data']['profile']:
                     eitem['profile_title'] = message['user_data']['profile']['title']

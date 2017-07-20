@@ -1,0 +1,86 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+#
+#
+# Copyright (C) 2015 Bitergia
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# Authors:
+#   Alvaro del Castillo San Felix <acs@bitergia.com>
+#
+
+import logging
+
+from dateutil import parser
+
+from .enrich import Enrich, metadata
+
+
+logger = logging.getLogger(__name__)
+
+
+class FunctestEnrich(Enrich):
+
+    def get_identities(self, item):
+        """ Return the identities from an item """
+        identities = []
+
+        return identities
+
+    @metadata
+    def get_rich_item(self, item):
+        eitem = {}
+
+        for f in self.RAW_FIELDS_COPY:
+            if f in item:
+                eitem[f] = item[f]
+            else:
+                eitem[f] = None
+
+        # The real data
+        func_test = item['data']
+
+        # data fields to copy
+        copy_fields = ["start_date", "stop_date", "case_name", "criteria", "scenario",
+                       "version", "pod_name", "installer", "build_tag", "trust_indicator"]
+        for f in copy_fields:
+            if f in func_test:
+                eitem[f] = func_test[f]
+            else:
+                eitem[f] = None
+
+        # Fields which names are translated
+        map_fields = {"_id": "api_id",
+                      "project_name": "project"
+                     }
+        for fn in map_fields:
+            if fn in func_test:
+                eitem[map_fields[fn]] = func_test[fn]
+            else:
+                eitem[map_fields[fn]] = None
+
+
+        if 'details' in func_test:
+            if 'tests' in func_test['details']:
+                eitem['tests'] = func_test['details']['tests']
+            if 'failures' in func_test['details']:
+                eitem['failures'] = func_test['details']['failures']
+            if 'duration' in func_test['details']:
+                eitem['duration'] = func_test['details']['duration']
+
+        eitem.update(self.get_grimoire_fields(func_test['start_date'], "func_test"))
+
+        return eitem

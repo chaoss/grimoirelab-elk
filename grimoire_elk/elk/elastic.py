@@ -50,7 +50,10 @@ class ElasticSearch(object):
     @classmethod
     def safe_index(cls, unique_id):
         """ Return a valid elastic index generated from unique_id """
-        return unique_id.replace("/","_").lower()
+        index = unique_id
+        if unique_id:
+            index = unique_id.replace("/","_").lower()
+        return index
 
     def __init__(self, url, index, mappings = None, clean = False,
                  insecure=True, analyzers=None):

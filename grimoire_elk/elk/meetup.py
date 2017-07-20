@@ -53,14 +53,6 @@ class MeetupEnrich(Enrich):
                 },
                 "group_geolocation": {
                    "type": "geo_point"
-                },
-                "group_topics" : {
-                    "type" : "string",
-                    "analyzer" : "comma"
-                },
-                "group_topics_keys" : {
-                    "type" : "string",
-                    "analyzer" : "comma"
                 }
            }
         } """
@@ -169,7 +161,12 @@ class MeetupEnrich(Enrich):
         eitem['num_rsvps'] = len(event['rsvps'])
         eitem['num_comments'] = len(event['comments'])
 
-        eitem['time_date'] = unixtime_to_datetime(event['time']/1000).isoformat()
+        try:
+            eitem['time_date'] = unixtime_to_datetime(event['time']/1000).isoformat()
+        except ValueError:
+            logger.error("Wrong datetime for %s: %s", eitem['url'], event['time'])
+            # If no datetime for the enriched item, it is useless for Kibana
+            return {}
 
         if 'venue' in event:
             venue = event['venue']
@@ -208,16 +205,17 @@ class MeetupEnrich(Enrich):
             }
             group_topics = [topic['name'] for topic in group['topics']]
             group_topics_keys = [topic['urlkey'] for topic in group['topics']]
-            eitem['group_topics_raw'] = group_topics
-            eitem['group_topics'] = ",".join(group_topics)
-            eitem['group_topics_keys'] = ",".join(group_topics_keys)
+            eitem['group_topics'] = group_topics
+            eitem['group_topics_keys'] = group_topics_keys
 
         if len(event['rsvps']) > 0:
             eitem['group_members'] = event['rsvps'][0]['group']['members']
 
         created = unixtime_to_datetime(event['created']/1000).isoformat()
         eitem['type'] = "meetup"
-        eitem.update(self.get_grimoire_fields(created, eitem['type']))
+        # time_date is when the meetup will take place, the needed one in this index
+        # created is when the meetup entry was created and it is not the interesting date
+        eitem.update(self.get_grimoire_fields(eitem['time_date'], eitem['type']))
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(event))

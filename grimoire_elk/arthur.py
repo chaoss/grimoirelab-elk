@@ -226,11 +226,11 @@ def refresh_projects(enrich_backend):
 
     logger.info("Total eitems refreshed for project field %i", total)
 
-def refresh_identities(enrich_backend, query_string=None):
+def refresh_identities(enrich_backend, filter_author=None):
     logger.debug("Refreshing identities fields from %s", enrich_backend.elastic.index_url)
     total = 0
 
-    for eitem in enrich_backend.fetch(query_string):
+    for eitem in enrich_backend.fetch(filter_author):
         #logger.info(eitem)
         roles = None
         try:
@@ -487,20 +487,18 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
         elif do_refresh_identities:
 
-            query_string = None
+            filter_author = None
             if author_id:
-                query_string = {}
-                query_string["fields"] = 'author_id'
-                query_string["query"] = author_id
+                filter_author = {'name': 'author_id',
+                                 'value': author_id}
             elif author_uuid:
-                query_string = {}
-                query_string["fields"] = 'author_uuid'
-                query_string["query"] = author_uuid
+                filter_author = {'name': 'author_uuid',
+                                 'value': author_uuid}
 
             logger.info("Refreshing identities fields in enriched index")
             field_id = enrich_backend.get_field_unique_id()
             logger.info(field_id)
-            eitems = refresh_identities(enrich_backend, query_string)
+            eitems = refresh_identities(enrich_backend, filter_author)
             enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
         else:
             clean = False  # Don't remove ocean index when enrich

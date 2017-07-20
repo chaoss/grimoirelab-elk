@@ -135,4 +135,6 @@ class ConfluenceEnrich(Enrich):
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
 
+        eitem.update(self.get_grimoire_fields(eitem['date'], "confluence"))
+
         return eitem
