@@ -77,27 +77,21 @@ class DockerHubEnrich(Enrich):
         image = item['data']
 
         # data fields to copy
-        copy_fields = ["affiliation", "build_on_cloud", "description", "full_description",
-                       "has_starred", "is_automated", "is_private",
-                       "name", "namespace", "pull_count", "repository_type",
+        copy_fields = ["is_automated", "is_private",
+                       "pull_count", "repository_type",
                        "star_count", "status", "user"]
         for f in copy_fields:
             if f in image:
                 eitem[f] = image[f]
             else:
                 eitem[f] = None
+
         # Fields which names are translated
-        map_fields = {"full_description": "full_description_analyzed",
-                      "description": "description_analyzed"}
+        map_fields = {}
         for fn in map_fields:
             eitem[map_fields[fn]] = image[fn]
 
-        eitem['can_admin'] = image['permissions']['admin']
-        eitem['can_read'] = image['permissions']['read']
-        eitem['can_write'] = image['permissions']['write']
-
-        # dates
-        eitem['fetched_on'] = image['fetched_on']
+        eitem["id"] = image["name"] + '-' + image["namespace"]
         eitem['last_updated'] = image['last_updated']
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "dockerhub"))
