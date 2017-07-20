@@ -225,8 +225,11 @@ def get_kibiter_version(url):
         The url must point to the Elasticsearch used by Kibiter
     """
 
-    config_url = '/.kibana/config/_search'
-    url += "/" + config_url
+    config_url = '.kibana/config/_search'
+    # Avoid having // in the URL because ES will fail
+    if url[-1] != '/':
+        url += "/"
+    url += config_url
     r = requests.get(url)
     r.raise_for_status()
     version = r.json()['hits']['hits'][0]['_id']
