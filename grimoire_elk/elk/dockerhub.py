@@ -42,10 +42,6 @@ class DockerHubEnrich(Enrich):
         mapping = """
         {
             "properties": {
-                "full_description_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
-                  },
                 "description_analyzed": {
                   "type": "string",
                   "index":"analyzed"
@@ -76,8 +72,8 @@ class DockerHubEnrich(Enrich):
         image = item['data']
 
         # data fields to copy
-        copy_fields = ["is_automated", "is_private",
-                       "pull_count", "repository_type",
+        copy_fields = ["affiliation", "build_on_cloud", "description",
+                       "is_automated", "is_private", "pull_count", "repository_type",
                        "star_count", "status", "user"]
         for f in copy_fields:
             if f in image:
@@ -95,6 +91,7 @@ class DockerHubEnrich(Enrich):
         eitem['is_docker_image'] = 0
 
         eitem['last_updated'] = image['last_updated']
+        eitem['description_analyzed'] = image['description']
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "dockerhub"))
 
