@@ -108,6 +108,8 @@ class SlackEnrich(Enrich):
         # The real data
         message = item['data']
 
+        eitem["reply_count"] = 0  # be sure it is always included
+
         # data fields to copy
         copy_fields = ["text", "type", "reply_count", "subscribed", "subtype",
                        "unread_count", "user"]
