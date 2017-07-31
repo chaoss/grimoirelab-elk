@@ -492,6 +492,13 @@ class Enrich(ElasticItems):
             # Try to use always the origin in any case
             if ds_name in self.prjs_map and eitem['origin'] in self.prjs_map[ds_name]:
                 project = self.prjs_map[ds_name][eitem['origin']]
+            elif ds_name in self.prjs_map:
+                # Try to find origin as part of the keys
+                for ds_repo in self.prjs_map[ds_name]:
+                    if eitem['origin'] in ds_repo:
+                        project = self.prjs_map[ds_name][ds_repo]
+                        break
+
 
         if project is None:
             project = DEFAULT_PROJECT
