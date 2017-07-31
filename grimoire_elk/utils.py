@@ -237,6 +237,29 @@ def get_elastic(url, es_index, clean=None, backend=None):
 
     return elastic
 
+def get_kibiter_version(url):
+    """
+        Return kibiter major number version
+
+        The url must point to the Elasticsearch used by Kibiter
+    """
+
+    config_url = '.kibana/config/_search'
+    # Avoid having // in the URL because ES will fail
+    if url[-1] != '/':
+        url += "/"
+    url += config_url
+    r = requests.get(url)
+    r.raise_for_status()
+
+    if len(r.json()['hits']['hits']) == 0:
+        logger.error("Can not get the Kibiter version")
+        return None
+
+    version = r.json()['hits']['hits'][0]['_id']
+    # 5.4.0-SNAPSHOT
+    major_version = version.split(".", 1)[0]
+    return major_version
 
 def config_logging(debug):
 
@@ -313,6 +336,7 @@ def get_params_parser():
                         help="Number of items per bulk request to Elasticsearch.")
     parser.add_argument('--scroll-size', default=100, type=int,
                         help="Number of items to get from Elasticsearch when scrolling.")
+    parser.add_argument('--arthur', action='store_true', help="Read items from arthur redis queue")
     parser.add_argument('backend', help=argparse.SUPPRESS)
     parser.add_argument('backend_args', nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)

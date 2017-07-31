@@ -25,10 +25,15 @@
 
 import inspect
 import logging
+import pickle
 import traceback
+
+import redis
 
 from datetime import datetime
 from dateutil import parser
+
+from arthur.common import Q_STORAGE_ITEMS
 
 from .ocean.conf import ConfOcean
 from .utils import get_elastic
@@ -40,9 +45,62 @@ logger = logging.getLogger(__name__)
 
 requests_ses = grimoire_con()
 
+arthur_items = {}  # Hash with tag list with all items collected from arthur queue
+
+
+def feed_arthur():
+    """ Feed Ocean with backend data collected from arthur redis queue"""
+
+    logger.info("Collecting items from redis queue")
+
+    db_url = 'redis://localhost/8'
+
+    conn = redis.StrictRedis.from_url(db_url)
+    logger.debug("Redis connection stablished with %s.", db_url)
+
+    # Get and remove queued items in an atomic transaction
+    pipe = conn.pipeline()
+    pipe.lrange(Q_STORAGE_ITEMS, 0, -1)
+    # pipe.ltrim(Q_STORAGE_ITEMS, 1, 0)
+    items = pipe.execute()[0]
+
+    for item in items:
+        arthur_item = pickle.loads(item)
+        if arthur_item['tag'] not in arthur_items:
+            arthur_items[arthur_item['tag']] = []
+        arthur_items[arthur_item['tag']].append(arthur_item)
+
+    for tag in arthur_items:
+        logger.debug("Items for %s: %i", tag, len(arthur_items[tag]))
+
+
+def feed_backend_arthur(backend_name, backend_params):
+    """ Feed Ocean with backend data collected from arthur redis queue"""
+
+
+    # Always get pending items from arthur for all data sources
+    feed_arthur()
+
+    logger.debug("Items available for %s", arthur_items.keys())
+
+    # Get only the items for the backend
+    if not get_connector_from_name(backend_name):
+        raise RuntimeError("Unknown backend %s" % backend_name)
+    connector = get_connector_from_name(backend_name)
+    klass = connector[3]  # BackendCmd for the connector
+
+    backend_cmd = klass(*backend_params)
+    tag = backend_cmd.backend.tag
+    logger.debug("Getting items for %s.", tag)
+
+    if tag in arthur_items:
+        logger.debug("Found items for %s.", tag)
+        for item in arthur_items[tag]:
+            yield item
+
 
 def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
-                 es_index=None, es_index_enrich=None, project=None):
+                 es_index=None, es_index_enrich=None, project=None, arthur=False):
     """ Feed Ocean with backend data """
 
     backend = None
@@ -113,7 +171,12 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
                 latest_items = backend_cmd.parsed_args.latest_items
 
         # fetch params support
-        if latest_items:
+        if arthur:
+            # If using arthur just provide the items generator to be used
+            # to collect the items and upload to Elasticsearch
+            aitems = feed_backend_arthur(backend_name, backend_params)
+            ocean_backend.feed(arthur_items=aitems)
+        elif latest_items:
             if category:
                 ocean_backend.feed(latest_items=latest_items, category=category)
             else:

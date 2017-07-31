@@ -68,7 +68,8 @@ if __name__ == '__main__':
             if not args.enrich_only:
                 feed_backend(url, clean, args.fetch_cache,
                              args.backend, args.backend_args,
-                             args.index, args.index_enrich, args.project)
+                             args.index, args.index_enrich, args.project,
+                             args.arthur)
                 logging.info("Backed feed completed")
 
             if args.enrich or args.enrich_only:
