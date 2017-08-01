@@ -70,11 +70,7 @@ class PhabricatorEnrich(Enrich):
                 "tags_analyzed": {
                    "type": "string",
                    "index":"analyzed"
-                 },
-                "tags_custom_analyzed" : {
-                    "type" : "string",
-                    "analyzer" : "comma"
-                }
+                 }
            }
         } """
 
@@ -207,7 +203,7 @@ class PhabricatorEnrich(Enrich):
             elif event['type'] == 'priority':
                 task_change['priority'] =  event['newValue']
             elif event['type'] == 'core:edge':
-                task_change['tags_custom_analyzed'] =  event['newValue']
+                task_change['tags_custom_analyzed'] =  [event['newValue']]
             if event['type'] in  ['reassign']:
                 # Try to get the userName and not the user id
                 if event['newValue'] in self.phab_ids_names:
@@ -347,12 +343,9 @@ class PhabricatorEnrich(Enrich):
             if tr ['comments']:
                 eitem['comments'] += 1
 
-        eitem['tags'] = None
+        eitem['tags'] = []
         for project in phab_item['projects']:
-            if not eitem['tags']:
-                eitem['tags'] = project['name']
-            else:
-                eitem['tags'] += ',' + project['name']
+            eitem['tags'].append(project['name'])
         eitem['tags_analyzed'] = eitem['tags']
         eitem['tags_custom_analyzed'] = eitem['tags']
 
