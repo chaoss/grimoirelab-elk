@@ -99,6 +99,9 @@ class MeetupEnrich(Enrich):
 
         return identity
 
+    def get_project_repository(self, eitem):
+        return eitem['tag']
+
     @metadata
     def get_rich_item(self, item):
         # We need to detect the category of item: activities (report), events or users
@@ -219,6 +222,9 @@ class MeetupEnrich(Enrich):
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(event))
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
 
         return eitem
 
