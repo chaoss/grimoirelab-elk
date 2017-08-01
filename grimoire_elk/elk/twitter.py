@@ -26,7 +26,7 @@ import logging
 
 from dateutil import parser
 
-from .enrich import Enrich, metadata
+from .enrich import Enrich, metadata, DEFAULT_PROJECT
 
 
 logger = logging.getLogger(__name__)
@@ -48,10 +48,6 @@ class TwitterEnrich(Enrich):
         mapping = """
         {
             "properties": {
-                "hashtags_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
-                  },
                 "text_analyzed": {
                   "type": "string",
                   "index":"analyzed"
@@ -86,6 +82,39 @@ class TwitterEnrich(Enrich):
         identities.append(user)
 
         return identities
+
+    def get_item_project(self, eitem):
+        """ Get project mapping enrichment field.
+
+        Twitter mappings is pretty special so it needs a special
+        implementacion.
+        """
+
+        project = None
+        eitem_project = {}
+        ds_name = self.get_connector_name()  # data source name in projects map
+
+        for tag in eitem['hashtags_analyzed']:
+            if tag in self.prjs_map[ds_name]:
+                project = self.prjs_map[ds_name][tag]
+                break
+
+        if project is None:
+            project = DEFAULT_PROJECT
+
+        eitem_project = {"project": project}
+
+        # Time to add the project levels: eclipse.platform.releng.aggregator
+        eitem_path = ''
+        if project is not None:
+            subprojects = project.split('.')
+            for i in range(0, len(subprojects)):
+                if i > 0:
+                    eitem_path += "."
+                eitem_path += subprojects[i]
+                eitem_project['project_' + str(i+1)] = eitem_path
+        return eitem_project
+
 
     @metadata
     def get_rich_item(self, item):
@@ -128,10 +157,9 @@ class TwitterEnrich(Enrich):
         if "text" in tweet:
             eitem["text_analyzed"] = tweet["text"]
 
-        eitem['hashtags_analyzed'] = ''
+        eitem['hashtags_analyzed'] = []
         for tag in tweet['entities']['hashtags']:
-            eitem['hashtags_analyzed'] += tag['text']+","
-        eitem['hashtags_analyzed'] = eitem['hashtags_analyzed'][0:-1]
+            eitem['hashtags_analyzed'].append(tag['text'])
 
         eitem['retweeted'] = 0
         if tweet['retweeted']:
@@ -144,5 +172,8 @@ class TwitterEnrich(Enrich):
             eitem.update(self.get_item_sh(tweet))
 
         eitem.update(self.get_grimoire_fields(tweet["created_at"], "twitter"))
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
 
         return eitem
