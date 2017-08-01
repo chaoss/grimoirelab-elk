@@ -226,15 +226,24 @@ def get_kibiter_version(url):
     """
 
     config_url = '.kibana/config/_search'
+    major_version = None
     # Avoid having // in the URL because ES will fail
     if url[-1] != '/':
         url += "/"
     url += config_url
-    r = requests.get(url)
-    r.raise_for_status()
-    version = r.json()['hits']['hits'][0]['_id']
-    # 5.4.0-SNAPSHOT
-    major_version = version.split(".", 1)[0]
+
+    try:
+        r = requests.get(url)
+        r.raise_for_status()
+        if not r.json()['hits']['hits']:
+            logger.warning("Can not find Kibiter version")
+        else:
+            version = r.json()['hits']['hits'][0]['_id']
+            # 5.4.0-SNAPSHOT
+            major_version = version.split(".", 1)[0]
+    except requests.exceptions.HTTPError:
+        logger.warning("Can not find Kibiter version")
+
     return major_version
 
 def config_logging(debug):
