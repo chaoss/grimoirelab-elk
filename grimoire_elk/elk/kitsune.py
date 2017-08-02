@@ -153,6 +153,9 @@ class KitsuneEnrich(Enrich):
             if self.sortinghat:
                 eitem.update(self.get_item_sh(item))
 
+            if self.prjs_map:
+                eitem.update(self.get_item_project(eitem))
+
         elif kind == 'answer':
             answer = item
             eitem['type'] = kind
@@ -197,6 +200,9 @@ class KitsuneEnrich(Enrich):
                 answer[self.get_field_date()] = answer['updated']
                 eitem[self.get_field_date()] = answer[self.get_field_date()]
                 eitem.update(self.get_item_sh(answer))
+
+            if self.prjs_map:
+                eitem.update(self.get_item_project(eitem))
 
         return eitem
 

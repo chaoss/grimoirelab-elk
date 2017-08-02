@@ -140,6 +140,9 @@ class MediaWikiEnrich(Enrich):
             if self.sortinghat:
                 erevision.update(self.get_review_sh(rev, item))
 
+            if self.prjs_map:
+                eitem.update(self.get_item_project(erevision))
+
             # And now some calculated fields
             erevision["url"] = erevision["page_origin"] + "/" + erevision["page_title"]
             erevision["iscreated"] = 0
@@ -193,6 +196,9 @@ class MediaWikiEnrich(Enrich):
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
 
         return eitem
 

@@ -143,6 +143,9 @@ class StackExchangeEnrich(Enrich):
             if self.sortinghat:
                 eitem.update(self.get_item_sh(item))
 
+            if self.prjs_map:
+                eitem.update(self.get_item_project(eitem))
+
         elif kind == 'answer':
             answer = item
 
@@ -183,6 +186,9 @@ class StackExchangeEnrich(Enrich):
                 answer[self.get_field_date()] = eitem['creation_date']
                 eitem[self.get_field_date()] = eitem['creation_date']
                 eitem.update(self.get_item_sh(answer))
+
+            if self.prjs_map:
+                eitem.update(self.get_item_project(eitem))
 
         return eitem
 

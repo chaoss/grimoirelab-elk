@@ -180,6 +180,9 @@ class ReMoEnrich(Enrich):
             self.author = "user"
             eitem.update(self.get_item_sh(item))
 
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
+
         eitem.update(self.get_grimoire_fields(activity["report_date"], "activity"))
 
         eitem["is_attendee"] = 0
@@ -239,6 +242,9 @@ class ReMoEnrich(Enrich):
         if self.sortinghat:
             self.author = 'owner'
             eitem.update(self.get_item_sh(item))
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(event["start"], "event"))
 

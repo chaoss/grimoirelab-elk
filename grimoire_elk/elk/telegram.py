@@ -150,6 +150,9 @@ class TelegramEnrich(Enrich):
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
 
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
+
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "telegram"))
 
         return eitem

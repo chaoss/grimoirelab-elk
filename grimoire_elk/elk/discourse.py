@@ -108,6 +108,9 @@ class DiscourseEnrich(Enrich):
             if self.sortinghat:
                 eanswer.update(self.get_item_sh(answer, date_field="created_at"))
 
+            if self.prjs_map:
+                eitem.update(self.get_item_project(eanswer))
+
             nanswers += 1
             eanswer['first_answer'] = 0
             if nanswers == 1:
@@ -224,6 +227,9 @@ class DiscourseEnrich(Enrich):
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(first_post, date_field="created_at"))
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
 
         eitem['type'] = 'question'
         eitem.update(self.get_grimoire_fields(topic["created_at"], eitem['type']))

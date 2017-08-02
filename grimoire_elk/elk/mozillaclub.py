@@ -121,6 +121,9 @@ class MozillaClubEnrich(Enrich):
         if self.sortinghat:
             eitem.update(self.get_item_sh(item,"Your Name"))
 
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
+
         eitem.update(self.get_grimoire_fields(event["Timestamp"], "event"))
 
         return eitem

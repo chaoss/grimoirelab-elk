@@ -83,4 +83,7 @@ class FunctestEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(func_test['start_date'], "func_test"))
 
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
+
         return eitem
