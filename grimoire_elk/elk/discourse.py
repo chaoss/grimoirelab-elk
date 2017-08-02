@@ -109,7 +109,7 @@ class DiscourseEnrich(Enrich):
                 eanswer.update(self.get_item_sh(answer, date_field="created_at"))
 
             if self.prjs_map:
-                eitem.update(self.get_item_project(eanswer))
+                eanswer.update(self.get_item_project(eanswer))
 
             nanswers += 1
             eanswer['first_answer'] = 0
