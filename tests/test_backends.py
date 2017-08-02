@@ -38,7 +38,7 @@ from grimoire_elk.utils import get_connectors, get_elastic
 
 
 CONFIG_FILE = 'tests.conf'
-NUMBER_BACKENDS = 28
+NUMBER_BACKENDS = 30
 DB_SORTINGHAT = "test_sh"
 DB_PROJECTS = "test_projects"
 
@@ -134,7 +134,8 @@ class TestBackends(unittest.TestCase):
                 load_identities(ocean_backend, enrich_backend)
             enrich_count = enrich_backend.enrich_items(ocean_backend)
 
-            logging.info("Total items enriched %i ", enrich_count)
+            if enrich_count is not None:
+                logging.info("Total items enriched %i ", enrich_count)
 
     def test_enrich_sh(self):
         """Test enrich all sources with SortingHat"""
