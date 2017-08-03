@@ -478,6 +478,23 @@ class Enrich(ElasticItems):
         """
         return ''
 
+    @classmethod
+    def add_project_levels(cls, project):
+        """ Add project sub levels extra items """
+
+        eitem_path = ''
+        eitem_project_levels = {}
+
+        if project is not None:
+            subprojects = project.split('.')
+            for i in range(0, len(subprojects)):
+                if i > 0:
+                    eitem_path += "."
+                eitem_path += subprojects[i]
+                eitem_project_levels['project_' + str(i+1)] = eitem_path
+
+        return eitem_project_levels
+
     def get_item_project(self, eitem):
         """ Get project mapping enrichment field """
         eitem_project = {}
@@ -506,14 +523,8 @@ class Enrich(ElasticItems):
 
         eitem_project = {"project": project}
         # Time to add the project levels: eclipse.platform.releng.aggregator
-        eitem_path = ''
-        if project is not None:
-            subprojects = project.split('.')
-            for i in range(0, len(subprojects)):
-                if i > 0:
-                    eitem_path += "."
-                eitem_path += subprojects[i]
-                eitem_project['project_' + str(i+1)] = eitem_path
+        eitem_project.update(self.add_project_levels(project))
+
         return eitem_project
 
     # Sorting Hat stuff to be moved to SortingHat class
