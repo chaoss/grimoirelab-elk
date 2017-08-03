@@ -507,15 +507,16 @@ class Enrich(ElasticItems):
             # logger.warning("Project not found for repository %s (data source: %s)", repository, ds_name)
             project = None
             # Try to use always the origin in any case
-            if ds_name in self.prjs_map and eitem['origin'] in self.prjs_map[ds_name]:
-                project = self.prjs_map[ds_name][eitem['origin']]
-            elif ds_name in self.prjs_map:
-                # Try to find origin as part of the keys
-                for ds_repo in self.prjs_map[ds_name]:
-                    ds_repo = str(ds_repo)  # discourse has category_id ints
-                    if eitem['origin'] in ds_repo:
-                        project = self.prjs_map[ds_name][ds_repo]
-                        break
+            if 'origin' in eitem:
+                if ds_name in self.prjs_map and eitem['origin'] in self.prjs_map[ds_name]:
+                    project = self.prjs_map[ds_name][eitem['origin']]
+                elif ds_name in self.prjs_map:
+                    # Try to find origin as part of the keys
+                    for ds_repo in self.prjs_map[ds_name]:
+                        ds_repo = str(ds_repo)  # discourse has category_id ints
+                        if eitem['origin'] in ds_repo:
+                            project = self.prjs_map[ds_name][ds_repo]
+                            break
 
 
         if project is None:
