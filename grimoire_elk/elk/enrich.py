@@ -495,6 +495,7 @@ class Enrich(ElasticItems):
             elif ds_name in self.prjs_map:
                 # Try to find origin as part of the keys
                 for ds_repo in self.prjs_map[ds_name]:
+                    ds_repo = str(ds_repo)  # discourse has category_id ints
                     if eitem['origin'] in ds_repo:
                         project = self.prjs_map[ds_name][ds_repo]
                         break
