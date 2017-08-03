@@ -45,18 +45,25 @@ class TwitterEnrich(Enrich):
 
     def get_elastic_mappings(self):
 
+        from grimoire_elk.utils import kibiter_version
+
+        fielddata = ''
+        if kibiter_version == '5':
+            fielddata = ', "fielddata": true'
+
         mapping = """
         {
             "properties": {
                 "text_analyzed": {
                   "type": "string",
                   "index":"analyzed"
+                  %s
                   },
                   "geolocation": {
                      "type": "geo_point"
                   }
            }
-        } """
+        } """ % fielddata
 
         return {"items":mapping}
 
