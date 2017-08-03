@@ -28,7 +28,7 @@ from dateutil import parser
 import json
 import logging
 
-from .enrich import Enrich, metadata
+from .enrich import Enrich, metadata, DEFAULT_PROJECT
 
 from .utils import get_time_diff_days
 
@@ -71,11 +71,38 @@ class BugzillaRESTEnrich(Enrich):
         identity['name'] = user['real_name']
         return identity
 
-    def get_project_repository(self, eitem):
-        repo = eitem['origin']
+    def get_item_project(self, eitem):
+        """ Get project mapping enrichment field.
+
+        Twitter mappings is pretty special so it needs a special
+        implementacion.
+        """
+
+        project = None
+        eitem_project = {}
+        ds_name = self.get_connector_name()  # data source name in projects map
+
+        component = eitem['component']
+        url = eitem['origin']
         product = eitem['product']
-        repo += "/buglist.cgi?product="+product
-        return repo
+
+        repo_comp = url + "/buglist.cgi?product="+product+"&component="+component
+        repo_comp1 = url + "/buglist.cgi?component="+component+"&product="+product
+        repo_product = url + "/buglist.cgi?product="+product
+
+        for repo in [repo_comp, repo_comp1, repo_product, url]:
+            if repo in self.prjs_map[ds_name]:
+                project = self.prjs_map[ds_name][repo]
+                break
+
+        if project is None:
+            project = DEFAULT_PROJECT
+
+        eitem_project = {"project": project}
+
+        eitem_project.update(self.add_project_levels(project))
+
+        return eitem_project
 
     @metadata
     def get_rich_item(self, item):
