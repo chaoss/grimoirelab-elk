@@ -206,9 +206,10 @@ class DiscourseEnrich(Enrich):
         # The first post is the first published, and it is the question
         first_post = topic['post_stream']['posts'][0]
         eitem['category_id'] = topic['category_id']
-        eitem['category_name'] = self.categories[topic['category_id']]
         eitem['categories'] = self.__related_categories(topic['category_id'])
-        eitem['categories'] += [eitem['category_name']]
+        if topic['category_id'] in self.categories:
+            eitem['category_name'] = self.categories[topic['category_id']]
+            eitem['categories'] += [eitem['category_name']]
         eitem['url'] = eitem['origin'] + "/t/" + first_post['topic_slug']
         eitem['url'] += "/" + str(first_post['topic_id']) + "/" + str(first_post['post_number'])
         eitem['display_username'] = first_post['display_username']
