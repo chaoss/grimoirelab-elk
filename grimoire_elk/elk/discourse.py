@@ -74,7 +74,7 @@ class DiscourseEnrich(Enrich):
         return 'author'
 
     def get_project_repository(self, eitem):
-        return eitem['category_id']
+        return str(eitem['category_id'])
 
     def get_users_data(self, post):
         """ Adapt the data to be used with standard SH enrich API """
