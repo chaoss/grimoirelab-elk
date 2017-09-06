@@ -84,6 +84,9 @@ def kafka_kip(enrich):
 
         kip = None
 
+        if not subject:
+            return kip
+
         if 'KIP' not in subject:
             return kip
 
