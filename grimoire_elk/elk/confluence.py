@@ -125,6 +125,10 @@ class ConfluenceEnrich(Enrich):
         eitem['date'] = version['when']
         eitem['url'] =  page['_links']['base'] + page['_links']['webui']
 
+        if '_expandable' in page and 'space' in page['_expandable']:
+            eitem['space'] = page['_expandable']['space']
+            eitem['space'] = eitem['space'].replace('/rest/api/space/', '')
+
         # Specific enrichment
         if page['type'] == 'page':
             if page['version']['number'] == 1:
