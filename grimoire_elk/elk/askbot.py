@@ -256,7 +256,7 @@ class AskbotEnrich(Enrich):
         if self.sortinghat:
             answer['added_at_date'] = unixtime_to_datetime(float(answer["added_at"])).isoformat()
             eanswer.update(self.get_item_sh(answer, date_field="added_at_date"))
-            if eanswer['author_user_name'] != eanswer['author_askbot_user_name']:
+            if 'author_askbot_user_name' in eanswer and eanswer['author_user_name'] != eanswer['author_askbot_user_name']:
                 logger.warning('Bad SH identity in askbot answer. Found %s expecting %s',
                                eanswer['author_user_name'], eanswer['author_askbot_user_name'])
         answer_at = unixtime_to_datetime(float(answer["added_at"]))
