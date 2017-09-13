@@ -222,5 +222,6 @@ class MBoxEnrich(Enrich):
 
         return total
 
-    def kafka_kip(self, from_date=None):
+    def kafka_kip(self, enrich_backend, no_incremental=False):
+        # KIP study is not incremental
         kafka_kip(self)

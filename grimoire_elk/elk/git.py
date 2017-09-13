@@ -33,6 +33,7 @@ import requests
 from dateutil import parser
 
 from .enrich import Enrich, metadata
+from .utils import get_last_enrich
 
 try:
     from .sortinghat import SortingHat
@@ -538,7 +539,15 @@ class GitEnrich(Enrich):
         return total
 
 
-    def enrich_demography(self, from_date=None):
+    def enrich_demography(self, enrich_backend, no_incremental=False):
+
+        from_date = None
+
+        if no_incremental:
+            from_date = None
+        else:
+            from_date = self.elastic.get_last_date('author_max_date')
+
         logger.info("Doing demography enrich from %s since %s",
                     self.elastic.index_url, from_date)
 

@@ -24,6 +24,7 @@
 #
 
 import datetime
+import inspect
 import json
 import logging
 
@@ -126,3 +127,47 @@ def grimoire_con(insecure=True, conn_retries=12):
         conn.verify = False
 
     return conn
+
+def get_last_enrich(backend_cmd, enrich_backend):
+    last_enrich = None
+
+    if backend_cmd:
+        backend = backend_cmd.backend
+        # Only supported in data retrieved from a perceval backend
+        # Always filter by repository to support multi repository indexes
+        backend_name = enrich_backend.get_connector_name()
+        filter_ = get_repository_filter(backend, backend_name)
+
+        # Check if backend supports from_date
+        signature = inspect.signature(backend.fetch)
+
+        from_date = None
+        if 'from_date' in signature.parameters:
+            try:
+                # Support perceval pre and post BackendCommand refactoring
+                from_date = backend_cmd.from_date
+            except AttributeError:
+                from_date = backend_cmd.parsed_args.from_date
+
+        offset = None
+        if 'offset' in signature.parameters:
+            try:
+                offset = backend_cmd.offset
+            except AttributeError:
+                offset = backend_cmd.parsed_args.offset
+
+        if from_date:
+            if from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
+                last_enrich = from_date
+            else:
+                last_enrich = enrich_backend.get_last_update_from_es([filter_])
+
+        elif offset is not None:
+            if offset != 0:
+                last_enrich = offset
+            else:
+                last_enrich = enrich_backend.get_last_offset_from_es([filter_])
+    else:
+        last_enrich = enrich_backend.get_last_update_from_es()
+
+    return last_enrich

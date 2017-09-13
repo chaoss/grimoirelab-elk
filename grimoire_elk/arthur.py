@@ -33,7 +33,7 @@ from dateutil import parser
 from .ocean.conf import ConfOcean
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
-from .elk.utils import get_repository_filter, grimoire_con
+from .elk.utils import get_last_enrich, grimoire_con
 
 
 logger = logging.getLogger(__name__)
@@ -289,51 +289,6 @@ def enrich_items(ocean_backend, enrich_backend, events=False):
         total = enrich_backend.enrich_events(ocean_backend)
     return total
 
-def get_last_enrich(backend_cmd, enrich_backend):
-    last_enrich = None
-
-    if backend_cmd:
-        backend = backend_cmd.backend
-        # Only supported in data retrieved from a perceval backend
-        # Always filter by repository to support multi repository indexes
-        backend_name = enrich_backend.get_connector_name()
-        filter_ = get_repository_filter(backend, backend_name)
-
-        # Check if backend supports from_date
-        signature = inspect.signature(backend.fetch)
-
-        from_date = None
-        if 'from_date' in signature.parameters:
-            try:
-                # Support perceval pre and post BackendCommand refactoring
-                from_date = backend_cmd.from_date
-            except AttributeError:
-                from_date = backend_cmd.parsed_args.from_date
-
-        offset = None
-        if 'offset' in signature.parameters:
-            try:
-                offset = backend_cmd.offset
-            except AttributeError:
-                offset = backend_cmd.parsed_args.offset
-
-        if from_date:
-            if from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
-                last_enrich = from_date
-            else:
-                last_enrich = enrich_backend.get_last_update_from_es([filter_])
-
-        elif offset is not None:
-            if offset != 0:
-                last_enrich = offset
-            else:
-                last_enrich = enrich_backend.get_last_offset_from_es([filter_])
-    else:
-        last_enrich = enrich_backend.get_last_update_from_es()
-
-    return last_enrich
-
-
 def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
                       filter_raw=None, filter_raw_should=None):
     """ Get the ocean backend configured to start from the last enriched date """
@@ -380,15 +335,10 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
     return ocean_backend
 
 def do_studies(enrich_backend, no_incremental=False):
-    if no_incremental:
-        last_enrich = None
-    else:
-        last_enrich = get_last_enrich(None, enrich_backend)
-
     try:
         for study in enrich_backend.studies:
-            logger.info("Starting study: %s (from %s)", study, last_enrich)
-            study(from_date=last_enrich)
+            logger.info("Starting study: %s (no_incremental %s)", study, no_incremental)
+            study(enrich_backend, no_incremental)
     except Exception as e:
         logger.error("Problem executing study %s", study)
         traceback.print_exc()
