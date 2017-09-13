@@ -144,7 +144,7 @@ class MediaWikiEnrich(Enrich):
                 eitem.update(self.get_item_project(erevision))
 
             # And now some calculated fields
-            erevision["url"] = erevision["page_origin"] + "/" + erevision["page_title"]
+            erevision["url"] = erevision["page_origin"] + "/view/" + erevision["page_title"]
             erevision["url"] = erevision["url"].replace(" ", "_")
             erevision["iscreated"] = 0
             erevision["creation_date"] = None
