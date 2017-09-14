@@ -79,6 +79,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
         offset = None
         from_date = None
         category = None
+        latest_items = None
 
         signature = inspect.signature(backend.fetch)
 
@@ -101,11 +102,23 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
             except AttributeError:
                 category = backend_cmd.parsed_args.category
 
-        # from_date param support
-        if offset is not None and category:
-            ocean_backend.feed(from_offset=offset, category=category)
-        elif offset is not None:
-            ocean_backend.feed(from_offset=offset)
+        if 'latest_items' in signature.parameters:
+            try:
+                latest_items = backend_cmd.latest_items
+            except AttributeError:
+                latest_items = backend_cmd.parsed_args.latest_items
+
+        # fetch params support
+        if latest_items:
+            if category:
+                ocean_backend.feed(latest_items=latest_items, category=category)
+            else:
+                ocean_backend.feed(latest_items=latest_items)
+        elif offset:
+            if category:
+                ocean_backend.feed(from_offset=offset, category=category)
+            else:
+                ocean_backend.feed(from_offset=offset)
         elif from_date and from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
             if category:
                 ocean_backend.feed(from_date, category=category)
