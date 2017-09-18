@@ -137,6 +137,8 @@ class DiscourseEnrich(Enrich):
         for cat in categories:
             if 'subcategory_ids' in cat:
                 tree[cat['id']] = cat['subcategory_ids']
+            else:
+                tree[cat['id']] = {}
         return tree
 
     def __related_categories(self, category_id):
