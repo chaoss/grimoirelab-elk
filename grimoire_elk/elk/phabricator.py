@@ -231,7 +231,7 @@ class PhabricatorEnrich(Enrich):
         if 'authorData' not in item['fields'] or not item['fields']['authorData']:
             return
         self.phab_ids_names[item['fields']['authorData']['phid']] = item['fields']['authorData']['userName']
-        if 'ownerData' in item['fields']:
+        if 'ownerData' in item['fields'] and item['fields']['ownerData']:
             self.phab_ids_names[item['fields']['ownerData']['phid']] = item['fields']['ownerData']['userName']
         if 'priority' in item['fields']:
             val = item['fields']['priority']['value']
