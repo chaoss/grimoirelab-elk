@@ -73,7 +73,7 @@ class FunctestEnrich(Enrich):
                 eitem[map_fields[fn]] = None
 
 
-        if 'details' in func_test:
+        if 'details' in func_test and func_test['details']:
             if 'tests' in func_test['details']:
                 eitem['tests'] = func_test['details']['tests']
             if 'failures' in func_test['details']:
