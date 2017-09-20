@@ -61,6 +61,9 @@ class ConfluenceEnrich(Enrich):
 
         return identities
 
+    def get_project_repository(self, eitem):
+        return str(eitem['space'])
+
     def get_users_data(self, item):
         """ If user fields are inside the global item dict """
         if 'data' in item:
