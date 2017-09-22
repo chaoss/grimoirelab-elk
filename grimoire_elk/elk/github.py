@@ -263,7 +263,7 @@ class GitHubEnrich(Enrich):
         rich_issue['user_login'] = issue['user']['login']
         user = issue['user_data']
 
-        if user is not None:
+        if user is not None and user:
             rich_issue['user_name'] = user['name']
             rich_issue['author_name'] = user['name']
             rich_issue['user_email'] = user['email']
