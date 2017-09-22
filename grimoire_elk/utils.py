@@ -35,6 +35,8 @@ from dateutil import parser
 
 from .ocean.elastic import ElasticOcean
 
+from .elk.utils import grimoire_con
+
 # Connectors for Ocean
 from .ocean.askbot import AskbotOcean
 from .ocean.bugzilla import BugzillaOcean
@@ -233,7 +235,7 @@ def get_kibiter_version(url):
     url += config_url
 
     try:
-        r = requests.get(url)
+        r = grimoire_con(insecure=True).get(url)
         r.raise_for_status()
         if not r.json()['hits']['hits']:
             logger.warning("Can not find Kibiter version")
