@@ -6,25 +6,60 @@ network.host: _eth0:ipv4_
 
 readonlyrest:
     enable: true
-    response_if_req_forbidden: Forbidden by ReadonlyREST ES plugin
+    response_if_req_forbidden: <h1>Forbidden</h1>
 
     access_control_rules:
-    # We trust Kibana's server side process, full access granted via HTTP authentication
-    - name: "::KIBANA-SRV::"
-      # auth_key is good for testing, but replace it with `auth_key_sha256`!
-      auth_key: bitergia:bitergia
+
+    - name: "::kibana access::"
+#      groups: ["kibana"]
+      auth_key: kibana:kibana
+      type: allow
       verbosity: error # don't log successful request
-      type: allow
+      indices: [".kibana"]
 
-    # Using "Basic HTTP Auth" from browsers, can RW Kibana settings, RO on logstash indices from 2017 .
-    - name: "::RW DEVELOPER::"
-      auth_key: rw:dev
-      type: allow
-      kibana_access: rw
-      indices: [".kibana", ".kibana-devnull", "git"]
-
-    # Same as above, but cannot change dashboards, visualizations or settings in Kibana
-    - name: "::RO DEVELOPER::"
+    - name: "::RO KIBANA (anonymous)::"
       type: allow
       kibana_access: ro
-      indices: [".kibana", ".kibana-devnull", "git"]
+      indices: ["*"]
+
+    - name: "::RO ES (client)::"
+#      groups: ["client"]
+      auth_key: client:client
+      type: allow
+#      methods: GET, POST, PUT
+      actions: ["indices:data/read/*"]
+      indices: ["*"]
+
+    - name: "::RW KIBANA (client)::"
+#      groups: ["client"]
+      auth_key: client:client
+      type: allow
+      kibana_access: rw
+#      methods: GET, POST, PUT
+      indices: [".kibana"]
+
+    - name: "::RW ES & KIBANA (bitergia)::"
+#      groups: ["admin"]
+      auth_key: bitergia:bitergia
+      type: allow
+#      actions: ["cluster:admin/*"]
+#      actions: ["cluster:monitor/*"]
+#      actions: ["indices:admin/*"]
+#      actions: ["indices:monitor/*"]
+#      actions: ["indices:data/*"]
+#      actions: ["internal:indices/*"]
+      indices: ["*"]
+
+    users:
+
+    - username: kibana
+      auth_key: kibana # auth_key is good for testing but replace it with auth_key_sha1 for production!
+      groups: ["kibana"]
+
+    - username: bitergia
+      auth_key: bitergia # auth_key is good for testing but replace it with auth_key_sha1 for production!
+      groups: ["admin"]
+
+    - username: client
+      auth_key: client # auth_key is good for testing but replace it with auth_key_sha1 for production!
+      groups: ["client"]
