@@ -43,6 +43,8 @@ logger = logging.getLogger(__name__)
 def get_repository_filter(perceval_backend, perceval_backend_name,
                           term=False):
     """ Get the filter needed for get the items in a repository """
+    from .github import GITHUB
+
     filter_ = {}
 
     if not perceval_backend:
@@ -73,8 +75,9 @@ def get_repository_filter(perceval_backend, perceval_backend_name,
             # Filters are always a dict
             filter_ = json.loads(filter_)
 
-    if value == '':
+    if value in ['', GITHUB + '/']:
         # Support for getting all items from a multiorigin index
+        # In GitHub we receive GITHUB + '/', the site url without org and repo
         filter_ = {}
 
     return filter_
