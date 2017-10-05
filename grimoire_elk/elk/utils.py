@@ -115,9 +115,10 @@ def unixtime_to_datetime(ut):
     dt = dt.replace(tzinfo=tz.tzutc())
     return dt
 
-def grimoire_con(insecure=True, conn_retries=12):
+def grimoire_con(insecure=True, conn_retries=21):
     conn = requests.Session()
-    # conn_retries = 12  # 800s
+    # {backoff factor} * (2 ^ ({number of total retries} - 1))
+    # conn_retries = 21  # 209715.2 = 2.4d
     # Retry when there are errors in HTTP connections
     retries = Retry(connect=conn_retries, read=8, redirect=5, backoff_factor=0.2,
                     method_whitelist=False)
