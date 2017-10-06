@@ -133,7 +133,11 @@ class DiscourseEnrich(Enrich):
         tree = {}
         con = grimoire_con()
         raw = con.get(origin + "/categories.json")
-        categories = raw.json()["category_list"]['categories']
+        raw_json = raw.json()
+        if "category_list" in raw_json and 'categories' in raw_json["category_list"]:
+            categories = raw_json["category_list"]['categories']
+        else:
+            return tree
         for cat in categories:
             if 'subcategory_ids' in cat:
                 tree[cat['id']] = cat['subcategory_ids']
