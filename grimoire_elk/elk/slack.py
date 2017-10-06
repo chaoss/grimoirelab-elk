@@ -122,7 +122,7 @@ class SlackEnrich(Enrich):
         eitem['text_analyzed'] = eitem['text']
 
         eitem['number_attachs'] = 0
-        if 'attachments' in message:
+        if 'attachments' in message and message['attachments']:
             eitem['number_attachs'] = len(message['attachments'])
 
         eitem['reaction_count'] = 0
