@@ -46,6 +46,10 @@ class FunctestOcean(ElasticOcean):
                             "details": {
                                 "dynamic":false,
                                 "properties": {}
+                            },
+                            "trust_indicator": {
+                                "dynamic":false,
+                                "properties": {}
                             }
                         }
                     }
