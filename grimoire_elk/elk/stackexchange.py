@@ -142,6 +142,7 @@ class StackExchangeEnrich(Enrich):
             map_fields = {"title": "question_title"}
             for fn in map_fields:
                 eitem[map_fields[fn]] = question[fn]
+            eitem['title_analyzed'] = question['title']
 
             creation_date = unixtime_to_datetime(question["creation_date"]).isoformat()
             eitem['creation_date'] = creation_date
