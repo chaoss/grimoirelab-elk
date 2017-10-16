@@ -87,19 +87,33 @@ class AskbotEnrich(Enrich):
 
     def get_elastic_mappings(self):
 
+        from grimoire_elk.utils import kibiter_version
+
+        fielddata = ''
+        if kibiter_version == '5':
+            fielddata = ', "fielddata": true'
+
         mapping = """
         {
             "properties": {
                 "author_badges": {
                   "type": "string",
                   "index":"analyzed"
+                  %s
+                },
+                "question_tags": {
+                  "type": "string",
+                  "index":"analyzed"
+                  %s
                 },
                 "summary": {
                   "type": "string",
                   "index":"analyzed"
+                  %s
                 }
            }
-        } """
+        } """ % (fielddata, fielddata, fielddata)
+
         return {"items":mapping}
 
     @metadata
