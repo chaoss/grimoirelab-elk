@@ -56,6 +56,12 @@ class PhabricatorEnrich(Enrich):
 
     def get_elastic_mappings(self):
 
+        from grimoire_elk.utils import kibiter_version
+
+        fielddata = ''
+        if kibiter_version == '5':
+            fielddata = ', "fielddata": true'
+
         mapping = """
         {
             "properties": {
@@ -63,16 +69,18 @@ class PhabricatorEnrich(Enrich):
                   "type": "string",
                   "index":"analyzed"
                 },
-                "assigned_to_roles_analyzed": {
+                "assigned_to_roles": {
                   "type": "string",
                   "index":"analyzed"
+                  %s
                  },
                 "tags_analyzed": {
                    "type": "string",
                    "index":"analyzed"
+                   %s
                  }
            }
-        } """
+        } """ % (fielddata, fielddata)
 
         return {"items":mapping}
 
