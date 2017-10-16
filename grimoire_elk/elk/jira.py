@@ -158,7 +158,8 @@ class JiraEnrich(Enrich):
             eitem['priority'] = issue['fields']['priority']['name']
 
         # data.fields.progress.percent not exists in Puppet JIRA
-        eitem['progress_total'] = issue['fields']['progress']['total']
+        if 'progress'in issue['fields']:
+            eitem['progress_total'] = issue['fields']['progress']['total']
         eitem['project_id'] = issue['fields']['project']['id']
         eitem['project_key'] = issue['fields']['project']['key']
         eitem['project_name'] = issue['fields']['project']['name']
@@ -181,15 +182,18 @@ class JiraEnrich(Enrich):
         eitem['status_description'] = issue['fields']['status']['description']
         eitem['status'] = issue['fields']['status']['name']
         eitem['summary'] = issue['fields']['summary']
-        eitem['original_time_estimation'] = issue['fields']['timeoriginalestimate']
-        if eitem['original_time_estimation']:
-            eitem['original_time_estimation_hours'] =  int(eitem['original_time_estimation'])/3600
-        eitem['time_spent'] = issue['fields']['timespent']
-        if eitem['time_spent']:
-            eitem['time_spent_hours'] = int(eitem['time_spent'])/3600
-        eitem['time_estimation'] = issue['fields']['timeestimate']
-        if eitem['time_estimation']:
-            eitem['time_estimation_hours'] = int(eitem['time_estimation'])/3600
+        if 'timeoriginalestimate' in issue['fields']:
+            eitem['original_time_estimation'] = issue['fields']['timeoriginalestimate']
+            if eitem['original_time_estimation']:
+                eitem['original_time_estimation_hours'] = int(eitem['original_time_estimation'])/3600
+        if 'timespent' in issue['fields']:
+            eitem['time_spent'] = issue['fields']['timespent']
+            if eitem['time_spent']:
+                eitem['time_spent_hours'] = int(eitem['time_spent'])/3600
+        if 'timeestimate' in issue['fields']:
+            eitem['time_estimation'] = issue['fields']['timeestimate']
+            if eitem['time_estimation']:
+                eitem['time_estimation_hours'] = int(eitem['time_estimation'])/3600
         eitem['watchers'] = issue['fields']['watches']['watchCount']
         eitem['key'] = issue['key']
 
