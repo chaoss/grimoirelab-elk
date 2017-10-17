@@ -141,6 +141,8 @@ class ElasticSearch(object):
         # This method waits until the upload is visible in searches
 
         r = self.requests.get(self.index_url+'/_search?size=1')
+        if 'hits' not in r.json():
+            logging.error('Can get the number of already existing items in ES: %s', r.json())
         total = r.json()['hits']['total']  # Already existing items
         new_items = self.bulk_upload(items, field_id)
         if not sync:
