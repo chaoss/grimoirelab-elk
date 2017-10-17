@@ -45,7 +45,11 @@ class DockerHubEnrich(Enrich):
                 "description_analyzed": {
                   "type": "string",
                   "index":"analyzed"
-                  }
+                  },
+                "full_description_analyzed": {
+                  "type": "string",
+                  "index":"analyzed"
+                }
            }
         } """
 
@@ -92,6 +96,7 @@ class DockerHubEnrich(Enrich):
 
         eitem['last_updated'] = image['last_updated']
         eitem['description_analyzed'] = image['description']
+        eitem['full_description_analyzed'] = image['description']
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "dockerhub"))
 
