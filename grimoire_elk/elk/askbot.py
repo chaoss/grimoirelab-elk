@@ -99,20 +99,13 @@ class AskbotEnrich(Enrich):
                 "author_badges": {
                   "type": "string",
                   "index":"analyzed"
-                  %s
-                },
-                "question_tags": {
-                  "type": "string",
-                  "index":"analyzed"
-                  %s
                 },
                 "summary": {
                   "type": "string",
                   "index":"analyzed"
-                  %s
                 }
            }
-        } """ % (fielddata, fielddata, fielddata)
+        } """
 
         return {"items":mapping}
 
