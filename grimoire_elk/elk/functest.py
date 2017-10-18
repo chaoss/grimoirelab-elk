@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 class FunctestEnrich(Enrich):
 
-    BOOST_PROJECTS = ['functest', 'stoperf', 'VSPERF', 'bottlenecks', 'qtip', 'yardstick']
+    BOOST_PROJECTS = ['functest', 'stoperf', 'vsperf', 'bottlenecks', 'qtip', 'yardstick']
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -76,8 +76,9 @@ class FunctestEnrich(Enrich):
 
 
         if 'details' in func_test and func_test['details']:
-            if 'tests' in func_test['details']:
-                eitem['tests'] = func_test['details']['tests']
+            # Don't propagate tests because the mapping changes between items
+            # if 'tests' in func_test['details']:
+            #    eitem['tests'] = func_test['details']['tests']
             if 'failures' in func_test['details']:
                 eitem['failures'] = func_test['details']['failures']
             if 'duration' in func_test['details']:
@@ -91,7 +92,7 @@ class FunctestEnrich(Enrich):
 
         # Hack to show BOOST_PROJECTS first in the donut vis
         eitem['boost_list'] = ['all']
-        if eitem['project'] in self.BOOST_PROJECTS:
+        if eitem['project'].lower() in self.BOOST_PROJECTS:
             eitem['boost_list'] += ['boosted']
 
         return eitem
