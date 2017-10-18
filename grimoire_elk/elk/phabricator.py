@@ -70,8 +70,7 @@ class PhabricatorEnrich(Enrich):
                   "index":"analyzed"
                 },
                 "assigned_to_roles": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "string"
                   %s
                  },
                 "tags_analyzed": {
