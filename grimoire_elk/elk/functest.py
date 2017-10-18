@@ -92,7 +92,7 @@ class FunctestEnrich(Enrich):
 
         # Hack to show BOOST_PROJECTS first in the donut vis
         eitem['boost_list'] = ['all']
-        if eitem['project'].lower() in self.BOOST_PROJECTS:
+        if eitem['project'] and eitem['project'].lower() in self.BOOST_PROJECTS:
             eitem['boost_list'] += ['boosted']
 
         return eitem
