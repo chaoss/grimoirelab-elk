@@ -76,9 +76,10 @@ class FunctestEnrich(Enrich):
 
 
         if 'details' in func_test and func_test['details']:
-            # Don't propagate tests because the mapping changes between items
-            # if 'tests' in func_test['details']:
-            #    eitem['tests'] = func_test['details']['tests']
+            if 'tests' in func_test['details']:
+                if isinstance(func_test['details']['tests'], int):
+                    # Only propagate tests if it is a number
+                    eitem['tests'] = func_test['details']['tests']
             if 'failures' in func_test['details']:
                 eitem['failures'] = func_test['details']['failures']
             if 'duration' in func_test['details']:
