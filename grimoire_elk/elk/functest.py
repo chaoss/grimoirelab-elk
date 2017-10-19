@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 class FunctestEnrich(Enrich):
 
-    BOOST_PROJECTS = ['functest', 'stoperf', 'vsperf', 'bottlenecks', 'qtip', 'yardstick']
+    BOOST_PROJECTS = ['functest', 'storperf', 'vsperf', 'bottlenecks', 'qtip', 'yardstick']
 
     def get_identities(self, item):
         """ Return the identities from an item """
