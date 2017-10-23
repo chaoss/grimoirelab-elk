@@ -52,10 +52,8 @@ class MBoxEnrich(Enrich):
 
     def get_elastic_mappings(self):
 
-        from grimoire_elk.utils import kibiter_version
-
         fielddata = ''
-        if kibiter_version == '5':
+        if self.kibiter_version == '5':
             fielddata = ', "fielddata": true'
 
         mapping = """

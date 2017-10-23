@@ -29,6 +29,8 @@ import logging
 import subprocess
 import sys
 
+import requests
+
 from datetime import datetime as dt
 from os import path
 
@@ -89,6 +91,7 @@ def metadata(func):
 class Enrich(ElasticItems):
 
     sh_db = None
+    kibiter_version = None
     RAW_FIELDS_COPY = ["metadata__updated_on", "metadata__timestamp",
                        "ocean-unique-id", "offset", "origin", "tag", "uuid"]
 
@@ -152,6 +155,45 @@ class Enrich(ElasticItems):
         self.backend_params = None
         # Label used during enrichment for identities without a known affiliation
         self.unaffiliated_group = 'Unknown'
+
+
+    def __get_kibiter_version(self):
+        """
+            Return kibiter major number version
+
+            The url must point to the Elasticsearch used by Kibiter
+        """
+
+        url = self.elastic_url
+        config_url = '.kibana/config/_search'
+        major_version = None
+        # Avoid having // in the URL because ES will fail
+        if url[-1] != '/':
+            url += "/"
+        url += config_url
+
+        try:
+            r = grimoire_con(insecure=True).get(url)
+            r.raise_for_status()
+            if not r.json()['hits']['hits']:
+                logger.warning("Can not find Kibiter version")
+            else:
+                version = r.json()['hits']['hits'][0]['_id']
+                # 5.4.0-SNAPSHOT
+                major_version = version.split(".", 1)[0]
+        except requests.exceptions.HTTPError:
+            logger.warning("Can not find Kibiter version")
+
+        kibiter_version = major_version
+
+        return kibiter_version
+
+    def set_elastic_url(self, url):
+        """ Elastic URL """
+        self.elastic_url = url
+        # Once we have the elastic endpoint we can get the kibiter version
+        if self.kibiter_version is None:
+            self.kibiter_version = self.__get_kibiter_version()
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -285,9 +327,6 @@ class Enrich(ElasticItems):
         else:
             raise RuntimeError("Can't find projects mapping in %s" % (db_projects_map))
         return ds_repo_to_prj
-
-    def set_elastic(self, elastic):
-        self.elastic = elastic
 
     def get_field_unique_id(self):
         """ Field in the raw item with the unique id """

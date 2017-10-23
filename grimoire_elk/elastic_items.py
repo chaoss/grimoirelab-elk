@@ -50,6 +50,7 @@ class ElasticItems():
 
         self.requests = grimoire_con(insecure)
         self.elastic = None
+        self.elastic_url = None
 
     def get_repository_filter_raw(self, term=False):
         """ Returns the filter to be used in queries in a repository items """

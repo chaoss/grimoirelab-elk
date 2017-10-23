@@ -202,12 +202,9 @@ def get_connectors():
 def get_elastic(url, es_index, clean = None, backend = None):
 
     mapping = None
-    global kibiter_version
-
-    if kibiter_version is None:
-        kibiter_version = get_kibiter_version(url)
 
     if backend:
+        backend.set_elastic_url(url)
         mapping = backend.get_elastic_mappings()
         analyzers = backend.get_elastic_analyzers()
     try:
@@ -219,34 +216,6 @@ def get_elastic(url, es_index, clean = None, backend = None):
         sys.exit(1)
 
     return elastic
-
-def get_kibiter_version(url):
-    """
-        Return kibiter major number version
-
-        The url must point to the Elasticsearch used by Kibiter
-    """
-
-    config_url = '.kibana/config/_search'
-    major_version = None
-    # Avoid having // in the URL because ES will fail
-    if url[-1] != '/':
-        url += "/"
-    url += config_url
-
-    try:
-        r = grimoire_con(insecure=True).get(url)
-        r.raise_for_status()
-        if not r.json()['hits']['hits']:
-            logger.warning("Can not find Kibiter version")
-        else:
-            version = r.json()['hits']['hits'][0]['_id']
-            # 5.4.0-SNAPSHOT
-            major_version = version.split(".", 1)[0]
-    except requests.exceptions.HTTPError:
-        logger.warning("Can not find Kibiter version")
-
-    return major_version
 
 def config_logging(debug):
 

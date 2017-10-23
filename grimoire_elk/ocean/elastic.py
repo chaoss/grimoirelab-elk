@@ -60,6 +60,9 @@ class ElasticOcean(ElasticItems):
         self.fetch_cache = fetch_cache  # fetch from cache
         self.project = project  # project to be used for this data source
 
+    def set_elastic_url(self, url):
+        """ Elastic URL """
+        self.elastic_url = url
 
     def set_elastic(self, elastic):
         """ Elastic used to store last data source state """
