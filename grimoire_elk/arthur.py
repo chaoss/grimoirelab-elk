@@ -137,6 +137,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
             traceback.print_exc()
         else:
             logger.error("Error feeding ocean %s" % ex)
+            traceback.print_exc()
 
         repo['success'] = False
         repo['error'] = str(ex)
