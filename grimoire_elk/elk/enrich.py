@@ -40,7 +40,7 @@ from functools import lru_cache
 from ..elastic_items import ElasticItems
 
 from .utils import grimoire_con
-
+from .. import __version__
 
 logger = logging.getLogger(__name__)
 
@@ -140,14 +140,7 @@ class Enrich(ElasticItems):
         self.type_name = "items"  # type inside the index to store items enriched
 
         # To add the gelk version to enriched items
-        try:
-            # gelk is executed directly from a git clone
-            git_path = path.dirname(__file__)
-            self.gelk_version = subprocess.check_output(["git", "-C", git_path, "describe"]).strip()
-            self.gelk_version = self.gelk_version.decode("utf-8")
-        except subprocess.CalledProcessError:
-            logger.warning("Can't get the gelk version. %s", __file__)
-            self.gelk_version = 'Unknown'
+        self.gelk_version = __version__
 
         # params used to configure the backend
         # in perceval backends managed directly inside the backend
