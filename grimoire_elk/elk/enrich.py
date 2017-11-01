@@ -629,39 +629,31 @@ class Enrich(ElasticItems):
     def get_item_sh_fields(self, identity=None, item_date=None, sh_id=None,
                            rol='author'):
         """ Get standard SH fields from a SH identity """
-        eitem_sh = {}  # Item enriched
+        eitem_sh = self.__get_item_sh_fields_empty(rol)
 
         if identity:
             # Use the identity to get the SortingHat identity
             sh_ids = self.get_sh_ids(identity, self.get_connector_name())
             eitem_sh[rol+"_id"] = sh_ids['id']
             eitem_sh[rol+"_uuid"] = sh_ids['uuid']
+            eitem_sh[rol+"_name"] = identity['name']
+            eitem_sh[rol+"_user_name"] = identity['username']
+            eitem_sh[rol+"_domain"] = self.get_identity_domain(identity)
         elif sh_id:
             # Use the SortingHat id to get the identity
             eitem_sh[rol+"_id"] = sh_id
             eitem_sh[rol+"_uuid"] = self.get_uuid_from_id(sh_id)
         else:
             # No data to get a SH identity. Return an empty one.
-            return self.__get_item_sh_fields_empty(rol)
+            return eitem_sh
 
         # Get the SH profile to use first this data
         profile = self.get_profile_sh(eitem_sh[rol+"_uuid"])
 
         if profile:
             eitem_sh[rol+"_name"] = profile['name']
-            # username is not included in SH profile
-            eitem_sh[rol+"_user_name"] = None
-            if identity:
-                eitem_sh[rol+"_user_name"] = identity['username']
-            eitem_sh[rol+"_domain"] = self.get_identity_domain(profile)
         elif not profile and sh_id:
-            logger.warning("Can't find SH identity: %s", sh_id)
-            return {}
-        else:
-            # Just use directly the data in the identity
-            eitem_sh[rol+"_name"] = identity['name']
-            eitem_sh[rol+"_user_name"] = identity['username']
-            eitem_sh[rol+"_domain"] = self.get_identity_domain(identity)
+            logger.warning("Can't find SH identity profile: %s", sh_id)
 
         eitem_sh[rol+"_org_name"] = self.get_enrollment(eitem_sh[rol+"_uuid"], item_date)
         eitem_sh[rol+"_bot"] = self.is_bot(eitem_sh[rol+'_uuid'])
