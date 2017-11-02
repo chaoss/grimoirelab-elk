@@ -41,7 +41,9 @@ try:
 except ImportError:
     SORTINGHAT_LIBS = False
 
-GITHUB = 'https://github.com/'
+# regxep in order to match both github and gitlab url
+GITHUB = 'https://git[^/]+/'
+
 SH_GIT_COMMIT = 'github-commit'
 DEMOGRAPHY_COMMIT_MIN_DATE='1980-01-01'
 logger = logging.getLogger(__name__)
@@ -131,10 +133,10 @@ class GitEnrich(Enrich):
             self.pair_programming = True
 
         def add_sh_github_identity(user, user_field, rol):
-            """ Add a new github identity to SH if it does not exists """
+            """ Add a new github or gitlab identity to SH if it does not exists """            
             github_repo = None
-            if GITHUB in item['origin']:
-                github_repo = item['origin'].replace(GITHUB,'')
+            if re.search(GITHUB,item['origin']):                
+                github_repo = re.sub(GITHUB, '', item['origin'])
                 github_repo = re.sub('.git$', '', github_repo)
             if not github_repo:
                 return
@@ -221,6 +223,7 @@ class GitEnrich(Enrich):
             login = self.github_logins[user]
         except KeyError:
             # Get the login from github API
+            #TODO: manage both github and gitlab url
             GITHUB_API_URL = "https://api.github.com"
             commit_url = GITHUB_API_URL+"/repos/%s/commits/%s" % (repo, commit_hash)
             headers = {'Authorization': 'token ' + self.github_token}
@@ -356,9 +359,9 @@ class GitEnrich(Enrich):
             eitem["title"] = None
 
         # If it is a github repo, include just the repo string
-        if GITHUB in item['origin']:
-            eitem['github_repo'] = item['origin'].replace(GITHUB,'')
-            eitem['github_repo'] = re.sub('.git$', '', eitem['github_repo'])
+        if re.search(GITHUB,item['origin']):
+            eitem['github_repo'] = re.sub(GITHUB, '', item['origin'])
+            eitem['github_repo'] = re.sub('.git$','',eitem['github_repo'])
             eitem["url_id"] = eitem['github_repo']+"/commit/"+eitem['hash']
 
         if 'project' in item:
