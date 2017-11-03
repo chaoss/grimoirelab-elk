@@ -27,7 +27,7 @@ import argparse
 import logging
 import sys
 
-from urllib.parse import urljoin
+#from urllib.parse import urljoin
 
 import requests
 
@@ -48,6 +48,7 @@ from .ocean.functest import FunctestOcean
 from .ocean.gerrit import GerritOcean
 from .ocean.git import GitOcean
 from .ocean.github import GitHubOcean
+from .ocean.gitlab import GitLabOcean
 from .ocean.jenkins import JenkinsOcean
 from .ocean.jira import JiraOcean
 from .ocean.kitsune import KitsuneOcean
@@ -76,6 +77,7 @@ from .elk.discourse import DiscourseEnrich
 from .elk.functest import FunctestEnrich
 from .elk.git import GitEnrich
 from .elk.github import GitHubEnrich
+from .elk.gitlab import GitLabEnrich
 from .elk.gerrit import GerritEnrich
 from .elk.gmane import GmaneEnrich
 from .elk.hyperkitty import HyperKittyEnrich
@@ -109,6 +111,7 @@ from perceval.backends.core.dockerhub import DockerHub, DockerHubCommand
 from perceval.backends.core.gerrit import Gerrit, GerritCommand
 from perceval.backends.core.git import Git, GitCommand
 from perceval.backends.core.github import GitHub, GitHubCommand
+from perceval.backends.core.gitlab import GitLab, GitLabCommand
 from perceval.backends.core.gmane import Gmane, GmaneCommand
 from perceval.backends.core.jenkins import Jenkins, JenkinsCommand
 from perceval.backends.core.jira import Jira, JiraCommand
@@ -176,6 +179,7 @@ def get_connectors():
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
             "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
+            "gitlab":[GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
             "gmane":[Gmane, MBoxOcean, GmaneEnrich, GmaneCommand],
             "hyperkitty":[HyperKitty, MBoxOcean, HyperKittyEnrich, HyperKittyCommand],
             "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
