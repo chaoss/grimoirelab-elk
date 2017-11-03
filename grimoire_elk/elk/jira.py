@@ -99,7 +99,9 @@ class JiraEnrich(Enrich):
 
         item = item['data']
 
-        for field in ["assignee","reporter","creator"]:
+        for field in ["assignee", "reporter", "creator"]:
+            if field not in item["fields"]:
+                continue
             if item["fields"][field]:
                 identities.append(self.get_sh_identity(item["fields"][field]))
 
@@ -119,7 +121,7 @@ class JiraEnrich(Enrich):
         issue = item['data']
 
         # Fields that are the same in item and eitem
-        copy_fields = ["assigned_to","reporter"]
+        copy_fields = ["assigned_to", "reporter"]
         for f in copy_fields:
             if f in issue:
                 eitem[f] = issue[f]
@@ -164,7 +166,7 @@ class JiraEnrich(Enrich):
         eitem['project_key'] = issue['fields']['project']['key']
         eitem['project_name'] = issue['fields']['project']['name']
 
-        if issue['fields']['reporter'] and 'reporter' in issue['fields']:
+        if 'reporter' in issue['fields'] and issue['fields']['reporter']:
             eitem['reporter_name'] = issue['fields']['reporter']['displayName']
             eitem['reporter_email'] = None
             if "emailAddress" in issue["fields"]["reporter"]:
