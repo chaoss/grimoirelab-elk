@@ -69,7 +69,8 @@ setup(name="grimoire-kidash",
       keywords="development repositories analytics",
       scripts=["kidash.py"],
       install_requires=['python-dateutil',
-        'grimoire-elk==' + version
+        'grimoire-elk>=0.30.9',
+        'panels>=0.0.1'
         ],
       include_package_data=True,
       zip_safe=False

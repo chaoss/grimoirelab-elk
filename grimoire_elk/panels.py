@@ -26,11 +26,13 @@
 import json
 import logging
 
-from os import sys
+import os
+import os.path
+import pkgutil
+import sys
 
 from .elk.elastic import ElasticSearch
 from .elk.utils import grimoire_con
-
 
 logger = logging.getLogger(__name__)
 
@@ -342,61 +344,90 @@ def list_dashboards(elastic_url, es_index=None):
     for dash in res_json["hits"]["hits"]:
         print (dash["_id"])
 
-def get_dashboard_name(import_file):
-    """ Return the dashboard name included in a JSON file """
+def read_panel_file(panel_file):
+    """Read a panel file (in JSON format) and return its contents.
 
-    name = None
+    :param panel_file: name of JSON file with the dashboard to read
+    :returns: dictionary with dashboard read,
+                None if not found or wrong format
+    """
 
-    with open(import_file, 'r') as f:
+    if os.path.isfile(panel_file):
+        logger.debug("Reading panel from directory: %s", panel_file)
+        with open(panel_file, 'r') as f:
+            kibana_str = f.read()
+    else:
         try:
-            kibana = json.loads(f.read())
-        except ValueError:
-            logger.error("Wrong file format")
+            import panels
+            logger.debug("Reading panel from module panels")
+            # Next is just a hack for files with "expected" prefix
+            if panel_file.startswith('panels/json/'):
+                module_file = panel_file[len('panels/json/'):]
+            else:
+                module_file = panel_file
+            kibana_bytes = pkgutil.get_data('panels', 'json' + '/' + module_file)
+            kibana_str = kibana_bytes.decode(encoding='utf8')
+        except ImportError:
+            logger.error("Panel not found (not in directory, no panels module): %s",
+                        panel_file)
+            return None
+        except FileNotFoundError:
+            logger.error("Panel not found (not in directory, not in panels module): %s",
+                        panel_file)
+            return None
 
-        if 'dashboard' not in kibana:
-            logger.error("Wrong file format. Can't find 'dashboard' field.")
-        name = kibana['dashboard']['id']
+    try:
+        kibana_dict = json.loads(kibana_str)
+    except ValueError:
+        logger.error("Wrong file format (not JSON): %s", module_file)
+        return None
+    return kibana_dict
 
-    return name
+def get_dashboard_name(panel_file):
+    """ Return the dashboard name included in a JSON panel file """
+
+    kibana = read_panel_file(panel_file)
+    if (kibana is not None) and ('dashboard' in kibana):
+        return kibana['dashboard']['id']
+    else:
+        logger.error("Wrong panel format (can't find 'dashboard' field): %s",
+                    panel_file)
+        return None
 
 def import_dashboard(elastic_url, import_file, es_index=None):
-    logger.debug("Reading from %s the JSON for the dashboard to be imported",
+
+    logger.debug("Reading panels JSON file: %s",
                   import_file)
+    kibana = read_panel_file(import_file)
 
-    with open(import_file, 'r') as f:
-        try:
-            kibana = json.loads(f.read())
-        except ValueError:
-            logger.error("Wrong file format")
-            sys.exit(1)
+    if (kibana is None) or ('dashboard' not in kibana):
+        logger.error("Wrong file format (can't find 'dashboard' field): %s",
+                    import_file)
+        os.sys.exit(1)
 
-        if 'dashboard' not in kibana:
-            logger.error("Wrong file format. Can't find 'dashboard' field.")
-            sys.exit(1)
+    if not es_index:
+        es_index = ".kibana"
+    elastic = ElasticSearch(elastic_url, es_index)
 
-        if not es_index:
-            es_index = ".kibana"
-        elastic = ElasticSearch(elastic_url, es_index)
+    url = elastic.index_url+"/dashboard/"+kibana['dashboard']['id']
+    requests_ses.post(url, data = json.dumps(kibana['dashboard']['value']), verify=False)
 
-        url = elastic.index_url+"/dashboard/"+kibana['dashboard']['id']
-        requests_ses.post(url, data = json.dumps(kibana['dashboard']['value']), verify=False)
+    if 'searches' in kibana:
+        for search in kibana['searches']:
+            url = elastic.index_url+"/search/"+search['id']
+            requests_ses.post(url, data = json.dumps(search['value']), verify=False)
 
-        if 'searches' in kibana:
-            for search in kibana['searches']:
-                url = elastic.index_url+"/search/"+search['id']
-                requests_ses.post(url, data = json.dumps(search['value']), verify=False)
+    if 'index_patterns' in kibana:
+        for index in kibana['index_patterns']:
+            url = elastic.index_url+"/index-pattern/"+index['id']
+            requests_ses.post(url, data = json.dumps(index['value']), verify=False)
 
-        if 'index_patterns' in kibana:
-            for index in kibana['index_patterns']:
-                url = elastic.index_url+"/index-pattern/"+index['id']
-                requests_ses.post(url, data = json.dumps(index['value']), verify=False)
+    if 'visualizations' in kibana:
+        for vis in kibana['visualizations']:
+            url = elastic.index_url+"/visualization"+"/"+vis['id']
+            requests_ses.post(url, data = json.dumps(vis['value']), verify=False)
 
-        if 'visualizations' in kibana:
-            for vis in kibana['visualizations']:
-                url = elastic.index_url+"/visualization"+"/"+vis['id']
-                requests_ses.post(url, data = json.dumps(vis['value']), verify=False)
-
-        logger.debug("Done")
+    logger.debug("Done")
 
 
 def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
