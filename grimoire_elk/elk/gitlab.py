@@ -43,7 +43,9 @@ class GitLabEnrich(Enrich):
 
     roles = ['assignee_data', 'user_data']
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+    def __init__(self, db_sortinghat=None,
+                 db_projects_map=None,
+                 json_projects_map=None,
                  db_user='', db_password='', db_host=''):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
@@ -75,7 +77,7 @@ class GitLabEnrich(Enrich):
         for identity in ['user', 'assignee']:
             if item[identity]:
                 # In user_data we have the full user data
-                user = self.get_sh_identity(item[identity+"_data"])
+                user = self.get_sh_identity(item[identity + "_data"])
                 if user:
                     identities.append(user)
         return identities
@@ -125,7 +127,7 @@ class GitLabEnrich(Enrich):
                 logger.debug("Using Maps API to find %s" % (location))
                 r_json = r.json()
                 geo_code = r_json['results'][0]['geometry']['location']
-            except:
+            except Exception:
                 if location not in self.location_not_found:
                     logger.debug("Can't find geocode for " + location)
                     self.location_not_found.append(location)
@@ -137,12 +139,11 @@ class GitLabEnrich(Enrich):
                 }
                 self.geolocations[location] = geo_point
 
-
         return geo_point
 
-
     def get_gitlab_cache(self, kind, _key):
-        """ Get cache data for items of _type using _key as the cache dict key """
+        """ Get cache data for items of _type \
+            using _key as the cache dict key """
 
         cache = {}
         res_size = 100  # best size?
@@ -150,7 +151,7 @@ class GitLabEnrich(Enrich):
 
         index_gitlab = "gitlab/" + kind
 
-        url = self.elastic.url + "/"+index_gitlab
+        url = self.elastic.url + "/" + index_gitlab
         url += "/_search" + "?" + "size=%i" % res_size
         r = self.requests.get(url)
         type_items = r.json()
@@ -164,13 +165,12 @@ class GitLabEnrich(Enrich):
                     item = hit['_source']
                     cache[item[_key]] = item
                 _from += res_size
-                r = self.requests.get(url+"&from=%i" % _from)
+                r = self.requests.get(url + "&from=%i" % _from)
                 type_items = r.json()
                 if 'hits' not in type_items:
                     break
 
         return cache
-
 
     def geo_locations_from_es(self):
         return self.get_gitlab_cache("geolocations", "location")
@@ -184,7 +184,6 @@ class GitLabEnrich(Enrich):
 
         logger.debug("Adding geoloc to %s (in %i packs)" % (url, max_items))
 
-
         for loc in self.geolocations:
             if current >= max_items:
                 self.requests.put(url, data=bulk_json)
@@ -197,17 +196,16 @@ class GitLabEnrich(Enrich):
             # First upload the raw issue data to ES
             data_json = json.dumps(location)
             # Don't include in URL non ascii codes
-            safe_loc = str(loc.encode('ascii', 'ignore'),'ascii')
+            safe_loc = str(loc.encode('ascii', 'ignore'), 'ascii')
             geo_id = str("%s-%s-%s" % (location["lat"], location["lon"],
                                        safe_loc))
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (geo_id)
-            bulk_json += data_json +"\n"  # Bulk document
+            bulk_json += data_json + "\n"  # Bulk document
             current += 1
 
-        self.requests.put(url, data = bulk_json)
+        self.requests.put(url, data=bulk_json)
 
         logger.debug("Adding geoloc to ES Done")
-
 
     def get_elastic_mappings(self):
         """ geopoints type is not created in dynamic mapping """
@@ -229,7 +227,7 @@ class GitLabEnrich(Enrich):
         }
         """
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_field_unique_id(self):
         return "ocean-unique-id"
@@ -257,10 +255,10 @@ class GitLabEnrich(Enrich):
                 get_time_diff_days(issue['created_at'], datetime.utcnow())
         else:
             rich_issue['time_open_days'] = rich_issue['time_to_close_days']
-        
+
         if 'author' in issue:
             rich_issue['user_login'] = issue['author']['username']
-            
+
         user = issue['user_data']
 
         if user is not None and user:
@@ -268,10 +266,12 @@ class GitLabEnrich(Enrich):
             rich_issue['author_name'] = user['name']
             rich_issue['user_email'] = user['email']
             if rich_issue['user_email']:
-                rich_issue["user_domain"] = self.get_email_domain(rich_issue['user_email'])
+                rich_issue["user_domain"] = \
+                    self.get_email_domain(rich_issue['user_email'])
             rich_issue['user_org'] = user['company']
             rich_issue['user_location'] = user['location']
-            rich_issue['user_geolocation'] = self.get_geo_point(user['location'])
+            rich_issue['user_geolocation'] = \
+                self.get_geo_point(user['location'])
         else:
             rich_issue['user_name'] = None
             rich_issue['user_email'] = None
@@ -281,33 +281,33 @@ class GitLabEnrich(Enrich):
             rich_issue['user_geolocation'] = None
             rich_issue['author_name'] = None
 
-
         assignee = None
 
         if issue['assignee'] is not None:
             assignee = issue['assignee_data']
 
-            if 'username' in issue['assignee']:            
+            if 'username' in issue['assignee']:
                 rich_issue['assignee_login'] = issue['assignee']['username']
 
             if 'assignee_name' in rich_issue:
                 rich_issue['assignee_name'] = assignee['name']
-           
+
             if 'user_email' in rich_issue:
-                rich_issue['user_email'] = assignee[0]['email']            
-            
+                rich_issue['user_email'] = assignee[0]['email']
+
             if 'user_email' in rich_issue and rich_issue['user_email']:
-                rich_issue["user_domain"] = self.get_email_domain(rich_issue['user_email'])
-            
+                rich_issue["user_domain"] = \
+                    self.get_email_domain(rich_issue['user_email'])
+
             if 'user_org' in rich_issue:
-                rich_issue['user_org'] = assignee [0] ['organization']        
-            
+                rich_issue['user_org'] = assignee[0]['organization']
+
             if 'user_location' in rich_issue:
-                rich_issue['user_location'] = assignee [0] ['location']    
-                
+                rich_issue['user_location'] = assignee[0]['location']
+
             if 'user_geolocation' in rich_issue:
                 rich_issue['user_geolocation'] = \
-                    self.get_geo_point(assignee [0] ['location'])             
+                    self.get_geo_point(assignee[0]['location'])
         else:
             rich_issue['assignee_name'] = None
             rich_issue['assignee_login'] = None
@@ -317,12 +317,12 @@ class GitLabEnrich(Enrich):
             rich_issue['user_location'] = None
             rich_issue['user_geolocation'] = None
         rich_issue['id'] = issue['id']
-        
+
         if 'web_url' in issue:
             rich_issue['id_in_repo'] = issue['web_url'].split("/")[-1]
             rich_issue['repository'] = issue['web_url'].rsplit("/", 2)[0]
             rich_issue['url'] = issue['web_url']
-            
+
         rich_issue['title'] = issue['title']
         rich_issue['title_analyzed'] = issue['title']
         rich_issue['state'] = issue['state']
@@ -333,7 +333,7 @@ class GitLabEnrich(Enrich):
         labels = ''
         if 'labels' in issue:
             for label in issue['labels']:
-                labels += label+";;"
+                labels += label + ";;"
 
         if labels != '':
             labels[:-2]
@@ -341,12 +341,15 @@ class GitLabEnrich(Enrich):
 
         rich_issue['pull_request'] = True
         rich_issue['item_type'] = 'pull request'
-        if not 'head' in issue.keys() and not 'pull_request' in issue.keys():
+        if 'head' not in issue.keys() and 'pull_request' not in issue.keys():
             rich_issue['pull_request'] = False
             rich_issue['item_type'] = 'issue'
-        rich_issue['gitlab_repo'] = re.sub(GITLAB, '', rich_issue['repository'])
-        rich_issue['gitlab_repo'] = re.sub('.git$', '', rich_issue['gitlab_repo'])
-        rich_issue["url_id"] = rich_issue['gitlab_repo']+"/issues/"+rich_issue['id_in_repo']
+        rich_issue['gitlab_repo'] = \
+            re.sub(GITLAB, '', rich_issue['repository'])
+        rich_issue['gitlab_repo'] = \
+            re.sub('.git$', '', rich_issue['gitlab_repo'])
+        rich_issue["url_id"] = \
+            rich_issue['gitlab_repo'] + "/issues/" + rich_issue['id_in_repo']
 
         if self.prjs_map:
             rich_issue.update(self.get_item_project(rich_issue))
@@ -354,7 +357,8 @@ class GitLabEnrich(Enrich):
         if 'project' in item:
             rich_issue['project'] = item['project']
 
-        rich_issue.update(self.get_grimoire_fields(issue['created_at'], "issue"))
+        rich_issue.update(
+            self.get_grimoire_fields(issue['created_at'], "issue"))
 
         if self.sortinghat:
             item[self.get_field_date()] = rich_issue[self.get_field_date()]
@@ -366,7 +370,7 @@ class GitLabEnrich(Enrich):
         total = super(GitLabEnrich, self).enrich_items(items)
 
         logger.debug("Updating Gitlab users geolocations in Elastic")
-        self.geo_locations_to_es() # Update geolocations in Elastic
+        self.geo_locations_to_es()  # Update geolocations in Elastic
 
         return total
 
@@ -387,7 +391,6 @@ class GitLabUser(object):
         self.name = user['name']
         self.location = user['location']
 
-
     def _getOrg(self):
         company = None
 
@@ -398,7 +401,7 @@ class GitLabUser(object):
             company = ''
             # Return the list of orgs
             for org in self.orgs:
-                company += org['login'] +";;"
+                company += org['login'] + ";;"
             company = company[:-2]
 
         return company
