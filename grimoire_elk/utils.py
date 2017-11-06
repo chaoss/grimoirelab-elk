@@ -27,15 +27,9 @@ import argparse
 import logging
 import sys
 
-#from urllib.parse import urljoin
-
-import requests
-
 from dateutil import parser
 
 from .ocean.elastic import ElasticOcean
-
-from .elk.utils import grimoire_con
 
 # Connectors for Ocean
 from .ocean.askbot import AskbotOcean
@@ -104,7 +98,8 @@ from .elk.twitter import TwitterEnrich
 # Connectors for Perceval
 from perceval.backends.core.askbot import Askbot, AskbotCommand
 from perceval.backends.core.bugzilla import Bugzilla, BugzillaCommand
-from perceval.backends.core.bugzillarest import BugzillaREST, BugzillaRESTCommand
+from perceval.backends.core.bugzillarest import \
+        BugzillaREST, BugzillaRESTCommand
 from perceval.backends.core.discourse import Discourse, DiscourseCommand
 from perceval.backends.core.confluence import Confluence, ConfluenceCommand
 from perceval.backends.core.dockerhub import DockerHub, DockerHubCommand
@@ -125,11 +120,13 @@ from perceval.backends.core.pipermail import Pipermail, PipermailCommand
 from perceval.backends.core.redmine import Redmine, RedmineCommand
 from perceval.backends.core.rss import RSS, RSSCommand
 from perceval.backends.core.slack import Slack, SlackCommand
-from perceval.backends.core.stackexchange import StackExchange, StackExchangeCommand
+from perceval.backends.core.stackexchange import \
+    StackExchange, StackExchangeCommand
 from perceval.backends.core.supybot import Supybot, SupybotCommand
 from perceval.backends.core.telegram import Telegram, TelegramCommand
 from perceval.backends.mozilla.kitsune import Kitsune, KitsuneCommand
-from perceval.backends.mozilla.mozillaclub import MozillaClub, MozillaClubCommand
+from perceval.backends.mozilla.mozillaclub \
+    import MozillaClub, MozillaClubCommand
 from perceval.backends.mozilla.remo import ReMo, ReMoCommand
 from perceval.backends.opnfv.functest import Functest, FunctestCommand
 
@@ -142,6 +139,7 @@ logger = logging.getLogger(__name__)
 
 kibiter_version = None
 
+
 def get_connector_from_name(name):
     found = None
     connectors = get_connectors()
@@ -151,6 +149,7 @@ def get_connector_from_name(name):
             found = connectors[cname]
 
     return found
+
 
 def get_connector_name(cls):
     found = None
@@ -167,43 +166,81 @@ def get_connector_name(cls):
                     found = cname
     return found
 
+
 def get_connectors():
 
-    return {"askbot":[Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
-            "bugzilla":[Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
-            "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
-            "confluence":[Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
-            "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
-            "dockerhub":[DockerHub, DockerHubOcean, DockerHubEnrich, DockerHubCommand],
-            "functest":[Functest, FunctestOcean, FunctestEnrich, FunctestCommand],
-            "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
-            "git":[Git, GitOcean, GitEnrich, GitCommand],
-            "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
-            "gitlab":[GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
-            "gmane":[Gmane, MBoxOcean, GmaneEnrich, GmaneCommand],
-            "hyperkitty":[HyperKitty, MBoxOcean, HyperKittyEnrich, HyperKittyCommand],
-            "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
-            "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
-            "kitsune":[Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
-            "mbox":[MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
-            "mediawiki":[MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
-            "meetup":[Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
-            "mozillaclub":[MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
-            "nntp":[NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
-            "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
-            "pipermail":[Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
-            "redmine":[Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
-            "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
-            "rss":[RSS, RSSOcean, RSSEnrich, RSSCommand],
-            "slack":[Slack, SlackOcean, SlackEnrich, SlackCommand],
-            "stackexchange":[StackExchange, StackExchangeOcean,
-                             StackExchangeEnrich, StackExchangeCommand],
-             "supybot":[Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
-             "telegram":[Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
-             "twitter":[None, TwitterOcean, TwitterEnrich, None]
+    return {"askbot": [Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
+            "bugzilla":
+                [Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
+            "bugzillarest":
+                [BugzillaREST, BugzillaRESTOcean,
+                 BugzillaRESTEnrich, BugzillaRESTCommand],
+            "confluence":
+                [Confluence, ConfluenceOcean,
+                 ConfluenceEnrich, ConfluenceCommand],
+            "discourse":
+                [Discourse, DiscourseOcean,
+                 DiscourseEnrich, DiscourseCommand],
+            "dockerhub":
+                [DockerHub, DockerHubOcean,
+                 DockerHubEnrich, DockerHubCommand],
+            "functest":
+                [Functest, FunctestOcean, FunctestEnrich, FunctestCommand],
+            "gerrit":
+                [Gerrit, GerritOcean, GerritEnrich, GerritCommand],
+            "git":
+                [Git, GitOcean, GitEnrich, GitCommand],
+            "github":
+                [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
+            "gitlab":
+                [GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
+            "gmane":
+                [Gmane, MBoxOcean, GmaneEnrich, GmaneCommand],
+            "hyperkitty":
+                [HyperKitty, MBoxOcean, HyperKittyEnrich, HyperKittyCommand],
+            "jenkins":
+                [Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
+            "jira":
+                [Jira, JiraOcean, JiraEnrich, JiraCommand],
+            "kitsune":
+                [Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
+            "mbox":
+                [MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
+            "mediawiki":
+                [MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
+            "meetup":
+                [Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
+            "mozillaclub":
+                [MozillaClub, MozillaClubOcean,
+                 MozillaClubEnrich, MozillaClubCommand],
+            "nntp":
+                [NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
+            "phabricator":
+                [Phabricator, PhabricatorOcean,
+                 PhabricatorEnrich, PhabricatorCommand],
+            "pipermail":
+                [Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
+            "redmine":
+                [Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
+            "remo":
+                [ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
+            "rss":
+                [RSS, RSSOcean, RSSEnrich, RSSCommand],
+            "slack":
+                [Slack, SlackOcean, SlackEnrich, SlackCommand],
+            "stackexchange":
+                [StackExchange, StackExchangeOcean,
+                 StackExchangeEnrich, StackExchangeCommand],
+            "supybot":
+                [Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
+            "telegram":
+                [Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
+            "twitter":
+                [None, TwitterOcean, TwitterEnrich, None]
             }  # Will come from Registry
 
-def get_elastic(url, es_index, clean = None, backend = None):
+
+def get_elastic(url, es_index, clean=None, backend=None):
 
     mapping = None
 
@@ -213,7 +250,8 @@ def get_elastic(url, es_index, clean = None, backend = None):
         analyzers = backend.get_elastic_analyzers()
     try:
         insecure = True
-        elastic = ElasticSearch(url, es_index, mapping, clean, insecure, analyzers)
+        elastic = \
+            ElasticSearch(url, es_index, mapping, clean, insecure, analyzers)
 
     except ElasticConnectException:
         logger.error("Can't connect to Elastic Search. Is it running?")
@@ -221,21 +259,26 @@ def get_elastic(url, es_index, clean = None, backend = None):
 
     return elastic
 
+
 def config_logging(debug):
 
     if debug:
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
+        logging.basicConfig(level=logging.DEBUG,
+                            format='%(asctime)s %(message)s')
         logging.debug("Debug mode activated")
     else:
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+        logging.basicConfig(
+            level=logging.INFO, format='%(asctime)s %(message)s')
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
     # Per commit log is too verbose
     logging.getLogger("perceval.backends.core.git").setLevel(logging.WARNING)
 
+
 ARTHUR_USAGE_MSG = ''
 ARTHUR_DESC_MSG = ''
 ARTHUR_EPILOG_MSG = ''
+
 
 def get_params_parser():
     """Parse command line arguments"""
@@ -243,13 +286,14 @@ def get_params_parser():
     parser = argparse.ArgumentParser(usage=ARTHUR_USAGE_MSG,
                                      description=ARTHUR_DESC_MSG,
                                      epilog=ARTHUR_EPILOG_MSG,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     formatter_class=argparse.
+                                     RawDescriptionHelpFormatter,
                                      add_help=False)
 
     ElasticOcean.add_params(parser)
 
     parser.add_argument('-h', '--help', action='help',
-                       help=argparse.SUPPRESS)
+                        help=argparse.SUPPRESS)
     parser.add_argument('-g', '--debug', dest='debug',
                         action='store_true',
                         help=argparse.SUPPRESS)
@@ -260,41 +304,71 @@ def get_params_parser():
                         help="Use cache for item retrieval")
     parser.add_argument("--enrich",  action='store_true',
                         help="Enrich items after retrieving")
-    parser.add_argument("--enrich_only",  action='store_true',
-                        help="Only enrich items (DEPRECATED, use --only-enrich)")
-    parser.add_argument("--only-enrich",  dest='enrich_only', action='store_true',
+    parser.add_argument("--enrich_only",
+                        action='store_true',
+                        help="Only enrich items \
+                            (DEPRECATED, use --only-enrich)")
+    parser.add_argument("--only-enrich",
+                        dest='enrich_only', action='store_true',
                         help="Only enrich items")
     parser.add_argument("--filter-raw",  dest='filter_raw',
                         help="Filter raw items. Format: field:value")
     parser.add_argument("--filters-raw-prefix",  nargs='*',
-                        help="Filter raw items with prefix filter. Format: field:value field:value ...")
-    parser.add_argument("--events-enrich",  dest='events_enrich', action='store_true',
+                        help="Filter raw items with prefix filter. \
+                            Format: field:value field:value ...")
+    parser.add_argument("--events-enrich",  dest='events_enrich',
+                        action='store_true',
                         help="Enrich events in items")
     parser.add_argument('--index', help="Ocean index name")
-    parser.add_argument('--index-enrich', dest="index_enrich", help="Ocean enriched index name")
-    parser.add_argument('--db-user', help="User for db connection (default to root)",
+    parser.add_argument('--index-enrich',
+                        dest="index_enrich", help="Ocean enriched index name")
+    parser.add_argument('--db-user',
+                        help="User for db connection (default to root)",
                         default="root")
-    parser.add_argument('--db-password', help="Password for db connection (default empty)",
+    parser.add_argument('--db-password',
+                        help="Password for db connection (default empty)",
                         default="")
-    parser.add_argument('--db-host', help="Host for db connection (default to mariadb)",
+    parser.add_argument('--db-host',
+                        help="Host for db connection (default to mariadb)",
                         default="mariadb")
     parser.add_argument('--db-projects-map', help="Projects Mapping DB")
-    parser.add_argument('--json-projects-map', help="Projects Mapping JSON file")
-    parser.add_argument('--project', help="Project for the repository (origin)")
-    parser.add_argument('--refresh-projects', action='store_true', help="Refresh projects in enriched items")
-    parser.add_argument('--db-sortinghat', help="SortingHat DB")
-    parser.add_argument('--only-identities', action='store_true', help="Only add identities to SortingHat DB")
-    parser.add_argument('--refresh-identities', action='store_true', help="Refresh identities in enriched items")
-    parser.add_argument('--author_id', nargs='*', help="Field author_ids to be refreshed")
-    parser.add_argument('--author_uuid', nargs='*', help="Field author_uuids to be refreshed")
-    parser.add_argument('--github-token', help="If provided, github usernames will be retrieved in git enrich.")
-    parser.add_argument('--jenkins-rename-file', help="CSV mapping file with nodes renamed schema.")
-    parser.add_argument('--studies', action='store_true', help="Execute studies after enrichment.")
-    parser.add_argument('--only-studies', action='store_true', help="Execute only studies.")
+    parser.add_argument('--json-projects-map',
+                        help="Projects Mapping JSON file")
+    parser.add_argument('--project',
+                        help="Project for the repository (origin)")
+    parser.add_argument('--refresh-projects',
+                        action='store_true',
+                        help="Refresh projects in enriched items")
+    parser.add_argument('--db-sortinghat',
+                        help="SortingHat DB")
+    parser.add_argument('--only-identities',
+                        action='store_true',
+                        help="Only add identities to SortingHat DB")
+    parser.add_argument('--refresh-identities',
+                        action='store_true',
+                        help="Refresh identities in enriched items")
+    parser.add_argument('--author_id',
+                        nargs='*',
+                        help="Field author_ids to be refreshed")
+    parser.add_argument('--author_uuid',
+                        nargs='*',
+                        help="Field author_uuids to be refreshed")
+    parser.add_argument('--github-token',
+                        help="If provided, github usernames will be retrieved \
+                            in git enrich.")
+    parser.add_argument('--jenkins-rename-file',
+                        help="CSV mapping file with nodes renamed schema.")
+    parser.add_argument('--studies',
+                        action='store_true',
+                        help="Execute studies after enrichment.")
+    parser.add_argument('--only-studies',
+                        action='store_true', help="Execute only studies.")
     parser.add_argument('--bulk-size', default=1000, type=int,
-                        help="Number of items per bulk request to Elasticsearch.")
+                        help="Number of items per bulk request \
+                            to Elasticsearch.")
     parser.add_argument('--scroll-size', default=100, type=int,
-                        help="Number of items to get from Elasticsearch when scrolling.")
+                        help="Number of items to get from \
+                            Elasticsearch when scrolling.")
     parser.add_argument('backend', help=argparse.SUPPRESS)
     parser.add_argument('backend_args', nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)
@@ -313,6 +387,7 @@ def get_params():
     args = parser.parse_args()
 
     return args
+
 
 def get_time_diff_days(start_txt, end_txt):
     ''' Number of days between two days  '''
