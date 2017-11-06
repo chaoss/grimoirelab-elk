@@ -70,7 +70,7 @@ setup(name="grimoire-kidash",
       scripts=["kidash.py"],
       install_requires=['python-dateutil',
         'grimoire-elk>=0.30.9',
-        'panels>=0.0.1'
+        'grimoirelab-panels>=0.0.1'
         ],
       include_package_data=True,
       zip_safe=False
