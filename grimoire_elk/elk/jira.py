@@ -212,6 +212,11 @@ class JiraEnrich(Enrich):
         eitem['time_to_last_update_days'] = \
             get_time_diff_days(issue['fields']['created'], datetime.utcnow())
 
+        for field in issue['fields']:
+            if field.startswith('customfield_') and \
+                    (issue['fields'][field]['name'] == "Story Points"):
+                eitem['story_points'] = issue['fields'][field]['value']
+
         if self.sortinghat:
             eitem.update(self.get_item_sh(item, self.roles))
 
