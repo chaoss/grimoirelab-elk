@@ -24,8 +24,7 @@
 #
 
 import logging
-import MySQLdb
-
+import pymysql
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +49,7 @@ class Database:
         """
 
         try:
-            db = MySQLdb.connect(user = self.user, passwd = self.passwd,
+            db = pymysql.connect(user = self.user, passwd = self.passwd,
                                  host = self.host, port = self.port,
                                  db = self.shdb,
                                  use_unicode = True)
