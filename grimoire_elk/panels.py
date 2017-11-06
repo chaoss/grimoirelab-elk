@@ -367,12 +367,8 @@ def read_panel_file(panel_file):
                 module_file = panel_file
             kibana_bytes = pkgutil.get_data('panels', 'json' + '/' + module_file)
             kibana_str = kibana_bytes.decode(encoding='utf8')
-        except ImportError:
+        except (ImportError, FileNotFoundError, AttributeError):
             logger.error("Panel not found (not in directory, no panels module): %s",
-                        panel_file)
-            return None
-        except FileNotFoundError:
-            logger.error("Panel not found (not in directory, not in panels module): %s",
                         panel_file)
             return None
 
@@ -386,13 +382,15 @@ def read_panel_file(panel_file):
 def get_dashboard_name(panel_file):
     """ Return the dashboard name included in a JSON panel file """
 
+    dash_name = None
+
     kibana = read_panel_file(panel_file)
-    if (kibana is not None) and ('dashboard' in kibana):
-        return kibana['dashboard']['id']
-    else:
+    if kibana and 'dashboard' in kibana:
+        dash_name = kibana['dashboard']['id']
+    elif kibana:
         logger.error("Wrong panel format (can't find 'dashboard' field): %s",
                     panel_file)
-        return None
+    return dash_name
 
 def import_dashboard(elastic_url, import_file, es_index=None):
 
