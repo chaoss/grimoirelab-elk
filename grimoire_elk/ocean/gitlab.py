@@ -23,9 +23,8 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from dateutil import parser
-
 from .elastic import ElasticOcean
+
 
 class GitLabOcean(ElasticOcean):
     """GitLab Ocean feeder"""
