@@ -100,7 +100,10 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
             try:
                 category = backend_cmd.category
             except AttributeError:
-                category = backend_cmd.parsed_args.category
+                try:
+                    category = backend_cmd.parsed_args.category
+                except AttributeError:
+                    pass
 
         if 'latest_items' in signature.parameters:
             try:

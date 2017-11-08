@@ -42,6 +42,7 @@ from .ocean.askbot import AskbotOcean
 from .ocean.bugzilla import BugzillaOcean
 from .ocean.bugzillarest import BugzillaRESTOcean
 from .ocean.confluence import ConfluenceOcean
+from .ocean.crates import CratesOcean
 from .ocean.discourse import DiscourseOcean
 from .ocean.dockerhub import DockerHubOcean
 from .ocean.functest import FunctestOcean
@@ -71,6 +72,7 @@ from .elk.askbot import AskbotEnrich
 from .elk.bugzilla import BugzillaEnrich
 from .elk.bugzillarest import BugzillaRESTEnrich
 from .elk.confluence import ConfluenceEnrich
+from .elk.crates import CratesEnrich
 from .elk.dockerhub import DockerHubEnrich
 from .elk.discourse import DiscourseEnrich
 from .elk.functest import FunctestEnrich
@@ -125,6 +127,7 @@ from perceval.backends.core.slack import Slack, SlackCommand
 from perceval.backends.core.stackexchange import StackExchange, StackExchangeCommand
 from perceval.backends.core.supybot import Supybot, SupybotCommand
 from perceval.backends.core.telegram import Telegram, TelegramCommand
+from perceval.backends.mozilla.crates import Crates, CratesCommand
 from perceval.backends.mozilla.kitsune import Kitsune, KitsuneCommand
 from perceval.backends.mozilla.mozillaclub import MozillaClub, MozillaClubCommand
 from perceval.backends.mozilla.remo import ReMo, ReMoCommand
@@ -170,6 +173,7 @@ def get_connectors():
             "bugzilla":[Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
             "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
             "confluence":[Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
+            "crates":[Crates, CratesOcean, CratesEnrich, CratesCommand],
             "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
             "dockerhub":[DockerHub, DockerHubOcean, DockerHubEnrich, DockerHubCommand],
             "functest":[Functest, FunctestOcean, FunctestEnrich, FunctestCommand],
