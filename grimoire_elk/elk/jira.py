@@ -214,13 +214,15 @@ class JiraEnrich(Enrich):
 
         for field in issue['fields']:
             if field.startswith('customfield_'):
-                if issue['fields'][field]['name'] == "Story Points":
-                    eitem['story_points'] = issue['fields'][field]['value']
-                elif issue['fields'][field]['name'] == "Sprint":
-                    value = issue['fields'][field]['value']
-                    if value is not None and len(value)>0:
-                        sprint = value[0].partition(",name=")[2].split(',')[0]
-                        eitem['sprint'] = sprint
+                if type(issue['fields'][field]) is dict:
+                    if 'name' in issue['fields'][field]:
+                        if issue['fields'][field]['name'] == "Story Points":
+                            eitem['story_points'] = issue['fields'][field]['value']
+                        elif issue['fields'][field]['name'] == "Sprint":
+                            value = issue['fields'][field]['value']
+                            if value:
+                                sprint = value[0].partition(",name=")[2].split(',')[0]
+                                eitem['sprint'] = sprint
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item, self.roles))
