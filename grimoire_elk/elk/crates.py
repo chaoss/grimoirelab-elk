@@ -104,7 +104,7 @@ class CratesEnrich(Enrich):
             else:
                 eitem[f] = None
         # The real data
-        page = item['data']
+        crate = item['data']
 
         # data fields to copy
         copy_fields = ["id", "homepage", "name", "repository", "downloads",
@@ -113,14 +113,22 @@ class CratesEnrich(Enrich):
                        "updated_at"]
 
         for f in copy_fields:
-            if f in page:
-                eitem[f] = page[f]
+            if f in crate:
+                eitem[f] = crate[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
         map_fields = {"description": "description_analyzed"}
         for fn in map_fields:
-            eitem[map_fields[fn]] = page[fn]
+            eitem[map_fields[fn]] = crate[fn]
+
+        # author info
+        if crate['owner_user_data']['users']:
+            author = crate['owner_user_data']['users'][0]
+            eitem['author_id'] = author['id']
+            eitem['author_login'] = author['login']
+            eitem['author_url'] = author['url']
+            eitem['author_avatar'] = author['avatar']
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
