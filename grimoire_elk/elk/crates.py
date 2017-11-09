@@ -25,6 +25,8 @@
 import json
 import logging
 
+from copy import deepcopy
+
 from dateutil import parser
 
 from .enrich import Enrich, metadata
@@ -93,6 +95,42 @@ class CratesEnrich(Enrich):
             identity['name'] = user['name']
 
         return identity
+
+    def get_field_event_unique_id(self):
+        return "download_sample_id"
+
+    def get_rich_events(self, item):
+        """
+        In the events there are some common fields with the crate. The name
+        of the field must be the same in the create and in the downloads event
+        so we can filer using it in crate and event at the same time.
+
+        * Fields that don't change: the field does not change with the events
+        in a create so the value is always the same in the events of a create.
+
+        * Fields that change: the value of the field changes with events
+        """
+        events = []
+
+        if "version_downloads_data" not in item['data']:
+            return events
+
+        # To get values from the task
+        eitem = self.get_rich_item(item)
+
+        for sample in item['data']["version_downloads_data"]["version_downloads"]:
+            event = deepcopy(eitem)
+            event['download_sample_id'] = sample['id']
+            event['sample_date'] = sample['date']
+            sample_date = parser.parse(event['sample_date'])
+            event['sample_version'] = sample['version']
+            event['sample_downloads'] = sample['downloads']
+            event.update(self.get_grimoire_fields(sample_date.isoformat(), "downloads_event"))
+
+            events.append(event)
+
+        return events
+
 
     @metadata
     def get_rich_item(self, item):
