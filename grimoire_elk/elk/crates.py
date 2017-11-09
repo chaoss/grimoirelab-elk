@@ -148,7 +148,7 @@ class CratesEnrich(Enrich):
         copy_fields = ["id", "homepage", "name", "repository", "downloads",
                        "description", "recent_downloads", "max_version",
                        "keywords", "categories", "badges", "versions",
-                       "updated_at"]
+                       "updated_at", "created_at"]
 
         for f in copy_fields:
             if f in crate:
@@ -174,6 +174,6 @@ class CratesEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
 
-        eitem.update(self.get_grimoire_fields(eitem['updated_at'], "crates"))
+        eitem.update(self.get_grimoire_fields(eitem['created_at'], "crates"))
 
         return eitem
