@@ -1,3 +1,4 @@
+name,type
 api_id,keyword
 build_tag,keyword
 case_name,keyword
@@ -12,7 +13,6 @@ metadata__gelk_backend_name,keyword
 metadata__gelk_version,keyword
 metadata__timestamp,date
 metadata__updated_on,date
-name,type
 origin,keyword
 pod_name,keyword
 project,keyword

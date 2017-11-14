@@ -1,3 +1,4 @@
+name,type
 author_bot,long
 author_domain,keyword
 author_id,keyword
@@ -32,7 +33,6 @@ metadata__gelk_backend_name,keyword
 metadata__gelk_version,keyword
 metadata__timestamp,date
 metadata__updated_on,date
-name,type
 number_attachs,long
 origin,keyword
 profile_title,keyword

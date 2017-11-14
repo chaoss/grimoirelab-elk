@@ -1,3 +1,4 @@
+name,type
 assignee_data_bot,boolean
 assignee_data_domain,keyword
 assignee_data_id,keyword
@@ -33,7 +34,6 @@ metadata__gelk_backend_name,keyword
 metadata__gelk_version,keyword
 metadata__timestamp,date
 metadata__updated_on,date
-name,type
 ocean-unique-id,keyword
 origin,keyword
 project_1,keyword

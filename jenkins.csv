@@ -1,3 +1,4 @@
+name,type
 branch,keyword
 build_date,date
 build,long
@@ -19,7 +20,6 @@ metadata__gelk_backend_name,keyword
 metadata__gelk_version,keyword
 metadata__timestamp,date
 metadata__updated_on,date
-name,type
 ocean-unique-id,keyword
 origin,keyword
 pod,keyword

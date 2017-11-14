@@ -1,3 +1,4 @@
+name,type
 assigned,keyword
 assigned_to_bot,boolean
 assigned_to_domain,keyword
@@ -31,7 +32,6 @@ metadata__gelk_backend_name,keyword
 metadata__gelk_version,keyword
 metadata__timestamp,date
 metadata__updated_on,date
-name,type
 ocean-unique-id,keyword
 op_sys,keyword
 origin,keyword

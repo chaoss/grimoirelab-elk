@@ -1,3 +1,4 @@
+name,type
 author_bot,boolean
 author_id,keyword
 author_name,keyword
@@ -48,7 +49,6 @@ metadata__gelk_backend_name,keyword
 metadata__gelk_version,keyword
 metadata__timestamp,date
 metadata__updated_on,date
-name,type
 num_comments,long
 num_rsvps,long
 ocean-unique-id,keyword
