@@ -1,3 +1,4 @@
+name,type
 assigned_to_id,long
 assigned_to_name,keyword
 attachments,long
@@ -24,7 +25,6 @@ is_redmine_job,long
 journals,long
 metadata__timestamp,date
 metadata__updated_on,date
-name,type
 ocean-unique-id,keyword
 origin,keyword
 priority_id,long

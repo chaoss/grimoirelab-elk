@@ -1,3 +1,4 @@
+name,type
 author_bot,boolean
 author_domain,keyword
 author_id,keyword
@@ -25,7 +26,6 @@ metadata__gelk_backend_name,keyword
 metadata__gelk_version,keyword
 metadata__timestamp,date
 metadata__updated_on,date
-name,type
 ocean-unique-id,keyword
 origin,keyword
 project_1,keyword

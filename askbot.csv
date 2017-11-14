@@ -1,3 +1,4 @@
+name,type
 author_askbot_id,keyword
 author_askbot_user_name,keyword
 author_badges,text
@@ -22,7 +23,6 @@ metadata__gelk_backend_name,keyword
 metadata__gelk_version,keyword
 metadata__timestamp,date
 metadata__updated_on,date
-name,type
 ocean-unique-id,keyword
 origin,keyword
 question_answer_count,long
