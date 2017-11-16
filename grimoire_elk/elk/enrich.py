@@ -45,7 +45,7 @@ from .. import __version__
 logger = logging.getLogger(__name__)
 
 try:
-    import MySQLdb
+    import pymysql
     MYSQL_LIBS = True
 except ImportError:
     logger.info("MySQL not available")
@@ -299,7 +299,7 @@ class Enrich(ElasticItems):
         # Read the repo to project mapping from a database
         ds_repo_to_prj = {}
 
-        db = MySQLdb.connect(user=db_user, passwd=db_password, host=db_host,
+        db = pymysql.connect(user=db_user, passwd=db_password, host=db_host,
                              db=db_projects_map)
         cursor = db.cursor()
 

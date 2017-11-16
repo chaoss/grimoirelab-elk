@@ -448,7 +448,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             logger.info("Running only studies (no SH and no enrichment)")
             do_studies(enrich_backend, no_incremental)
         elif do_refresh_projects:
-            logger.info("Refreshing project field in enriched index")
+            logger.info("Refreshing project field in %s", enrich_backend.elastic.index_url)
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_projects(enrich_backend)
             enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
@@ -462,7 +462,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                 filter_author = {'name': 'author_uuid',
                                  'value': author_uuid}
 
-            logger.info("Refreshing identities fields in enriched index")
+            logger.info("Refreshing identities fields in %s", enrich_backend.elastic.index_url)
             field_id = enrich_backend.get_field_unique_id()
             logger.info(field_id)
             eitems = refresh_identities(enrich_backend, filter_author)

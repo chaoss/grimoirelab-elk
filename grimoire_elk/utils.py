@@ -167,6 +167,24 @@ def get_connector_name(cls):
                     found = cname
     return found
 
+def get_connector_name_from_cls_name(cls_name):
+    found = None
+    connectors = get_connectors()
+
+    for cname in connectors:
+        for con in connectors[cname]:
+            if not con:
+                continue
+            if cls_name == con.__name__:
+                if found:
+                    # The canonical name is included in the classname
+                    if cname in con.__name__.lower():
+                        found = cname
+                else:
+                    found = cname
+    return found
+
+
 def get_connectors():
 
     return {"askbot":[Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
