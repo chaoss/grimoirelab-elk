@@ -38,6 +38,10 @@ logger = logging.getLogger(__name__)
 
 requests_ses = grimoire_con()
 
+ES_VER = None
+HEADERS_JSON = {"Content-Type": "application/json"}
+
+
 def get_dashboard_json(elastic, dashboard):
     dash_json_url = elastic.index_url+"/dashboard/"+dashboard
 
@@ -333,23 +337,36 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
     dash_data['panelsJSON'] = json.dumps(new_panels(elastic, panels, search_id))
     dash_path = "/dashboard/"+dashboard+"__"+enrich_index
     url = elastic.index_url + dash_path
-    headers = {"Content-Type": "application/json"}
-    res = requests_ses.post(url, data = json.dumps(dash_data), verify=False, headers=headers)
+    res = requests_ses.post(url, data = json.dumps(dash_data), verify=False, headers=HEADERS_JSON)
     res.raise_for_status()
     dash_url = kibana_host+"/app/kibana#"+dash_path
     return dash_url
+
+def find_elasticsearch_version(elastic):
+    res = requests_ses.get(elastic.url)
+    main_ver = res.json()['version']['number'].split(".")[0]
+    return int(main_ver)
 
 def list_dashboards(elastic_url, es_index=None):
     if not es_index:
         es_index = ".kibana"
 
     elastic = ElasticSearch(elastic_url, es_index)
+    elastic_ver = find_elasticsearch_version(elastic)
 
-    dash_json_url = elastic.index_url+"/dashboard/_search?size=10000"
-
-    print (dash_json_url)
-
-    res = requests_ses.get(dash_json_url, verify=False)
+    if elastic_ver < 6:
+        dash_json_url = elastic.index_url+"/dashboard/_search?size=10000"
+        res = requests_ses.get(dash_json_url, verify=False)
+    else:
+        items_json_url = elastic.index_url+"/_search?size=10000"
+        query = '''
+        {
+            "query" : {
+                "term" : { "type" : "dashboard"  }
+             }
+        }'''
+        res = requests_ses.post(items_json_url, data=query, verify=False,
+                                headers=HEADERS_JSON)
     res.raise_for_status()
 
     res_json = res.json()
@@ -359,7 +376,12 @@ def list_dashboards(elastic_url, es_index=None):
         raise RuntimeError("Can't find dashboards")
 
     for dash in res_json["hits"]["hits"]:
-        print (dash["_id"])
+        if elastic_ver < 6:
+            dash_json = dash["_source"]
+        else:
+            dash_json = dash["_source"]["dashboard"]
+
+        print("_id:%s title:%s" % (dash["_id"], dash_json["title"]))
 
 def read_panel_file(panel_file):
     """Read a panel file (in JSON format) and return its contents.
