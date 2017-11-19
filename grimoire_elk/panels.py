@@ -53,15 +53,15 @@ def find_item_json(elastic, type_, item_id):
     elastic_ver = find_elasticsearch_version(elastic)
 
     if elastic_ver < 6:
-        dash_json_url = elastic.index_url+"/"+type_+"/"+item_id
+        item_json_url = elastic.index_url+"/"+type_+"/"+item_id
     else:
         if type_ not in item_id:
             # Inside a dashboard ids don't include type_:
             item_id = type_ + ":" + item_id
         # The type_is included in the item_id
-        dash_json_url = elastic.index_url+"/doc/"+item_id
+        item_json_url = elastic.index_url+"/doc/"+item_id
 
-    res = requests_ses.get(dash_json_url, verify=False)
+    res = requests_ses.get(item_json_url, verify=False)
     res.raise_for_status()
 
     item_json = res.json()
@@ -77,6 +77,25 @@ def find_item_json(elastic, type_, item_id):
 
     return item_json
 
+def import_item_json(elastic, type_, item_id, item_json):
+    """ Import an item in Elasticsearch  """
+    elastic_ver = find_elasticsearch_version(elastic)
+
+    if elastic_ver < 6:
+        item_json_url = elastic.index_url+"/"+type_+"/"+item_id
+    else:
+        if type_ not in item_id:
+            # Inside a json dashboard ids don't include type_
+            item_id = type_ + ":" + item_id
+        item_json_url = elastic.index_url+"/doc/"+item_id
+        item_json = {"type": type_, type_: item_json}
+
+    headers = HEADERS_JSON
+    res = requests_ses.post(item_json_url, data=json.dumps(item_json),
+                            verify=False, headers=headers)
+    res.raise_for_status()
+
+    return item_json
 
 def exists_dashboard(elastic_url, dash_id, es_index=None):
     """ Check if a dashboard exists """
@@ -429,8 +448,6 @@ def get_dashboard_name(panel_file):
 
 def import_dashboard(elastic_url, import_file, es_index=None):
 
-    headers = {"Content-Type": "application/json"}
-
     logger.debug("Reading panels JSON file: %s", import_file)
     kibana = read_panel_file(import_file)
 
@@ -441,36 +458,25 @@ def import_dashboard(elastic_url, import_file, es_index=None):
 
     if not es_index:
         es_index = ".kibana"
+
     elastic = ElasticSearch(elastic_url, es_index)
 
-    url = elastic.index_url+"/dashboard/"+kibana['dashboard']['id']
-
-    data = json.dumps(kibana['dashboard']['value'])
-    res = requests_ses.post(url, data=data, verify=False, headers=headers)
-    res.raise_for_status()
-
+    import_item_json(elastic, "dashboard", kibana['dashboard']['id'],
+                     kibana['dashboard']['value'])
 
     if 'searches' in kibana:
         for search in kibana['searches']:
-            url = elastic.index_url+"/search/"+search['id']
-            res = requests_ses.post(url, data = json.dumps(search['value']),
-                                    verify=False, headers=headers)
-            res.raise_for_status()
+            import_item_json(elastic, "search", search['id'], search['value'])
 
     if 'index_patterns' in kibana:
         for index in kibana['index_patterns']:
-            url = elastic.index_url+"/index-pattern/"+index['id']
-            res = requests_ses.post(url, data = json.dumps(index['value']),
-                                    verify=False, headers=headers)
-            res.raise_for_status()
+            import_item_json(elastic, "index-pattern", index['id'], index['value'])
 
     if 'visualizations' in kibana:
         for vis in kibana['visualizations']:
-            url = elastic.index_url+"/visualization"+"/"+vis['id']
-            res = requests_ses.post(url, data = json.dumps(vis['value']), verify=False, headers=headers)
-            res.raise_for_status()
+            import_item_json(elastic, "visualization", vis['id'], vis['value'])
 
-    logger.debug("Done")
+    logger.debug("Panels imported")
 
 
 def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
