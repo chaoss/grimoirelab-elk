@@ -165,7 +165,11 @@ class MeetupEnrich(Enrich):
         eitem['num_comments'] = len(event['comments'])
 
         try:
-            eitem['time_date'] = unixtime_to_datetime(event['time']/1000).isoformat()
+            if 'time' in event:
+                eitem['time_date'] = unixtime_to_datetime(event['time']/1000).isoformat()
+            else:
+                logger.error("time field nof found in event")
+                return {}
         except ValueError:
             logger.error("Wrong datetime for %s: %s", eitem['url'], event['time'])
             # If no datetime for the enriched item, it is useless for Kibana
