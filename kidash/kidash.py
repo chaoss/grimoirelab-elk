@@ -47,6 +47,7 @@ def get_params_parser_create_dash():
     parser.add_argument("--kibana", dest="kibana_index", default=".kibana", help="Kibana index name (.kibana default)")
     parser.add_argument("--list", action='store_true', help="list available dashboards")
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
+    parser.add_argument("--data-sources", nargs='+', dest="data_sources", help="Data sources to be included")
 
     return parser
 
@@ -64,16 +65,16 @@ def get_params():
 
 if __name__ == '__main__':
 
-    args = get_params()
+    ARGS = get_params()
 
-    config_logging(args.debug)
+    config_logging(ARGS.debug)
 
-    if args.import_file:
-        import_dashboard(args.elastic_url, args.import_file, args.kibana_index)
-    elif args.export_file:
-        if os.path.isfile(args.export_file):
-            logging.info("%s exists. Remove it before running.", args.export_file)
+    if ARGS.import_file:
+        import_dashboard(ARGS.elastic_url, ARGS.import_file, ARGS.kibana_index, ARGS.data_sources)
+    elif ARGS.export_file:
+        if os.path.isfile(ARGS.export_file):
+            logging.info("%s exists. Remove it before running.", ARGS.export_file)
             sys.exit(0)
-        export_dashboard(args.elastic_url, args.dashboard, args.export_file, args.kibana_index)
-    elif args.list:
-        list_dashboards(args.elastic_url, args.kibana_index)
+        export_dashboard(ARGS.elastic_url, ARGS.dashboard, ARGS.export_file, ARGS.kibana_index)
+    elif ARGS.list:
+        list_dashboards(ARGS.elastic_url, ARGS.kibana_index)

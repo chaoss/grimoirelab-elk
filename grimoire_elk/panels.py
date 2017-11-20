@@ -23,6 +23,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import copy
 import json
 import logging
 
@@ -77,9 +78,48 @@ def find_item_json(elastic, type_, item_id):
 
     return item_json
 
-def import_item_json(elastic, type_, item_id, item_json):
+
+def clean_dashboard_for_data_sources(dash_json, data_sources):
+    """ Remove all items that are not from the data sources """
+
+    logger.debug("Cleaning dashboard for %s", data_sources)
+
+    dash_json_clean = copy.deepcopy(dash_json)
+
+    dash_json_clean['uiStateJSON'] = ""
+    dash_json_clean['panelsJSON'] = ""
+
+    # Time to add the panels (widgets) related to the data_sources
+    panelsJSON = json.loads(dash_json['panelsJSON'])
+    clean_panelsJSON = []
+    for panel in panelsJSON:
+        for ds in data_sources:
+            if panel['id'].split("_")[0] == ds:
+                clean_panelsJSON.append(panel)
+                break
+    dash_json_clean['panelsJSON'] = json.dumps(clean_panelsJSON)
+
+    return dash_json_clean
+
+def import_item_json(elastic, type_, item_id, item_json, data_sources=None):
     """ Import an item in Elasticsearch  """
     elastic_ver = find_elasticsearch_version(elastic)
+
+    if data_sources:
+        if type_ == 'dashboard':
+            item_json = clean_dashboard_for_data_sources(item_json, data_sources)
+        if type_ == 'search':
+            if not is_search_from_data_sources(item_json, data_sources):
+                logger.debug("Search %s not for %s. Not included.", item_id, data_sources)
+                return
+        elif type_ == 'index_pattern':
+            if not is_index_pattern_from_data_sources(item_json, data_sources):
+                logger.debug("Index pattern %s not for %s. Not included.", item_id, data_sources)
+                return
+        elif type_ == 'visualization':
+            if not is_vis_from_data_sources(item_json, data_sources):
+                logger.debug("Vis %s not for %s. Not included.", item_id, data_sources)
+                return
 
     if elastic_ver < 6:
         item_json_url = elastic.index_url+"/"+type_+"/"+item_id
@@ -223,7 +263,6 @@ def get_index_pattern_from_vis(elastic, vis):
     elif "kibanaSavedObjectMeta" in vis_json:
         index_pattern = get_index_pattern_from_meta(vis_json["kibanaSavedObjectMeta"])
     return index_pattern
-
 
 def create_index_pattern(elastic_url, dashboard, enrich_index, es_index=None):
     """ Create a index pattern using as template the index pattern
@@ -446,7 +485,47 @@ def get_dashboard_name(panel_file):
                     panel_file)
     return dash_name
 
-def import_dashboard(elastic_url, import_file, es_index=None):
+def is_search_from_data_sources(search, data_sources):
+    found = False
+    index_pattern = get_index_pattern_from_meta(search['kibanaSavedObjectMeta'])
+
+    for data_source in data_sources:
+        # ex: github_issues
+        if data_source == index_pattern.split("_")[0]:
+            found = True
+            break
+
+    return found
+
+def is_vis_from_data_sources(vis, data_sources):
+    found = False
+    vis_title = vis['value']['title']
+
+    for data_source in data_sources:
+        # ex: github_issues_evolutionary
+        if data_source == vis_title.split("_")[0]:
+            found = True
+            break
+
+    return found
+
+def is_index_pattern_from_data_sources(index, data_sources):
+    found = False
+    es_index = index['title']
+
+    for data_source in data_sources:
+        # ex: github_issues
+        if data_source == es_index.split("_")[0]:
+            found = True
+            break
+
+    return found
+
+
+def import_dashboard(elastic_url, import_file, es_index=None, data_sources=None):
+    """ Import a dashboard. If data_sources are defined, just include items
+        for this data source.
+    """
 
     logger.debug("Reading panels JSON file: %s", import_file)
     kibana = read_panel_file(import_file)
@@ -462,21 +541,28 @@ def import_dashboard(elastic_url, import_file, es_index=None):
     elastic = ElasticSearch(elastic_url, es_index)
 
     import_item_json(elastic, "dashboard", kibana['dashboard']['id'],
-                     kibana['dashboard']['value'])
+                     kibana['dashboard']['value'], data_sources)
 
     if 'searches' in kibana:
         for search in kibana['searches']:
-            import_item_json(elastic, "search", search['id'], search['value'])
+            import_item_json(elastic, "search", search['id'], search['value'], data_sources)
 
     if 'index_patterns' in kibana:
         for index in kibana['index_patterns']:
-            import_item_json(elastic, "index-pattern", index['id'], index['value'])
+            if not data_sources or is_index_pattern_from_data_sources(index, data_sources):
+                import_item_json(elastic, "index-pattern", index['id'], index['value'])
+            else:
+                logger.debug("Index pattern %s not for %s. Not included.", search['id'], data_sources)
 
     if 'visualizations' in kibana:
         for vis in kibana['visualizations']:
-            import_item_json(elastic, "visualization", vis['id'], vis['value'])
+            if not data_sources or is_vis_from_data_sources(vis, data_sources):
+                import_item_json(elastic, "visualization", vis['id'], vis['value'])
+            else:
+                logger.debug("Vis %s not for %s. Not included.", vis['id'], data_sources)
 
-    logger.debug("Panels imported")
+
+    logger.info("Dashboard %s imported", get_dashboard_name(import_file))
 
 
 def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
