@@ -216,7 +216,6 @@ def export_items(elastic_url, in_index, out_index, limit=None):
     elastic_in = ElasticSearch(elastic_url, in_index)
     # Create the correct mapping for the data sources detected from in_index
     ds_mapping = find_mapping(elastic_url, in_index)
-    ds_mapping = None
     elastic_out = ElasticSearch(elastic_url, out_index, mappings=ds_mapping)
     # Time to just copy from in_index to our_index
     uid_field = find_uuid(elastic_url, in_index)
