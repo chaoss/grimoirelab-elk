@@ -164,6 +164,28 @@ class ElasticSearch(object):
                 logger.debug("Probably %i item updates" % (total-total_search))
                 break
 
+    @classmethod
+    def global_mapping(cls):
+        """ Return the global mapping to be used always """
+
+        # By default all strings are not analyzed
+        not_analyze_strings = """
+        {
+          "dynamic_templates": [
+            { "notanalyzed": {
+                  "match": "*",
+                  "match_mapping_type": "string",
+                  "mapping": {
+                      "type":        "string",
+                      "index":       "not_analyzed"
+                  }
+               }
+            }
+          ]
+        } """
+
+        return not_analyze_strings
+
     def create_mappings(self, mappings):
 
         for _type in mappings:
@@ -172,26 +194,13 @@ class ElasticSearch(object):
 
             # First create the manual mappings
             if mappings[_type] != '{}':
-                r = self.requests.put(url_map, data=mappings[_type])
-                if r.status_code != 200:
-                    logger.error("Error creating ES mappings %s", r.text)
+                res = self.requests.put(url_map, data=mappings[_type])
+                if res.status_code != 200:
+                    logger.error("Error creating ES mappings %s", res.text)
 
-            # By default all strings are not analyzed
-            not_analyze_strings = """
-            {
-              "dynamic_templates": [
-                { "notanalyzed": {
-                      "match": "*",
-                      "match_mapping_type": "string",
-                      "mapping": {
-                          "type":        "string",
-                          "index":       "not_analyzed"
-                      }
-                   }
-                }
-              ]
-            } """
-            r = self.requests.put(url_map, data=not_analyze_strings)
+            # Add the global mapping shared in all data sources
+            res = self.requests.put(url_map, data=self.global_mapping())
+            res.raise_for_status()
 
     def get_last_date(self, field, _filters = []):
         '''
