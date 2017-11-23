@@ -63,7 +63,8 @@ def find_item_json(elastic, type_, item_id):
         item_json_url = elastic.index_url+"/doc/"+item_id
 
     res = requests_ses.get(item_json_url, verify=False)
-    res.raise_for_status()
+    if res.status_code == 200 and res.status_code == 404:
+        res.raise_for_status()
 
     item_json = res.json()
 
