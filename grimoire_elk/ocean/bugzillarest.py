@@ -23,7 +23,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-'''Gerrit Ocean feeder'''
+'''BugzillaREST Ocean feeder'''
 
 from .elastic import ElasticOcean
 
@@ -32,13 +32,18 @@ class BugzillaRESTOcean(ElasticOcean):
     def _fix_item(self, item):
         bug_id = str(item["data"]["id"])
         item["ocean-unique-id"] = bug_id+"_"+item['origin']
+
+        # Remove all custom fields to avoid the 1000 fields limit in ES
+        fields = list(item["data"].keys())
+        for field in fields:
+            if field.startswith("cf_"):
+                item["data"].pop(field)
         try:
             # Make this type always float (it changes between long and float)
             item["data"]['fields']["priority"]['subpriority'] = \
                 float(item["data"]['fields']["priority"]['subpriority'])
         except:
             pass
-
 
 
     def get_elastic_mappings(self):
