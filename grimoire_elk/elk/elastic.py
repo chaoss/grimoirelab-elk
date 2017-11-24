@@ -92,7 +92,8 @@ class ElasticSearch(object):
         """ Bulk PUT controlling unicode issues """
 
         try:
-            self.requests.put(url, data=bulk_json)
+            res = self.requests.put(url, data=bulk_json)
+            res.raise_for_status()
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
             logger.error("Encondig error ... converting bulk to iso-8859-1")
