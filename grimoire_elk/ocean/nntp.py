@@ -29,6 +29,14 @@ from .mbox import MBoxOcean
 class NNTPOcean(MBoxOcean):
     """NNTP Ocean feeder"""
 
+    def _fix_item(self, item):
+        # Remove all custom fields to avoid the 1000 fields limit in ES
+        fields = list(item["data"].keys())
+        for field in fields:
+            if field.lower().startswith("x-"):
+                item["data"].pop(field)
+
+
     @classmethod
     def get_perceval_params_from_url(cls, url):
         # In the url the NNTP server and the group are included
