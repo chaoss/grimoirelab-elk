@@ -29,3 +29,10 @@ class CratesOcean(ElasticOcean):
     """Confluence Ocean feeder"""
 
     pass
+
+    @classmethod
+    def get_perceval_params_from_url(cls, url):
+        # crates does not need any param
+        params = []
+
+        return params
