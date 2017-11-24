@@ -40,7 +40,8 @@ DEFAULT_LIMIT = 1000
 def get_params():
     parser = argparse.ArgumentParser(usage="usage:index_mapping [options]",
                                      description="Ensure correct mappings in GrimoireLab indexes")
-    parser.add_argument("-e", "--elastic-url", required=True, help="ElasticSearch URL")
+    parser.add_argument("-e", "--elastic-url", required=True, help="Elasticsearch URL for read/write")
+    parser.add_argument("--elastic_url-write", help="Elasticsearch URL for write")
     parser.add_argument("-i", "--in-index", required=True,
                         help="ElasticSearch index from which to import items")
     parser.add_argument("-o", "--out-index", required=True,
@@ -195,7 +196,7 @@ def fetch(elastic, limit=None):
     return
 
 
-def export_items(elastic_url, in_index, out_index, limit=None):
+def export_items(elastic_url, in_index, out_index, limit=None, elastic_url_out=None):
     """ Export items from in_index to out_index using the correct mapping """
 
     logging.info("Exporting items from %s/%s to %s", elastic_url, in_index, out_index)
@@ -216,7 +217,10 @@ def export_items(elastic_url, in_index, out_index, limit=None):
     elastic_in = ElasticSearch(elastic_url, in_index)
     # Create the correct mapping for the data sources detected from in_index
     ds_mapping = find_mapping(elastic_url, in_index)
-    elastic_out = ElasticSearch(elastic_url, out_index, mappings=ds_mapping)
+    if not elastic_url_out:
+        elastic_out = ElasticSearch(elastic_url, out_index, mappings=ds_mapping)
+    else:
+        elastic_out = ElasticSearch(elastic_url_out, out_index, mappings=ds_mapping)
     # Time to just copy from in_index to our_index
     uid_field = find_uuid(elastic_url, in_index)
     total = elastic_out.bulk_upload(fetch(elastic_in, limit), uid_field)
@@ -236,4 +240,4 @@ if __name__ == '__main__':
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
 
-    export_items(ARGS.elastic_url, ARGS.in_index, ARGS.out_index, ARGS.limit)
+    export_items(ARGS.elastic_url, ARGS.in_index, ARGS.out_index, ARGS.limit, ARGS.elastic_url_write)
