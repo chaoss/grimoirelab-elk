@@ -24,8 +24,9 @@
 #
 
 from .elastic import ElasticOcean
+from .mbox import MBoxOcean
 
-class NNTPOcean(ElasticOcean):
+class NNTPOcean(MBoxOcean):
     """NNTP Ocean feeder"""
 
     @classmethod

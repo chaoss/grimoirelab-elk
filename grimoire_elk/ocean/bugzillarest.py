@@ -32,22 +32,35 @@ class BugzillaRESTOcean(ElasticOcean):
     def _fix_item(self, item):
         bug_id = str(item["data"]["id"])
         item["ocean-unique-id"] = bug_id+"_"+item['origin']
+        try:
+            # Make this type always float (it changes between long and float)
+            item["data"]['fields']["priority"]['subpriority'] = \
+                float(item["data"]['fields']["priority"]['subpriority'])
+        except:
+            pass
+
+
 
     def get_elastic_mappings(self):
-        # data.comments.text
+        # data.comments.text inmense term
+        # data.history.changes.removed immense term
         mapping = '''
          {
             "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "comments": {
-                                "dynamic":false,
-                                "properties": {}
-                            }
+            "properties": {
+                "data": {
+                    "properties": {
+                        "comments": {
+                            "dynamic":false,
+                            "properties": {}
+                        },
+                        "history": {
+                            "dynamic":false,
+                            "properties": {}
                         }
                     }
                 }
+            }
         }
         '''
 
