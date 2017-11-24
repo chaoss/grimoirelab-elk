@@ -63,18 +63,6 @@ class CratesEnrich(Enrich):
 
         return identities
 
-    def get_project_repository(self, eitem):
-        return str(eitem['space'])
-
-    # def get_users_data(self, item):
-    #     """ If user fields are inside the global item dict """
-    #     if 'data' in item:
-    #         users_data = item['data']['version']
-    #     else:
-    #         # the item is directly the data (kitsune answer)
-    #         users_data = item
-    #     return users_data
-
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
 
