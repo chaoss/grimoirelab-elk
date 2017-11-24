@@ -33,6 +33,7 @@ from urllib.parse import quote_plus
 import requests
 
 from grimoire_elk.elk.elastic import ElasticSearch
+from grimoire_elk.elastic_items import ElasticItems
 from grimoire_elk.utils import get_connectors, get_connector_name_from_cls_name
 
 DEFAULT_LIMIT = 1000
@@ -83,10 +84,10 @@ def find_uuid(es_url, index):
 
     return uid_field
 
-def find_mapping(es_url, index):
-    """ Find the mapping given an index """
+def find_perceval_backend(es_url, index):
 
-    mapping = None
+    backend = None
+
     # Backend connectors
     connectors = get_connectors()
 
@@ -101,12 +102,12 @@ def find_mapping(es_url, index):
         con_name = get_connector_name_from_cls_name(enrich_class)
         logging.debug("Getting the mapping for %s", con_name)
         klass = connectors[con_name][2]
-        mapping = klass().get_elastic_mappings()
+        backend = klass()
     elif 'perceval_version' in fields:
         logging.debug("Detected raw index for %s", first_item['backend_name'])
         con_name = get_connector_name_from_cls_name(first_item['backend_name'])
         klass = connectors[con_name][1]
-        mapping = klass(None).get_elastic_mappings()
+        backend = klass(None)
     elif 'retweet_count' in fields:
         con_name = 'twitter'
         logging.debug("Detected raw index for %s", con_name)
@@ -117,6 +118,19 @@ def find_mapping(es_url, index):
     else:
         logging.error("Can not find is the index if raw or enriched: %s", index)
         sys.exit(1)
+
+    return backend
+
+
+def find_mapping(es_url, index):
+    """ Find the mapping given an index """
+
+    mapping = None
+
+    backend = find_perceval_backend(es_url, index)
+
+    if backend:
+        mapping = backend.get_elastic_mappings()
 
     if mapping:
         logging.debug("MAPPING FOUND:\n%s", json.dumps(json.loads(mapping['items']), indent=True))
@@ -171,7 +185,7 @@ def get_elastic_items(elastic, elastic_scroll_id=None, limit=None):
 
 
 # Items generator
-def fetch(elastic, limit=None):
+def fetch(elastic, backend, limit=None):
     """ Fetch the items from raw or enriched index """
 
     logging.debug("Creating a elastic items generator.")
@@ -188,15 +202,19 @@ def fetch(elastic, limit=None):
             if not rjson["hits"]["hits"]:
                 break
             for hit in rjson["hits"]["hits"]:
-                eitem = hit['_source']
-                yield eitem
+                item = hit['_source']
+                try:
+                    backend._fix_item(item)
+                except:
+                    pass
+                yield item
         else:
             logging.error("No results found from %s", elastic.index_url)
             break
     return
 
 
-def export_items(elastic_url, in_index, out_index, limit=None, elastic_url_out=None):
+def export_items(elastic_url, in_index, out_index, elastic_url_out=None):
     """ Export items from in_index to out_index using the correct mapping """
 
     logging.info("Exporting items from %s/%s to %s", elastic_url, in_index, out_index)
@@ -221,9 +239,11 @@ def export_items(elastic_url, in_index, out_index, limit=None, elastic_url_out=N
         elastic_out = ElasticSearch(elastic_url, out_index, mappings=ds_mapping)
     else:
         elastic_out = ElasticSearch(elastic_url_out, out_index, mappings=ds_mapping)
+
     # Time to just copy from in_index to our_index
     uid_field = find_uuid(elastic_url, in_index)
-    total = elastic_out.bulk_upload(fetch(elastic_in, limit), uid_field)
+    backend = find_perceval_backend(elastic_url, in_index)
+    total = elastic_out.bulk_upload_sync(fetch(elastic_in, backend), uid_field)
 
     logging.info("Total items copied: %i", total)
 
@@ -240,4 +260,8 @@ if __name__ == '__main__':
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
 
-    export_items(ARGS.elastic_url, ARGS.in_index, ARGS.out_index, ARGS.limit, ARGS.elastic_url_write)
+    if ARGS.limit:
+        ElasticSearch.max_items_bulk = ARGS.limit
+        ElasticItems.scroll_size = ARGS.limit
+
+    export_items(ARGS.elastic_url, ARGS.in_index, ARGS.out_index, ARGS.elastic_url_write)
