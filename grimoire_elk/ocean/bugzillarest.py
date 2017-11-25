@@ -62,6 +62,12 @@ class BugzillaRESTOcean(ElasticOcean):
                         "history": {
                             "dynamic":false,
                             "properties": {}
+                        },
+                        "url": {
+                            "type": "string"
+                        },
+                        "version": {
+                            "type": "string"
                         }
                     }
                 }
