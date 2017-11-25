@@ -33,7 +33,6 @@ from urllib.parse import quote_plus
 import requests
 
 from grimoire_elk.elk.elastic import ElasticSearch
-from grimoire_elk.elastic_items import ElasticItems
 from grimoire_elk.utils import get_connectors, get_connector_name_from_cls_name
 
 DEFAULT_LIMIT = 1000
@@ -51,6 +50,7 @@ def get_params():
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
     parser.add_argument('-l', '--limit', dest='limit', default=DEFAULT_LIMIT, type=int,
                         help='Number of items to collect (default 100)')
+    parser.add_argument('--search-after', dest='search_after', action='store_true')
     args = parser.parse_args()
 
     return args
@@ -183,17 +183,62 @@ def get_elastic_items(elastic, elastic_scroll_id=None, limit=None):
 
     return rjson
 
+def get_elastic_items_search(elastic, search_after=None, size=None):
+    """ Get the items from the index using search after scrolling """
+
+    if not size:
+        size = DEFAULT_LIMIT
+
+    url = elastic.index_url + "/_search"
+
+    search_after_query = ''
+
+    if search_after:
+        search_after_query = ', "search_after": [%i] ' % search_after
+        logging.debug("Search after: %i", search_after)
+
+    query = """
+    {
+        "size": %i,
+        "query": {
+            "bool": {
+                "must": []
+            }
+        },
+        "sort": [
+            {"metadata__timestamp": "asc"}
+        ] %s
+
+    }
+    """ % (size, search_after_query)
+
+    # logging.debug("%s\n%s", url, json.dumps(json.loads(query), indent=4))
+    res = requests.post(url, data=query)
+
+    rjson = None
+    try:
+        rjson = res.json()
+    except:
+        logging.error("No JSON found in %s", res.text)
+        logging.error("No results found from %s", url)
+
+    return rjson
+
 
 # Items generator
-def fetch(elastic, backend, limit=None):
+def fetch(elastic, backend, limit=None, scroll=True):
     """ Fetch the items from raw or enriched index """
 
     logging.debug("Creating a elastic items generator.")
 
     elastic_scroll_id = None
+    search_after = None
 
     while True:
-        rjson = get_elastic_items(elastic, elastic_scroll_id, limit)
+        if scroll:
+            rjson = get_elastic_items(elastic, elastic_scroll_id, limit)
+        else:
+            rjson = get_elastic_items_search(elastic, search_after, limit)
 
         if rjson and "_scroll_id" in rjson:
             elastic_scroll_id = rjson["_scroll_id"]
@@ -203,6 +248,8 @@ def fetch(elastic, backend, limit=None):
                 break
             for hit in rjson["hits"]["hits"]:
                 item = hit['_source']
+                if 'sort' in hit:
+                    search_after = hit['sort'][0]
                 try:
                     backend._fix_item(item)
                 except:
@@ -211,11 +258,16 @@ def fetch(elastic, backend, limit=None):
         else:
             logging.error("No results found from %s", elastic.index_url)
             break
+
     return
 
 
-def export_items(elastic_url, in_index, out_index, elastic_url_out=None):
+def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
+                 search_after=False, limit=None):
     """ Export items from in_index to out_index using the correct mapping """
+
+    if not limit:
+        limit = DEFAULT_LIMIT
 
     logging.info("Exporting items from %s/%s to %s", elastic_url, in_index, out_index)
 
@@ -243,7 +295,10 @@ def export_items(elastic_url, in_index, out_index, elastic_url_out=None):
     # Time to just copy from in_index to our_index
     uid_field = find_uuid(elastic_url, in_index)
     backend = find_perceval_backend(elastic_url, in_index)
-    total = elastic_out.bulk_upload_sync(fetch(elastic_in, backend), uid_field)
+    if search_after:
+        total = elastic_out.bulk_upload(fetch(elastic_in, backend, limit, scroll=False), uid_field)
+    else:
+        total = elastic_out.bulk_upload(fetch(elastic_in, backend, limit), uid_field)
 
     logging.info("Total items copied: %i", total)
 
@@ -262,6 +317,6 @@ if __name__ == '__main__':
 
     if ARGS.limit:
         ElasticSearch.max_items_bulk = ARGS.limit
-        ElasticItems.scroll_size = ARGS.limit
 
-    export_items(ARGS.elastic_url, ARGS.in_index, ARGS.out_index, ARGS.elastic_url_write)
+    export_items(ARGS.elastic_url, ARGS.in_index, ARGS.out_index,
+                 ARGS.elastic_url_write, ARGS.search_after, ARGS.limit)
