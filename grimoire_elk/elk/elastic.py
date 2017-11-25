@@ -165,6 +165,8 @@ class ElasticSearch(object):
                 logger.debug("Probably %i item updates" % (total-total_search))
                 break
 
+        return new_items
+
     @classmethod
     def global_mapping(cls):
         """ Return the global mapping to be used always """
