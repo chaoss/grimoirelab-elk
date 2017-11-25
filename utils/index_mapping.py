@@ -50,7 +50,11 @@ def get_params():
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
     parser.add_argument('-l', '--limit', dest='limit', default=DEFAULT_LIMIT, type=int,
                         help='Number of items to collect (default 100)')
-    parser.add_argument('--search-after', dest='search_after', action='store_true')
+    parser.add_argument('--search-after', dest='search_after', action='store_true',
+                        help='Use search-after for scrolling the index')
+    parser.add_argument('--search-after-init', dest='search_after_value',
+                        type=int,
+                        help='Initial value for starting the search-after')
     args = parser.parse_args()
 
     return args
@@ -226,13 +230,13 @@ def get_elastic_items_search(elastic, search_after=None, size=None):
 
 
 # Items generator
-def fetch(elastic, backend, limit=None, scroll=True):
+def fetch(elastic, backend, limit=None, search_after_value=None, scroll=True):
     """ Fetch the items from raw or enriched index """
 
     logging.debug("Creating a elastic items generator.")
 
     elastic_scroll_id = None
-    search_after = None
+    search_after = search_after_value
 
     while True:
         if scroll:
@@ -263,7 +267,7 @@ def fetch(elastic, backend, limit=None, scroll=True):
 
 
 def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
-                 search_after=False, limit=None):
+                 search_after=False, search_after_value=None, limit=None):
     """ Export items from in_index to out_index using the correct mapping """
 
     if not limit:
@@ -296,7 +300,8 @@ def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
     uid_field = find_uuid(elastic_url, in_index)
     backend = find_perceval_backend(elastic_url, in_index)
     if search_after:
-        total = elastic_out.bulk_upload(fetch(elastic_in, backend, limit, scroll=False), uid_field)
+        total = elastic_out.bulk_upload(fetch(elastic_in, backend, limit,
+                                        search_after_value, scroll=False), uid_field)
     else:
         total = elastic_out.bulk_upload(fetch(elastic_in, backend, limit), uid_field)
 
@@ -319,4 +324,5 @@ if __name__ == '__main__':
         ElasticSearch.max_items_bulk = ARGS.limit
 
     export_items(ARGS.elastic_url, ARGS.in_index, ARGS.out_index,
-                 ARGS.elastic_url_write, ARGS.search_after, ARGS.limit)
+                 ARGS.elastic_url_write, ARGS.search_after, ARGS.search_after_value,
+                 ARGS.limit)
