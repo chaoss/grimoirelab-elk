@@ -53,7 +53,7 @@ def get_params():
     parser.add_argument('--search-after', dest='search_after', action='store_true',
                         help='Use search-after for scrolling the index')
     parser.add_argument('--search-after-init', dest='search_after_value',
-                        type=int,
+                        nargs='+',
                         help='Initial value for starting the search-after')
     parser.add_argument('-c', '--copy', dest='copy', action='store_true',
                         help='Copy the indexes without modifying mappings')
@@ -223,8 +223,9 @@ def get_elastic_items_search(elastic, search_after=None, size=None):
     search_after_query = ''
 
     if search_after:
-        search_after_query = ', "search_after": [%i] ' % search_after
-        logging.debug("Search after: %i", search_after)
+        logging.debug("Search after: %s", search_after)
+        # timestamp uuid
+        search_after_query = ', "search_after": [%i, "%s"] ' % (search_after[0], search_after[1])
 
     query = """
     {
@@ -235,7 +236,8 @@ def get_elastic_items_search(elastic, search_after=None, size=None):
             }
         },
         "sort": [
-            {"metadata__timestamp": "asc"}
+            {"metadata__timestamp": "asc"},
+            {"uuid": "asc"}
         ] %s
 
     }
@@ -278,7 +280,7 @@ def fetch(elastic, backend, limit=None, search_after_value=None, scroll=True):
             for hit in rjson["hits"]["hits"]:
                 item = hit['_source']
                 if 'sort' in hit:
-                    search_after = hit['sort'][0]
+                    search_after = hit['sort']
                 try:
                     backend._fix_item(item)
                 except:
@@ -298,6 +300,11 @@ def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
 
     if not limit:
         limit = DEFAULT_LIMIT
+
+    if search_after_value:
+        search_after_value_timestamp = int(search_after_value[0])
+        search_after_value_uuid = search_after_value[1]
+        search_after_value = [search_after_value_timestamp, search_after_value_uuid]
 
     logging.info("Exporting items from %s/%s to %s", elastic_url, in_index, out_index)
 
@@ -332,7 +339,7 @@ def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
     backend = find_perceval_backend(elastic_url, in_index)
     if search_after:
         total = elastic_out.bulk_upload_sync(fetch(elastic_in, backend, limit,
-                                             search_after_value, scroll=False), uid_field)
+                                                   search_after_value, scroll=False), uid_field)
     else:
         total = elastic_out.bulk_upload_sync(fetch(elastic_in, backend, limit), uid_field)
 
