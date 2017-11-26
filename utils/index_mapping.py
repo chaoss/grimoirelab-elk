@@ -319,10 +319,8 @@ def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
         # Create the correct mapping for the data sources detected from in_index
         ds_mapping = find_mapping(elastic_url, in_index)
     else:
-        logging.debug('Using the remote mapping')
+        logging.debug('Using the input index mapping')
         ds_mapping = extract_mapping(elastic_url, in_index)
-
-    print(json.dumps(ds_mapping, indent=True))
 
     if not elastic_url_out:
         elastic_out = ElasticSearch(elastic_url, out_index, mappings=ds_mapping)
@@ -333,10 +331,10 @@ def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
     uid_field = find_uuid(elastic_url, in_index)
     backend = find_perceval_backend(elastic_url, in_index)
     if search_after:
-        total = elastic_out.bulk_upload(fetch(elastic_in, backend, limit,
-                                        search_after_value, scroll=False), uid_field)
+        total = elastic_out.bulk_upload_sync(fetch(elastic_in, backend, limit,
+                                             search_after_value, scroll=False), uid_field)
     else:
-        total = elastic_out.bulk_upload(fetch(elastic_in, backend, limit), uid_field)
+        total = elastic_out.bulk_upload_sync(fetch(elastic_in, backend, limit), uid_field)
 
     logging.info("Total items copied: %i", total)
 
