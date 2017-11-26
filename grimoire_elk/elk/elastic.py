@@ -135,37 +135,59 @@ class ElasticSearch(object):
         return new_items
 
     def bulk_upload_sync(self, items, field_id, sync=True):
-        ''' Upload in controlled packs items to ES using bulk API
+        ''' Upload items in packs to ES using bulk API
             and wait until the items appears in searches '''
 
         # After a bulk upload the searches are not refreshed real time
         # This method waits until the upload is visible in searches
 
-        r = self.requests.get(self.index_url+'/_search?size=1')
-        if 'hits' not in r.json():
-            logging.error('Can get the number of already existing items in ES: %s', r.json())
-        total = r.json()['hits']['total']  # Already existing items
-        new_items = self.bulk_upload(items, field_id)
-        if not sync:
-            return
-        total += new_items
+        def wait_index(total_expected):
+            """ Wait until ES has indexed all items """
+            # Wait until in searches all items are returned
+            # In incremental update, some items are updates not additions so
+            # this check will fail. Exist ok in the timeout for this case.
 
-        # Wait until in searches all items are returned
-        # In incremental update, some items are updates not additions so
-        # this check will fail. Exist ok in the timeout for this case.
+            total_search = 0  # total items found with search
+            search_start = datetime.now()
+            while total_search != total_expected:
+                sleep(0.1)
+                res = self.requests.get(self.index_url+'/_search?size=1')
+                res.raise_for_status()
+                total_search = res.json()['hits']['total']
+                if (datetime.now()-search_start).total_seconds() > self.wait_bulk_seconds:
+                    logger.debug("Bulk data does not appear as NEW after %is",
+                                 self.wait_bulk_seconds)
+                    logger.debug("Probably %i item updates", total-total_search)
+                    break
 
-        total_search = 0  # total items found with search
-        search_start = datetime.now()
-        while total_search != total:
-            sleep(0.1)
-            r = self.requests.get(self.index_url+'/_search?size=1')
-            total_search = r.json()['hits']['total']
-            if (datetime.now()-search_start).total_seconds() > self.wait_bulk_seconds:
-                logger.debug("Bulk data does not appear as NEW after %is" % (self.wait_bulk_seconds))
-                logger.debug("Probably %i item updates" % (total-total_search))
-                break
 
-        return new_items
+        # Get the initial number ot items in the index
+        res = self.requests.get(self.index_url+'/_search?size=1')
+        res.raise_for_status()
+        if 'hits' not in res.json():
+            raise RuntimeError('Can get the number of already existing items in ES: %s', res.text)
+        total = res.json()['hits']['total']
+
+        max_items = self.max_items_bulk
+        # After each pack we wait until all pack is indexed
+        items_pack = []
+
+        for item in items:
+            # We should pack the items before sending them
+            # After each pack we wait that is fully indexed to continue
+
+            if len(items_pack) >= max_items:
+                logging.debug("Pack ready to be sent to bulk API")
+                total += self.bulk_upload(items_pack, field_id)
+                items_pack = []
+                if sync:
+                    wait_index(total)
+
+            items_pack.append(item)
+
+        total += self.bulk_upload(items_pack, field_id)
+
+        return total
 
     @classmethod
     def global_mapping(cls):
