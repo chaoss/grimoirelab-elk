@@ -223,7 +223,7 @@ def get_elastic_items_search(elastic, search_after=None, size=None):
     search_after_query = ''
 
     if search_after:
-        logging.debug("Search after: %i", search_after)
+        logging.debug("Search after: %s", search_after)
         # timestamp uuid
         search_after_query = ', "search_after": [%i, "%s"] ' % (search_after[0], search_after[1])
 
