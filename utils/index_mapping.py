@@ -55,6 +55,8 @@ def get_params():
     parser.add_argument('--search-after-init', dest='search_after_value',
                         type=int,
                         help='Initial value for starting the search-after')
+    parser.add_argument('-c', '--copy', dest='copy', action='store_true',
+                        help='Copy the indexes without modifying mappings')
     args = parser.parse_args()
 
     return args
@@ -187,6 +189,29 @@ def get_elastic_items(elastic, elastic_scroll_id=None, limit=None):
 
     return rjson
 
+def extract_mapping(elastic_url, in_index):
+
+    mappings = None
+
+    url = elastic_url + "/_mapping"
+
+    res = requests.get(url)
+    res.raise_for_status()
+
+    rjson = None
+    try:
+        rjson = res.json()
+    except:
+        logging.error("No JSON found in %s", res.text)
+        logging.error("No results found from %s", url)
+
+    mappings = rjson[in_index]['mappings']
+
+    mappings['items'] = json.dumps(mappings['items'])
+
+    return mappings
+
+
 def get_elastic_items_search(elastic, search_after=None, size=None):
     """ Get the items from the index using search after scrolling """
 
@@ -267,7 +292,8 @@ def fetch(elastic, backend, limit=None, search_after_value=None, scroll=True):
 
 
 def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
-                 search_after=False, search_after_value=None, limit=None):
+                 search_after=False, search_after_value=None, limit=None,
+                 copy=False):
     """ Export items from in_index to out_index using the correct mapping """
 
     if not limit:
@@ -289,8 +315,15 @@ def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
 
     # Time to upload the items with the correct mapping
     elastic_in = ElasticSearch(elastic_url, in_index)
-    # Create the correct mapping for the data sources detected from in_index
-    ds_mapping = find_mapping(elastic_url, in_index)
+    if not copy:
+        # Create the correct mapping for the data sources detected from in_index
+        ds_mapping = find_mapping(elastic_url, in_index)
+    else:
+        logging.debug('Using the remote mapping')
+        ds_mapping = extract_mapping(elastic_url, in_index)
+
+    print(json.dumps(ds_mapping, indent=True))
+
     if not elastic_url_out:
         elastic_out = ElasticSearch(elastic_url, out_index, mappings=ds_mapping)
     else:
@@ -325,4 +358,4 @@ if __name__ == '__main__':
 
     export_items(ARGS.elastic_url, ARGS.in_index, ARGS.out_index,
                  ARGS.elastic_url_write, ARGS.search_after, ARGS.search_after_value,
-                 ARGS.limit)
+                 ARGS.limit, ARGS.copy)
