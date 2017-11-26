@@ -24,9 +24,18 @@
 #
 
 from .elastic import ElasticOcean
+from .mbox import MBoxOcean
 
-class NNTPOcean(ElasticOcean):
+class NNTPOcean(MBoxOcean):
     """NNTP Ocean feeder"""
+
+    def _fix_item(self, item):
+        # Remove all custom fields to avoid the 1000 fields limit in ES
+        fields = list(item["data"].keys())
+        for field in fields:
+            if field.lower().startswith("x-"):
+                item["data"].pop(field)
+
 
     @classmethod
     def get_perceval_params_from_url(cls, url):

@@ -40,7 +40,8 @@ DEFAULT_LIMIT = 1000
 def get_params():
     parser = argparse.ArgumentParser(usage="usage:index_mapping [options]",
                                      description="Ensure correct mappings in GrimoireLab indexes")
-    parser.add_argument("-e", "--elastic-url", required=True, help="ElasticSearch URL")
+    parser.add_argument("-e", "--elastic-url", required=True, help="Elasticsearch URL for read/write")
+    parser.add_argument("--elastic_url-write", help="Elasticsearch URL for write")
     parser.add_argument("-i", "--in-index", required=True,
                         help="ElasticSearch index from which to import items")
     parser.add_argument("-o", "--out-index", required=True,
@@ -49,6 +50,13 @@ def get_params():
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
     parser.add_argument('-l', '--limit', dest='limit', default=DEFAULT_LIMIT, type=int,
                         help='Number of items to collect (default 100)')
+    parser.add_argument('--search-after', dest='search_after', action='store_true',
+                        help='Use search-after for scrolling the index')
+    parser.add_argument('--search-after-init', dest='search_after_value',
+                        nargs='+',
+                        help='Initial value for starting the search-after')
+    parser.add_argument('-c', '--copy', dest='copy', action='store_true',
+                        help='Copy the indexes without modifying mappings')
     args = parser.parse_args()
 
     return args
@@ -82,10 +90,10 @@ def find_uuid(es_url, index):
 
     return uid_field
 
-def find_mapping(es_url, index):
-    """ Find the mapping given an index """
+def find_perceval_backend(es_url, index):
 
-    mapping = None
+    backend = None
+
     # Backend connectors
     connectors = get_connectors()
 
@@ -100,12 +108,12 @@ def find_mapping(es_url, index):
         con_name = get_connector_name_from_cls_name(enrich_class)
         logging.debug("Getting the mapping for %s", con_name)
         klass = connectors[con_name][2]
-        mapping = klass().get_elastic_mappings()
+        backend = klass()
     elif 'perceval_version' in fields:
         logging.debug("Detected raw index for %s", first_item['backend_name'])
         con_name = get_connector_name_from_cls_name(first_item['backend_name'])
         klass = connectors[con_name][1]
-        mapping = klass(None).get_elastic_mappings()
+        backend = klass(None)
     elif 'retweet_count' in fields:
         con_name = 'twitter'
         logging.debug("Detected raw index for %s", con_name)
@@ -116,6 +124,19 @@ def find_mapping(es_url, index):
     else:
         logging.error("Can not find is the index if raw or enriched: %s", index)
         sys.exit(1)
+
+    return backend
+
+
+def find_mapping(es_url, index):
+    """ Find the mapping given an index """
+
+    mapping = None
+
+    backend = find_perceval_backend(es_url, index)
+
+    if backend:
+        mapping = backend.get_elastic_mappings()
 
     if mapping:
         logging.debug("MAPPING FOUND:\n%s", json.dumps(json.loads(mapping['items']), indent=True))
@@ -168,17 +189,87 @@ def get_elastic_items(elastic, elastic_scroll_id=None, limit=None):
 
     return rjson
 
+def extract_mapping(elastic_url, in_index):
+
+    mappings = None
+
+    url = elastic_url + "/_mapping"
+
+    res = requests.get(url)
+    res.raise_for_status()
+
+    rjson = None
+    try:
+        rjson = res.json()
+    except:
+        logging.error("No JSON found in %s", res.text)
+        logging.error("No results found from %s", url)
+
+    mappings = rjson[in_index]['mappings']
+
+    mappings['items'] = json.dumps(mappings['items'])
+
+    return mappings
+
+
+def get_elastic_items_search(elastic, search_after=None, size=None):
+    """ Get the items from the index using search after scrolling """
+
+    if not size:
+        size = DEFAULT_LIMIT
+
+    url = elastic.index_url + "/_search"
+
+    search_after_query = ''
+
+    if search_after:
+        logging.debug("Search after: %s", search_after)
+        # timestamp uuid
+        search_after_query = ', "search_after": [%i, "%s"] ' % (search_after[0], search_after[1])
+
+    query = """
+    {
+        "size": %i,
+        "query": {
+            "bool": {
+                "must": []
+            }
+        },
+        "sort": [
+            {"metadata__timestamp": "asc"},
+            {"uuid": "asc"}
+        ] %s
+
+    }
+    """ % (size, search_after_query)
+
+    # logging.debug("%s\n%s", url, json.dumps(json.loads(query), indent=4))
+    res = requests.post(url, data=query)
+
+    rjson = None
+    try:
+        rjson = res.json()
+    except:
+        logging.error("No JSON found in %s", res.text)
+        logging.error("No results found from %s", url)
+
+    return rjson
+
 
 # Items generator
-def fetch(elastic, limit=None):
+def fetch(elastic, backend, limit=None, search_after_value=None, scroll=True):
     """ Fetch the items from raw or enriched index """
 
     logging.debug("Creating a elastic items generator.")
 
     elastic_scroll_id = None
+    search_after = search_after_value
 
     while True:
-        rjson = get_elastic_items(elastic, elastic_scroll_id, limit)
+        if scroll:
+            rjson = get_elastic_items(elastic, elastic_scroll_id, limit)
+        else:
+            rjson = get_elastic_items_search(elastic, search_after, limit)
 
         if rjson and "_scroll_id" in rjson:
             elastic_scroll_id = rjson["_scroll_id"]
@@ -187,16 +278,33 @@ def fetch(elastic, limit=None):
             if not rjson["hits"]["hits"]:
                 break
             for hit in rjson["hits"]["hits"]:
-                eitem = hit['_source']
-                yield eitem
+                item = hit['_source']
+                if 'sort' in hit:
+                    search_after = hit['sort']
+                try:
+                    backend._fix_item(item)
+                except:
+                    pass
+                yield item
         else:
             logging.error("No results found from %s", elastic.index_url)
             break
+
     return
 
 
-def export_items(elastic_url, in_index, out_index, limit=None):
+def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
+                 search_after=False, search_after_value=None, limit=None,
+                 copy=False):
     """ Export items from in_index to out_index using the correct mapping """
+
+    if not limit:
+        limit = DEFAULT_LIMIT
+
+    if search_after_value:
+        search_after_value_timestamp = int(search_after_value[0])
+        search_after_value_uuid = search_after_value[1]
+        search_after_value = [search_after_value_timestamp, search_after_value_uuid]
 
     logging.info("Exporting items from %s/%s to %s", elastic_url, in_index, out_index)
 
@@ -214,12 +322,26 @@ def export_items(elastic_url, in_index, out_index, limit=None):
 
     # Time to upload the items with the correct mapping
     elastic_in = ElasticSearch(elastic_url, in_index)
-    # Create the correct mapping for the data sources detected from in_index
-    ds_mapping = find_mapping(elastic_url, in_index)
-    elastic_out = ElasticSearch(elastic_url, out_index, mappings=ds_mapping)
+    if not copy:
+        # Create the correct mapping for the data sources detected from in_index
+        ds_mapping = find_mapping(elastic_url, in_index)
+    else:
+        logging.debug('Using the input index mapping')
+        ds_mapping = extract_mapping(elastic_url, in_index)
+
+    if not elastic_url_out:
+        elastic_out = ElasticSearch(elastic_url, out_index, mappings=ds_mapping)
+    else:
+        elastic_out = ElasticSearch(elastic_url_out, out_index, mappings=ds_mapping)
+
     # Time to just copy from in_index to our_index
     uid_field = find_uuid(elastic_url, in_index)
-    total = elastic_out.bulk_upload(fetch(elastic_in, limit), uid_field)
+    backend = find_perceval_backend(elastic_url, in_index)
+    if search_after:
+        total = elastic_out.bulk_upload_sync(fetch(elastic_in, backend, limit,
+                                                   search_after_value, scroll=False), uid_field)
+    else:
+        total = elastic_out.bulk_upload_sync(fetch(elastic_in, backend, limit), uid_field)
 
     logging.info("Total items copied: %i", total)
 
@@ -236,4 +358,9 @@ if __name__ == '__main__':
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
 
-    export_items(ARGS.elastic_url, ARGS.in_index, ARGS.out_index, ARGS.limit)
+    if ARGS.limit:
+        ElasticSearch.max_items_bulk = ARGS.limit
+
+    export_items(ARGS.elastic_url, ARGS.in_index, ARGS.out_index,
+                 ARGS.elastic_url_write, ARGS.search_after, ARGS.search_after_value,
+                 ARGS.limit, ARGS.copy)
