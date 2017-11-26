@@ -147,7 +147,6 @@ class ElasticSearch(object):
             res.raise_for_status()
             return res.json()['hits']['total']
 
-
         def wait_index(total_expected):
             """ Wait until ES has indexed all items """
             # Wait until in searches all items are returned
@@ -181,6 +180,7 @@ class ElasticSearch(object):
                 items_pack = []
                 if sync:
                     wait_index(total_items+max_items)
+                logger.debug('Total items already uploaded %i', total)
 
             items_pack.append(item)
 
