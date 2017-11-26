@@ -110,6 +110,7 @@ class ElasticSearch(object):
         url = self.index_url+'/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)" % (url, self.max_items_bulk))
+        task_init = time()
 
         for item in items:
             if current >= self.max_items_bulk:
@@ -125,7 +126,6 @@ class ElasticSearch(object):
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
             bulk_json += data_json +"\n"  # Bulk document
             current += 1
-        task_init = time()
         self._safe_put_bulk(url, bulk_json)
         new_items += current
         json_size = sys.getsizeof(bulk_json) / (1024*1024)
@@ -141,6 +141,13 @@ class ElasticSearch(object):
         # After a bulk upload the searches are not refreshed real time
         # This method waits until the upload is visible in searches
 
+        def current_items():
+            """ Current number of items in the index """
+            res = self.requests.get(self.index_url+'/_search?size=1')
+            res.raise_for_status()
+            return res.json()['hits']['total']
+
+
         def wait_index(total_expected):
             """ Wait until ES has indexed all items """
             # Wait until in searches all items are returned
@@ -151,23 +158,15 @@ class ElasticSearch(object):
             search_start = datetime.now()
             while total_search != total_expected:
                 sleep(0.1)
-                res = self.requests.get(self.index_url+'/_search?size=1')
-                res.raise_for_status()
-                total_search = res.json()['hits']['total']
+                total_search = current_items()
                 if (datetime.now()-search_start).total_seconds() > self.wait_bulk_seconds:
                     logger.debug("Bulk data does not appear as NEW after %is",
                                  self.wait_bulk_seconds)
-                    logger.debug("Probably %i item updates", total-total_search)
+                    logger.debug("Probably %i item updates", total_expected-total_search)
                     break
 
 
-        # Get the initial number ot items in the index
-        res = self.requests.get(self.index_url+'/_search?size=1')
-        res.raise_for_status()
-        if 'hits' not in res.json():
-            raise RuntimeError('Can get the number of already existing items in ES: %s', res.text)
-        total = res.json()['hits']['total']
-
+        total = 0
         max_items = self.max_items_bulk
         # After each pack we wait until all pack is indexed
         items_pack = []
@@ -177,11 +176,11 @@ class ElasticSearch(object):
             # After each pack we wait that is fully indexed to continue
 
             if len(items_pack) >= max_items:
-                logging.debug("Pack ready to be sent to bulk API")
+                total_items = current_items()
                 total += self.bulk_upload(items_pack, field_id)
                 items_pack = []
                 if sync:
-                    wait_index(total)
+                    wait_index(total_items+max_items)
 
             items_pack.append(item)
 
