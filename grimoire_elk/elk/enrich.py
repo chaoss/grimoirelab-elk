@@ -640,6 +640,10 @@ class Enrich(ElasticItems):
             # No data to get a SH identity. Return an empty one.
             return eitem_sh
 
+        # If the identity does not exists return and empty identity
+        if not eitem_sh[rol+"_uuid"]:
+            return eitem_sh
+
         # Get the SH profile to use first this data
         profile = self.get_profile_sh(eitem_sh[rol+"_uuid"])
 
