@@ -37,18 +37,27 @@ class PhabricatorOcean(ElasticOcean):
     def get_elastic_mappings(self):
         # This field data.transaction has string arrays and dicts arrays
         mapping = '''
-         {
+        {
             "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "transactions": {
-                                "dynamic":false,
-                                "properties": {}
-                            }
-                        }
-                    }
-                }
+            "properties": {
+                "data": {
+                    "properties": {
+                        "transactions": {
+                            "dynamic":false,
+                            "properties": {}
+                        },
+                        "fields": {
+                            "properties": {
+                                "priority" : {
+                                    "properties": {
+                                        "subpriority" : {"type": "float"}
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 }
+             }
         }
         '''
 
