@@ -135,8 +135,8 @@ class ElasticSearch(object):
         return new_items
 
     def bulk_upload_sync(self, items, field_id, sync=True):
-        ''' Upload items in packs to ES using bulk API
-            and wait until the items appears in searches '''
+        """ Upload items in packs to ES using bulk API
+            and wait until the items appears in searches """
 
         # After a bulk upload the searches are not refreshed real time
         # This method waits until the upload is visible in searches
@@ -148,10 +148,11 @@ class ElasticSearch(object):
             return res.json()['hits']['total']
 
         def wait_index(total_expected):
-            """ Wait until ES has indexed all items """
-            # Wait until in searches all items are returned
-            # In incremental update, some items are updates not additions so
-            # this check will fail. Exist ok in the timeout for this case.
+            """ Wait until ES has indexed all items
+
+            In incremental update, some items are updates not additions so
+            this check will fail. Log and return with timeout in this case.
+            """
 
             total_search = 0  # total items found with search
             search_start = datetime.now()
