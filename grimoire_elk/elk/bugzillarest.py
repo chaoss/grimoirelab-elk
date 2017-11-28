@@ -23,10 +23,11 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from time import time
-from dateutil import parser
-import json
 import logging
+
+from datetime import datetime
+
+from dateutil import parser
 
 from .enrich import Enrich, metadata, DEFAULT_PROJECT
 
@@ -37,6 +38,8 @@ logger = logging.getLogger(__name__)
 
 
 class BugzillaRESTEnrich(Enrich):
+
+    roles = ['assigned_to_detail', 'qa_contact_detail', 'creator_detail']
 
     def get_field_author(self):
         return 'creator_detail'
@@ -51,12 +54,9 @@ class BugzillaRESTEnrich(Enrich):
         """ Return the identities from an item """
         identities = []
 
-        identity_fields = ['assigned_to_detail', 'qa_contact_detail', 'creator_detail']
-
-        for f in identity_fields:
-            if f in item['data']:
-                user = self.get_sh_identity(item['data'][f])
-            identities.append(user)
+        for rol in self.roles:
+            if rol in item['data']:
+                identities.append(self.get_sh_identity(item["data"][rol]))
         return identities
 
     def get_sh_identity(self, item, identity_field=None):
@@ -132,6 +132,8 @@ class BugzillaRESTEnrich(Enrich):
         eitem["status"]  = issue['status']
         if "summary" in issue:
             eitem["summary"]  = issue['summary']
+            # Share the name field with bugzilla and share the panel
+            eitem["main_description"] = eitem["summary"]
         # Component and product
         eitem["component"] = issue['component']
         eitem["product"]  = issue['product']
@@ -153,11 +155,23 @@ class BugzillaRESTEnrich(Enrich):
         eitem['url'] = item['origin'] + "/show_bug.cgi?id=" + str(issue['id'])
         eitem['time_to_last_update_days'] = \
             get_time_diff_days(eitem['creation_ts'], eitem['delta_ts'])
+        eitem['timeopen_days'] = \
+            get_time_diff_days(eitem['creation_ts'], datetime.utcnow())
+
+        eitem['changes'] = 0
+        for history in issue['history']:
+            if 'changes' in history:
+                eitem['changes'] += len(history['changes'])
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, self.roles))
+            # To reuse the name of the fields in Bugzilla and share the panel
+            eitem['assigned_to_org_name'] = eitem['assigned_to_detail_org_name']
+            eitem['assigned_to_uuid'] = eitem['assigned_to_detail_uuid']
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
+
+        eitem.update(self.get_grimoire_fields(issue['creation_time'],"bugrest"))
 
         return eitem

@@ -128,7 +128,6 @@ class BugzillaEnrich(Enrich):
         eitem['severity'] = item['data']['bug_severity'][0]['__text__']
         eitem['op_sys'] = item['data']['op_sys'][0]['__text__']
         eitem['product'] = item['data']['product'][0]['__text__']
-        eitem['project_name'] = item['data']['product'][0]['__text__']
         eitem['component'] = item['data']['component'][0]['__text__']
         eitem['platform'] = item['data']['rep_platform'][0]['__text__']
         if '__text__' in item['data']['resolution'][0]:
