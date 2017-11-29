@@ -28,14 +28,13 @@ import json
 import logging
 import sys
 
-from urllib.parse import quote_plus
-
 import requests
 
 from grimoire_elk.elk.elastic import ElasticSearch
 from grimoire_elk.utils import get_connectors, get_connector_name_from_cls_name
 
 DEFAULT_LIMIT = 1000
+
 
 def get_params():
     parser = argparse.ArgumentParser(usage="usage:index_mapping [options]",
@@ -45,7 +44,7 @@ def get_params():
     parser.add_argument("-i", "--in-index", required=True,
                         help="ElasticSearch index from which to import items")
     parser.add_argument("-o", "--out-index", required=True,
-                        help="ElasticSearch index in which to export the " + \
+                        help="ElasticSearch index in which to export the " +
                              "items using a GrimoireLab mapping")
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
     parser.add_argument('-l', '--limit', dest='limit', default=DEFAULT_LIMIT, type=int,
@@ -60,6 +59,7 @@ def get_params():
     args = parser.parse_args()
 
     return args
+
 
 def find_uuid(es_url, index):
     """ Find the unique identifier field for a given index """
@@ -89,6 +89,7 @@ def find_uuid(es_url, index):
         sys.exit(1)
 
     return uid_field
+
 
 def find_perceval_backend(es_url, index):
 
@@ -142,6 +143,7 @@ def find_mapping(es_url, index):
         logging.debug("MAPPING FOUND:\n%s", json.dumps(json.loads(mapping['items']), indent=True))
     return mapping
 
+
 def get_elastic_items(elastic, elastic_scroll_id=None, limit=None):
     """ Get the items from the index """
 
@@ -162,9 +164,9 @@ def get_elastic_items(elastic, elastic_scroll_id=None, limit=None):
         url = elastic.url
         url += "/_search/scroll"
         scroll_data = {
-            "scroll" : max_process_items_pack_time,
-            "scroll_id" : elastic_scroll_id
-            }
+            "scroll": max_process_items_pack_time,
+            "scroll_id": elastic_scroll_id
+        }
         res = requests.post(url, data=json.dumps(scroll_data))
     else:
         query = """
@@ -183,11 +185,12 @@ def get_elastic_items(elastic, elastic_scroll_id=None, limit=None):
     rjson = None
     try:
         rjson = res.json()
-    except:
+    except Exception:
         logging.error("No JSON found in %s", res.text)
         logging.error("No results found from %s", url)
 
     return rjson
+
 
 def extract_mapping(elastic_url, in_index):
 
@@ -201,7 +204,7 @@ def extract_mapping(elastic_url, in_index):
     rjson = None
     try:
         rjson = res.json()
-    except:
+    except Exception:
         logging.error("No JSON found in %s", res.text)
         logging.error("No results found from %s", url)
 
@@ -249,7 +252,7 @@ def get_elastic_items_search(elastic, search_after=None, size=None):
     rjson = None
     try:
         rjson = res.json()
-    except:
+    except Exception:
         logging.error("No JSON found in %s", res.text)
         logging.error("No results found from %s", url)
 
@@ -283,7 +286,7 @@ def fetch(elastic, backend, limit=None, search_after_value=None, scroll=True):
                     search_after = hit['sort']
                 try:
                     backend._fix_item(item)
-                except:
+                except Exception:
                     pass
                 yield item
         else:

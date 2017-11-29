@@ -44,8 +44,9 @@ from grimoire_elk.utils import config_logging
 
 GITHUB_URL = "https://github.com/"
 GITHUB_API_URL = "https://api.github.com"
-NREPOS = 10 # Default number of repos to be analyzed
+NREPOS = 10  # Default number of repos to be analyzed
 CAULDRON_DASH_URL = "https://cauldron.io/dashboards"
+
 
 def get_params_parser():
     """Parse command line arguments"""
@@ -70,6 +71,7 @@ def get_params_parser():
 
     return parser
 
+
 def get_params():
     parser = get_params_parser()
     args = parser.parse_args()
@@ -80,25 +82,28 @@ def get_params():
 
     return args
 
+
 def get_payload():
     # 100 max in repos
     payload = {'per_page': 100,
                'fork': False,
-               'sort': 'updated', # does not work in repos listing
+               'sort': 'updated',  # does not work in repos listing
                'direction': 'desc'}
     return payload
+
 
 def get_headers(token):
     headers = {'Authorization': 'token ' + token}
     return headers
+
 
 def get_owner_repos_url(owner, token):
     """ The owner could be a org or a user.
         It waits if need to have rate limit.
         Also it fixes a djando issue changing - with _
     """
-    url_org = GITHUB_API_URL+"/orgs/"+owner+"/repos"
-    url_user = GITHUB_API_URL+"/users/"+owner+"/repos"
+    url_org = GITHUB_API_URL + "/orgs/" + owner + "/repos"
+    url_user = GITHUB_API_URL + "/users/" + owner + "/repos"
 
     url_owner = url_org  # Use org by default
 
@@ -111,7 +116,7 @@ def get_owner_repos_url(owner, token):
     except requests.exceptions.HTTPError as e:
         if r.status_code == 403:
             rate_limit_reset_ts = datetime.fromtimestamp(int(r.headers['X-RateLimit-Reset']))
-            seconds_to_reset = (rate_limit_reset_ts - datetime.utcnow()).seconds+1
+            seconds_to_reset = (rate_limit_reset_ts - datetime.utcnow()).seconds + 1
             logging.info("GitHub rate limit exhausted. Waiting %i secs for rate limit reset." % (seconds_to_reset))
             sleep(seconds_to_reset)
         else:
@@ -130,14 +135,13 @@ def get_repositores(owner_url, token, nrepos):
         logging.debug("Getting repos from: %s" % (url))
         try:
             r = requests.get(url,
-                            params=get_payload(),
-                            headers=get_headers(token))
+                             params=get_payload(),
+                             headers=get_headers(token))
 
             r.raise_for_status()
             all_repos += r.json()
 
             logging.debug("Rate limit: %s" % (r.headers['X-RateLimit-Remaining']))
-
 
             if 'next' not in r.links:
                 break
@@ -158,6 +162,7 @@ def get_repositores(owner_url, token, nrepos):
         logging.debug("%s %i %s" % (repo['updated_at'], repo['size'], repo['name']))
     return nrepos_sorted
 
+
 def create_redirect_web_page(web_dir, org_name, kibana_url):
     """ Create HTML pages with the org name that redirect to
         the Kibana dashboard filtered for this org """
@@ -169,11 +174,12 @@ def create_redirect_web_page(web_dir, org_name, kibana_url):
     </html>
     """ % (kibana_url, org_name, org_name)
     try:
-        with open(path.join(web_dir,org_name),"w") as f:
+        with open(path.join(web_dir, org_name), "w") as f:
             f.write(html_redirect)
     except FileNotFoundError as ex:
         logging.error("Wrong web dir for redirect pages: %s" % (web_dir))
         logging.error(ex)
+
 
 def notify_contact(mail, owner, graas_url, repos, first_repo=False):
     """ Send an email to the contact with the details to access
@@ -186,7 +192,7 @@ http://bitergia.com
     """
 
     twitter_txt = "Check Cauldron.io dashboard for %s at %s/dashboards/%s" % (owner, graas_url, owner)
-    twitter_url = "https://twitter.com/intent/tweet?text="+quote_plus(twitter_txt)
+    twitter_url = "https://twitter.com/intent/tweet?text=" + quote_plus(twitter_txt)
     twitter_url += "&via=bitergia"
 
     if first_repo:
@@ -239,23 +245,25 @@ Thank you very much,
 def publish_twitter(twitter_contact, owner):
     """ Publish in twitter the dashboard """
     dashboard_url = CAULDRON_DASH_URL + "/%s" % (owner)
-    # tweet = "@%s your http://cauldron.io dashboard for #%s at GitHub is ready: %s. Check it out! #oscon #opendevmetrics" % (twitter_contact, owner, dashboard_url)
-    tweet = "@%s your http://cauldron.io dashboard for #%s at GitHub is ready: %s. Check it out! #oscon" % (twitter_contact, owner, dashboard_url)
+    tweet = "@%s your http://cauldron.io dashboard for #%s at GitHub is ready: %s. Check it out! #oscon" \
+        % (twitter_contact, owner, dashboard_url)
     status = quote_plus(tweet)
     oauth = get_oauth()
-    r = requests.post(url="https://api.twitter.com/1.1/statuses/update.json?status="+status, auth=oauth)
+    r = requests.post(url="https://api.twitter.com/1.1/statuses/update.json?status=" + status, auth=oauth)
+
 
 def get_oauth():
     filepath = "twitter.oauth"
-    with open(filepath, 'r'): pass
+    with open(filepath, 'r'):
+        pass
     config = configparser.SafeConfigParser()
     config.read(filepath)
 
-    params = ['consumer_key','consumer_secret','oauth_token','oauth_token_secret']
+    params = ['consumer_key', 'consumer_secret', 'oauth_token', 'oauth_token_secret']
 
     if 'oauth' not in config.sections():
         raise RuntimeError("Bad oauth file format %s, section missing: %s" % (filepath, 'oauth'))
-    oauth_config =  dict(config.items('oauth'))
+    oauth_config = dict(config.items('oauth'))
     for param in params:
         if param not in oauth_config:
             raise RuntimeError("Bad oauth file format %s, not found param: %s" % (filepath, param))
@@ -266,6 +274,7 @@ def get_oauth():
                    resource_owner_secret=oauth_config['oauth_token_secret'])
 
     return oauth
+
 
 if __name__ == '__main__':
 
@@ -279,13 +288,12 @@ if __name__ == '__main__':
     git_index = "github_git"
     issues_index = "github_issues"
 
-
     # The owner could be a org or an user.
     owner_url = get_owner_repos_url(args.org, args.token)
     owner = args.org
 
     logging.info("Creating new GitHub dashboard with %i repositores from %s" %
-                (args.nrepos, owner))
+                 (args.nrepos, owner))
 
     # Generate redirect web page first so dashboard can be used
     # with partial data during data retrieval
@@ -296,7 +304,7 @@ if __name__ == '__main__':
 
     for repo in repos:
         project = owner  # project = org in GitHub
-        url = GITHUB_URL+owner+"/"+repo['name']
+        url = GITHUB_URL + owner + "/" + repo['name']
         basic_cmd = "p2o.py -g -e %s --project %s --enrich" % \
             (args.elastic_url, project)
         cmd = basic_cmd + " --index %s git %s" % (git_index, url)
@@ -314,8 +322,7 @@ if __name__ == '__main__':
                     notify_contact(args.contact, owner, args.graas_url, repos, first_repo)
                 first_repo = False
 
-
-    total_time_min = (datetime.now()-task_init).total_seconds()/60
+    total_time_min = (datetime.now() - task_init).total_seconds() / 60
 
     logging.info("Finished %s in %.2f min" % (owner, total_time_min))
 

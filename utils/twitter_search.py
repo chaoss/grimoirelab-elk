@@ -53,6 +53,7 @@ DEBUG_LOG_FORMAT = "[%(asctime)s - %(name)s - %(levelname)s] - %(message)s"
 SINCE_ID_PARAM = 'since_id'
 MAX_ID_PARAM = 'max_id'
 
+
 def main():
 
     args = parse_args()
@@ -89,9 +90,9 @@ def main():
 
         # Get Tweets
         logging.info('SINCE_ID: %s ',
-            params[SINCE_ID_PARAM] if SINCE_ID_PARAM in params else '')
+                     params[SINCE_ID_PARAM] if SINCE_ID_PARAM in params else '')
         logging.info('MAX_ID:   %s',
-            params[MAX_ID_PARAM] if MAX_ID_PARAM in params else '')
+                     params[MAX_ID_PARAM] if MAX_ID_PARAM in params else '')
 
         r = requests.get(URL_SEARCH_TWEETS, auth=auth, params=params)
 
@@ -128,7 +129,7 @@ def main():
         if MAX_ID_PARAM in params:
             min_id = params[MAX_ID_PARAM]
         else:
-            min_id =  sys.maxsize
+            min_id = sys.maxsize
 
         for tweet in r.json()['statuses']:
             current_id = tweet['id']
@@ -146,7 +147,6 @@ def main():
     logging.info('Tweets retrieved: %s.', total_tweets)
     if total_tweets > 0:
         logging.info('This is the end. Newest id: %s', newest_id)
-
 
 
 def parse_args():
@@ -204,7 +204,6 @@ def configure_logging(debug=False):
     else:
         logging.basicConfig(level=logging.DEBUG,
                             format=DEBUG_LOG_FORMAT)
-
 
 
 if __name__ == '__main__':

@@ -49,16 +49,18 @@ def get_params():
 
     return args
 
+
 def get_perceval_params(url, index):
     logging.info("Get perceval params for index: %s" % (index))
     elastic = get_elastic(url, ConfOcean.get_index())
     ConfOcean.set_elastic(elastic)
 
-    r = requests.get(elastic.index_url+"/repos/"+index)
+    r = requests.get(elastic.index_url + "/repos/" + index)
 
     params = r.json()['_source']['params']
 
     return params
+
 
 def get_identities(obackend):
     """ Get identities from items in ocean backend and remove duplicates """
@@ -94,7 +96,7 @@ if __name__ == '__main__':
 
         perceval_backend = perceval_backend_class(**perceval_params)
 
-        obackend =  ocean_backend_class(perceval_backend, incremental=False)
+        obackend = ocean_backend_class(perceval_backend, incremental=False)
         obackend.set_elastic(get_elastic(args.elastic_url, args.index))
 
         identities = get_identities(obackend)
@@ -102,4 +104,4 @@ if __name__ == '__main__':
 
         # Add the identities to Sorting Hat
 
-        print ("Total identities processed: %i" % (len(identities)))
+        print("Total identities processed: %i" % (len(identities)))

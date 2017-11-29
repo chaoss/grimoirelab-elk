@@ -32,6 +32,7 @@ from grimoire_elk.ocean.elastic import ElasticOcean
 from grimoire_elk.panels import create_dashboard
 from grimoire_elk.utils import config_logging
 
+
 def get_params_parser_create_dash():
     """Parse command line arguments"""
 
@@ -47,6 +48,7 @@ def get_params_parser_create_dash():
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
 
     return parser
+
 
 def get_params():
     parser = get_params_parser_create_dash()
