@@ -23,13 +23,9 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
 
 from datetime import datetime
-from time import time
-
-from dateutil import parser
 
 from .enrich import Enrich, metadata
 
@@ -131,16 +127,16 @@ class JiraEnrich(Enrich):
         # dizquierdo requirements T146
         eitem['changes'] = issue['changelog']['total']
         if issue["fields"]["assignee"]:
-            eitem['assignee'] =  issue["fields"]["assignee"]["displayName"]
+            eitem['assignee'] = issue["fields"]["assignee"]["displayName"]
             eitem['assignee_email'] = None
-            if "creator" in issue["fields"] and issue["fields"]["creator"] \
-                and "emailAddress" in issue["fields"]["creator"]:
+            if ("creator" in issue["fields"] and issue["fields"]["creator"] and
+                "emailAddress" in issue["fields"]["creator"]):
                 eitem['assignee_email'] = issue["fields"]["assignee"]["emailAddress"]
             if "timeZone" in issue["fields"]["assignee"]:
                 eitem['assignee_tz'] = issue["fields"]["assignee"]["timeZone"]
 
         if issue["fields"]["creator"] and "creator" in issue["fields"]:
-            eitem['author_name'] =  issue["fields"]["creator"]["displayName"]
+            eitem['author_name'] = issue["fields"]["creator"]["displayName"]
             if "emailAddress" in issue["fields"]["creator"]:
                 eitem['author_email'] = issue["fields"]["creator"]["emailAddress"]
             eitem['author_login'] = issue["fields"]["creator"]["name"]
@@ -155,8 +151,8 @@ class JiraEnrich(Enrich):
 
         eitem['labels'] = issue['fields']['labels']
 
-        if 'priority' in issue['fields'] and issue['fields']['priority'] \
-            and 'name' in issue['fields']['priority']:
+        if ('priority' in issue['fields'] and issue['fields']['priority'] and
+            'name' in issue['fields']['priority']):
             eitem['priority'] = issue['fields']['priority']['name']
 
         # data.fields.progress.percent not exists in Puppet JIRA
@@ -187,15 +183,15 @@ class JiraEnrich(Enrich):
         if 'timeoriginalestimate' in issue['fields']:
             eitem['original_time_estimation'] = issue['fields']['timeoriginalestimate']
             if eitem['original_time_estimation']:
-                eitem['original_time_estimation_hours'] = int(eitem['original_time_estimation'])/3600
+                eitem['original_time_estimation_hours'] = int(eitem['original_time_estimation']) / 3600
         if 'timespent' in issue['fields']:
             eitem['time_spent'] = issue['fields']['timespent']
             if eitem['time_spent']:
-                eitem['time_spent_hours'] = int(eitem['time_spent'])/3600
+                eitem['time_spent_hours'] = int(eitem['time_spent']) / 3600
         if 'timeestimate' in issue['fields']:
             eitem['time_estimation'] = issue['fields']['timeestimate']
             if eitem['time_estimation']:
-                eitem['time_estimation_hours'] = int(eitem['time_estimation'])/3600
+                eitem['time_estimation_hours'] = int(eitem['time_estimation']) / 3600
         eitem['watchers'] = issue['fields']['watches']['watchCount']
         eitem['key'] = issue['key']
 
@@ -206,7 +202,7 @@ class JiraEnrich(Enrich):
 
         if 'long_desc' in issue:
             eitem['number_of_comments'] = len(issue['long_desc'])
-        eitem['url'] = item['origin'] + "/browse/"+ issue['key']
+        eitem['url'] = item['origin'] + "/browse/" + issue['key']
         eitem['time_to_close_days'] = \
             get_time_diff_days(issue['fields']['created'], issue['fields']['updated'])
         eitem['time_to_last_update_days'] = \

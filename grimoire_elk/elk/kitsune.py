@@ -56,8 +56,7 @@ class KitsuneEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
-
+        return {"items": mapping}
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
@@ -94,7 +93,6 @@ class KitsuneEnrich(Enrich):
                     identities.append(user)
         return identities
 
-
     @metadata
     def get_rich_item(self, item, kind='question'):
         eitem = {}
@@ -123,17 +121,16 @@ class KitsuneEnrich(Enrich):
             eitem["content_analyzed"] = question['content']
 
             # Fields which names are translated
-            map_fields = {
-                    "id": "question_id",
-                    "num_votes": "score"
-            }
+            map_fields = {"id": "question_id",
+                          "num_votes": "score"
+                          }
             for fn in map_fields:
                 eitem[map_fields[fn]] = question[fn]
 
             tags = ''
             for tag in question['tags']:
                 tags += tag['slug'] + ","
-            tags = tags[0:-1] # remove last ,
+            tags = tags[0:-1]  # remove last ,
             eitem["tags"] = tags
             eitem["tags_analyzed"] = tags
 
@@ -172,10 +169,10 @@ class KitsuneEnrich(Enrich):
 
             # Fields which names are translated
             map_fields = {
-                    "id": "answer_id",
-                    "question": "question_id",
-                    "num_helpful_votes": "score",
-                    "num_unhelpful_votes":"unhelpful_answer"
+                "id": "answer_id",
+                "question": "question_id",
+                "num_helpful_votes": "score",
+                "num_unhelpful_votes": "unhelpful_answer"
             }
             for fn in map_fields:
                 eitem[map_fields[fn]] = answer[fn]
@@ -212,7 +209,7 @@ class KitsuneEnrich(Enrich):
         bulk_json = ""
         total = 0
 
-        url = self.elastic.index_url+'/items/_bulk'
+        url = self.elastic.index_url + '/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
@@ -227,7 +224,7 @@ class KitsuneEnrich(Enrich):
             data_json = json.dumps(rich_item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                 (item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
+            bulk_json += data_json + "\n"  # Bulk document
             current += 1
             total += 1
             # Time to enrich also de answers
@@ -243,10 +240,10 @@ class KitsuneEnrich(Enrich):
                     bulk_json += '{"index" : {"_id" : "%s_%i" } }\n' % \
                         (item[self.get_field_unique_id()],
                          rich_answer['answer_id'])
-                    bulk_json += data_json +"\n"  # Bulk document
+                    bulk_json += data_json + "\n"  # Bulk document
                     current += 1
                     total += 1
 
-        self.requests.put(url, data = bulk_json)
+        self.requests.put(url, data=bulk_json)
 
         return total

@@ -25,7 +25,6 @@
 
 from datetime import datetime
 from dateutil import parser
-import json
 import logging
 import time
 
@@ -52,9 +51,12 @@ class GerritEnrich(Enrich):
         if 'data' in item and type(item) == dict:
             user = item['data'][identity_field]
 
-        if 'name' in user: identity['name'] = user['name']
-        if 'email' in user: identity['email'] = user['email']
-        if 'username' in user: identity['username'] = user['username']
+        if 'name' in user:
+            identity['name'] = user['name']
+        if 'email' in user:
+            identity['email'] = user['email']
+        if 'username' in user:
+            identity['username'] = user['username']
         return identity
 
     def get_project_repository(self, eitem):
@@ -103,12 +105,11 @@ class GerritEnrich(Enrich):
     def _fix_review_dates(self, item):
         ''' Convert dates so ES detect them '''
 
-
-        for date_field in ['timestamp','createdOn','lastUpdated']:
+        for date_field in ['timestamp', 'createdOn', 'lastUpdated']:
             if date_field in item.keys():
                 date_ts = item[date_field]
                 item[date_field] = time.strftime('%Y-%m-%dT%H:%M:%S',
-                                                  time.localtime(date_ts))
+                                                 time.localtime(date_ts))
         if 'patchSets' in item.keys():
             for patch in item['patchSets']:
                 pdate_ts = patch['createdOn']
@@ -126,7 +127,6 @@ class GerritEnrich(Enrich):
                 comment['timestamp'] = time.strftime('%Y-%m-%dT%H:%M:%S',
                                                      time.localtime(cdate_ts))
 
-
     def get_elastic_mappings(self):
 
         mapping = """
@@ -143,8 +143,7 @@ class GerritEnrich(Enrich):
         }
         """
 
-        return {"items":mapping}
-
+        return {"items": mapping}
 
     @metadata
     def get_rich_item(self, item):
@@ -189,14 +188,14 @@ class GerritEnrich(Enrich):
         if len(review["patchSets"]) > 0:
             createdOn_date = parser.parse(review["patchSets"][0]['createdOn'])
         lastUpdated_date = parser.parse(review['lastUpdated'])
-        seconds_day = float(60*60*24)
-        if eitem['status'] in ['MERGED','ABANDONED']:
+        seconds_day = float(60 * 60 * 24)
+        if eitem['status'] in ['MERGED', 'ABANDONED']:
             timeopen = \
-                (lastUpdated_date-createdOn_date).total_seconds() / seconds_day
+                (lastUpdated_date - createdOn_date).total_seconds() / seconds_day
         else:
             timeopen = \
-                (datetime.utcnow()-createdOn_date).total_seconds() / seconds_day
-        eitem["timeopen"] =  '%.2f' % timeopen
+                (datetime.utcnow() - createdOn_date).total_seconds() / seconds_day
+        eitem["timeopen"] = '%.2f' % timeopen
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))

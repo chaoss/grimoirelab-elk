@@ -24,8 +24,6 @@
 
 import logging
 
-from dateutil import parser
-
 from .enrich import Enrich, metadata
 
 
@@ -71,13 +69,12 @@ class FunctestEnrich(Enrich):
         # Fields which names are translated
         map_fields = {"_id": "api_id",
                       "project_name": "project"
-                     }
+                      }
         for fn in map_fields:
             if fn in func_test:
                 eitem[map_fields[fn]] = func_test[fn]
             else:
                 eitem[map_fields[fn]] = None
-
 
         if 'details' in func_test and func_test['details']:
             if 'tests' in func_test['details']:

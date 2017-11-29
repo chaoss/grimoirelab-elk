@@ -22,7 +22,6 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
 
 from dateutil import parser
@@ -105,7 +104,7 @@ class AskbotEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     @metadata
     def get_rich_item(self, item):
@@ -162,7 +161,7 @@ class AskbotEnrich(Enrich):
 
         eitem['comment_count'] = 0
         if 'answers' in question:
-            eitem['comment_count'] = sum([len (a['comments']) if 'comments' in a else 0 for a in question['answers']])
+            eitem['comment_count'] = sum([len(a['comments']) if 'comments' in a else 0 for a in question['answers']])
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
@@ -172,7 +171,6 @@ class AskbotEnrich(Enrich):
 
         eitem["type"] = "question"
         eitem.update(self.get_grimoire_fields(added_at.isoformat(), eitem["type"]))
-
 
         return eitem
 
@@ -192,8 +190,8 @@ class AskbotEnrich(Enrich):
     def get_rich_comment(self, item, answer, comment):
         ecomment = self.get_rich_item(item)  # reuse all fields from item
         ecomment['id'] = comment['id']
-        ecomment['url'] = item['data']['url']+"/?answer="
-        ecomment['url'] += answer['id']+'#post-id-'+answer['id']
+        ecomment['url'] = item['data']['url'] + "/?answer="
+        ecomment['url'] += answer['id'] + '#post-id-' + answer['id']
         if 'author' in comment:
             # Not sure if this format is present in some version of askbot
             ecomment['author_askbot_user_name'] = comment['author']['username']
@@ -242,8 +240,8 @@ class AskbotEnrich(Enrich):
     def get_rich_answer(self, item, answer):
         eanswer = self.get_rich_item(item)  # reuse all fields from item
         eanswer['id'] = answer['id']
-        eanswer['url'] = item['data']['url']+"/?answer="
-        eanswer['url'] += answer['id']+'#post-id-'+answer['id']
+        eanswer['url'] = item['data']['url'] + "/?answer="
+        eanswer['url'] += answer['id'] + '#post-id-' + answer['id']
         if type(answer['answered_by']) is dict:
             eanswer['author_askbot_user_name'] = answer['answered_by']['username']
             eanswer['author_askbot_id'] = answer['answered_by']['id']

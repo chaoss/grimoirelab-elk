@@ -28,9 +28,8 @@ import logging
 import traceback
 
 from sortinghat import api
-from sortinghat.db.model import Identity, UniqueIdentity
-from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
-from sortinghat.matcher import create_identity_matcher
+from sortinghat.db.model import Identity
+from sortinghat.exceptions import AlreadyExistsError, WrappedValueError
 
 
 logger = logging.getLogger(__name__)
@@ -44,7 +43,7 @@ class SortingHat(object):
 
         with db.connect() as session:
             query = session.query(Identity).\
-            filter(Identity.id == sh_id)
+                filter(Identity.id == sh_id)
             identities = query.all()
             if identities:
                 uuid = identities[0].uuid
@@ -56,7 +55,7 @@ class SortingHat(object):
 
         with db.connect() as session:
             query = session.query(Identity).\
-            filter(Identity.name == identity['name'], Identity.email == identity['email'], Identity.source == source)
+                filter(Identity.name == identity['name'], Identity.email == identity['email'], Identity.source == source)
             identities = query.all()
             if identities:
                 user = {}
@@ -75,7 +74,7 @@ class SortingHat(object):
                                     identity['name'], identity['username'])
 
             logger.debug("New sortinghat identity %s %s,%s,%s ",
-                        uuid, identity['username'], identity['name'], identity['email'])
+                         uuid, identity['username'], identity['name'], identity['email'])
 
             profile = {"name": identity['name'] if identity['name'] else identity['username'],
                        "email": identity['email']}
@@ -88,12 +87,12 @@ class SortingHat(object):
             logger.warning("Trying to add a None identity. Ignoring it.")
         except UnicodeEncodeError as ex:
             logger.warning("UnicodeEncodeError. Ignoring it. %s %s %s",
-                            identity['email'], identity['name'],
-                            identity['username'])
+                           identity['email'], identity['name'],
+                           identity['username'])
         except Exception as ex:
             logger.warning("Unknown exception adding identity. Ignoring it. %s %s %s",
-                            identity['email'], identity['name'],
-                            identity['username'])
+                           identity['email'], identity['name'],
+                           identity['username'])
             traceback.print_exc()
 
         if 'company' in identity and identity['company'] is not None:
@@ -107,7 +106,6 @@ class SortingHat(object):
 
         return uuid
 
-
     @classmethod
     def add_identities(cls, db, identities, backend):
         """ Load identities list from backend in Sorting Hat """
@@ -118,6 +116,6 @@ class SortingHat(object):
 
         for identity in identities:
             cls.add_identity(db, identity, backend)
-            total +=1
+            total += 1
 
         logger.info("Total identities added to SH: %i", total)

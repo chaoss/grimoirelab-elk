@@ -86,9 +86,9 @@ class BugzillaRESTEnrich(Enrich):
         url = eitem['origin']
         product = eitem['product']
 
-        repo_comp = url + "/buglist.cgi?product="+product+"&component="+component
-        repo_comp1 = url + "/buglist.cgi?component="+component+"&product="+product
-        repo_product = url + "/buglist.cgi?product="+product
+        repo_comp = url + "/buglist.cgi?product=" + product + "&component=" + component
+        repo_comp1 = url + "/buglist.cgi?component=" + component + "&product=" + product
+        repo_product = url + "/buglist.cgi?product=" + product
 
         for repo in [repo_comp, repo_comp1, repo_product, url]:
             if repo in self.prjs_map[ds_name]:
@@ -129,14 +129,14 @@ class BugzillaRESTEnrich(Enrich):
             eitem["creator"] = issue["creator_detail"]["real_name"]
 
         eitem["id"] = issue['id']
-        eitem["status"]  = issue['status']
+        eitem["status"] = issue['status']
         if "summary" in issue:
-            eitem["summary"]  = issue['summary']
+            eitem["summary"] = issue['summary']
             # Share the name field with bugzilla and share the panel
             eitem["main_description"] = eitem["summary"]
         # Component and product
         eitem["component"] = issue['component']
-        eitem["product"]  = issue['product']
+        eitem["product"] = issue['product']
 
         # Fix dates
         date_ts = parser.parse(issue['creation_time'])
@@ -172,6 +172,6 @@ class BugzillaRESTEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
 
-        eitem.update(self.get_grimoire_fields(issue['creation_time'],"bugrest"))
+        eitem.update(self.get_grimoire_fields(issue['creation_time'], "bugrest"))
 
         return eitem

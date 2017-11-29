@@ -33,7 +33,6 @@ import requests
 from dateutil import parser
 
 from .enrich import Enrich, metadata
-from .utils import get_last_enrich
 
 try:
     from .sortinghat import SortingHat
@@ -43,8 +42,9 @@ except ImportError:
 
 GITHUB = 'https://github.com/'
 SH_GIT_COMMIT = 'github-commit'
-DEMOGRAPHY_COMMIT_MIN_DATE='1980-01-01'
+DEMOGRAPHY_COMMIT_MIN_DATE = '1980-01-01'
 logger = logging.getLogger(__name__)
+
 
 class GitEnrich(Enrich):
 
@@ -53,7 +53,6 @@ class GitEnrich(Enrich):
     AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) and (?P<last_author>.* .*) (?P<email>.*)')
     # Temporal hack to use pair programing only in CloudFoundry (cloudfoundry and cloudfoundry-incubator)
     CLOUDFOUNDRY_URL = 'https://github.com/cloudfoundry'
-
 
     roles = ['Author', 'Commit']
 
@@ -106,7 +105,7 @@ class GitEnrich(Enrich):
            }
         }""" % fielddata
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def __get_authors(self, authors_str):
         # Extract the authors from a multiauthor
@@ -134,7 +133,7 @@ class GitEnrich(Enrich):
             """ Add a new github identity to SH if it does not exists """
             github_repo = None
             if GITHUB in item['origin']:
-                github_repo = item['origin'].replace(GITHUB,'')
+                github_repo = item['origin'].replace(GITHUB, '')
                 github_repo = re.sub('.git$', '', github_repo)
             if not github_repo:
                 return
@@ -154,7 +153,7 @@ class GitEnrich(Enrich):
                 if user_data not in self.github_logins:
                     self.github_logins[user_data] = sh_identity['username']
                     logger.debug("GitHub-commit exists. username:%s user:%s",
-                                  sh_identity['username'], user_data)
+                                 sh_identity['username'], user_data)
 
         commit_hash = item['data']['commit']
 
@@ -222,7 +221,7 @@ class GitEnrich(Enrich):
         except KeyError:
             # Get the login from github API
             GITHUB_API_URL = "https://api.github.com"
-            commit_url = GITHUB_API_URL+"/repos/%s/commits/%s" % (repo, commit_hash)
+            commit_url = GITHUB_API_URL + "/repos/%s/commits/%s" % (repo, commit_hash)
             headers = {'Authorization': 'token ' + self.github_token}
 
             r = self.requests.get(commit_url, headers=headers)
@@ -277,8 +276,8 @@ class GitEnrich(Enrich):
 
             self.github_logins[user] = login
             logger.debug("%s is %s in github (not found %i authors %i committers )", user, login,
-                          self.github_logins_author_not_found,
-                          self.github_logins_committer_not_found)
+                         self.github_logins_author_not_found,
+                         self.github_logins_committer_not_found)
 
         return login
 
@@ -294,14 +293,14 @@ class GitEnrich(Enrich):
         # The real data
         commit = item['data']
         # data fields to copy
-        copy_fields = ["message","Author"]
+        copy_fields = ["message", "Author"]
         for f in copy_fields:
             if f in commit:
                 eitem[f] = commit[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"commit": "hash","message":"message_analyzed","Commit":"Committer"}
+        map_fields = {"commit": "hash", "message": "message_analyzed", "Commit": "Committer"}
         for fn in map_fields:
             if fn in commit:
                 eitem[map_fields[fn]] = commit[fn]
@@ -313,9 +312,9 @@ class GitEnrich(Enrich):
         commit_date = parser.parse(commit["CommitDate"])
         eitem["author_date"] = author_date.replace(tzinfo=None).isoformat()
         eitem["commit_date"] = commit_date.replace(tzinfo=None).isoformat()
-        eitem["utc_author"] = (author_date-author_date.utcoffset()).replace(tzinfo=None).isoformat()
-        eitem["utc_commit"] = (commit_date-commit_date.utcoffset()).replace(tzinfo=None).isoformat()
-        eitem["tz"]  = int(author_date.strftime("%z")[0:3])
+        eitem["utc_author"] = (author_date - author_date.utcoffset()).replace(tzinfo=None).isoformat()
+        eitem["utc_commit"] = (commit_date - commit_date.utcoffset()).replace(tzinfo=None).isoformat()
+        eitem["tz"] = int(author_date.strftime("%z")[0:3])
         # Other enrichment
         eitem["repo_name"] = item["origin"]
         # Number of files touched
@@ -340,12 +339,12 @@ class GitEnrich(Enrich):
         eitem["lines_changed"] = lines_added + lines_removed
 
         # author_name and author_domain are added always
-        identity  = self.get_sh_identity(commit["Author"])
+        identity = self.get_sh_identity(commit["Author"])
         eitem["author_name"] = identity['name']
         eitem["author_domain"] = self.get_identity_domain(identity)
 
         # committer data
-        identity  = self.get_sh_identity(commit["Commit"])
+        identity = self.get_sh_identity(commit["Commit"])
         eitem["committer_name"] = identity['name']
         eitem["committer_domain"] = self.get_identity_domain(identity)
 
@@ -357,9 +356,9 @@ class GitEnrich(Enrich):
 
         # If it is a github repo, include just the repo string
         if GITHUB in item['origin']:
-            eitem['github_repo'] = item['origin'].replace(GITHUB,'')
+            eitem['github_repo'] = item['origin'].replace(GITHUB, '')
             eitem['github_repo'] = re.sub('.git$', '', eitem['github_repo'])
-            eitem["url_id"] = eitem['github_repo']+"/commit/"+eitem['hash']
+            eitem["url_id"] = eitem['github_repo'] + "/commit/" + eitem['hash']
 
         if 'project' in item:
             eitem['project'] = item['project']
@@ -379,7 +378,6 @@ class GitEnrich(Enrich):
 
         return eitem
 
-
     def __add_pair_programming_metrics(self, commit, eitem):
 
         def get_pair_programming_metrics(eitem, nauthors):
@@ -396,7 +394,6 @@ class GitEnrich(Enrich):
             metrics["pair_programming_lines_changed"] = round(lchanged / nauthors, ndecimals)
 
             return metrics
-
 
         # Include pair programming metrics in all cases. In general, 1 author.
         eitem.update(get_pair_programming_metrics(eitem, 1))
@@ -437,7 +434,7 @@ class GitEnrich(Enrich):
         total_signed_off = 0
         total_multi_author = 0
 
-        url = self.elastic.index_url+'/items/_bulk'
+        url = self.elastic.index_url + '/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
@@ -464,14 +461,14 @@ class GitEnrich(Enrich):
                     item['data']['Commit'] = item['data']['committers'][0]
                 # Add the authors list using the original Author and the Signed-off list
                 if 'Signed-off-by' in item['data']:
-                    authors_all = item['data']['Signed-off-by']+[item['data']['Author']]
+                    authors_all = item['data']['Signed-off-by'] + [item['data']['Author']]
                     item['data']['authors_signed_off'] = list(set(authors_all))
 
             if current >= max_items:
                 try:
                     r = self.requests.put(url, data=bulk_json)
                     r.raise_for_status()
-                    json_size = sys.getsizeof(bulk_json) / (1024*1024)
+                    json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                     logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
@@ -486,7 +483,7 @@ class GitEnrich(Enrich):
             data_json = json.dumps(rich_item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                 (item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
+            bulk_json += data_json + "\n"  # Bulk document
             current += 1
             total += 1
 
@@ -500,10 +497,10 @@ class GitEnrich(Enrich):
                         item['data']['Author'] = authors[i]
                         item['data']['is_git_commit_multi_author'] = 1
                         rich_item = self.get_rich_item(item)
-                        commit_id = item[self.get_field_unique_id()] + "_" + str(i-1)
+                        commit_id = item[self.get_field_unique_id()] + "_" + str(i - 1)
                         data_json = json.dumps(rich_item)
                         bulk_json += '{"index" : {"_id" : "%s" } }\n' % commit_id
-                        bulk_json += data_json +"\n"  # Bulk document
+                        bulk_json += data_json + "\n"  # Bulk document
                         current += 1
                         total += 1
                         total_multi_author += 1
@@ -524,7 +521,7 @@ class GitEnrich(Enrich):
                         commit_id = item[self.get_field_unique_id()] + "_" + str(nsg)
                         data_json = json.dumps(rich_item)
                         bulk_json += '{"index" : {"_id" : "%s" } }\n' % commit_id
-                        bulk_json += data_json +"\n"  # Bulk document
+                        bulk_json += data_json + "\n"  # Bulk document
                         current += 1
                         total += 1
                         total_signed_off += 1
@@ -542,7 +539,6 @@ class GitEnrich(Enrich):
             logger.info("Multi author commits generated: %i", total_multi_author)
 
         return total
-
 
     def enrich_demography(self, enrich_backend, no_incremental=False):
 
@@ -583,7 +579,6 @@ class GitEnrich(Enrich):
         },
         """ % (filters)
 
-
         # First, get the min and max commit date for all the authors
         # Limit aggregations: https://github.com/elastic/elasticsearch/issues/18838
         # 10000 seems to be a sensible number of the number of people in git
@@ -616,7 +611,7 @@ class GitEnrich(Enrich):
 
         logger.debug(es_query)
 
-        r = self.requests.post(self.elastic.index_url+"/_search", data=es_query, verify=False)
+        r = self.requests.post(self.elastic.index_url + "/_search", data=es_query, verify=False)
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
@@ -644,13 +639,12 @@ class GitEnrich(Enrich):
         """
         author_query_json = json.loads(author_query)
 
-
         for author in authors:
             # print("%s: %s %s" % (author['key'], author['min']['value_as_string'], author['max']['value_as_string']))
             # Time to add all the commits (items) from this author
             author_query_json['query']['bool']['must'][0]['term']['Author'] = author['key']
             author_query_str = json.dumps(author_query_json)
-            r = self.requests.post(self.elastic.index_url+"/_search?size=10000", data=author_query_str, verify=False)
+            r = self.requests.post(self.elastic.index_url + "/_search?size=10000", data=author_query_str, verify=False)
 
             if "hits" not in r.json():
                 logger.error("Can't find commits for %s", author['key'])

@@ -24,6 +24,7 @@
 
 from .mbox import MBoxEnrich
 
+
 class HyperKittyEnrich(MBoxEnrich):
 
     def get_project_repository(self, eitem):

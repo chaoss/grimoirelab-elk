@@ -22,7 +22,6 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
 
 from copy import deepcopy
@@ -52,7 +51,7 @@ class CratesEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -118,7 +117,6 @@ class CratesEnrich(Enrich):
             events.append(event)
 
         return events
-
 
     @metadata
     def get_rich_item(self, item):

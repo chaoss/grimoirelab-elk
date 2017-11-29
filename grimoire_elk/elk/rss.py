@@ -22,7 +22,6 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
 
 from dateutil import parser
@@ -47,8 +46,7 @@ class RSSEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
-
+        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -74,11 +72,10 @@ class RSSEnrich(Enrich):
         identity['email'] = None
         identity['name'] = None
 
-        if  identity_field in entry:
+        if identity_field in entry:
             identity['username'] = entry[identity_field]
             identity['name'] = entry[identity_field]
         return identity
-
 
     @metadata
     def get_rich_item(self, item):

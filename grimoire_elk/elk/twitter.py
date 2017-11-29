@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 class TwitterEnrich(Enrich):
 
     def get_field_author(self):
-        return  "user"
+        return "user"
 
     def get_field_date(self):
         return "created_at"
@@ -58,7 +58,7 @@ class TwitterEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
@@ -111,7 +111,6 @@ class TwitterEnrich(Enrich):
 
         return eitem_project
 
-
     @metadata
     def get_rich_item(self, item):
         eitem = {}
@@ -129,7 +128,7 @@ class TwitterEnrich(Enrich):
             else:
                 eitem[f] = None
         # Date fields
-        eitem["created_at"]  = parser.parse(tweet["created_at"]).isoformat()
+        eitem["created_at"] = parser.parse(tweet["created_at"]).isoformat()
         # Fields which names are translated
         map_fields = {"@timestamp": "timestamp",
                       "@version": "version"
@@ -161,8 +160,9 @@ class TwitterEnrich(Enrich):
         if tweet['retweeted']:
             eitem['retweeted'] = 1
 
-        eitem['url'] = "http://twitter.com/"+tweet['user']['screen_name']+"/status/"+tweet['id_str']
-        eitem['user_url_twitter'] = "http://twitter.com/"+tweet['user']['screen_name']
+        eitem['url'] = "http://twitter.com/" + tweet['user']['screen_name']
+        eitem['url'] += "/status/" + tweet['id_str']
+        eitem['user_url_twitter'] = "http://twitter.com/" + tweet['user']['screen_name']
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(tweet))

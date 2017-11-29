@@ -35,7 +35,6 @@ logger = logging.getLogger(__name__)
 
 class MeetupEnrich(Enrich):
 
-
     def get_field_author(self):
         return "author"
 
@@ -57,7 +56,7 @@ class MeetupEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
@@ -82,9 +81,8 @@ class MeetupEnrich(Enrich):
             identities.append(user)
         return identities
 
-
     def get_sh_identity(self, item, identity_field=None):
-        identity = {'username':None, 'email':None, 'name':None}
+        identity = {'username': None, 'email': None, 'name': None}
 
         if not item:
             return identity
@@ -134,7 +132,6 @@ class MeetupEnrich(Enrich):
             else:
                 eitem[f] = None
 
-
         # event host fields: author of the event
         if 'event_hosts' in event:
             host = event['event_hosts'][0]
@@ -157,7 +154,7 @@ class MeetupEnrich(Enrich):
                        "featured", "rsvpable"]
         for f in copy_fields:
             if f in event:
-                eitem["meetup_"+f] = event[f]
+                eitem["meetup_" + f] = event[f]
             else:
                 eitem[f] = None
 
@@ -166,7 +163,7 @@ class MeetupEnrich(Enrich):
 
         try:
             if 'time' in event:
-                eitem['time_date'] = unixtime_to_datetime(event['time']/1000).isoformat()
+                eitem['time_date'] = unixtime_to_datetime(event['time'] / 1000).isoformat()
             else:
                 logger.error("time field nof found in event")
                 return {}
@@ -181,7 +178,7 @@ class MeetupEnrich(Enrich):
                            "localized_country_name", "repinned", "address_1"]
             for f in copy_fields:
                 if f in venue:
-                    eitem["venue_"+f] = venue[f]
+                    eitem["venue_" + f] = venue[f]
                 else:
                     eitem[f] = None
 
@@ -195,14 +192,13 @@ class MeetupEnrich(Enrich):
             eitem['series_description'] = event['series']['description']
             eitem['series_start_date'] = event['series']['start_date']
 
-
         if 'group' in event:
             group = event['group']
             copy_fields = ["id", "created", "join_mode", "name", "url_name",
                            "who"]
             for f in copy_fields:
                 if f in group:
-                    eitem["group_"+f] = group[f]
+                    eitem["group_" + f] = group[f]
                 else:
                     eitem[f] = None
 
@@ -218,7 +214,7 @@ class MeetupEnrich(Enrich):
         if len(event['rsvps']) > 0:
             eitem['group_members'] = event['rsvps'][0]['group']['members']
 
-        created = unixtime_to_datetime(event['created']/1000).isoformat()
+        created = unixtime_to_datetime(event['created'] / 1000).isoformat()
         eitem['type'] = "meetup"
         # time_date is when the meetup will take place, the needed one in this index
         # created is when the meetup entry was created and it is not the interesting date
@@ -232,7 +228,6 @@ class MeetupEnrich(Enrich):
 
         return eitem
 
-
     def get_item_sh(self, item):
         """ Add sorting hat enrichment fields  """
 
@@ -241,14 +236,14 @@ class MeetupEnrich(Enrich):
         # Not shared common get_item_sh because it is pretty specific
         if 'member' in item:
             # comment and rsvp
-            identity  = self.get_sh_identity(item['member'])
+            identity = self.get_sh_identity(item['member'])
         elif 'event_hosts' in item:
             # meetup event
-            identity  = self.get_sh_identity(item['event_hosts'][0])
+            identity = self.get_sh_identity(item['event_hosts'][0])
         else:
             return sh_fields
 
-        created = unixtime_to_datetime(item['created']/1000)
+        created = unixtime_to_datetime(item['created'] / 1000)
         sh_fields = self.get_item_sh_fields(identity, created)
 
         return sh_fields
@@ -258,7 +253,7 @@ class MeetupEnrich(Enrich):
         if 'comments' in item['data']:
             for comment in item['data']['comments']:
                 ecomment = self.get_rich_item(item)  # reuse all fields from item
-                created = unixtime_to_datetime(comment['created']/1000).isoformat()
+                created = unixtime_to_datetime(comment['created'] / 1000).isoformat()
                 ecomment['url'] = comment['link']
                 ecomment['id'] = comment['id']
                 ecomment['comment'] = comment['comment']
@@ -293,7 +288,7 @@ class MeetupEnrich(Enrich):
             for rsvp in item['data']['rsvps']:
                 ersvp = self.get_rich_item(item)  # reuse all fields from item
                 ersvp['type'] = 'rsvp'
-                created = unixtime_to_datetime(rsvp['created']/1000).isoformat()
+                created = unixtime_to_datetime(rsvp['created'] / 1000).isoformat()
                 ersvp.update(self.get_grimoire_fields(created, ersvp['type']))
                 ersvp.pop('is_meetup_meetup')
                 # event host fields: author of the event
@@ -312,7 +307,7 @@ class MeetupEnrich(Enrich):
 
                 ersvp['rsvps_guests'] = rsvp['guests']
                 ersvp['rsvps_updated'] = rsvp['updated']
-                ersvp['rsvps_response']	= rsvp['response']
+                ersvp['rsvps_response'] = rsvp['response']
 
                 if self.sortinghat:
                     ersvp.update(self.get_item_sh(rsvp))

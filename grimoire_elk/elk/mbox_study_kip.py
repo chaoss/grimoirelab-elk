@@ -58,8 +58,8 @@ def kafka_kip(enrich):
                 continue
             elif "to -1" in line or "is -1" in line or "= -1" in line or "-1 or" in line:
                 continue
-            elif line.startswith("+1") or " +1 " in line or line.endswith("+1") \
-                 or " +1." in line or " +1," in line:
+            elif (line.startswith("+1") or " +1 " in line or line.endswith("+1") or
+                  " +1." in line or " +1," in line):
                 vote = 1
                 binding = 1  # by default the votes are binding for +1
                 if 'non-binding' in line.lower():
@@ -67,8 +67,8 @@ def kafka_kip(enrich):
                 elif 'binding' in line.lower():
                     binding = 1
                 break
-            elif line.startswith("-1") or line.endswith(" -1") or " -1 " in line \
-                 or " -1." in line or " -1," in line:
+            elif (line.startswith("-1") or line.endswith(" -1") or " -1 " in line or
+                  " -1." in line or " -1," in line):
                 vote = -1
                 if 'non-binding' in line.lower():
                     binding = 0
@@ -94,12 +94,11 @@ def kafka_kip(enrich):
         if len(kip_tokens) > 2:
             # [KIP-DISCUSSION] KIP-7 Security
             for token in kip_tokens:
-                kip = extract_kip("KIP"+token)
+                kip = extract_kip("KIP" + token)
                 if kip:
                     break
             # logger.debug("Several KIPs in %s. Found: %i", subject, kip)
             return kip
-
 
         str_with_kip = kip_tokens[1]
 
@@ -332,9 +331,8 @@ def kafka_kip(enrich):
                     kip_fields['kip_status'] = 'inactive'
 
                 inactive_days = kip_fields['kip_voting_inactive_days']
-                if  inactive_days and inactive_days > max_inactive_days:
+                if inactive_days and inactive_days > max_inactive_days:
                     kip_fields['kip_status'] = 'inactive'
-
 
             # The final status is in the kip_is_last_discuss or kip_is_last_vote
             # It will be filled in the next enrichment round
@@ -350,7 +348,6 @@ def kafka_kip(enrich):
             total += 1
 
         logger.info("Total eitems with kafka extra kip fields %i", total)
-
 
     def add_kip_fields(enrich):
         """ Add extra fields needed for kip analysis"""

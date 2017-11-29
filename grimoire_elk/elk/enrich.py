@@ -26,13 +26,11 @@
 import json
 import functools
 import logging
-import subprocess
 import sys
 
 import requests
 
 from datetime import datetime as dt
-from os import path
 
 from dateutil import parser
 from functools import lru_cache
@@ -80,8 +78,8 @@ def metadata(func):
         eitem = func(self, *args, **kwargs)
         metadata = {
             'metadata__gelk_version': self.gelk_version,
-            'metadata__gelk_backend_name' : self.__class__.__name__,
-            'metadata__enriched_on' : dt.utcnow().isoformat()
+            'metadata__gelk_backend_name': self.__class__.__name__,
+            'metadata__enriched_on': dt.utcnow().isoformat()
         }
         eitem.update(metadata)
         return eitem
@@ -123,7 +121,7 @@ class Enrich(ElasticItems):
         if not json_projects:
             if db_projects_map and not MYSQL_LIBS:
                 raise RuntimeError("Projects configured but MySQL libraries not available.")
-            if  db_projects_map and not json_projects:
+            if db_projects_map and not json_projects:
                 self.prjs_map = self.__get_projects_map(db_projects_map,
                                                         db_user, db_password,
                                                         db_host)
@@ -148,7 +146,6 @@ class Enrich(ElasticItems):
         self.backend_params = None
         # Label used during enrichment for identities without a known affiliation
         self.unaffiliated_group = 'Unknown'
-
 
     def __get_kibiter_version(self):
         """
@@ -220,9 +217,10 @@ class Enrich(ElasticItems):
 
         for project in json:
             for ds in json[project]:
-                if ds == "meta": continue  # not a real data source
+                if ds == "meta":
+                    continue  # not a real data source
                 if ds not in ds_repo_to_prj:
-                    if not ds in ds_repo_to_prj:
+                    if ds not in ds_repo_to_prj:
                         ds_repo_to_prj[ds] = {}
                 for repo in json[project][ds]:
                     if repo in ds_repo_to_prj[ds]:
@@ -231,20 +229,20 @@ class Enrich(ElasticItems):
                         else:
                             if len(project.split(".")) > len(ds_repo_to_prj[ds][repo].split(".")):
                                 logger.debug("Changed repo project because we found a leaf: %s leaf vs %s (%s, %s)",
-                                              project, ds_repo_to_prj[ds][repo], repo, ds)
+                                             project, ds_repo_to_prj[ds][repo], repo, ds)
                                 ds_repo_to_prj[ds][repo] = project
                     else:
                         ds_repo_to_prj[ds][repo] = project
-        return  ds_repo_to_prj
+        return ds_repo_to_prj
 
     def __compare_projects_map(self, db, json):
         # Compare the projects coming from db and from a json file in eclipse
         ds_map_db = {}
         ds_map_json = {
-            "git":"scm",
-            "pipermail":"mls",
-            "gerrit":"scr",
-            "bugzilla":"its"
+            "git": "scm",
+            "pipermail": "mls",
+            "gerrit": "scr",
+            "bugzilla": "its"
         }
         for ds in ds_map_json:
             ds_map_db[ds_map_json[ds]] = ds
@@ -349,7 +347,7 @@ class Enrich(ElasticItems):
 
         items = ocean_backend.fetch()
 
-        url = self.elastic.index_url+'/items/_bulk'
+        url = self.elastic.index_url + '/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
@@ -361,7 +359,7 @@ class Enrich(ElasticItems):
                 try:
                     r = self.requests.put(url, data=bulk_json)
                     r.raise_for_status()
-                    json_size = sys.getsizeof(bulk_json) / (1024*1024)
+                    json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                     logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
@@ -377,7 +375,7 @@ class Enrich(ElasticItems):
                 data_json = json.dumps(rich_item)
                 bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                     (item[self.get_field_unique_id()])
-                bulk_json += data_json +"\n"  # Bulk document
+                bulk_json += data_json + "\n"  # Bulk document
                 current += 1
                 total += 1
             else:
@@ -387,7 +385,7 @@ class Enrich(ElasticItems):
                     bulk_json += '{"index" : {"_id" : "%s_%s" } }\n' % \
                         (item[self.get_field_unique_id()],
                          rich_event[self.get_field_event_unique_id()])
-                    bulk_json += data_json +"\n"  # Bulk document
+                    bulk_json += data_json + "\n"  # Bulk document
                     current += 1
                     total += 1
 
@@ -459,7 +457,7 @@ class Enrich(ElasticItems):
 
         mapping = '{}'
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_elastic_analyzers(self):
         """ Custom analyzers for our indexes  """
@@ -494,7 +492,7 @@ class Enrich(ElasticItems):
         except Exception as ex:
             pass
 
-        name = "is_"+self.get_connector_name()+"_"+item_name
+        name = "is_" + self.get_connector_name() + "_" + item_name
 
         return {
             "grimoire_creation_date": grimoire_date,
@@ -523,7 +521,7 @@ class Enrich(ElasticItems):
                 if i > 0:
                     eitem_path += "."
                 eitem_path += subprojects[i]
-                eitem_project_levels['project_' + str(i+1)] = eitem_path
+                eitem_project_levels['project_' + str(i + 1)] = eitem_path
 
         return eitem_project_levels
 
@@ -549,7 +547,6 @@ class Enrich(ElasticItems):
                         if eitem['origin'] in ds_repo:
                             project = self.prjs_map[ds_name][ds_repo]
                             break
-
 
         if project is None:
             project = DEFAULT_PROJECT
@@ -591,7 +588,7 @@ class Enrich(ElasticItems):
         """ Get the enrollment for the uuid when the item was done """
         # item_date must be offset-naive (utc)
         if item_date and item_date.tzinfo:
-            item_date = (item_date-item_date.utcoffset()).replace(tzinfo=None)
+            item_date = (item_date - item_date.utcoffset()).replace(tzinfo=None)
 
         enrollments = self.get_enrollments(uuid)
         enroll = self.unaffiliated_group
@@ -610,13 +607,13 @@ class Enrich(ElasticItems):
         # If empty_field is None, the fields do not appear in index patterns
         empty_field = ''
         return {
-            rol+"_id": empty_field,
-            rol+"_uuid": empty_field,
-            rol+"_name": empty_field,
-            rol+"_user_name": empty_field,
-            rol+"_domain": empty_field,
-            rol+"_org_name": empty_field,
-            rol+"_bot": False
+            rol + "_id": empty_field,
+            rol + "_uuid": empty_field,
+            rol + "_name": empty_field,
+            rol + "_user_name": empty_field,
+            rol + "_domain": empty_field,
+            rol + "_org_name": empty_field,
+            rol + "_bot": False
         }
 
     def get_item_sh_fields(self, identity=None, item_date=None, sh_id=None,
@@ -627,33 +624,33 @@ class Enrich(ElasticItems):
         if identity:
             # Use the identity to get the SortingHat identity
             sh_ids = self.get_sh_ids(identity, self.get_connector_name())
-            eitem_sh[rol+"_id"] = sh_ids['id']
-            eitem_sh[rol+"_uuid"] = sh_ids['uuid']
-            eitem_sh[rol+"_name"] = identity['name']
-            eitem_sh[rol+"_user_name"] = identity['username']
-            eitem_sh[rol+"_domain"] = self.get_identity_domain(identity)
+            eitem_sh[rol + "_id"] = sh_ids['id']
+            eitem_sh[rol + "_uuid"] = sh_ids['uuid']
+            eitem_sh[rol + "_name"] = identity['name']
+            eitem_sh[rol + "_user_name"] = identity['username']
+            eitem_sh[rol + "_domain"] = self.get_identity_domain(identity)
         elif sh_id:
             # Use the SortingHat id to get the identity
-            eitem_sh[rol+"_id"] = sh_id
-            eitem_sh[rol+"_uuid"] = self.get_uuid_from_id(sh_id)
+            eitem_sh[rol + "_id"] = sh_id
+            eitem_sh[rol + "_uuid"] = self.get_uuid_from_id(sh_id)
         else:
             # No data to get a SH identity. Return an empty one.
             return eitem_sh
 
         # If the identity does not exists return and empty identity
-        if not eitem_sh[rol+"_uuid"]:
+        if not eitem_sh[rol + "_uuid"]:
             return eitem_sh
 
         # Get the SH profile to use first this data
-        profile = self.get_profile_sh(eitem_sh[rol+"_uuid"])
+        profile = self.get_profile_sh(eitem_sh[rol + "_uuid"])
 
         if profile:
-            eitem_sh[rol+"_name"] = profile['name']
+            eitem_sh[rol + "_name"] = profile['name']
         elif not profile and sh_id:
             logger.warning("Can't find SH identity profile: %s", sh_id)
 
-        eitem_sh[rol+"_org_name"] = self.get_enrollment(eitem_sh[rol+"_uuid"], item_date)
-        eitem_sh[rol+"_bot"] = self.is_bot(eitem_sh[rol+'_uuid'])
+        eitem_sh[rol + "_org_name"] = self.get_enrollment(eitem_sh[rol + "_uuid"], item_date)
+        eitem_sh[rol + "_bot"] = self.is_bot(eitem_sh[rol + '_uuid'])
         return eitem_sh
 
     def get_profile_sh(self, uuid):
@@ -682,11 +679,11 @@ class Enrich(ElasticItems):
         date = parser.parse(eitem[self.get_field_date()])
 
         for rol in roles:
-            if rol+"_id" not in eitem:
+            if rol + "_id" not in eitem:
                 # For example assignee in github it is usual that it does not appears
-                logger.debug("Enriched index does not include SH ids for %s. Can not refresh it.", rol+"_id")
+                logger.debug("Enriched index does not include SH ids for %s. Can not refresh it.", rol + "_id")
                 continue
-            sh_id = eitem[rol+"_id"]
+            sh_id = eitem[rol + "_id"]
             if not sh_id:
                 logger.debug("%s_id is None", rol)
                 continue

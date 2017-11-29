@@ -53,8 +53,7 @@ class DockerHubEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
-
+        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -115,7 +114,7 @@ class DockerHubEnrich(Enrich):
         items = ocean_backend.fetch()
         images_items = {}
 
-        url = self.elastic.index_url+'/items/_bulk'
+        url = self.elastic.index_url + '/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
@@ -123,7 +122,7 @@ class DockerHubEnrich(Enrich):
             if current >= max_items:
                 r = self.requests.put(url, data=bulk_json)
                 r.raise_for_status()
-                json_size = sys.getsizeof(bulk_json) / (1024*1024)
+                json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                 logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
                 bulk_json = ""
                 current = 0
@@ -132,7 +131,7 @@ class DockerHubEnrich(Enrich):
             data_json = json.dumps(rich_item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                 (item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
+            bulk_json += data_json + "\n"  # Bulk document
             current += 1
             total += 1
 
@@ -149,7 +148,6 @@ class DockerHubEnrich(Enrich):
                     rich_item['is_event'] = 0
                     images_items[rich_item['id']] = rich_item
 
-
         if total == 0:
             # No items enriched, nothing to upload to ES
             return total
@@ -165,7 +163,7 @@ class DockerHubEnrich(Enrich):
             data_json = json.dumps(data)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                 (data['id'] + "_image")
-            bulk_json += data_json +"\n"  # Bulk document
+            bulk_json += data_json + "\n"  # Bulk document
             total += 1
 
         r = self.requests.put(url, data=bulk_json)

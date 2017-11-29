@@ -24,5 +24,6 @@
 
 from .mbox import MBoxEnrich
 
+
 class GmaneEnrich(MBoxEnrich):
     pass  # GmaneEnrich is the same than MBoxEnrich with a different name

@@ -22,10 +22,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
-
-from dateutil import parser
 
 from .utils import get_time_diff_days, grimoire_con
 
@@ -43,7 +40,6 @@ class DiscourseEnrich(Enrich):
                          db_user, db_password, db_host)
         self.categories = {}  # Map from category_id to category_name
         self.categories_tree = {}  # Categories with subcategories
-
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -160,7 +156,6 @@ class DiscourseEnrich(Enrich):
             for subcat in self.categories_tree[cat]:
                 print("-> %s (%i)" % (self.categories[subcat], subcat))
 
-
     @metadata
     def get_rich_item(self, item):
 
@@ -230,7 +225,7 @@ class DiscourseEnrich(Enrich):
         # First reply time
         eitem['time_from_question'] = None
         firt_post_time = None
-        if len(topic['post_stream']['posts'])>1:
+        if len(topic['post_stream']['posts']) > 1:
             firt_post_time = first_post['created_at']
             second_post_time = topic['post_stream']['posts'][1]['created_at']
             eitem['first_reply_time'] = get_time_diff_days(firt_post_time, second_post_time)

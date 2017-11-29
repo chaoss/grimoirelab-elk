@@ -76,7 +76,7 @@ class JenkinsEnrich(Enrich):
                 logger.debug("Total node renames: %i", len(self.nodes_rename.keys()))
         except FileNotFoundError:
             logger.info("Jenkis node rename file not found %s",
-                         self.nodes_rename_file)
+                        self.nodes_rename_file)
 
     def get_elastic_mappings(self):
 
@@ -90,8 +90,7 @@ class JenkinsEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
-
+        return {"items": mapping}
 
     def get_field_author(self):
         # In Jenkins there are no identities support
@@ -119,13 +118,13 @@ class JenkinsEnrich(Enrich):
         """
 
         extra_fields = {
-            'category' : None,
-            'installer' : None,
-            'scenario' : None,
-            'testproject' : None,
-            'pod' : None,
-            'loop' : None,
-            'branch' : None
+            'category': None,
+            'installer': None,
+            'scenario': None,
+            'testproject': None,
+            'pod': None,
+            'loop': None,
+            'branch': None
         }
 
         try:
@@ -192,15 +191,15 @@ class JenkinsEnrich(Enrich):
         # Job url: remove the last /build_id from job_url/build_id/
         eitem['job_url'] = eitem['url'].rsplit("/", 2)[0]
         eitem['job_name'] = eitem['url'].rsplit('/', 3)[1]
-        eitem['job_build'] = eitem['job_name']+'/'+str(eitem['build'])
+        eitem['job_build'] = eitem['job_name'] + '/' + str(eitem['build'])
 
         # Enrich dates
         eitem["build_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
 
         # Add duration in days
         if "duration" in eitem:
-            seconds_day = float(60*60*24)
-            duration_days = eitem["duration"]/(1000*seconds_day)
+            seconds_day = float(60 * 60 * 24)
+            duration_days = eitem["duration"] / (1000 * seconds_day)
             eitem["duration_days"] = float('%.2f' % duration_days)
 
         # Add extra fields extracted from job name

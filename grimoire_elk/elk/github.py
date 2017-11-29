@@ -29,8 +29,6 @@ import re
 
 from datetime import datetime
 
-from dateutil import parser
-
 from .utils import get_time_diff_days
 
 from .enrich import Enrich, metadata
@@ -55,7 +53,7 @@ class GitHubEnrich(Enrich):
     def set_elastic(self, elastic):
         self.elastic = elastic
         # Recover cache data from Elastic
-        self.geolocations = self.geo_locations_from_es()
+        self.geolocations = self.geo_locationsfrom__es()
 
     def get_field_author(self):
         return "user_data"
@@ -76,7 +74,7 @@ class GitHubEnrich(Enrich):
         for identity in ['user', 'assignee']:
             if item[identity]:
                 # In user_data we have the full user data
-                user = self.get_sh_identity(item[identity+"_data"])
+                user = self.get_sh_identity(item[identity + "_data"])
                 if user:
                     identities.append(user)
         return identities
@@ -108,10 +106,9 @@ class GitHubEnrich(Enrich):
 
         if location in self.geolocations:
             geo_location = self.geolocations[location]
-            geo_point = {
-                    "lat": geo_location['lat'],
-                    "lon": geo_location['lon']
-            }
+            geo_point = {"lat": geo_location['lat'],
+                         "lon": geo_location['lon']
+                         }
 
         elif location in self.location_not_found:
             # Don't call the API.
@@ -126,7 +123,7 @@ class GitHubEnrich(Enrich):
                 logger.debug("Using Maps API to find %s" % (location))
                 r_json = r.json()
                 geo_code = r_json['results'][0]['geometry']['location']
-            except:
+            except Exception:
                 if location not in self.location_not_found:
                     logger.debug("Can't find geocode for " + location)
                     self.location_not_found.append(location)
@@ -138,20 +135,18 @@ class GitHubEnrich(Enrich):
                 }
                 self.geolocations[location] = geo_point
 
-
         return geo_point
 
-
-    def get_github_cache(self, kind, _key):
-        """ Get cache data for items of _type using _key as the cache dict key """
+    def get_github_cache(self, kind, key_):
+        """ Get cache data for items of _type using key_ as the cache dict key """
 
         cache = {}
         res_size = 100  # best size?
-        _from = 0
+        from_ = 0
 
         index_github = "github/" + kind
 
-        url = self.elastic.url + "/"+index_github
+        url = self.elastic.url + "/" + index_github
         url += "/_search" + "?" + "size=%i" % res_size
         r = self.requests.get(url)
         type_items = r.json()
@@ -163,17 +158,16 @@ class GitHubEnrich(Enrich):
             while len(type_items['hits']['hits']) > 0:
                 for hit in type_items['hits']['hits']:
                     item = hit['_source']
-                    cache[item[_key]] = item
-                _from += res_size
-                r = self.requests.get(url+"&from=%i" % _from)
+                    cache[item[key_]] = item
+                from_ += res_size
+                r = self.requests.get(url + "&from=%i" % from_)
                 type_items = r.json()
                 if 'hits' not in type_items:
                     break
 
         return cache
 
-
-    def geo_locations_from_es(self):
+    def geo_locationsfrom__es(self):
         return self.get_github_cache("geolocations", "location")
 
     def geo_locations_to_es(self):
@@ -184,7 +178,6 @@ class GitHubEnrich(Enrich):
         url = self.elastic.url + "/github/geolocations/_bulk"
 
         logger.debug("Adding geoloc to %s (in %i packs)" % (url, max_items))
-
 
         for loc in self.geolocations:
             if current >= max_items:
@@ -198,17 +191,16 @@ class GitHubEnrich(Enrich):
             # First upload the raw issue data to ES
             data_json = json.dumps(location)
             # Don't include in URL non ascii codes
-            safe_loc = str(loc.encode('ascii', 'ignore'),'ascii')
+            safe_loc = str(loc.encode('ascii', 'ignore'), 'ascii')
             geo_id = str("%s-%s-%s" % (location["lat"], location["lon"],
                                        safe_loc))
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (geo_id)
-            bulk_json += data_json +"\n"  # Bulk document
+            bulk_json += data_json + "\n"  # Bulk document
             current += 1
 
-        self.requests.put(url, data = bulk_json)
+        self.requests.put(url, data=bulk_json)
 
         logger.debug("Adding geoloc to ES Done")
-
 
     def get_elastic_mappings(self):
         """ geopoints type is not created in dynamic mapping """
@@ -230,7 +222,7 @@ class GitHubEnrich(Enrich):
         }
         """
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_field_unique_id(self):
         return "ocean-unique-id"
@@ -281,7 +273,6 @@ class GitHubEnrich(Enrich):
             rich_issue['user_geolocation'] = None
             rich_issue['author_name'] = None
 
-
         assignee = None
 
         if issue['assignee'] is not None:
@@ -317,20 +308,20 @@ class GitHubEnrich(Enrich):
         labels = ''
         if 'labels' in issue:
             for label in issue['labels']:
-                labels += label['name']+";;"
+                labels += label['name'] + ";;"
         if labels != '':
             labels[:-2]
         rich_issue['labels'] = labels
 
         rich_issue['pull_request'] = True
         rich_issue['item_type'] = 'pull request'
-        if not 'head' in issue.keys() and not 'pull_request' in issue.keys():
+        if 'head' not in issue.keys() and 'pull_request' not in issue.keys():
             rich_issue['pull_request'] = False
             rich_issue['item_type'] = 'issue'
 
-        rich_issue['github_repo'] = rich_issue['repository'].replace(GITHUB,'')
+        rich_issue['github_repo'] = rich_issue['repository'].replace(GITHUB, '')
         rich_issue['github_repo'] = re.sub('.git$', '', rich_issue['github_repo'])
-        rich_issue["url_id"] = rich_issue['github_repo']+"/issues/"+rich_issue['id_in_repo']
+        rich_issue["url_id"] = rich_issue['github_repo'] + "/issues/" + rich_issue['id_in_repo']
 
         if self.prjs_map:
             rich_issue.update(self.get_item_project(rich_issue))
@@ -350,7 +341,7 @@ class GitHubEnrich(Enrich):
         total = super(GitHubEnrich, self).enrich_items(items)
 
         logger.debug("Updating GitHub users geolocations in Elastic")
-        self.geo_locations_to_es() # Update geolocations in Elastic
+        self.geo_locations_to_es()  # Update geolocations in Elastic
 
         return total
 
@@ -371,7 +362,6 @@ class GitHubUser(object):
         self.name = user['name']
         self.location = user['location']
 
-
     def _getOrg(self):
         company = None
 
@@ -382,7 +372,7 @@ class GitHubUser(object):
             company = ''
             # Return the list of orgs
             for org in self.orgs:
-                company += org['login'] +";;"
+                company += org['login'] + ";;"
             company = company[:-2]
 
         return company

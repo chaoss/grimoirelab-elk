@@ -36,7 +36,6 @@ from .utils import get_time_diff_days
 logger = logging.getLogger(__name__)
 
 
-
 class RedmineEnrich(Enrich):
 
     def get_elastic_mappings(self):
@@ -51,7 +50,7 @@ class RedmineEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -71,9 +70,9 @@ class RedmineEnrich(Enrich):
     def get_sh_identity(self, data, rol):
         identity = {}
         identity['email'] = None
-        if rol+"_data" in data:
-            if 'mail' in data[rol+"_data"]:
-                identity['email'] = data[rol+"_data"]['mail']
+        if rol + "_data" in data:
+            if 'mail' in data[rol + "_data"]:
+                identity['email'] = data[rol + "_data"]['mail']
         identity['username'] = data[rol]['id']
         identity['name'] = data[rol]['name']
         return identity
@@ -83,7 +82,7 @@ class RedmineEnrich(Enrich):
 
         eitem = {}  # Item enriched
 
-        identity  = self.get_sh_identity(item['data'], 'author')
+        identity = self.get_sh_identity(item['data'], 'author')
         eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
 
         return eitem
@@ -100,7 +99,7 @@ class RedmineEnrich(Enrich):
         ticket = item['data']
 
         # data fields to copy
-        copy_fields = ["subject","description","updated_on",
+        copy_fields = ["subject", "description", "updated_on",
                        "due_date", "estimated_hours", "done_ratio",
                        "id", "spent_hours", "start_date", "subject",
                        "last_update"]
@@ -112,7 +111,7 @@ class RedmineEnrich(Enrich):
         eitem['description_analyzed'] = eitem['description']
         # Fields which names are translated
         map_fields = {"due_date": "estimated_closing_date",
-                      "created_on":"creation_date",
+                      "created_on": "creation_date",
                       "closed_on": "closing_date"}
         for fn in map_fields:
             if fn in ticket:
@@ -122,8 +121,8 @@ class RedmineEnrich(Enrich):
                   'tracker', 'author', 'assigned_to']
         for f in common:
             if f in ticket:
-                eitem[f+'_id'] = ticket[f]['id']
-                eitem[f+'_name'] = ticket[f]['name']
+                eitem[f + '_id'] = ticket[f]['id']
+                eitem[f + '_name'] = ticket[f]['name']
 
         len_fields = ['attachments', 'changesets', 'journals', 'relations']
         for f in len_fields:
@@ -133,7 +132,7 @@ class RedmineEnrich(Enrich):
         if 'parent' in ticket:
             eitem['parent_id'] = ticket['parent']['id']
 
-        eitem['url'] = eitem['origin']+"/issues/"+str(eitem['id'])
+        eitem['url'] = eitem['origin'] + "/issues/" + str(eitem['id'])
 
         # Time to
         if "closing_date" in eitem:
@@ -146,7 +145,6 @@ class RedmineEnrich(Enrich):
                 get_time_diff_days(eitem['creation_date'], datetime.utcnow())
             eitem['timeworking_days'] = \
                 get_time_diff_days(eitem['start_date'], datetime.utcnow())
-
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "job"))
 
