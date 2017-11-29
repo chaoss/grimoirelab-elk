@@ -1,0 +1,24 @@
+language: python
+
+python:
+  - "3.4"
+
+sudo: false
+
+services:
+  - elasticsearch
+
+before_install:
+  - sleep 15
+  - mongorestore dump > /dev/null 2>&1
+  - pip install -r "web-dashboards/requirements.txt"
+  - pip install flake8
+  - pip install coveralls
+  - pip install perceval
+  - pip install sortinghat
+
+# install:
+#   - ./setup.py install
+
+script:
+  - flake8 .
