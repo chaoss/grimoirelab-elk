@@ -169,10 +169,20 @@ def create_redirect_web_page(web_dir, org_name, kibana_url):
     html_redirect = """
     <html>
         <head>
-            <meta http-equiv="refresh" content="0; URL=%s/app/kibana#/dashboard/Overview?_g=(filters:!(('$state':(store:globalState),meta:(alias:!n,disabled:!f,index:github_git_enrich,key:project,negate:!f,value:%s),query:(match:(project:(query:%s,type:phrase))))),refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-2y,mode:quick,to:now))" />
+    """
+    html_redirect += """<meta http-equiv="refresh" content="0; URL=%s/app/kibana"""\
+                     % kibana_url
+    html_redirect += """#/dashboard/Overview?_g=(filters:!(('$state':"""
+    html_redirect += """(store:globalState),meta:(alias:!n,disabled:!f,index:"""
+    html_redirect += """github_git_enrich,key:project,negate:!f,value:%s),"""\
+                     % org_name
+    html_redirect += """query:(match:(project:(query:%s,type:phrase))))),"""\
+                     % org_name
+    html_redirect += """refreshInterval:(display:Off,pause:!f,value:0),"""
+    html_redirect += """time:(from:now-2y,mode:quick,to:now))" />
         </head>
     </html>
-    """ % (kibana_url, org_name, org_name)
+    """
     try:
         with open(path.join(web_dir, org_name), "w") as f:
             f.write(html_redirect)
