@@ -94,6 +94,9 @@ class TwitterEnrich(Enrich):
         eitem_project = {}
         ds_name = self.get_connector_name()  # data source name in projects map
 
+        if ds_name not in self.prjs_map:
+            return eitem_project
+
         for tag in eitem['hashtags_analyzed']:
             if tag in self.prjs_map[ds_name]:
                 project = self.prjs_map[ds_name][tag]
