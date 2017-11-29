@@ -25,6 +25,7 @@
 
 from .elastic import ElasticOcean
 
+
 class FunctestOcean(ElasticOcean):
     """Functest Ocean feeder"""
 
@@ -57,4 +58,4 @@ class FunctestOcean(ElasticOcean):
         }
         '''
 
-        return {"items":mapping}
+        return {"items": mapping}

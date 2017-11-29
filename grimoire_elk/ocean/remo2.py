@@ -23,6 +23,7 @@
 
 from .elastic import ElasticOcean
 
+
 class ReMoOcean(ElasticOcean):
     """ReMo API v2 Ocean feeder"""
 

@@ -25,6 +25,7 @@
 
 from .elastic import ElasticOcean
 
+
 class SlackOcean(ElasticOcean):
     """Slack Ocean feeder"""
 

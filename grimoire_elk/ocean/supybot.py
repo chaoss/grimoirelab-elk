@@ -25,6 +25,7 @@
 
 from .elastic import ElasticOcean
 
+
 class SupybotOcean(ElasticOcean):
     """MediaWiki Ocean feeder"""
 

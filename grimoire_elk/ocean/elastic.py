@@ -27,7 +27,6 @@
 
 
 import inspect
-import json
 import logging
 
 from datetime import datetime
@@ -46,7 +45,7 @@ class ElasticOcean(ElasticItems):
 
         parser = cmdline_parser
 
-        parser.add_argument("-e", "--elastic_url",  default="http://127.0.0.1:9200",
+        parser.add_argument("-e", "--elastic_url", default="http://127.0.0.1:9200",
                             help="Host with elastic search" +
                             "(default: http://127.0.0.1:9200)")
         parser.add_argument("--elastic_url-enrich",
@@ -82,15 +81,15 @@ class ElasticOcean(ElasticItems):
         """ specific mappings implemented in each data source """
         mapping = '{}'
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_elastic_analyzers(self):
         """ Custom analyzers for our indexes  """
 
         return None
 
-    def get_last_update_from_es(self, _filter = None):
-        last_update = self.elastic.get_last_date(self.get_field_date(), _filter)
+    def get_last_update_from_es(self, filter_=None):
+        last_update = self.elastic.get_last_date(self.get_field_date(), filter_)
 
         return last_update
 
@@ -215,18 +214,16 @@ class ElasticOcean(ElasticItems):
                 items_pack.append(item)
                 added += 1
             else:
-                drop +=1
+                drop += 1
         self._items_to_es(items_pack)
 
-
-        total_time_min = (datetime.now()-task_init).total_seconds()/60
+        total_time_min = (datetime.now() - task_init).total_seconds() / 60
 
         logger.debug("Added %i items to ocean", added)
         logger.debug("Dropped %i items using drop_item filter" % (drop))
         logger.info("Finished in %.2f min" % (total_time_min))
 
         return self
-
 
     def _items_to_es(self, json_items):
         """ Append items JSON to ES (data source state) """
@@ -235,7 +232,7 @@ class ElasticOcean(ElasticItems):
             return
 
         logger.info("Adding items to Ocean for %s (%i items)" %
-                      (self, len(json_items)))
+                    (self, len(json_items)))
 
         field_id = self.get_field_unique_id()
 

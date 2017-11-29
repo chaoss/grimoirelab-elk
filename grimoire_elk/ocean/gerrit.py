@@ -25,14 +25,13 @@
 
 '''Gerrit Ocean feeder'''
 
-from datetime import datetime
-
 from .elastic import ElasticOcean
+
 
 class GerritOcean(ElasticOcean):
 
     def _fix_item(self, item):
-        item["ocean-unique-id"] = str(item["data"]["number"])+"_"+item['origin']
+        item["ocean-unique-id"] = str(item["data"]["number"]) + "_" + item['origin']
 
     def get_elastic_mappings(self):
         # immense term in field="data.commitMessage"
@@ -51,4 +50,4 @@ class GerritOcean(ElasticOcean):
         }
         '''
 
-        return {"items":mapping}
+        return {"items": mapping}

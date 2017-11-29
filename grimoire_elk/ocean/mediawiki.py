@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# StackExchange Ocean feeder
+# MediaWiki Ocean feeder
 #
 # Copyright (C) 2015 Bitergia
 #
@@ -24,6 +24,7 @@
 #
 
 from .elastic import ElasticOcean
+
 
 class MediaWikiOcean(ElasticOcean):
     """MediaWiki Ocean feeder"""

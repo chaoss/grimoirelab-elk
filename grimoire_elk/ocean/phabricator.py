@@ -23,6 +23,7 @@
 
 from .elastic import ElasticOcean
 
+
 class PhabricatorOcean(ElasticOcean):
     """Phabricator Ocean feeder"""
 
@@ -61,4 +62,4 @@ class PhabricatorOcean(ElasticOcean):
         }
         '''
 
-        return {"items":mapping}
+        return {"items": mapping}

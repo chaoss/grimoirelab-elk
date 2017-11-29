@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# StackExchange Ocean feeder
+# Discourse feeder
 #
-# Copyright (C) 2015 Bitergia
+# Copyright (C) 2015-2017 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,12 +22,12 @@
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
-from dateutil import parser
 
 from .elastic import ElasticOcean
+
 
 class DiscourseOcean(ElasticOcean):
     """Discourse Ocean feeder"""
 
     def _fix_item(self, item):
-        item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
+        item["ocean-unique-id"] = str(item["data"]["id"]) + "_" + item['origin']
