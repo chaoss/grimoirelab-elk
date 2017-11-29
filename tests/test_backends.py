@@ -30,7 +30,7 @@ import unittest
 
 from datetime import datetime
 
-if not '..' in sys.path:
+if '..' not in sys.path:
     sys.path.insert(0, '..')
 
 from grimoire_elk.arthur import load_identities
@@ -41,6 +41,7 @@ CONFIG_FILE = 'tests.conf'
 NUMBER_BACKENDS = 31
 DB_SORTINGHAT = "test_sh"
 DB_PROJECTS = "test_projects"
+
 
 class TestBackends(unittest.TestCase):
     """Functional tests for GrimoireELK Backends"""
@@ -97,7 +98,7 @@ class TestBackends(unittest.TestCase):
         for con in sorted(connectors.keys()):
             with open(os.path.join("data", con + ".json")) as f:
                 items = json.load(f)
-                es_index = "test_"+con
+                es_index = "test_" + con
                 clean = True
                 perceval_backend = None
                 ocean_backend = connectors[con][1](perceval_backend)
@@ -114,8 +115,8 @@ class TestBackends(unittest.TestCase):
         connectors = get_connectors()
         for con in sorted(connectors.keys()):
             perceval_backend = None
-            ocean_index = "test_"+con
-            enrich_index = "test_"+con+"_enrich"
+            ocean_index = "test_" + con
+            enrich_index = "test_" + con + "_enrich"
             clean = False
             ocean_backend = connectors[con][1](perceval_backend)
             elastic_ocean = get_elastic(es_con, ocean_index, clean, ocean_backend)
@@ -170,7 +171,7 @@ class TestBackends(unittest.TestCase):
         logging.info("Refreshing data in: %s", es_con)
         connectors = get_connectors()
         for con in sorted(connectors.keys()):
-            enrich_index = "test_"+con+"_enrich"
+            enrich_index = "test_" + con + "_enrich"
             enrich_backend = connectors[con][2](db_sortinghat=DB_SORTINGHAT)
             clean = False
             elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
@@ -197,7 +198,7 @@ class TestBackends(unittest.TestCase):
         logging.info("Refreshing data in: %s", es_con)
         connectors = get_connectors()
         for con in sorted(connectors.keys()):
-            enrich_index = "test_"+con+"_enrich"
+            enrich_index = "test_" + con + "_enrich"
             enrich_backend = connectors[con][2](db_projects_map=DB_PROJECTS)
             clean = False
             elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
