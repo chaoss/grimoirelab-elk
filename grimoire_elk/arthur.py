@@ -40,6 +40,7 @@ logger = logging.getLogger(__name__)
 
 requests_ses = grimoire_con()
 
+
 def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None):
     """ Feed Ocean with backend data """
@@ -134,8 +135,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
 
     except Exception as ex:
         if backend:
-            logger.error("Error feeding ocean from %s (%s): %s" %
-                          (backend_name, backend.origin, ex))
+            logger.error("Error feeding ocean from %s (%s): %s", backend_name, backend.origin, ex)
             # this print makes blackbird fails
             traceback.print_exc()
         else:
@@ -153,7 +153,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
     repo['project'] = project
 
     if es_index:
-        unique_id = es_index+"_"+backend.origin
+        unique_id = es_index + "_" + backend.origin
         ConfOcean.add_repo(unique_id, repo)
     else:
         logger.debug("Repository not added to Ocean because errors.")
@@ -187,8 +187,8 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
     {"query": { "bool": { "should": [%s] }}}
     """ % (terms)
 
-    url_search = enrich_backend.elastic.index_url+"/_search"
-    url_search +="?size=1000"  # TODO get all items
+    url_search = enrich_backend.elastic.index_url + "/_search"
+    url_search += "?size=1000"  # TODO get all items
 
     r = requests_ses.post(url_search, data=query)
 
@@ -207,9 +207,9 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
             items_ids.append(item_id)
 
     # Time to get the items
-    logger.debug ("Items to be renriched for merged uuids: %s" % (",".join(items_ids)))
+    logger.debug("Items to be renriched for merged uuids: %s" % (",".join(items_ids)))
 
-    url_mget = ocean_backend.elastic.index_url+"/_mget"
+    url_mget = ocean_backend.elastic.index_url + "/_mget"
 
     items_ids_query = ""
 
@@ -230,6 +230,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
 
     return items
 
+
 def refresh_projects(enrich_backend):
     logger.debug("Refreshing project field in %s", enrich_backend.elastic.index_url)
     total = 0
@@ -243,12 +244,13 @@ def refresh_projects(enrich_backend):
 
     logger.info("Total eitems refreshed for project field %i", total)
 
+
 def refresh_identities(enrich_backend, filter_author=None):
     logger.debug("Refreshing identities fields from %s", enrich_backend.elastic.index_url)
     total = 0
 
     for eitem in enrich_backend.fetch(filter_author):
-        #logger.info(eitem)
+        # logger.info(eitem)
         roles = None
         try:
             roles = enrich_backend.roles
@@ -260,6 +262,7 @@ def refresh_identities(enrich_backend, filter_author=None):
         total += 1
 
     logger.info("Total eitems refreshed for identities fields %i", total)
+
 
 def load_identities(ocean_backend, enrich_backend):
     try:
@@ -286,8 +289,8 @@ def load_identities(ocean_backend, enrich_backend):
                 new_identities.append(identity)
         if items_count % 100 == 0:
             logger.debug("Processed %i items identities (%i identities) from %s",
-                          items_count, len(new_identities),
-                          enrich_backend.get_connector_name())
+                         items_count, len(new_identities),
+                         enrich_backend.get_connector_name())
     logger.debug("TOTAL ITEMS: %i", items_count)
 
     logger.info("Total new identities to be checked %i", len(new_identities))
@@ -297,14 +300,16 @@ def load_identities(ocean_backend, enrich_backend):
 
     return len(new_identities)
 
+
 def enrich_items(ocean_backend, enrich_backend, events=False):
     total = 0
 
     if not events:
-        total= enrich_backend.enrich_items(ocean_backend)
+        total = enrich_backend.enrich_items(ocean_backend)
     else:
         total = enrich_backend.enrich_events(ocean_backend)
     return total
+
 
 def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
                       filter_raw=None, filter_raw_should=None):
@@ -351,6 +356,7 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
 
     return ocean_backend
 
+
 def do_studies(enrich_backend, no_incremental=False):
     try:
         for study in enrich_backend.studies:
@@ -360,8 +366,9 @@ def do_studies(enrich_backend, no_incremental=False):
         logger.error("Problem executing study %s", study)
         traceback.print_exc()
 
+
 def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
-                   ocean_index_enrich = None,
+                   ocean_index_enrich=None,
                    db_projects_map=None, json_projects_map=None,
                    db_sortinghat=None,
                    no_incremental=False, only_identities=False,
@@ -373,7 +380,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    filters_raw_prefix=None, jenkins_rename_file=None,
                    unaffiliated_group=None):
     """ Enrich Ocean index """
-
 
     backend = None
     enrich_index = None
@@ -402,7 +408,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         else:
             if not ocean_index:
                 ocean_index = backend_name + "_" + backend.origin
-            enrich_index = ocean_index+"_enrich"
+            enrich_index = ocean_index + "_enrich"
         if events_enrich:
             enrich_index += "_events"
 
@@ -424,19 +430,19 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         # filter_raw must be converted from the string param to a dict
         filter_raw_dict = {}
         if filter_raw:
-            filter_raw_dict['name'] = filter_raw.split(":")[0].replace('"','')
-            filter_raw_dict['value'] = filter_raw.split(":")[1].replace('"','')
+            filter_raw_dict['name'] = filter_raw.split(":")[0].replace('"', '')
+            filter_raw_dict['value'] = filter_raw.split(":")[1].replace('"', '')
         # filters_raw_prefix must be converted from the list param to
         # DSL query format for a should filter inside a boolean filter
         filter_raw_should = None
         if filters_raw_prefix:
             filter_raw_should = {"should": []}
             for filter_prefix in filters_raw_prefix:
-                fname = filter_prefix.split(":")[0].replace('"','')
-                fvalue = filter_prefix.split(":")[1].replace('"','')
+                fname = filter_prefix.split(":")[0].replace('"', '')
+                fvalue = filter_prefix.split(":")[1].replace('"', '')
                 filter_raw_should["should"].append(
                     {
-                    "prefix" : { fname : fvalue }
+                        "prefix": {fname: fvalue}
                     }
                 )
 
@@ -472,7 +478,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
             ocean_backend.set_elastic(elastic_ocean)
 
-
             logger.info("Adding enrichment data to %s", enrich_backend.elastic.index_url)
 
             if db_sortinghat:
@@ -500,7 +505,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         logger.error("%s", traceback.format_exc())
         if backend:
             logger.error("Error enriching ocean from %s (%s): %s",
-                          backend_name, backend.origin, ex)
+                         backend_name, backend.origin, ex)
         else:
             logger.error("Error enriching ocean %s", ex)
 

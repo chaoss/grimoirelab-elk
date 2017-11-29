@@ -41,6 +41,7 @@ requests_ses = grimoire_con()
 ES_VER = None
 HEADERS_JSON = {"Content-Type": "application/json"}
 
+
 def find_elasticsearch_version(elastic):
     global ES_VER
     if not ES_VER:
@@ -49,18 +50,19 @@ def find_elasticsearch_version(elastic):
         ES_VER = int(main_ver)
     return ES_VER
 
+
 def find_item_json(elastic, type_, item_id):
     """ Find and item (dashboard, vis, search, index pattern) using its id """
     elastic_ver = find_elasticsearch_version(elastic)
 
     if elastic_ver < 6:
-        item_json_url = elastic.index_url+"/"+type_+"/"+item_id
+        item_json_url = elastic.index_url + "/" + type_ + "/" + item_id
     else:
         if type_ not in item_id:
             # Inside a dashboard ids don't include type_:
             item_id = type_ + ":" + item_id
         # The type_is included in the item_id
-        item_json_url = elastic.index_url+"/doc/"+item_id
+        item_json_url = elastic.index_url + "/doc/" + item_id
 
     res = requests_ses.get(item_json_url, verify=False)
     if res.status_code == 200 and res.status_code == 404:
@@ -102,6 +104,7 @@ def clean_dashboard_for_data_sources(dash_json, data_sources):
 
     return dash_json_clean
 
+
 def import_item_json(elastic, type_, item_id, item_json, data_sources=None):
     """ Import an item in Elasticsearch  """
     elastic_ver = find_elasticsearch_version(elastic)
@@ -123,12 +126,12 @@ def import_item_json(elastic, type_, item_id, item_json, data_sources=None):
                 return
 
     if elastic_ver < 6:
-        item_json_url = elastic.index_url+"/"+type_+"/"+item_id
+        item_json_url = elastic.index_url + "/" + type_ + "/" + item_id
     else:
         if type_ not in item_id:
             # Inside a json dashboard ids don't include type_
             item_id = type_ + ":" + item_id
-        item_json_url = elastic.index_url+"/doc/"+item_id
+        item_json_url = elastic.index_url + "/doc/" + item_id
         item_json = {"type": type_, type_: item_json}
 
     headers = HEADERS_JSON
@@ -137,6 +140,7 @@ def import_item_json(elastic, type_, item_id, item_json, data_sources=None):
     res.raise_for_status()
 
     return item_json
+
 
 def exists_dashboard(elastic_url, dash_id, es_index=None):
     """ Check if a dashboard exists """
@@ -151,25 +155,30 @@ def exists_dashboard(elastic_url, dash_id, es_index=None):
 
     return exists
 
+
 def get_dashboard_json(elastic, dashboard_id):
     dash_json = find_item_json(elastic, "dashboard", dashboard_id)
 
     return dash_json
+
 
 def get_vis_json(elastic, vis_id):
     vis_json = find_item_json(elastic, "visualization", vis_id)
 
     return vis_json
 
+
 def get_search_json(elastic, search_id):
     search_json = find_item_json(elastic, "search", search_id)
 
     return search_json
 
+
 def get_index_pattern_json(elastic, index_pattern_id):
     index_pattern_json = find_item_json(elastic, "index-pattern", index_pattern_id)
 
     return index_pattern_json
+
 
 def get_search_from_vis(elastic, vis):
     search_id = None
@@ -228,17 +237,18 @@ def create_search(elastic_url, dashboard, index_pattern, es_index=None):
     search_json['kibanaSavedObjectMeta']['searchSourceJSON'] = new_search_source
 
     search_json['title'] += " " + index_pattern
-    new_search_id = search_id+"__"+index_pattern
+    new_search_id = search_id + "__" + index_pattern
 
-    url = elastic.index_url+"/search/"+new_search_id
+    url = elastic.index_url + "/search/" + new_search_id
     headers = {"Content-Type": "application/json"}
-    res = requests_ses.post(url, data = json.dumps(search_json),
+    res = requests_ses.post(url, data=json.dumps(search_json),
                             verify=False, headers=headers)
     res.raise_for_status()
 
     logger.debug("New search created: %s", url)
 
     return new_search_id
+
 
 def get_index_pattern_from_meta(meta_data):
     index = None
@@ -250,6 +260,7 @@ def get_index_pattern_from_meta(meta_data):
         if len(mdata["filter"]) > 0:
             index = mdata["filter"][0]["meta"]["index"]
     return index
+
 
 def get_index_pattern_from_vis(elastic, vis):
     index_pattern = None
@@ -264,6 +275,7 @@ def get_index_pattern_from_vis(elastic, vis):
     elif "kibanaSavedObjectMeta" in vis_json:
         index_pattern = get_index_pattern_from_meta(vis_json["kibanaSavedObjectMeta"])
     return index_pattern
+
 
 def create_index_pattern(elastic_url, dashboard, enrich_index, es_index=None):
     """ Create a index pattern using as template the index pattern
@@ -304,18 +316,18 @@ def create_index_pattern(elastic_url, dashboard, enrich_index, es_index=None):
 
     logger.debug("Found %s template index pattern", index_pattern)
 
-
     new_index_pattern_json = get_index_pattern_json(elastic, index_pattern)
 
     new_index_pattern_json['title'] = enrich_index
-    url = elastic.index_url+"/index-pattern/"+enrich_index
+    url = elastic.index_url + "/index-pattern/" + enrich_index
     headers = {"Content-Type": "application/json"}
-    res = requests_ses.post(url, data = json.dumps(new_index_pattern_json),
+    res = requests_ses.post(url, data=json.dumps(new_index_pattern_json),
                             verify=False, headers=headers)
     res.raise_for_status()
     logger.debug("New index pattern created: %s", url)
 
     return enrich_index
+
 
 def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index=None):
     """ Create a new dashboard using dashboard as template
@@ -331,13 +343,12 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
             if panel['type'] in ['visualization', 'search']:
                 if panel['type'] == 'visualization':
                     dash_vis_ids.append(panel['id'])
-                panel['id'] += "__"+enrich_index
+                panel['id'] += "__" + enrich_index
                 if panel['type'] == 'search':
                     panel['id'] = search_id
             new_panels.append(panel)
 
         create_vis(elastic, dash_vis_ids, search_id)
-
 
         return new_panels
 
@@ -345,13 +356,13 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
         """ Create new visualizations for the dashboard """
 
         # Create visualizations for the new dashboard
-        item_template_url = elastic.index_url+"/visualization"
+        item_template_url = elastic.index_url + "/visualization"
         # Hack: Get all vis if they are <10000. Use scroll API to get all.
         # Better: use mget to get all vis in dash_vis_ids
-        item_template_url_search = item_template_url+"/_search?size=10000"
+        item_template_url_search = item_template_url + "/_search?size=10000"
         res = requests_ses.get(item_template_url_search, verify=False)
         res.raise_for_status()
-        all_visualizations =res.json()['hits']['hits']
+        all_visualizations = res.json()['hits']['hits']
 
         visualizations = []
         for vis in all_visualizations:
@@ -363,7 +374,7 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
         for vis in visualizations:
             vis_data = vis['_source']
             vis_name = vis['_id'].split("_")[-1]
-            vis_id = vis_name+"__"+enrich_index
+            vis_id = vis_name + "__" + enrich_index
             vis_data['title'] = vis_id
             vis_meta = json.loads(vis_data['kibanaSavedObjectMeta']['searchSourceJSON'])
             vis_meta['index'] = enrich_index
@@ -371,10 +382,10 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
             if "savedSearchId" in vis_data:
                 vis_data["savedSearchId"] = search_id
 
-            url = item_template_url+"/"+vis_id
+            url = item_template_url + "/" + vis_id
 
             headers = {"Content-Type": "application/json"}
-            res = requests_ses.post(url, data = json.dumps(vis_data),
+            res = requests_ses.post(url, data=json.dumps(vis_data),
                                     verify=False, headers=headers)
             res.raise_for_status()
             logger.debug("Created new vis %s", url)
@@ -395,12 +406,13 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
     # Load template panels to create the new ones with their new vis
     panels = json.loads(dash_data['panelsJSON'])
     dash_data['panelsJSON'] = json.dumps(new_panels(elastic, panels, search_id))
-    dash_path = "/dashboard/"+dashboard+"__"+enrich_index
+    dash_path = "/dashboard/" + dashboard + "__" + enrich_index
     url = elastic.index_url + dash_path
-    res = requests_ses.post(url, data = json.dumps(dash_data), verify=False, headers=HEADERS_JSON)
+    res = requests_ses.post(url, data=json.dumps(dash_data), verify=False, headers=HEADERS_JSON)
     res.raise_for_status()
-    dash_url = kibana_host+"/app/kibana#"+dash_path
+    dash_url = kibana_host + "/app/kibana#" + dash_path
     return dash_url
+
 
 def list_dashboards(elastic_url, es_index=None):
     if not es_index:
@@ -410,10 +422,10 @@ def list_dashboards(elastic_url, es_index=None):
     elastic_ver = find_elasticsearch_version(elastic)
 
     if elastic_ver < 6:
-        dash_json_url = elastic.index_url+"/dashboard/_search?size=10000"
+        dash_json_url = elastic.index_url + "/dashboard/_search?size=10000"
         res = requests_ses.get(dash_json_url, verify=False)
     else:
-        items_json_url = elastic.index_url+"/_search?size=10000"
+        items_json_url = elastic.index_url + "/_search?size=10000"
         query = '''
         {
             "query" : {
@@ -438,6 +450,7 @@ def list_dashboards(elastic_url, es_index=None):
 
         print("_id:%s title:%s" % (dash["_id"], dash_json["title"]))
 
+
 def read_panel_file(panel_file):
     """Read a panel file (in JSON format) and return its contents.
 
@@ -453,6 +466,7 @@ def read_panel_file(panel_file):
     else:
         try:
             import panels
+            panels_mod = panels
             logger.debug("Reading panel from module panels")
             # Next is just a hack for files with "expected" prefix
             if panel_file.startswith('panels/json/'):
@@ -463,7 +477,7 @@ def read_panel_file(panel_file):
             kibana_str = kibana_bytes.decode(encoding='utf8')
         except (ImportError, FileNotFoundError, AttributeError):
             logger.error("Panel not found (not in directory, no panels module): %s",
-                        panel_file)
+                         panel_file)
             return None
 
     try:
@@ -472,6 +486,7 @@ def read_panel_file(panel_file):
         logger.error("Wrong file format (not JSON): %s", module_file)
         return None
     return kibana_dict
+
 
 def get_dashboard_name(panel_file):
     """ Return the dashboard name included in a JSON panel file """
@@ -483,8 +498,9 @@ def get_dashboard_name(panel_file):
         dash_name = kibana['dashboard']['id']
     elif kibana:
         logger.error("Wrong panel format (can't find 'dashboard' field): %s",
-                    panel_file)
+                     panel_file)
     return dash_name
+
 
 def is_search_from_data_sources(search, data_sources):
     found = False
@@ -498,6 +514,7 @@ def is_search_from_data_sources(search, data_sources):
 
     return found
 
+
 def is_vis_from_data_sources(vis, data_sources):
     found = False
     vis_title = vis['value']['title']
@@ -509,6 +526,7 @@ def is_vis_from_data_sources(vis, data_sources):
             break
 
     return found
+
 
 def is_index_pattern_from_data_sources(index, data_sources):
     found = False
@@ -562,7 +580,6 @@ def import_dashboard(elastic_url, import_file, es_index=None, data_sources=None)
             else:
                 logger.debug("Vis %s not for %s. Not included.", vis['id'], data_sources)
 
-
     logger.info("Dashboard %s imported", get_dashboard_name(import_file))
 
 
@@ -584,7 +601,7 @@ def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
 
     elastic = ElasticSearch(elastic_url, es_index)
 
-    kibana["dashboard"] = {"id":dash_id, "value":get_dashboard_json(elastic, dash_id)}
+    kibana["dashboard"] = {"id": dash_id, "value": get_dashboard_json(elastic, dash_id)}
 
     if "panelsJSON" not in kibana["dashboard"]["value"]:
         # The dashboard is empty. No visualizations included.
@@ -599,18 +616,18 @@ def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
             search_id = get_search_from_vis(elastic, vis_id)
             if search_id and search_id not in search_ids_done:
                 search_ids_done.append(search_id)
-                kibana["searches"].append({"id":search_id,
-                                           "value":get_search_json(elastic, search_id)})
+                kibana["searches"].append({"id": search_id,
+                                           "value": get_search_json(elastic, search_id)})
             index_pattern_id = get_index_pattern_from_vis(elastic, vis_id)
             if index_pattern_id and index_pattern_id not in index_ids_done:
                 index_ids_done.append(index_pattern_id)
-                kibana["index_patterns"].append({"id":index_pattern_id,
-                                                 "value":get_index_pattern_json(elastic, index_pattern_id)})
+                kibana["index_patterns"].append({"id": index_pattern_id,
+                                                 "value": get_index_pattern_json(elastic, index_pattern_id)})
         elif panel['type'] in ['search']:
             # A search could be directly visualized inside a panel
             search_id = panel['id']
-            kibana["searches"].append({"id":search_id,
-                                       "value":get_search_json(elastic, search_id)})
+            kibana["searches"].append({"id": search_id,
+                                       "value": get_search_json(elastic, search_id)})
 
     logger.debug("Done")
 

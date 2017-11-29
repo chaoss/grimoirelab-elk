@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA. 
+# Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA.
 #
 # Authors:
 #     Alvaro del Castillo <acs@bitergia.com>
@@ -24,5 +24,6 @@ import logging
 
 from ._version import __version__
 
+__all__ = [__version__]
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())

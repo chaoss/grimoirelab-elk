@@ -27,15 +27,9 @@ import argparse
 import logging
 import sys
 
-from urllib.parse import urljoin
-
-import requests
-
 from dateutil import parser
 
 from .ocean.elastic import ElasticOcean
-
-from .elk.utils import grimoire_con
 
 # Connectors for Ocean
 from .ocean.askbot import AskbotOcean
@@ -142,6 +136,7 @@ logger = logging.getLogger(__name__)
 
 kibiter_version = None
 
+
 def get_connector_from_name(name):
     found = None
     connectors = get_connectors()
@@ -151,6 +146,7 @@ def get_connector_from_name(name):
             found = connectors[cname]
 
     return found
+
 
 def get_connector_name(cls):
     found = None
@@ -166,6 +162,7 @@ def get_connector_name(cls):
                 else:
                     found = cname
     return found
+
 
 def get_connector_name_from_cls_name(cls_name):
     found = None
@@ -187,41 +184,42 @@ def get_connector_name_from_cls_name(cls_name):
 
 def get_connectors():
 
-    return {"askbot":[Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
-            "bugzilla":[Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
-            "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
-            "confluence":[Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
-            "crates":[Crates, CratesOcean, CratesEnrich, CratesCommand],
-            "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
-            "dockerhub":[DockerHub, DockerHubOcean, DockerHubEnrich, DockerHubCommand],
-            "functest":[Functest, FunctestOcean, FunctestEnrich, FunctestCommand],
-            "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
-            "git":[Git, GitOcean, GitEnrich, GitCommand],
-            "github":[GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
-            "gmane":[Gmane, MBoxOcean, GmaneEnrich, GmaneCommand],
-            "hyperkitty":[HyperKitty, MBoxOcean, HyperKittyEnrich, HyperKittyCommand],
-            "jenkins":[Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
-            "jira":[Jira, JiraOcean, JiraEnrich, JiraCommand],
-            "kitsune":[Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
-            "mbox":[MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
-            "mediawiki":[MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
-            "meetup":[Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
-            "mozillaclub":[MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
-            "nntp":[NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
-            "phabricator":[Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
-            "pipermail":[Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
-            "redmine":[Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
-            "remo":[ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
-            "rss":[RSS, RSSOcean, RSSEnrich, RSSCommand],
-            "slack":[Slack, SlackOcean, SlackEnrich, SlackCommand],
-            "stackexchange":[StackExchange, StackExchangeOcean,
-                             StackExchangeEnrich, StackExchangeCommand],
-             "supybot":[Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
-             "telegram":[Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
-             "twitter":[None, TwitterOcean, TwitterEnrich, None]
+    return {"askbot": [Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
+            "bugzilla": [Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
+            "bugzillarest": [BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
+            "confluence": [Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
+            "crates": [Crates, CratesOcean, CratesEnrich, CratesCommand],
+            "discourse": [Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
+            "dockerhub": [DockerHub, DockerHubOcean, DockerHubEnrich, DockerHubCommand],
+            "functest": [Functest, FunctestOcean, FunctestEnrich, FunctestCommand],
+            "gerrit": [Gerrit, GerritOcean, GerritEnrich, GerritCommand],
+            "git": [Git, GitOcean, GitEnrich, GitCommand],
+            "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
+            "gmane": [Gmane, MBoxOcean, GmaneEnrich, GmaneCommand],
+            "hyperkitty": [HyperKitty, MBoxOcean, HyperKittyEnrich, HyperKittyCommand],
+            "jenkins": [Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
+            "jira": [Jira, JiraOcean, JiraEnrich, JiraCommand],
+            "kitsune": [Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
+            "mbox": [MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
+            "mediawiki": [MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
+            "meetup": [Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
+            "mozillaclub": [MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
+            "nntp": [NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
+            "phabricator": [Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
+            "pipermail": [Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
+            "redmine": [Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
+            "remo": [ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
+            "rss": [RSS, RSSOcean, RSSEnrich, RSSCommand],
+            "slack": [Slack, SlackOcean, SlackEnrich, SlackCommand],
+            "stackexchange": [StackExchange, StackExchangeOcean,
+                              StackExchangeEnrich, StackExchangeCommand],
+            "supybot": [Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
+            "telegram": [Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
+            "twitter": [None, TwitterOcean, TwitterEnrich, None]
             }  # Will come from Registry
 
-def get_elastic(url, es_index, clean = None, backend = None):
+
+def get_elastic(url, es_index, clean=None, backend=None):
 
     mapping = None
 
@@ -239,6 +237,7 @@ def get_elastic(url, es_index, clean = None, backend = None):
 
     return elastic
 
+
 def config_logging(debug):
 
     if debug:
@@ -251,9 +250,11 @@ def config_logging(debug):
     # Per commit log is too verbose
     logging.getLogger("perceval.backends.core.git").setLevel(logging.WARNING)
 
+
 ARTHUR_USAGE_MSG = ''
 ARTHUR_DESC_MSG = ''
 ARTHUR_EPILOG_MSG = ''
+
 
 def get_params_parser():
     """Parse command line arguments"""
@@ -267,26 +268,25 @@ def get_params_parser():
     ElasticOcean.add_params(parser)
 
     parser.add_argument('-h', '--help', action='help',
-                       help=argparse.SUPPRESS)
+                        help=argparse.SUPPRESS)
     parser.add_argument('-g', '--debug', dest='debug',
                         action='store_true',
                         help=argparse.SUPPRESS)
-
-    parser.add_argument("--no_incremental",  action='store_true',
+    parser.add_argument("--no_incremental", action='store_true',
                         help="don't use last state for data source")
-    parser.add_argument("--fetch_cache",  action='store_true',
+    parser.add_argument("--fetch_cache", action='store_true',
                         help="Use cache for item retrieval")
-    parser.add_argument("--enrich",  action='store_true',
+    parser.add_argument("--enrich", action='store_true',
                         help="Enrich items after retrieving")
-    parser.add_argument("--enrich_only",  action='store_true',
+    parser.add_argument("--enrich_only", action='store_true',
                         help="Only enrich items (DEPRECATED, use --only-enrich)")
-    parser.add_argument("--only-enrich",  dest='enrich_only', action='store_true',
+    parser.add_argument("--only-enrich", dest='enrich_only', action='store_true',
                         help="Only enrich items")
-    parser.add_argument("--filter-raw",  dest='filter_raw',
+    parser.add_argument("--filter-raw", dest='filter_raw',
                         help="Filter raw items. Format: field:value")
-    parser.add_argument("--filters-raw-prefix",  nargs='*',
+    parser.add_argument("--filters-raw-prefix", nargs='*',
                         help="Filter raw items with prefix filter. Format: field:value field:value ...")
-    parser.add_argument("--events-enrich",  dest='events_enrich', action='store_true',
+    parser.add_argument("--events-enrich", dest='events_enrich', action='store_true',
                         help="Enrich events in items")
     parser.add_argument('--index', help="Ocean index name")
     parser.add_argument('--index-enrich', dest="index_enrich", help="Ocean enriched index name")
@@ -332,6 +332,7 @@ def get_params():
 
     return args
 
+
 def get_time_diff_days(start_txt, end_txt):
     ''' Number of days between two days  '''
 
@@ -341,9 +342,9 @@ def get_time_diff_days(start_txt, end_txt):
     start = parser.parse(start_txt)
     end = parser.parse(end_txt)
 
-    seconds_day = float(60*60*24)
+    seconds_day = float(60 * 60 * 24)
     diff_days = \
-        (end-start).total_seconds() / seconds_day
+        (end - start).total_seconds() / seconds_day
     diff_days = float('%.2f' % diff_days)
 
     return diff_days
