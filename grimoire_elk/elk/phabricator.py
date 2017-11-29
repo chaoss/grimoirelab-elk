@@ -232,7 +232,8 @@ class PhabricatorEnrich(Enrich):
     def __fill_phab_ids(self, item):
         """ Get mappings between phab ids and names """
         for p in item['projects']:
-            self.phab_ids_names[p['phid']] = p['name']
+            if 'name' in p and 'phid' in p:
+                self.phab_ids_names[p['phid']] = p['name']
         if 'authorData' not in item['fields'] or not item['fields']['authorData']:
             return
         self.phab_ids_names[item['fields']['authorData']['phid']] = item['fields']['authorData']['userName']
