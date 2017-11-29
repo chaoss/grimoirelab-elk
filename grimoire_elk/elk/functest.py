@@ -42,6 +42,10 @@ class FunctestEnrich(Enrich):
 
         return identities
 
+    def get_field_author(self):
+        # In Functest there is no identities support
+        return None
+
     @metadata
     def get_rich_item(self, item):
         eitem = {}
