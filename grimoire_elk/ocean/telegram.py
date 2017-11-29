@@ -23,6 +23,7 @@
 
 from .elastic import ElasticOcean
 
+
 class TelegramOcean(ElasticOcean):
     """Telegram Ocean feeder"""
 

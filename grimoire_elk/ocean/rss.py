@@ -25,6 +25,7 @@
 
 from .elastic import ElasticOcean
 
+
 class RSSOcean(ElasticOcean):
     """RSS Ocean feeder"""
 

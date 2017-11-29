@@ -51,6 +51,7 @@ def get_params_parser_create_dash():
 
     return parser
 
+
 def get_params():
     parser = get_params_parser_create_dash()
     args = parser.parse_args()

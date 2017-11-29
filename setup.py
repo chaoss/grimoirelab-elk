@@ -42,7 +42,7 @@ try:
     long_description = pypandoc.convert(readme_md, 'rst')
 except (IOError, ImportError):
     print("Warning: pypandoc module not found, or pandoc not installed. "
-            "Using md instead of rst", file=sys.stderr)
+          "Using md instead of rst", file=sys.stderr)
     with codecs.open(readme_md, encoding='utf-8') as f:
         long_description = f.read()
 
@@ -59,24 +59,24 @@ setup(name="grimoire-elk",
       author_email="metrics-grimoire@lists.libresoft.info",
       license="GPLv3",
       classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5'],
+          'Development Status :: 5 - Production/Stable',
+          'Intended Audience :: Developers',
+          'Topic :: Software Development',
+          'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5'],
       keywords="development repositories analytics",
       packages=['grimoire_elk', 'grimoire_elk.elk', 'grimoire_elk.ocean'],
       python_requires='>=3.4',
       setup_requires=['wheel'],
       extras_require={'sortinghat': ['sortinghat'],
-                        'arthur': ['grimoirelab-arthur'],
-                        'mysql': ['PyMySQL']},
+                      'arthur': ['grimoirelab-arthur'],
+                      'mysql': ['PyMySQL']},
       tests_require=[],
       test_suite='tests',
       scripts=["utils/p2o.py"],
       install_requires=['perceval>=0.9.2', 'perceval-mozilla>=0.1.1', 'perceval-opnfv>=0.1.1'],
       include_package_data=True,
       zip_safe=False
-    )
+      )

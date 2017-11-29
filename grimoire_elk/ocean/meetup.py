@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# Git Ocean feeder
+# Meetup Ocean feeder
 #
 # Copyright (C) 2015 Bitergia
 #
@@ -24,6 +24,7 @@
 #
 
 from .elastic import ElasticOcean
+
 
 class MeetupOcean(ElasticOcean):
     """Git Ocean feeder"""

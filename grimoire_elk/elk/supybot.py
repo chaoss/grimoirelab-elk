@@ -22,7 +22,6 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
 
 from dateutil import parser
@@ -55,9 +54,7 @@ class SupybotEnrich(Enrich):
            }
         } """ % fielddata
 
-
         return {"items": mapping}
-
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -97,14 +94,14 @@ class SupybotEnrich(Enrich):
         message = item['data']
 
         # data fields to copy
-        copy_fields = ["nick","body","type"]
+        copy_fields = ["nick", "body", "type"]
         for f in copy_fields:
             if f in message:
                 eitem[f] = message[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"body": "body_analyzed", "timestamp":"sent_date"}
+        map_fields = {"body": "body_analyzed", "timestamp": "sent_date"}
         for fn in map_fields:
             eitem[map_fields[fn]] = message[fn]
 

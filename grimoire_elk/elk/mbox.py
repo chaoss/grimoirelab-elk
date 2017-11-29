@@ -71,7 +71,7 @@ class MBoxEnrich(Enrich):
            }
         } """ % fielddata
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -166,9 +166,9 @@ class MBoxEnrich(Enrich):
         # Time zone
         try:
             message_date = parser.parse(message['Date'])
-            eitem["tz"]  = int(message_date.strftime("%z")[0:3])
-        except:
-            eitem["tz"]  = None
+            eitem["tz"] = int(message_date.strftime("%z")[0:3])
+        except Exception:
+            eitem["tz"] = None
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
@@ -200,7 +200,7 @@ class MBoxEnrich(Enrich):
         total = 0
         bulk_json = ""
 
-        url = self.elastic.index_url+'/items/_bulk'
+        url = self.elastic.index_url + '/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
@@ -214,15 +214,15 @@ class MBoxEnrich(Enrich):
             data_json = json.dumps(rich_item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                 (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
+            bulk_json += data_json + "\n"  # Bulk document
             current += 1
             total += 1
         try:
-            self.requests.put(url, data = bulk_json)
+            self.requests.put(url, data=bulk_json)
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
             logger.error("Encoding error ... converting bulk to iso-8859-1")
-            bulk_json = bulk_json.encode('iso-8859-1','ignore')
+            bulk_json = bulk_json.encode('iso-8859-1', 'ignore')
             self.requests.put(url, data=bulk_json)
 
         return total

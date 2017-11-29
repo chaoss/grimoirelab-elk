@@ -24,13 +24,11 @@
 
 import logging
 
-from dateutil import parser
 
 from .enrich import Enrich, metadata
 
 
 logger = logging.getLogger(__name__)
-
 
 
 class SlackEnrich(Enrich):
@@ -44,7 +42,6 @@ class SlackEnrich(Enrich):
         if self.kibiter_version == '5':
             fielddata = ', "fielddata": true'
 
-
         mapping = """
         {
             "properties": {
@@ -54,9 +51,9 @@ class SlackEnrich(Enrich):
                    %s
                   }
            }
-        } """  % fielddata
+        } """ % fielddata
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {
@@ -91,7 +88,6 @@ class SlackEnrich(Enrich):
         identities.append(identity)
 
         return identities
-
 
     @metadata
     def get_rich_item(self, item):
@@ -155,7 +151,7 @@ class SlackEnrich(Enrich):
             if 'tz_offset' in message['user_data']:
                 eitem['tz'] = message['user_data']['tz_offset']
                 # tz must be in -12h to 12h interval, so seconds -> hours
-                eitem['tz'] = round(int(eitem['tz'])/(60*60))
+                eitem['tz'] = round(int(eitem['tz']) / (60 * 60))
             if 'is_admin' in message['user_data']:
                 eitem['is_admin'] = message['user_data']['is_admin']
             if 'is_owner' in message['user_data']:

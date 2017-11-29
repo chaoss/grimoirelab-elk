@@ -41,8 +41,8 @@ try:
     import pypandoc
     long_description = pypandoc.convert(readme_md, 'rst')
 except (IOError, ImportError):
-    print("Warning: pypandoc module not found, or pandoc not installed. " \
-            + "Using md instead of rst")
+    print("Warning: pypandoc module not found, or pandoc not installed. " +
+          "Using md instead of rst")
     with codecs.open(readme_md, encoding='utf-8') as f:
         long_description = f.read()
 
@@ -59,19 +59,19 @@ setup(name="grimoire-kidash",
       author_email="metrics-grimoire@lists.libresoft.info",
       license="GPLv3",
       classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5'],
+          'Development Status :: 5 - Production/Stable',
+          'Intended Audience :: Developers',
+          'Topic :: Software Development',
+          'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5'],
       keywords="development repositories analytics",
       scripts=["kidash.py"],
       install_requires=['python-dateutil',
-        'grimoire-elk>=0.30.9',
-        'grimoirelab-panels>=0.0.1'
-        ],
+                        'grimoire-elk>=0.30.9',
+                        'grimoirelab-panels>=0.0.1'
+                        ],
       include_package_data=True,
       zip_safe=False
-    )
+      )

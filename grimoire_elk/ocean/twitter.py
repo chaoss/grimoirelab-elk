@@ -23,6 +23,7 @@
 
 from .elastic import ElasticOcean
 
+
 class TwitterOcean(ElasticOcean):
     """Twitter Ocean feeder"""
 

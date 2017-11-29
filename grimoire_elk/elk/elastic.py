@@ -40,8 +40,10 @@ logger = logging.getLogger(__name__)
 class ElasticConnectException(Exception):
     message = "Can't connect to ElasticSearch"
 
+
 class ElasticWriteException(Exception):
     message = "Can't write to ElasticSearch"
+
 
 class ElasticSearch(object):
 
@@ -52,10 +54,10 @@ class ElasticSearch(object):
         """ Return a valid elastic index generated from unique_id """
         index = unique_id
         if unique_id:
-            index = unique_id.replace("/","_").lower()
+            index = unique_id.replace("/", "_").lower()
         return index
 
-    def __init__(self, url, index, mappings = None, clean = False,
+    def __init__(self, url, index, mappings=None, clean=False,
                  insecure=True, analyzers=None):
         ''' clean: remove already existing index
             insecure: support https with invalid certificates
@@ -64,7 +66,7 @@ class ElasticSearch(object):
         self.url = url
         # Valid index for elastic
         self.index = self.safe_index(index)
-        self.index_url = self.url+"/"+self.index
+        self.index_url = self.url + "/" + self.index
         self.wait_bulk_seconds = 2  # time to wait to complete a bulk operation
 
         self.requests = grimoire_con(insecure)
@@ -76,7 +78,7 @@ class ElasticSearch(object):
             r = self.requests.put(self.index_url, data=analyzers)
             if r.status_code != 200:
                 logger.error("Can't create index %s (%s)",
-                              self.index_url, r.status_code)
+                             self.index_url, r.status_code)
                 raise ElasticWriteException()
             else:
                 logger.info("Created index " + self.index_url)
@@ -97,7 +99,7 @@ class ElasticSearch(object):
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
             logger.error("Encondig error ... converting bulk to iso-8859-1")
-            bulk_json = bulk_json.encode('iso-8859-1','ignore')
+            bulk_json = bulk_json.encode('iso-8859-1', 'ignore')
             self.requests.put(url, data=bulk_json)
 
     def bulk_upload(self, items, field_id):
@@ -107,7 +109,7 @@ class ElasticSearch(object):
         new_items = 0  # total items added with bulk
         bulk_json = ""
 
-        url = self.index_url+'/items/_bulk'
+        url = self.index_url + '/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)" % (url, self.max_items_bulk))
         task_init = time()
@@ -118,19 +120,19 @@ class ElasticSearch(object):
                 self._safe_put_bulk(url, bulk_json)
                 new_items += current
                 current = 0
-                json_size = sys.getsizeof(bulk_json) / (1024*1024)
+                json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                 logger.debug("bulk packet sent (%.2f sec, %i total, %.2f MB)"
-                              % (time()-task_init, new_items, json_size))
+                             % (time() - task_init, new_items, json_size))
                 bulk_json = ""
             data_json = json.dumps(item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
-            bulk_json += data_json +"\n"  # Bulk document
+            bulk_json += data_json + "\n"  # Bulk document
             current += 1
         self._safe_put_bulk(url, bulk_json)
         new_items += current
-        json_size = sys.getsizeof(bulk_json) / (1024*1024)
+        json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
         logger.debug("bulk packet sent (%.2f sec prev, %i total, %.2f MB)"
-                      % (time()-task_init, new_items, json_size))
+                     % (time() - task_init, new_items, json_size))
 
         return new_items
 
@@ -143,7 +145,7 @@ class ElasticSearch(object):
 
         def current_items():
             """ Current number of items in the index """
-            res = self.requests.get(self.index_url+'/_search?size=1')
+            res = self.requests.get(self.index_url + '/_search?size=1')
             res.raise_for_status()
             return res.json()['hits']['total']
 
@@ -159,12 +161,11 @@ class ElasticSearch(object):
             while total_search != total_expected:
                 sleep(0.1)
                 total_search = current_items()
-                if (datetime.now()-search_start).total_seconds() > self.wait_bulk_seconds:
+                if (datetime.now() - search_start).total_seconds() > self.wait_bulk_seconds:
                     logger.debug("Bulk data does not appear as NEW after %is",
                                  self.wait_bulk_seconds)
-                    logger.debug("Probably %i item updates", total_expected-total_search)
+                    logger.debug("Probably %i item updates", total_expected - total_search)
                     break
-
 
         total = 0
         max_items = self.max_items_bulk
@@ -180,7 +181,7 @@ class ElasticSearch(object):
                 total += self.bulk_upload(items_pack, field_id)
                 items_pack = []
                 if sync:
-                    wait_index(total_items+max_items)
+                    wait_index(total_items + max_items)
                 logger.debug('Total items already uploaded %i', total)
 
             items_pack.append(item)
@@ -215,7 +216,7 @@ class ElasticSearch(object):
 
         for _type in mappings:
 
-            url_map = self.index_url + "/"+_type+"/_mapping"
+            url_map = self.index_url + "/" + _type + "/_mapping"
 
             # First create the manual mappings
             if mappings[_type] != '{}':
@@ -227,30 +228,30 @@ class ElasticSearch(object):
             res = self.requests.put(url_map, data=self.global_mapping())
             res.raise_for_status()
 
-    def get_last_date(self, field, _filters = []):
+    def get_last_date(self, field, filters_=[]):
         '''
             :field: field with the data
-            :_filter: additional filter to find the date
+            :filter_: additional filter to find the date
         '''
 
-        last_date = self.get_last_item_field(field, _filters=_filters)
+        last_date = self.get_last_item_field(field, filters_=filters_)
 
         return last_date
 
-    def get_last_offset(self, field, _filters = []):
+    def get_last_offset(self, field, filters_=[]):
         '''
             :field: field with the data
-            :_filter: additional filter to find the date
+            :filter_: additional filter to find the date
         '''
 
-        offset = self.get_last_item_field(field, _filters=_filters, offset=True)
+        offset = self.get_last_item_field(field, filters_=filters_, offset=True)
 
         return offset
 
-    def get_last_item_field(self, field, _filters = [], offset = False):
+    def get_last_item_field(self, field, filters_=[], offset=False):
         '''
             :field: field with the data
-            :_filters: additional filters to find the date
+            :filters_: additional filters to find the date
             :offset: Return offset field insted of date field
         '''
 
@@ -260,15 +261,16 @@ class ElasticSearch(object):
         url += "/_search"
 
         data_query = ''
-        if _filters is None: _filters = []
-        for _filter in _filters:
-            if not _filter:
+        if filters_ is None:
+            filters_ = []
+        for filter_ in filters_:
+            if not filter_:
                 continue
             data_query += '''
                 "query" : {
                     "term" : { "%s" : "%s"  }
                  },
-            ''' % (_filter['name'], _filter['value'])
+            ''' % (filter_['name'], filter_['value'])
 
         data_agg = '''
             "aggs": {
@@ -305,5 +307,5 @@ class ElasticSearch(object):
                             last_value = unixtime_to_datetime(last_value)
                         except ValueError:
                             # last_value is in microsecs
-                            last_value = unixtime_to_datetime(last_value/1000)
+                            last_value = unixtime_to_datetime(last_value / 1000)
         return last_value

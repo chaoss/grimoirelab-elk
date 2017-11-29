@@ -33,6 +33,7 @@ from grimoire_elk.elk.elastic import ElasticSearch, ElasticConnectException, Ela
 from grimoire_elk.ocean.elastic import ElasticOcean
 from grimoire_elk.ocean.conf import ConfOcean
 
+
 def get_elastic():
 
     try:
@@ -47,7 +48,6 @@ def get_elastic():
         logging.error("Can't write to Elastic Search.")
         sys.exit(1)
 
-
     return elastic_ocean
 
 
@@ -58,7 +58,7 @@ def get_params():
 
     # Commands supported
 
-    parser.add_argument("-l", "--list",  action='store_true',
+    parser.add_argument("-l", "--list", action='store_true',
                         help="Lists repositories")
     parser.add_argument("-r", "--remove",
                         help="Remove a repository")
@@ -68,6 +68,7 @@ def get_params():
     args = parser.parse_args()
 
     return args
+
 
 def list_repos_ids():
     logging.debug("Listing repos ids")
@@ -88,7 +89,7 @@ def list_repos():
         url = elastic.index_url + "/repos/" + repo_id
         r = requests.get(url)
         repo = r.json()['_source']
-        print ("%s %s %s" % (repo_id, repo['repo_update'], repo['success']))
+        print("%s %s %s" % (repo_id, repo['repo_update'], repo['success']))
 
 
 def remove_repo(repo_id):
@@ -101,6 +102,7 @@ def remove_repo(repo_id):
         logging.info("Done")
     else:
         logging.error("Can not remove %s (%i)" % (repo_id, r.status_code))
+
 
 def config_logging(debug):
 

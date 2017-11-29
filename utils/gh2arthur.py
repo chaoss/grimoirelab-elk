@@ -24,12 +24,12 @@
 #
 
 import argparse
-import configparser
 import json
 import logging
-import requests
+import sys
 
 import MySQLdb
+import requests
 
 from datetime import datetime
 from os import path
@@ -44,19 +44,20 @@ from grimoire_elk.utils import config_logging
 
 GITHUB_URL = "https://github.com/"
 GITHUB_API_URL = "https://api.github.com"
-NREPOS = 0 # Default number of repos to be analyzed: all
+NREPOS = 0  # Default number of repos to be analyzed: all
 CAULDRON_DASH_URL = "https://cauldron.io/dashboards"
 GIT_CLONE_DIR = "/tmp"
 OCEAN_INDEX = "ocean"
 PERCEVAL_BACKEND = "git"
 PROJECTS_DS = "scm"
 
+
 def get_params_parser():
     """Parse command line arguments"""
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-e", "--elastic_url",  default="http://127.0.0.1:9200",
+    parser.add_argument("-e", "--elastic_url", default="http://127.0.0.1:9200",
                         help="Host with elastic search" +
                         "(default: http://127.0.0.1:9200)")
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
@@ -69,6 +70,7 @@ def get_params_parser():
 
     return parser
 
+
 def get_params():
     parser = get_params_parser()
     args = parser.parse_args()
@@ -79,25 +81,28 @@ def get_params():
 
     return args
 
+
 def get_payload():
     # 100 max in repos
     payload = {'per_page': 100,
                'fork': False,
-               'sort': 'updated', # does not work in repos listing
+               'sort': 'updated',  # does not work in repos listing
                'direction': 'desc'}
     return payload
+
 
 def get_headers(token):
     headers = {'Authorization': 'token ' + token}
     return headers
+
 
 def get_owner_repos_url(owner, token):
     """ The owner could be a org or a user.
         It waits if need to have rate limit.
         Also it fixes a djando issue changing - with _
     """
-    url_org = GITHUB_API_URL+"/orgs/"+owner+"/repos"
-    url_user = GITHUB_API_URL+"/users/"+owner+"/repos"
+    url_org = GITHUB_API_URL + "/orgs/" + owner + "/repos"
+    url_user = GITHUB_API_URL + "/users/" + owner + "/repos"
 
     url_owner = url_org  # Use org by default
 
@@ -110,7 +115,7 @@ def get_owner_repos_url(owner, token):
     except requests.exceptions.HTTPError as e:
         if r.status_code == 403:
             rate_limit_reset_ts = datetime.fromtimestamp(int(r.headers['X-RateLimit-Reset']))
-            seconds_to_reset = (rate_limit_reset_ts - datetime.utcnow()).seconds+1
+            seconds_to_reset = (rate_limit_reset_ts - datetime.utcnow()).seconds + 1
             logging.info("GitHub rate limit exhausted. Waiting %i secs for rate limit reset." % (seconds_to_reset))
             sleep(seconds_to_reset)
         else:
@@ -129,14 +134,13 @@ def get_repositores(owner_url, token, nrepos):
         logging.debug("Getting repos from: %s" % (url))
         try:
             r = requests.get(url,
-                            params=get_payload(),
-                            headers=get_headers(token))
+                             params=get_payload(),
+                             headers=get_headers(token))
 
             r.raise_for_status()
             all_repos += r.json()
 
             logging.debug("Rate limit: %s" % (r.headers['X-RateLimit-Remaining']))
-
 
             if 'next' not in r.links:
                 break
@@ -150,7 +154,7 @@ def get_repositores(owner_url, token, nrepos):
     nrepos_recent = [repo for repo in all_repos if not repo['fork']]
     # Sort by updated_at and limit to nrepos
     nrepos_sorted = sorted(nrepos_recent, key=lambda repo: parser.parse(repo['updated_at']), reverse=True)
-    if nrepos>0:
+    if nrepos > 0:
         nrepos_sorted = nrepos_sorted[0:nrepos]
     # First the small repositories to feedback the user quickly
     nrepos_sorted = sorted(nrepos_sorted, key=lambda repo: repo['size'])
@@ -194,17 +198,18 @@ def create_projects_schema(cursor):
     cursor.execute(project_repositories_table)
     cursor.execute(project_children_table)
 
+
 def insert_projects_mapping(db_projects_map, project, repositories):
     try:
         db = MySQLdb.connect(user="root", passwd="", host="mariadb",
-                             db = db_projects_map)
+                             db=db_projects_map)
     except Exception:
         # Try to create the database and the tables
         db = MySQLdb.connect(user="root", passwd="", host="mariadb")
         cursor = db.cursor()
         cursor.execute("CREATE DATABASE %s CHARACTER SET utf8" % (db_projects_map))
         db = MySQLdb.connect(user="root", passwd="", host="mariadb",
-                             db = db_projects_map)
+                             db=db_projects_map)
         cursor = db.cursor()
         create_projects_schema(cursor)
 
@@ -238,13 +243,12 @@ if __name__ == '__main__':
     total_repos = 0
 
     # enrich ocean
-    index_enrich = OCEAN_INDEX+"_"+PERCEVAL_BACKEND+"_enrich"
+    index_enrich = OCEAN_INDEX + "_" + PERCEVAL_BACKEND + "_enrich"
     es_enrich = None
     try:
         es_enrich = ElasticSearch(args.elastic_url, index_enrich)
     except ElasticConnectException:
         logging.error("Can't connect to Elastic Search. Is it running?")
-
 
     # The owner could be an org or an user.
     for org in args.org:
@@ -257,15 +261,14 @@ if __name__ == '__main__':
         if args.db_projects_map:
             insert_projects_mapping(args.db_projects_map, org, repos)
 
-
         for repo in repos:
             repo_url = repo['clone_url']
             origin = repo_url
-            clone_dir = path.join(GIT_CLONE_DIR,repo_url.replace("/","_"))
-            _filter = {"name":"origin", "value":origin}
+            clone_dir = path.join(GIT_CLONE_DIR, repo_url.replace("/", "_"))
+            filter_ = {"name": "origin", "value": origin}
             last_update = None
             if es_enrich:
-                last_update = es_enrich.get_last_date("metadata__updated_on", _filter)
+                last_update = es_enrich.get_last_date("metadata__updated_on", filter_)
             if last_update:
                 last_update = last_update.isoformat()
             repo_args = {
@@ -283,7 +286,6 @@ if __name__ == '__main__':
             })
 
         total_repos += len(repos)
-
 
     logging.debug("Total repos listed: %i" % (total_repos))
 

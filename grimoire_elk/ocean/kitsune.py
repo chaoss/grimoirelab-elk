@@ -23,6 +23,7 @@
 
 from .elastic import ElasticOcean
 
+
 class KitsuneOcean(ElasticOcean):
     """Kitsune Ocean feeder"""
 

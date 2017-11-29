@@ -27,11 +27,12 @@
 
 from .elastic import ElasticOcean
 
+
 class BugzillaRESTOcean(ElasticOcean):
 
     def _fix_item(self, item):
         bug_id = str(item["data"]["id"])
-        item["ocean-unique-id"] = bug_id+"_"+item['origin']
+        item["ocean-unique-id"] = bug_id + "_" + item['origin']
 
     def get_elastic_mappings(self):
         # data.comments.text
@@ -51,4 +52,4 @@ class BugzillaRESTOcean(ElasticOcean):
         }
         '''
 
-        return {"items":mapping}
+        return {"items": mapping}

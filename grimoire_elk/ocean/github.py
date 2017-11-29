@@ -23,15 +23,14 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from dateutil import parser
-
 from .elastic import ElasticOcean
+
 
 class GitHubOcean(ElasticOcean):
     """GitHub Ocean feeder"""
 
     def _fix_item(self, item):
-        item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
+        item["ocean-unique-id"] = str(item["data"]["id"]) + "_" + item['origin']
 
     @classmethod
     def get_arthur_params_from_url(cls, url):

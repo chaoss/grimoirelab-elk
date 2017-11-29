@@ -36,17 +36,19 @@ description = """
 Uses Google API to get list of hits of some keywords.
 """
 
-def parse_args ():
+
+def parse_args():
     """
     Parse command line arguments
 
     """
 
-    parser = argparse.ArgumentParser(description = description)
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('keywords', nargs='+',
                         help="Keywords to search as Google hits")
     args = parser.parse_args()
     return args
+
 
 def get_hits(keyword):
     """
@@ -64,10 +66,10 @@ def get_hits(keyword):
     # Strip the hits
     hits = re.search('\d+', hit_string).group(0)
     keyword_json = {
-                "hits": hits,
-                "type": "googleSearchHits",
-                "keywords": [keyword]
-             }
+        "hits": hits,
+        "type": "googleSearchHits",
+        "keywords": [keyword]
+    }
     return keyword_json
 
 

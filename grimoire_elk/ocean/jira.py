@@ -23,9 +23,8 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from dateutil import parser
-
 from .elastic import ElasticOcean
+
 
 class JiraOcean(ElasticOcean):
     """JIRA Ocean feeder"""
@@ -48,8 +47,7 @@ class JiraOcean(ElasticOcean):
         }
         '''
 
-        return {"items":mapping}
-
+        return {"items": mapping}
 
     def _fix_item(self, item):
-        item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
+        item["ocean-unique-id"] = str(item["data"]["id"]) + "_" + item['origin']

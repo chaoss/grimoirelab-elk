@@ -26,9 +26,7 @@ import logging
 
 from datetime import datetime
 
-from dateutil import parser
-
-from .enrich import Enrich, metadata
+from .enrich import Enrich
 
 from .utils import get_time_diff_days, unixtime_to_datetime
 
@@ -43,7 +41,7 @@ class PhabricatorEnrich(Enrich):
     roles = ['authorData', 'ownerData']
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
-                     db_user='', db_password='', db_host=''):
+                 db_user='', db_password='', db_host=''):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map, db_user, db_password, db_host)
 
         self.phab_ids_names = {}  # To convert from phab ids to phab names
@@ -79,7 +77,7 @@ class PhabricatorEnrich(Enrich):
            }
         } """ % (fielddata, fielddata)
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -182,7 +180,7 @@ class PhabricatorEnrich(Enrich):
                         val = self.phab_ids_names[val]
                     event['newValue'] += "," + val
                 event['newValue'] = event['newValue'][1:]  # remove first comma
-            elif event['type'] in  ['status', 'description', 'priority', 'reassign', 'title', 'space', 'core:create', 'parent']:
+            elif event['type'] in ['status', 'description', 'priority', 'reassign', 'title', 'space', 'core:create', 'parent']:
                 # Convert to str so the field is always a string
                 event['oldValue'] = str(t['oldValue'])
                 if event['oldValue'] in self.phab_ids_names:
@@ -193,7 +191,7 @@ class PhabricatorEnrich(Enrich):
             elif event['type'] == 'core:comment':
                 event['newValue'] = t['comments']
             elif event['type'] == 'core:subscribers':
-                event['newValue']= ",".join(t['newValue'])
+                event['newValue'] = ",".join(t['newValue'])
             else:
                 # logger.debug("Event type %s old to new value not supported", t['transactionType'])
                 pass
@@ -206,10 +204,10 @@ class PhabricatorEnrich(Enrich):
             if event['type'] in ['status']:
                 task_change['status'] = event['newValue']
             elif event['type'] == 'priority':
-                task_change['priority'] =  event['newValue']
+                task_change['priority'] = event['newValue']
             elif event['type'] == 'core:edge':
-                task_change['tags_custom_analyzed'] =  [event['newValue']]
-            if event['type'] in  ['reassign']:
+                task_change['tags_custom_analyzed'] = [event['newValue']]
+            if event['type'] in ['reassign']:
                 # Try to get the userName and not the user id
                 if event['newValue'] in self.phab_ids_names:
                     task_change['assigned_to_userName'] = self.phab_ids_names[event['newValue']]
@@ -220,14 +218,12 @@ class PhabricatorEnrich(Enrich):
                     # Try to get the userName and not the user id
                     event['oldValue'] = self.phab_ids_names[event['oldValue']]
 
-
             for f in task_change:
                 event[f] = task_change[f]
 
             events.append(event)
 
         return events
-
 
     def __fill_phab_ids(self, item):
         """ Get mappings between phab ids and names """
@@ -286,12 +282,12 @@ class PhabricatorEnrich(Enrich):
             eitem['author_roles'] = phab_item['fields']['authorData']['roles']
             eitem['author_userName'] = phab_item['fields']['authorData']['userName']
             eitem['author_realName'] = phab_item['fields']['authorData']['realName']
-        if 'ownerData' in phab_item['fields'] and  phab_item['fields']['ownerData']:
+        if 'ownerData' in phab_item['fields'] and phab_item['fields']['ownerData']:
             eitem['assigned_to_roles'] = phab_item['fields']['ownerData']['roles']
             eitem['assigned_to_userName'] = phab_item['fields']['ownerData']['userName']
             eitem['assigned_to_realName'] = phab_item['fields']['ownerData']['realName']
 
-        eitem['priority'] = phab_item['fields']['priority'] ['name']
+        eitem['priority'] = phab_item['fields']['priority']['name']
         eitem['priority_value'] = phab_item['fields']['priority']['value']
         eitem['status'] = phab_item['fields']['status']['name']
         eitem['creation_date'] = unixtime_to_datetime(phab_item['fields']['dateCreated']).isoformat()
@@ -300,7 +296,7 @@ class PhabricatorEnrich(Enrich):
         # raise
         eitem['main_description'] = phab_item['fields']['name']
         eitem['main_description_analyzed'] = eitem['main_description']
-        eitem['url'] = eitem['origin']+"/T"+str(eitem['bug_id'])
+        eitem['url'] = eitem['origin'] + "/T" + str(eitem['bug_id'])
 
         # Time to assign (time to open -> time to assign)
         eitem['time_to_assign_days'] = None
@@ -335,8 +331,8 @@ class PhabricatorEnrich(Enrich):
                     eitem['time_to_assign_days'] = get_time_diff_days(eitem['creation_date'], change_date)
                     first_assignee_phid = change['newValue']
                     first_assignee_date = change_date
-                if 'authorData' in change and change['authorData'] and 'userName' in change['authorData'] and \
-                    change['authorData']['userName'] not in changes_assignee_list:
+                if ('authorData' in change and change['authorData'] and 'userName' in change['authorData'] and
+                    change['authorData']['userName'] not in changes_assignee_list):
                     changes_assignee_list.append(change['authorData']['userName'])
                 eitem['changes_assignment'] += 1
             if not eitem['time_to_attend_days'] and first_assignee_phid:
@@ -346,7 +342,7 @@ class PhabricatorEnrich(Enrich):
         eitem['changes_assignee_list'] = ','.join(changes_assignee_list)
         eitem['comments'] = 0
         for tr in phab_item['transactions']:
-            if tr ['comments']:
+            if tr['comments']:
                 eitem['comments'] += 1
 
         eitem['tags'] = []

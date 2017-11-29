@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# StackExchange Ocean feeder
+# DockerHub feeder
 #
-# Copyright (C) 2015 Bitergia
+# Copyright (C) 2017 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #
 
 from .elastic import ElasticOcean
+
 
 class DockerHubOcean(ElasticOcean):
     """DockerHub Ocean feeder"""

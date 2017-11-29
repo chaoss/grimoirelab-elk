@@ -53,7 +53,7 @@ class StackExchangeEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
@@ -88,13 +88,13 @@ class StackExchangeEnrich(Enrich):
         return identities
 
     @metadata
-    def get_rich_item(self, item, kind='question', question_tags = None):
+    def get_rich_item(self, item, kind='question', question_tags=None):
         eitem = {}
 
         # Fields common in questions and answers
         common_fields = ["title", "comment_count", "question_id",
                          "delete_vote_count", "up_vote_count",
-                         "down_vote_count","favorite_count", "view_count",
+                         "down_vote_count", "favorite_count", "view_count",
                          "last_activity_date", "link", "score", "tags"]
 
         if kind == 'question':
@@ -199,7 +199,7 @@ class StackExchangeEnrich(Enrich):
         total = 0
         bulk_json = ""
 
-        url = self.elastic.index_url+'/items/_bulk'
+        url = self.elastic.index_url + '/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
@@ -214,7 +214,7 @@ class StackExchangeEnrich(Enrich):
             data_json = json.dumps(rich_item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                 (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
+            bulk_json += data_json + "\n"  # Bulk document
             current += 1
             total += 1
             # Time to enrich also de answers
@@ -225,10 +225,10 @@ class StackExchangeEnrich(Enrich):
                     bulk_json += '{"index" : {"_id" : "%i_%i" } }\n' % \
                         (rich_answer[self.get_field_unique_id()],
                          rich_answer['answer_id'])
-                    bulk_json += data_json +"\n"  # Bulk document
+                    bulk_json += data_json + "\n"  # Bulk document
                     current += 1
                     total += 1
 
-        self.requests.put(url, data = bulk_json)
+        self.requests.put(url, data=bulk_json)
 
         return total

@@ -21,7 +21,6 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import argparse
 import json
 import logging
 import os
@@ -37,6 +36,7 @@ from grimoire_elk.elk.utils import grimoire_con
 logger = logging.getLogger(__name__)
 
 requests_ses = grimoire_con()
+
 
 def fetch_track_items(upstream_file_url, data_source):
     """ The file format is:
@@ -68,6 +68,7 @@ def fetch_track_items(upstream_file_url, data_source):
                 track_uris.append(line.split('url: ')[1].strip('\n'))
     return track_uris
 
+
 def get_gerrit_numbers(gerrit_uris):
     # uuid to search the gerrit review in ElasticSearch
     numbers = []
@@ -76,6 +77,7 @@ def get_gerrit_numbers(gerrit_uris):
         numbers.append(gerrit_number)
 
     return numbers
+
 
 def enrich_gerrit_items(es, index_gerrit_raw, gerrit_numbers, project, db_config):
     reviews = _get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers)
@@ -89,7 +91,6 @@ def enrich_gerrit_items(es, index_gerrit_raw, gerrit_numbers, project, db_config
                             db_host=db_config['host'],
                             json_projects_map=projects_file_path)
 
-
     # First load identities
     load_identities(reviews, enricher)
 
@@ -100,6 +101,7 @@ def enrich_gerrit_items(es, index_gerrit_raw, gerrit_numbers, project, db_config
     os.unlink(projects_file_path)
 
     return enriched_items
+
 
 def get_commits_from_gerrit(es, index_gerrit_raw, gerrit_numbers):
     # Get the gerrit reviews from ES and extract the commits sha
@@ -114,6 +116,7 @@ def get_commits_from_gerrit(es, index_gerrit_raw, gerrit_numbers):
                 commits_sha.append(patch['revision'])
 
     return commits_sha
+
 
 def enrich_git_items(es, index_git_raw, commits_sha_list, project, db_config):
     commits = _get_git_commits(es, index_git_raw, commits_sha_list)
@@ -154,6 +157,7 @@ def _get_gerrit_number(gerrit_uri):
 
     return number
 
+
 def _get_gerrit_origin(gerrit_uri):
     # Get the uuid for this item_uri. Possible formats
     # https://review.openstack.org/424868/
@@ -187,6 +191,7 @@ def _get_gerrit_reviews(es, index_gerrit_raw, gerrit_numbers):
         reviews.append(review['_source'])
     return reviews
 
+
 def _create_projects_file(project_name, data_source, items):
     """ Create a projects file from the items origin data """
 
@@ -212,7 +217,7 @@ def _get_git_commits(es, index_git_raw, commits_sha_list):
     # Get gerrit raw items
     query = {
         "query": {
-            "terms": {"data.commit" : commits_sha_list}
+            "terms": {"data.commit": commits_sha_list}
         }
     }
 

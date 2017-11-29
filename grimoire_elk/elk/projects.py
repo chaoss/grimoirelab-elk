@@ -37,7 +37,6 @@ class GrimoireLibProjects(object):
         self.projects_db = projects_db
         self.repository = repository
 
-
     def get_projects(self):
         """ Get the projects list from database """
 
@@ -45,9 +44,8 @@ class GrimoireLibProjects(object):
 
         gerrit_projects_db = self.projects_db
 
-        db = Database (user = "root", passwd = "",
-                       host = "localhost", port = 3306,
-                       scrdb = None, shdb = gerrit_projects_db, prjdb = None)
+        db = Database(user="root", passwd="", host="localhost", port=3306,
+                      scrdb=None, shdb=gerrit_projects_db, prjdb=None)
 
         sql = """
             SELECT DISTINCT(repository_name)
@@ -61,7 +59,7 @@ class GrimoireLibProjects(object):
         # openstack_rpm-packaging-tools
         for repo in repos_list_raw:
             # repo_name = repo[0].replace("review.openstack.org_","")
-            repo_name = repo[0].replace(self.repository+"_","")
+            repo_name = repo[0].replace(self.repository + "_", "")
             repos_list.append(repo_name)
 
         return repos_list

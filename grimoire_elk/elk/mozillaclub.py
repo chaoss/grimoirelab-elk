@@ -72,7 +72,7 @@ class MozillaClubEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
@@ -108,7 +108,7 @@ class MozillaClubEnrich(Enrich):
 
         # just copy all fields converting in field names spaces to _
         for f in event:
-            eitem[f.replace(" ","_")] = event[f]
+            eitem[f.replace(" ", "_")] = event[f]
 
         # Use the unique id from perceval
         eitem['id'] = eitem['uuid']
@@ -119,7 +119,7 @@ class MozillaClubEnrich(Enrich):
         eitem['Attendance'] = int(eitem['Attendance'])
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item,"Your Name"))
+            eitem.update(self.get_item_sh(item, "Your Name"))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
@@ -133,7 +133,7 @@ class MozillaClubEnrich(Enrich):
         current = 0
         bulk_json = ""
 
-        url = self.elastic.index_url+'/items/_bulk'
+        url = self.elastic.index_url + '/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
@@ -148,6 +148,6 @@ class MozillaClubEnrich(Enrich):
             data_json = json.dumps(rich_item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                 (item[self.get_field_unique_id()])
-            bulk_json += data_json +"\n"  # Bulk document
+            bulk_json += data_json + "\n"  # Bulk document
             current += 1
-        self.requests.put(url, data = bulk_json)
+        self.requests.put(url, data=bulk_json)

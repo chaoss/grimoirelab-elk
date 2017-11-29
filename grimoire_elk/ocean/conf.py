@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 class ConfOcean(object):
 
     conf_index = "conf"
-    conf_repos = conf_index+"/repos"
+    conf_repos = conf_index + "/repos"
     elastic = None
     requests_ses = grimoire_con()
 
@@ -56,7 +56,6 @@ class ConfOcean(object):
             cls.requests_ses.post(url)
             logger.info("Creating OceanConf index " + url)
 
-
     @classmethod
     def add_repo(cls, unique_id, repo):
         ''' Add a new perceval repository with its arguments '''
@@ -70,7 +69,7 @@ class ConfOcean(object):
 
         logger.debug("Adding repo to Ocean %s %s" % (url, repo))
 
-        cls.requests_ses.post(url, data = json.dumps(repo))
+        cls.requests_ses.post(url, data=json.dumps(repo))
 
     @classmethod
     def get_repos(cls):
@@ -91,7 +90,7 @@ class ConfOcean(object):
 
             repos_raw = r['hits']['hits']  # Already existing items
 
-            [ repos.append(rep['_source']) for rep in repos_raw ]
+            [repos.append(rep['_source']) for rep in repos_raw]
 
         return repos
 
@@ -111,6 +110,6 @@ class ConfOcean(object):
 
         if 'hits' in r:
             repos_raw = r['hits']['hits']  # Already existing items
-            [ repos_ids.append(rep['_id']) for rep in repos_raw ]
+            [repos_ids.append(rep['_id']) for rep in repos_raw]
 
         return repos_ids

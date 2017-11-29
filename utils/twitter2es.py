@@ -32,6 +32,7 @@ from dateutil import parser
 
 from grimoire_elk.elk.elastic import ElasticSearch
 
+
 def get_params():
     parser = argparse.ArgumentParser(usage="usage: twitter2es [options]",
                                      description="Import tweets in ElasticSearch")
@@ -43,6 +44,7 @@ def get_params():
 
     return args
 
+
 def logstash_fields(tweet):
     """ Return the logstash generated fields for this tweet"""
     fields = {
@@ -52,6 +54,7 @@ def logstash_fields(tweet):
 
     return fields
 
+
 def fetch_tweets(json_dir):
     for filename in os.listdir(json_dir):
         with open(os.path.join(json_dir, filename)) as json_file:
@@ -60,6 +63,7 @@ def fetch_tweets(json_dir):
             for tweet in tweets:
                 tweet.update(logstash_fields(tweet))
                 yield tweet
+
 
 if __name__ == '__main__':
 

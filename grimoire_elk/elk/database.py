@@ -34,7 +34,7 @@ class Database:
     """To work with a database (likely including several schemas).
     """
 
-    def __init__ (self, user, passwd, host, port, scrdb, shdb, prjdb):
+    def __init__(self, user, passwd, host, port, scrdb, shdb, prjdb):
         self.user = user
         self.passwd = passwd
         self.host = host
@@ -49,12 +49,11 @@ class Database:
         """
 
         try:
-            db = pymysql.connect(user = self.user, passwd = self.passwd,
-                                 host = self.host, port = self.port,
-                                 db = self.shdb,
-                                 use_unicode = True)
+            db = pymysql.connect(user=self.user, passwd=self.passwd,
+                                 host=self.host, port=self.port,
+                                 db=self.shdb, use_unicode=True)
             return db, db.cursor()
-        except:
+        except Exception:
             logger.error("Database connection error")
             raise
 
@@ -67,7 +66,7 @@ class Database:
         #                   sh_db = self.shdb,
         #                   prj_db = self.prjdb)
 
-        results = int (self.cursor.execute(query))
+        results = int(self.cursor.execute(query))
         if results > 0:
             result1 = self.cursor.fetchall()
             return result1

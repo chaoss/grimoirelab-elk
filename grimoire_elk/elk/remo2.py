@@ -56,7 +56,7 @@ class ReMoEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
@@ -73,13 +73,13 @@ class ReMoEnrich(Enrich):
         return identities
 
     def get_sh_identity(self, item, identity_field=None):
-		# "owner": {
+        # "owner": {
         #             "first_name": "Huda",
         #             "last_name": "Sarfraz",
         #             "_url": "https://reps.mozilla.org/api/beta/users/959/",
         #             "display_name": "huda_sarfraz"
         #          },
-        identity = {'username':None, 'email':None, 'name':None}
+        identity = {'username': None, 'email': None, 'name': None}
 
         if not item:
             return identity
@@ -90,7 +90,7 @@ class ReMoEnrich(Enrich):
 
         identity['username'] = user["display_name"]
         identity['email'] = None
-        identity['name'] = user["first_name"]+" "+user["last_name"]
+        identity['name'] = user["first_name"] + " " + user["last_name"]
 
         return identity
 
@@ -142,13 +142,11 @@ class ReMoEnrich(Enrich):
 
         return eitem
 
-
     def __get_rich_item_activities(self, item):
         eitem = {}
 
         # The real data
         activity = item['data']
-
 
         # data fields to copy
         copy_fields = ["activity", "activity_description", "external_link",
@@ -160,13 +158,12 @@ class ReMoEnrich(Enrich):
             else:
                 eitem[f] = None
 
-
         eitem['user_profile_url'] = activity['user']['_url']
-        eitem['user'] = activity['user']['first_name']+" "+activity['user']['last_name']
+        eitem['user'] = activity['user']['first_name'] + " " + activity['user']['last_name']
 
         if 'mentor' in activity and activity['mentor']:
             eitem['mentor_profile_url'] = activity['mentor']['_url']
-            eitem['mentor'] = activity['mentor']['first_name']+" "+activity['mentor']['last_name']
+            eitem['mentor'] = activity['mentor']['first_name'] + " " + activity['mentor']['last_name']
 
         # geolocation
         if -90 < int(activity['latitude']) < 90 and \
@@ -206,10 +203,10 @@ class ReMoEnrich(Enrich):
         event = item['data']
 
         # data fields to copy
-        copy_fields = ["initiative", "categories", "city","country",
-                       "description","estimated_attendance","remo_url",
-                       "external_link", "region","timezone",
-                       "planning_pad_url","hashtag"]
+        copy_fields = ["initiative", "categories", "city", "country",
+                       "description", "estimated_attendance", "remo_url",
+                       "external_link", "region", "timezone",
+                       "planning_pad_url", "hashtag"]
         for f in copy_fields:
             if f in event:
                 eitem[f] = event[f]
@@ -218,9 +215,9 @@ class ReMoEnrich(Enrich):
         # Fields which names are translated
         map_fields = {
             "description": "description_analyzed",
-            "end":"end_date",
-            "start":"start_date",
-            "name":"title"
+            "end": "end_date",
+            "start": "start_date",
+            "name": "title"
         }
         for fn in map_fields:
             eitem[map_fields[fn]] = event[fn]
@@ -232,8 +229,8 @@ class ReMoEnrich(Enrich):
             eitem['owner'] = event['owner']['display_name']
 
         # geolocation
-        if -90<int(event['lat'])<90 and \
-            -180<int(event['lon'])<180:
+        if (-90 < int(event['lat']) < 90 and
+            -180 < int(event['lon']) < 180):
             eitem['geolocation'] = {
                 "lat": event['lat'],
                 "lon": event['lon'],
@@ -247,6 +244,5 @@ class ReMoEnrich(Enrich):
             eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(event["start"], "event"))
-
 
         return eitem

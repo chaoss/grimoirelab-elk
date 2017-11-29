@@ -48,27 +48,30 @@ def get_params():
     parser.add_argument('-n', '--nrepos', dest='nrepos', type=int, default=NREPOS,
                         help='Number of GitHub repositories from the Organization to be analyzed (default:10)')
 
-    return  parser.parse_args()
+    return parser.parse_args()
+
 
 def get_payload():
     # 100 max in repos
     payload = {'per_page': 100,
                'fork': False,
-               'sort': 'updated', # does not work in repos listing
+               'sort': 'updated',  # does not work in repos listing
                'direction': 'desc'}
     return payload
+
 
 def get_headers(token):
     headers = {'Authorization': 'token ' + token}
     return headers
+
 
 def get_owner_repos_url(owner, token):
     """ The owner could be a org or a user.
         It waits if need to have rate limit.
         Also it fixes a djando issue changing - with _
     """
-    url_org = GITHUB_API_URL+"/orgs/"+owner+"/repos"
-    url_user = GITHUB_API_URL+"/users/"+owner+"/repos"
+    url_org = GITHUB_API_URL + "/orgs/" + owner + "/repos"
+    url_user = GITHUB_API_URL + "/users/" + owner + "/repos"
 
     url_owner = url_org  # Use org by default
 
@@ -81,13 +84,14 @@ def get_owner_repos_url(owner, token):
     except requests.exceptions.HTTPError as e:
         if r.status_code == 403:
             rate_limit_reset_ts = datetime.fromtimestamp(int(r.headers['X-RateLimit-Reset']))
-            seconds_to_reset = (rate_limit_reset_ts - datetime.utcnow()).seconds+1
+            seconds_to_reset = (rate_limit_reset_ts - datetime.utcnow()).seconds + 1
             logging.info("GitHub rate limit exhausted. Waiting %i secs for rate limit reset." % (seconds_to_reset))
             sleep(seconds_to_reset)
         else:
             # owner is not an org, try with a user
             url_owner = url_user
     return url_owner
+
 
 def get_repositories(owner, token, nrepos):
     """ owner could be an org or and user """
@@ -101,14 +105,13 @@ def get_repositories(owner, token, nrepos):
         logging.debug("Getting repos from: %s", url)
         try:
             r = requests.get(url,
-                            params=get_payload(),
-                            headers=get_headers(token))
+                             params=get_payload(),
+                             headers=get_headers(token))
 
             r.raise_for_status()
             all_repos += r.json()
 
             logging.debug("Rate limit: %s", r.headers['X-RateLimit-Remaining'])
-
 
             if 'next' not in r.links:
                 break
@@ -131,6 +134,7 @@ def get_repositories(owner, token, nrepos):
     for repo in nrepos_sorted:
         logging.debug("%s %i %s", repo['updated_at'], repo['size'], repo['name'])
     return nrepos_sorted
+
 
 if __name__ == '__main__':
     args = get_params()

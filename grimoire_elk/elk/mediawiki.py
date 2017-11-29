@@ -50,8 +50,7 @@ class MediaWikiEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
-
+        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -90,7 +89,7 @@ class MediaWikiEnrich(Enrich):
             # Use as identity the first reviewer for a page
             revision = item['data']['revisions'][0]
 
-        if  identity_field in revision:
+        if identity_field in revision:
             identity['username'] = revision[identity_field]
             identity['name'] = revision[identity_field]
 
@@ -99,8 +98,8 @@ class MediaWikiEnrich(Enrich):
     def get_review_sh(self, revision, item):
         """ Add sorting hat enrichment fields for the author of the revision """
 
-        identity  = self.get_sh_identity(revision)
-        update =  parser.parse(item[self.get_field_date()])
+        identity = self.get_sh_identity(revision)
+        update = parser.parse(item[self.get_field_date()])
         erevision = self.get_item_sh_fields(identity, update)
 
         return erevision
@@ -127,16 +126,16 @@ class MediaWikiEnrich(Enrich):
             copy_fields_item = ["origin", "metadata__updated_on", "metadata__timestamp", "pageid", "title"]
             for f in copy_fields_item:
                 if f in eitem:
-                    erevision["page_"+f] = eitem[f]
+                    erevision["page_" + f] = eitem[f]
                 else:
-                    erevision["page_"+f] = None
+                    erevision["page_" + f] = None
             # Copy fields from the review
             copy_fields = ["revid", "user", "parentid", "timestamp", "comment"]
             for f in copy_fields:
                 if f in rev:
-                    erevision["revision_"+f] = rev[f]
+                    erevision["revision_" + f] = rev[f]
                 else:
-                    erevision["revision_"+f] = None
+                    erevision["revision_" + f] = None
             if self.sortinghat:
                 erevision.update(self.get_review_sh(rev, item))
 
@@ -173,7 +172,7 @@ class MediaWikiEnrich(Enrich):
         page = item['data']
 
         # data fields to copy
-        copy_fields = ["pageid","title"]
+        copy_fields = ["pageid", "title"]
         for f in copy_fields:
             if f in page:
                 eitem[f] = page[f]
@@ -191,7 +190,7 @@ class MediaWikiEnrich(Enrich):
         eitem["nrevisions"] = 0
         if "revisions" in page:
             eitem["nrevisions"] = len(page["revisions"])
-            if len(page["revisions"])>0:
+            if len(page["revisions"]) > 0:
                 eitem["first_editor"] = page["revisions"][0]["user"]
                 eitem["last_edited_date"] = page["revisions"][-1]["timestamp"]
 
@@ -210,14 +209,13 @@ class MediaWikiEnrich(Enrich):
         else:
             super(MediaWikiEnrich, self).enrich_items(items)
 
-
     def enrich_events(self, ocean_backend):
         max_items = self.elastic.max_items_bulk
         current = 0
         bulk_json = ""
         total = 0
 
-        url = self.elastic.index_url+'/items/_bulk'
+        url = self.elastic.index_url + '/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)" % (url, max_items))
 
@@ -232,9 +230,9 @@ class MediaWikiEnrich(Enrich):
                 data_json = json.dumps(enrich_review)
                 bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                     (enrich_review[self.get_field_unique_id_review()])
-                bulk_json += data_json +"\n"  # Bulk document
+                bulk_json += data_json + "\n"  # Bulk document
                 current += 1
                 total += 1
-        self.requests.put(url, data = bulk_json)
+        self.requests.put(url, data=bulk_json)
 
         return total

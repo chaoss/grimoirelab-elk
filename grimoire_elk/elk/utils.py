@@ -39,7 +39,6 @@ from dateutil import parser, tz
 logger = logging.getLogger(__name__)
 
 
-
 def get_repository_filter(perceval_backend, perceval_backend_name,
                           term=False):
     """ Get the filter needed for get the items in a repository """
@@ -82,6 +81,7 @@ def get_repository_filter(perceval_backend, perceval_backend_name,
 
     return filter_
 
+
 def get_time_diff_days(start, end):
     ''' Number of days between two dates in UTC format  '''
 
@@ -93,12 +93,12 @@ def get_time_diff_days(start, end):
     if type(end) is not datetime.datetime:
         end = parser.parse(end).replace(tzinfo=None)
 
-    seconds_day = float(60*60*24)
-    diff_days = \
-        (end-start).total_seconds() / seconds_day
+    seconds_day = float(60 * 60 * 24)
+    diff_days = (end - start).total_seconds() / seconds_day
     diff_days = float('%.2f' % diff_days)
 
     return diff_days
+
 
 # https://github.com/grimoirelab/perceval/blob/master/perceval/utils.py#L149
 def unixtime_to_datetime(ut):
@@ -114,6 +114,7 @@ def unixtime_to_datetime(ut):
     dt = datetime.datetime.utcfromtimestamp(ut)
     dt = dt.replace(tzinfo=tz.tzutc())
     return dt
+
 
 def grimoire_con(insecure=True, conn_retries=21):
     conn = requests.Session()
@@ -131,6 +132,7 @@ def grimoire_con(insecure=True, conn_retries=21):
         conn.verify = False
 
     return conn
+
 
 def get_last_enrich(backend_cmd, enrich_backend):
     last_enrich = None

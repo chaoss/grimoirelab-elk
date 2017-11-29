@@ -24,6 +24,7 @@
 #
 from .elastic import ElasticOcean
 
+
 class AskbotOcean(ElasticOcean):
     """Askbot Ocean feeder"""
 
@@ -54,7 +55,7 @@ class AskbotOcean(ElasticOcean):
         }
         '''
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     @classmethod
     def get_p2o_params_from_url(cls, url):

@@ -23,7 +23,6 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import argparse
 import json
 import logging
 
@@ -38,7 +37,8 @@ from e2k import create_dashboard, get_params_parser_create_dash
 
 app = Flask(__name__)
 
-params_fields = ['p2o_params','e2k_params']  # Params needed to create a dashboard
+params_fields = ['p2o_params', 'e2k_params']  # Params needed to create a dashboard
+
 
 def check_params(params):
     """Check if we have all params to create the dashboard"""
@@ -49,6 +49,7 @@ def check_params(params):
             check = False
             break
     return check
+
 
 def get_backend_id(backend_name, backend_params):
 
@@ -62,6 +63,7 @@ def get_backend_id(backend_name, backend_params):
     backend = backend_cmd.backend
 
     return backend.unique_id
+
 
 def build_dashboard(params):
     parser = get_params_parser()
@@ -91,15 +93,16 @@ def build_dashboard(params):
                        args.backend, args.backend_args,
                        depends_on=task_feed)
     # The creation of the dashboard is quick. Do it sync and return the URL.
-    enrich_index = args.backend+"_"
-    enrich_index += get_backend_id(args.backend, args.backend_args)+"_enrich"
+    enrich_index = args.backend + "_"
+    enrich_index += get_backend_id(args.backend, args.backend_args) + "_enrich"
     args = parser_create_dash.parse_args(params['e2k_params'].split())
     kibana_host = "http://localhost:5601"
     dash_url = create_dashboard(args.elastic_url, args.dashboard, enrich_index, kibana_host)
 
     return dash_url
 
-@app.route("/api/dashboard",methods = ['POST'])
+
+@app.route("/api/dashboard", methods=['POST'])
 def dashboard():
     """Create a new dashboard using params from POST"""
     if request.headers['Content-Type'] == 'application/json':
@@ -107,7 +110,7 @@ def dashboard():
         print(request.json)
         if not check_params(params):
             error = "Error in params. Please include %s" % (", ".join(params_fields))
-            msg = {"params": json.dumps(params), \
+            msg = {"params": json.dumps(params),
                    "error": error}
             resp = Response(json.dumps(msg), status=400, mimetype='application/json')
             return resp
@@ -122,4 +125,4 @@ if __name__ == "__main__":
     app.debug = True
     # app.run()
     # To access the REST server from the network
-    app.run(host= '0.0.0.0')
+    app.run(host='0.0.0.0')

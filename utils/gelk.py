@@ -45,6 +45,7 @@ from perceval.backends.bugzilla import Bugzilla
 from perceval.backends.github import GitHub
 from perceval.backends.gerrit import Gerrit
 
+
 def get_connector_from_name(name, connectors):
     found = None
 
@@ -104,7 +105,6 @@ if __name__ == '__main__':
     if args.cache:
         clean = True
 
-
     try:
         # Ocean
         elastic_state = ElasticSearch(args.elastic_url,
@@ -113,7 +113,7 @@ if __name__ == '__main__':
                                       clean)
 
         # Enriched ocean
-        enrich_index = es_index+"_enrich"
+        enrich_index = es_index + "_enrich"
         elastic = ElasticSearch(args.elastic_url,
                                 enrich_index,
                                 enrich_backend.get_elastic_mappings(),
@@ -137,7 +137,6 @@ if __name__ == '__main__':
         logging.info("Adding enrichment data to %s" %
                      (enrich_backend.elastic.index_url))
 
-
         items = []
         new_identities = []
         items_count = 0
@@ -156,7 +155,7 @@ if __name__ == '__main__':
             items_count += 1
         enrich_backend.enrich_items(items)
 
-        logging.info("Total items enriched %i " %  items_count)
+        logging.info("Total items enriched %i " % items_count)
 
         logging.info("Total new identities to be checked %i" % len(new_identities))
 
@@ -164,14 +163,12 @@ if __name__ == '__main__':
 
         # Redo enrich for items with new merged identities
 
-
     except KeyboardInterrupt:
         logging.info("\n\nReceived Ctrl-C or other break signal. Exiting.\n")
         logging.debug("Recovering cache")
         backend.cache.recover()
         sys.exit(0)
 
-
-    total_time_min = (datetime.now()-app_init).total_seconds()/60
+    total_time_min = (datetime.now() - app_init).total_seconds() / 60
 
     logging.info("Finished in %.2f min" % (total_time_min))

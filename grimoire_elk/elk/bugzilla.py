@@ -79,7 +79,7 @@ class BugzillaEnrich(Enrich):
     def get_project_repository(self, eitem):
         repo = eitem['origin']
         product = eitem['product']
-        repo += "buglist.cgi?product="+product
+        repo += "buglist.cgi?product=" + product
         return repo
 
     def get_identities(self, item):
@@ -93,7 +93,7 @@ class BugzillaEnrich(Enrich):
 
         if 'activity' in item["data"]:
             for event in item["data"]['activity']:
-                event_user = [{"__text__":event['Who']}]
+                event_user = [{"__text__": event['Who']}]
                 identities.append(self.get_sh_identity(event_user))
         if 'long_desc' in item["data"]:
             for comment in item["data"]['long_desc']:
@@ -143,7 +143,6 @@ class BugzillaEnrich(Enrich):
             if "__text__" in issue["assigned_to"][0]:
                 eitem["assignee_email"] = issue["assigned_to"][0]["__text__"]
 
-
         if "reporter" in issue:
             if "name" in issue["reporter"][0]:
                 eitem["reporter_name"] = issue["reporter"][0]["name"]
@@ -155,16 +154,14 @@ class BugzillaEnrich(Enrich):
         date_ts = parser.parse(issue['creation_ts'][0]['__text__'])
         eitem['creation_date'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
-
         eitem["bug_id"] = issue['bug_id'][0]['__text__']
-        eitem["status"]  = issue['bug_status'][0]['__text__']
+        eitem["status"] = issue['bug_status'][0]['__text__']
         if "short_desc" in issue:
             if "__text__" in issue["short_desc"][0]:
-                eitem["main_description"]  = issue['short_desc'][0]['__text__']
+                eitem["main_description"] = issue['short_desc'][0]['__text__']
         if "summary" in issue:
             if "__text__" in issue["summary"][0]:
-                eitem["summary"]  = issue['summary'][0]['__text__']
-
+                eitem["summary"] = issue['summary'][0]['__text__']
 
         # Fix dates
         date_ts = parser.parse(issue['delta_ts'][0]['__text__'])
@@ -189,6 +186,6 @@ class BugzillaEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
 
-        eitem.update(self.get_grimoire_fields(eitem['creation_date'],"bug"))
+        eitem.update(self.get_grimoire_fields(eitem['creation_date'], "bug"))
 
         return eitem

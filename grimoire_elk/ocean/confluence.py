@@ -25,6 +25,7 @@
 
 from .elastic import ElasticOcean
 
+
 class ConfluenceOcean(ElasticOcean):
     """Confluence Ocean feeder"""
 

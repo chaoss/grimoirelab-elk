@@ -28,7 +28,7 @@
 import json
 import logging
 
-from .elk.utils import unixtime_to_datetime, get_repository_filter, grimoire_con
+from .elk.utils import get_repository_filter, grimoire_con
 
 logger = logging.getLogger(__name__)
 
@@ -126,9 +126,9 @@ class ElasticItems():
             url = self.elastic.url
             url += "/_search/scroll"
             scroll_data = {
-                "scroll" : max_process_items_pack_time,
-                "scroll_id" : elastic_scroll_id
-                }
+                "scroll": max_process_items_pack_time,
+                "scroll_id": elastic_scroll_id
+            }
             r = self.requests.post(url, data=json.dumps(scroll_data))
         else:
             # If using a perceval backends always filter by repository
@@ -205,7 +205,7 @@ class ElasticItems():
         rjson = None
         try:
             rjson = r.json()
-        except:
+        except Exception:
             logger.error("No JSON found in %s" % (r.text))
             logger.error("No results found from %s" % (url))
 

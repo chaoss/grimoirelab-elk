@@ -24,13 +24,10 @@
 
 import logging
 
-from dateutil import parser
-
 from .enrich import Enrich, metadata
 
 
 logger = logging.getLogger(__name__)
-
 
 
 class TelegramEnrich(Enrich):
@@ -55,7 +52,7 @@ class TelegramEnrich(Enrich):
            }
         } """ % (fielddata)
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
@@ -71,7 +68,6 @@ class TelegramEnrich(Enrich):
             identity['name'] = from_['first_name']
         return identity
 
-
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
@@ -84,7 +80,6 @@ class TelegramEnrich(Enrich):
 
         return identities
 
-
     @metadata
     def get_rich_item(self, item):
         eitem = {}
@@ -94,7 +89,6 @@ class TelegramEnrich(Enrich):
                 eitem[f] = item[f]
             else:
                 eitem[f] = None
-
 
         eitem['update_id'] = item['data']['update_id']
 
@@ -150,7 +144,6 @@ class TelegramEnrich(Enrich):
                 eitem['reply_to_author_last_name'] = message['reply_to_message']['from']['last_name']
             if 'username' in message['reply_to_message']['from']:
                 eitem['reply_to_username'] = message['reply_to_message']['from']['username']
-
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))

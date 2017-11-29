@@ -23,6 +23,7 @@
 
 from grimoire_elk.ocean.elastic import ElasticOcean
 
+
 class MozillaClubOcean(ElasticOcean):
     """MozillaClub Ocean feeder"""
 

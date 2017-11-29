@@ -22,10 +22,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
-
-from dateutil import parser
 
 from .enrich import Enrich, metadata
 
@@ -50,7 +47,7 @@ class ConfluenceEnrich(Enrich):
            }
         } """
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -126,7 +123,7 @@ class ConfluenceEnrich(Enrich):
             eitem['message'] = version['message']
         eitem['version'] = version['number']
         eitem['date'] = version['when']
-        eitem['url'] =  page['_links']['base'] + page['_links']['webui']
+        eitem['url'] = page['_links']['base'] + page['_links']['webui']
 
         if '_expandable' in page and 'space' in page['_expandable']:
             eitem['space'] = page['_expandable']['space']
@@ -137,7 +134,7 @@ class ConfluenceEnrich(Enrich):
             if page['version']['number'] == 1:
                 eitem['type'] = 'new_page'
         eitem['is_blogpost'] = 0
-        eitem['is_'+eitem['type']] = 1
+        eitem['is_' + eitem['type']] = 1
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))

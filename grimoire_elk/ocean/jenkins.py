@@ -25,6 +25,7 @@
 
 from .elastic import ElasticOcean
 
+
 class JenkinsOcean(ElasticOcean):
     """Jenkins Ocean feeder"""
 
@@ -52,7 +53,7 @@ class JenkinsOcean(ElasticOcean):
         }
         '''
 
-        return {"items":mapping}
+        return {"items": mapping}
 
     @classmethod
     def get_p2o_params_from_url(cls, url):

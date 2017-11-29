@@ -25,6 +25,7 @@
 
 from .elastic import ElasticOcean
 
+
 class NNTPOcean(ElasticOcean):
     """NNTP Ocean feeder"""
 
