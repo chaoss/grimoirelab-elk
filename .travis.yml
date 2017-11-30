@@ -7,20 +7,22 @@ sudo: false
 
 services:
   - elasticsearch
+  - mysql
 
 before_install:
-  - sleep 15
-  - mongorestore dump > /dev/null 2>&1
-  - pip install -r "web-dashboards/requirements.txt"
   - pip install flake8
   - pip install coveralls
   - pip install perceval
   - pip install perceval-mozilla
   - pip install perceval-opnfv
   - pip install sortinghat
+  - pip install PyMySQL
 
 # install:
 #   - ./setup.py install
 
 script:
   - flake8 .
+  - mysqladmin -u root create test_sh
+  - echo -e "[ElasticSearch]\nurl=http://localhost:9200" > tests/tests.conf
+  - cd tests && ./run_tests.py
