@@ -109,6 +109,9 @@ class ElasticSearch(object):
         new_items = 0  # total items added with bulk
         bulk_json = ""
 
+        if not items:
+            return new_items
+
         url = self.index_url + '/items/_bulk'
 
         logger.debug("Adding items to %s (in %i packs)" % (url, self.max_items_bulk))
