@@ -146,12 +146,15 @@ class BugzillaRESTEnrich(Enrich):
         eitem['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
         # Add extra JSON fields used in Kibana (enriched fields)
+        eitem['comments'] = 0
         eitem['number_of_comments'] = 0
         eitem['time_to_last_update_days'] = None
         eitem['url'] = None
 
         if 'long_desc' in issue:
             eitem['number_of_comments'] = len(issue['long_desc'])
+        if 'comments' in issue:
+            eitem['comments'] = len(issue['comments'])
         eitem['url'] = item['origin'] + "/show_bug.cgi?id=" + str(issue['id'])
         eitem['time_to_last_update_days'] = \
             get_time_diff_days(eitem['creation_ts'], eitem['delta_ts'])
