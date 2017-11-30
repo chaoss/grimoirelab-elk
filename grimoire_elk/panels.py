@@ -262,6 +262,16 @@ def get_index_pattern_from_meta(meta_data):
     return index
 
 
+def get_index_pattern_from_search(elastic, search):
+    index_pattern = None
+    search_json = get_search_json(elastic, search)
+    if not search_json:
+        return
+    if "kibanaSavedObjectMeta" in search_json:
+        index_pattern = get_index_pattern_from_meta(search_json["kibanaSavedObjectMeta"])
+    return index_pattern
+
+
 def get_index_pattern_from_vis(elastic, vis):
     index_pattern = None
     vis_json = get_vis_json(elastic, vis)
@@ -609,6 +619,7 @@ def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
 
     # Export all visualizations and the index patterns and searches in them
     for panel in json.loads(kibana["dashboard"]["value"]["panelsJSON"]):
+        logger.debug("Analyzing panel %s (%s)", panel['id'], panel['type'])
         if panel['type'] in ['visualization']:
             vis_id = panel['id']
             vis_json = get_vis_json(elastic, vis_id)
@@ -628,6 +639,11 @@ def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
             search_id = panel['id']
             kibana["searches"].append({"id": search_id,
                                        "value": get_search_json(elastic, search_id)})
+            index_pattern_id = get_index_pattern_from_search(elastic, search_id)
+            if index_pattern_id and index_pattern_id not in index_ids_done:
+                index_ids_done.append(index_pattern_id)
+                kibana["index_patterns"].append({"id": index_pattern_id,
+                                                 "value": get_index_pattern_json(elastic, index_pattern_id)})
 
     logger.debug("Done")
 
