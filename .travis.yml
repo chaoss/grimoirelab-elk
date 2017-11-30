@@ -15,7 +15,7 @@ before_install:
   - pip install perceval
   - pip install perceval-mozilla
   - pip install perceval-opnfv
-  - pip install pandas
+  - pip install pandas==0.18.1
   - pip install sortinghat
   - pip install PyMySQL
 
