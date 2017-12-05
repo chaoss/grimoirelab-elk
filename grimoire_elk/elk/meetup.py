@@ -105,6 +105,10 @@ class MeetupEnrich(Enrich):
         # We need to detect the category of item: activities (report), events or users
         eitem = {}
 
+        if 'time' not in item['data']:
+            logger.error("[meetup] Not processing %s: no time field", item['uuid'])
+            return eitem
+
         for f in self.RAW_FIELDS_COPY:
             if f in item:
                 eitem[f] = item[f]
@@ -253,6 +257,8 @@ class MeetupEnrich(Enrich):
         if 'comments' in item['data']:
             for comment in item['data']['comments']:
                 ecomment = self.get_rich_item(item)  # reuse all fields from item
+                if not ecomment:
+                    return comments_enrich
                 created = unixtime_to_datetime(comment['created'] / 1000).isoformat()
                 ecomment['url'] = comment['link']
                 ecomment['id'] = comment['id']
@@ -287,6 +293,8 @@ class MeetupEnrich(Enrich):
         if 'rsvps' in item['data']:
             for rsvp in item['data']['rsvps']:
                 ersvp = self.get_rich_item(item)  # reuse all fields from item
+                if not ersvp:
+                    return rsvps_enrich
                 ersvp['type'] = 'rsvp'
                 created = unixtime_to_datetime(rsvp['created'] / 1000).isoformat()
                 ersvp.update(self.get_grimoire_fields(created, ersvp['type']))
