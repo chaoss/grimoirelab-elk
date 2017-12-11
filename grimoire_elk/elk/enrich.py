@@ -646,6 +646,8 @@ class Enrich(ElasticItems):
 
         if profile:
             eitem_sh[rol + "_name"] = profile['name']
+            if profile['email']:
+                eitem_sh[rol + "_domain"] = self.get_email_domain(profile['email'])
         elif not profile and sh_id:
             logger.warning("Can't find SH identity profile: %s", sh_id)
 
