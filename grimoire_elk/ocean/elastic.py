@@ -169,7 +169,6 @@ class ElasticOcean(ElasticItems):
         drop = 0
         added = 0
 
-
         if self.fetch_cache:
             items = self.perceval_backend.fetch_from_cache()
         else:

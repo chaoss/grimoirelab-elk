@@ -77,7 +77,6 @@ def feed_arthur():
 def feed_backend_arthur(backend_name, backend_params):
     """ Feed Ocean with backend data collected from arthur redis queue"""
 
-
     # Always get pending items from arthur for all data sources
     feed_arthur()
 
