@@ -81,11 +81,6 @@ class ElasticItems():
         from .utils import get_connector_name
         return get_connector_name(type(self))
 
-    def get_connector_backend_name(self):
-        """ Find the name for the current connector """
-        from .utils import get_connector_backend_name
-        return get_connector_backend_name(type(self))
-
     # Items generator
     def fetch(self, _filter=None):
         """ Fetch the items from raw or enriched index. An optional _filter
@@ -141,14 +136,6 @@ class ElasticItems():
             # We need the filter dict as a string to join with the rest
             filters = self.get_repository_filter_raw(term=True)
             filters = json.dumps(filters)
-
-            # Filter also using the backend_name to let a raw index with items
-            # from different backends (arthur common raw index)
-            filters += '''
-                , {"term":
-                    { "backend_name":"%s"  }
-                }
-            ''' % (self.get_connector_backend_name())
 
             if self.filter_raw:
                 filters += '''
