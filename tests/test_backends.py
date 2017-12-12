@@ -66,6 +66,7 @@ class TestBackends(unittest.TestCase):
             item['ocean-unique-id'] = item['uuid']
         else:
             # twitter comes from logstash and uses id
+            item['uuid'] = item['id']
             item['ocean-unique-id'] = item['id']
 
         # Hack until we decide when to drop this field
