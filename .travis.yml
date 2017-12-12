@@ -12,10 +12,12 @@ services:
 before_install:
   - pip install flake8
   - pip install coveralls
+  - pip install kingarthur
   - pip install perceval
   - pip install perceval-mozilla
   - pip install perceval-opnfv
   - pip install pandas==0.18.1
+  - pip install redis
   - pip install sortinghat
   - pip install PyMySQL
 
