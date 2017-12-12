@@ -25,6 +25,7 @@
 
 import argparse
 import logging
+import requests
 import sys
 
 from dateutil import parser
@@ -237,6 +238,7 @@ def get_elastic(url, es_index, clean=None, backend=None):
 
     return elastic
 
+
 def get_kibiter_version(url):
     """
         Return kibiter major number version
@@ -260,6 +262,7 @@ def get_kibiter_version(url):
     # 5.4.0-SNAPSHOT
     major_version = version.split(".", 1)[0]
     return major_version
+
 
 def config_logging(debug):
 
