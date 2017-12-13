@@ -128,7 +128,16 @@ class ElasticOcean(ElasticItems):
         item['metadata__timestamp'] = timestamp.isoformat()
 
     def feed(self, from_date=None, from_offset=None, category=None, latest_items=None, arthur_items=None):
-        """ Feed data in Elastic from Perceval """
+        """ Feed data in Elastic from Perceval or Arthur """
+
+        if self.fetch_cache:
+            items = self.perceval_backend.fetch_from_cache()
+            self.feed_items(items)
+            return
+        elif arthur_items:
+            items = arthur_items
+            self.feed_items(items)
+            return
 
         if from_date and from_offset:
             raise RuntimeError("Can't not feed using from_date and from_offset.")
@@ -163,43 +172,41 @@ class ElasticOcean(ElasticItems):
             else:
                 logger.info("Not incremental")
 
+        if latest_items:
+            if category:
+                items = self.perceval_backend.fetch(latest_items=latest_items,
+                                                    category=category)
+            else:
+                items = self.perceval_backend.fetch(latest_items=latest_items)
+        elif last_update:
+            # if offset used for incremental do not use date
+            # Perceval backend from_date must not include timezone
+            # It always uses the server datetime
+            last_update = last_update.replace(tzinfo=None)
+            if category:
+                items = self.perceval_backend.fetch(from_date=last_update, category=category)
+            else:
+                items = self.perceval_backend.fetch(from_date=last_update)
+        elif offset is not None:
+            if category:
+                items = self.perceval_backend.fetch(offset=offset, category=category)
+            else:
+                items = self.perceval_backend.fetch(offset=offset)
+        else:
+            if category:
+                items = self.perceval_backend.fetch(category=category)
+            else:
+                items = self.perceval_backend.fetch()
+
+        self.feed_items(items)
+
+    def feed_items(self, items):
+
         task_init = datetime.now()
 
         items_pack = []  # to feed item in packs
         drop = 0
         added = 0
-
-        if self.fetch_cache:
-            items = self.perceval_backend.fetch_from_cache()
-        else:
-            if latest_items:
-                if category:
-                    items = self.perceval_backend.fetch(latest_items=latest_items,
-                                                        category=category)
-                else:
-                    items = self.perceval_backend.fetch(latest_items=latest_items)
-            elif last_update:
-                # if offset used for incremental do not use date
-                # Perceval backend from_date must not include timezone
-                # It always uses the server datetime
-                last_update = last_update.replace(tzinfo=None)
-                if category:
-                    items = self.perceval_backend.fetch(from_date=last_update, category=category)
-                else:
-                    items = self.perceval_backend.fetch(from_date=last_update)
-            elif offset is not None:
-                if category:
-                    items = self.perceval_backend.fetch(offset=offset, category=category)
-                else:
-                    items = self.perceval_backend.fetch(offset=offset)
-            else:
-                if category:
-                    items = self.perceval_backend.fetch(category=category)
-                else:
-                    items = self.perceval_backend.fetch()
-
-        if arthur_items:
-            items = arthur_items
 
         for item in items:
             # print("%s %s" % (item['url'], item['lastUpdated_date']))
