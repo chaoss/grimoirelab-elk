@@ -61,7 +61,7 @@ def feed_arthur():
     # Get and remove queued items in an atomic transaction
     pipe = conn.pipeline()
     pipe.lrange(Q_STORAGE_ITEMS, 0, -1)
-    # pipe.ltrim(Q_STORAGE_ITEMS, 1, 0)
+    pipe.ltrim(Q_STORAGE_ITEMS, 1, 0)
     items = pipe.execute()[0]
 
     for item in items:
