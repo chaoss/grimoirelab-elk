@@ -48,3 +48,8 @@ class JiraOcean(ElasticOcean):
         '''
 
         return {"items": mapping}
+
+    @classmethod
+    def get_arthur_params_from_url(cls, url):
+        """ Get the arthur params given a URL for the data source """
+        return {"url": url}
