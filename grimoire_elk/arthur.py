@@ -308,20 +308,40 @@ def refresh_projects(enrich_backend):
 
 
 def refresh_identities(enrich_backend, filter_author=None):
+
+    def update_items(new_filter_author):
+        for eitem in enrich_backend.fetch(new_filter_author):
+            # logger.info(eitem)
+            roles = None
+            try:
+                roles = enrich_backend.roles
+            except AttributeError:
+                pass
+            new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
+            eitem.update(new_identities)
+            yield eitem
+
     logger.debug("Refreshing identities fields from %s", enrich_backend.elastic.index_url)
     total = 0
 
-    for eitem in enrich_backend.fetch(filter_author):
-        # logger.info(eitem)
-        roles = None
-        try:
-            roles = enrich_backend.roles
-        except AttributeError:
-            pass
-        new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
-        eitem.update(new_identities)
-        yield eitem
-        total += 1
+    max_ids = enrich_backend.elastic.max_items_clause
+
+    if filter_author:
+        nidentities = len(filter_author['value'])
+        logger.debug('Identities to refresh: %i', nidentities)
+        if nidentities > max_ids:
+            logger.warning('Refreshing identities in groups of %i', max_ids)
+            while filter_author['value']:
+                new_filter_author = {"name": filter_author['name'],
+                                     "value": filter_author['value'][0:max_ids]}
+                filter_author['value'] = filter_author['value'][max_ids:]
+                for item in update_items(new_filter_author):
+                    yield item
+                    total += 1
+        else:
+            for item in update_items(filter_author):
+                yield item
+                total += 1
 
     logger.info("Total eitems refreshed for identities fields %i", total)
 
