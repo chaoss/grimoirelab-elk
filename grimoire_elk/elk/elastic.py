@@ -48,6 +48,7 @@ class ElasticWriteException(Exception):
 class ElasticSearch(object):
 
     max_items_bulk = 1000
+    max_items_clause = 1000  # max items in search clause (refresh identities)
 
     @classmethod
     def safe_index(cls, unique_id):
