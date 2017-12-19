@@ -31,6 +31,8 @@ import sys
 
 from time import time, sleep
 
+import requests
+
 from .utils import unixtime_to_datetime, grimoire_con
 
 
@@ -229,7 +231,10 @@ class ElasticSearch(object):
 
             # Add the global mapping shared in all data sources
             res = self.requests.put(url_map, data=self.global_mapping())
-            res.raise_for_status()
+            try:
+                res.raise_for_status()
+            except requests.exceptions.HTTPError:
+                logger.warning('Can add mapping %s: %s', url_map, self.global_mapping())
 
     def get_last_date(self, field, filters_=[]):
         '''
