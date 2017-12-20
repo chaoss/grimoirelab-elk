@@ -293,7 +293,7 @@ class MeetupEnrich(Enrich):
         if 'rsvps' in item['data']:
             for rsvp in item['data']['rsvps']:
                 ersvp = self.get_rich_item(item)  # reuse all fields from item
-                if not ersvp:
+                if not ersvp or 'id' not in ersvp:
                     return rsvps_enrich
                 ersvp['type'] = 'rsvp'
                 created = unixtime_to_datetime(rsvp['created'] / 1000).isoformat()
