@@ -74,9 +74,10 @@ def get_repository_filter(perceval_backend, perceval_backend_name,
             # Filters are always a dict
             filter_ = json.loads(filter_)
 
-    if value in ['', GITHUB + '/']:
+    if value in ['', GITHUB + '/', 'https://meetup.com/']:
         # Support for getting all items from a multiorigin index
         # In GitHub we receive GITHUB + '/', the site url without org and repo
+        # In Meetup we receive https://meetup.com/ as the tag
         filter_ = {}
 
     return filter_
