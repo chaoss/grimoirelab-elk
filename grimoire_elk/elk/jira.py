@@ -149,7 +149,8 @@ class JiraEnrich(Enrich):
         eitem['isssue_type'] = issue["fields"]['issuetype']['name']
         eitem['issue_description'] = issue["fields"]['issuetype']['description']
 
-        eitem['labels'] = issue['fields']['labels']
+        if 'labels' in issue['fields']:
+            eitem['labels'] = issue['fields']['labels']
 
         if ('priority' in issue['fields'] and issue['fields']['priority'] and
             'name' in issue['fields']['priority']):
