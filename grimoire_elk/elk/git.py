@@ -32,7 +32,10 @@ import requests
 
 from dateutil import parser
 
+from .areas_of_code_study import areas_of_code
+
 from .enrich import Enrich, metadata
+
 
 try:
     from .sortinghat import SortingHat
@@ -61,7 +64,9 @@ class GitEnrich(Enrich):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
 
-        self.studies = [self.enrich_demography]
+        self.studies = []
+        self.studies.append(self.enrich_demography)
+        self.studies.append(self.enrich_areas_of_code)
 
         # GitHub API management
         self.github_token = None
@@ -671,3 +676,8 @@ class GitEnrich(Enrich):
         self.elastic.bulk_upload(author_items, "_item_id")
 
         logger.debug("Completed demography enrich from %s" % (self.elastic.index_url))
+
+    def enrich_areas_of_code(self, enrich_backend, no_incremental=False):
+        logger.info("[Areas of Code] Starting study")
+        areas_of_code()
+        logger.info("[Areas of Code] End")
