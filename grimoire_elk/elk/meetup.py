@@ -257,7 +257,7 @@ class MeetupEnrich(Enrich):
         if 'comments' in item['data']:
             for comment in item['data']['comments']:
                 ecomment = self.get_rich_item(item)  # reuse all fields from item
-                if not ecomment:
+                if not ecomment or 'id' not in ecomment:
                     return comments_enrich
                 created = unixtime_to_datetime(comment['created'] / 1000).isoformat()
                 ecomment['url'] = comment['link']
