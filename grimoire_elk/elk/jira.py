@@ -103,6 +103,32 @@ class JiraEnrich(Enrich):
 
         return identities
 
+    @classmethod
+    def enrich_fields(cls, fields, eitem):
+        """Enrich the fields property of an issue.
+
+        Loops through al properties in issue['fields'],
+        using those that are relevant to enrich eitem with new properties.
+        Those properties are user defined, depending on options
+        configured in Jira. For example, if SCRUM is activated,
+        we have a field named "Story Points".
+
+        :param fields: fields property of an issue
+        :param eitem: enriched item, which will be modified adding more properties
+        """
+
+        for field in fields:
+            if field.startswith('customfield_'):
+                if type(fields[field]) is dict:
+                    if 'name' in fields[field]:
+                        if fields[field]['name'] == "Story Points":
+                            eitem['story_points'] = fields[field]['value']
+                        elif fields[field]['name'] == "Sprint":
+                            value = fields[field]['value']
+                            if value:
+                                sprint = value[0].partition(",name=")[2].split(',')[0]
+                                eitem['sprint'] = sprint
+
     @metadata
     def get_rich_item(self, item):
 
@@ -209,17 +235,7 @@ class JiraEnrich(Enrich):
         eitem['time_to_last_update_days'] = \
             get_time_diff_days(issue['fields']['created'], datetime.utcnow())
 
-        for field in issue['fields']:
-            if field.startswith('customfield_'):
-                if type(issue['fields'][field]) is dict:
-                    if 'name' in issue['fields'][field]:
-                        if issue['fields'][field]['name'] == "Story Points":
-                            eitem['story_points'] = issue['fields'][field]['value']
-                        elif issue['fields'][field]['name'] == "Sprint":
-                            value = issue['fields'][field]['value']
-                            if value:
-                                sprint = value[0].partition(",name=")[2].split(',')[0]
-                                eitem['sprint'] = sprint
+        self.enrich_fields(issue['fields'], eitem)
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item, self.roles))
