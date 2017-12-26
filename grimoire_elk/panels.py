@@ -30,6 +30,7 @@ import logging
 import os
 import os.path
 import pkgutil
+import sys
 
 from .elk.elastic import ElasticSearch
 from .elk.utils import grimoire_con
@@ -424,7 +425,10 @@ def create_dashboard(elastic_url, dashboard, enrich_index, kibana_host, es_index
     return dash_url
 
 
-def list_dashboards(elastic_url, es_index=None):
+def search_dashboards(elastic_url, es_index=None):
+
+    dashboards = []
+
     if not es_index:
         es_index = ".kibana"
 
@@ -458,7 +462,16 @@ def list_dashboards(elastic_url, es_index=None):
         else:
             dash_json = dash["_source"]["dashboard"]
 
-        print("_id:%s title:%s" % (dash["_id"], dash_json["title"]))
+        dashboards.append({"_id": dash["_id"], "title": dash_json["title"]})
+
+    return dashboards
+
+
+def list_dashboards(elastic_url, es_index=None):
+
+    dashboards = search_dashboards(elastic_url, es_index)
+    for dash in dashboards:
+        print("_id:%s title:%s" % (dash["_id"], dash["title"]))
 
 
 def read_panel_file(panel_file):
@@ -552,48 +565,55 @@ def is_index_pattern_from_data_sources(index, data_sources):
 
 
 def import_dashboard(elastic_url, import_file, es_index=None, data_sources=None):
-    """ Import a dashboard. If data_sources are defined, just include items
-        for this data source.
+    """ Import a dashboard from a file
     """
 
     logger.debug("Reading panels JSON file: %s", import_file)
-    kibana = read_panel_file(import_file)
+    dashboard = read_panel_file(import_file)
 
-    if (kibana is None) or ('dashboard' not in kibana):
+    if (dashboard is None) or ('dashboard' not in dashboard):
         logger.error("Wrong file format (can't find 'dashboard' field): %s",
                      import_file)
-        os.sys.exit(1)
+        sys.exit(1)
+
+    feed_dashboard(dashboard, elastic_url, es_index, data_sources)
+
+    logger.info("Dashboard %s imported", get_dashboard_name(import_file))
+
+
+def feed_dashboard(dashboard, elastic_url, es_index=None, data_sources=None):
+    """ Import a dashboard. If data_sources are defined, just include items
+        for this data source.
+    """
 
     if not es_index:
         es_index = ".kibana"
 
     elastic = ElasticSearch(elastic_url, es_index)
 
-    import_item_json(elastic, "dashboard", kibana['dashboard']['id'],
-                     kibana['dashboard']['value'], data_sources)
+    import_item_json(elastic, "dashboard", dashboard['dashboard']['id'],
+                     dashboard['dashboard']['value'], data_sources)
 
-    if 'searches' in kibana:
-        for search in kibana['searches']:
+    if 'searches' in dashboard:
+        for search in dashboard['searches']:
             import_item_json(elastic, "search", search['id'], search['value'], data_sources)
 
-    if 'index_patterns' in kibana:
-        for index in kibana['index_patterns']:
+    if 'index_patterns' in dashboard:
+        for index in dashboard['index_patterns']:
             if not data_sources or is_index_pattern_from_data_sources(index, data_sources):
                 import_item_json(elastic, "index-pattern", index['id'], index['value'])
             else:
                 logger.debug("Index pattern %s not for %s. Not included.", search['id'], data_sources)
 
-    if 'visualizations' in kibana:
-        for vis in kibana['visualizations']:
+    if 'visualizations' in dashboard:
+        for vis in dashboard['visualizations']:
             if not data_sources or is_vis_from_data_sources(vis, data_sources):
                 import_item_json(elastic, "visualization", vis['id'], vis['value'])
             else:
                 logger.debug("Vis %s not for %s. Not included.", vis['id'], data_sources)
 
-    logger.info("Dashboard %s imported", get_dashboard_name(import_file))
 
-
-def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
+def fetch_dashboard(elastic_url, dash_id, es_index=None):
 
     # Kibana dashboard fields
     kibana = {"dashboard": None,
@@ -605,7 +625,7 @@ def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
     search_ids_done = []
     index_ids_done = []
 
-    logger.debug("Exporting dashboard %s to %s", dash_id, export_file)
+    logger.debug("Fetching dashboard %s", dash_id)
     if not es_index:
         es_index = ".kibana"
 
@@ -645,7 +665,16 @@ def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
                 kibana["index_patterns"].append({"id": index_pattern_id,
                                                  "value": get_index_pattern_json(elastic, index_pattern_id)})
 
-    logger.debug("Done")
+    return kibana
+
+
+def export_dashboard(elastic_url, dash_id, export_file, es_index=None):
+
+    logger.debug("Exporting dashboard %s to %s", dash_id, export_file)
+
+    kibana = fetch_dashboard(elastic_url, dash_id, es_index)
 
     with open(export_file, 'w') as f:
         f.write(json.dumps(kibana, indent=4, sort_keys=True))
+
+    logger.debug("Done")
