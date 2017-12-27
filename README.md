@@ -2,7 +2,7 @@
 
 GrimoireELK is an evolving prototype of the *Grimoire Open Development Analytics platform*. 
 
-Tutorials on howto use it are published in [GrimoireLab Training](https://grimoirelab.gitbooks.io/training/content/).
+Tutorials on howto use it are published in [GrimoireLab Tutorial](https://grimoirelab.gitbooks.io/tutorial).
 
 ## Packages
 
