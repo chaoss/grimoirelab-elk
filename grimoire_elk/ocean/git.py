@@ -29,6 +29,25 @@ from .elastic import ElasticOcean
 class GitOcean(ElasticOcean):
     """Git Ocean feeder"""
 
+    def get_elastic_mappings(self):
+        # immense term in field="data.message"
+        mapping = '''
+         {
+            "dynamic":true,
+            "properties": {
+                "data": {
+                    "properties": {
+                        "message": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+        '''
+
+        return {"items": mapping}
+
     @classmethod
     def get_p2o_params_from_url(cls, url):
         # Git could include in the URL a  filters-raw-prefix T1722
