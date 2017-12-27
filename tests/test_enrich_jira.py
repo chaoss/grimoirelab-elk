@@ -32,6 +32,7 @@ if '..' not in sys.path:
 
 from grimoire_elk.elk.jira import JiraEnrich
 
+
 class TestEnrichJira(unittest.TestCase):
     """Functional unit tests for GrimoireELK Enrichment for Jira"""
 
@@ -53,6 +54,7 @@ class TestEnrichJira(unittest.TestCase):
             if 'fields' in ritem['_source']['data']:
                 JiraEnrich.enrich_fields(ritem['_source']['data']['fields'], enriched)
             self.assertDictEqual(enriched, eitem)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')

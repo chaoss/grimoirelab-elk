@@ -103,6 +103,22 @@ class JiraEnrich(Enrich):
 
         return identities
 
+    @staticmethod
+    def fix_value_null(value):
+        """Fix <null> values in some Jira parameters.
+
+        In some values fields, as returned by the Jira API,
+        some fields appear as <null>. This function convert Them
+        to None.
+
+        :param value: string found in a value fields
+        :return: same as value, or None
+        """
+        if value == '<null>':
+            return None
+        else:
+            return value
+
     @classmethod
     def enrich_fields(cls, fields, eitem):
         """Enrich the fields property of an issue.
@@ -127,7 +143,13 @@ class JiraEnrich(Enrich):
                             value = fields[field]['value']
                             if value:
                                 sprint = value[0].partition(",name=")[2].split(',')[0]
+                                sprint_start = value[0].partition(",startDate=")[2].split(',')[0]
+                                sprint_end = value[0].partition(",endDate=")[2].split(',')[0]
+                                sprint_complete = value[0].partition(",completeDate=")[2].split(',')[0]
                                 eitem['sprint'] = sprint
+                                eitem['sprint_start'] = cls.fix_value_null(sprint_start)
+                                eitem['sprint_end'] = cls.fix_value_null(sprint_end)
+                                eitem['sprint_complete'] = cls.fix_value_null(sprint_complete)
 
     @metadata
     def get_rich_item(self, item):
