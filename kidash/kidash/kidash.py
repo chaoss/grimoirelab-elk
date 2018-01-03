@@ -32,8 +32,8 @@ import os.path
 import pkgutil
 import sys
 
-from .elk.elastic import ElasticSearch
-from .elk.utils import grimoire_con
+from grimoire_elk.elk.elastic import ElasticSearch
+from grimoire_elk.elk.utils import grimoire_con
 
 logger = logging.getLogger(__name__)
 
