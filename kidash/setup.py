@@ -25,13 +25,14 @@
 import codecs
 import os
 import re
+import sys
 
 # Always prefer setuptools over distutils
 from setuptools import setup
 
 here = os.path.abspath(os.path.dirname(__file__))
 readme_md = os.path.join(here, 'README.md')
-version_py = os.path.join(here, '_version.py')
+version_py = os.path.join(here, 'kidash', '_version.py')
 
 # Pypi wants the description to be in reStrcuturedText, but
 # we have it in Markdown. So, let's convert formats.
@@ -42,7 +43,7 @@ try:
     long_description = pypandoc.convert(readme_md, 'rst')
 except (IOError, ImportError):
     print("Warning: pypandoc module not found, or pandoc not installed. " +
-          "Using md instead of rst")
+          "Using md instead of rst", file=sys.stderr)
     with codecs.open(readme_md, encoding='utf-8') as f:
         long_description = f.read()
 
@@ -50,7 +51,7 @@ with codecs.open(version_py, 'r', encoding='utf-8') as fd:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
                         fd.read(), re.MULTILINE).group(1)
 
-setup(name="grimoire-kidash",
+setup(name="kidash",
       description="GrimoireLab script to manage Kibana dashboards from the command line",
       long_description=long_description,
       url="https://github.com/grimoirelab/GrimoireELK",
@@ -67,10 +68,16 @@ setup(name="grimoire-kidash",
           'Programming Language :: Python :: 3.4',
           'Programming Language :: Python :: 3.5'],
       keywords="development repositories analytics",
-      scripts=["kidash.py"],
+      packages=['kidash'],
+      python_requires='>=3.4',
+      setup_requires=['wheel'],
+      extras_require={},
+      tests_require=[],
+      test_suite='tests',
+      scripts=["bin/kidash"],
       install_requires=['python-dateutil',
-                        'grimoire-elk>=0.30.9',
-                        'grimoirelab-panels>=0.0.1'
+                        'grimoire-elk>=0.30.18',
+                        'grimoirelab-panels>=0.0.7'
                         ],
       include_package_data=True,
       zip_safe=False

@@ -30,7 +30,7 @@ import sys
 
 from grimoire_elk.ocean.elastic import ElasticOcean
 from grimoire_elk.utils import config_logging
-from grimoire_elk.panels import import_dashboard, export_dashboard, list_dashboards
+from kidash.kidash import import_dashboard, export_dashboard, list_dashboards
 
 
 def get_params_parser_create_dash():
