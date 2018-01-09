@@ -553,7 +553,7 @@ def is_vis_from_data_sources(vis, data_sources):
 
 def is_index_pattern_from_data_sources(index, data_sources):
     found = False
-    es_index = index['title']
+    es_index = index['value']['title']
 
     for data_source in data_sources:
         # ex: github_issues
@@ -603,7 +603,7 @@ def feed_dashboard(dashboard, elastic_url, es_index=None, data_sources=None):
             if not data_sources or is_index_pattern_from_data_sources(index, data_sources):
                 import_item_json(elastic, "index-pattern", index['id'], index['value'])
             else:
-                logger.debug("Index pattern %s not for %s. Not included.", search['id'], data_sources)
+                logger.debug("Index pattern %s not for %s. Not included.", index['id'], data_sources)
 
     if 'visualizations' in dashboard:
         for vis in dashboard['visualizations']:
