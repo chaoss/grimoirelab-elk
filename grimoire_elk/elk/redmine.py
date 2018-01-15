@@ -44,8 +44,7 @@ class RedmineEnrich(Enrich):
         {
             "properties": {
                 "description_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   }
            }
         } """

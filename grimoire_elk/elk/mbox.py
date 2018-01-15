@@ -60,13 +60,11 @@ class MBoxEnrich(Enrich):
         {
             "properties": {
                  "Subject_analyzed": {
-                   "type": "string",
-                   "index":"analyzed"
+                   "type": "keyword"
                    %s
                  },
                  "body": {
-                   "type": "string",
-                   "index":"analyzed"
+                   "type": "keyword"
                  }
            }
         } """ % fielddata

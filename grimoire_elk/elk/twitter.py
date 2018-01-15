@@ -49,8 +49,7 @@ class TwitterEnrich(Enrich):
         {
             "properties": {
                 "text_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   },
                   "geolocation": {
                      "type": "geo_point"

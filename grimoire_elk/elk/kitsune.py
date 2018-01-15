@@ -46,12 +46,10 @@ class KitsuneEnrich(Enrich):
         {
             "properties": {
                 "content_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   },
                 "tags_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   }
            }
         } """

@@ -84,8 +84,7 @@ class JenkinsEnrich(Enrich):
         {
             "properties": {
                 "fullDisplayName_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   }
            }
         } """

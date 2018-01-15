@@ -40,8 +40,7 @@ class RSSEnrich(Enrich):
         {
             "properties": {
                 "summary_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   }
            }
         } """

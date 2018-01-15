@@ -94,12 +94,10 @@ class AskbotEnrich(Enrich):
         {
             "properties": {
                 "author_badges": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                 },
                 "summary": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                 }
            }
         } """

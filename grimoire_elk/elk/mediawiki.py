@@ -44,8 +44,7 @@ class MediaWikiEnrich(Enrich):
         {
             "properties": {
                 "title_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   }
            }
         } """

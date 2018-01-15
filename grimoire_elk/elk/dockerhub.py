@@ -43,12 +43,10 @@ class DockerHubEnrich(Enrich):
         {
             "properties": {
                 "description_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   },
                 "full_description_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                 }
            }
         } """

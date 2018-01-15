@@ -51,20 +51,16 @@ class MozillaClubEnrich(Enrich):
         {
             "properties": {
                 "Event Description": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   },
                 "Event Creation": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   },
                 "Feedback from Attendees": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   },
                 "Your Feedback": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   },
                 "geolocation": {
                    "type": "geo_point"
