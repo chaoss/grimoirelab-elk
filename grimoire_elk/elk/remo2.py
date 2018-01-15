@@ -47,8 +47,7 @@ class ReMoEnrich(Enrich):
         {
             "properties": {
                 "description_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                 },
                 "geolocation": {
                     "type": "geo_point"

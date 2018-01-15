@@ -91,14 +91,19 @@ class ElasticItems():
         elastic_scroll_id = None
 
         while True:
-            rjson = self.get_elastic_items(elastic_scroll_id, _filter)
+            rjson = self.get_elastic_items(elastic_scroll_id, _filter=_filter)
 
             if rjson and "_scroll_id" in rjson:
                 elastic_scroll_id = rjson["_scroll_id"]
 
             if rjson and "hits" in rjson:
-                if len(rjson["hits"]["hits"]) == 0:
+                received = len(rjson["hits"]["hits"])
+                if received == 0:
+                    logger.debug("Fetching from %s: done receiving",
+                                 self.elastic.index_url)
                     break
+                logger.debug("Fetching from %s: %d received",
+                             self.elastic.index_url, received)
                 for hit in rjson["hits"]["hits"]:
                     eitem = hit['_source']
                     yield eitem
@@ -110,6 +115,8 @@ class ElasticItems():
     def get_elastic_items(self, elastic_scroll_id=None, _filter=None):
         """ Get the items from the index related to the backend applying and
         optional _filter if provided"""
+
+        headers = {"Content-Type" : "application/json"}
 
         if not self.elastic:
             return None
@@ -126,10 +133,11 @@ class ElasticItems():
             url = self.elastic.url
             url += "/_search/scroll"
             scroll_data = {
-                "scroll": max_process_items_pack_time,
-                "scroll_id": elastic_scroll_id
-            }
-            r = self.requests.post(url, data=json.dumps(scroll_data))
+                "scroll" : max_process_items_pack_time,
+                "scroll_id" : elastic_scroll_id
+                }
+            res = self.requests.post(url, data=json.dumps(scroll_data), headers=headers)
+            res.raise_for_status()
         else:
             # If using a perceval backends always filter by repository
             # to support multi repository indexes
@@ -198,15 +206,16 @@ class ElasticItems():
             }
             """ % (filters, order_query)
 
-            logger.debug("%s\n%s", url, json.dumps(json.loads(query), indent=4))
-            r = self.requests.post(url, data=query)
+            logger.debug("Raw query to %s\n%s", url, json.dumps(json.loads(query), indent=4))
+            res = self.requests.post(url, data=query, headers=headers)
+            res.raise_for_status()
 
         items = []
         rjson = None
         try:
-            rjson = r.json()
+            rjson = res.json()
         except Exception:
-            logger.error("No JSON found in %s" % (r.text))
+            logger.error("No JSON found in %s" % (res.text))
             logger.error("No results found from %s" % (url))
 
         return rjson

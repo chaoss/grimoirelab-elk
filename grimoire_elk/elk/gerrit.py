@@ -133,8 +133,7 @@ class GerritEnrich(Enrich):
         {
             "properties": {
                "summary_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                },
                "timeopen": {
                   "type": "double"

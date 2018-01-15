@@ -62,16 +62,14 @@ class PhabricatorEnrich(Enrich):
         {
             "properties": {
                 "main_description_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                 },
                 "assigned_to_roles": {
-                  "type": "string"
+                  "type": "text"
                   %s
                  },
                 "tags_analyzed": {
-                   "type": "string",
-                   "index":"analyzed"
+                   "type": "keyword"
                    %s
                  }
            }

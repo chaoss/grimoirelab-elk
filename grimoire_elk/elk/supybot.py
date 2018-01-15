@@ -47,8 +47,7 @@ class SupybotEnrich(Enrich):
         {
             "properties": {
                 "body_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                   %s
                   }
            }

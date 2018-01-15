@@ -38,7 +38,7 @@ class GitOcean(ElasticOcean):
                 "data": {
                     "properties": {
                         "message": {
-                            "type": "string"
+                            "type": "text"
                         }
                     }
                 }

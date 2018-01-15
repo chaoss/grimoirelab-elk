@@ -47,8 +47,7 @@ class StackExchangeEnrich(Enrich):
         {
             "properties": {
                 "title_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                 }
            }
         } """

@@ -60,13 +60,47 @@ class ElasticSearch(object):
             index = unique_id.replace("/", "_").lower()
         return index
 
+    @staticmethod
+    def _check_instance(url, insecure):
+        """Checks if there is an instance of Elasticsearch in url.
+
+        Actually, it checks if GET on the url returns a JSON document
+        with a field tagline "You know, for search",
+        and a field version.number.
+
+        :value      url: url of the instance to check
+        :value insecure: don't verify ssl connection (boolean)
+        :returns:        major version of Ellasticsearch, as string.
+        """
+
+        res = grimoire_con(insecure).get(url)
+        if res.status_code != 200:
+            logger.error("Didn't get 200 OK from url %s", url)
+            raise ElasticConnectException
+        else:
+            try:
+                version_str = res.json()['version']['number']
+                version_major = version_str.split('.')[0]
+                return version_major
+            except Exception:
+                logger.error("Could not read proper welcome message from url %s",
+                             url)
+                logger.error("Message read: %s", res.text)
+                raise ElasticConnectException
+
     def __init__(self, url, index, mappings=None, clean=False,
                  insecure=True, analyzers=None):
         ''' clean: remove already existing index
             insecure: support https with invalid certificates
         '''
 
+        # Get major version of Elasticsearch instance
+        self.major = self._check_instance(url, insecure)
+        logger.debug("Found version of ES instance at %s: %s.",
+                     url, self.major)
+
         self.url = url
+
         # Valid index for elastic
         self.index = self.safe_index(index)
         self.index_url = self.url + "/" + self.index
@@ -74,11 +108,13 @@ class ElasticSearch(object):
 
         self.requests = grimoire_con(insecure)
 
-        r = self.requests.get(self.index_url)
+        res = self.requests.get(self.index_url)
 
-        if r.status_code != 200:
+        if res.status_code != 200:
             # Index does no exists
-            r = self.requests.put(self.index_url, data=analyzers)
+            headers = {"Content-Type": "application/json"}
+            r = self.requests.put(self.index_url, data=analyzers,
+                                  headers=headers)
             if r.status_code != 200:
                 logger.error("Can't create index %s (%s)",
                              self.index_url, r.status_code)
@@ -87,8 +123,10 @@ class ElasticSearch(object):
                 logger.info("Created index " + self.index_url)
         else:
             if clean:
-                self.requests.delete(self.index_url)
-                self.requests.put(self.index_url, data=analyzers)
+                res = self.requests.delete(self.index_url)
+                res.raise_for_status()
+                res = self.requests.put(self.index_url, data=analyzers)
+                res.raise_for_status()
                 logger.info("Deleted and created index " + self.index_url)
         if mappings:
             self.create_mappings(mappings)
@@ -96,14 +134,17 @@ class ElasticSearch(object):
     def _safe_put_bulk(self, url, bulk_json):
         """ Bulk PUT controlling unicode issues """
 
+        headers = {"Content-Type": "application/x-ndjson"}
+
         try:
-            res = self.requests.put(url, data=bulk_json)
+            res = self.requests.put(url, data=bulk_json, headers=headers)
             res.raise_for_status()
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
             logger.error("Encondig error ... converting bulk to iso-8859-1")
-            bulk_json = bulk_json.encode('iso-8859-1', 'ignore')
-            self.requests.put(url, data=bulk_json)
+            bulk_json = bulk_json.encode('iso-8859-1','ignore')
+            res = self.requests.put(url, data=bulk_json, headers=headers)
+            res.raise_for_status()
 
     def bulk_upload(self, items, field_id):
         ''' Upload in controlled packs items to ES using bulk API '''
@@ -146,7 +187,7 @@ class ElasticSearch(object):
         """ Upload items in packs to ES using bulk API
             and wait until the items appears in searches """
 
-        # After a bulk upload the searches are not refreshed real time
+        # After a bulk upload the searches are not refreshed immediately
         # This method waits until the upload is visible in searches
 
         def current_items():
@@ -220,27 +261,64 @@ class ElasticSearch(object):
 
     def create_mappings(self, mappings):
 
+        headers = {"Content-Type" : "application/json"}
+
         for _type in mappings:
 
             url_map = self.index_url + "/" + _type + "/_mapping"
 
             # First create the manual mappings
             if mappings[_type] != '{}':
-                res = self.requests.put(url_map, data=mappings[_type])
+                res = self.requests.put(url_map, data=mappings[_type],
+                                        headers=headers)
                 if res.status_code != 200:
                     logger.error("Error creating ES mappings %s", res.text)
+                    logger.error("Mapping: " + str(mappings[_type]))
+                    res.raise_for_status()
 
-            # Add the global mapping shared in all data sources
-            res = self.requests.put(url_map, data=self.global_mapping())
+            # By default all strings are not analyzed in ES < 6
+            if self.major == '2' or self.major == '5':
+                # Before version 6, strings were strings
+                not_analyze_strings = """
+                {
+                  "dynamic_templates": [
+                    { "notanalyzed": {
+                          "match": "*",
+                          "match_mapping_type": "string",
+                          "mapping": {
+                              "type":        "string",
+                              "index":       "not_analyzed"
+                          }
+                       }
+                    }
+                  ]
+                } """
+            else:
+                # After version 6, strings are keywords (not analyzed)
+                not_analyze_strings = """
+                {
+                  "dynamic_templates": [
+                    { "notanalyzed": {
+                          "match": "*",
+                          "match_mapping_type": "string",
+                          "mapping": {
+                              "type":        "keyword"
+                          }
+                       }
+                    }
+                  ]
+                } """
+            res = self.requests.put(url_map, data=not_analyze_strings, headers=headers)
             try:
                 res.raise_for_status()
             except requests.exceptions.HTTPError:
-                logger.warning('Can add mapping %s: %s', url_map, self.global_mapping())
+                logger.warning("Can't add mapping %s: %s", url_map, self.global_mapping())
+
 
     def get_last_date(self, field, filters_=[]):
         '''
             :field: field with the data
-            :filter_: additional filter to find the date
+            :filters_: additional filters to find the date
         '''
 
         last_date = self.get_last_item_field(field, filters_=filters_)
@@ -250,7 +328,7 @@ class ElasticSearch(object):
     def get_last_offset(self, field, filters_=[]):
         '''
             :field: field with the data
-            :filter_: additional filter to find the date
+            :filters_: additional filters to find the date
         '''
 
         offset = self.get_last_item_field(field, filters_=filters_, offset=True)
@@ -296,7 +374,11 @@ class ElasticSearch(object):
         } ''' % (data_query, data_agg)
 
         logger.debug("%s %s", url, data_json)
-        res = self.requests.post(url, data=data_json)
+
+        headers = {"Content-Type" : "application/json"}
+
+        res = self.requests.post(url, data=data_json, headers=headers)
+        res.raise_for_status()
         res_json = res.json()
 
         if 'aggregations' in res_json:

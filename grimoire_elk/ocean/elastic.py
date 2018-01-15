@@ -86,8 +86,9 @@ class ElasticOcean(ElasticItems):
 
         return None
 
-    def get_last_update_from_es(self, filter_=None):
-        last_update = self.elastic.get_last_date(self.get_field_date(), filter_)
+    def get_last_update_from_es(self, filters_=None):
+        last_update = self.elastic.get_last_date(self.get_field_date(),
+                                                 filters_=filters_)
 
         return last_update
 
@@ -144,7 +145,7 @@ class ElasticOcean(ElasticItems):
 
         # We need to filter by repository to support several repositories
         # in the same raw index
-        _filters = [get_repository_filter(self.perceval_backend,
+        filters_ = [get_repository_filter(self.perceval_backend,
                     self.get_connector_name())]
 
         # Check if backend supports from_date
@@ -155,7 +156,7 @@ class ElasticOcean(ElasticItems):
             if from_date:
                 last_update = from_date
             else:
-                self.last_update = self.get_last_update_from_es(_filters)
+                self.last_update = self.get_last_update_from_es(filters_=filters_)
                 last_update = self.last_update
 
             logger.info("Incremental from: %s", last_update)
@@ -165,7 +166,7 @@ class ElasticOcean(ElasticItems):
             if from_offset:
                 offset = from_offset
             else:
-                offset = self.elastic.get_last_offset("offset", _filters)
+                offset = self.elastic.get_last_offset("offset", filters_=filters_)
 
             if offset is not None:
                 logger.info("Incremental from: %i offset", offset)

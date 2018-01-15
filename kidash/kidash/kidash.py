@@ -30,7 +30,6 @@ import logging
 import os
 import os.path
 import pkgutil
-import sys
 
 from grimoire_elk.elk.elastic import ElasticSearch
 from grimoire_elk.elk.utils import grimoire_con
@@ -286,7 +285,6 @@ def get_index_pattern_from_vis(elastic, vis):
     elif "kibanaSavedObjectMeta" in vis_json:
         index_pattern = get_index_pattern_from_meta(vis_json["kibanaSavedObjectMeta"])
     return index_pattern
-
 
 def create_index_pattern(elastic_url, dashboard, enrich_index, es_index=None):
     """ Create a index pattern using as template the index pattern

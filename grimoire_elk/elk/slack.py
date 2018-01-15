@@ -46,8 +46,7 @@ class SlackEnrich(Enrich):
         {
             "properties": {
                 "text_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "keyword"
                    %s
                   }
            }

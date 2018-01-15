@@ -96,8 +96,7 @@ class GitEnrich(Enrich):
         {
             "properties": {
                "message_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
+                  "type": "text"
                   %s
                }
            }
@@ -424,6 +423,8 @@ class GitEnrich(Enrich):
         """ Implementation supporting signed-off and multiauthor/committer commits.
         """
 
+        headers = {"Content-Type" : "application/json"}
+
         max_items = self.elastic.max_items_bulk
         current = 0
         total = 0
@@ -464,16 +465,16 @@ class GitEnrich(Enrich):
 
             if current >= max_items:
                 try:
-                    r = self.requests.put(url, data=bulk_json)
-                    r.raise_for_status()
-                    json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
+                    res = self.requests.put(url, data=bulk_json, headers=headers)
+                    res.raise_for_status()
+                    json_size = sys.getsizeof(bulk_json) / (1024*1024)
                     logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
                     logger.error("Unicode error in enriched items")
                     logger.debug(bulk_json)
                     safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
-                    self.requests.put(url, data=safe_json)
+                    self.requests.put(url, data=safe_json, headers=headers)
                 bulk_json = ""
                 current = 0
 
@@ -529,7 +530,7 @@ class GitEnrich(Enrich):
             # No items enriched, nothing to upload to ES
             return total
 
-        r = self.requests.put(url, data=bulk_json)
+        r = self.requests.put(url, data=bulk_json, headers=headers)
         r.raise_for_status()
 
         if self.pair_programming:

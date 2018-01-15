@@ -215,8 +215,7 @@ class GitHubEnrich(Enrich):
                    "type": "geo_point"
                },
                "title_analyzed": {
-                 "type": "string",
-                 "index":"analyzed"
+                 "type": "keyword"
                }
             }
         }
