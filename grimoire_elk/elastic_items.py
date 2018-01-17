@@ -29,11 +29,14 @@ import json
 import logging
 
 from .elk.utils import get_repository_filter, grimoire_con
+from .elastic_mapping import Mapping
 
 logger = logging.getLogger(__name__)
 
 
 class ElasticItems():
+
+    mapping = Mapping
 
     # In large projects like Eclipse commits, 100 is too much
     # Change it from p2o command line or mordred config
@@ -184,7 +187,8 @@ class ElasticItems():
             order_field = None
             if self.perceval_backend:
                 order_field = self.get_incremental_date()
-            elif self.get_connector_name() == 'twitter':
+            elif hasattr(self, 'is_twitter_ocean'):
+                # TwitterOcean, order field is special
                 order_field = '@timestamp'
             if order_field is not None:
                 order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
@@ -196,15 +200,27 @@ class ElasticItems():
                 query_should = '{"bool": {%s}}' % filters_should
                 filters += ", " + query_should
 
-            query = """
-            {
-                "query": {
-                    "bool": {
-                        "must": [%s]
-                    }
-                } %s
-            }
-            """ % (filters, order_query)
+            filters_dict = json.loads(filters)
+            if len(filters_dict) == 0:
+                # Avoid empty list of filters, ES 6.x doesn't like it
+                # In this case, ensure that order_query does not start with ,
+                if order_query.startswith(','):
+                    order_query = order_query[1:]
+                query = """
+                {
+                  %s
+                }
+                """ % (order_query)
+            else:
+                query = """
+                {
+                    "query": {
+                        "bool": {
+                            "must": [%s]
+                        }
+                    } %s
+                }
+                """ % (filters, order_query)
 
             logger.debug("Raw query to %s\n%s", url, json.dumps(json.loads(query), indent=4))
             res = self.requests.post(url, data=query, headers=headers)

@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# JIRA Ocean feeder
 #
-# Copyright (C) 2015 Bitergia
+# Copyright (C) 2018 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,50 +19,33 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # Authors:
-#   Alvaro del Castillo San Felix <acs@bitergia.com>
+#   Jesus M. Gonzalez-Barahona <jgb@bitergia.com>
 #
 
-from .elastic import ElasticOcean
-from ..elastic_mapping import Mapping as BaseMapping
+class Mapping:
+    """Class for Elasticsearch mappings.
 
-class Mapping(BaseMapping):
+    This class will be subclassed by backends,
+    which will provide specific mappings.
+    """
 
     @staticmethod
     def get_elastic_mappings(es_major):
         """Get Elasticsearch mapping.
 
-        Non dynamic discovery of type for:
-            * data.renderedFields.description
+        Different versions of Elasticsearch may need specific versions
+        of the mapping, thus using es_major to potentially provide
+        different mappings.
+
+        When the mapping depends on the version of Kibiter/Kibana,
+        we will use the Elasticsearch version anyway, since they should
+        be paired (same major version for 5 and larger, ES major version 2
+        for Kibiter/Kibana major version 4).
 
         :param es_major: major version of Elasticsearch, as string
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '''
-         {
-            "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "renderedFields": {
-                                "dynamic":false,
-                                "properties": {}
-                            }
-                        }
-                    }
-                }
-        }
-        '''
+        mapping = '{}'
 
         return {"items": mapping}
-
-
-class JiraOcean(ElasticOcean):
-    """JIRA Ocean feeder"""
-
-    mapping = Mapping
-    
-    @classmethod
-    def get_arthur_params_from_url(cls, url):
-        """ Get the arthur params given a URL for the data source """
-        return {"url": url}

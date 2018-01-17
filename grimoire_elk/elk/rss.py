@@ -27,25 +27,48 @@ import logging
 from dateutil import parser
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
 
-class RSSEnrich(Enrich):
+class Mapping(BaseMapping):
 
-    def get_elastic_mappings(self):
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
 
-        mapping = """
-        {
-            "properties": {
-                "summary_analyzed": {
-                  "type": "keyword"
-                  }
-           }
-        } """
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "summary_analyzed": {
+                      "type": "keyword"
+                      }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "summary_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                      }
+               }
+            } """
 
         return {"items": mapping}
+
+
+class RSSEnrich(Enrich):
+
+    mapping = Mapping
 
     def get_identities(self, item):
         """ Return the identities from an item """

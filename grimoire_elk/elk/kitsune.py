@@ -28,33 +28,57 @@ import logging
 from dateutil import parser
 
 from .enrich import Enrich, metadata
-
 from .utils import get_time_diff_days
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "content_analyzed": {
+                      "type": "keyword"
+                      },
+                    "tags_analyzed": {
+                      "type": "keyword"
+                      }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "content_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                      },
+                    "tags_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                      }
+               }
+            } """
+
+        return {"items": mapping}
 
 class KitsuneEnrich(Enrich):
 
+    mappping = Mapping
+
     def get_field_author(self):
         return "creator"
-
-    def get_elastic_mappings(self):
-
-        mapping = """
-        {
-            "properties": {
-                "content_analyzed": {
-                  "type": "keyword"
-                  },
-                "tags_analyzed": {
-                  "type": "keyword"
-                  }
-           }
-        } """
-
-        return {"items": mapping}
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}

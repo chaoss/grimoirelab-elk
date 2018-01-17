@@ -28,12 +28,48 @@ import logging
 from dateutil import parser
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "fullDisplayName_analyzed": {
+                      "type": "keyword"
+                      }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "fullDisplayName_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                      }
+               }
+            } """
+
+        return {"items": mapping}
+
+
 class JenkinsEnrich(Enrich):
+
+    mapping = Mapping
 
     MAIN_NODE_NAME = "main"
 
@@ -77,19 +113,6 @@ class JenkinsEnrich(Enrich):
         except FileNotFoundError:
             logger.info("Jenkis node rename file not found %s",
                         self.nodes_rename_file)
-
-    def get_elastic_mappings(self):
-
-        mapping = """
-        {
-            "properties": {
-                "fullDisplayName_analyzed": {
-                  "type": "keyword"
-                  }
-           }
-        } """
-
-        return {"items": mapping}
 
     def get_field_author(self):
         # In Jenkins there are no identities support

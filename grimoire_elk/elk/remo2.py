@@ -25,12 +25,54 @@
 import logging
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "description_analyzed": {
+                      "type": "keyword"
+                    },
+                    "geolocation": {
+                        "type": "geo_point"
+                    }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "description_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                    },
+                    "geolocation": {
+                        "type": "geo_point"
+                    }
+               }
+            } """
+
+        return {"items": mapping}
+
+
 class ReMoEnrich(Enrich):
+
+    mapping = Mapping
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
@@ -40,22 +82,6 @@ class ReMoEnrich(Enrich):
 
     def get_field_author(self):
         return self.author
-
-    def get_elastic_mappings(self):
-
-        mapping = """
-        {
-            "properties": {
-                "description_analyzed": {
-                  "type": "keyword"
-                },
-                "geolocation": {
-                    "type": "geo_point"
-                }
-           }
-        } """
-
-        return {"items": mapping}
 
     def get_identities(self, item):
         ''' Return the identities from an item '''

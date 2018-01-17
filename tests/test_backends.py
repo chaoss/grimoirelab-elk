@@ -112,6 +112,13 @@ class TestBackends(unittest.TestCase):
         config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
         es_con = dict(config.items('ElasticSearch'))['url']
+        db_user = ''
+        db_password = ''
+        if 'Database' in config:
+             if 'user' in config['Database']:
+                 db_user = config['Database']['user']
+             if 'password' in config['Database']:
+                 db_password = config['Database']['password']
         logging.info("Enriching data in: %s", es_con)
         connectors = get_connectors()
         for con in sorted(connectors.keys()):
@@ -126,9 +133,13 @@ class TestBackends(unittest.TestCase):
             if not sortinghat and not projects:
                 enrich_backend = connectors[con][2]()
             elif sortinghat and not projects:
-                enrich_backend = connectors[con][2](db_sortinghat=DB_SORTINGHAT)
+                enrich_backend = connectors[con][2](db_sortinghat=DB_SORTINGHAT,
+                                                    db_user=db_user,
+                                                    db_password=db_password)
             elif not sortinghat and projects:
-                enrich_backend = connectors[con][2](db_projects_map=DB_PROJECTS)
+                enrich_backend = connectors[con][2](db_projects_map=DB_PROJECTS,
+                                                    db_user=db_user,
+                                                    db_password=db_password)
             elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
             enrich_backend.set_elastic(elastic_enrich)
             if sortinghat:
@@ -169,11 +180,21 @@ class TestBackends(unittest.TestCase):
         config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
         es_con = dict(config.items('ElasticSearch'))['url']
+        db_user = ''
+        db_password = ''
+        if 'Database' in config:
+             if 'user' in config['Database']:
+                 db_user = config['Database']['user']
+             if 'password' in config['Database']:
+                 db_password = config['Database']['password']
+
         logging.info("Refreshing data in: %s", es_con)
         connectors = get_connectors()
         for con in sorted(connectors.keys()):
             enrich_index = "test_" + con + "_enrich"
-            enrich_backend = connectors[con][2](db_sortinghat=DB_SORTINGHAT)
+            enrich_backend = connectors[con][2](db_sortinghat=DB_SORTINGHAT,
+                                                db_user=db_user,
+                                                db_password=db_password)
             clean = False
             elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
             enrich_backend.set_elastic(elastic_enrich)
@@ -196,11 +217,21 @@ class TestBackends(unittest.TestCase):
         config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
         es_con = dict(config.items('ElasticSearch'))['url']
+        db_user = ''
+        db_password = ''
+        if 'Database' in config:
+             if 'user' in config['Database']:
+                 db_user = config['Database']['user']
+             if 'password' in config['Database']:
+                 db_password = config['Database']['password']
+
         logging.info("Refreshing data in: %s", es_con)
         connectors = get_connectors()
         for con in sorted(connectors.keys()):
             enrich_index = "test_" + con + "_enrich"
-            enrich_backend = connectors[con][2](db_projects_map=DB_PROJECTS)
+            enrich_backend = connectors[con][2](db_projects_map=DB_PROJECTS,
+                                                db_user=db_user,
+                                                db_password=db_password)
             clean = False
             elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
             enrich_backend.set_elastic(elastic_enrich)
@@ -212,4 +243,4 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
-    unittest.main()
+    unittest.main(warnings='ignore')

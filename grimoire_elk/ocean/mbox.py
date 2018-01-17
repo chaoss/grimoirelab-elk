@@ -26,16 +26,24 @@
 import logging
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
+class Mapping(BaseMapping):
 
-class MBoxOcean(ElasticOcean):
-    """MBox Ocean feeder"""
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
 
-    def get_elastic_mappings(self):
-        # immense term in field="body"
+        Non dynamic discovery of type for:
+            * data.body (inmense field)
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
         mapping = '''
          {
             "dynamic":true,
@@ -53,6 +61,12 @@ class MBoxOcean(ElasticOcean):
         '''
 
         return {"items": mapping}
+
+
+class MBoxOcean(ElasticOcean):
+    """MBox Ocean feeder"""
+
+    mapping = Mapping
 
     @classmethod
     def get_perceval_params_from_url(cls, url):

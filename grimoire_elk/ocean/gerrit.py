@@ -26,25 +26,55 @@
 '''Gerrit Ocean feeder'''
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
 
+class Mapping(BaseMapping):
 
-class GerritOcean(ElasticOcean):
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
 
-    def get_elastic_mappings(self):
-        # immense term in field="data.commitMessage"
-        mapping = '''
-         {
-            "dynamic":true,
-            "properties": {
-                "data": {
-                    "properties": {
-                        "commitMessage": {
-                            "type": "string"
+        Ensure data.commitMessage is string, since it can be very large
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major == '2':
+            # Keep compatibility with 2.x mappings
+            mapping = '''
+             {
+                "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "commitMessage": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
             }
-        }
-        '''
+            '''
+        else:
+            mapping = '''
+             {
+                "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "commitMessage": {
+                                "type": "text"
+                            }
+                        }
+                    }
+                }
+            }
+            '''
 
         return {"items": mapping}
+
+
+class GerritOcean(ElasticOcean):
+
+    mapping = Mapping

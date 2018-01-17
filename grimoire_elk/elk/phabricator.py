@@ -27,6 +27,7 @@ import logging
 from datetime import datetime
 
 from .enrich import Enrich
+from ..elastic_mapping import Mapping as BaseMapping
 
 from .utils import get_time_diff_days, unixtime_to_datetime
 
@@ -35,8 +36,63 @@ TASK_OPEN_STATUS = 'Open'
 TASK_CLOSED_STATUS = 'Resolved'
 logger = logging.getLogger(__name__)
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            fielddata = ', "fielddata": true'
+        else:
+            fielddata = ''
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "main_description_analyzed": {
+                      "type": "keyword"
+                    },
+                    "assigned_to_roles": {
+                      "type": "text"
+                      %s
+                     },
+                    "tags_analyzed": {
+                       "type": "keyword"
+                     }
+               }
+            } """ % (fielddata)
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "main_description_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                    },
+                    "assigned_to_roles": {
+                      "type": "string"
+                      %s
+                     },
+                    "tags_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                       %s
+                     }
+               }
+            } """ % (fielddata, fielddata)
+
+        return {"items": mapping}
+
 
 class PhabricatorEnrich(Enrich):
+
+    mapping = Mapping
 
     roles = ['authorData', 'ownerData']
 
@@ -51,31 +107,6 @@ class PhabricatorEnrich(Enrich):
 
     def get_field_author(self):
         return "authorData"
-
-    def get_elastic_mappings(self):
-
-        fielddata = ''
-        if self.kibiter_version == '5':
-            fielddata = ', "fielddata": true'
-
-        mapping = """
-        {
-            "properties": {
-                "main_description_analyzed": {
-                  "type": "keyword"
-                },
-                "assigned_to_roles": {
-                  "type": "text"
-                  %s
-                 },
-                "tags_analyzed": {
-                   "type": "keyword"
-                   %s
-                 }
-           }
-        } """ % (fielddata, fielddata)
-
-        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """

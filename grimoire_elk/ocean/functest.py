@@ -23,21 +23,25 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+"""Functest (OPNFV data about functional testing) Ocean feeder"""
+
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
 
+class Mapping(BaseMapping):
 
-class FunctestOcean(ElasticOcean):
-    """Functest Ocean feeder"""
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
 
-    def _fix_item(self, item):
-        if 'details' in item["data"]:
-            if isinstance(item["data"]["details"], str):
-                # Wrong format. This field is a dict with the details or
-                # and array with dicts
-                item["data"]["details"] = {}
+        Non dynamic discovery of type for:
+            * data.details: has {} [] and "" values!
+            * data.trust_indicator
 
-    def get_elastic_mappings(self):
-        # data.details has {} [] and "" values!
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
         mapping = '''
          {
             "dynamic":true,
@@ -59,3 +63,15 @@ class FunctestOcean(ElasticOcean):
         '''
 
         return {"items": mapping}
+
+class FunctestOcean(ElasticOcean):
+    """Functest Ocean feeder"""
+
+    mapping = Mapping
+
+    def _fix_item(self, item):
+        if 'details' in item["data"]:
+            if isinstance(item["data"]["details"], str):
+                # Wrong format. This field is a dict with the details or
+                # and array with dicts
+                item["data"]["details"] = {}

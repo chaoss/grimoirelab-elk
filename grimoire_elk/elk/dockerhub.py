@@ -27,31 +27,58 @@ import logging
 import sys
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "description_analyzed": {
+                      "type": "keyword"
+                      },
+                    "full_description_analyzed": {
+                      "type": "keyword"
+                    }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "description_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                      },
+                    "full_description_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                    }
+               }
+            } """
+
+        return {"items": mapping}
+
+
 class DockerHubEnrich(Enrich):
+
+    mapping = Mapping
 
     def get_field_author(self):
         return "nick"
-
-    def get_elastic_mappings(self):
-
-        mapping = """
-        {
-            "properties": {
-                "description_analyzed": {
-                  "type": "keyword"
-                  },
-                "full_description_analyzed": {
-                  "type": "keyword"
-                }
-           }
-        } """
-
-        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -116,9 +143,11 @@ class DockerHubEnrich(Enrich):
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
+        headers = {"Content-Type" : "application/json"}
+
         for item in items:
             if current >= max_items:
-                r = self.requests.put(url, data=bulk_json)
+                r = self.requests.put(url, data=bulk_json, headers=headers)
                 r.raise_for_status()
                 json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                 logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
@@ -150,7 +179,7 @@ class DockerHubEnrich(Enrich):
             # No items enriched, nothing to upload to ES
             return total
 
-        r = self.requests.put(url, data=bulk_json)
+        r = self.requests.put(url, data=bulk_json, headers=headers)
         r.raise_for_status()
 
         # Time to upload the images enriched items. The id is uuid+"_image"
@@ -164,7 +193,7 @@ class DockerHubEnrich(Enrich):
             bulk_json += data_json + "\n"  # Bulk document
             total += 1
 
-        r = self.requests.put(url, data=bulk_json)
+        r = self.requests.put(url, data=bulk_json, headers=headers)
         r.raise_for_status()
 
         return total

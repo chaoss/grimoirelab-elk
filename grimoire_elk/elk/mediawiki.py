@@ -28,28 +28,51 @@ import logging
 from dateutil import parser
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "title_analyzed": {
+                      "type": "keyword"
+                      }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "title_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                      }
+               }
+            } """
+
+        return {"items": mapping}
+
+
 class MediaWikiEnrich(Enrich):
+
+    mapping = Mapping
 
     def get_field_unique_id_review(self):
         return "revision_revid"
-
-    def get_elastic_mappings(self):
-
-        mapping = """
-        {
-            "properties": {
-                "title_analyzed": {
-                  "type": "keyword"
-                  }
-           }
-        } """
-
-        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """

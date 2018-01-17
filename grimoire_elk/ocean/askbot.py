@@ -23,18 +23,22 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
 
+class Mapping(BaseMapping):
 
-class AskbotOcean(ElasticOcean):
-    """Askbot Ocean feeder"""
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
 
-    def _fix_item(self, item):
-        # item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
-        item["ocean-unique-id"] = item["uuid"]
+        Non dynamic discovery of type for:
+            * data.answers.answered_by
+            * data.author
 
-    def get_elastic_mappings(self):
-        # data.answers.answered_by
-        # data.author
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
         mapping = '''
          {
             "dynamic":true,
@@ -56,6 +60,15 @@ class AskbotOcean(ElasticOcean):
         '''
 
         return {"items": mapping}
+
+class AskbotOcean(ElasticOcean):
+    """Askbot Ocean feeder"""
+
+    mapping = Mapping
+
+    def _fix_item(self, item):
+        # item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
+        item["ocean-unique-id"] = item["uuid"]
 
     @classmethod
     def get_p2o_params_from_url(cls, url):

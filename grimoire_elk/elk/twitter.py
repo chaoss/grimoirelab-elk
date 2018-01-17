@@ -27,12 +27,54 @@ import logging
 from dateutil import parser
 
 from .enrich import Enrich, metadata, DEFAULT_PROJECT
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "text_analyzed": {
+                      "type": "keyword"
+                      },
+                      "geolocation": {
+                         "type": "geo_point"
+                      }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "text_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                      },
+                      "geolocation": {
+                         "type": "geo_point"
+                      }
+               }
+            } """
+
+        return {"items": mapping}
+
+
 class TwitterEnrich(Enrich):
+
+    mapping = Mapping
 
     def get_field_author(self):
         return "user"
@@ -42,22 +84,6 @@ class TwitterEnrich(Enrich):
 
     def get_field_unique_id(self):
         return "id_str"
-
-    def get_elastic_mappings(self):
-
-        mapping = """
-        {
-            "properties": {
-                "text_analyzed": {
-                  "type": "keyword"
-                  },
-                  "geolocation": {
-                     "type": "geo_point"
-                  }
-           }
-        } """
-
-        return {"items": mapping}
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
