@@ -30,12 +30,62 @@ from dateutil import parser
 import email.utils
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 from .mbox_study_kip import kafka_kip, MAX_LINES_FOR_VOTE
+
 
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            fielddata = ', "fielddata": true'
+        else:
+            fielddata = ''
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                     "Subject_analyzed": {
+                       "type": "keyword"
+                     },
+                     "body": {
+                       "type": "keyword"
+                     }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                     "Subject_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                       %s
+                     },
+                     "body": {
+                      "type": "string",
+                      "index": "analyzed"
+                     }
+               }
+            } """ % fielddata
+
+        return {"items": mapping}
+
+
 class MBoxEnrich(Enrich):
+
+    mapping = Mapping
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
@@ -49,27 +99,6 @@ class MBoxEnrich(Enrich):
 
     def get_fields_uuid(self):
         return ["from_uuid"]
-
-    def get_elastic_mappings(self):
-
-        fielddata = ''
-        if self.kibiter_version == '5':
-            fielddata = ', "fielddata": true'
-
-        mapping = """
-        {
-            "properties": {
-                 "Subject_analyzed": {
-                   "type": "keyword"
-                   %s
-                 },
-                 "body": {
-                   "type": "keyword"
-                 }
-           }
-        } """ % fielddata
-
-        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """

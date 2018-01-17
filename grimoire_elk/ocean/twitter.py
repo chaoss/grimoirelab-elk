@@ -27,6 +27,9 @@ from .elastic import ElasticOcean
 class TwitterOcean(ElasticOcean):
     """Twitter Ocean feeder"""
 
+    # To easy checking for this class
+    is_twitter_ocean = True
+
     def get_field_date(self):
         """ Field with the update in the JSON items. Now the same in all. """
         return "@timestamp"

@@ -20,6 +20,7 @@ before_install:
   - pip install redis
   - pip install sortinghat
   - pip install PyMySQL
+  - pip install httpretty==0.8.6
 
 # install:
 #   - ./setup.py install
@@ -28,6 +29,6 @@ script:
   - flake8 .
   - mysqladmin -u root create test_sh
   - mysqladmin -u root create test_projects
-  - mysql -u root test_projects < tests/test_projects.sql 
+  - mysql -u root test_projects < tests/test_projects.sql
   - echo -e "[ElasticSearch]\nurl=http://localhost:9200" > tests/tests.conf
   - cd tests && ./run_tests.py

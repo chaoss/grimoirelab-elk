@@ -26,17 +26,21 @@
 '''Bugzilla Ocean feeder'''
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
 
+class Mapping(BaseMapping):
 
-class BugzillaOcean(ElasticOcean):
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
 
-    def _fix_item(self, item):
-        # Could be used for filtering
-        product = item['data']['product'][0]['__text__']
-        item['product'] = product
+        Non dynamic discovery of type for:
+            * data.long_desc.thetext.__text__
 
-    def get_elastic_mappings(self):
-        # data.long_desc.thetext.__text__
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
         mapping = '''
          {
             "dynamic":true,
@@ -54,6 +58,17 @@ class BugzillaOcean(ElasticOcean):
         '''
 
         return {"items": mapping}
+
+
+class BugzillaOcean(ElasticOcean):
+    """Bugzilla Ocean feeder"""
+
+    mapping = Mapping
+
+    def _fix_item(self, item):
+        # Could be used for filtering
+        product = item['data']['product'][0]['__text__']
+        item['product'] = product
 
     @classmethod
     def get_p2o_params_from_url(cls, url):

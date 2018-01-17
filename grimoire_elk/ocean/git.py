@@ -24,29 +24,59 @@
 #
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
+
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        Ensure data.message is string, since it can be very large
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major == '2':
+            # Keep compatibility with 2.x mappings
+            mapping = '''
+             {
+                "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "message": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+            '''
+        else:
+            mapping = '''
+             {
+                "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "message": {
+                                "type": "text"
+                            }
+                        }
+                    }
+                }
+            }
+            '''
+            print
+        return {"items": mapping}
 
 
 class GitOcean(ElasticOcean):
     """Git Ocean feeder"""
 
-    def get_elastic_mappings(self):
-        # immense term in field="data.message"
-        mapping = '''
-         {
-            "dynamic":true,
-            "properties": {
-                "data": {
-                    "properties": {
-                        "message": {
-                            "type": "text"
-                        }
-                    }
-                }
-            }
-        }
-        '''
-
-        return {"items": mapping}
+    mapping = Mapping
 
     @classmethod
     def get_p2o_params_from_url(cls, url):

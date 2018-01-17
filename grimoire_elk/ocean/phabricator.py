@@ -22,20 +22,23 @@
 #
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
 
+class Mapping(BaseMapping):
 
-class PhabricatorOcean(ElasticOcean):
-    """Phabricator Ocean feeder"""
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
 
-    def _fix_item(self, item):
-        # https://discuss.elastic.co/t/field-name-cannot-contain/33251/16
-        if 'custom.external_reference' in item["data"]['fields']:
-            item["data"]['fields']["custom_external_reference"] = item["data"]['fields'].pop("custom.external_reference")
-        if 'custom.security_topic' in item["data"]['fields']:
-            item["data"]['fields']["custom_security_topic"] = item["data"]['fields'].pop("custom.security_topic")
+        Non dynamic discovery of type for:
+            * data.transaction: has string arrays and dicts arrays
+        Specific type for:
+            * data.fields.priority.subpriority (float)
 
-    def get_elastic_mappings(self):
-        # This field data.transaction has string arrays and dicts arrays
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
         mapping = '''
         {
             "dynamic":true,
@@ -62,3 +65,16 @@ class PhabricatorOcean(ElasticOcean):
         '''
 
         return {"items": mapping}
+
+
+class PhabricatorOcean(ElasticOcean):
+    """Phabricator Ocean feeder"""
+
+    mapping = Mapping
+
+    def _fix_item(self, item):
+        # https://discuss.elastic.co/t/field-name-cannot-contain/33251/16
+        if 'custom.external_reference' in item["data"]['fields']:
+            item["data"]['fields']["custom_external_reference"] = item["data"]['fields'].pop("custom.external_reference")
+        if 'custom.security_topic' in item["data"]['fields']:
+            item["data"]['fields']["custom_security_topic"] = item["data"]['fields'].pop("custom.security_topic")

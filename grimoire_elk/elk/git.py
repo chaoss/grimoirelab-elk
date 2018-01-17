@@ -33,6 +33,7 @@ import requests
 from dateutil import parser
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 try:
     from .sortinghat import SortingHat
@@ -45,8 +46,48 @@ SH_GIT_COMMIT = 'github-commit'
 DEMOGRAPHY_COMMIT_MIN_DATE = '1980-01-01'
 logger = logging.getLogger(__name__)
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            fielddata = ', "fielddata": true'
+        else:
+            fielddata = ''
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                   "message_analyzed": {
+                      "type": "text"
+                      %s
+                   }
+               }
+            }""" % fielddata
+        else:
+            mapping = """
+            {
+                "properties": {
+                   "message_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                      %s
+                   }
+               }
+            }""" % fielddata
+
+        return {"items": mapping}
 
 class GitEnrich(Enrich):
+
+    mapping = Mapping
 
     # REGEX to extract authors from a multi author commit: several authors present
     # in the Author field in the commit. Used if self.pair_programming is True
@@ -86,23 +127,23 @@ class GitEnrich(Enrich):
         """ Field with the date in the JSON enriched items """
         return "grimoire_creation_date"
 
-    def get_elastic_mappings(self):
-
-        fielddata = ''
-        if self.kibiter_version == '5':
-            fielddata = ', "fielddata": true'
-
-        mapping = """
-        {
-            "properties": {
-               "message_analyzed": {
-                  "type": "text"
-                  %s
-               }
-           }
-        }""" % fielddata
-
-        return {"items": mapping}
+    # def get_elastic_mappings(self):
+    #
+    #     fielddata = ''
+    #     if self.kibiter_version == '5':
+    #         fielddata = ', "fielddata": true'
+    #
+    #     mapping = """
+    #     {
+    #         "properties": {
+    #            "message_analyzed": {
+    #               "type": "text"
+    #               %s
+    #            }
+    #        }
+    #     }""" % fielddata
+    #
+    #     return {"items": mapping}
 
     def __get_authors(self, authors_str):
         # Extract the authors from a multiauthor

@@ -110,9 +110,9 @@ class ElasticSearch(object):
 
         res = self.requests.get(self.index_url)
 
+        headers = {"Content-Type": "application/json"}
         if res.status_code != 200:
             # Index does no exists
-            headers = {"Content-Type": "application/json"}
             r = self.requests.put(self.index_url, data=analyzers,
                                   headers=headers)
             if r.status_code != 200:
@@ -125,11 +125,13 @@ class ElasticSearch(object):
             if clean:
                 res = self.requests.delete(self.index_url)
                 res.raise_for_status()
-                res = self.requests.put(self.index_url, data=analyzers)
+                res = self.requests.put(self.index_url, data=analyzers,
+                                        headers=headers)
                 res.raise_for_status()
                 logger.info("Deleted and created index " + self.index_url)
         if mappings:
-            self.create_mappings(mappings)
+            map_dict = mappings.get_elastic_mappings(es_major=self.major)
+            self.create_mappings(map_dict)
 
     def _safe_put_bulk(self, url, bulk_json):
         """ Bulk PUT controlling unicode issues """

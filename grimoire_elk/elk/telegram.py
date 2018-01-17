@@ -25,33 +25,57 @@
 import logging
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            fielddata = ', "fielddata": true'
+        else:
+            fielddata = ''
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "text_analyzed": {
+                      "type": "keyword"
+                      }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "text_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                      %s
+                      }
+               }
+            } """ % (fielddata)
+
+        return {"items": mapping}
+
+
 class TelegramEnrich(Enrich):
+
+    mapping = Mapping
 
     def get_field_author(self):
         return "from"
-
-    def get_elastic_mappings(self):
-
-        fielddata = ''
-        if self.kibiter_version == '5':
-            fielddata = ', "fielddata": true'
-
-        mapping = """
-        {
-            "properties": {
-                "text_analyzed": {
-                  "type": "keyword"
-                  %s
-                  }
-           }
-        } """ % (fielddata)
-
-        return {"items": mapping}
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}

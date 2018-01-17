@@ -26,6 +26,7 @@ import json
 import logging
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 from .utils import unixtime_to_datetime
 
@@ -33,26 +34,48 @@ from .utils import unixtime_to_datetime
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "title_analyzed": {
+                      "type": "keyword"
+                    }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "title_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                    }
+               }
+            } """
+
+        return {"items": mapping}
+
+
 class StackExchangeEnrich(Enrich):
+
+    mapping = Mapping
 
     def get_field_unique_id(self):
         return "question_id"
 
     def get_field_author(self):
         return "owner"
-
-    def get_elastic_mappings(self):
-
-        mapping = """
-        {
-            "properties": {
-                "title_analyzed": {
-                  "type": "keyword"
-                }
-           }
-        } """
-
-        return {"items": mapping}
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}

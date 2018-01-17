@@ -23,15 +23,24 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-'''Gerrit Ocean feeder'''
+'''Bugzilla (REST API) Ocean feeder'''
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
 
+class Mapping(BaseMapping):
 
-class BugzillaRESTOcean(ElasticOcean):
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
 
-    def get_elastic_mappings(self):
-        # data.comments.text
+        Non dynamic discovery of type for:
+            * data.comments.text
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
         mapping = '''
          {
             "dynamic":true,
@@ -49,3 +58,7 @@ class BugzillaRESTOcean(ElasticOcean):
         '''
 
         return {"items": mapping}
+
+class BugzillaRESTOcean(ElasticOcean):
+
+    mapping = Mapping

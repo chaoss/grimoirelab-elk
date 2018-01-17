@@ -29,12 +29,56 @@ import logging
 import time
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                   "summary_analyzed": {
+                      "type": "keyword"
+                   },
+                   "timeopen": {
+                      "type": "double"
+                   }
+                }
+            }
+            """
+        else:
+            mapping = """
+            {
+                "properties": {
+                   "summary_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                   },
+                   "timeopen": {
+                      "type": "double"
+                   }
+                }
+            }
+            """
+
+        return {"items": mapping}
+
+
 class GerritEnrich(Enrich):
+
+    mapping = Mapping
 
     def get_field_author(self):
         return "owner"
@@ -126,23 +170,6 @@ class GerritEnrich(Enrich):
                 cdate_ts = comment['timestamp']
                 comment['timestamp'] = time.strftime('%Y-%m-%dT%H:%M:%S',
                                                      time.localtime(cdate_ts))
-
-    def get_elastic_mappings(self):
-
-        mapping = """
-        {
-            "properties": {
-               "summary_analyzed": {
-                  "type": "keyword"
-               },
-               "timeopen": {
-                  "type": "double"
-               }
-            }
-        }
-        """
-
-        return {"items": mapping}
 
     @metadata
     def get_rich_item(self, item):

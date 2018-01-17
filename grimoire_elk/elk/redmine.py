@@ -29,6 +29,7 @@ from datetime import datetime
 from dateutil import parser
 
 from .enrich import Enrich
+from ..elastic_mapping import Mapping as BaseMapping
 
 from .utils import get_time_diff_days
 
@@ -36,20 +37,42 @@ from .utils import get_time_diff_days
 logger = logging.getLogger(__name__)
 
 
-class RedmineEnrich(Enrich):
+class Mapping(BaseMapping):
 
-    def get_elastic_mappings(self):
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
 
-        mapping = """
-        {
-            "properties": {
-                "description_analyzed": {
-                  "type": "keyword"
-                  }
-           }
-        } """
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "description_analyzed": {
+                      "type": "keyword"
+                      }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "description_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                      }
+               }
+            } """
 
         return {"items": mapping}
+
+
+class RedmineEnrich(Enrich):
+
+    mapping = Mapping
 
     def get_identities(self, item):
         """ Return the identities from an item """

@@ -24,12 +24,22 @@
 #
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
 
+class Mapping(BaseMapping):
 
-class JenkinsOcean(ElasticOcean):
-    """Jenkins Ocean feeder"""
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
 
-    def get_elastic_mappings(self):
+        Non dynamic discovery of type for:
+            * data.runs
+            * data.actions
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
         mapping = '''
          {
             "dynamic":true,
@@ -51,6 +61,12 @@ class JenkinsOcean(ElasticOcean):
         '''
 
         return {"items": mapping}
+
+
+class JenkinsOcean(ElasticOcean):
+    """Jenkins Ocean feeder"""
+
+    mapping = Mapping
 
     @classmethod
     def get_p2o_params_from_url(cls, url):

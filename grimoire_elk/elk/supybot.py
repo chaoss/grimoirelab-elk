@@ -27,33 +27,57 @@ import logging
 from dateutil import parser
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            fielddata = ', "fielddata": true'
+        else:
+            fielddata = ''
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "body_analyzed": {
+                      "type": "keyword"
+                      }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "body_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                      %s
+                      }
+               }
+            } """ % fielddata
+
+        return {"items": mapping}
+
+
 class SupybotEnrich(Enrich):
+
+    mapping = Mapping
 
     def get_field_author(self):
         return "nick"
-
-    def get_elastic_mappings(self):
-
-        fielddata = ''
-        if self.kibiter_version == '5':
-            fielddata = ', "fielddata": true'
-
-        mapping = """
-        {
-            "properties": {
-                "body_analyzed": {
-                  "type": "keyword"
-                  %s
-                  }
-           }
-        } """ % fielddata
-
-        return {"items": mapping}
 
     def get_identities(self, item):
         """ Return the identities from an item """

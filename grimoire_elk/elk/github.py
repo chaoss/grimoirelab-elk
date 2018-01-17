@@ -32,13 +32,65 @@ from datetime import datetime
 from .utils import get_time_diff_days
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 GITHUB = 'https://github.com/'
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        geopoints type is not created in dynamic mapping
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                   "assignee_geolocation": {
+                       "type": "geo_point"
+                   },
+                   "user_geolocation": {
+                       "type": "geo_point"
+                   },
+                   "title_analyzed": {
+                     "type": "keyword"
+                   }
+                }
+            }
+            """
+        else:
+            mapping = """
+            {
+                "properties": {
+                   "assignee_geolocation": {
+                       "type": "geo_point"
+                   },
+                   "user_geolocation": {
+                       "type": "geo_point"
+                   },
+                   "title_analyzed": {
+                      "type": "string",
+                      "index": "analyzed"
+                   }
+                }
+            }
+            """
+
+        return {"items": mapping}
+
+
 class GitHubEnrich(Enrich):
+
+    mapping = Mapping
 
     roles = ['assignee_data', 'user_data']
 
@@ -201,27 +253,6 @@ class GitHubEnrich(Enrich):
         self.requests.put(url, data=bulk_json)
 
         logger.debug("Adding geoloc to ES Done")
-
-    def get_elastic_mappings(self):
-        """ geopoints type is not created in dynamic mapping """
-
-        mapping = """
-        {
-            "properties": {
-               "assignee_geolocation": {
-                   "type": "geo_point"
-               },
-               "user_geolocation": {
-                   "type": "geo_point"
-               },
-               "title_analyzed": {
-                 "type": "keyword"
-               }
-            }
-        }
-        """
-
-        return {"items": mapping}
 
     def get_project_repository(self, eitem):
         repo = eitem['origin']

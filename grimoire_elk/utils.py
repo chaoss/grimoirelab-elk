@@ -226,11 +226,14 @@ def get_elastic(url, es_index, clean=None, backend=None):
 
     if backend:
         backend.set_elastic_url(url)
-        mapping = backend.get_elastic_mappings()
+#        mapping = backend.get_elastic_mappings()
+        mapping = backend.mapping
         analyzers = backend.get_elastic_analyzers()
     try:
         insecure = True
-        elastic = ElasticSearch(url, es_index, mapping, clean, insecure, analyzers)
+        elastic = ElasticSearch(url=url, index=es_index, mappings=mapping,
+                                clean=clean, insecure=insecure,
+                                analyzers=analyzers)
 
     except ElasticConnectException:
         logger.error("Can't connect to Elastic Search. Is it running?")

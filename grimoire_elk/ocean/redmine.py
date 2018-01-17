@@ -24,13 +24,21 @@
 #
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
 
+class Mapping(BaseMapping):
 
-class RedmineOcean(ElasticOcean):
-    """Redmine Ocean feeder"""
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
 
-    def get_elastic_mappings(self):
-        # data.journals.notes
+        Non dynamic discovery of type for:
+            * data.journals
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
         mapping = '''
          {
             "dynamic":true,
@@ -48,3 +56,9 @@ class RedmineOcean(ElasticOcean):
         '''
 
         return {"items": mapping}
+
+
+class RedmineOcean(ElasticOcean):
+    """Redmine Ocean feeder"""
+
+    mapping = Mapping

@@ -32,12 +32,14 @@ import logging
 from datetime import datetime
 from ..elk.utils import unixtime_to_datetime, get_repository_filter
 from ..elastic_items import ElasticItems
-
+from ..elastic_mapping import Mapping
 
 logger = logging.getLogger(__name__)
 
 
 class ElasticOcean(ElasticItems):
+
+    mapping = Mapping
 
     @classmethod
     def add_params(cls, cmdline_parser):
@@ -75,11 +77,11 @@ class ElasticOcean(ElasticItems):
         field = "uuid"
         return field
 
-    def get_elastic_mappings(self):
-        """ specific mappings implemented in each data source """
-        mapping = '{}'
-
-        return {"items": mapping}
+#    def get_elastic_mappings(self):
+#        """ specific mappings implemented in each data source """
+#        mapping = '{}'
+#
+#        return {"items": mapping}
 
     def get_elastic_analyzers(self):
         """ Custom analyzers for our indexes  """

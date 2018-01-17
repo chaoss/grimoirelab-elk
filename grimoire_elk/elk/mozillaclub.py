@@ -26,12 +26,74 @@ import json
 import logging
 
 from grimoire_elk.elk.enrich import Enrich
+from ..elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = """
+            {
+                "properties": {
+                    "Event Description": {
+                      "type": "keyword"
+                      },
+                    "Event Creation": {
+                      "type": "keyword"
+                      },
+                    "Feedback from Attendees": {
+                      "type": "keyword"
+                      },
+                    "Your Feedback": {
+                      "type": "keyword"
+                      },
+                    "geolocation": {
+                       "type": "geo_point"
+                    }
+               }
+            } """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "Event Description": {
+                      "type": "string",
+                      "index": "analyzed"
+                      },
+                    "Event Creation": {
+                      "type": "string",
+                      "index": "analyzed"
+                      },
+                    "Feedback from Attendees": {
+                      "type": "string",
+                      "index": "analyzed"
+                      },
+                    "Your Feedback": {
+                      "type": "string",
+                      "index": "analyzed"
+                      },
+                    "geolocation": {
+                       "type": "geo_point"
+                    }
+               }
+            } """
+
+        return {"items": mapping}
+
 class MozillaClubEnrich(Enrich):
+
+    mapping = Mapping
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -44,31 +106,6 @@ class MozillaClubEnrich(Enrich):
 
     def get_field_unique_id(self):
         return "uuid"
-
-    def get_elastic_mappings(self):
-
-        mapping = """
-        {
-            "properties": {
-                "Event Description": {
-                  "type": "keyword"
-                  },
-                "Event Creation": {
-                  "type": "keyword"
-                  },
-                "Feedback from Attendees": {
-                  "type": "keyword"
-                  },
-                "Your Feedback": {
-                  "type": "keyword"
-                  },
-                "geolocation": {
-                   "type": "geo_point"
-                }
-           }
-        } """
-
-        return {"items": mapping}
 
     def get_identities(self, item):
         ''' Return the identities from an item '''
