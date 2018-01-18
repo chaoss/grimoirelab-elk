@@ -25,6 +25,7 @@
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 
+
 class Mapping(BaseMapping):
 
     @staticmethod
@@ -60,6 +61,7 @@ class Mapping(BaseMapping):
         '''
 
         return {"items": mapping}
+
 
 class AskbotOcean(ElasticOcean):
     """Askbot Ocean feeder"""

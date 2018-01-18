@@ -28,8 +28,6 @@ import functools
 import logging
 import sys
 
-import requests
-
 from datetime import datetime as dt
 
 from dateutil import parser
@@ -150,43 +148,9 @@ class Enrich(ElasticItems):
         # Label used during enrichment for identities without a known affiliation
         self.unaffiliated_group = 'Unknown'
 
-    # def __get_kibiter_version(self):
-    #     """
-    #         Return kibiter major number version
-    #
-    #         The url must point to the Elasticsearch used by Kibiter
-    #     """
-    #
-    #     url = self.elastic_url
-    #     config_url = '.kibana/config/_search'
-    #     major_version = None
-    #     # Avoid having // in the URL because ES will fail
-    #     if url[-1] != '/':
-    #         url += "/"
-    #     url += config_url
-    #
-    #     try:
-    #         r = grimoire_con(insecure=True).get(url)
-    #         r.raise_for_status()
-    #         if not r.json()['hits']['hits']:
-    #             logger.warning("Can not find Kibiter version")
-    #         else:
-    #             version = r.json()['hits']['hits'][0]['_id']
-    #             # 5.4.0-SNAPSHOT
-    #             major_version = version.split(".", 1)[0]
-    #     except requests.exceptions.HTTPError:
-    #         logger.warning("Can not find Kibiter version")
-    #
-    #     kibiter_version = major_version
-    #
-    #     return kibiter_version
-
     def set_elastic_url(self, url):
         """ Elastic URL """
         self.elastic_url = url
-        # Once we have the elastic endpoint we can get the kibiter version
-#        if self.kibiter_version is None:
-#            self.kibiter_version = self.__get_kibiter_version()
 
     def set_elastic(self, elastic):
         self.elastic = elastic

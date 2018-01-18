@@ -70,6 +70,7 @@ class Mapping(BaseMapping):
 
         return {"items": mapping}
 
+
 class SlackEnrich(Enrich):
 
     mapping = Mapping

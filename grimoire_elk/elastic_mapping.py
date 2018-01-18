@@ -22,6 +22,7 @@
 #   Jesus M. Gonzalez-Barahona <jgb@bitergia.com>
 #
 
+
 class Mapping:
     """Class for Elasticsearch mappings.
 
