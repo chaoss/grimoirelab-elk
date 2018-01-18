@@ -91,6 +91,7 @@ class Mapping(BaseMapping):
 
         return {"items": mapping}
 
+
 class MozillaClubEnrich(Enrich):
 
     mapping = Mapping

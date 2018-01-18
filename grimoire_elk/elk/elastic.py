@@ -144,7 +144,7 @@ class ElasticSearch(object):
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
             logger.error("Encondig error ... converting bulk to iso-8859-1")
-            bulk_json = bulk_json.encode('iso-8859-1','ignore')
+            bulk_json = bulk_json.encode('iso-8859-1', 'ignore')
             res = self.requests.put(url, data=bulk_json, headers=headers)
             res.raise_for_status()
 
@@ -263,7 +263,7 @@ class ElasticSearch(object):
 
     def create_mappings(self, mappings):
 
-        headers = {"Content-Type" : "application/json"}
+        headers = {"Content-Type": "application/json"}
 
         for _type in mappings:
 
@@ -315,7 +315,6 @@ class ElasticSearch(object):
                 res.raise_for_status()
             except requests.exceptions.HTTPError:
                 logger.warning("Can't add mapping %s: %s", url_map, self.global_mapping())
-
 
     def get_last_date(self, field, filters_=[]):
         '''
@@ -377,7 +376,7 @@ class ElasticSearch(object):
 
         logger.debug("%s %s", url, data_json)
 
-        headers = {"Content-Type" : "application/json"}
+        headers = {"Content-Type": "application/json"}
 
         res = self.requests.post(url, data=data_json, headers=headers)
         res.raise_for_status()

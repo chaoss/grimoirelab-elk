@@ -115,10 +115,10 @@ class TestBackends(unittest.TestCase):
         db_user = ''
         db_password = ''
         if 'Database' in config:
-             if 'user' in config['Database']:
-                 db_user = config['Database']['user']
-             if 'password' in config['Database']:
-                 db_password = config['Database']['password']
+            if 'user' in config['Database']:
+                db_user = config['Database']['user']
+            if 'password' in config['Database']:
+                db_password = config['Database']['password']
         logging.info("Enriching data in: %s", es_con)
         connectors = get_connectors()
         for con in sorted(connectors.keys()):
@@ -183,10 +183,10 @@ class TestBackends(unittest.TestCase):
         db_user = ''
         db_password = ''
         if 'Database' in config:
-             if 'user' in config['Database']:
-                 db_user = config['Database']['user']
-             if 'password' in config['Database']:
-                 db_password = config['Database']['password']
+            if 'user' in config['Database']:
+                db_user = config['Database']['user']
+            if 'password' in config['Database']:
+                db_password = config['Database']['password']
 
         logging.info("Refreshing data in: %s", es_con)
         connectors = get_connectors()
@@ -220,10 +220,10 @@ class TestBackends(unittest.TestCase):
         db_user = ''
         db_password = ''
         if 'Database' in config:
-             if 'user' in config['Database']:
-                 db_user = config['Database']['user']
-             if 'password' in config['Database']:
-                 db_password = config['Database']['password']
+            if 'user' in config['Database']:
+                db_user = config['Database']['user']
+            if 'password' in config['Database']:
+                db_password = config['Database']['password']
 
         logging.info("Refreshing data in: %s", es_con)
         connectors = get_connectors()

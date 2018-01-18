@@ -34,6 +34,7 @@ from ..elastic_mapping import Mapping as BaseMapping
 
 logger = logging.getLogger(__name__)
 
+
 class Mapping(BaseMapping):
 
     @staticmethod
@@ -72,6 +73,7 @@ class Mapping(BaseMapping):
             } """
 
         return {"items": mapping}
+
 
 class KitsuneEnrich(Enrich):
 

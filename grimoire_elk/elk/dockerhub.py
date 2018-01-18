@@ -143,7 +143,7 @@ class DockerHubEnrich(Enrich):
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
-        headers = {"Content-Type" : "application/json"}
+        headers = {"Content-Type": "application/json"}
 
         for item in items:
             if current >= max_items:

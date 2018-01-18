@@ -119,7 +119,7 @@ class ElasticItems():
         """ Get the items from the index related to the backend applying and
         optional _filter if provided"""
 
-        headers = {"Content-Type" : "application/json"}
+        headers = {"Content-Type": "application/json"}
 
         if not self.elastic:
             return None
@@ -136,9 +136,9 @@ class ElasticItems():
             url = self.elastic.url
             url += "/_search/scroll"
             scroll_data = {
-                "scroll" : max_process_items_pack_time,
-                "scroll_id" : elastic_scroll_id
-                }
+                "scroll": max_process_items_pack_time,
+                "scroll_id": elastic_scroll_id
+            }
             res = self.requests.post(url, data=json.dumps(scroll_data), headers=headers)
             res.raise_for_status()
         else:

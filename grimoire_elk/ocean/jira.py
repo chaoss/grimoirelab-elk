@@ -26,6 +26,7 @@
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 
+
 class Mapping(BaseMapping):
 
     @staticmethod
@@ -62,7 +63,7 @@ class JiraOcean(ElasticOcean):
     """JIRA Ocean feeder"""
 
     mapping = Mapping
-    
+
     @classmethod
     def get_arthur_params_from_url(cls, url):
         """ Get the arthur params given a URL for the data source """

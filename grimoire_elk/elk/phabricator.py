@@ -36,6 +36,7 @@ TASK_OPEN_STATUS = 'Open'
 TASK_CLOSED_STATUS = 'Resolved'
 logger = logging.getLogger(__name__)
 
+
 class Mapping(BaseMapping):
 
     @staticmethod

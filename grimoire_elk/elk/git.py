@@ -46,6 +46,7 @@ SH_GIT_COMMIT = 'github-commit'
 DEMOGRAPHY_COMMIT_MIN_DATE = '1980-01-01'
 logger = logging.getLogger(__name__)
 
+
 class Mapping(BaseMapping):
 
     @staticmethod
@@ -84,6 +85,7 @@ class Mapping(BaseMapping):
             }""" % fielddata
 
         return {"items": mapping}
+
 
 class GitEnrich(Enrich):
 
@@ -464,7 +466,7 @@ class GitEnrich(Enrich):
         """ Implementation supporting signed-off and multiauthor/committer commits.
         """
 
-        headers = {"Content-Type" : "application/json"}
+        headers = {"Content-Type": "application/json"}
 
         max_items = self.elastic.max_items_bulk
         current = 0
@@ -508,7 +510,7 @@ class GitEnrich(Enrich):
                 try:
                     res = self.requests.put(url, data=bulk_json, headers=headers)
                     res.raise_for_status()
-                    json_size = sys.getsizeof(bulk_json) / (1024*1024)
+                    json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                     logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
