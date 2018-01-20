@@ -200,7 +200,7 @@ class ElasticItems():
                 query_should = '{"bool": {%s}}' % filters_should
                 filters += ", " + query_should
 
-            filters_dict = json.loads(filters)
+            filters_dict = json.loads("[" + filters + "]")
             if len(filters_dict) == 0:
                 # Avoid empty list of filters, ES 6.x doesn't like it
                 # In this case, ensure that order_query does not start with ,
