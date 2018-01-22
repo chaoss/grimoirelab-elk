@@ -41,6 +41,9 @@ try:
 except ImportError:
     SORTINGHAT_LIBS = False
 
+# Mandatory in Elasticsearch 6, optional in earlier versions
+HEADER_JSON = {"Content-Type": "application/json"}
+
 GITHUB = 'https://github.com/'
 SH_GIT_COMMIT = 'github-commit'
 DEMOGRAPHY_COMMIT_MIN_DATE = '1980-01-01'
@@ -653,7 +656,9 @@ class GitEnrich(Enrich):
 
         logger.debug(es_query)
 
-        r = self.requests.post(self.elastic.index_url + "/_search", data=es_query, verify=False)
+        r = self.requests.post(self.elastic.index_url + "/_search",
+                               data=es_query, headers=HEADER_JSON,
+                               verify=False)
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
@@ -686,7 +691,9 @@ class GitEnrich(Enrich):
             # Time to add all the commits (items) from this author
             author_query_json['query']['bool']['must'][0]['term']['Author'] = author['key']
             author_query_str = json.dumps(author_query_json)
-            r = self.requests.post(self.elastic.index_url + "/_search?size=10000", data=author_query_str, verify=False)
+            r = self.requests.post(self.elastic.index_url + "/_search?size=10000",
+                                   data=author_query_str, headers=HEADER_JSON,
+                                   verify=False)
 
             if "hits" not in r.json():
                 logger.error("Can't find commits for %s", author['key'])
