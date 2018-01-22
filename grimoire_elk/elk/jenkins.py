@@ -49,7 +49,7 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "fullDisplayName_analyzed": {
-                      "type": "keyword"
+                      "type": "text"
                       }
                }
             } """

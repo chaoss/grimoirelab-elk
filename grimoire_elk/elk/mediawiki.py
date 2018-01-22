@@ -49,7 +49,7 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "title_analyzed": {
-                      "type": "keyword"
+                      "type": "text"
                       }
                }
             } """

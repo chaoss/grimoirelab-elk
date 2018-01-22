@@ -48,7 +48,7 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "text_analyzed": {
-                      "type": "keyword"
+                      "type": "text"
                       },
                       "geolocation": {
                          "type": "geo_point"

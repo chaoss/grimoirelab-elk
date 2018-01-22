@@ -49,7 +49,7 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "description_analyzed": {
-                      "type": "keyword"
+                      "type": "text"
                       },
                     "venue_geolocation": {
                        "type": "geo_point"

@@ -62,7 +62,7 @@ class Mapping(BaseMapping):
                        "type": "geo_point"
                    },
                    "title_analyzed": {
-                     "type": "keyword"
+                     "type": "text"
                    }
                 }
             }

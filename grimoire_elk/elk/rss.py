@@ -48,7 +48,7 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "summary_analyzed": {
-                      "type": "keyword"
+                      "type": "text"
                       }
                }
             } """
