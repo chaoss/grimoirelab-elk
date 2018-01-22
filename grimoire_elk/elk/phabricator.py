@@ -48,11 +48,6 @@ class Mapping(BaseMapping):
         """
 
         if es_major != '2':
-            fielddata = ', "fielddata": true'
-        else:
-            fielddata = ''
-
-        if es_major != '2':
             mapping = """
             {
                 "properties": {
@@ -60,14 +55,15 @@ class Mapping(BaseMapping):
                       "type": "text"
                     },
                     "assigned_to_roles": {
-                      "type": "text"
-                      %s
+                      "type": "text",
+                      "fielddata": true
                      },
                     "tags_analyzed": {
-                       "type": "text"
+                      "type": "text",
+                      "fielddata": true
                      }
                }
-            } """ % (fielddata)
+            } """
         else:
             mapping = """
             {
@@ -78,15 +74,13 @@ class Mapping(BaseMapping):
                     },
                     "assigned_to_roles": {
                       "type": "string"
-                      %s
                      },
                     "tags_analyzed": {
                       "type": "string",
                       "index": "analyzed"
-                       %s
                      }
                }
-            } """ % (fielddata, fielddata)
+            } """
 
         return {"items": mapping}
 

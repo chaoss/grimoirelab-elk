@@ -48,19 +48,15 @@ class Mapping(BaseMapping):
         """
 
         if es_major != '2':
-            fielddata = ', "fielddata": true'
-        else:
-            fielddata = ''
-
-        if es_major != '2':
             mapping = """
             {
                 "properties": {
                      "Subject_analyzed": {
-                       "type": "string"
+                       "type": "text",
+                       "fielddata": true
                      },
                      "body": {
-                       "type": "string"
+                       "type": "text"
                      }
                }
             } """
@@ -71,14 +67,13 @@ class Mapping(BaseMapping):
                      "Subject_analyzed": {
                       "type": "string",
                       "index": "analyzed"
-                       %s
                      },
                      "body": {
                       "type": "string",
                       "index": "analyzed"
                      }
                }
-            } """ % fielddata
+            } """
 
         return {"items": mapping}
 
