@@ -50,10 +50,10 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "content_analyzed": {
-                      "type": "keyword"
+                      "type": "text"
                       },
                     "tags_analyzed": {
-                      "type": "keyword"
+                      "type": "text"
                       }
                }
             } """

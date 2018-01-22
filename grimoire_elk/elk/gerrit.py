@@ -50,7 +50,7 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                    "summary_analyzed": {
-                      "type": "keyword"
+                      "type": "text"
                    },
                    "timeopen": {
                       "type": "double"

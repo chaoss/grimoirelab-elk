@@ -47,16 +47,16 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "Event Description": {
-                      "type": "keyword"
+                      "type": "text"
                       },
                     "Event Creation": {
-                      "type": "keyword"
+                      "type": "text"
                       },
                     "Feedback from Attendees": {
-                      "type": "keyword"
+                      "type": "text"
                       },
                     "Your Feedback": {
-                      "type": "keyword"
+                      "type": "text"
                       },
                     "geolocation": {
                        "type": "geo_point"

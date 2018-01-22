@@ -57,14 +57,14 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "main_description_analyzed": {
-                      "type": "keyword"
+                      "type": "text"
                     },
                     "assigned_to_roles": {
                       "type": "text"
                       %s
                      },
                     "tags_analyzed": {
-                       "type": "keyword"
+                       "type": "text"
                      }
                }
             } """ % (fielddata)
