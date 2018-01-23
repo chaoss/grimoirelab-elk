@@ -324,7 +324,7 @@ class Enrich(ElasticItems):
         for item in items:
             if current >= max_items:
                 try:
-                    r = self.requests.put(url, data=bulk_json)
+                    r = self.requests.put(url, headers=HEADERS_JSON, data=bulk_json)
                     r.raise_for_status()
                     json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                     logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
@@ -333,7 +333,7 @@ class Enrich(ElasticItems):
                     logger.error("Unicode error in enriched items")
                     logger.debug(bulk_json)
                     safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
-                    self.requests.put(url, data=safe_json)
+                    self.requests.put(url, headers=HEADERS_JSON, data=safe_json)
                 bulk_json = ""
                 current = 0
 
