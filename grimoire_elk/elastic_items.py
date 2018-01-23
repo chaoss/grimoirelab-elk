@@ -145,8 +145,11 @@ class ElasticItems():
             # If using a perceval backends always filter by repository
             # to support multi repository indexes
             # We need the filter dict as a string to join with the rest
-            filters = self.get_repository_filter_raw(term=True)
-            filters = json.dumps(filters)
+            filters_dict = self.get_repository_filter_raw(term=True)
+            if filters_dict:
+                filters = json.dumps(filters_dict)
+            else:
+                filters = ''
 
             if self.filter_raw:
                 filters += '''
@@ -199,6 +202,10 @@ class ElasticItems():
                 # We need to add a bool should query to the outer must query
                 query_should = '{"bool": {%s}}' % filters_should
                 filters += ", " + query_should
+
+            # Fix the filters string if it starts with "," (empty first filter)
+            if filters.lstrip().startswith(','):
+                filters = filters.lstrip()[1:]
 
             filters_dict = json.loads("[" + filters + "]")
             if len(filters_dict) == 0:
