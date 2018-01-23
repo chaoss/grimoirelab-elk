@@ -371,7 +371,8 @@ class PhabricatorEnrich(Enrich):
 
         eitem['tags'] = []
         for project in phab_item['projects']:
-            eitem['tags'].append(project['name'])
+            if project:
+                eitem['tags'].append(project['name'])
         eitem['tags_analyzed'] = eitem['tags']
         eitem['tags_custom_analyzed'] = eitem['tags']
 
