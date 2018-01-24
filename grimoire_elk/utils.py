@@ -53,6 +53,7 @@ from .ocean.meetup import MeetupOcean
 from .ocean.mozillaclub import MozillaClubOcean
 from .ocean.nntp import NNTPOcean
 from .ocean.phabricator import PhabricatorOcean
+from .ocean.pipermail import PipermailOcean
 from .ocean.redmine import RedmineOcean
 from .ocean.remo2 import ReMoOcean
 from .ocean.rss import RSSOcean
@@ -207,7 +208,7 @@ def get_connectors():
             "mozillaclub": [MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
             "nntp": [NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
             "phabricator": [Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
-            "pipermail": [Pipermail, MBoxOcean, PipermailEnrich, PipermailCommand],
+            "pipermail": [Pipermail, PipermailOcean, PipermailEnrich, PipermailCommand],
             "redmine": [Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo": [ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "rss": [RSS, RSSOcean, RSSEnrich, RSSCommand],
