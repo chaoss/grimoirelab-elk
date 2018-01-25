@@ -111,7 +111,7 @@ class ElasticItems():
                     eitem = hit['_source']
                     yield eitem
             else:
-                logger.error("No results found from %s", self.elastic.index_url)
+                logger.warning("No results found from %s", self.elastic.index_url)
                 break
         return
 
@@ -139,8 +139,7 @@ class ElasticItems():
                 "scroll": max_process_items_pack_time,
                 "scroll_id": elastic_scroll_id
             }
-            res = self.requests.post(url, data=json.dumps(scroll_data), headers=headers)
-            res.raise_for_status()
+            query_data = json.dumps(scroll_data)
         else:
             # If using a perceval backends always filter by repository
             # to support multi repository indexes
@@ -230,15 +229,17 @@ class ElasticItems():
                 """ % (filters, order_query)
 
             logger.debug("Raw query to %s\n%s", url, json.dumps(json.loads(query), indent=4))
-            res = self.requests.post(url, data=query, headers=headers)
-            res.raise_for_status()
+            query_data = query
 
         items = []
         rjson = None
         try:
+            res = self.requests.post(url, data=query_data, headers=headers)
+            res.raise_for_status()
             rjson = res.json()
         except Exception:
-            logger.error("No JSON found in %s" % (res.text))
-            logger.error("No results found from %s" % (url))
+            # The index could not exists yet or it could be empty
+            logger.warning("No JSON found in %s" % (res.text))
+            logger.warning("No results found from %s" % (url))
 
         return rjson
