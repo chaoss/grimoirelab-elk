@@ -323,7 +323,6 @@ def refresh_identities(enrich_backend, filter_author=None):
 
     def update_items(new_filter_author):
 
-        print("Updating identities in items", new_filter_author)
         for eitem in enrich_backend.fetch(new_filter_author):
             # logger.info(eitem)
             roles = None
