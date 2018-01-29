@@ -308,8 +308,22 @@ def refresh_projects(enrich_backend):
 
 
 def refresh_identities(enrich_backend, filter_author=None):
+    """Refresh identities in enriched index.
+
+    Retrieve items from the enriched index corresponding to enrich_backend,
+    and update their identities information, with fresh data from the
+    SortingHat database.
+
+    Instead of the whole index, only items matching the filter_author
+    filter are fitered, if that parameters is not None.
+
+    :param enrich_backend: enriched backend to update
+    :param  filter_author: filter to use to match items
+    """
 
     def update_items(new_filter_author):
+
+        print("Updating identities in items", new_filter_author)
         for eitem in enrich_backend.fetch(new_filter_author):
             # logger.info(eitem)
             roles = None
@@ -322,11 +336,17 @@ def refresh_identities(enrich_backend, filter_author=None):
             yield eitem
 
     logger.debug("Refreshing identities fields from %s", enrich_backend.elastic.index_url)
+
     total = 0
 
     max_ids = enrich_backend.elastic.max_items_clause
 
-    if filter_author:
+    if filter_author is None:
+        # No filter, update all items
+        for item in update_items(None):
+            yield item
+            total += 1
+    else:
         nidentities = len(filter_author['value'])
         logger.debug('Identities to refresh: %i', nidentities)
         if nidentities > max_ids:
@@ -342,7 +362,6 @@ def refresh_identities(enrich_backend, filter_author=None):
             for item in update_items(filter_author):
                 yield item
                 total += 1
-
     logger.info("Total eitems refreshed for identities fields %i", total)
 
 
