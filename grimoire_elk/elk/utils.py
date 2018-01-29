@@ -117,12 +117,13 @@ def unixtime_to_datetime(ut):
     return dt
 
 
-def grimoire_con(insecure=True, conn_retries=21):
+def grimoire_con(insecure=True, conn_retries=21, total=21):
     conn = requests.Session()
     # {backoff factor} * (2 ^ ({number of total retries} - 1))
     # conn_retries = 21  # 209715.2 = 2.4d
+    # total covers issues like 'ProtocolError('Connection aborted.')
     # Retry when there are errors in HTTP connections
-    retries = Retry(connect=conn_retries, read=8, redirect=5, backoff_factor=0.2,
+    retries = Retry(total=total, connect=conn_retries, read=8, redirect=5, backoff_factor=0.2,
                     method_whitelist=False)
     adapter = requests.adapters.HTTPAdapter(max_retries=retries)
     conn.mount('http://', adapter)
