@@ -87,10 +87,12 @@ class TestBackends(unittest.TestCase):
                 ocean._items_to_es(items_pack)
                 items_pack = []
             items_pack.append(item)
-        ocean._items_to_es(items_pack)
+        inserted = ocean._items_to_es(items_pack)
+        return inserted
 
     def test_data_load(self):
         """Test load all sources JSON data into ES"""
+
         config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
         es_con = dict(config.items('ElasticSearch'))['url']
@@ -105,7 +107,29 @@ class TestBackends(unittest.TestCase):
                 ocean_backend = connectors[con][1](perceval_backend)
                 elastic_ocean = get_elastic(es_con, es_index, clean, ocean_backend)
                 ocean_backend.set_elastic(elastic_ocean)
-                self.__data2es(items, ocean_backend)
+                inserted = self.__data2es(items, ocean_backend)
+
+                self.assertTrue(len(items), inserted)
+
+    def test_data_load_error(self):
+        """Test whether an exception is thrown when inserting data intO"""
+
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE)
+        es_con = dict(config.items('ElasticSearch'))['url']
+        logging.info("Loading data in: %s", es_con)
+        connector = get_connectors()['functest']
+        with open(os.path.join("data", "functest_wrong.json")) as f:
+            items = json.load(f)
+            es_index = "test_functest"
+            clean = True
+            perceval_backend = None
+            ocean_backend = connector[1](perceval_backend)
+            elastic_ocean = get_elastic(es_con, es_index, clean, ocean_backend)
+            ocean_backend.set_elastic(elastic_ocean)
+
+            inserted = self.__data2es(items, ocean_backend)
+            self.assertGreater(len(items), inserted)
 
     def test_enrich(self, sortinghat=False, projects=False):
         """Test enrich all sources"""

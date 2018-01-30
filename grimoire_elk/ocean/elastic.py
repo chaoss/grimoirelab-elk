@@ -247,4 +247,5 @@ class ElasticOcean(ElasticItems):
 
         field_id = self.get_field_unique_id()
 
-        self.elastic.bulk_upload_sync(json_items, field_id)
+        inserted = self.elastic.bulk_upload_sync(json_items, field_id)
+        return inserted
