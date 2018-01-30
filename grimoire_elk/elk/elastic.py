@@ -33,6 +33,7 @@ from time import time, sleep
 
 import requests
 
+from ..errors import ELKError
 from .utils import unixtime_to_datetime, grimoire_con
 
 
@@ -148,6 +149,26 @@ class ElasticSearch(object):
             res = self.requests.put(url, data=bulk_json, headers=headers)
             res.raise_for_status()
 
+        result = res.json()
+        failed_items = []
+        if result['errors']:
+            # Due to multiple errors that may be thrown when inserting bulk data, only the first error is returned
+            failed_items = [item['index'] for item in result['items'] if 'error' in item['index']]
+            error = str(failed_items[0]['error'])
+
+            logger.error("Failed to insert data to ES: " + error)
+
+        inserted_items = len(result['items']) - len(failed_items)
+
+        # The exception is currently not thrown to avoid stopping ocean uploading processes
+        try:
+            if failed_items:
+                raise ELKError(cause=error)
+        except ELKError:
+            pass
+
+        return inserted_items
+
     def bulk_upload(self, items, field_id):
         ''' Upload in controlled packs items to ES using bulk API '''
 
@@ -166,8 +187,7 @@ class ElasticSearch(object):
         for item in items:
             if current >= self.max_items_bulk:
                 task_init = time()
-                self._safe_put_bulk(url, bulk_json)
-                new_items += current
+                new_items += self._safe_put_bulk(url, bulk_json)
                 current = 0
                 json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                 logger.debug("bulk packet sent (%.2f sec, %i total, %.2f MB)"
@@ -177,8 +197,7 @@ class ElasticSearch(object):
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
             bulk_json += data_json + "\n"  # Bulk document
             current += 1
-        self._safe_put_bulk(url, bulk_json)
-        new_items += current
+        new_items += self._safe_put_bulk(url, bulk_json)
         json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
         logger.debug("bulk packet sent (%.2f sec prev, %i total, %.2f MB)"
                      % (time() - task_init, new_items, json_size))
