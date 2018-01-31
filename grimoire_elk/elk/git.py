@@ -400,6 +400,10 @@ class GitEnrich(Enrich):
         if 'project' in item:
             eitem['project'] = item['project']
 
+        # Adding the git author domain
+        author_domain = self.get_identity_domain(self.get_sh_identity(item, 'Author'))
+        eitem['git_author_domain'] = author_domain
+
         eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
 
         if self.sortinghat:
