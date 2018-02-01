@@ -585,15 +585,8 @@ class GitEnrich(Enrich):
 
     def enrich_demography(self, enrich_backend, no_incremental=False):
 
-        from_date = None
-
-        if no_incremental:
-            from_date = None
-        else:
-            from_date = self.elastic.get_last_date('author_max_date')
-
-        logger.info("Doing demography enrich from %s since %s",
-                    self.elastic.index_url, from_date)
+        logger.info("Doing demography enrich for %s", self.elastic.index_url)
+        time.sleep(1)  # HACK: Wait until git enrich index has been written
 
         date_field = self.get_incremental_date()
 
@@ -604,20 +597,20 @@ class GitEnrich(Enrich):
         }
         ''' % (date_field, DEMOGRAPHY_COMMIT_MIN_DATE)
 
-        if from_date:
-            from_date = from_date.isoformat()
-
-            filters += '''
-            ,
-            {"range":
-                {"%s": {"gte": "%s"}}
-            }
-            ''' % (date_field, from_date)
-
+        # Only commits not already processed by demography study so it
+        # must not contains the extra fields author_min_date/author_max_date
         query = """
         "query": {
             "bool": {
-                "must": [%s]
+                "must": [%s],
+                "must_not": [
+                    {"exists": {
+                        "field": "author_min_date"
+                    }},
+                    {"exists": {
+                        "field": "author_max_date"
+                    }}
+                ]
             }
         },
         """ % (filters)
