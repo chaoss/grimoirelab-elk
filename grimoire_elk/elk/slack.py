@@ -181,14 +181,6 @@ class SlackEnrich(Enrich):
                     eitem['profile_title'] = message['user_data']['profile']['title']
                 eitem['avatar'] = message['user_data']['profile']['image_32']
 
-        if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
-
-        if self.prjs_map:
-            eitem.update(self.get_item_project(eitem))
-
-        eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "message"))
-
         # Channel info
         channel = message['channel_info']
         eitem['channel_name'] = channel['name']
@@ -206,6 +198,15 @@ class SlackEnrich(Enrich):
                 eitem['channel_' + field] = 1
 
         eitem = self.__convert_booleans(eitem)
+
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(item))
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
+
+        eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "message"))
+
 
         return eitem
 
