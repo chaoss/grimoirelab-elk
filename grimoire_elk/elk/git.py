@@ -130,24 +130,6 @@ class GitEnrich(Enrich):
         """ Field with the date in the JSON enriched items """
         return "grimoire_creation_date"
 
-    # def get_elastic_mappings(self):
-    #
-    #     fielddata = ''
-    #     if self.kibiter_version == '5':
-    #         fielddata = ', "fielddata": true'
-    #
-    #     mapping = """
-    #     {
-    #         "properties": {
-    #            "message_analyzed": {
-    #               "type": "text"
-    #               %s
-    #            }
-    #        }
-    #     }""" % fielddata
-    #
-    #     return {"items": mapping}
-
     def __get_authors(self, authors_str):
         # Extract the authors from a multiauthor
 

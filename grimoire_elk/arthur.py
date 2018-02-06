@@ -570,7 +570,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
             logger.info("Refreshing identities fields in %s", enrich_backend.elastic.index_url)
             field_id = enrich_backend.get_field_unique_id()
-            logger.info(field_id)
             eitems = refresh_identities(enrich_backend, filter_author)
             enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
         else:
