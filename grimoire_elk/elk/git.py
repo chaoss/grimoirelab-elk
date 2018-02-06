@@ -119,6 +119,10 @@ class GitEnrich(Enrich):
     def get_field_author(self):
         return "Author"
 
+    def get_field_unique_id(self):
+        # Field available in the enriched item
+        return "git_uuid"
+
     def get_fields_uuid(self):
         return ["author_uuid", "committer_uuid"]
 
@@ -327,6 +331,8 @@ class GitEnrich(Enrich):
                 eitem[f] = item[f]
             else:
                 eitem[f] = None
+        # For pair programming uuid is not a unique field. Use git_uuid in general as unique field.
+        eitem['git_uuid'] = eitem['uuid']
         # The real data
         commit = item['data']
         # data fields to copy
@@ -520,8 +526,8 @@ class GitEnrich(Enrich):
 
             rich_item = self.get_rich_item(item)
             data_json = json.dumps(rich_item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (item[self.get_field_unique_id()])
+            unique_field = self.get_field_unique_id()
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_item[unique_field])
             bulk_json += data_json + "\n"  # Bulk document
             current += 1
             total += 1
@@ -536,9 +542,11 @@ class GitEnrich(Enrich):
                         item['data']['Author'] = authors[i]
                         item['data']['is_git_commit_multi_author'] = 1
                         rich_item = self.get_rich_item(item)
-                        commit_id = item[self.get_field_unique_id()] + "_" + str(i - 1)
+                        item['data']['is_git_commit_multi_author'] = 1
                         data_json = json.dumps(rich_item)
-                        bulk_json += '{"index" : {"_id" : "%s" } }\n' % commit_id
+                        commit_id = item["uuid"] + "_" + str(i - 1)
+                        rich_item['git_uuid'] = commit_id
+                        bulk_json += '{"index" : {"_id" : "%s" } }\n' % rich_item['git_uuid']
                         bulk_json += data_json + "\n"  # Bulk document
                         current += 1
                         total += 1
@@ -557,9 +565,10 @@ class GitEnrich(Enrich):
                         item['data']['Author'] = author
                         item['data']['is_git_commit_signed_off'] = 1
                         rich_item = self.get_rich_item(item)
-                        commit_id = item[self.get_field_unique_id()] + "_" + str(nsg)
+                        commit_id = item["uuid"] + "_" + str(nsg)
+                        rich_item['git_uuid'] = commit_id
                         data_json = json.dumps(rich_item)
-                        bulk_json += '{"index" : {"_id" : "%s" } }\n' % commit_id
+                        bulk_json += '{"index" : {"_id" : "%s" } }\n' % rich_item['git_uuid']
                         bulk_json += data_json + "\n"  # Bulk document
                         current += 1
                         total += 1
