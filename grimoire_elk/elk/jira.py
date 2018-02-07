@@ -257,6 +257,11 @@ class JiraEnrich(Enrich):
         eitem['time_to_last_update_days'] = \
             get_time_diff_days(issue['fields']['created'], datetime.utcnow())
 
+        if 'fixVersions' in issue['fields']:
+            eitem['releases'] = []
+            for version in issue['fields']['fixVersions']:
+                eitem['releases'] += [version['name']]
+
         self.enrich_fields(issue['fields'], eitem)
 
         if self.sortinghat:
