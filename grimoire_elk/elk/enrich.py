@@ -34,6 +34,7 @@ from dateutil import parser
 from functools import lru_cache
 
 from ..elastic_items import ElasticItems
+from ..errors import ELKError
 
 from .utils import grimoire_con
 from .. import __version__
@@ -362,8 +363,26 @@ class Enrich(ElasticItems):
 
         r = self.requests.put(url, data=bulk_json, headers=HEADERS_JSON)
         r.raise_for_status()
+        result = r.json()
 
-        return total
+        failed_items = []
+        if result['errors']:
+            # Due to multiple errors that may be thrown when inserting bulk data, only the first error is returned
+            failed_items = [item['index'] for item in result['items'] if 'error' in item['index']]
+            error = str(failed_items[0]['error'])
+
+            logger.error("Failed to enrich data ES: %s, %s", error, url)
+
+        inserted_items = len(result['items']) - len(failed_items)
+
+        # The exception is currently not thrown to avoid stopping elk uploading processes
+        try:
+            if failed_items:
+                raise ELKError(cause=error)
+        except ELKError:
+            pass
+
+        return inserted_items
 
     def get_connector_name(self):
         """ Find the name for the current connector """
