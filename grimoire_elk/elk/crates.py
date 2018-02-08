@@ -87,6 +87,10 @@ class CratesEnrich(Enrich):
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
 
+        identity['username'] = None
+        identity['email'] = None
+        identity['name'] = None
+
         user = item  # by default a specific user dict is expected
         if 'data' in item and isinstance(item, dict):
             users = item['data'][identity_field]['users']
@@ -95,9 +99,6 @@ class CratesEnrich(Enrich):
             else:
                 user = users[0]
 
-        identity['username'] = None
-        identity['email'] = None
-        identity['name'] = None
         if 'login' in user:
             identity['username'] = user['login']
         if 'name' in user:
