@@ -54,6 +54,18 @@ class Mapping(BaseMapping):
                             "actions": {
                                 "dynamic":false,
                                 "properties": {}
+                            },
+                            "changeSet": {
+                                "properties": {
+                                    "items": {
+                                        "properties": {
+                                            "comment": {
+                                                "type": "text",
+                                                "index": "not_analyzed"
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

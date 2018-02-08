@@ -156,7 +156,7 @@ class ElasticSearch(object):
             failed_items = [item['index'] for item in result['items'] if 'error' in item['index']]
             error = str(failed_items[0]['error'])
 
-            logger.error("Failed to insert data to ES: " + error)
+            logger.error("Failed to insert data to ES: %s, %s", error, url)
 
         inserted_items = len(result['items']) - len(failed_items)
 
