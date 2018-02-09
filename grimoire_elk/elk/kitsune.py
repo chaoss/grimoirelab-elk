@@ -232,6 +232,7 @@ class KitsuneEnrich(Enrich):
         current = 0
         bulk_json = ""
         total = 0
+        nitems = 0
 
         url = self.elastic.index_url + '/items/_bulk'
 
@@ -239,6 +240,7 @@ class KitsuneEnrich(Enrich):
 
         items = ocean_backend.fetch()
         for item in items:
+            nitems += 1
             if current >= max_items:
                 self.requests.put(url, data=bulk_json)
                 bulk_json = ""
@@ -270,4 +272,4 @@ class KitsuneEnrich(Enrich):
 
         self.requests.put(url, data=bulk_json)
 
-        return total
+        return nitems
