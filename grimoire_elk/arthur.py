@@ -39,6 +39,7 @@ from .ocean.conf import ConfOcean
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
 from .elk.utils import get_last_enrich, grimoire_con
+from .elk.git import GitEnrich
 
 
 logger = logging.getLogger(__name__)
@@ -569,6 +570,12 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                                  'value': author_uuid}
 
             logger.info("Refreshing identities fields in %s", enrich_backend.elastic.index_url)
+
+            # Hack to support pair programming git indexes
+            if isinstance(enrich_backend, GitEnrich):
+                eitems = refresh_identities(enrich_backend, filter_author)
+                enrich_backend.check_pair_programming(eitems)
+
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_identities(enrich_backend, filter_author)
             enrich_backend.elastic.bulk_upload_sync(eitems, field_id)

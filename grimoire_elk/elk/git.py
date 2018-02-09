@@ -120,9 +120,10 @@ class GitEnrich(Enrich):
         return "Author"
 
     def get_field_unique_id(self):
-        # "git_uuid" must be available in the enriched item
-        # Don't use it until we have re-enriched all git indexes in production
-        # return "git_uuid"
+        # In pair_programming the uuid is not unique: a commit can create
+        # several commits
+        if self.pair_programming:
+            return "git_uuid"
         return "uuid"
 
     def get_fields_uuid(self):
@@ -453,6 +454,11 @@ class GitEnrich(Enrich):
             eitem.update(get_pair_programming_metrics(eitem, nauthors))
         return eitem
 
+    def check_pair_programming(self, items):
+        if any(items) and self.CLOUDFOUNDRY_URL in next(items)['origin']:
+            self.pair_programming = True
+
+
     def enrich_items(self, ocean_backend, events=False):
         """ Implementation supporting signed-off and multiauthor/committer commits.
         """
@@ -472,12 +478,10 @@ class GitEnrich(Enrich):
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
         items = ocean_backend.fetch()
+        self.check_pair_programming(items)
+        items = ocean_backend.fetch()
 
         for item in items:
-
-            if self.CLOUDFOUNDRY_URL in item['origin']:
-                self.pair_programming = True
-
             if self.pair_programming:
                 # First we need to add the authors field to all commits
                 # Check multi author
