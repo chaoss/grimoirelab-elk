@@ -253,12 +253,20 @@ class DiscourseEnrich(Enrich):
         # And now for each item we want also the answers (tops)
         items = ocean_backend.fetch()
         nanswers = 0
+        nitems = 0
         rich_item_answers = []
 
         for item in items:
+            nitems += 1
             rich_item_answers += self.get_rich_item_answers(item)
 
         if rich_item_answers:
             nanswers += self.elastic.bulk_upload(rich_item_answers,
                                                  self.get_field_unique_id_answer())
-        logger.info("Total answers enriched: %i", nanswers)
+
+            if nanswers != len(rich_item_answers):
+                missing = len(rich_item_answers) - nanswers
+                logger.error("%s/%s missing answers for Discourse",
+                             str(missing), str(len(rich_item_answers)))
+
+        return nitems
