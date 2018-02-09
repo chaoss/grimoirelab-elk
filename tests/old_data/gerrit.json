@@ -1,0 +1,2834 @@
+[{
+    "backend_name": "Gerrit",
+    "backend_version": "0.3.0",
+    "data": {
+        "branch": "master",
+        "comments": [
+            {
+                "message": "Uploaded patch set 1.",
+                "reviewer": {
+                    "email": "kevin",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "timestamp": 1468879792
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild Successful \n\nhttp://16.77.117.70:8085/job/prb-new/547/ : SUCCESS",
+                "reviewer": {
+                    "email": "hpnopenstackci",
+                    "name": "HP Networking CI",
+                    "username": "hpn"
+                },
+                "timestamp": 1468879804
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild failed. To re-run the job please post a comment with 'recheck neutron-mlnx'.\n\n- Neutron-ML2-MLNX http://13.69.151.247/36/343936/1/check-mlnx/Neutron-ML2-MLNX/b272f0b : FAILURE in 25m 42s\n- Neutron-ML2-Sriov http://13.69.151.247/36/343936/1/check-mlnx/Neutron-ML2-Sriov/2d0b358 : SUCCESS in 33m 42s\n\nTo re-run the job post 'recheck neutron-mlnx' comment. For more information visit https://wiki.openstack.org/wiki/ThirdPartySystems/Mellanox_CI",
+                "reviewer": {
+                    "email": "mlnx-openstack-ci",
+                    "name": "Mellanox CI",
+                    "username": "mellanox"
+                },
+                "timestamp": 1468882011
+            },
+            {
+                "message": "Patch Set 1:\n\n* sriov-test http://52.27.155.124/sriov/343936/1 : SUCCESS",
+                "reviewer": {
+                    "email": "sriov-ci",
+                    "name": "Intel SR-IOV CI",
+                    "username": "sriovci"
+                },
+                "timestamp": 1468882222
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild Failed \n\nhttps://jenkins.opendaylight.org/releng/job/netvirt-openstack-gerrit/1337/ : FAILURE For more information on OpenDaylight CI, visit https://wiki.openstack.org/wiki/ThirdPartySystems/OpenDaylight_CI",
+                "reviewer": {
+                    "email": "odl-openstack",
+                    "name": "OpenDaylight CI",
+                    "username": "odl-jenkins"
+                },
+                "timestamp": 1468882453
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild succeeded (check pipeline).\n\n- tempest-dsvm-ovsdpdk-nfv-networking http://intel-openstack-ci-logs.ovh/36/343936/1/check/tempest-dsvm-ovsdpdk-nfv-networking/618954b : SUCCESS in 49m 17s\n- tempest-dsvm-ovsdpdk-odl http://intel-openstack-ci-logs.ovh/36/343936/1/check/tempest-dsvm-ovsdpdk-odl/8a14fce : FAILURE in 58m 09s (non-voting)",
+                "reviewer": {
+                    "email": "openstack-nfv-ci",
+                    "name": "Intel NFV CI",
+                    "username": "intel-nfv-ci"
+                },
+                "timestamp": 1468883499
+            },
+            {
+                "message": "Patch Set 1: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-neutron-docs http://docs-draft.openstack.org/36/343936/1/check/gate-neutron-docs/d7bed53//doc/build/html/ : SUCCESS in 5m 28s\n- gate-neutron-pep8 http://logs.openstack.org/36/343936/1/check/gate-neutron-pep8/6887292/ : SUCCESS in 7m 06s\n- gate-neutron-python27 http://logs.openstack.org/36/343936/1/check/gate-neutron-python27/82c917b/ : SUCCESS in 14m 34s\n- gate-neutron-python34 http://logs.openstack.org/36/343936/1/check/gate-neutron-python34/7504e73/ : SUCCESS in 14m 50s\n- gate-neutron-python35 http://logs.openstack.org/36/343936/1/check/gate-neutron-python35/85114cd/ : SUCCESS in 15m 53s\n- gate-tempest-dsvm-neutron-full http://logs.openstack.org/36/343936/1/check/gate-tempest-dsvm-neutron-full/76d91f3/ : SUCCESS in 55m 46s\n- gate-grenade-dsvm-neutron http://logs.openstack.org/36/343936/1/check/gate-grenade-dsvm-neutron/71139fb/ : SUCCESS in 52m 30s\n- gate-neutron-dsvm-api http://logs.openstack.org/36/343936/1/check/gate-neutron-dsvm-api/eaf156a/ : SUCCESS in 38m 24s\n- gate-neutron-dsvm-functional http://logs.openstack.org/36/343936/1/check/gate-neutron-dsvm-functional/118734b/ : SUCCESS in 16m 51s\n- gate-neutron-dsvm-fullstack http://logs.openstack.org/36/343936/1/check/gate-neutron-dsvm-fullstack/3120350/ : SUCCESS in 17m 51s (non-voting)\n- gate-rally-dsvm-neutron-neutron http://logs.openstack.org/36/343936/1/check/gate-rally-dsvm-neutron-neutron/7e84091/ : SUCCESS in 50m 42s (non-voting)\n- gate-tempest-dsvm-neutron-dvr http://logs.openstack.org/36/343936/1/check/gate-tempest-dsvm-neutron-dvr/762e2f7/ : SUCCESS in 1h 04m 23s\n- gate-tempest-dsvm-neutron-identity-v3-only-full-nv http://logs.openstack.org/36/343936/1/check/gate-tempest-dsvm-neutron-identity-v3-only-full-nv/6720b93/ : SUCCESS in 52m 06s (non-voting)\n- gate-tempest-dsvm-neutron-linuxbridge http://logs.openstack.org/36/343936/1/check/gate-tempest-dsvm-neutron-linuxbridge/3fd33ea/ : SUCCESS in 54m 08s\n- gate-tempest-dsvm-neutron-pg-full http://logs.openstack.org/36/343936/1/check/gate-tempest-dsvm-neutron-pg-full/ff4a82a/ : SUCCESS in 1h 03m 53s (non-voting)\n- gate-neutron-lbaasv2-dsvm-minimal http://logs.openstack.org/36/343936/1/check/gate-neutron-lbaasv2-dsvm-minimal/211ca8a/ : SUCCESS in 30m 57s\n- gate-grenade-dsvm-neutron-multinode http://logs.openstack.org/36/343936/1/check/gate-grenade-dsvm-neutron-multinode/5f37ac0/ : SUCCESS in 1h 05m 35s\n- gate-grenade-dsvm-neutron-dvr-multinode http://logs.openstack.org/36/343936/1/check/gate-grenade-dsvm-neutron-dvr-multinode/5825d79/ : SUCCESS in 1h 00m 08s\n- gate-tempest-dsvm-neutron-multinode-full http://logs.openstack.org/36/343936/1/check/gate-tempest-dsvm-neutron-multinode-full/903fd45/ : SUCCESS in 1h 13m 20s (non-voting)\n- gate-tempest-dsvm-neutron-dvr-multinode-full http://logs.openstack.org/36/343936/1/check/gate-tempest-dsvm-neutron-dvr-multinode-full/64dbcac/ : SUCCESS in 1h 15m 27s (non-voting)\n- gate-tempest-dsvm-ironic-pxe_ipa-nv http://logs.openstack.org/36/343936/1/check/gate-tempest-dsvm-ironic-pxe_ipa-nv/21c3643/ : SUCCESS in 32m 40s (non-voting)",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1468884853
+            },
+            {
+                "message": "Patch Set 1: Code-Review-1\n\nFigure out a way to test it.",
+                "reviewer": {
+                    "email": "armamig",
+                    "name": "Armando Migliaccio",
+                    "username": "armando-migliaccio"
+                },
+                "timestamp": 1468885064
+            },
+            {
+                "message": "Patch Set 1:\n\nThe migration...I mean, you know what I mean.",
+                "reviewer": {
+                    "email": "armamig",
+                    "name": "Armando Migliaccio",
+                    "username": "armando-migliaccio"
+                },
+                "timestamp": 1468885096
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild succeeded.\n\n- dsvm-tempest-neutron-network http://dd6b71949550285df7dc-dda4e480e005aaa13ec303551d2d8155.r49.cf1.rackcdn.com/36/343936/1/check/dsvm-tempest-neutron-network/a0b91b2 : SUCCESS in 1h 33m 50s (non-voting)",
+                "reviewer": {
+                    "name": "Citrix XenServer CI",
+                    "username": "citrix_xenserver_ci"
+                },
+                "timestamp": 1468897587
+            },
+            {
+                "message": "Uploaded patch set 2.",
+                "reviewer": {
+                    "email": "kevin",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "timestamp": 1468923871
+            },
+            {
+                "message": "Patch Set 2:\n\nBuild Successful \n\nhttp://16.77.117.70:8085/job/prb-new/570/ : SUCCESS",
+                "reviewer": {
+                    "email": "hpnopenstackci",
+                    "name": "HP Networking CI",
+                    "username": "hpn"
+                },
+                "timestamp": 1468923879
+            },
+            {
+                "message": "Patch Set 2:\n\nBuild Failed \n\nhttps://jenkins.opendaylight.org/releng/job/netvirt-openstack-gerrit/1357/ : FAILURE For more information on OpenDaylight CI, visit https://wiki.openstack.org/wiki/ThirdPartySystems/OpenDaylight_CI",
+                "reviewer": {
+                    "email": "odl-openstack",
+                    "name": "OpenDaylight CI",
+                    "username": "odl-jenkins"
+                },
+                "timestamp": 1468924371
+            },
+            {
+                "message": "Patch Set 2: Verified+1\n\nBuild succeeded.\n\n- Neutron-ML2-MLNX http://13.69.151.247/36/343936/2/check-mlnx/Neutron-ML2-MLNX/f7b8ff0 : SUCCESS in 29m 53s\n- Neutron-ML2-Sriov http://13.69.151.247/36/343936/2/check-mlnx/Neutron-ML2-Sriov/7da6247 : SUCCESS in 29m 16s\n\nTo re-run the job post 'recheck neutron-mlnx' comment. For more information visit https://wiki.openstack.org/wiki/ThirdPartySystems/Mellanox_CI",
+                "reviewer": {
+                    "email": "mlnx-openstack-ci",
+                    "name": "Mellanox CI",
+                    "username": "mellanox"
+                },
+                "timestamp": 1468926170
+            },
+            {
+                "message": "Patch Set 2:\n\n* sriov-test http://52.27.155.124/sriov/343936/2 : SUCCESS",
+                "reviewer": {
+                    "email": "sriov-ci",
+                    "name": "Intel SR-IOV CI",
+                    "username": "sriovci"
+                },
+                "timestamp": 1468928096
+            },
+            {
+                "message": "Patch Set 2: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-neutron-docs http://docs-draft.openstack.org/36/343936/2/check/gate-neutron-docs/44c38fd//doc/build/html/ : SUCCESS in 5m 01s\n- gate-neutron-pep8 http://logs.openstack.org/36/343936/2/check/gate-neutron-pep8/31d9d68/ : SUCCESS in 12m 48s\n- gate-neutron-python27 http://logs.openstack.org/36/343936/2/check/gate-neutron-python27/302b1a9/ : SUCCESS in 22m 43s\n- gate-neutron-python34 http://logs.openstack.org/36/343936/2/check/gate-neutron-python34/e466275/ : SUCCESS in 20m 25s\n- gate-neutron-python35 http://logs.openstack.org/36/343936/2/check/gate-neutron-python35/8555777/ : SUCCESS in 29m 24s\n- gate-tempest-dsvm-neutron-full http://logs.openstack.org/36/343936/2/check/gate-tempest-dsvm-neutron-full/e1e818a/ : SUCCESS in 58m 20s\n- gate-grenade-dsvm-neutron http://logs.openstack.org/36/343936/2/check/gate-grenade-dsvm-neutron/d635610/ : SUCCESS in 49m 06s\n- gate-neutron-dsvm-api http://logs.openstack.org/36/343936/2/check/gate-neutron-dsvm-api/50f1266/ : SUCCESS in 30m 31s\n- gate-neutron-dsvm-functional http://logs.openstack.org/36/343936/2/check/gate-neutron-dsvm-functional/237e941/ : SUCCESS in 21m 34s\n- gate-neutron-dsvm-fullstack http://logs.openstack.org/36/343936/2/check/gate-neutron-dsvm-fullstack/0dd493e/ : SUCCESS in 22m 25s (non-voting)\n- gate-rally-dsvm-neutron-neutron http://logs.openstack.org/36/343936/2/check/gate-rally-dsvm-neutron-neutron/899a534/ : SUCCESS in 42m 48s (non-voting)\n- gate-tempest-dsvm-neutron-dvr http://logs.openstack.org/36/343936/2/check/gate-tempest-dsvm-neutron-dvr/32cf5cf/ : SUCCESS in 1h 08m 11s\n- gate-tempest-dsvm-neutron-identity-v3-only-full-nv http://logs.openstack.org/36/343936/2/check/gate-tempest-dsvm-neutron-identity-v3-only-full-nv/2a64a53/ : SUCCESS in 1h 05m 26s (non-voting)\n- gate-tempest-dsvm-neutron-linuxbridge http://logs.openstack.org/36/343936/2/check/gate-tempest-dsvm-neutron-linuxbridge/cc3796a/ : SUCCESS in 57m 17s\n- gate-tempest-dsvm-neutron-pg-full http://logs.openstack.org/36/343936/2/check/gate-tempest-dsvm-neutron-pg-full/ddf10ac/ : SUCCESS in 59m 50s (non-voting)\n- gate-neutron-lbaasv2-dsvm-minimal http://logs.openstack.org/36/343936/2/check/gate-neutron-lbaasv2-dsvm-minimal/e84f478/ : SUCCESS in 26m 54s\n- gate-grenade-dsvm-neutron-multinode http://logs.openstack.org/36/343936/2/check/gate-grenade-dsvm-neutron-multinode/4af9eda/ : SUCCESS in 55m 11s\n- gate-grenade-dsvm-neutron-dvr-multinode http://logs.openstack.org/36/343936/2/check/gate-grenade-dsvm-neutron-dvr-multinode/77a3bfa/ : SUCCESS in 42m 50s\n- gate-tempest-dsvm-neutron-multinode-full http://logs.openstack.org/36/343936/2/check/gate-tempest-dsvm-neutron-multinode-full/7ce846d/ : SUCCESS in 1h 12m 32s (non-voting)\n- gate-tempest-dsvm-neutron-dvr-multinode-full http://logs.openstack.org/36/343936/2/check/gate-tempest-dsvm-neutron-dvr-multinode-full/172086e/ : SUCCESS in 1h 16m 22s (non-voting)\n- gate-tempest-dsvm-ironic-pxe_ipa-nv http://logs.openstack.org/36/343936/2/check/gate-tempest-dsvm-ironic-pxe_ipa-nv/441be38/ : SUCCESS in 20m 53s (non-voting)",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1468928976
+            },
+            {
+                "message": "Patch Set 2: Verified+1\n\nBuild succeeded.\n\n- neutron-dvsm-tempest http://64.119.130.115/neutron/343936/2/ : SUCCESS in 1h 27m 59s (non-voting)",
+                "reviewer": {
+                    "email": "hyper-v_ci_at_microsoft.com",
+                    "name": "Microsoft Hyper-V CI",
+                    "username": "hyper-v-ci"
+                },
+                "timestamp": 1468929176
+            },
+            {
+                "message": "Patch Set 2:\n\nBuild succeeded.\n\n- dsvm-tempest-neutron-network http://dd6b71949550285df7dc-dda4e480e005aaa13ec303551d2d8155.r49.cf1.rackcdn.com/36/343936/2/check/dsvm-tempest-neutron-network/af558b0 : SUCCESS in 1h 40m 30s (non-voting)",
+                "reviewer": {
+                    "name": "Citrix XenServer CI",
+                    "username": "citrix_xenserver_ci"
+                },
+                "timestamp": 1468930621
+            },
+            {
+                "message": "Patch Set 2:\n\nBuild succeeded (check pipeline).\n\n- tempest-dsvm-ovsdpdk-nfv-networking http://intel-openstack-ci-logs.ovh/36/343936/2/check/tempest-dsvm-ovsdpdk-nfv-networking/1128704 : SUCCESS in 1h 03m 32s\n- tempest-dsvm-ovsdpdk-odl http://intel-openstack-ci-logs.ovh/36/343936/2/check/tempest-dsvm-ovsdpdk-odl/919e4a4 : FAILURE in 1h 37m 33s (non-voting)",
+                "reviewer": {
+                    "email": "openstack-nfv-ci_at_intel.com",
+                    "name": "Intel NFV CI",
+                    "username": "intel-nfv-ci"
+                },
+                "timestamp": 1468938585
+            },
+            {
+                "message": "Patch Set 2: Verified-1\n\nMerge Failed.\n\nThis change or one of its cross-repo dependencies was unable to be automatically merged with the current state of its repository. Please rebase the change and upload a new patchset.",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469227134
+            },
+            {
+                "message": "Patch Set 2: Code-Review-1\n\n(4 comments)",
+                "reviewer": {
+                    "email": "jschwarz_at_redhat.com",
+                    "name": "John Schwarz",
+                    "username": "jschwarz"
+                },
+                "timestamp": 1469373986
+            },
+            {
+                "message": "Patch Set 2:\n\n(1 comment)",
+                "reviewer": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "timestamp": 1469486483
+            },
+            {
+                "message": "Uploaded patch set 3.",
+                "reviewer": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "timestamp": 1469486682
+            },
+            {
+                "message": "Patch Set 2:\n\n(2 comments)",
+                "reviewer": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "timestamp": 1469486847
+            },
+            {
+                "message": "Uploaded patch set 4.",
+                "reviewer": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "timestamp": 1469486854
+            },
+            {
+                "message": "Patch Set 3:\n\nBuild Failed \n\nhttps://jenkins.opendaylight.org/releng/job/netvirt-openstack-gerrit/1540/ : FAILURE For more information on OpenDaylight CI, visit https://wiki.openstack.org/wiki/ThirdPartySystems/OpenDaylight_CI",
+                "reviewer": {
+                    "email": "odl-openstack_at_opendaylight.org",
+                    "name": "OpenDaylight CI",
+                    "username": "odl-jenkins"
+                },
+                "timestamp": 1469489238
+            },
+            {
+                "message": "Patch Set 4:\n\nBuild Failed \n\nhttps://jenkins.opendaylight.org/releng/job/netvirt-openstack-gerrit/1541/ : FAILURE For more information on OpenDaylight CI, visit https://wiki.openstack.org/wiki/ThirdPartySystems/OpenDaylight_CI",
+                "reviewer": {
+                    "email": "odl-openstack_at_opendaylight.org",
+                    "name": "OpenDaylight CI",
+                    "username": "odl-jenkins"
+                },
+                "timestamp": 1469489293
+            },
+            {
+                "message": "Patch Set 4:\n\nBuild succeeded.\n\n- dsvm-tempest-neutron-network http://dd6b71949550285df7dc-dda4e480e005aaa13ec303551d2d8155.r49.cf1.rackcdn.com/36/343936/4/check/dsvm-tempest-neutron-network/536ae0f : SUCCESS in 1h 43m 01s (non-voting)",
+                "reviewer": {
+                    "name": "Citrix XenServer CI",
+                    "username": "citrix_xenserver_ci"
+                },
+                "timestamp": 1469493668
+            },
+            {
+                "message": "Patch Set 4: Verified+1\n\nBuild succeeded.\n\n- neutron-dvsm-tempest http://64.119.130.115/neutron/343936/4/ : FAILURE in 1h 09m 10s (non-voting)",
+                "reviewer": {
+                    "email": "hyper-v_ci_at_microsoft.com",
+                    "name": "Microsoft Hyper-V CI",
+                    "username": "hyper-v-ci"
+                },
+                "timestamp": 1469493682
+            },
+            {
+                "message": "Patch Set 4: Verified+1\n\nBuild succeeded.\n\n- Neutron-ML2-MLNX http://13.69.151.247/36/343936/4/check-mlnx/Neutron-ML2-MLNX/2b855c1 : SUCCESS in 32m 00s\n- Neutron-ML2-Sriov http://13.69.151.247/36/343936/4/check-mlnx/Neutron-ML2-Sriov/6f1dd4e : SUCCESS in 32m 19s\n\nTo re-run the job post 'recheck neutron-mlnx' comment. For more information visit https://wiki.openstack.org/wiki/ThirdPartySystems/Mellanox_CI",
+                "reviewer": {
+                    "email": "mlnx-openstack-ci_at_dev.mellanox.co.il",
+                    "name": "Mellanox CI",
+                    "username": "mellanox"
+                },
+                "timestamp": 1469507282
+            },
+            {
+                "message": "Patch Set 4: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-neutron-docs-ubuntu-xenial http://logs.openstack.org/36/343936/4/check/gate-neutron-docs-ubuntu-xenial/c964748/ : SUCCESS in 9m 58s\n- gate-neutron-pep8-ubuntu-xenial http://logs.openstack.org/36/343936/4/check/gate-neutron-pep8-ubuntu-xenial/25d1dc3/ : SUCCESS in 14m 02s\n- gate-neutron-python27-ubuntu-xenial http://logs.openstack.org/36/343936/4/check/gate-neutron-python27-ubuntu-xenial/080957a/ : SUCCESS in 21m 50s\n- gate-neutron-python34 http://logs.openstack.org/36/343936/4/check/gate-neutron-python34/4dc1a0d/ : SUCCESS in 16m 16s\n- gate-neutron-python35 http://logs.openstack.org/36/343936/4/check/gate-neutron-python35/1748b60/ : SUCCESS in 19m 08s\n- gate-tempest-dsvm-neutron-full http://logs.openstack.org/36/343936/4/check/gate-tempest-dsvm-neutron-full/8c2c5b4/ : SUCCESS in 1h 21m 52s\n- gate-grenade-dsvm-neutron http://logs.openstack.org/36/343936/4/check/gate-grenade-dsvm-neutron/278e32e/ : SUCCESS in 51m 50s\n- gate-neutron-dsvm-api http://logs.openstack.org/36/343936/4/check/gate-neutron-dsvm-api/8af0847/ : SUCCESS in 35m 47s\n- gate-neutron-dsvm-functional http://logs.openstack.org/36/343936/4/check/gate-neutron-dsvm-functional/a8fba71/ : SUCCESS in 16m 32s\n- gate-neutron-dsvm-fullstack http://logs.openstack.org/36/343936/4/check/gate-neutron-dsvm-fullstack/a53bb06/ : SUCCESS in 33m 48s (non-voting)\n- gate-rally-dsvm-neutron-neutron http://logs.openstack.org/36/343936/4/check/gate-rally-dsvm-neutron-neutron/8678934/ : SUCCESS in 1h 09m 11s (non-voting)\n- gate-tempest-dsvm-neutron-dvr http://logs.openstack.org/36/343936/4/check/gate-tempest-dsvm-neutron-dvr/59ec37a/ : SUCCESS in 1h 18m 56s\n- gate-tempest-dsvm-neutron-identity-v3-only-full-nv http://logs.openstack.org/36/343936/4/check/gate-tempest-dsvm-neutron-identity-v3-only-full-nv/59da5d9/ : SUCCESS in 1h 17m 38s (non-voting)\n- gate-tempest-dsvm-neutron-linuxbridge http://logs.openstack.org/36/343936/4/check/gate-tempest-dsvm-neutron-linuxbridge/8e318f1/ : SUCCESS in 1h 12m 50s\n- gate-tempest-dsvm-neutron-pg-full http://logs.openstack.org/36/343936/4/check/gate-tempest-dsvm-neutron-pg-full/e7586f6/ : SUCCESS in 1h 20m 59s (non-voting)\n- gate-neutron-lbaasv2-dsvm-minimal http://logs.openstack.org/36/343936/4/check/gate-neutron-lbaasv2-dsvm-minimal/3fc17df/ : SUCCESS in 18m 37s\n- gate-grenade-dsvm-neutron-multinode http://logs.openstack.org/36/343936/4/check/gate-grenade-dsvm-neutron-multinode/be5906d/ : SUCCESS in 1h 11m 05s\n- gate-grenade-dsvm-neutron-dvr-multinode http://logs.openstack.org/36/343936/4/check/gate-grenade-dsvm-neutron-dvr-multinode/4c644a7/ : SUCCESS in 1h 12m 58s\n- gate-tempest-dsvm-neutron-multinode-full http://logs.openstack.org/36/343936/4/check/gate-tempest-dsvm-neutron-multinode-full/2e0f934/ : SUCCESS in 1h 36m 36s (non-voting)\n- gate-tempest-dsvm-neutron-dvr-multinode-full http://logs.openstack.org/36/343936/4/check/gate-tempest-dsvm-neutron-dvr-multinode-full/28ca25a/ : SUCCESS in 1h 44m 36s (non-voting)\n- gate-tempest-dsvm-ironic-pxe_ipa-nv http://logs.openstack.org/36/343936/4/check/gate-tempest-dsvm-ironic-pxe_ipa-nv/8f2239e/ : SUCCESS in 35m 40s (non-voting)",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469508359
+            },
+            {
+                "message": "Patch Set 4:\n\nBuild succeeded (check pipeline).\n\n- tempest-dsvm-ovsdpdk-nfv-networking http://intel-openstack-ci-logs.ovh/36/343936/4/check/tempest-dsvm-ovsdpdk-nfv-networking/897d350 : SUCCESS in 52m 21s\n- tempest-dsvm-ovsdpdk-odl http://intel-openstack-ci-logs.ovh/36/343936/4/check/tempest-dsvm-ovsdpdk-odl/ac7f314 : FAILURE in 57m 51s (non-voting)",
+                "reviewer": {
+                    "email": "openstack-nfv-ci_at_intel.com",
+                    "name": "Intel NFV CI",
+                    "username": "intel-nfv-ci"
+                },
+                "timestamp": 1469508810
+            },
+            {
+                "message": "Patch Set 2:\n\n(1 comment)",
+                "reviewer": {
+                    "email": "jschwarz_at_redhat.com",
+                    "name": "John Schwarz",
+                    "username": "jschwarz"
+                },
+                "timestamp": 1469518347
+            },
+            {
+                "message": "Patch Set 4: Code-Review+1",
+                "reviewer": {
+                    "email": "jschwarz_at_redhat.com",
+                    "name": "John Schwarz",
+                    "username": "jschwarz"
+                },
+                "timestamp": 1469518393
+            },
+            {
+                "message": "Patch Set 4:\n\nBuild failed. For help on isolating this failure, please contact cisco-openstack-neutron-ci_at_cisco.com. To re-run, post a 'recheck cisco-ml2' comment.\n\n- ml2-nexus http://192.133.158.2:8080/job/ml2-nexus/22290 : SUCCESS in 28m 01s\n- python27 http://192.133.158.2:8080/job/python27/14855 : SUCCESS in 17m 21s (non-voting)\n- tailf-ncs http://192.133.158.2:8080/job/tailf-ncs/18907 : SUCCESS in 18m 45s\n- ucs-manager http://192.133.158.2:8080/job/ucs-manager/7126 : FAILURE in 29m 25s",
+                "reviewer": {
+                    "email": "ml2.ci_at_cisco.com",
+                    "name": "Cisco ml2 CI",
+                    "username": "cisco_ml2_ci"
+                },
+                "timestamp": 1469520429
+            },
+            {
+                "message": "Patch Set 3:\n\n* sriov-test http://52.27.155.124/sriov/343936/3 : SUCCESS",
+                "reviewer": {
+                    "email": "sriov-ci_at_intel.com",
+                    "name": "Intel SR-IOV CI",
+                    "username": "sriovci"
+                },
+                "timestamp": 1469532844
+            },
+            {
+                "message": "Patch Set 4:\n\n* sriov-test http://52.27.155.124/sriov/343936/4 : SUCCESS",
+                "reviewer": {
+                    "email": "sriov-ci_at_intel.com",
+                    "name": "Intel SR-IOV CI",
+                    "username": "sriovci"
+                },
+                "timestamp": 1469533675
+            },
+            {
+                "message": "Patch Set 4: Verified-1\n\nMerge Failed.\n\nThis change or one of its cross-repo dependencies was unable to be automatically merged with the current state of its repository. Please rebase the change and upload a new patchset.",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469560047
+            },
+            {
+                "message": "Uploaded patch set 5.",
+                "reviewer": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "timestamp": 1469604383
+            },
+            {
+                "message": "Patch Set 5:\n\nBuild Failed \n\nhttps://jenkins.opendaylight.org/releng/job/netvirt-openstack-gerrit/1580/ : FAILURE For more information on OpenDaylight CI, visit https://wiki.openstack.org/wiki/ThirdPartySystems/OpenDaylight_CI",
+                "reviewer": {
+                    "email": "odl-openstack_at_opendaylight.org",
+                    "name": "OpenDaylight CI",
+                    "username": "odl-jenkins"
+                },
+                "timestamp": 1469604911
+            },
+            {
+                "message": "Patch Set 5: Verified+1\n\nBuild succeeded.\n\n- neutron-dvsm-tempest http://64.119.130.115/neutron/343936/5/ : SUCCESS in 1h 12m 45s (non-voting)",
+                "reviewer": {
+                    "email": "hyper-v_ci_at_microsoft.com",
+                    "name": "Microsoft Hyper-V CI",
+                    "username": "hyper-v-ci"
+                },
+                "timestamp": 1469608765
+            },
+            {
+                "message": "Patch Set 5: Verified+1\n\nBuild succeeded.\n\n- Neutron-ML2-MLNX http://13.69.151.247/36/343936/5/check-mlnx/Neutron-ML2-MLNX/db6caef : SUCCESS in 30m 11s\n- Neutron-ML2-Sriov http://13.69.151.247/36/343936/5/check-mlnx/Neutron-ML2-Sriov/ed62b9b : SUCCESS in 31m 15s\n\nTo re-run the job post 'recheck neutron-mlnx' comment. For more information visit https://wiki.openstack.org/wiki/ThirdPartySystems/Mellanox_CI",
+                "reviewer": {
+                    "email": "mlnx-openstack-ci_at_dev.mellanox.co.il",
+                    "name": "Mellanox CI",
+                    "username": "mellanox"
+                },
+                "timestamp": 1469610861
+            },
+            {
+                "message": "Patch Set 5: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-neutron-docs-ubuntu-xenial http://docs-draft.openstack.org/36/343936/5/check/gate-neutron-docs-ubuntu-xenial/4a10283//doc/build/html/ : SUCCESS in 5m 43s\n- gate-neutron-pep8-ubuntu-xenial http://logs.openstack.org/36/343936/5/check/gate-neutron-pep8-ubuntu-xenial/6e8995c/ : SUCCESS in 5m 10s\n- gate-neutron-python27-ubuntu-xenial http://logs.openstack.org/36/343936/5/check/gate-neutron-python27-ubuntu-xenial/8e548b9/ : SUCCESS in 14m 48s\n- gate-neutron-python34 http://logs.openstack.org/36/343936/5/check/gate-neutron-python34/563bc67/ : SUCCESS in 18m 25s\n- gate-neutron-python35 http://logs.openstack.org/36/343936/5/check/gate-neutron-python35/9ac0f92/ : SUCCESS in 16m 55s\n- gate-tempest-dsvm-neutron-full http://logs.openstack.org/36/343936/5/check/gate-tempest-dsvm-neutron-full/d26063f/ : SUCCESS in 1h 21m 46s\n- gate-grenade-dsvm-neutron http://logs.openstack.org/36/343936/5/check/gate-grenade-dsvm-neutron/891bc04/ : SUCCESS in 1h 02m 31s\n- gate-neutron-dsvm-api http://logs.openstack.org/36/343936/5/check/gate-neutron-dsvm-api/05e20db/ : SUCCESS in 44m 27s\n- gate-neutron-dsvm-functional http://logs.openstack.org/36/343936/5/check/gate-neutron-dsvm-functional/f4f303c/ : SUCCESS in 28m 19s\n- gate-neutron-dsvm-fullstack http://logs.openstack.org/36/343936/5/check/gate-neutron-dsvm-fullstack/1fa79bc/ : SUCCESS in 27m 06s (non-voting)\n- gate-rally-dsvm-neutron-neutron http://logs.openstack.org/36/343936/5/check/gate-rally-dsvm-neutron-neutron/3ea2c72/ : SUCCESS in 1h 05m 13s (non-voting)\n- gate-tempest-dsvm-neutron-dvr http://logs.openstack.org/36/343936/5/check/gate-tempest-dsvm-neutron-dvr/20f24a3/ : SUCCESS in 1h 30m 23s\n- gate-tempest-dsvm-neutron-identity-v3-only-full-nv http://logs.openstack.org/36/343936/5/check/gate-tempest-dsvm-neutron-identity-v3-only-full-nv/1e3dbbc/ : SUCCESS in 1h 16m 07s (non-voting)\n- gate-tempest-dsvm-neutron-linuxbridge http://logs.openstack.org/36/343936/5/check/gate-tempest-dsvm-neutron-linuxbridge/4397503/ : SUCCESS in 1h 01m 23s\n- gate-tempest-dsvm-neutron-pg-full http://logs.openstack.org/36/343936/5/check/gate-tempest-dsvm-neutron-pg-full/5edcea5/ : SUCCESS in 1h 29m 28s (non-voting)\n- gate-neutron-lbaasv2-dsvm-minimal http://logs.openstack.org/36/343936/5/check/gate-neutron-lbaasv2-dsvm-minimal/ebf9f17/ : SUCCESS in 41m 48s\n- gate-grenade-dsvm-neutron-multinode http://logs.openstack.org/36/343936/5/check/gate-grenade-dsvm-neutron-multinode/27bd0ed/ : SUCCESS in 1h 19m 45s\n- gate-grenade-dsvm-neutron-dvr-multinode http://logs.openstack.org/36/343936/5/check/gate-grenade-dsvm-neutron-dvr-multinode/de1342b/ : SUCCESS in 1h 14m 56s\n- gate-tempest-dsvm-neutron-multinode-full http://logs.openstack.org/36/343936/5/check/gate-tempest-dsvm-neutron-multinode-full/5675c10/ : FAILURE in 1h 31m 19s (non-voting)\n- gate-tempest-dsvm-neutron-dvr-multinode-full http://logs.openstack.org/36/343936/5/check/gate-tempest-dsvm-neutron-dvr-multinode-full/2b2c260/ : FAILURE in 1h 39m 55s (non-voting)\n- gate-tempest-dsvm-ironic-ipa-partition-pxe_ssh-tinyipa http://logs.openstack.org/36/343936/5/check/gate-tempest-dsvm-ironic-ipa-partition-pxe_ssh-tinyipa/22704dc/ : SUCCESS in 1h 03m 40s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469611192
+            },
+            {
+                "message": "Patch Set 5:\n\nBuild succeeded.\n\n- dsvm-tempest-neutron-network http://dd6b71949550285df7dc-dda4e480e005aaa13ec303551d2d8155.r49.cf1.rackcdn.com/36/343936/5/check/dsvm-tempest-neutron-network/4d98a09 : SUCCESS in 1h 38m 41s (non-voting)",
+                "reviewer": {
+                    "name": "Citrix XenServer CI",
+                    "username": "citrix_xenserver_ci"
+                },
+                "timestamp": 1469612123
+            },
+            {
+                "message": "Patch Set 5:\n\nBuild succeeded (check pipeline).\n\n- tempest-dsvm-ovsdpdk-nfv-networking http://intel-openstack-ci-logs.ovh/36/343936/5/check/tempest-dsvm-ovsdpdk-nfv-networking/6de46e1 : SUCCESS in 55m 51s\n- tempest-dsvm-ovsdpdk-odl http://intel-openstack-ci-logs.ovh/36/343936/5/check/tempest-dsvm-ovsdpdk-odl/24497a8 : FAILURE in 1h 14m 34s (non-voting)",
+                "reviewer": {
+                    "email": "openstack-nfv-ci_at_intel.com",
+                    "name": "Intel NFV CI",
+                    "username": "intel-nfv-ci"
+                },
+                "timestamp": 1469617535
+            },
+            {
+                "message": "Patch Set 5:\n\nBuild succeeded.\n\n- ml2-nexus http://192.133.158.2:8080/job/ml2-nexus/22350 : SUCCESS in 33m 30s\n- python27 http://192.133.158.2:8080/job/python27/14916 : SUCCESS in 26m 04s (non-voting)\n- tailf-ncs http://192.133.158.2:8080/job/tailf-ncs/18967 : SUCCESS in 19m 50s\n- ucs-manager http://192.133.158.2:8080/job/ucs-manager/7175 : SUCCESS in 34m 03s",
+                "reviewer": {
+                    "email": "ml2.ci_at_cisco.com",
+                    "name": "Cisco ml2 CI",
+                    "username": "cisco_ml2_ci"
+                },
+                "timestamp": 1469621492
+            }
+        ],
+        "commitMessage": "Add RouterPort bindings for all HA ports\n\nAdding these bindings allows us to remove the special-cased HA\ninterface deletion in l3_hamode_db that had the potential for\nleaving orphaned ports on failures. With the bindings present,\nthe interface deletion is handled before the router delete so\na failure to delete the interface will prevent router deletion.\n\nRelated-Bug: #1540271\nChange-Id: I2de8503742661c18a2ec2c5ade7ec58ea380e749\n",
+        "createdOn": 1468879792,
+        "id": "I2de8503742661c18a2ec2c5ade7ec58ea380e749",
+        "lastUpdated": 1469621492,
+        "number": "343936",
+        "open": true,
+        "owner": {
+            "email": "kevin_at_benton.pub",
+            "name": "Kevin Benton",
+            "username": "blak111"
+        },
+        "patchSets": [
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1468884853,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "armamig_at_gmail.com",
+                            "name": "Armando Migliaccio",
+                            "username": "armando-migliaccio"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1468885064,
+                        "type": "Code-Review",
+                        "value": "-1"
+                    }
+                ],
+                "author": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "createdOn": 1468879792,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "1",
+                "parents": [
+                    "0074b943d6efc5526c687cc9ca3857aabc2dbc63"
+                ],
+                "ref": "refs/changes/36/343936/1",
+                "revision": "52df0848d3b25966bc7b1ea92092df2c12464e60",
+                "sizeDeletions": -17,
+                "sizeInsertions": 67,
+                "uploader": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1469227134,
+                        "type": "Verified",
+                        "value": "-1"
+                    },
+                    {
+                        "by": {
+                            "email": "hyper-v_ci_at_microsoft.com",
+                            "name": "Microsoft Hyper-V CI",
+                            "username": "hyper-v-ci"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1468929176,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "mlnx-openstack-ci_at_dev.mellanox.co.il",
+                            "name": "Mellanox CI",
+                            "username": "mellanox"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1468926170,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "jschwarz_at_redhat.com",
+                            "name": "John Schwarz",
+                            "username": "jschwarz"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1469373986,
+                        "type": "Code-Review",
+                        "value": "-1"
+                    }
+                ],
+                "author": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "comments": [
+                    {
+                        "file": "neutron/tests/functional/db/migrations/test_a8b517cff8ab_add_routerport_bindings_for_ha.py",
+                        "line": 23,
+                        "message": "Not sure if it's intentional (no '-1 Workflow'), but this class currently doesn't run any test as it doesn't have a 'test_%s' function.",
+                        "reviewer": {
+                            "email": "jschwarz_at_redhat.com",
+                            "name": "John Schwarz",
+                            "username": "jschwarz"
+                        }
+                    },
+                    {
+                        "file": "neutron/tests/functional/db/migrations/test_a8b517cff8ab_add_routerport_bindings_for_ha.py",
+                        "line": 23,
+                        "message": "Please look at https://github.com/openstack/neutron/blob/master/neutron/tests/functional/db/test_migrations.py . It doesn't have methods named 'test'. It's based on the 'pre_upgrade' and 'check' methods in the class.",
+                        "reviewer": {
+                            "email": "kevin_at_benton.pub",
+                            "name": "Kevin Benton",
+                            "username": "blak111"
+                        }
+                    },
+                    {
+                        "file": "neutron/tests/functional/db/migrations/test_a8b517cff8ab_add_routerport_bindings_for_ha.py",
+                        "line": 23,
+                        "message": "Ah! Thanks for the clarification!: )",
+                        "reviewer": {
+                            "email": "jschwarz_at_redhat.com",
+                            "name": "John Schwarz",
+                            "username": "jschwarz"
+                        }
+                    },
+                    {
+                        "file": "neutron/tests/functional/db/migrations/test_a8b517cff8ab_add_routerport_bindings_for_ha.py",
+                        "line": 41,
+                        "message": "Please rename to router_id",
+                        "reviewer": {
+                            "email": "jschwarz_at_redhat.com",
+                            "name": "John Schwarz",
+                            "username": "jschwarz"
+                        }
+                    },
+                    {
+                        "file": "neutron/tests/functional/db/migrations/test_a8b517cff8ab_add_routerport_bindings_for_ha.py",
+                        "line": 52,
+                        "message": "Please rename to agent_id",
+                        "reviewer": {
+                            "email": "jschwarz_at_redhat.com",
+                            "name": "John Schwarz",
+                            "username": "jschwarz"
+                        }
+                    },
+                    {
+                        "file": "neutron/tests/functional/db/migrations/test_a8b517cff8ab_add_routerport_bindings_for_ha.py",
+                        "line": 52,
+                        "message": "Done",
+                        "reviewer": {
+                            "email": "kevin_at_benton.pub",
+                            "name": "Kevin Benton",
+                            "username": "blak111"
+                        }
+                    },
+                    {
+                        "file": "neutron/tests/functional/db/migrations/test_a8b517cff8ab_add_routerport_bindings_for_ha.py",
+                        "line": 53,
+                        "message": "Please rename to 'timestamp' or something else that isn't importable (you can \"import time\" so it's confusing which namespace is used below).",
+                        "reviewer": {
+                            "email": "jschwarz_at_redhat.com",
+                            "name": "John Schwarz",
+                            "username": "jschwarz"
+                        }
+                    },
+                    {
+                        "file": "neutron/tests/functional/db/migrations/test_a8b517cff8ab_add_routerport_bindings_for_ha.py",
+                        "line": 53,
+                        "message": "Done",
+                        "reviewer": {
+                            "email": "kevin_at_benton.pub",
+                            "name": "Kevin Benton",
+                            "username": "blak111"
+                        }
+                    }
+                ],
+                "createdOn": 1468923871,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "2",
+                "parents": [
+                    "0074b943d6efc5526c687cc9ca3857aabc2dbc63"
+                ],
+                "ref": "refs/changes/36/343936/2",
+                "revision": "0945355e6ea45cc70904e983a92d56b95297d991",
+                "sizeDeletions": -17,
+                "sizeInsertions": 168,
+                "uploader": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                }
+            },
+            {
+                "author": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "createdOn": 1469486682,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "3",
+                "parents": [
+                    "6a23addc09bd470b497a3e9cdadee0731bfbdd38"
+                ],
+                "ref": "refs/changes/36/343936/3",
+                "revision": "1f0d7bacd5f9a4e352a57d8abd49cb39c4b7bb5e",
+                "sizeDeletions": -17,
+                "sizeInsertions": 169,
+                "uploader": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1469560047,
+                        "type": "Verified",
+                        "value": "-1"
+                    },
+                    {
+                        "by": {
+                            "email": "hyper-v_ci_at_microsoft.com",
+                            "name": "Microsoft Hyper-V CI",
+                            "username": "hyper-v-ci"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1469493682,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "mlnx-openstack-ci_at_dev.mellanox.co.il",
+                            "name": "Mellanox CI",
+                            "username": "mellanox"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1469507282,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "jschwarz_at_redhat.com",
+                            "name": "John Schwarz",
+                            "username": "jschwarz"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1469518393,
+                        "type": "Code-Review",
+                        "value": "1"
+                    }
+                ],
+                "author": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "createdOn": 1469486854,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "4",
+                "parents": [
+                    "6a23addc09bd470b497a3e9cdadee0731bfbdd38"
+                ],
+                "ref": "refs/changes/36/343936/4",
+                "revision": "78d87ae766bf16b4aeb1dbd67449b262e2bf0053",
+                "sizeDeletions": -17,
+                "sizeInsertions": 170,
+                "uploader": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1469611192,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "hyper-v_ci_at_microsoft.com",
+                            "name": "Microsoft Hyper-V CI",
+                            "username": "hyper-v-ci"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1469608765,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "mlnx-openstack-ci_at_dev.mellanox.co.il",
+                            "name": "Mellanox CI",
+                            "username": "mellanox"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1469610861,
+                        "type": "Verified",
+                        "value": "1"
+                    }
+                ],
+                "author": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                },
+                "createdOn": 1469604383,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "5",
+                "parents": [
+                    "451193c8509125963af781352d9301e70d4ed956"
+                ],
+                "ref": "refs/changes/36/343936/5",
+                "revision": "c3b6000bd5f380abed18d117d2376022a45742fe",
+                "sizeDeletions": -16,
+                "sizeInsertions": 169,
+                "uploader": {
+                    "email": "kevin_at_benton.pub",
+                    "name": "Kevin Benton",
+                    "username": "blak111"
+                }
+            }
+        ],
+        "project": "openstack/neutron",
+        "status": "NEW",
+        "subject": "Add RouterPort bindings for all HA ports",
+        "topic": "bug/1540271",
+        "url": "https://review.openstack.org/343936"
+    },
+    "origin": "review.openstack.org",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469621778.440684,
+    "updated_on": 1469621492.0,
+    "uuid": "c3af84409571de282986af90da72ca61f07a80d7"
+},
+{
+    "backend_name": "Gerrit",
+    "backend_version": "0.3.0",
+    "data": {
+        "branch": "master",
+        "comments": [
+            {
+                "message": "Uploaded patch set 1.",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1467022938
+            },
+            {
+                "message": "Uploaded patch set 2: Commit message was updated.",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1467023491
+            },
+            {
+                "message": "Patch Set 2: Verified-1\n\nBuild failed (check pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n- gate-neutron-specs-docs http://logs.openstack.org/01/334401/2/check/gate-neutron-specs-docs/d530a19/ : FAILURE in 3m 41s\n- gate-neutron-specs-python27 http://logs.openstack.org/01/334401/2/check/gate-neutron-specs-python27/b840b78/ : FAILURE in 3m 33s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1467024796
+            },
+            {
+                "message": "Patch Set 2: Code-Review-1\n\n(8 comments)\n\nSome questions inline.",
+                "reviewer": {
+                    "email": "pc_at_michali.net",
+                    "name": "Paul Michali",
+                    "username": "pcm"
+                },
+                "timestamp": 1467118043
+            },
+            {
+                "message": "Uploaded patch set 3.",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1467119347
+            },
+            {
+                "message": "Patch Set 3: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-neutron-specs-docs http://docs-draft.openstack.org/01/334401/3/check/gate-neutron-specs-docs/8707b74//doc/build/html/ : SUCCESS in 6m 02s\n- gate-neutron-specs-python27 http://logs.openstack.org/01/334401/3/check/gate-neutron-specs-python27/29ffa66/ : SUCCESS in 3m 46s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1467120034
+            },
+            {
+                "message": "Uploaded patch set 4.",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1467121113
+            },
+            {
+                "message": "Patch Set 2:\n\n(6 comments)\n\n> (8 comments)\n > \n > Some questions inline.",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1467121586
+            },
+            {
+                "message": "Patch Set 4: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-neutron-specs-docs http://docs-draft.openstack.org/01/334401/4/check/gate-neutron-specs-docs/e114882//doc/build/html/ : SUCCESS in 4m 58s\n- gate-neutron-specs-python27 http://logs.openstack.org/01/334401/4/check/gate-neutron-specs-python27/03435bb/ : SUCCESS in 3m 11s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1467122326
+            },
+            {
+                "message": "Patch Set 4:\n\n(2 comments)",
+                "reviewer": {
+                    "email": "rtheis_at_us.ibm.com",
+                    "name": "Richard Theis",
+                    "username": "rtheis"
+                },
+                "timestamp": 1467146088
+            },
+            {
+                "message": "Patch Set 4: Code-Review-1\n\n(3 comments)\n\nLet's be more specific on the VPNaaS to OVN interface",
+                "reviewer": {
+                    "email": "rmoats_at_us.ibm.com",
+                    "name": "Ryan Moats",
+                    "username": "regXboi"
+                },
+                "timestamp": 1467216641
+            },
+            {
+                "message": "Patch Set 4: Code-Review-1\n\n(7 comments)",
+                "reviewer": {
+                    "email": "emspiege_at_us.ibm.com",
+                    "name": "Mickey Spiegel",
+                    "username": "mickeys"
+                },
+                "timestamp": 1467226418
+            },
+            {
+                "message": "Patch Set 4:\n\n(2 comments)\n\n> (2 comments)\n\nRichard, Thank you so much your comments. I will update the patch according your comments. Thank you so much for your time again",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1467289979
+            },
+            {
+                "message": "Patch Set 4:\n\n(10 comments)\n\n> (3 comments)\n > \n > Let's be more specific on the VPNaaS to OVN interface\n\nHi Ryan, Thank you for you comments.",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1467553675
+            },
+            {
+                "message": "Patch Set 4:\n\n> (7 comments)\n\nHi Mickey, Thank you for you comments. I replied together with Ryan comments",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1467553711
+            },
+            {
+                "message": "Patch Set 4:\n\n(4 comments)",
+                "reviewer": {
+                    "email": "emspiege_at_us.ibm.com",
+                    "name": "Mickey Spiegel",
+                    "username": "mickeys"
+                },
+                "timestamp": 1468340458
+            },
+            {
+                "message": "Patch Set 4:\n\n(3 comments)\n\n> (4 comments)\n\nThank you so much for your comments, Mickey.",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1468412825
+            },
+            {
+                "message": "Patch Set 4:\n\n(3 comments)",
+                "reviewer": {
+                    "email": "emspiege_at_us.ibm.com",
+                    "name": "Mickey Spiegel",
+                    "username": "mickeys"
+                },
+                "timestamp": 1468430805
+            },
+            {
+                "message": "Patch Set 4:\n\n(1 comment)",
+                "reviewer": {
+                    "email": "emspiege_at_us.ibm.com",
+                    "name": "Mickey Spiegel",
+                    "username": "mickeys"
+                },
+                "timestamp": 1468484488
+            },
+            {
+                "message": "Patch Set 4:\n\n(2 comments)\n\n> (1 comment)\n\nMickey, thank you for your comments.",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1468487811
+            },
+            {
+                "message": "Patch Set 2:\n\n(5 comments)",
+                "reviewer": {
+                    "email": "irenab.dev_at_gmail.com",
+                    "name": "Berezovsky Irena",
+                    "username": "irenab"
+                },
+                "timestamp": 1468744176
+            },
+            {
+                "message": "Patch Set 2:\n\n(5 comments)\n\n> (5 comments)\n\nHi Berezovsky. Thank you so much for your comments",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1468757004
+            },
+            {
+                "message": "Uploaded patch set 5.",
+                "reviewer": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "timestamp": 1469621487
+            }
+        ],
+        "commitMessage": "VPNaaS for OVN Networking\n\nThis blueprint covers the support for VPNaaS with OVN networking by adding a\nnew centralized VPNaaS agent on a group of HA nodes. The new VPN agent will\ncreate a namespace on the node and connect the namespace with the OVN\ndistributed logical router, and run the *Swan process in the namespace.\n\nChange-Id: Icabaf2f951caf33485356ae9be723b115b04ce54\nRelated-Bug: #1586253\nCo-Authored-By: Bepsy <paulbe_at_us.ibm.com>\nCo-Authored-By: Nick.zhu <nick.zhuyj_at_cn.ibm.com>\nCo-Authored-By: JinJingLin <linjjwx_at_cn.ibm.com>\n",
+        "createdOn": 1467022938,
+        "id": "Icabaf2f951caf33485356ae9be723b115b04ce54",
+        "lastUpdated": 1469621487,
+        "number": "334401",
+        "open": true,
+        "owner": {
+            "email": "xianms_at_cn.ibm.com",
+            "name": "MingShuang Xian",
+            "username": "MingShuangXian"
+        },
+        "patchSets": [
+            {
+                "author": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "createdOn": 1467022938,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "1",
+                "parents": [
+                    "7d5b0498d985ec4968b0c418070ae67f708a32af"
+                ],
+                "ref": "refs/changes/01/334401/1",
+                "revision": "1c37c341d4003c9976bcb30571a7e6a9f7127bb2",
+                "sizeDeletions": 0,
+                "sizeInsertions": 322,
+                "uploader": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1467024796,
+                        "type": "Verified",
+                        "value": "-1"
+                    },
+                    {
+                        "by": {
+                            "email": "pc_at_michali.net",
+                            "name": "Paul Michali",
+                            "username": "pcm"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1467118043,
+                        "type": "Code-Review",
+                        "value": "-1"
+                    }
+                ],
+                "author": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "comments": [
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 60,
+                        "message": "this part is not clear. On one hand you say it's going to support 'VPN+OVN', on the other 'any distributed router'",
+                        "reviewer": {
+                            "email": "irenab.dev_at_gmail.com",
+                            "name": "Berezovsky Irena",
+                            "username": "irenab"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 60,
+                        "message": "Hi Berezovsky. We planed to use neutron API to create transit network, routes, etc. So it is supposed to be able to support any kinds of distributed router solution, not only OVN. But as discussion below, other developers expected this solution should only use OVN API and  this solution should be specified to OVN. I agreed with their comments. So I'll update the spec to make this spec only for OVN distributed router. Not for other neutron L3 solution.",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 81,
+                        "message": "Is this the service driver? May want a familiar name.",
+                        "reviewer": {
+                            "email": "pc_at_michali.net",
+                            "name": "Paul Michali",
+                            "username": "pcm"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 81,
+                        "message": "yes, it is service driver. will fix it",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 102,
+                        "message": "service",
+                        "reviewer": {
+                            "email": "irenab.dev_at_gmail.com",
+                            "name": "Berezovsky Irena",
+                            "username": "irenab"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 102,
+                        "message": "thanks. Will update in next version",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 143,
+                        "message": "Where these agents are running? Are there dedicated nodes or any compute node can be suitable?",
+                        "reviewer": {
+                            "email": "irenab.dev_at_gmail.com",
+                            "name": "Berezovsky Irena",
+                            "username": "irenab"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 143,
+                        "message": "It is same as current neutron l3-agent. It can be runing on any nodes. But for prod development, it is better to have dedicated nodes  to run these agents",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 240,
+                        "message": "currently shares the",
+                        "reviewer": {
+                            "email": "pc_at_michali.net",
+                            "name": "Paul Michali",
+                            "username": "pcm"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 240,
+                        "message": "will fix it",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 248,
+                        "message": "address",
+                        "reviewer": {
+                            "email": "irenab.dev_at_gmail.com",
+                            "name": "Berezovsky Irena",
+                            "username": "irenab"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 248,
+                        "message": "will update in next version",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 274,
+                        "message": "agent",
+                        "reviewer": {
+                            "email": "pc_at_michali.net",
+                            "name": "Paul Michali",
+                            "username": "pcm"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 274,
+                        "message": "We added a new RFE about IPsec metering support https://bugs.launchpad.net/neutron/+bug/1591993. So I deleted the VPN metering selection",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 277,
+                        "message": "manage",
+                        "reviewer": {
+                            "email": "pc_at_michali.net",
+                            "name": "Paul Michali",
+                            "username": "pcm"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 279,
+                        "message": "ceilometer",
+                        "reviewer": {
+                            "email": "pc_at_michali.net",
+                            "name": "Paul Michali",
+                            "username": "pcm"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 291,
+                        "message": "Which table?  There is an external_v4_ip and external_v6_ip fields in the service table to define the external IP being used, IIRC.  I think there was a case where an external driver could specify the external IP to use.",
+                        "reviewer": {
+                            "email": "pc_at_michali.net",
+                            "name": "Paul Michali",
+                            "username": "pcm"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 291,
+                        "message": "An",
+                        "reviewer": {
+                            "email": "pc_at_michali.net",
+                            "name": "Paul Michali",
+                            "username": "pcm"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 291,
+                        "message": "I will add more details about the external IP address.",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 291,
+                        "message": "fix",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 297,
+                        "message": "Can you please add the dataflow description for the VPN ingress/egress traffic?",
+                        "reviewer": {
+                            "email": "irenab.dev_at_gmail.com",
+                            "name": "Berezovsky Irena",
+                            "username": "irenab"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 297,
+                        "message": "sure, will add it in next version",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 307,
+                        "message": "Plans for testing? Functional test changes?",
+                        "reviewer": {
+                            "email": "pc_at_michali.net",
+                            "name": "Paul Michali",
+                            "username": "pcm"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 307,
+                        "message": "Our team is trying to add more CI jobs for VPNaaS. Will update more details soon",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    }
+                ],
+                "createdOn": 1467023491,
+                "isDraft": false,
+                "kind": "NO_CODE_CHANGE",
+                "number": "2",
+                "parents": [
+                    "7d5b0498d985ec4968b0c418070ae67f708a32af"
+                ],
+                "ref": "refs/changes/01/334401/2",
+                "revision": "28415224e299cb7de44b7e308a40c5b838330cf1",
+                "sizeDeletions": 0,
+                "sizeInsertions": 322,
+                "uploader": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1467120034,
+                        "type": "Verified",
+                        "value": "1"
+                    }
+                ],
+                "author": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "createdOn": 1467119347,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "3",
+                "parents": [
+                    "7d5b0498d985ec4968b0c418070ae67f708a32af"
+                ],
+                "ref": "refs/changes/01/334401/3",
+                "revision": "56575479f8b76099bffc5b257b934bbff7d08037",
+                "sizeDeletions": 0,
+                "sizeInsertions": 312,
+                "uploader": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1467122326,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "rmoats_at_us.ibm.com",
+                            "name": "Ryan Moats",
+                            "username": "regXboi"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1467216641,
+                        "type": "Code-Review",
+                        "value": "-1"
+                    },
+                    {
+                        "by": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1467226418,
+                        "type": "Code-Review",
+                        "value": "-1"
+                    }
+                ],
+                "author": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "comments": [
+                    {
+                        "file": "/COMMIT_MSG",
+                        "line": 15,
+                        "message": "This spec doesn't close the bug.  Also, is anything being done to address the concerns raised in the RFE about getting the upstream CI fixed before adding new VPNaaS features?",
+                        "reviewer": {
+                            "email": "rtheis_at_us.ibm.com",
+                            "name": "Richard Theis",
+                            "username": "rtheis"
+                        }
+                    },
+                    {
+                        "file": "/COMMIT_MSG",
+                        "line": 15,
+                        "message": "I will update the closes-bug tag. Our team is trying add more CI test. Today we have submitted two CI test patches \nhttps://review.openstack.org/#/c/335828/\nhttps://review.openstack.org/#/c/335838/",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 8,
+                        "message": "Are there networking-ovn or ovs/ovn changes required to support these VPNaaS changes?  This wasn't clear to me after a quick read.",
+                        "reviewer": {
+                            "email": "rtheis_at_us.ibm.com",
+                            "name": "Richard Theis",
+                            "username": "rtheis"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 8,
+                        "message": "Currently, we did not see any dependency with OVN. And we describe that there is no changes needed on OVN side on selection Proposed Change.",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 65,
+                        "message": "You do need to call networking-ovn L3 to create static routes, as well as networking-ovn L2 to create the transit network. What is calling what to make all that happen?\nThis is pretty much the same comment as Ryan's below on line 106.",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 65,
+                        "message": "Hi Mickey, we did not planed to use ovn L3 and L2 interfaces before. We want to use use neutron L3 and L2 interface to add routes and create transit network, etc. Any benefits you saw to use OVN interfaces? One benefits I saw to use OVN interfaces is to hide the transit network and routes from openstack.",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 65,
+                        "message": "Hiding the transit network and routes is one benefit.\nSharing the code with the OVN L3 gateway / Floating IP solution is another benefit.\nI thought neutron does not allow use of link local subnets?\nIf so, bypassing neutron and going to networking-ovn would get around that issue.",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 65,
+                        "message": "Hi Mickey, I did not see the link local subnets issue. I tried today via horizon, it's allow to create a subnet with link local IP and configure a link local ip address as a route next's hop. \nAnyway, we will try to use the OVN APIs directly and update the specs accordingly. \nJust want to double check, when you said the OVN APIs, you are talking the APIs in class networking_ovn.ovsdb.impl_idl_ovn, we should use these APIs, right?",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 65,
+                        "message": "Yes, the APIs in networking_ovn.ovsdb.impl_idl_ovn",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 106,
+                        "message": "You appear to envision that the VPN service driver will have code that calls the networking-ovn apis to perform OVN configuration (see L243)?  If so, please show that in the above diagram and highlight the changes.",
+                        "reviewer": {
+                            "email": "rmoats_at_us.ibm.com",
+                            "name": "Ryan Moats",
+                            "username": "regXboi"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 106,
+                        "message": "Hi Ryan, can we use neutron L2 and L3 API directly? We did not plan to use with OVN API directly since the OVN is a neutron ML2 plugin also.",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 131,
+                        "message": "\"for the router\"?\nIs the VPN agent considered to be a router?\nOr should this read \"for the VPN\"?",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 131,
+                        "message": "No, we did not consider it is a router. I will correct it in next version",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 223,
+                        "message": "As an implementation point question: is the transit port on the OVN router envisioned to be distributed, or is it envisioned to be co-located with the centralized portion of the router that provides the L3 gateway function?",
+                        "reviewer": {
+                            "email": "rmoats_at_us.ibm.com",
+                            "name": "Ryan Moats",
+                            "username": "regXboi"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 223,
+                        "message": "IMO co-locating with the L3 gateway router does not help. The namespace is not OVN, so it is separate from the OVN router (whether the distributed OVN router or the L3 gateway router). You have to go over a port to get to the namespace. Currently, OVN router ports are all patch ports, even if some are centralized while others are distributed. OVN does allow for an OVN router patch port to be directly connected to another OVN router patch port. However, I would think that the OVN port to the namespace looks more like a VIF, from OVN's point of view. OVN does not currently allow a router port to connect directly to a VIF. If you take the easy way out and use OVN router patch port - OVN logical switch patch port - OVN logical switch - OVN logical switch VIF port - namespace, then there is no significant advantage whether you start from the L3 gateway router versus the OVN distributed router.\n\nWhat does make a lot of sense to me is to use the same transit network for VPN agent connectivity as is used for OVN distributed router to OVN L3 gateway connectivity. See https://etherpad.openstack.org/p/Integration_with_OVN_L3_Gateway for details on the latter. Change the default from /30 to something larger. Give the first two ports to the OVN distributed router and the OVN L3 gateway router, then give the third port to the VPN agent. Perhaps more ports will be necessary for VRRP on the L3 gateway router and the VPN agent. On the OVN distributed router, the default gateway points up to the L3 gateway router. Static routes point to the VPN agent.",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 223,
+                        "message": "Hi Ryan, It is distributed. The reason is as what Mickey mentioned below.",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 223,
+                        "message": "Hi Mickey, Agree with you. the port on the OVN router should be distributed. \nFor the OVN centralized transit network, one question is where is configured? it is on OVN L3 plugin? So it is invisible for VPN if VPN uses the neutron L3/L2 API directly, right.",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 243,
+                        "message": "manipulating static routes in OVN should be done via the networking-ovn apis",
+                        "reviewer": {
+                            "email": "rmoats_at_us.ibm.com",
+                            "name": "Ryan Moats",
+                            "username": "regXboi"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 243,
+                        "message": "we could use the neutron l3 API directly, right? Any benefits you saw to use OVN API? One benefits I saw to use OVN API is to hide the routes from openstack.",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 243,
+                        "message": "If you are using link local next hop, then you should specify network/router interface as well as the next hop address, since there could be aliasing of the same link local address across different router ports. Neutron does not support specification of network/router interface in static routes, but OVN does.",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 243,
+                        "message": "Sorry. I did not get your points, could you give me an example? When are there same link local address across different router ports in one router?",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 243,
+                        "message": "If you use the same transit network as L3 gateway router, I don't have a real life use case. However, assume hypothetically that you used a different transit network. What if the same link local subnet were used for the L3 gateway router transit network and the VPNaaS transit network? In terms of the IP protocol, there is no problem with this setup, because the two subnets are on two different links/networks, and the addresses are link local. However, a route with a link local next hop must specify which of the links/networks the next hop link local address is associated with, in order to disambiguate. The major router vendors support static routes with link local next hops, specifying the next hop router port as well as the next hop link local address.",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 243,
+                        "message": "I suppose this case would not happen in our openstack since we do not allow overlapping of the subnet. \nAnyway, we will try to use the OVN APIs",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 281,
+                        "message": "Looking at the class VPNService definition, I see external_v4_ip = sa.Column(sa.String(16)) and external_v6_ip = sa.Column(sa.String(64)). Why do you need to add anything? What is the relationship between the existing columns and the new column?",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 281,
+                        "message": "Yes, external_v4_ip and external_v6_ip are used for the VPN service. Not for the router. We want to an entry to record the IP address used for VPN per router, Not for VPN service.\nFor example. There is a router A. It should have a public IP address(129.1.1.1)  for VPN. For current neutron L3 router implementation, this IP address is its external gateway IP address.\nThen customer could create two VPN services, both VPN services bind with router A, Then both of VPN services  external_v4_ip are 129.1.1.1\nBut for VPN+OVN, VPN can't use 129.1.1.1 anymore because 129.1.1.1 will be used for OVN SNAT. So it needs a new public IP address",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 281,
+                        "message": "I don't follow your reasoning, and I don't think I agree. It is true that currently the VPN service external_v4_ip and external_v6_ip are set to the router external gateway IP address. However, that just happens to be how the value is derived when VPNaaS runs inside the router, as with the reference implementation.\n\nLook at the description in the API documentation:\n\"Read-only external (public) IPv4 address that is used for the VPN service. The VPN plugin sets this address if an IPv4 interface is available.\"\nThere is nothing in that description about how the VPN plugin derives the address. It is about usage.\n\nThink from an operator's point of view. The user defines a VPN service. The user reads the external_v4_ip, then goes off to the other end of the site-to-site connection and configures that external_v4_ip value as the remote tunnel endpoint. The exact same thing is true for the value that you want to add. Why should the user have to know anything about the underlying implementation in order to know whether to use external_v4_ip or external_ip at the other end of the site-to-site connection?\n\nThe change should be under the covers, not to the VPN table itself.",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 281,
+                        "message": "Maybe I did not describe it clearly. Our propose is to recored the VPN gateway public IP address of the router, since VPN can't share the original router external gateway IP address on OVN networking. And we did not plan to change the existed VPN tables definition. We will add a new table  on VPN database.  I have almost finished the according codes. The code patch is https://review.openstack.org/#/c/341393/\nI will update the spec to make it more clear if you are fine with the code patch",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 281,
+                        "message": "I don't agree with your characterization of the existing VPN tables. Why is there an external_v4_ip in the VPN service table? My claim is that it is there for VPNaaS, specifically so that someone creating a VPNaaS connection can find out the tunnel IP address to configure on the remote end. Note the API description: \"... that is used for the VPN service.\"\n\nIn case of your OVN VPNaaS implementation, the router gateway address has nothing to do with the VPN service. There is no packet or flow that has the router gateway address anywhere in the packet. There is no need for the user to associate the router gateway address with the VPN service, so external_v4_ip and external_v6_ip should not reflect the router gateway address. The only use of the router gateway address is for your plugin to determine on what subnet to go ask for a port, but that is under the covers and there is no reason for the user to know the details regarding how you got the VPNaaS external IP address. All the user needs to know is the value of the VPNaaS external IP address, not how it was derived. You should decouple the existing external_v4_ip and external_v6_ip from the router gateway address, for the case of OVN.",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 281,
+                        "message": "A question came up about supporting a VPN service even when there is no router external gateway interface, and whether the user should be able to specify the external IP address, not just read-only.\n\nIf you want to support this, I would suggest something like the addition of an external_port parameter associated with a VPN service, either by adding to the existing /v2.0/vpn/vpnservices or defining a separate table associating the port with the VPN service UUID. The idea is to specify the port, similar to the specification of a port UUID in /v2.0/routers/\u200b{router_id}\u200b/add_router_interface.\n\nIf you do this, I still think the resulting IP address should populate the existing external_v4_ip or external_v6_ip parameter in the existing VPN service table. That way if a customer has a script that grabs that address in order to configure the remote end of a site-to-site IPsec connection, the script will still work.\n\nEven if you do all this, there is still a question whether you should support a user leaving the external_port unspecified, where you automatically create a port for the VPNaaS namespace, in the same subnet as the router external gateway. That would be one way to provide ease of use, while still giving users the option to select the IP address themselves, if they prefer that.",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 281,
+                        "message": "Hi Mickey, Agree with you. the external_v4_ip or v6 will be populated from this new api. I did not try to change the definition of the existed VPN  tables.\n/v2.0/routers/\u200b{router_id}\u200b/add_router_interface is used to add the private network gateway port port, not the external gateway port. \nNeutron use the API /v2.0/routers with below request body to add external gateway port:\n{\n   \"router\": {\n      \"external_gateway_info\": {\n         \"network_id\": \"8ca37218-28ff-41cb-9b10-039601ea7e6b\"\n      }\n   }\n}\n\nif we add to existing  /v2.0/vpn/vpnservices api with the port UUID, then customer have to create the port firstly and have to configure it per vpn services. If there are more one vpn service bound with one router, customer need to do  multiple configuration. There are another case is what will happen if customer configures different port for two different vpn services which is bound with a same router?\n\nSo I still think it is better to just to specify the external network UUID, then the plugin will automatically create it with the UUID. That is same as what the router external gateway is doing.\n\nAnd I think it is better to bind the external network with the router id, not the vpn services id. It is also same as vpn use router external gateway IP address.\n\nthat is why I just added some extended attribute with the router. Anyway, if you like, I could change this API URL to /v2.0/vpn/external_port \nbut as I know, the new URL, there will be 5 API for any new URL:POST/PUT/DELETE/GET/LIST. Do we really need so many APIs.\n\nI think after the customer configure the vpn external IP/Port, VPN plugin will schedule a new agent and create the namespace and bind the port/ip to the namespace. This is what the l3-agent was doing.",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 292,
+                        "message": "Looking at the existing API, GET /v2.0/vpn/vpnservices includes read-only external_v4_ip and external_v6_ip. Why do you need to add a separate 'external_ip'? What is the relationship between the existing read-only parameters and the new 'external_ip' parameter?",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 292,
+                        "message": "same reason at line 281",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 292,
+                        "message": "Same reply as above at line 281",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 299,
+                        "message": "As I suggested above, I think the transit network and subnet should be shared with networking-ovn, which creates a transit network between the OVN distributed router and the OVN gateway router. I don't think this should be VPNaaS specific.",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 299,
+                        "message": "if we use OVN API directly, not neutron API. Then it makes sense to use OVN gateway transit network",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 308,
+                        "message": "Please clarify. So the transit network will be used as the VPN HA network?",
+                        "reviewer": {
+                            "email": "emspiege_at_us.ibm.com",
+                            "name": "Mickey Spiegel",
+                            "username": "mickeys"
+                        }
+                    },
+                    {
+                        "file": "specs/newton/vpn-ovn.rst",
+                        "line": 308,
+                        "message": "Yes, the transit network will be used for HA also",
+                        "reviewer": {
+                            "email": "xianms_at_cn.ibm.com",
+                            "name": "MingShuang Xian",
+                            "username": "MingShuangXian"
+                        }
+                    }
+                ],
+                "createdOn": 1467121113,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "4",
+                "parents": [
+                    "7d5b0498d985ec4968b0c418070ae67f708a32af"
+                ],
+                "ref": "refs/changes/01/334401/4",
+                "revision": "cbce550216b5371355ef2c3fa077ccf061611c54",
+                "sizeDeletions": 0,
+                "sizeInsertions": 325,
+                "uploader": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                }
+            },
+            {
+                "author": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                },
+                "createdOn": 1469621487,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "5",
+                "parents": [
+                    "7d5b0498d985ec4968b0c418070ae67f708a32af"
+                ],
+                "ref": "refs/changes/01/334401/5",
+                "revision": "c4cbf49a32b399e85f7b5ab57d76d55e63fd76ca",
+                "sizeDeletions": 0,
+                "sizeInsertions": 405,
+                "uploader": {
+                    "email": "xianms_at_cn.ibm.com",
+                    "name": "MingShuang Xian",
+                    "username": "MingShuangXian"
+                }
+            }
+        ],
+        "project": "openstack/neutron-specs",
+        "status": "NEW",
+        "subject": "VPNaaS for OVN Networking",
+        "topic": "bug/1586253",
+        "url": "https://review.openstack.org/334401"
+    },
+    "origin": "review.openstack.org",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469621778.446178,
+    "updated_on": 1469621487.0,
+    "uuid": "ab7522dc1b54047cceae14360c96f4f999c51ec2"
+},
+{
+    "backend_name": "Gerrit",
+    "backend_version": "0.3.0",
+    "data": {
+        "branch": "master",
+        "comments": [
+            {
+                "message": "Uploaded patch set 1.",
+                "reviewer": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "timestamp": 1465561190
+            },
+            {
+                "message": "Patch Set 1: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-instack-undercloud-docs http://docs-draft.openstack.org/64/328264/1/check/gate-instack-undercloud-docs/bd56226//doc/build/html/ : SUCCESS in 4m 25s\n- gate-instack-undercloud-pep8 http://logs.openstack.org/64/328264/1/check/gate-instack-undercloud-pep8/b2b8acd/ : SUCCESS in 1m 50s\n- gate-instack-undercloud-python27 http://logs.openstack.org/64/328264/1/check/gate-instack-undercloud-python27/29f7250/ : SUCCESS in 1m 33s\n- gate-instack-undercloud-puppet-lint http://logs.openstack.org/64/328264/1/check/gate-instack-undercloud-puppet-lint/3c45111/ : SUCCESS in 1m 52s\n- gate-instack-undercloud-puppet-syntax-3-centos-7 http://logs.openstack.org/64/328264/1/check/gate-instack-undercloud-puppet-syntax-3-centos-7/1ddace2/ : SUCCESS in 2m 43s\n- gate-instack-undercloud-puppet-syntax-4-centos-7 http://logs.openstack.org/64/328264/1/check/gate-instack-undercloud-puppet-syntax-4-centos-7/8dcafc3/ : SUCCESS in 2m 06s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1465561635
+            },
+            {
+                "message": "Topic set to undercloud-cleanup",
+                "reviewer": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "timestamp": 1465561751
+            },
+            {
+                "message": "Patch Set 1: Workflow-1",
+                "reviewer": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "timestamp": 1465561880
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild failed (check-tripleo pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n\n- gate-tripleo-ci-centos-7-upgrades http://logs.openstack.org/64/328264/1/check-tripleo/gate-tripleo-ci-centos-7-upgrades/c7454e4/ : FAILURE in 31m 41s\n- gate-tripleo-ci-centos-7-ha http://logs.openstack.org/64/328264/1/check-tripleo/gate-tripleo-ci-centos-7-ha/f01191b/ : FAILURE in 31m 51s\n- gate-tripleo-ci-centos-7-nonha http://logs.openstack.org/64/328264/1/check-tripleo/gate-tripleo-ci-centos-7-nonha/8677c36/ : FAILURE in 48m 13s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1465564514
+            },
+            {
+                "message": "Uploaded patch set 2.",
+                "reviewer": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "timestamp": 1465827132
+            },
+            {
+                "message": "Patch Set 2: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-instack-undercloud-docs http://docs-draft.openstack.org/64/328264/2/check/gate-instack-undercloud-docs/e0f5728//doc/build/html/ : SUCCESS in 1m 47s\n- gate-instack-undercloud-pep8 http://logs.openstack.org/64/328264/2/check/gate-instack-undercloud-pep8/2362e6e/ : SUCCESS in 2m 35s\n- gate-instack-undercloud-python27 http://logs.openstack.org/64/328264/2/check/gate-instack-undercloud-python27/6ec9926/ : SUCCESS in 2m 50s\n- gate-instack-undercloud-puppet-lint http://logs.openstack.org/64/328264/2/check/gate-instack-undercloud-puppet-lint/4e6a060/ : SUCCESS in 1m 53s\n- gate-instack-undercloud-puppet-syntax-3-centos-7 http://logs.openstack.org/64/328264/2/check/gate-instack-undercloud-puppet-syntax-3-centos-7/15d0ddb/ : SUCCESS in 1m 20s\n- gate-instack-undercloud-puppet-syntax-4-centos-7 http://logs.openstack.org/64/328264/2/check/gate-instack-undercloud-puppet-syntax-4-centos-7/958433c/ : SUCCESS in 1m 12s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1465827856
+            },
+            {
+                "message": "Uploaded patch set 3.",
+                "reviewer": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "timestamp": 1465827900
+            },
+            {
+                "message": "Patch Set 3: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-instack-undercloud-docs http://docs-draft.openstack.org/64/328264/3/check/gate-instack-undercloud-docs/2ca0941//doc/build/html/ : SUCCESS in 2m 31s\n- gate-instack-undercloud-pep8 http://logs.openstack.org/64/328264/3/check/gate-instack-undercloud-pep8/7ad1967/ : SUCCESS in 3m 50s\n- gate-instack-undercloud-python27 http://logs.openstack.org/64/328264/3/check/gate-instack-undercloud-python27/a4b8fbc/ : SUCCESS in 1m 53s\n- gate-instack-undercloud-puppet-lint http://logs.openstack.org/64/328264/3/check/gate-instack-undercloud-puppet-lint/f22c17f/ : SUCCESS in 2m 26s\n- gate-instack-undercloud-puppet-syntax-3-centos-7 http://logs.openstack.org/64/328264/3/check/gate-instack-undercloud-puppet-syntax-3-centos-7/5ac9e10/ : SUCCESS in 2m 29s\n- gate-instack-undercloud-puppet-syntax-4-centos-7 http://logs.openstack.org/64/328264/3/check/gate-instack-undercloud-puppet-syntax-4-centos-7/0816ee0/ : SUCCESS in 4m 50s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1465828732
+            },
+            {
+                "message": "Patch Set 3: Code-Review-1\n\ni'm curious why this might be needed as we are already yum update'ing the world in puppet-stack-config.pp in a first step. then we run a 2nd step that would take advantage of the updated puppet dependencies.\n\ni'd really like to not have to add another bash script given our move away from that:\nhttps://blueprints.launchpad.net/tripleo/+spec/undercloud-elements",
+                "reviewer": {
+                    "email": "jslagle_at_redhat.com",
+                    "name": "James Slagle",
+                    "username": "slagle"
+                },
+                "timestamp": 1465842137
+            },
+            {
+                "message": "Patch Set 3:\n\nBuild succeeded (check-tripleo pipeline).\n\n- gate-tripleo-ci-centos-7-upgrades http://logs.openstack.org/64/328264/3/check-tripleo/gate-tripleo-ci-centos-7-upgrades/6c8a6b1/ : SUCCESS in 1h 54m 24s\n- gate-tripleo-ci-centos-7-ha http://logs.openstack.org/64/328264/3/check-tripleo/gate-tripleo-ci-centos-7-ha/fa86a38/ : SUCCESS in 1h 40m 21s\n- gate-tripleo-ci-centos-7-nonha http://logs.openstack.org/64/328264/3/check-tripleo/gate-tripleo-ci-centos-7-nonha/074e51e/ : SUCCESS in 1h 22m 48s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1465843233
+            },
+            {
+                "message": "Patch Set 3:\n\n> i'm curious why this might be needed as we are already yum update'ing\n> the world in puppet-stack-config.pp in a first step. then we run a\n> 2nd step that would take advantage of the updated puppet dependencies.\n\nWe need to ensure puppet and it's dependencies is on latest version\nbefore running puppet. There might be issue in facter or hiera or puppet\nmodules that could cause puppet to fail before running yum update exec.\n\nRunning yum update completely breaks puppet way of managing services, we\nshould do this the puppet way if we are moving to puppet. And we should\nnot update or touch anything else than what we need for running\nundercloud.\n\nI'm thinking about moving this into python code of undercloud.py but the\nissue there is that source of information for whether we use packages or\nget modules from source is in DIB :(",
+                "reviewer": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "timestamp": 1465905251
+            },
+            {
+                "message": "Patch Set 3:\n\n> > i'm curious why this might be needed as we are already yum\n > update'ing\n > > the world in puppet-stack-config.pp in a first step. then we run\n > a\n > > 2nd step that would take advantage of the updated puppet\n > dependencies.\n > \n > We need to ensure puppet and it's dependencies is on latest version\n > before running puppet. There might be issue in facter or hiera or\n > puppet\n > modules that could cause puppet to fail before running yum update\n > exec.\n > \n > Running yum update completely breaks puppet way of managing\n > services, we\n\nwe've been doing that for a while, so this is not true. \"completely breaks\" is an overstatement.\n\nyou've pointed out one issue that we know about: triggering a db sync. to which there is another solution: in the absence of knowing when one is required, we should always do it. Not make that choice based on an unrelated action such as updating the package. Updating the package is only going to require a db sync when upgrading across major versions of OpenStack, so in most cases it's not going to require one. It's just a bad choice imo.\n\nlet's not use that to impose some puppet \"conventions\", which are quite restrictive, unnecessary and unwanted.",
+                "reviewer": {
+                    "email": "jslagle_at_redhat.com",
+                    "name": "James Slagle",
+                    "username": "slagle"
+                },
+                "timestamp": 1465906160
+            },
+            {
+                "message": "Patch Set 3: Verified-1\n\nMerge Failed.\n\nThis change or one of its cross-repo dependencies was unable to be automatically merged with the current state of its repository. Please rebase the change and upload a new patchset.",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1465914872
+            },
+            {
+                "message": "Uploaded patch set 4: Patch Set 3 was rebased.",
+                "reviewer": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "timestamp": 1466158686
+            },
+            {
+                "message": "Patch Set 4: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-instack-undercloud-docs http://docs-draft.openstack.org/64/328264/4/check/gate-instack-undercloud-docs/96578d0//doc/build/html/ : SUCCESS in 3m 47s\n- gate-instack-undercloud-pep8 http://logs.openstack.org/64/328264/4/check/gate-instack-undercloud-pep8/fda55ef/ : SUCCESS in 8m 42s\n- gate-instack-undercloud-python27 http://logs.openstack.org/64/328264/4/check/gate-instack-undercloud-python27/9e42f62/ : SUCCESS in 8m 49s\n- gate-instack-undercloud-puppet-lint http://logs.openstack.org/64/328264/4/check/gate-instack-undercloud-puppet-lint/209f098/ : SUCCESS in 7m 19s\n- gate-instack-undercloud-puppet-syntax-3-centos-7 http://logs.openstack.org/64/328264/4/check/gate-instack-undercloud-puppet-syntax-3-centos-7/3938122/ : SUCCESS in 6m 54s\n- gate-instack-undercloud-puppet-syntax-4-centos-7 http://logs.openstack.org/64/328264/4/check/gate-instack-undercloud-puppet-syntax-4-centos-7/878c104/ : SUCCESS in 3m 52s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1466159386
+            },
+            {
+                "message": "Patch Set 4:\n\nBuild failed (check-tripleo pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n\n- gate-tripleo-ci-centos-7-upgrades http://logs.openstack.org/64/328264/4/check-tripleo/gate-tripleo-ci-centos-7-upgrades/6c8ad85/ : FAILURE in 1h 19m 04s\n- gate-tripleo-ci-centos-7-ha http://logs.openstack.org/64/328264/4/check-tripleo/gate-tripleo-ci-centos-7-ha/fdcacca/ : FAILURE in 1h 27m 09s\n- gate-tripleo-ci-centos-7-nonha http://logs.openstack.org/64/328264/4/check-tripleo/gate-tripleo-ci-centos-7-nonha/a150585/ : FAILURE in 1h 28m 44s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1466164103
+            },
+            {
+                "message": "Patch Set 4: Verified-1\n\nMerge Failed.\n\nThis change or one of its cross-repo dependencies was unable to be automatically merged with the current state of its repository. Please rebase the change and upload a new patchset.",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1468251297
+            },
+            {
+                "message": "Uploaded patch set 5: Patch Set 4 was rebased.",
+                "reviewer": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "timestamp": 1469185456
+            },
+            {
+                "message": "Patch Set 5: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-instack-undercloud-docs http://docs-draft.openstack.org/64/328264/5/check/gate-instack-undercloud-docs/9855191//doc/build/html/ : SUCCESS in 2m 51s\n- gate-instack-undercloud-pep8 http://logs.openstack.org/64/328264/5/check/gate-instack-undercloud-pep8/5d256ce/ : SUCCESS in 5m 48s\n- gate-instack-undercloud-python27 http://logs.openstack.org/64/328264/5/check/gate-instack-undercloud-python27/503782d/ : SUCCESS in 3m 28s\n- gate-tripleo-ci-centos-7-nonha-multinode-nv http://logs.openstack.org/64/328264/5/check/gate-tripleo-ci-centos-7-nonha-multinode-nv/54d0500/ : SUCCESS in 1h 09m 27s (non-voting)\n- gate-instack-undercloud-puppet-lint http://logs.openstack.org/64/328264/5/check/gate-instack-undercloud-puppet-lint/8d683a5/ : SUCCESS in 2m 50s\n- gate-instack-undercloud-puppet-syntax-3-centos-7 http://logs.openstack.org/64/328264/5/check/gate-instack-undercloud-puppet-syntax-3-centos-7/401dbdf/ : SUCCESS in 6m 33s\n- gate-instack-undercloud-puppet-syntax-4-centos-7 http://logs.openstack.org/64/328264/5/check/gate-instack-undercloud-puppet-syntax-4-centos-7/5f51aba/ : SUCCESS in 6m 23s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469189965
+            },
+            {
+                "message": "Patch Set 5:\n\nBuild failed (check-tripleo pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n\n- gate-tripleo-ci-centos-7-ovb-ha http://logs.openstack.org/64/328264/5/check-tripleo/gate-tripleo-ci-centos-7-ovb-ha/e14fd65/ : FAILURE in 2h 36m 48s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469195946
+            },
+            {
+                "message": "Patch Set 5: Verified-1\n\nMerge Failed.\n\nThis change or one of its cross-repo dependencies was unable to be automatically merged with the current state of its repository. Please rebase the change and upload a new patchset.",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469466741
+            },
+            {
+                "message": "Uploaded patch set 6: Patch Set 5 was rebased.",
+                "reviewer": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "timestamp": 1469618863
+            },
+            {
+                "message": "Patch Set 6: Verified-1\n\nBuild failed (check pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n- gate-instack-undercloud-docs-ubuntu-xenial http://docs-draft.openstack.org/64/328264/6/check/gate-instack-undercloud-docs-ubuntu-xenial/51cdd00//doc/build/html/ : SUCCESS in 5m 15s\n- gate-instack-undercloud-pep8-ubuntu-xenial http://logs.openstack.org/64/328264/6/check/gate-instack-undercloud-pep8-ubuntu-xenial/3181fd6/ : SUCCESS in 5m 09s\n- gate-instack-undercloud-python27-ubuntu-xenial http://logs.openstack.org/64/328264/6/check/gate-instack-undercloud-python27-ubuntu-xenial/1de25f3/ : SUCCESS in 5m 45s\n- gate-tripleo-ci-centos-7-nonha-multinode-nv http://logs.openstack.org/64/328264/6/check/gate-tripleo-ci-centos-7-nonha-multinode-nv/be707ef/ : FAILURE in 25m 21s (non-voting)\n- gate-instack-undercloud-puppet-lint http://logs.openstack.org/64/328264/6/check/gate-instack-undercloud-puppet-lint/d1efcd4/ : FAILURE in 3m 27s\n- gate-instack-undercloud-puppet-syntax-3-centos-7 http://logs.openstack.org/64/328264/6/check/gate-instack-undercloud-puppet-syntax-3-centos-7/aca7673/ : FAILURE in 5m 10s\n- gate-instack-undercloud-puppet-syntax-4-centos-7 http://logs.openstack.org/64/328264/6/check/gate-instack-undercloud-puppet-syntax-4-centos-7/b650bc4/ : FAILURE in 4m 56s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469621487
+            }
+        ],
+        "commitMessage": "Update puppet dependancies before running puppet\n\nThough puppet modules and puppet is provided by elements in\ntripleo-puppet-elements DIB can't update so we have to do it\nmanually.\n\nChange-Id: I747251e17b85c677dd4500a558f1d87b33cb3e5f\n",
+        "createdOn": 1465561190,
+        "id": "I747251e17b85c677dd4500a558f1d87b33cb3e5f",
+        "lastUpdated": 1469621487,
+        "number": "328264",
+        "open": true,
+        "owner": {
+            "email": "social_at_v3.sk",
+            "name": "Lukas Bezdicka",
+            "username": "xbezdick"
+        },
+        "patchSets": [
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1465561635,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "social_at_v3.sk",
+                            "name": "Lukas Bezdicka",
+                            "username": "xbezdick"
+                        },
+                        "description": "Workflow",
+                        "grantedOn": 1465561880,
+                        "type": "Workflow",
+                        "value": "-1"
+                    }
+                ],
+                "author": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "createdOn": 1465561190,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "1",
+                "parents": [
+                    "e544d902f223f0d806e00e203a4cc11fdaf13bc4"
+                ],
+                "ref": "refs/changes/64/328264/1",
+                "revision": "d2c4032d376e5fe03d559c29af1307ce56c7907e",
+                "sizeDeletions": 0,
+                "sizeInsertions": 8,
+                "uploader": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1465827856,
+                        "type": "Verified",
+                        "value": "1"
+                    }
+                ],
+                "author": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "createdOn": 1465827132,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "2",
+                "parents": [
+                    "e544d902f223f0d806e00e203a4cc11fdaf13bc4"
+                ],
+                "ref": "refs/changes/64/328264/2",
+                "revision": "915c0efcad9d212443b84d5ba0483f2800825f87",
+                "sizeDeletions": 0,
+                "sizeInsertions": 8,
+                "uploader": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1465914872,
+                        "type": "Verified",
+                        "value": "-1"
+                    },
+                    {
+                        "by": {
+                            "email": "jslagle_at_redhat.com",
+                            "name": "James Slagle",
+                            "username": "slagle"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1465842137,
+                        "type": "Code-Review",
+                        "value": "-1"
+                    }
+                ],
+                "author": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "createdOn": 1465827900,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "3",
+                "parents": [
+                    "036ba5f53eb32d9c56dbfa360b48f3cbcc7c3d00"
+                ],
+                "ref": "refs/changes/64/328264/3",
+                "revision": "91b3cf6b079a3ca4ace322dd09091ce42c243f55",
+                "sizeDeletions": 0,
+                "sizeInsertions": 8,
+                "uploader": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1468251297,
+                        "type": "Verified",
+                        "value": "-1"
+                    },
+                    {
+                        "by": {
+                            "email": "jslagle_at_redhat.com",
+                            "name": "James Slagle",
+                            "username": "slagle"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1465842137,
+                        "type": "Code-Review",
+                        "value": "-1"
+                    }
+                ],
+                "author": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "createdOn": 1466158686,
+                "isDraft": false,
+                "kind": "TRIVIAL_REBASE",
+                "number": "4",
+                "parents": [
+                    "d231454f88c9fa26a1abddca1eefa1af1405cd0b"
+                ],
+                "ref": "refs/changes/64/328264/4",
+                "revision": "a2547017a0e5773cb1cd9a2bee816c29ef51a93f",
+                "sizeDeletions": 0,
+                "sizeInsertions": 8,
+                "uploader": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1469466741,
+                        "type": "Verified",
+                        "value": "-1"
+                    },
+                    {
+                        "by": {
+                            "email": "jslagle_at_redhat.com",
+                            "name": "James Slagle",
+                            "username": "slagle"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1465842137,
+                        "type": "Code-Review",
+                        "value": "-1"
+                    }
+                ],
+                "author": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "createdOn": 1469185456,
+                "isDraft": false,
+                "kind": "TRIVIAL_REBASE",
+                "number": "5",
+                "parents": [
+                    "f3deccde406e4c30046d356291f8d4b08682cb16"
+                ],
+                "ref": "refs/changes/64/328264/5",
+                "revision": "4fb3fd8ec3a855a49df176d51d07ae48670e0568",
+                "sizeDeletions": 0,
+                "sizeInsertions": 8,
+                "uploader": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1469621487,
+                        "type": "Verified",
+                        "value": "-1"
+                    },
+                    {
+                        "by": {
+                            "email": "jslagle_at_redhat.com",
+                            "name": "James Slagle",
+                            "username": "slagle"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1465842137,
+                        "type": "Code-Review",
+                        "value": "-1"
+                    }
+                ],
+                "author": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                },
+                "createdOn": 1469618863,
+                "isDraft": false,
+                "kind": "TRIVIAL_REBASE",
+                "number": "6",
+                "parents": [
+                    "1760e5b9cc82c5a758cf53fe10479b70a842c1d4"
+                ],
+                "ref": "refs/changes/64/328264/6",
+                "revision": "c4c86aaf4d37289f2383c3a02a6582ea0fcd2626",
+                "sizeDeletions": 0,
+                "sizeInsertions": 8,
+                "uploader": {
+                    "email": "social_at_v3.sk",
+                    "name": "Lukas Bezdicka",
+                    "username": "xbezdick"
+                }
+            }
+        ],
+        "project": "openstack/instack-undercloud",
+        "status": "NEW",
+        "subject": "Update puppet dependancies before running puppet",
+        "topic": "undercloud-cleanup",
+        "url": "https://review.openstack.org/328264"
+    },
+    "origin": "review.openstack.org",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469621778.453849,
+    "updated_on": 1469621487.0,
+    "uuid": "19c055cd50a08a67a94b33b9126ff2ad7128fe83"
+},
+{
+    "backend_name": "Gerrit",
+    "backend_version": "0.3.0",
+    "data": {
+        "branch": "master",
+        "comments": [
+            {
+                "message": "Uploaded patch set 1.",
+                "reviewer": {
+                    "email": "chen.tang_at_easystack.cn",
+                    "name": "Tang Chen",
+                    "username": "tangchen"
+                },
+                "timestamp": 1469610409
+            },
+            {
+                "message": "Patch Set 1: Code-Review-1\n\nThanks for the patch,\n\nI don't know what other cores think but I would prefer to not add the classifiers until we have functional tests with PY3 instead of only unittests. We need to make sure that not only Ironic but all it's dependencies can run on PY3 before we claim to support it.",
+                "reviewer": {
+                    "email": "lucasagomes_at_gmail.com",
+                    "name": "Lucas Alvares Gomes",
+                    "username": "lucasagomes"
+                },
+                "timestamp": 1469610939
+            },
+            {
+                "message": "Patch Set 1:\n\nTesting completed on IBM PowerKVM platform. For rechecking only on the IBM PowerKVM CI, add a review comment with pkvm: recheck. Contact info: kvmpower_at_linux.vnet.ibm.com. For more information, see https://wiki.openstack.org/wiki/PowerKVM\n\n- gate-tempest-dsvm-ironic-agent_ipmitool http://dal05.objectstorage.softlayer.net/v1/AUTH_3d8e6ecb-f597-448c-8ec2-164e9f710dd6/pkvmci/ironic/05/347705/1/check/gate-tempest-dsvm-ironic-agent_ipmitool/5f8fe77/ : SUCCESS in 1h 05m 59s (non-voting)",
+                "reviewer": {
+                    "email": "kvmpower_at_linux.vnet.ibm.com",
+                    "name": "IBM PowerKVM CI",
+                    "username": "powerkvm"
+                },
+                "timestamp": 1469614381
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild failed. For help on isolating this failure, please contact cisco-openstack-neutron-ci_at_cisco.com. To re-run, post a 'cisco-ironic-recheck' comment.\n\n- tempest-dsvm-ironic-pxe_iscsi_cimc http://192.133.158.2:8080/job/tempest-dsvm-ironic-pxe_iscsi_cimc/2750 : SUCCESS in 1h 17m 33s\n- tempest-dsvm-ironic-pxe_ucs http://192.133.158.2:8080/job/tempest-dsvm-ironic-pxe_ucs/2167 : FAILURE in 52m 56s",
+                "reviewer": {
+                    "email": "ironic_ci_at_external.cisco.com",
+                    "name": "Cisco CI",
+                    "username": "cisco_ironic_ci"
+                },
+                "timestamp": 1469615072
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild succeeded\n  - For information of Fujitsu iRMC CI, see:\n    https://wiki.openstack.org/wiki/ThirdPartySystems/Fujitsu_iRMC_CI\n\n- tempest-dsvm-ironic-agent-irmc http://openstackci.jp.fujitsu.com/irmcci/05/347705/1/check/tempest-dsvm-ironic-agent-irmc/b196409 : SUCCESS in 1h 32m 05s (non-voting)",
+                "reviewer": {
+                    "email": "fj-lsoft-irmcci_at_dl.jp.fujitsu.com",
+                    "name": "Fujitsu iRMC CI",
+                    "username": "Fujitsu_iRMC_CI"
+                },
+                "timestamp": 1469615956
+            },
+            {
+                "message": "Patch Set 1: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-ironic-docs-ubuntu-xenial http://docs-draft.openstack.org/05/347705/1/check/gate-ironic-docs-ubuntu-xenial/4d425aa//doc/build/html/ : SUCCESS in 3m 54s\n- gate-ironic-pep8-ubuntu-xenial http://logs.openstack.org/05/347705/1/check/gate-ironic-pep8-ubuntu-xenial/bce6e0b/ : SUCCESS in 7m 30s\n- gate-ironic-python27-db-ubuntu-xenial http://logs.openstack.org/05/347705/1/check/gate-ironic-python27-db-ubuntu-xenial/1296b85/ : SUCCESS in 7m 14s\n- gate-ironic-python34-db http://logs.openstack.org/05/347705/1/check/gate-ironic-python34-db/2a17b50/ : SUCCESS in 6m 25s\n- gate-ironic-python35-db http://logs.openstack.org/05/347705/1/check/gate-ironic-python35-db/aa0c733/ : SUCCESS in 6m 27s\n- gate-tempest-dsvm-ironic-pxe_ipa-postgres-nv http://logs.openstack.org/05/347705/1/check/gate-tempest-dsvm-ironic-pxe_ipa-postgres-nv/4dd1376/ : SUCCESS in 55m 20s (non-voting)\n- gate-tempest-dsvm-ironic-ipa-wholedisk-agent_ssh-tinyipa http://logs.openstack.org/05/347705/1/check/gate-tempest-dsvm-ironic-ipa-wholedisk-agent_ssh-tinyipa/abb3ee2/ : SUCCESS in 46m 54s\n- gate-tempest-dsvm-ironic-ipa-partition-agent_ssh-tinyipa-nv http://logs.openstack.org/05/347705/1/check/gate-tempest-dsvm-ironic-ipa-partition-agent_ssh-tinyipa-nv/806ee15/ : SUCCESS in 1h 00m 48s (non-voting)\n- gate-tempest-dsvm-ironic-ipa-partition-pxe_ssh-tinyipa http://logs.openstack.org/05/347705/1/check/gate-tempest-dsvm-ironic-ipa-partition-pxe_ssh-tinyipa/ff6bdc2/ : SUCCESS in 57m 30s\n- gate-ironic-inspector-dsvm-ipa-nv http://logs.openstack.org/05/347705/1/check/gate-ironic-inspector-dsvm-ipa-nv/1043bf2/ : SUCCESS in 49m 00s (non-voting)\n- gate-tempest-dsvm-ironic-ipa-partition-pxe_ipmitool-tinyipa-nv http://logs.openstack.org/05/347705/1/check/gate-tempest-dsvm-ironic-ipa-partition-pxe_ipmitool-tinyipa-nv/457679e/ : FAILURE in 1h 03m 45s (non-voting)\n- gate-tempest-dsvm-ironic-ipa-wholedisk-agent_ipmitool-tinyipa-nv http://logs.openstack.org/05/347705/1/check/gate-tempest-dsvm-ironic-ipa-wholedisk-agent_ipmitool-tinyipa-nv/372b3eb/ : SUCCESS in 57m 04s (non-voting)\n- gate-grenade-dsvm-ironic http://logs.openstack.org/05/347705/1/check/gate-grenade-dsvm-ironic/acc6aa4/ : SUCCESS in 1h 49m 14s\n- gate-tempest-dsvm-ironic-multitenant-network-nv http://logs.openstack.org/05/347705/1/check/gate-tempest-dsvm-ironic-multitenant-network-nv/ab55fe6/ : FAILURE in 21m 51s (non-voting)\n- ironic-coverage-db-ubuntu-xenial http://logs.openstack.org/05/347705/1/check/ironic-coverage-db-ubuntu-xenial/16e7c8f/ : SUCCESS in 4m 06s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469621484
+            }
+        ],
+        "commitMessage": "Add python 3.x classifier\n\nThere are tests for python 3.4 and 3.5 now. So we can\ntell users that Ironic supports python 3.4 and 3.5.\n\nChange-Id: Id781c6d6fd2125869604d243707fccccd0c51da0\n",
+        "createdOn": 1469610409,
+        "id": "Id781c6d6fd2125869604d243707fccccd0c51da0",
+        "lastUpdated": 1469621484,
+        "number": "347705",
+        "open": true,
+        "owner": {
+            "email": "chen.tang_at_easystack.cn",
+            "name": "Tang Chen",
+            "username": "tangchen"
+        },
+        "patchSets": [
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1469621484,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "lucasagomes_at_gmail.com",
+                            "name": "Lucas Alvares Gomes",
+                            "username": "lucasagomes"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1469610939,
+                        "type": "Code-Review",
+                        "value": "-1"
+                    }
+                ],
+                "author": {
+                    "email": "chen.tang_at_easystack.cn",
+                    "name": "Tang Chen",
+                    "username": "tangchen"
+                },
+                "createdOn": 1469610409,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "1",
+                "parents": [
+                    "f7bfa3ee73a2f94be28017212b699d07e9c7ad92"
+                ],
+                "ref": "refs/changes/05/347705/1",
+                "revision": "d2a198328c6e1c3c90ebb3041cb79c3f113fddfa",
+                "sizeDeletions": 0,
+                "sizeInsertions": 3,
+                "uploader": {
+                    "email": "chen.tang_at_easystack.cn",
+                    "name": "Tang Chen",
+                    "username": "tangchen"
+                }
+            }
+        ],
+        "project": "openstack/ironic",
+        "status": "NEW",
+        "subject": "Add python 3.x classifier",
+        "topic": "metadata-20160727",
+        "url": "https://review.openstack.org/347705"
+    },
+    "origin": "review.openstack.org",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469621778.459235,
+    "updated_on": 1469621484.0,
+    "uuid": "a60036d2f43f15b2f7ec9ea85c5f8015b569091e"
+},
+{
+    "backend_name": "Gerrit",
+    "backend_version": "0.3.0",
+    "data": {
+        "branch": "stable/mitaka",
+        "comments": [
+            {
+                "message": "Patch Set 1: Cherry Picked from branch master.",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1467731501
+            },
+            {
+                "message": "Patch Set 1: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-tripleo-heat-templates-puppet-lint http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-lint/6419462/ : SUCCESS in 7m 08s\n- gate-tripleo-heat-templates-puppet-syntax-3-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-3-centos-7/5b5018a/ : SUCCESS in 4m 01s\n- gate-tripleo-heat-templates-puppet-syntax-4-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-4-centos-7/94e1114/ : SUCCESS in 3m 10s\n- gate-tripleo-heat-templates-pep8 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-pep8/2d4831b/ : SUCCESS in 6m 57s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1467732085
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild failed (check-tripleo pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n\n- gate-tripleo-ci-centos-7-ovb-ha http://logs.openstack.org/20/337720/1/check-tripleo/gate-tripleo-ci-centos-7-ovb-ha/3ea0eb9/ : FAILURE in 1h 50m 32s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1467741747
+            },
+            {
+                "message": "Patch Set 1: Code-Review-1\n\nsee in logs:\nError: /Stage[main]/Gnocchi::Db::Sync/Exec[gnocchi-db-sync]: gnocchi-upgrade --config-file /etc/gnocchi/gnocchi.conf --skip-storage --create-legacy-resource-types returned 2 instead of one of [0]\\u001b[0m\\n\",",
+                "reviewer": {
+                    "email": "emilien_at_redhat.com",
+                    "name": "Emilien Macchi",
+                    "username": "emilienm"
+                },
+                "timestamp": 1467750032
+            },
+            {
+                "message": "Patch Set 1:\n\nhttp://logs.openstack.org/20/337720/1/check-tripleo/gate-tripleo-ci-centos-7-ovb-ha/3ea0eb9/logs/postci.txt.gz#_2016-07-05_17_57_47_000",
+                "reviewer": {
+                    "email": "emilien_at_redhat.com",
+                    "name": "Emilien Macchi",
+                    "username": "emilienm"
+                },
+                "timestamp": 1467750038
+            },
+            {
+                "message": "Patch Set 1:\n\nThis is a packaging issue. We need gnocchi 2.1 which introduces this new option. But rdo mitaka still runs 2.0.3.",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1467752310
+            },
+            {
+                "message": "Patch Set 1:\n\nhttps://review.rdoproject.org/r/1587 is switching RDO Trunk Mitaka to stable/2.1 branch",
+                "reviewer": {
+                    "email": "alan.pevec_at_redhat.com",
+                    "name": "Alan Pevec",
+                    "username": "apevec"
+                },
+                "timestamp": 1467799338
+            },
+            {
+                "message": "Patch Set 1:\n\nstable/2.1 is not in rdo/mitaka. We should be able to get this going now.",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1468606482
+            },
+            {
+                "message": "Patch Set 1:\n\nrecheck",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1468606487
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild succeeded (check pipeline).\n\n- gate-tripleo-heat-templates-puppet-lint http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-lint/62d5f69/ : SUCCESS in 3m 23s\n- gate-tripleo-heat-templates-puppet-syntax-3-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-3-centos-7/e02f0d6/ : SUCCESS in 3m 05s\n- gate-tripleo-heat-templates-puppet-syntax-4-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-4-centos-7/c157d24/ : SUCCESS in 3m 04s\n- gate-tripleo-heat-templates-pep8 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-pep8/707ab8f/ : SUCCESS in 4m 03s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1468606956
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild failed (check-tripleo pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n\n- gate-tripleo-ci-centos-7-ovb-ha http://logs.openstack.org/20/337720/1/check-tripleo/gate-tripleo-ci-centos-7-ovb-ha/21c8a9d/ : FAILURE in 15m 00s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1468607400
+            },
+            {
+                "message": "Patch Set 1:\n\nrecheck",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1468675285
+            },
+            {
+                "message": "Patch Set 1:\n\nrecheck",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1468858799
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild succeeded (check pipeline).\n\n- gate-tripleo-heat-templates-puppet-lint http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-lint/e12b90b/ : SUCCESS in 4m 25s\n- gate-tripleo-heat-templates-puppet-syntax-3-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-3-centos-7/f0c6160/ : SUCCESS in 2m 56s\n- gate-tripleo-heat-templates-puppet-syntax-4-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-4-centos-7/17da5dd/ : SUCCESS in 3m 40s\n- gate-tripleo-heat-templates-pep8 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-pep8/95dc3fb/ : SUCCESS in 3m 35s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1468859888
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild failed (check-tripleo pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n\n- gate-tripleo-ci-centos-7-ovb-ha http://logs.openstack.org/20/337720/1/check-tripleo/gate-tripleo-ci-centos-7-ovb-ha/e87a152/ : FAILURE in 17m 14s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1468866675
+            },
+            {
+                "message": "Patch Set 1:\n\nrecheck",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1468948623
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild failed (check-tripleo pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n\n- gate-tripleo-ci-centos-7-ovb-ha http://logs.openstack.org/20/337720/1/check-tripleo/gate-tripleo-ci-centos-7-ovb-ha/d68cef1/ : FAILURE in 16m 23s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1468950671
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild succeeded (check pipeline).\n\n- gate-tripleo-heat-templates-puppet-lint http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-lint/829ba60/ : SUCCESS in 3m 04s\n- gate-tripleo-heat-templates-puppet-syntax-3-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-3-centos-7/ea32d44/ : SUCCESS in 3m 03s\n- gate-tripleo-heat-templates-puppet-syntax-4-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-4-centos-7/07714b6/ : SUCCESS in 2m 40s\n- gate-tripleo-heat-templates-pep8 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-pep8/a404566/ : SUCCESS in 4m 29s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1468953591
+            },
+            {
+                "message": "Patch Set 1: -Code-Review",
+                "reviewer": {
+                    "email": "emilien_at_redhat.com",
+                    "name": "Emilien Macchi",
+                    "username": "emilienm"
+                },
+                "timestamp": 1468955960
+            },
+            {
+                "message": "Patch Set 1:\n\nrecheck",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1469017701
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild succeeded (check pipeline).\n\n- gate-tripleo-heat-templates-puppet-lint http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-lint/5df439a/ : SUCCESS in 3m 28s\n- gate-tripleo-heat-templates-puppet-syntax-3-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-3-centos-7/f4d82be/ : SUCCESS in 2m 45s\n- gate-tripleo-heat-templates-puppet-syntax-4-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-4-centos-7/8bf8b5e/ : SUCCESS in 1m 56s\n- gate-tripleo-heat-templates-pep8 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-pep8/a2a91b3/ : SUCCESS in 2m 47s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469018339
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild failed (check-tripleo pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n\n- gate-tripleo-ci-centos-7-ovb-ha http://logs.openstack.org/20/337720/1/check-tripleo/gate-tripleo-ci-centos-7-ovb-ha/0a4474f/ : FAILURE in 15m 14s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469021305
+            },
+            {
+                "message": "Patch Set 1: Code-Review+1",
+                "reviewer": {
+                    "email": "julien_at_danjou.info",
+                    "name": "Julien Danjou",
+                    "username": "jdanjou"
+                },
+                "timestamp": 1469026404
+            },
+            {
+                "message": "Patch Set 1:\n\nrecheck",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1469034472
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild succeeded (check pipeline).\n\n- gate-tripleo-heat-templates-puppet-lint http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-lint/4b2ad9d/ : SUCCESS in 5m 32s\n- gate-tripleo-heat-templates-puppet-syntax-3-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-3-centos-7/6c257c9/ : SUCCESS in 2m 55s\n- gate-tripleo-heat-templates-puppet-syntax-4-centos-7 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-puppet-syntax-4-centos-7/1803c7e/ : SUCCESS in 3m 09s\n- gate-tripleo-heat-templates-pep8 http://logs.openstack.org/20/337720/1/check/gate-tripleo-heat-templates-pep8/ec7ca90/ : SUCCESS in 3m 25s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469038614
+            },
+            {
+                "message": "Patch Set 1:\n\nrecheck",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1469044044
+            },
+            {
+                "message": "Patch Set 1:\n\nBuild failed (check-tripleo pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n\n- gate-tripleo-ci-centos-7-ovb-ha http://logs.openstack.org/20/337720/1/check-tripleo/gate-tripleo-ci-centos-7-ovb-ha/3a5c42a/ : FAILURE in 15m 31s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469045936
+            },
+            {
+                "message": "Patch Set 2: Patch Set 1 was rebased",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1469046045
+            },
+            {
+                "message": "Patch Set 2: Verified+1\n\nBuild succeeded (check pipeline).\n\n- gate-tripleo-heat-templates-puppet-lint http://logs.openstack.org/20/337720/2/check/gate-tripleo-heat-templates-puppet-lint/b750576/ : SUCCESS in 3m 49s\n- gate-tripleo-heat-templates-puppet-syntax-3-centos-7 http://logs.openstack.org/20/337720/2/check/gate-tripleo-heat-templates-puppet-syntax-3-centos-7/ccc02c7/ : SUCCESS in 3m 12s\n- gate-tripleo-heat-templates-puppet-syntax-4-centos-7 http://logs.openstack.org/20/337720/2/check/gate-tripleo-heat-templates-puppet-syntax-4-centos-7/a3c5a9a/ : SUCCESS in 4m 10s\n- gate-tripleo-heat-templates-pep8 http://logs.openstack.org/20/337720/2/check/gate-tripleo-heat-templates-pep8/91be9d8/ : SUCCESS in 4m 16s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469048404
+            },
+            {
+                "message": "Patch Set 2:\n\nBuild failed (check-tripleo pipeline).  For information on how to proceed, see http://docs.openstack.org/infra/manual/developers.html#automated-testing\n\n\n- gate-tripleo-ci-centos-7-ovb-ha http://logs.openstack.org/20/337720/2/check-tripleo/gate-tripleo-ci-centos-7-ovb-ha/43deb51/ : FAILURE in 16m 18s",
+                "reviewer": {
+                    "name": "Jenkins",
+                    "username": "jenkins"
+                },
+                "timestamp": 1469063351
+            },
+            {
+                "message": "Patch Set 2:\n\nrecheck",
+                "reviewer": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "timestamp": 1469621484
+            }
+        ],
+        "commitMessage": "Use create-legacy-resource-types during gnocchi-upgrade\n\nGnocchi 2.1 introduces a change where legacy resource types\nneeded by ceilometer are not created by default. Instead a\nnew flag is exposed to create these. We should use this by\ndefault. Note that this is an optional flag and is only\nneeded if you want to create legacy resource types.\n\nChange-Id: I95ccccb40ce4a8319d0776c4d62c2890cf1fd970\nCloses-bug: #1592449\n(cherry picked from commit 67cb6c703eaa986cbb2b9ca4cac4c9fa48c7ef60)\n",
+        "createdOn": 1467731501,
+        "id": "I95ccccb40ce4a8319d0776c4d62c2890cf1fd970",
+        "lastUpdated": 1469621484,
+        "number": "337720",
+        "open": true,
+        "owner": {
+            "email": "pkilambi_at_redhat.com",
+            "name": "Pradeep Kilambi",
+            "username": "pkilambi"
+        },
+        "patchSets": [
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1467732085,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "julien_at_danjou.info",
+                            "name": "Julien Danjou",
+                            "username": "jdanjou"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1469026404,
+                        "type": "Code-Review",
+                        "value": "1"
+                    }
+                ],
+                "author": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "createdOn": 1467731501,
+                "isDraft": false,
+                "kind": "REWORK",
+                "number": "1",
+                "parents": [
+                    "51de7044bc5ae90a76ac641068860d640c0c8d15"
+                ],
+                "ref": "refs/changes/20/337720/1",
+                "revision": "ba7e195a1175f377f21f1e058b8f717ebf6c243a",
+                "sizeDeletions": -1,
+                "sizeInsertions": 1,
+                "uploader": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                }
+            },
+            {
+                "approvals": [
+                    {
+                        "by": {
+                            "name": "Jenkins",
+                            "username": "jenkins"
+                        },
+                        "description": "Verified",
+                        "grantedOn": 1469048404,
+                        "type": "Verified",
+                        "value": "1"
+                    },
+                    {
+                        "by": {
+                            "email": "julien_at_danjou.info",
+                            "name": "Julien Danjou",
+                            "username": "jdanjou"
+                        },
+                        "description": "Code-Review",
+                        "grantedOn": 1469026404,
+                        "type": "Code-Review",
+                        "value": "1"
+                    }
+                ],
+                "author": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                },
+                "createdOn": 1469046045,
+                "isDraft": false,
+                "kind": "TRIVIAL_REBASE",
+                "number": "2",
+                "parents": [
+                    "112337e9ad7634ab6accd04d2638041673fd37fe"
+                ],
+                "ref": "refs/changes/20/337720/2",
+                "revision": "804bbed4c63ecb829c7218b676bed7f44073ebeb",
+                "sizeDeletions": -1,
+                "sizeInsertions": 1,
+                "uploader": {
+                    "email": "pkilambi_at_redhat.com",
+                    "name": "Pradeep Kilambi",
+                    "username": "pkilambi"
+                }
+            }
+        ],
+        "project": "openstack/tripleo-heat-templates",
+        "status": "NEW",
+        "subject": "Use create-legacy-resource-types during gnocchi-upgrade",
+        "topic": "bug/1592449",
+        "url": "https://review.openstack.org/337720"
+    },
+    "origin": "review.openstack.org",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469621778.46044,
+    "updated_on": 1469621484.0,
+    "uuid": "f8e830ef9145cc1ecfb0788bbf7129d48922897e"
+}]

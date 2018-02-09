@@ -1,99 +1,767 @@
-[
-{
+[{
     "backend_name": "Slack",
-    "backend_version": "0.2.0",
+    "backend_version": "0.4.0",
     "category": "message",
     "data": {
         "channel_info": {
             "created": 1480595743,
-            "creator": "U38J51N7J",
-            "id": "C38K1VD6K",
+            "creator": "U0001",
+            "id": "C011DUKE8",
             "is_archived": false,
             "is_channel": true,
             "is_general": true,
             "is_member": true,
             "is_read_only": false,
-            "last_read": "1489407934.141666",
+            "last_read": "1489127926.000217",
             "latest": {
-                "reactions": [
-                    {
-                        "count": 1,
-                        "name": "+1",
-                        "users": [
-                            "U38J51N7J"
-                        ]
-                    }
-                ],
-                "text": "Hi <@U38J51N7J>, hi everyone, Your proposal <@U38J51N7J> works for us, that is: SHALL support for Java and PHP, SHOULD support JavaScript, an option to experiment with C/C++ and MAY for other languages. Thumbs up for the PhD joining the team!",
-                "ts": "1490880518.527599",
-                "type": "message",
-                "user": "U41B9QT3K"
+                "bot_id": "B0001",
+                "subtype": "bot_message",
+                "text": "There are no events this week.",
+                "ts": "1486969200.000136",
+                "type": "message"
             },
             "members": [
-                "U41J51N7J",
-                "U41JXKU2C",
-                "U415YS2CQ",
-                "U41DMRB7H"
+                "U0001",
+                "U0002",
+                "U0003"
             ],
-            "name": "general",
-            "name_normalized": "general",
+            "name": "test channel",
+            "name_normalized": "test channel",
             "previous_names": [],
             "purpose": {
                 "creator": "",
                 "last_set": 0,
-                "value": "This channel is for team-wide communication and announcements. All team members are in this channel."
+                "value": "Test channel."
             },
             "topic": {
                 "creator": "",
                 "last_set": 0,
-                "value": "Company-wide announcements and work-based matters"
+                "value": "A test channel for testing Perceval"
             },
-            "unread_count": 3,
-            "unread_count_display": 3
+            "unread_count": 1,
+            "unread_count_display": 1
         },
-        "text": "Hi .... ",
-        "ts": "1490878537.675168",
+        "comment": {
+            "comment": "Thanks.",
+            "created": 1486999900.0,
+            "id": "ABCDEFGHI",
+            "is_intro": false,
+            "timestamp": 1486999900,
+            "user": "U0003"
+        },
+        "is_intro": false,
+        "subtype": "file_comment",
+        "text": "<@U0003|dizquierdo> commented on <@U0002|acs> file>: Thanks.",
+        "ts": "1486999900.000000",
         "type": "message",
-        "user": "U41J51N7J",
+        "user_data": {
+            "color": "674b1b",
+            "deleted": false,
+            "has_2fa": false,
+            "id": "U0003",
+            "is_admin": false,
+            "is_bot": false,
+            "is_owner": false,
+            "is_primary_owner": false,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "name": "dizquierdo",
+            "profile": {
+                "avatar_hash": "ge557006561e",
+                "email": "dizquierdo@example.com",
+                "image_192": "https://secure.gravatar.com",
+                "image_24": "https://secure.gravatar.com",
+                "image_32": "https://secure.gravatar.com",
+                "image_48": "https://secure.gravatar.com",
+                "image_512": "https://secure.gravatar.com",
+                "image_72": "https://secure.gravatar.com",
+                "real_name": "",
+                "real_name_normalized": ""
+            },
+            "real_name": "",
+            "status": null,
+            "team_id": "T0001",
+            "tz": "Europe/Amsterdam",
+            "tz_label": "Central European Time",
+            "tz_offset": 3600
+        }
+    },
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.9.10",
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1518165795.497159,
+    "updated_on": 1486999900.0,
+    "uuid": "cc2338c23bf5293308d596629c598cd5ec37d14b"
+},{
+    "backend_name": "Slack",
+    "backend_version": "0.4.0",
+    "category": "message",
+    "data": {
+        "bot_id": "B0001",
+        "channel_info": {
+            "created": 1480595743,
+            "creator": "U0001",
+            "id": "C011DUKE8",
+            "is_archived": false,
+            "is_channel": true,
+            "is_general": true,
+            "is_member": true,
+            "is_read_only": false,
+            "last_read": "1489127926.000217",
+            "latest": {
+                "bot_id": "B0001",
+                "subtype": "bot_message",
+                "text": "There are no events this week.",
+                "ts": "1486969200.000136",
+                "type": "message"
+            },
+            "members": [
+                "U0001",
+                "U0002",
+                "U0003"
+            ],
+            "name": "test channel",
+            "name_normalized": "test channel",
+            "previous_names": [],
+            "purpose": {
+                "creator": "",
+                "last_set": 0,
+                "value": "Test channel."
+            },
+            "topic": {
+                "creator": "",
+                "last_set": 0,
+                "value": "A test channel for testing Perceval"
+            },
+            "unread_count": 1,
+            "unread_count_display": 1
+        },
+        "subtype": "bot_message",
+        "text": "There are no events this week.",
+        "ts": "1486969200.000136",
+        "type": "message"
+    },
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.9.10",
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1518165795.497235,
+    "updated_on": 1486969200.000136,
+    "uuid": "b48fd01f4e010597091b7e44cecfb6074f56a1a6"
+},{
+    "backend_name": "Slack",
+    "backend_version": "0.4.0",
+    "category": "message",
+    "data": {
+        "channel_info": {
+            "created": 1480595743,
+            "creator": "U0001",
+            "id": "C011DUKE8",
+            "is_archived": false,
+            "is_channel": true,
+            "is_general": true,
+            "is_member": true,
+            "is_read_only": false,
+            "last_read": "1489127926.000217",
+            "latest": {
+                "bot_id": "B0001",
+                "subtype": "bot_message",
+                "text": "There are no events this week.",
+                "ts": "1486969200.000136",
+                "type": "message"
+            },
+            "members": [
+                "U0001",
+                "U0002",
+                "U0003"
+            ],
+            "name": "test channel",
+            "name_normalized": "test channel",
+            "previous_names": [],
+            "purpose": {
+                "creator": "",
+                "last_set": 0,
+                "value": "Test channel."
+            },
+            "topic": {
+                "creator": "",
+                "last_set": 0,
+                "value": "A test channel for testing Perceval"
+            },
+            "unread_count": 1,
+            "unread_count_display": 1
+        },
+        "subtype": "channel_join",
+        "text": "<@U0003|dizquierdo> has joined the channel",
+        "ts": "1427799888.000000",
+        "type": "message",
+        "user": "U0003",
+        "user_data": {
+            "color": "674b1b",
+            "deleted": false,
+            "has_2fa": false,
+            "id": "U0003",
+            "is_admin": false,
+            "is_bot": false,
+            "is_owner": false,
+            "is_primary_owner": false,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "name": "dizquierdo",
+            "profile": {
+                "avatar_hash": "ge557006561e",
+                "email": "dizquierdo@example.com",
+                "image_192": "https://secure.gravatar.com",
+                "image_24": "https://secure.gravatar.com",
+                "image_32": "https://secure.gravatar.com",
+                "image_48": "https://secure.gravatar.com",
+                "image_512": "https://secure.gravatar.com",
+                "image_72": "https://secure.gravatar.com",
+                "real_name": "",
+                "real_name_normalized": ""
+            },
+            "real_name": "",
+            "status": null,
+            "team_id": "T0001",
+            "tz": "Europe/Amsterdam",
+            "tz_label": "Central European Time",
+            "tz_offset": 3600
+        }
+    },
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.9.10",
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1518165795.497275,
+    "updated_on": 1427799888.0,
+    "uuid": "bb95a1facf7d61baaf57322f3d6b6d2d45af8aeb"
+},{
+    "backend_name": "Slack",
+    "backend_version": "0.4.0",
+    "category": "message",
+    "data": {
+        "channel_info": {
+            "created": 1480595743,
+            "creator": "U0001",
+            "id": "C011DUKE8",
+            "is_archived": false,
+            "is_channel": true,
+            "is_general": true,
+            "is_member": true,
+            "is_read_only": false,
+            "last_read": "1489127926.000217",
+            "latest": {
+                "bot_id": "B0001",
+                "subtype": "bot_message",
+                "text": "There are no events this week.",
+                "ts": "1486969200.000136",
+                "type": "message"
+            },
+            "members": [
+                "U0001",
+                "U0002",
+                "U0003"
+            ],
+            "name": "test channel",
+            "name_normalized": "test channel",
+            "previous_names": [],
+            "purpose": {
+                "creator": "",
+                "last_set": 0,
+                "value": "Test channel."
+            },
+            "topic": {
+                "creator": "",
+                "last_set": 0,
+                "value": "A test channel for testing Perceval"
+            },
+            "unread_count": 1,
+            "unread_count_display": 1
+        },
+        "text": "tengo el m\u00f3vil",
+        "ts": "1427135890.000071",
+        "type": "message",
+        "user": "U0002",
+        "user_data": {
+            "color": "3c989f",
+            "deleted": false,
+            "has_2fa": false,
+            "id": "U0002",
+            "is_admin": false,
+            "is_bot": false,
+            "is_owner": false,
+            "is_primary_owner": false,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "name": "jsmanrique",
+            "profile": {
+                "avatar_hash": "g9d147af7eb8",
+                "email": "jsmanrique@example.com",
+                "first_name": "Jose",
+                "image_192": "https://secure.gravatar.com",
+                "image_24": "https://secure.gravatar.com",
+                "image_32": "https://secure.gravatar.com",
+                "image_48": "https://secure.gravatar.com",
+                "image_512": "https://secure.gravatar.com",
+                "image_72": "https://secure.gravatar.com",
+                "last_name": "Manrique",
+                "real_name": "Jose Manrique",
+                "real_name_normalized": "Jose Manrique"
+            },
+            "real_name": "Jose Manrique",
+            "status": null,
+            "team_id": "T0001",
+            "tz": "Europe/Amsterdam",
+            "tz_label": "Central European Time",
+            "tz_offset": 3600
+        }
+    },
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.9.10",
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1518165795.512553,
+    "updated_on": 1427135890.000071,
+    "uuid": "f8668de6fadeb5730e0a80d4c8e5d3f8d175f4d5"
+},{
+    "backend_name": "Slack",
+    "backend_version": "0.4.0",
+    "category": "message",
+    "data": {
+        "channel_info": {
+            "created": 1480595743,
+            "creator": "U0001",
+            "id": "C011DUKE8",
+            "is_archived": false,
+            "is_channel": true,
+            "is_general": true,
+            "is_member": true,
+            "is_read_only": false,
+            "last_read": "1489127926.000217",
+            "latest": {
+                "bot_id": "B0001",
+                "subtype": "bot_message",
+                "text": "There are no events this week.",
+                "ts": "1486969200.000136",
+                "type": "message"
+            },
+            "members": [
+                "U0001",
+                "U0002",
+                "U0003"
+            ],
+            "name": "test channel",
+            "name_normalized": "test channel",
+            "previous_names": [],
+            "purpose": {
+                "creator": "",
+                "last_set": 0,
+                "value": "Test channel."
+            },
+            "topic": {
+                "creator": "",
+                "last_set": 0,
+                "value": "A test channel for testing Perceval"
+            },
+            "unread_count": 1,
+            "unread_count_display": 1
+        },
+        "text": "hey acs",
+        "ts": "1427135835.000070",
+        "type": "message",
+        "user": "U0002",
+        "user_data": {
+            "color": "3c989f",
+            "deleted": false,
+            "has_2fa": false,
+            "id": "U0002",
+            "is_admin": false,
+            "is_bot": false,
+            "is_owner": false,
+            "is_primary_owner": false,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "name": "jsmanrique",
+            "profile": {
+                "avatar_hash": "g9d147af7eb8",
+                "email": "jsmanrique@example.com",
+                "first_name": "Jose",
+                "image_192": "https://secure.gravatar.com",
+                "image_24": "https://secure.gravatar.com",
+                "image_32": "https://secure.gravatar.com",
+                "image_48": "https://secure.gravatar.com",
+                "image_512": "https://secure.gravatar.com",
+                "image_72": "https://secure.gravatar.com",
+                "last_name": "Manrique",
+                "real_name": "Jose Manrique",
+                "real_name_normalized": "Jose Manrique"
+            },
+            "real_name": "Jose Manrique",
+            "status": null,
+            "team_id": "T0001",
+            "tz": "Europe/Amsterdam",
+            "tz_label": "Central European Time",
+            "tz_offset": 3600
+        }
+    },
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.9.10",
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1518165795.512639,
+    "updated_on": 1427135835.00007,
+    "uuid": "29c2942a704c4e0b067daeb76edb2f826376cecf"
+},{
+    "backend_name": "Slack",
+    "backend_version": "0.4.0",
+    "category": "message",
+    "data": {
+        "channel_info": {
+            "created": 1480595743,
+            "creator": "U0001",
+            "id": "C011DUKE8",
+            "is_archived": false,
+            "is_channel": true,
+            "is_general": true,
+            "is_member": true,
+            "is_read_only": false,
+            "last_read": "1489127926.000217",
+            "latest": {
+                "bot_id": "B0001",
+                "subtype": "bot_message",
+                "text": "There are no events this week.",
+                "ts": "1486969200.000136",
+                "type": "message"
+            },
+            "members": [
+                "U0001",
+                "U0002",
+                "U0003"
+            ],
+            "name": "test channel",
+            "name_normalized": "test channel",
+            "previous_names": [],
+            "purpose": {
+                "creator": "",
+                "last_set": 0,
+                "value": "Test channel."
+            },
+            "topic": {
+                "creator": "",
+                "last_set": 0,
+                "value": "A test channel for testing Perceval"
+            },
+            "unread_count": 1,
+            "unread_count_display": 1
+        },
+        "text": "\u00bfvale?",
+        "ts": "1427135740.000069",
+        "type": "message",
+        "user": "U0001",
         "user_data": {
             "color": "9f69e7",
             "deleted": false,
-            "id": "U41J51N7J",
+            "has_2fa": false,
+            "id": "U0001",
             "is_admin": true,
             "is_bot": false,
             "is_owner": true,
             "is_primary_owner": true,
             "is_restricted": false,
             "is_ultra_restricted": false,
-            "name": "johny",
+            "name": "acs",
             "profile": {
-                "avatar_hash": "g4c733f36a6a",
-                "email": "jj@test.com",
-                "first_name": "Jorgen",
-                "image_192": "https://...",
-                "image_24": "https://...",
-                "image_32": "https://...",
-                "image_48": "https://...",
-                "image_512": "https://...",
-                "image_72": "https://...",
-                "last_name": "Smoith",
-                "real_name": "JS",
-                "real_name_normalized": "JS"
+                "avatar_hash": "ge934740e4ac",
+                "email": "acs@example.com",
+                "first_name": "Alvaro",
+                "image_192": "https://secure.gravatar.com",
+                "image_24": "https://secure.gravatar.com",
+                "image_32": "https://secure.gravatar.com",
+                "image_48": "https://secure.gravatar.com",
+                "image_512": "https://secure.gravatar.com",
+                "image_72": "https://secure.gravatar.com",
+                "last_name": "del Castillo",
+                "phone": "",
+                "real_name": "Alvaro del Castillo",
+                "real_name_normalized": "Alvaro del Castillo",
+                "skype": "",
+                "title": ""
             },
-            "real_name": "JS",
+            "real_name": "Alvaro del Castillo",
             "status": null,
-            "team_id": "T41C2F56Z",
+            "team_id": "T0001",
             "tz": "Europe/Amsterdam",
-            "tz_label": "Central European Summer Time",
-            "tz_offset": 7200,
-            "updated": 1480595743
+            "tz_label": "Central European Time",
+            "tz_offset": 3600
         }
     },
-    "origin": "https://slack.com/C38K1VD6K",
-    "perceval_version": "0.8.0.dev0",
-    "tag": "https://slack.com/C38K1VD6K",
-    "timestamp": 1490878646.914155,
-    "updated_on": 1490878537.675168,
-    "uuid": "6b269178a090bc865f8803a9b7be1cbe37983239"
-}
-]
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.9.10",
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1518165795.525898,
+    "updated_on": 1427135740.000069,
+    "uuid": "757e88ea008db0fff739dd261179219aedb84a95"
+},{
+    "backend_name": "Slack",
+    "backend_version": "0.4.0",
+    "category": "message",
+    "data": {
+        "channel_info": {
+            "created": 1480595743,
+            "creator": "U0001",
+            "id": "C011DUKE8",
+            "is_archived": false,
+            "is_channel": true,
+            "is_general": true,
+            "is_member": true,
+            "is_read_only": false,
+            "last_read": "1489127926.000217",
+            "latest": {
+                "bot_id": "B0001",
+                "subtype": "bot_message",
+                "text": "There are no events this week.",
+                "ts": "1486969200.000136",
+                "type": "message"
+            },
+            "members": [
+                "U0001",
+                "U0002",
+                "U0003"
+            ],
+            "name": "test channel",
+            "name_normalized": "test channel",
+            "previous_names": [],
+            "purpose": {
+                "creator": "",
+                "last_set": 0,
+                "value": "Test channel."
+            },
+            "topic": {
+                "creator": "",
+                "last_set": 0,
+                "value": "A test channel for testing Perceval"
+            },
+            "unread_count": 1,
+            "unread_count_display": 1
+        },
+        "text": "jsmanrique: tenemos que dar m\u00e9tricas super chulas",
+        "ts": "1427135733.000068",
+        "type": "message",
+        "user": "U0001",
+        "user_data": {
+            "color": "9f69e7",
+            "deleted": false,
+            "has_2fa": false,
+            "id": "U0001",
+            "is_admin": true,
+            "is_bot": false,
+            "is_owner": true,
+            "is_primary_owner": true,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "name": "acs",
+            "profile": {
+                "avatar_hash": "ge934740e4ac",
+                "email": "acs@example.com",
+                "first_name": "Alvaro",
+                "image_192": "https://secure.gravatar.com",
+                "image_24": "https://secure.gravatar.com",
+                "image_32": "https://secure.gravatar.com",
+                "image_48": "https://secure.gravatar.com",
+                "image_512": "https://secure.gravatar.com",
+                "image_72": "https://secure.gravatar.com",
+                "last_name": "del Castillo",
+                "phone": "",
+                "real_name": "Alvaro del Castillo",
+                "real_name_normalized": "Alvaro del Castillo",
+                "skype": "",
+                "title": ""
+            },
+            "real_name": "Alvaro del Castillo",
+            "status": null,
+            "team_id": "T0001",
+            "tz": "Europe/Amsterdam",
+            "tz_label": "Central European Time",
+            "tz_offset": 3600
+        }
+    },
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.9.10",
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1518165795.526138,
+    "updated_on": 1427135733.000068,
+    "uuid": "e92555381bc431a53c0b594fc118850eafd6e212"
+},{
+    "backend_name": "Slack",
+    "backend_version": "0.4.0",
+    "category": "message",
+    "data": {
+        "channel_info": {
+            "created": 1480595743,
+            "creator": "U0001",
+            "id": "C011DUKE8",
+            "is_archived": false,
+            "is_channel": true,
+            "is_general": true,
+            "is_member": true,
+            "is_read_only": false,
+            "last_read": "1489127926.000217",
+            "latest": {
+                "bot_id": "B0001",
+                "subtype": "bot_message",
+                "text": "There are no events this week.",
+                "ts": "1486969200.000136",
+                "type": "message"
+            },
+            "members": [
+                "U0001",
+                "U0002",
+                "U0003"
+            ],
+            "name": "test channel",
+            "name_normalized": "test channel",
+            "previous_names": [],
+            "purpose": {
+                "creator": "",
+                "last_set": 0,
+                "value": "Test channel."
+            },
+            "topic": {
+                "creator": "",
+                "last_set": 0,
+                "value": "A test channel for testing Perceval"
+            },
+            "unread_count": 1,
+            "unread_count_display": 1
+        },
+        "text": "hi!",
+        "ts": "1427135689.000067",
+        "type": "message",
+        "user": "U0002",
+        "user_data": {
+            "color": "3c989f",
+            "deleted": false,
+            "has_2fa": false,
+            "id": "U0002",
+            "is_admin": false,
+            "is_bot": false,
+            "is_owner": false,
+            "is_primary_owner": false,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "name": "jsmanrique",
+            "profile": {
+                "avatar_hash": "g9d147af7eb8",
+                "email": "jsmanrique@example.com",
+                "first_name": "Jose",
+                "image_192": "https://secure.gravatar.com",
+                "image_24": "https://secure.gravatar.com",
+                "image_32": "https://secure.gravatar.com",
+                "image_48": "https://secure.gravatar.com",
+                "image_512": "https://secure.gravatar.com",
+                "image_72": "https://secure.gravatar.com",
+                "last_name": "Manrique",
+                "real_name": "Jose Manrique",
+                "real_name_normalized": "Jose Manrique"
+            },
+            "real_name": "Jose Manrique",
+            "status": null,
+            "team_id": "T0001",
+            "tz": "Europe/Amsterdam",
+            "tz_label": "Central European Time",
+            "tz_offset": 3600
+        }
+    },
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.9.10",
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1518165795.539717,
+    "updated_on": 1427135689.000067,
+    "uuid": "b92892e7b65add0e83d0839de20b2375a42014e8"
+},{
+    "backend_name": "Slack",
+    "backend_version": "0.4.0",
+    "category": "message",
+    "data": {
+        "channel_info": {
+            "created": 1480595743,
+            "creator": "U0001",
+            "id": "C011DUKE8",
+            "is_archived": false,
+            "is_channel": true,
+            "is_general": true,
+            "is_member": true,
+            "is_read_only": false,
+            "last_read": "1489127926.000217",
+            "latest": {
+                "bot_id": "B0001",
+                "subtype": "bot_message",
+                "text": "There are no events this week.",
+                "ts": "1486969200.000136",
+                "type": "message"
+            },
+            "members": [
+                "U0001",
+                "U0002",
+                "U0003"
+            ],
+            "name": "test channel",
+            "name_normalized": "test channel",
+            "previous_names": [],
+            "purpose": {
+                "creator": "",
+                "last_set": 0,
+                "value": "Test channel."
+            },
+            "topic": {
+                "creator": "",
+                "last_set": 0,
+                "value": "A test channel for testing Perceval"
+            },
+            "unread_count": 1,
+            "unread_count_display": 1
+        },
+        "text": "hi!",
+        "ts": "1427135634.000066",
+        "type": "message",
+        "user": "U0001",
+        "user_data": {
+            "color": "9f69e7",
+            "deleted": false,
+            "has_2fa": false,
+            "id": "U0001",
+            "is_admin": true,
+            "is_bot": false,
+            "is_owner": true,
+            "is_primary_owner": true,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "name": "acs",
+            "profile": {
+                "avatar_hash": "ge934740e4ac",
+                "email": "acs@example.com",
+                "first_name": "Alvaro",
+                "image_192": "https://secure.gravatar.com",
+                "image_24": "https://secure.gravatar.com",
+                "image_32": "https://secure.gravatar.com",
+                "image_48": "https://secure.gravatar.com",
+                "image_512": "https://secure.gravatar.com",
+                "image_72": "https://secure.gravatar.com",
+                "last_name": "del Castillo",
+                "phone": "",
+                "real_name": "Alvaro del Castillo",
+                "real_name_normalized": "Alvaro del Castillo",
+                "skype": "",
+                "title": ""
+            },
+            "real_name": "Alvaro del Castillo",
+            "status": null,
+            "team_id": "T0001",
+            "tz": "Europe/Amsterdam",
+            "tz_label": "Central European Time",
+            "tz_offset": 3600
+        }
+    },
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.9.10",
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1518165795.539766,
+    "updated_on": 1427135634.000066,
+    "uuid": "e59d9ca0d9a2ba1c747dc60a0904edd22d69e20e"
+}]

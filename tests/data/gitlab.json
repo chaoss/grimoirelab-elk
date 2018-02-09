@@ -1,0 +1,416 @@
+[{
+    "backend_name": "GitLab",
+    "backend_version": "0.1.0",
+    "category": "issue",
+    "data": {
+        "assignee": {
+            "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+            "id": 1,
+            "name": "Timothy Engler",
+            "state": "active",
+            "username": "redfish64",
+            "web_url": "https://gitlab.com/redfish64"
+        },
+        "assignees": [
+            {
+                "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+                "id": 1,
+                "name": "Timothy Engler",
+                "state": "active",
+                "username": "redfish64",
+                "web_url": "https://gitlab.com/redfish64"
+            }
+        ],
+        "author": {
+            "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+            "id": 1,
+            "name": "Timothy Engler",
+            "state": "active",
+            "username": "redfish64",
+            "web_url": "https://gitlab.com/redfish64"
+        },
+        "award_emoji_data": [
+            {
+                "awardable_id": 4368539,
+                "awardable_type": "Issue",
+                "created_at": "2017-02-14T07:37:28.237Z",
+                "id": 220847,
+                "name": "map",
+                "updated_at": "2017-02-14T07:37:28.237Z",
+                "user": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+                    "id": 1,
+                    "name": "Timothy Engler",
+                    "state": "active",
+                    "username": "redfish64",
+                    "web_url": "https://gitlab.com/redfish64"
+                }
+            },
+            {
+                "awardable_id": 4509661,
+                "awardable_type": "Issue",
+                "created_at": "2017-02-23T13:43:10.098Z",
+                "id": 226432,
+                "name": "thumbsup",
+                "updated_at": "2017-02-23T13:43:10.098Z",
+                "user": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/165370ed8ecc66deca004a8499589b6b?s=80&d=identicon",
+                    "id": 2,
+                    "name": "Yoeri Nijs",
+                    "state": "active",
+                    "username": "YoeriNijs",
+                    "web_url": "https://gitlab.com/YoeriNijs"
+                }
+            }
+        ],
+        "closed_at": null,
+        "confidential": false,
+        "created_at": "2017-03-17T03:44:12.073Z",
+        "description": "From: https://f-droid.org/wiki/index.php?title=com.rareventure.gps2/lastbuild_71&redirect=no\r\n\r\n```\r\nFAILURE: Build failed with an exception.\r\n\r\n* What went wrong:\r\nA problem occurred configuring project ':demo'.\r\n> Could not resolve all dependencies for configuration ':demo:_debugApk'.\r\n   > A problem occurred configuring project ':tangram'.\r\n      > Failed to install the following SDK components:\r\n        [CMake 3.6.3155560]\r\n        The SDK directory (/home/vagrant/android-sdk) is not writeable,\r\n        please update the directory permissions.\r\n```",
+        "discussion_locked": null,
+        "downvotes": 0,
+        "due_date": null,
+        "id": 1,
+        "iid": 1,
+        "labels": [],
+        "milestone": null,
+        "notes_data": [
+            {
+                "attachment": null,
+                "author": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+                    "id": 1,
+                    "name": "Timothy Engler",
+                    "state": "active",
+                    "username": "redfish64",
+                    "web_url": "https://gitlab.com/redfish64"
+                },
+                "award_emoji_data": [
+                    {
+                        "awardable_id": 4368539,
+                        "awardable_type": "Issue",
+                        "created_at": "2017-02-14T07:37:28.237Z",
+                        "id": 220847,
+                        "name": "map",
+                        "updated_at": "2017-02-14T07:37:28.237Z",
+                        "user": {
+                            "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+                            "id": 1,
+                            "name": "Timothy Engler",
+                            "state": "active",
+                            "username": "redfish64",
+                            "web_url": "https://gitlab.com/redfish64"
+                        }
+                    },
+                    {
+                        "awardable_id": 4509661,
+                        "awardable_type": "Issue",
+                        "created_at": "2017-02-23T13:43:10.098Z",
+                        "id": 226432,
+                        "name": "thumbsup",
+                        "updated_at": "2017-02-23T13:43:10.098Z",
+                        "user": {
+                            "avatar_url": "https://secure.gravatar.com/avatar/165370ed8ecc66deca004a8499589b6b?s=80&d=identicon",
+                            "id": 2,
+                            "name": "Yoeri Nijs",
+                            "state": "active",
+                            "username": "YoeriNijs",
+                            "web_url": "https://gitlab.com/YoeriNijs"
+                        }
+                    }
+                ],
+                "body": "moved to fdroidserver#268",
+                "created_at": "2017-03-18T14:44:19.482Z",
+                "id": 1,
+                "noteable_id": 4741612,
+                "noteable_iid": 639,
+                "noteable_type": "Issue",
+                "system": true,
+                "updated_at": "2017-03-18T14:44:19.482Z"
+            },
+            {
+                "attachment": null,
+                "author": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+                    "id": 1,
+                    "name": "Timothy Engler",
+                    "state": "active",
+                    "username": "redfish64",
+                    "web_url": "https://gitlab.com/redfish64"
+                },
+                "award_emoji_data": [],
+                "body": "Nothing on my side to fix, moving to server.",
+                "created_at": "2017-03-18T14:43:38.132Z",
+                "id": 2,
+                "noteable_id": 4741612,
+                "noteable_iid": 639,
+                "noteable_type": "Issue",
+                "system": false,
+                "updated_at": "2017-03-18T14:43:38.132Z"
+            }
+        ],
+        "project_id": 1,
+        "state": "closed",
+        "time_stats": {
+            "human_time_estimate": null,
+            "human_total_time_spent": null,
+            "time_estimate": 0,
+            "total_time_spent": 0
+        },
+        "title": "bad directory permissions when building TTT?",
+        "updated_at": "2016-03-18T14:44:19.566Z",
+        "upvotes": 0,
+        "user_notes_count": 1,
+        "web_url": "https://gitlab.com/fdroid/fdroiddata/issues/639",
+        "weight": null
+    },
+    "origin": "https://gitlab.com/fdroid/fdroiddata",
+    "perceval_version": "0.9.10",
+    "tag": "https://gitlab.com/fdroid/fdroiddata",
+    "timestamp": 1518165263.066529,
+    "updated_on": 1458312259.566,
+    "uuid": "ae231b1236212fab4c52303fec6ac30e105a55ed"
+},{
+    "backend_name": "GitLab",
+    "backend_version": "0.1.0",
+    "category": "issue",
+    "data": {
+        "assignee": null,
+        "assignees": [],
+        "author": {
+            "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+            "id": 1,
+            "name": "Timothy Engler",
+            "state": "active",
+            "username": "redfish64",
+            "web_url": "https://gitlab.com/redfish64"
+        },
+        "award_emoji_data": [],
+        "closed_at": null,
+        "confidential": false,
+        "created_at": "2017-03-18T09:52:55.303Z",
+        "description": "Feeder (com.nononsenseapps.feeder) unnecessary require Android 7.0\n\nPlease compile it with lower minSDK.",
+        "discussion_locked": null,
+        "downvotes": 0,
+        "due_date": null,
+        "id": 2,
+        "iid": 2,
+        "labels": [],
+        "milestone": null,
+        "notes_data": [
+            {
+                "attachment": null,
+                "author": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+                    "id": 1,
+                    "name": "Timothy Engler",
+                    "state": "active",
+                    "username": "redfish64",
+                    "web_url": "https://gitlab.com/redfish64"
+                },
+                "award_emoji_data": [],
+                "body": "https://github.com/spacecowboy/Feeder/issues/13",
+                "created_at": "2017-03-18T18:36:39.757Z",
+                "id": 1,
+                "noteable_id": 4756532,
+                "noteable_iid": 641,
+                "noteable_type": "Issue",
+                "system": false,
+                "updated_at": "2017-03-18T18:36:39.757Z"
+            }
+        ],
+        "project_id": 1,
+        "state": "closed",
+        "time_stats": {
+            "human_time_estimate": null,
+            "human_total_time_spent": null,
+            "time_estimate": 0,
+            "total_time_spent": 0
+        },
+        "title": "Feeder (com.nononsenseapps.feeder) unnecessary require Android 7.0",
+        "updated_at": "2017-03-18T18:36:39.764Z",
+        "upvotes": 0,
+        "user_notes_count": 2,
+        "web_url": "https://gitlab.com/fdroid/fdroiddata/issues/641",
+        "weight": null
+    },
+    "origin": "https://gitlab.com/fdroid/fdroiddata",
+    "perceval_version": "0.9.10",
+    "tag": "https://gitlab.com/fdroid/fdroiddata",
+    "timestamp": 1518165263.102124,
+    "updated_on": 1489862199.764,
+    "uuid": "d7719c1bc73d829fbfa89fe57c9c9eeedfb076d1"
+},{
+    "backend_name": "GitLab",
+    "backend_version": "0.1.0",
+    "category": "issue",
+    "data": {
+        "assignee": null,
+        "assignees": [],
+        "author": {
+            "avatar_url": "https://secure.gravatar.com/avatar/165370ed8ecc66deca004a8499589b6b?s=80&d=identicon",
+            "id": 2,
+            "name": "Yoeri Nijs",
+            "state": "active",
+            "username": "YoeriNijs",
+            "web_url": "https://gitlab.com/YoeriNijs"
+        },
+        "award_emoji_data": [
+            {
+                "awardable_id": 4368539,
+                "awardable_type": "Issue",
+                "created_at": "2017-02-14T07:37:28.237Z",
+                "id": 220847,
+                "name": "map",
+                "updated_at": "2017-02-14T07:37:28.237Z",
+                "user": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+                    "id": 1,
+                    "name": "Timothy Engler",
+                    "state": "active",
+                    "username": "redfish64",
+                    "web_url": "https://gitlab.com/redfish64"
+                }
+            },
+            {
+                "awardable_id": 4509661,
+                "awardable_type": "Issue",
+                "created_at": "2017-02-23T13:43:10.098Z",
+                "id": 226432,
+                "name": "thumbsup",
+                "updated_at": "2017-02-23T13:43:10.098Z",
+                "user": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/165370ed8ecc66deca004a8499589b6b?s=80&d=identicon",
+                    "id": 2,
+                    "name": "Yoeri Nijs",
+                    "state": "active",
+                    "username": "YoeriNijs",
+                    "web_url": "https://gitlab.com/YoeriNijs"
+                }
+            }
+        ],
+        "closed_at": null,
+        "confidential": false,
+        "created_at": "2017-03-18T19:02:11.291Z",
+        "description": "Current version of NodeBuddy in F-Droid is outdated. Some bugfixes are implemented in the new release, v1.0.1. Request is to update the current build.",
+        "discussion_locked": null,
+        "downvotes": 0,
+        "due_date": null,
+        "id": 3,
+        "iid": 3,
+        "labels": [],
+        "milestone": null,
+        "notes_data": [
+            {
+                "attachment": null,
+                "author": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/165370ed8ecc66deca004a8499589b6b?s=80&d=identicon",
+                    "id": 2,
+                    "name": "Yoeri Nijs",
+                    "state": "active",
+                    "username": "YoeriNijs",
+                    "web_url": "https://gitlab.com/YoeriNijs"
+                },
+                "award_emoji_data": [],
+                "body": "closed",
+                "created_at": "2017-03-18T19:29:36.614Z",
+                "id": 1,
+                "noteable_id": 4759442,
+                "noteable_iid": 642,
+                "noteable_type": "Issue",
+                "system": true,
+                "updated_at": "2017-03-18T19:29:36.614Z"
+            }
+        ],
+        "project_id": 1,
+        "state": "closed",
+        "time_stats": {
+            "human_time_estimate": null,
+            "human_total_time_spent": null,
+            "time_estimate": 0,
+            "total_time_spent": 0
+        },
+        "title": "Outdated: NoteBuddy",
+        "updated_at": "2017-03-18T19:29:36.617Z",
+        "upvotes": 0,
+        "user_notes_count": 0,
+        "web_url": "https://gitlab.com/fdroid/fdroiddata/issues/642",
+        "weight": null
+    },
+    "origin": "https://gitlab.com/fdroid/fdroiddata",
+    "perceval_version": "0.9.10",
+    "tag": "https://gitlab.com/fdroid/fdroiddata",
+    "timestamp": 1518165263.149937,
+    "updated_on": 1489865376.617,
+    "uuid": "a0ed19c0659e412804beb34bb0dce7ed9529e0a2"
+},{
+    "backend_name": "GitLab",
+    "backend_version": "0.1.0",
+    "category": "issue",
+    "data": {
+        "assignee": null,
+        "assignees": [],
+        "author": {
+            "avatar_url": "https://secure.gravatar.com/avatar/165370ed8ecc66deca004a8499589b6b?s=80&d=identicon",
+            "id": 2,
+            "name": "Yoeri Nijs",
+            "state": "active",
+            "username": "YoeriNijs",
+            "web_url": "https://gitlab.com/YoeriNijs"
+        },
+        "award_emoji_data": [],
+        "closed_at": null,
+        "confidential": false,
+        "created_at": "2017-03-13T17:10:38.734Z",
+        "description": "The Gitlab username has been changed, so the links in the metadata for Starun need to be updated to the following:\n\nWeb Site:https://gitlab.com/atorresm/Starun \n\nSource Code:https://gitlab.com/atorresm/Starun/tree/HEAD\n\nIssue Tracker:https://gitlab.com/atorresm/Starun/issues \n\nChangelog:https://gitlab.com/atorresm/Starun/blob/HEAD/CHANGELOG\n\nRepo:https://gitlab.com/atorresm/Starun.git",
+        "discussion_locked": null,
+        "downvotes": 0,
+        "due_date": null,
+        "id": 4,
+        "iid": 4,
+        "labels": [],
+        "milestone": null,
+        "notes_data": [
+            {
+                "attachment": null,
+                "author": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/165370ed8ecc66deca004a8499589b6b?s=80&d=identicon",
+                    "id": 2,
+                    "name": "Yoeri Nijs",
+                    "state": "active",
+                    "username": "YoeriNijs",
+                    "web_url": "https://gitlab.com/YoeriNijs"
+                },
+                "award_emoji_data": [],
+                "body": "closed",
+                "created_at": "2017-03-15T22:55:49.337Z",
+                "id": 1,
+                "noteable_id": 4693060,
+                "noteable_iid": 635,
+                "noteable_type": "Issue",
+                "system": true,
+                "updated_at": "2017-03-15T22:55:49.337Z"
+            }
+        ],
+        "project_id": 1,
+        "state": "closed",
+        "time_stats": {
+            "human_time_estimate": null,
+            "human_total_time_spent": null,
+            "time_estimate": 0,
+            "total_time_spent": 0
+        },
+        "title": "Update Starun links",
+        "updated_at": "2017-03-18T23:21:05.911Z",
+        "upvotes": 0,
+        "user_notes_count": 0,
+        "web_url": "https://gitlab.com/fdroid/fdroiddata/issues/636",
+        "weight": null
+    },
+    "origin": "https://gitlab.com/fdroid/fdroiddata",
+    "perceval_version": "0.9.10",
+    "tag": "https://gitlab.com/fdroid/fdroiddata",
+    "timestamp": 1518165263.178882,
+    "updated_on": 1489879265.911,
+    "uuid": "f165360164293e94ee2c27af82ffc0fa36a6f5fc"
+}]

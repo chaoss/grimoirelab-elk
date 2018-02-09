@@ -1,0 +1,103 @@
+[{
+    "backend_name": "Telegram",
+    "backend_version": "0.2.0",
+    "data": {
+        "message": {
+            "chat": {
+                "id": -1130512,
+                "title": "Bitorgia",
+                "type": "group"
+            },
+            "date": 1469619378,
+            "entities": [
+                {
+                    "length": 12,
+                    "offset": 5,
+                    "type": "mention"
+                }
+            ],
+            "from": {
+                "first_name": "Alvaro",
+                "id": 792173,
+                "username": "delalvaro"
+            },
+            "message_id": 593,
+            "text": "S\u00ef,  @owltest_bot sigue escuchando y se pueden bajar los mensajes"
+        },
+        "update_id": 151824225
+    },
+    "offset": 151824225,
+    "origin": "https://telegram.org/owltestbot",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619462.384875,
+    "updated_on": 1469619378.0,
+    "uuid": "a7bc0733cf7665cba886455dd4100e0cf44ffa11"
+},
+{
+    "backend_name": "Telegram",
+    "backend_version": "0.2.0",
+    "data": {
+        "message": {
+            "chat": {
+                "id": -1130512,
+                "title": "Botergia",
+                "type": "group"
+            },
+            "date": 1469619394,
+            "from": {
+                "first_name": "Alvaro",
+                "id": 792173,
+                "username": "delalvaro"
+            },
+            "message_id": 594,
+            "text": "otro mensaje de prueba para los datos de logs de pruebas!"
+        },
+        "update_id": 151824226
+    },
+    "offset": 151824226,
+    "origin": "https://telegram.org/owltestbot",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619462.385428,
+    "updated_on": 1469619394.0,
+    "uuid": "1fbc634264533f96601045f8e41c1f92fd3b80a8"
+},
+{
+    "backend_name": "Telegram",
+    "backend_version": "0.2.0",
+    "data": {
+        "message": {
+            "chat": {
+                "id": -1130512,
+                "title": "Botergia",
+                "type": "group"
+            },
+            "date": 1469619457,
+            "from": {
+                "first_name": "Alvaro",
+                "id": 792173,
+                "username": "delalvaro"
+            },
+            "message_id": 595,
+            "sticker": {
+                "emoji": "\ud83d\udc18",
+                "file_id": "BQADAgAD7gAD9HsZAAFCdfFWtd5o1gI",
+                "file_size": 34348,
+                "height": 512,
+                "thumb": {
+                    "file_id": "AAQCABO-o1kqAARdN9Z7Y4p-PmA7AAIC",
+                    "file_size": 5672,
+                    "height": 128,
+                    "width": 128
+                },
+                "width": 512
+            }
+        },
+        "update_id": 151824227
+    },
+    "offset": 151824227,
+    "origin": "https://telegram.org/owltestbot",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619462.385735,
+    "updated_on": 1469619457.0,
+    "uuid": "75444105ebfc0bba1e019eb27db45ca3a3c7e92f"
+}]

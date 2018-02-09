@@ -1,99 +1,65 @@
 [{
     "backend_name": "HyperKitty",
-    "backend_version": "0.1.0",
+    "backend_version": "0.2.0",
     "category": "message",
     "data": {
-        "Content-Type": "multipart/mixed; boundary=\"===============1620484253328270364==\"",
-        "Date": "Tue, 31 Jan 2017 18:24:24 -0500",
-        "From": "ddw David Wilson <ddw.256 at gmail.com>",
-        "MIME-Version": "1.0",
-        "Message-ID": "<0be0c9d9-7ac9-104e-da0c-08561131829e@gmail.com>",
-        "Subject": "[MM3-users] Mailman 3 Status Update Please?",
-        "To": "mailman-users at mailman3.org",
+        "Date": "Thu, 14 Apr 2016 11:06:56 +0200",
+        "From": "jgb at example.com (Jesus M. Gonzalez-Barahona)",
+        "Message-ID": "<1460624816.5581.114.camel@example.com>",
+        "Subject": "[Metrics-grimoire] [GrimoireLab] Presenting GrimoireLab",
         "body": {
-            "plain": "Barry et al;\n\nI have been eagerly looking forward to a comprehensive install script \nfor Mailman3 since the originally stated target date of Aug Sept and \nwondered if any new dates have been proposed?\n\nFurthermore, I wonder if either of the two following projects have been \nproposed for Google Summer of Code applications:\n\n1) the afore mentioned comprehensive install script for Mailman3 on \nvarious targeted hardware; and/or;\n\n2) updated for Python 3 and the latest P3 compatible Django utilities \nfor archiving and email list collection, along with any new appropriate \nfeatures?\n\nMany thanks in advance for all your efforts in this extremely worthwhile \nOSS project.\n\nBest regards.\n\nDave Wilson\n"
+            "plain": "Hi all,\n\nThis is to present GrimoreLab [1] to this mailing list. GrimoireLab is\nintended to become a full platform for software development analytics,\nfrom data retrieval to visualization. It is a complete redesign,\nstarting from scratch, of everything in MetricsGrimoire a vizGrimoire.?\n\nAfter the experience of many years with *Grimoire, the idea is to write\nmore efficient, more flexible, more integrated and more capable tools.\nFor now, Bitergia is leading the developing effort, since it intends to\nuse GrimoireLab for its business, but anyone is welcome to join the\neffort (including, of course, all of you).\n\nIf you don't mind, we intend to use this mailing list (with the tag\n[GrimoireLab] in the subject, as in this message) to discuss about this\nnew system.\n\nIf you're interested in some more details, have a look at the\npresentation I delivered recently at the Collab Summit [2].\n\nComments are welcome.\n\nSaludos,\n\n\tJesus.\n\n[1]?http://grimoirelab.github.io/\n\n[2]?https://speakerdeck.com/jgbarah/grimoirelab-a-tool-for-open-develop\nment-analytics\n\n-- \nhttp://twitter.com/jgbarah????????? http://gsyc.es/~jgb\n\n"
         },
-        "unixfrom": "ddw.256 at gmail.com Wed Feb  1 06:31:51 2017"
+        "unixfrom": "jgb at example.com  Thu Apr 14 11:06:56 2016"
     },
-    "origin": "https://lists.mailman3.org/archives/list/mailman-users@mailman3.org",
-    "perceval_version": "0.7.0.dev1",
-    "tag": "https://lists.mailman3.org/archives/list/mailman-users@mailman3.org",
-    "timestamp": 1487325245.832878,
-    "updated_on": 1485905064.0,
-    "uuid": "c282e21baddf3d429c72a990dd5b3fb0c3fe48db"
-},
-{
+    "origin": "http://example.com/archives/list/test@example.com/",
+    "perceval_version": "0.9.10",
+    "tag": "http://example.com/archives/list/test@example.com/",
+    "timestamp": 1518176840.377762,
+    "updated_on": 1460624816.0,
+    "uuid": "26ad05669b2d2e6f6a8e244b2fd65cefafdb3d53"
+},{
     "backend_name": "HyperKitty",
-    "backend_version": "0.1.0",
+    "backend_version": "0.2.0",
     "category": "message",
     "data": {
-        "Content-Type": "multipart/mixed; boundary=\"===============6585135661985763360==\"",
-        "Date": "Wed, 01 Feb 2017 10:35:34 -0500",
-        "From": "Barry Warsaw <barry at list.org>",
-        "In-Reply-To": "0be0c9d9-7ac9-104e-da0c-08561131829e@gmail.com",
-        "MIME-Version": "1.0",
-        "Message-ID": "<20170201103534.1663d832@subdivisions.wooz.org>",
-        "Subject": "[MM3-users] Re: Mailman 3 Status Update Please?",
-        "To": "mailman-users at mailman3.org",
+        "Date": "Sat, 23 Apr 2016 18:18:56 +0200",
+        "From": "andy at example.com (Andy Grunwald)",
+        "In-Reply-To": "<1460624816.5581.114.camel@example.com>",
+        "Message-ID": "<CACRHdMZgAgzyhewu_aAJ2f2DWHVZdNH6J7zd2S=YWQuf-2yZDw@example.com>",
+        "References": "<1460624816.5581.114.camel@example.com>",
+        "Subject": "[Metrics-grimoire] [GrimoireLab] Presenting GrimoireLab",
         "body": {
-            "plain": "Hi David,\n\nOn Jan 31, 2017, at 06:24 PM, ddw David Wilson wrote:\n\n>I have been eagerly looking forward to a comprehensive install script for\n>Mailman3 since the originally stated target date of Aug Sept and wondered if\n>any new dates have been proposed?\n\nWe're very close I think.  Core is essentially done.  I've made a pass through\nthe Postorius, HyperKitty, and mailmanclient milestones and there's not a lot\nleft, but both of the former two could probably use some help getting to the\nfinish line.  I'm going to spend some time on mailmanclient.  gitlab.com is\ndown right now so I can't provide any links.\n\n>Furthermore, I wonder if either of the two following projects have been\n>proposed for Google Summer of Code applications:\n>\n>1) the afore mentioned comprehensive install script for Mailman3 on various\n>targeted hardware; and/or;\n\nWe've been debating about the best way to do this, and right now the only\nthing we can agree on is that mailman-bundler needs to go away. ;)\n\nWe know we want distro packages, but that's a longer term prospect.  I suspect\nwe want some container-based deployment options too, and I know that there are\nseveral dockerfiles floating around, but none are currently blessed\nofficially.  It's possible we won't have one single official deploy method,\nbut instead we'll encourage experimentation and help to promote the best\noptions in the short term, perhaps with adoption in the longer term.  I don't\nhave a more solid answer than that, but I highly encourage anybody who has an\ninterest in this to come to mailman-developers@ and help us get there.\n\n>2) updated for Python 3 and the latest P3 compatible Django utilities for\n>archiving and email list collection, along with any new appropriate features?\n\nThat's a great question for the Postorius and HyperKitty folks.  Core is\nPython 3 already (and only), while P and HK should support both on Django.\nmailmanclient is and will remain bilingual.\n\n>Many thanks in advance for all your efforts in this extremely worthwhile OSS\n>project.\n\nThank!  We have a small team of core developers, but they are really awesome.\nAnd of course, we welcome new contributors!\n\nCheers,\n-Barry"
+            "plain": "Thank you Jesus.\nFor me it is fine to use this mailinglist.\n\nOne question: The old tools (CVSAnaly, MLStats, ...) are deprecated /\nobsolete and get no further development from your side anymore?\n\nAndy\n\n2016-04-14 11:06 GMT+02:00 Jesus M. Gonzalez-Barahona <jgb at example.com>:\n\n> Hi all,\n>\n> This is to present GrimoreLab [1] to this mailing list. GrimoireLab is\n> intended to become a full platform for software development analytics,\n> from data retrieval to visualization. It is a complete redesign,\n> starting from scratch, of everything in MetricsGrimoire a vizGrimoire.\n>\n> After the experience of many years with *Grimoire, the idea is to write\n> more efficient, more flexible, more integrated and more capable tools.\n> For now, Bitergia is leading the developing effort, since it intends to\n> use GrimoireLab for its business, but anyone is welcome to join the\n> effort (including, of course, all of you).\n>\n> If you don't mind, we intend to use this mailing list (with the tag\n> [GrimoireLab] in the subject, as in this message) to discuss about this\n> new system.\n>\n> If you're interested in some more details, have a look at the\n> presentation I delivered recently at the Collab Summit [2].\n>\n> Comments are welcome.\n>\n> Saludos,\n>\n>         Jesus.\n>\n> [1] http://grimoirelab.github.io/\n>\n> [2] https://speakerdeck.com/jgbarah/grimoirelab-a-tool-for-open-develop\n> ment-analytics\n>\n> --\n> http://twitter.com/jgbarah          http://gsyc.es/~jgb\n>\n> _______________________________________________\n> Metrics-Grimoire mailing list\n> Metrics-Grimoire at lists.libresoft.es\n> https://lists.libresoft.es/listinfo/metrics-grimoire\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <http://lists.libresoft.es/pipermail/metrics-grimoire/attachments/20160423/30a5c1ca/attachment.html>\n"
         },
-        "unixfrom": "barry at list.org Wed Feb  1 15:35:39 2017"
+        "unixfrom": "andy at example.com  Sat Apr 23 18:18:56 2016"
     },
-    "origin": "https://lists.mailman3.org/archives/list/mailman-users@mailman3.org",
-    "perceval_version": "0.7.0.dev1",
-    "tag": "https://lists.mailman3.org/archives/list/mailman-users@mailman3.org",
-    "timestamp": 1487325245.835195,
-    "updated_on": 1485963334.0,
-    "uuid": "80887079cb7555174ad8b72ce4711fc2aa67c91c"
-},
-{
+    "origin": "http://example.com/archives/list/test@example.com/",
+    "perceval_version": "0.9.10",
+    "tag": "http://example.com/archives/list/test@example.com/",
+    "timestamp": 1518176840.379302,
+    "updated_on": 1461428336.0,
+    "uuid": "c785b05dd2a267d267e8497303157cea4a871838"
+},{
     "backend_name": "HyperKitty",
-    "backend_version": "0.1.0",
+    "backend_version": "0.2.0",
     "category": "message",
     "data": {
-        "Content-Type": "multipart/mixed; boundary=\"===============2922373100601802448==\"",
-        "Date": "Wed, 01 Feb 2017 16:39:55 +0100",
-        "From": "Simon Hanna <simon.hanna at serve-me.info>",
-        "In-Reply-To": "20170201103534.1663d832@subdivisions.wooz.org",
-        "MIME-Version": "1.0",
-        "Message-ID": "<e6090619-32d9-6bac-7417-7c8ab524ea13@serve-me.info>",
-        "Subject": "[MM3-users] Re: Mailman 3 Status Update Please?",
-        "To": "mailman-users at mailman3.org",
+        "Date": "Tue, 26 Apr 2016 00:00:07 +0200",
+        "From": "jgb at example.com (Jesus M. Gonzalez-Barahona)",
+        "In-Reply-To": "<CACRHdMZgAgzyhewu_aAJ2f2DWHVZdNH6J7zd2S=YWQuf-2yZDw@example.com>",
+        "Message-ID": "<1461621607.19185.342.camel@example.com>",
+        "References": "<1460624816.5581.114.camel@example.com>\n\t<CACRHdMZgAgzyhewu_aAJ2f2DWHVZdNH6J7zd2S=YWQuf-2yZDw@example.com>",
+        "Subject": "[Metrics-grimoire] [GrimoireLab] Presenting GrimoireLab",
         "body": {
-            "plain": "\n>> 2) updated for Python 3 and the latest P3 compatible Django utilities for\n>> archiving and email list collection, along with any new appropriate features?\n> That's a great question for the Postorius and HyperKitty folks.  Core is\n> Python 3 already (and only), while P and HK should support both on Django.\n> mailmanclient is and will remain bilingual.\nCorrection: Neither Postorius nor Hyperkitty currently support Python 3.\nThe only thing blocking Postorius is django-mailman3.\n(I have a mr for the changes needed to the Postorius' code)\nI'm not sure about the status of hyperkitty."
+            "plain": "On Sat, 2016-04-23 at 18:18 +0200, Andy Grunwald wrote:\n> Thank you Jesus.\n> For me it is fine to use this mailinglist.\n\nGreat.\n\n> One question: The old tools (CVSAnaly, MLStats, ...) are deprecated /\n> obsolete and get no further development from your side anymore?\n\nAt least for a while, we're planning to still maintain them. For now,\nwe're still using them, and basing some services on them. But with\ntime, the new tools should provide all their functionality, and likely\nBitergia will no longer actively maintain them. Which doesn't mean that\nsome of their developers (be them hired by Bitergia or not) still\nmaintain them in their own time.\n\nSaludos,\n\n\tJesus.\n\n> Andy\n> \n> 2016-04-14 11:06 GMT+02:00 Jesus M. Gonzalez-Barahona <jgb at example.com>:\n> > Hi all,\n> > \n> > This is to present GrimoreLab [1] to this mailing list. GrimoireLab\n> > is\n> > intended to become a full platform for software development\n> > analytics,\n> > from data retrieval to visualization. It is a complete redesign,\n> > starting from scratch, of everything in MetricsGrimoire a\n> > vizGrimoire.?\n> > \n> > After the experience of many years with *Grimoire, the idea is to\n> > write\n> > more efficient, more flexible, more integrated and more capable\n> > tools.\n> > For now, Bitergia is leading the developing effort, since it\n> > intends to\n> > use GrimoireLab for its business, but anyone is welcome to join the\n> > effort (including, of course, all of you).\n> > \n> > If you don't mind, we intend to use this mailing list (with the tag\n> > [GrimoireLab] in the subject, as in this message) to discuss about\n> > this\n> > new system.\n> > \n> > If you're interested in some more details, have a look at the\n> > presentation I delivered recently at the Collab Summit [2].\n> > \n> > Comments are welcome.\n> > \n> > Saludos,\n> > \n> > ? ? ? ? Jesus.\n> > \n> > [1]?http://grimoirelab.github.io/\n> > \n> > [2]?https://speakerdeck.com/jgbarah/grimoirelab-a-tool-for-open-dev\n> > elop\n> > ment-analytics\n> > \n> > --\n> > http://twitter.com/jgbarah????????? http://gsyc.es/~jgb\n> > \n> > _______________________________________________\n> > Metrics-Grimoire mailing list\n> > Metrics-Grimoire at lists.libresoft.es\n> > https://lists.libresoft.es/listinfo/metrics-grimoire\n> _______________________________________________\n> Metrics-Grimoire mailing list\n> Metrics-Grimoire at lists.libresoft.es\n> https://lists.libresoft.es/listinfo/metrics-grimoire\n-- \nhttp://twitter.com/jgbarah????????? http://gsyc.es/~jgb\n\n"
         },
-        "unixfrom": "simon.hanna at serve-me.info Wed Feb  1 15:39:59 2017"
+        "unixfrom": "jgb at example.com  Tue Apr 26 00:00:07 2016"
     },
-    "origin": "https://lists.mailman3.org/archives/list/mailman-users@mailman3.org",
-    "perceval_version": "0.7.0.dev1",
-    "tag": "https://lists.mailman3.org/archives/list/mailman-users@mailman3.org",
-    "timestamp": 1487325245.836446,
-    "updated_on": 1485963595.0,
-    "uuid": "0db55116ac5f470f7e3de5a10b7a41da8defdf07"
-},
-{
-    "backend_name": "HyperKitty",
-    "backend_version": "0.1.0",
-    "category": "message",
-    "data": {
-        "Content-Type": "multipart/mixed; boundary=\"===============6514862801850754205==\"",
-        "Date": "Wed, 01 Feb 2017 10:42:57 -0500",
-        "From": "Barry Warsaw <barry at list.org>",
-        "In-Reply-To": "e6090619-32d9-6bac-7417-7c8ab524ea13@serve-me.info",
-        "MIME-Version": "1.0",
-        "Message-ID": "<20170201104257.4d091264@subdivisions.wooz.org>",
-        "Subject": "[MM3-users] Re: Mailman 3 Status Update Please?",
-        "To": "mailman-users at mailman3.org",
-        "body": {
-            "plain": "On Feb 01, 2017, at 04:39 PM, Simon Hanna wrote:\n\n>Correction: Neither Postorius nor Hyperkitty currently support Python 3.\n>The only thing blocking Postorius is django-mailman3.\n>(I have a mr for the changes needed to the Postorius' code)\n>I'm not sure about the status of hyperkitty.\n\nThanks Simon.  I'd love to see Python 3 throughout the Mailman stack!\n\n-Barry\n"
-        },
-        "unixfrom": "barry at list.org Wed Feb  1 15:43:00 2017"
-    },
-    "origin": "https://lists.mailman3.org/archives/list/mailman-users@mailman3.org",
-    "perceval_version": "0.7.0.dev1",
-    "tag": "https://lists.mailman3.org/archives/list/mailman-users@mailman3.org",
-    "timestamp": 1487325245.837577,
-    "updated_on": 1485963777.0,
-    "uuid": "f9a31542a8cbb627f800d1ea0dd579312b462a7e"
+    "origin": "http://example.com/archives/list/test@example.com/",
+    "perceval_version": "0.9.10",
+    "tag": "http://example.com/archives/list/test@example.com/",
+    "timestamp": 1518176840.381132,
+    "updated_on": 1461621607.0,
+    "uuid": "fc3f60f140bba0e7f3fcad82890928e6b580a923"
 }]
