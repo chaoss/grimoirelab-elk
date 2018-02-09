@@ -150,6 +150,10 @@ class MBoxEnrich(Enrich):
         # The real data
         message = item['data']
 
+        if 'DATE' in message:
+            message['Date'] = message['DATE']
+            message.pop('DATE', None)
+
         # Fields that are the same in message and eitem
         copy_fields = ["Date", "From", "Subject", "Message-ID"]
         for f in copy_fields:
