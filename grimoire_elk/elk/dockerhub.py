@@ -132,6 +132,7 @@ class DockerHubEnrich(Enrich):
         must be created """
 
         max_items = self.elastic.max_items_bulk
+        nitems = 0
         current = 0
         total = 0
         bulk_json = ""
@@ -146,6 +147,7 @@ class DockerHubEnrich(Enrich):
         headers = {"Content-Type": "application/json"}
 
         for item in items:
+            nitems += 1
             if current >= max_items:
                 r = self.requests.put(url, data=bulk_json, headers=headers)
                 r.raise_for_status()
@@ -196,4 +198,4 @@ class DockerHubEnrich(Enrich):
         r = self.requests.put(url, data=bulk_json, headers=headers)
         r.raise_for_status()
 
-        return total
+        return nitems
