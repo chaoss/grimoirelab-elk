@@ -364,19 +364,31 @@ class MeetupEnrich(Enrich):
         items = ocean_backend.fetch()
         ncom = 0
         nrsvps = 0
+        nitems = 0
         rich_item_comments = []
         rich_item_rsvps = []
 
         for item in items:
+            nitems += 1
             rich_item_comments += self.get_rich_item_comments(item)
             rich_item_rsvps += self.get_rich_item_rsvps(item)
 
         if rich_item_comments:
             ncom += self.elastic.bulk_upload(rich_item_comments,
                                              self.get_field_unique_id_comment())
+
+            if ncom != len(rich_item_comments):
+                missing = len(rich_item_comments) - ncom
+                logger.error("%s/%s missing comments for Meetup",
+                             str(missing), str(len(rich_item_comments)))
+
         if rich_item_rsvps:
             nrsvps += self.elastic.bulk_upload(rich_item_rsvps,
                                                self.get_field_unique_id_rsvps())
 
-        logger.info("Total comments enriched: %i", ncom)
-        logger.info("Total nrsvps enriched: %i", nrsvps)
+            if nrsvps != len(rich_item_rsvps):
+                missing = len(rich_item_rsvps) - nrsvps
+                logger.error("%s/%s missing rsvps for Meetup",
+                             str(missing), str(len(rich_item_rsvps)))
+
+        return nitems
