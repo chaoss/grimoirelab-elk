@@ -1,0 +1,1434 @@
+[{
+    "backend_name": "Redmine",
+    "backend_version": "0.5.1",
+    "category": "issue",
+    "data": {
+        "assigned_to": {
+            "id": 2566,
+            "name": "Brad Hubbard"
+        },
+        "assigned_to_data": {
+            "created_on": "2015-05-11T17:53:44Z",
+            "firstname": "Brad",
+            "id": 2566,
+            "last_login_on": "2016-02-18T02:39:10Z",
+            "lastname": "Hubbard",
+            "mail": "bhubbard__redhat.com"
+        },
+        "attachments": [],
+        "author": {
+            "id": 2566,
+            "name": "Brad Hubbard"
+        },
+        "author_data": {
+            "created_on": "2015-05-11T17:53:44Z",
+            "firstname": "Brad",
+            "id": 2566,
+            "last_login_on": "2016-02-18T02:39:10Z",
+            "lastname": "Hubbard",
+            "mail": "bhubbard__redhat.com"
+        },
+        "category": {
+            "id": 2,
+            "name": "OSD"
+        },
+        "changesets": [],
+        "closed_on": "2016-11-01T01:20:50Z",
+        "created_on": "2016-09-28T07:45:58Z",
+        "custom_fields": [
+            {
+                "id": 1,
+                "name": "Source",
+                "value": "Development"
+            },
+            {
+                "id": 3,
+                "name": "Tags",
+                "value": ""
+            },
+            {
+                "id": 2,
+                "name": "Backport",
+                "value": ""
+            },
+            {
+                "id": 13,
+                "name": "Regression",
+                "value": "0"
+            },
+            {
+                "id": 4,
+                "name": "Severity",
+                "value": "3 - minor"
+            },
+            {
+                "id": 5,
+                "name": "Reviewed",
+                "value": ""
+            },
+            {
+                "id": 9,
+                "multiple": true,
+                "name": "Affected Versions",
+                "value": []
+            },
+            {
+                "id": 10,
+                "multiple": true,
+                "name": "ceph-qa-suite",
+                "value": []
+            },
+            {
+                "id": 16,
+                "multiple": true,
+                "name": "Release",
+                "value": []
+            },
+            {
+                "id": 18,
+                "name": "Needs Doc",
+                "value": "0"
+            }
+        ],
+        "description": "<pre>\r\nWARNING: max attr value size (1024) is smaller than osd_max_object_name_len (2048).  Your backend filesystem appears to not support attrs large enough to handle the configured max rados name size.  You may get unexpected ENAMETOOLONG errors on rados operations or buggy behavior\r\n</pre>\r\n\r\nThis warning is issued every time an OSD starts and is merely noise as it is inaccurate and premature.",
+        "done_ratio": 0,
+        "id": 17420,
+        "journals": [
+            {
+                "created_on": "2016-09-28T07:53:28Z",
+                "details": [
+                    {
+                        "name": "status_id",
+                        "new_value": "2",
+                        "old_value": "1",
+                        "property": "attr"
+                    }
+                ],
+                "id": 79019,
+                "notes": "https://github.com/ceph/ceph/pull/11246",
+                "user": {
+                    "id": 2566,
+                    "name": "Brad Hubbard"
+                },
+                "user_data": {
+                    "created_on": "2015-05-11T17:53:44Z",
+                    "firstname": "Brad",
+                    "id": 2566,
+                    "last_login_on": "2016-02-18T02:39:10Z",
+                    "lastname": "Hubbard",
+                    "mail": "bhubbard__redhat.com"
+                }
+            },
+            {
+                "created_on": "2016-11-01T01:20:50Z",
+                "details": [
+                    {
+                        "name": "status_id",
+                        "new_value": "3",
+                        "old_value": "2",
+                        "property": "attr"
+                    }
+                ],
+                "id": 80578,
+                "notes": "",
+                "user": {
+                    "id": 2566,
+                    "name": "Brad Hubbard"
+                },
+                "user_data": {
+                    "created_on": "2015-05-11T17:53:44Z",
+                    "firstname": "Brad",
+                    "id": 2566,
+                    "last_login_on": "2016-02-18T02:39:10Z",
+                    "lastname": "Hubbard",
+                    "mail": "bhubbard__redhat.com"
+                }
+            }
+        ],
+        "priority": {
+            "id": 4,
+            "name": "Normal"
+        },
+        "project": {
+            "id": 1,
+            "name": "Ceph"
+        },
+        "spent_hours": 0.0,
+        "start_date": "2016-09-28",
+        "status": {
+            "id": 3,
+            "name": "Resolved"
+        },
+        "subject": "Erroneous WARNING: max attr value size (1024) is smaller than osd_max_object_name_len (2048).",
+        "tracker": {
+            "id": 1,
+            "name": "Bug"
+        },
+        "updated_on": "2016-11-01T01:20:50Z"
+    },
+    "origin": "http://tracker.ceph.com/",
+    "perceval_version": "0.5.0.dev1",
+    "tag": "http://tracker.ceph.com/",
+    "timestamp": 1480391833.184778,
+    "updated_on": 1477963250.0,
+    "uuid": "3aa470864f1fc95b9feeb09da9cb79758cde0d2a"
+},
+{
+    "backend_name": "Redmine",
+    "backend_version": "0.5.1",
+    "category": "issue",
+    "data": {
+        "assigned_to": {
+            "id": 2566,
+            "name": "Brad Hubbard"
+        },
+        "assigned_to_data": {
+            "created_on": "2015-05-11T17:53:44Z",
+            "firstname": "Brad",
+            "id": 2566,
+            "last_login_on": "2016-02-18T02:39:10Z",
+            "lastname": "Hubbard",
+            "mail": "bhubbard__redhat.com"
+        },
+        "attachments": [
+            {
+                "author": {
+                    "id": 3531,
+                    "name": "Yuri Gorshkov"
+                },
+                "content_type": "application/gzip",
+                "content_url": "http://tracker.ceph.com/attachments/download/2390/cephsml-osd.33.log.gz",
+                "created_on": "2016-06-21T15:13:03Z",
+                "description": "",
+                "filename": "cephsml-osd.33.log.gz",
+                "filesize": 22207,
+                "id": 2390
+            },
+            {
+                "author": {
+                    "id": 3531,
+                    "name": "Yuri Gorshkov"
+                },
+                "content_type": "application/x-tar",
+                "content_url": "http://tracker.ceph.com/attachments/download/2391/osdlog.tar",
+                "created_on": "2016-06-22T15:22:02Z",
+                "description": "",
+                "filename": "osdlog.tar",
+                "filesize": 215040,
+                "id": 2391
+            },
+            {
+                "author": {
+                    "id": 3531,
+                    "name": "Yuri Gorshkov"
+                },
+                "content_type": "text/x-log",
+                "content_url": "http://tracker.ceph.com/attachments/download/2491/cephsml-osd.1.log",
+                "created_on": "2016-08-11T12:21:23Z",
+                "description": "",
+                "filename": "cephsml-osd.1.log",
+                "filesize": 318332,
+                "id": 2491
+            }
+        ],
+        "author": {
+            "id": 3531,
+            "name": "Yuri Gorshkov"
+        },
+        "author_data": {
+            "created_on": "2016-06-21T15:08:14Z",
+            "firstname": "Yuri",
+            "id": 3531,
+            "last_login_on": "2016-11-24T11:58:23Z",
+            "lastname": "Gorshkov",
+            "mail": "ygorshkov__smartlabs.tv"
+        },
+        "category": {
+            "id": 2,
+            "name": "OSD"
+        },
+        "changesets": [],
+        "closed_on": "2016-11-01T01:23:09Z",
+        "created_on": "2016-06-21T15:14:55Z",
+        "custom_fields": [
+            {
+                "id": 1,
+                "name": "Source",
+                "value": "Community (user)"
+            },
+            {
+                "id": 3,
+                "name": "Tags",
+                "value": "bluestore"
+            },
+            {
+                "id": 2,
+                "name": "Backport",
+                "value": ""
+            },
+            {
+                "id": 13,
+                "name": "Regression",
+                "value": "0"
+            },
+            {
+                "id": 4,
+                "name": "Severity",
+                "value": "3 - minor"
+            },
+            {
+                "id": 5,
+                "name": "Reviewed",
+                "value": ""
+            },
+            {
+                "id": 9,
+                "multiple": true,
+                "name": "Affected Versions",
+                "value": [
+                    "516"
+                ]
+            },
+            {
+                "id": 10,
+                "multiple": true,
+                "name": "ceph-qa-suite",
+                "value": []
+            },
+            {
+                "id": 16,
+                "multiple": true,
+                "name": "Release",
+                "value": [
+                    "jewel"
+                ]
+            },
+            {
+                "id": 18,
+                "name": "Needs Doc",
+                "value": "0"
+            }
+        ],
+        "description": "Hi there.\r\n\r\nWe've set up a small 4-node Bluestore cluster for testing and I noticed that sometimes the OSD would not start after a shutdown, throwing assertion immediately. Here's a snippet from the OSD stdout and I've attached the OSD log:\r\n\r\n2016-06-21 18:14:22.956887 7f376e0bd800 -1 WARNING: the following dangerous and experimental features are enabled: bluestore,rocksdb\r\n2016-06-21 18:14:22.957140 7f376e0bd800 -1 WARNING: the following dangerous and experimental features are enabled: bluestore,rocksdb\r\n2016-06-21 18:14:22.957229 7f376e0bd800 -1 WARNING: experimental feature 'bluestore' is enabled\r\nPlease be aware that this feature is experimental, untested,\r\nunsupported, and may result in data corruption, data loss,\r\nand/or irreparable damage to your cluster.  Do not use\r\nfeature with important data.\r\n\r\nstarting osd.33 at :/0 osd_data /var/lib/ceph/osd/cephsml-33 /var/lib/ceph/osd/cephsml-33/journal\r\n2016-06-21 18:14:22.979703 7f376e0bd800 -1 WARNING: the following dangerous and experimental features are enabled: bluestore,rocksdb\r\n2016-06-21 18:14:23.033441 7f376e0bd800 -1 WARNING: experimental feature 'rocksdb' is enabled\r\nPlease be aware that this feature is experimental, untested,\r\nunsupported, and may result in data corruption, data loss,\r\nand/or irreparable damage to your cluster.  Do not use\r\nfeature with important data.\r\n\r\n2016-06-21 18:14:24.024998 7f376e0bd800 -1 WARNING: experimental feature 'rocksdb' is enabled\r\nPlease be aware that this feature is experimental, untested,\r\nunsupported, and may result in data corruption, data loss,\r\nand/or irreparable damage to your cluster.  Do not use\r\nfeature with important data.\r\n\r\nosd/OSD.h: In function 'OSDMapRef OSDService::get_map(epoch_t)' thread 7f376e0bd800 time 2016-06-21 18:14:24.088885\r\nosd/OSD.h: 885: FAILED assert(ret)\r\n ceph version 10.2.2 (45107e21c568dd033c2f0a3107dec8f0b0e58374)\r\n 1: (ceph::__ceph_assert_fail(char const*, char const*, int, char const*)+0x85) [0x7f376eaea5b5]\r\n 2: (OSDService::get_map(unsigned int)+0x3d) [0x7f376e4c893d]\r\n 3: (OSD::init()+0x1fe2) [0x7f376e47bdb2]\r\n 4: (main()+0x2c55) [0x7f376e3dfbe5]\r\n 5: (__libc_start_main()+0xf5) [0x7f376afceb15]\r\n 6: (()+0x353009) [0x7f376e42a009]\r\n NOTE: a copy of the executable, or `objdump -rdS <executable>` is needed to interpret this.\r\n2016-06-21 18:14:24.090582 7f376e0bd800 -1 osd/OSD.h: In function 'OSDMapRef OSDService::get_map(epoch_t)' thread 7f376e0bd800 time 2016-06-21 18:14:24.088885\r\nosd/OSD.h: 885: FAILED assert(ret)\r\n\r\n ceph version 10.2.2 (45107e21c568dd033c2f0a3107dec8f0b0e58374)\r\n 1: (ceph::__ceph_assert_fail(char const*, char const*, int, char const*)+0x85) [0x7f376eaea5b5]\r\n 2: (OSDService::get_map(unsigned int)+0x3d) [0x7f376e4c893d]\r\n 3: (OSD::init()+0x1fe2) [0x7f376e47bdb2]\r\n 4: (main()+0x2c55) [0x7f376e3dfbe5]\r\n 5: (__libc_start_main()+0xf5) [0x7f376afceb15]\r\n 6: (()+0x353009) [0x7f376e42a009]\r\n NOTE: a copy of the executable, or `objdump -rdS <executable>` is needed to interpret this.\r\n\r\n  -665> 2016-06-21 18:14:22.956887 7f376e0bd800 -1 WARNING: the following dangerous and experimental features are enabled: bluestore,rocksdb\r\n  -664> 2016-06-21 18:14:22.957140 7f376e0bd800 -1 WARNING: the following dangerous and experimental features are enabled: bluestore,rocksdb\r\n  -660> 2016-06-21 18:14:22.957229 7f376e0bd800 -1 WARNING: experimental feature 'bluestore' is enabled\r\nPlease be aware that this feature is experimental, untested,\r\nunsupported, and may result in data corruption, data loss,\r\nand/or irreparable damage to your cluster.  Do not use\r\nfeature with important data.\r\n\r\n  -650> 2016-06-21 18:14:22.979703 7f376e0bd800 -1 WARNING: the following dangerous and experimental features are enabled: bluestore,rocksdb\r\n  -620> 2016-06-21 18:14:23.033441 7f376e0bd800 -1 WARNING: experimental feature 'rocksdb' is enabled\r\nPlease be aware that this feature is experimental, untested,\r\nunsupported, and may result in data corruption, data loss,\r\nand/or irreparable damage to your cluster.  Do not use\r\nfeature with important data.\r\n\r\n  -162> 2016-06-21 18:14:24.024998 7f376e0bd800 -1 WARNING: experimental feature 'rocksdb' is enabled\r\nPlease be aware that this feature is experimental, untested,\r\nunsupported, and may result in data corruption, data loss,\r\nand/or irreparable damage to your cluster.  Do not use\r\nfeature with important data.\r\n\r\n     0> 2016-06-21 18:14:24.090582 7f376e0bd800 -1 osd/OSD.h: In function 'OSDMapRef OSDService::get_map(epoch_t)' thread 7f376e0bd800 time 2016-06-21 18:14:24.088885\r\nosd/OSD.h: 885: FAILED assert(ret)\r\n\r\n ceph version 10.2.2 (45107e21c568dd033c2f0a3107dec8f0b0e58374)\r\n 1: (ceph::__ceph_assert_fail(char const*, char const*, int, char const*)+0x85) [0x7f376eaea5b5]\r\n 2: (OSDService::get_map(unsigned int)+0x3d) [0x7f376e4c893d]\r\n 3: (OSD::init()+0x1fe2) [0x7f376e47bdb2]\r\n 4: (main()+0x2c55) [0x7f376e3dfbe5]\r\n 5: (__libc_start_main()+0xf5) [0x7f376afceb15]\r\n 6: (()+0x353009) [0x7f376e42a009]\r\n NOTE: a copy of the executable, or `objdump -rdS <executable>` is needed to interpret this.\r\n\r\n*** Caught signal (Aborted) **\r\n in thread 7f376e0bd800 thread_name:ceph-osd\r\n ceph version 10.2.2 (45107e21c568dd033c2f0a3107dec8f0b0e58374)\r\n 1: (()+0x91341a) [0x7f376e9ea41a]\r\n 2: (()+0xf100) [0x7f376ca20100]\r\n 3: (gsignal()+0x37) [0x7f376afe25f7]\r\n 4: (abort()+0x148) [0x7f376afe3ce8]\r\n 5: (ceph::__ceph_assert_fail(char const*, char const*, int, char const*)+0x267) [0x7f376eaea797]\r\n 6: (OSDService::get_map(unsigned int)+0x3d) [0x7f376e4c893d]\r\n 7: (OSD::init()+0x1fe2) [0x7f376e47bdb2]\r\n 8: (main()+0x2c55) [0x7f376e3dfbe5]\r\n 9: (__libc_start_main()+0xf5) [0x7f376afceb15]\r\n 10: (()+0x353009) [0x7f376e42a009]\r\n2016-06-21 18:14:24.095919 7f376e0bd800 -1 *** Caught signal (Aborted) **\r\n in thread 7f376e0bd800 thread_name:ceph-osd\r\n\r\n ceph version 10.2.2 (45107e21c568dd033c2f0a3107dec8f0b0e58374)\r\n 1: (()+0x91341a) [0x7f376e9ea41a]\r\n 2: (()+0xf100) [0x7f376ca20100]\r\n 3: (gsignal()+0x37) [0x7f376afe25f7]\r\n 4: (abort()+0x148) [0x7f376afe3ce8]\r\n 5: (ceph::__ceph_assert_fail(char const*, char const*, int, char const*)+0x267) [0x7f376eaea797]\r\n 6: (OSDService::get_map(unsigned int)+0x3d) [0x7f376e4c893d]\r\n 7: (OSD::init()+0x1fe2) [0x7f376e47bdb2]\r\n 8: (main()+0x2c55) [0x7f376e3dfbe5]\r\n 9: (__libc_start_main()+0xf5) [0x7f376afceb15]\r\n 10: (()+0x353009) [0x7f376e42a009]\r\n NOTE: a copy of the executable, or `objdump -rdS <executable>` is needed to interpret this.\r\n\r\n     0> 2016-06-21 18:14:24.095919 7f376e0bd800 -1 *** Caught signal (Aborted) **\r\n in thread 7f376e0bd800 thread_name:ceph-osd\r\n\r\n ceph version 10.2.2 (45107e21c568dd033c2f0a3107dec8f0b0e58374)\r\n 1: (()+0x91341a) [0x7f376e9ea41a]\r\n 2: (()+0xf100) [0x7f376ca20100]\r\n 3: (gsignal()+0x37) [0x7f376afe25f7]\r\n 4: (abort()+0x148) [0x7f376afe3ce8]\r\n 5: (ceph::__ceph_assert_fail(char const*, char const*, int, char const*)+0x267) [0x7f376eaea797]\r\n 6: (OSDService::get_map(unsigned int)+0x3d) [0x7f376e4c893d]\r\n 7: (OSD::init()+0x1fe2) [0x7f376e47bdb2]\r\n 8: (main()+0x2c55) [0x7f376e3dfbe5]\r\n 9: (__libc_start_main()+0xf5) [0x7f376afceb15]\r\n 10: (()+0x353009) [0x7f376e42a009]\r\n NOTE: a copy of the executable, or `objdump -rdS <executable>` is needed to interpret this.\r\n\r\nAborted\r\n",
+        "done_ratio": 0,
+        "id": 16400,
+        "journals": [
+            {
+                "created_on": "2016-06-21T15:21:09Z",
+                "details": [],
+                "id": 73094,
+                "notes": "FYI I've attached the objdump -rdS output for our version of ceph-osd (taken from official jewel repositories).",
+                "user": {
+                    "id": 3531,
+                    "name": "Yuri Gorshkov"
+                },
+                "user_data": {
+                    "created_on": "2016-06-21T15:08:14Z",
+                    "firstname": "Yuri",
+                    "id": 3531,
+                    "last_login_on": "2016-11-24T11:58:23Z",
+                    "lastname": "Gorshkov",
+                    "mail": "ygorshkov__smartlabs.tv"
+                }
+            },
+            {
+                "created_on": "2016-06-21T22:55:41Z",
+                "details": [],
+                "id": 73111,
+                "notes": "Could you try this again with debug osd set to 30?\r\n\r\nI know 30 is high but some of these messages only output at 30.\r\n\r\ndout(30) << \"get_map \" << epoch << \" - miss, below lower bound\" << dendl;\r\n\r\nPlease upload the log once you have generated it.",
+                "user": {
+                    "id": 2566,
+                    "name": "Brad Hubbard"
+                },
+                "user_data": {
+                    "created_on": "2015-05-11T17:53:44Z",
+                    "firstname": "Brad",
+                    "id": 2566,
+                    "last_login_on": "2016-02-18T02:39:10Z",
+                    "lastname": "Hubbard",
+                    "mail": "bhubbard__redhat.com"
+                }
+            },
+            {
+                "created_on": "2016-06-22T15:22:16Z",
+                "details": [
+                    {
+                        "name": "2391",
+                        "new_value": "osdlog.tar",
+                        "property": "attachment"
+                    }
+                ],
+                "id": 73130,
+                "notes": "So, we were (re-)deploying our test cluster with ceph-ansible and suddenly Ansible decided to restart all the OSDs. After the OSDs came back up, there were ~10 out of 96 that wouldn't come up.\r\nOut of these, I picked up two and noticed they had different, albeit similar failure modes. Here are the logs from the attempts to start the damaged OSDs.\r\n\r\nSince I now know how to reproduce the situation, I would try running our remaining OSDs with debug 30 ASAP to see what goes on when Ansible tried to stop them.\r\n",
+                "user": {
+                    "id": 3531,
+                    "name": "Yuri Gorshkov"
+                },
+                "user_data": {
+                    "created_on": "2016-06-21T15:08:14Z",
+                    "firstname": "Yuri",
+                    "id": 3531,
+                    "last_login_on": "2016-11-24T11:58:23Z",
+                    "lastname": "Gorshkov",
+                    "mail": "ygorshkov__smartlabs.tv"
+                }
+            },
+            {
+                "created_on": "2016-06-22T15:47:44Z",
+                "details": [],
+                "id": 73133,
+                "notes": "We now tried to reproduce by letting Ansible restart all the OSDs but to no avail - seems like the failure was confined to a specific set of OSDs:\r\n\r\n[ygorshkov__bt-mnsk1-mstor03 ~]$ sudo ceph --cluster cephsml osd tree|egrep '(host|down)'\r\n2016-06-22 18:47:21.559526 7f434a5f6700 -1 WARNING: the following dangerous and experimental features are enabled: bluestore,rocksdb\r\n2016-06-22 18:47:21.582836 7f434a5f6700 -1 WARNING: the following dangerous and experimental features are enabled: bluestore,rocksdb\r\n-2 0.00220     host bt-mnsk1-mstor04                                   \r\n 3 0.00009         osd.3                down        0          1.00000 \r\n84 0.00009         osd.84               down        0          1.00000 \r\n-3 0.00220     host bt-mnsk1-mstor01                                   \r\n 0 0.00009         osd.0                down        0          1.00000 \r\n12 0.00009         osd.12               down        0          1.00000 \r\n34 0.00009         osd.34               down        0          1.00000 \r\n40 0.00009         osd.40               down        0          1.00000 \r\n52 0.00009         osd.52               down        0          1.00000 \r\n76 0.00009         osd.76               down        0          1.00000 \r\n93 0.00009         osd.93               down        0          1.00000 \r\n-4 0.00220     host bt-mnsk1-mstor02                                   \r\n 2 0.00009         osd.2                down        0          1.00000 \r\n13 0.00009         osd.13               down        0          1.00000 \r\n17 0.00009         osd.17               down        0          1.00000 \r\n29 0.00009         osd.29               down        0          1.00000 \r\n53 0.00009         osd.53               down        0          1.00000 \r\n59 0.00009         osd.59               down        0          1.00000 \r\n71 0.00009         osd.71               down        0          1.00000 \r\n-5 0.00220     host bt-mnsk1-mstor03                                   \r\n 1 0.00009         osd.1                down        0          1.00000 \r\n45 0.00009         osd.45               down        0          1.00000 \r\n46 0.00009         osd.46               down        0          1.00000 \r\n64 0.00009         osd.64               down        0          1.00000 \r\n88 0.00009         osd.88               down        0          1.00000 \r\n26 0.00009         osd.26               down        0          1.00000 \r\n",
+                "user": {
+                    "id": 3531,
+                    "name": "Yuri Gorshkov"
+                },
+                "user_data": {
+                    "created_on": "2016-06-21T15:08:14Z",
+                    "firstname": "Yuri",
+                    "id": 3531,
+                    "last_login_on": "2016-11-24T11:58:23Z",
+                    "lastname": "Gorshkov",
+                    "mail": "ygorshkov__smartlabs.tv"
+                }
+            },
+            {
+                "created_on": "2016-06-23T05:54:11Z",
+                "details": [],
+                "id": 73227,
+                "notes": "For osd.0 it looks like some sort of corruption with regard to epoch 845. \r\n\r\n2016-06-22 18:14:57.678449 7f8df1d14800 20 osd.0 0 get_map 845 - loading and decoding 0x7f8dfea0fb00\r\nosd/OSD.h: In function 'OSDMapRef OSDService::get_map(epoch_t)' thread 7f8df1d14800 time 2016-06-22 18:14:57.678744\r\nosd/OSD.h: 885: FAILED assert(ret)\r\n\r\nAs far as the log from osd.12 it looks more like an IO error of some sort.\r\n\r\n2016-06-22 18:15:08.266918 7f10c9790800 -1 bluefs mount failed to replay log: (5) Input/output error\r\n2016-06-22 18:15:08.266935 7f10c9790800 -1 bluestore(/var/lib/ceph/osd/cephsml-12) _open_db failed bluefs mount: (5) Input/output error\r\n2016-06-22 18:15:08.266940 7f10c9790800  1 bdev(/var/lib/ceph/osd/cephsml-12/block) close\r\n2016-06-22 18:15:08.508404 7f10c9790800  1 bdev(/var/lib/ceph/osd/cephsml-12/block) close\r\n2016-06-22 18:15:08.734524 7f10c9790800 -1 osd.12 0 OSD:init: unable to mount object store\r\n2016-06-22 18:15:08.734542 7f10c9790800 -1 \u001b[0;31m ** ERROR: osd init failed: (5) Input/output error\u001b[0m\r\n\r\nIO errors are usually indicative of an issue below the application layer.\r\n\r\nCan you double check the storage in use here?",
+                "user": {
+                    "id": 2566,
+                    "name": "Brad Hubbard"
+                },
+                "user_data": {
+                    "created_on": "2015-05-11T17:53:44Z",
+                    "firstname": "Brad",
+                    "id": 2566,
+                    "last_login_on": "2016-02-18T02:39:10Z",
+                    "lastname": "Hubbard",
+                    "mail": "bhubbard__redhat.com"
+                }
+            },
+            {
+                "created_on": "2016-06-23T13:07:24Z",
+                "details": [],
+                "id": 73246,
+                "notes": "Hi.\r\n\r\nAfter the first glance the underlying storage appears to be normal. I will double-check, though.\r\n\r\nWhen our colleague tried to remove the now-defunct OSD (osd.88), another OSD on another host (osd.63) has failed. (I've sanitized the host names in the output for privacy reason, the hostnames themselves weren't changed).\r\n\r\nSee the attached file for the output of osd.63.\r\n\r\n016-06-23 13:45:59.807982 mon.2 [INF] from='client.? 192.168.36.7:0/1957761979' entity='client.admin' cmd=[{\"prefix\": \"osd crush remove\", \"name\": \"osd.88\"}]: dispatch\r\n2016-06-23 13:45:59.808968 mon.0 [INF] from='client.724418 :/0' entity='client.admin' cmd=[{\"prefix\": \"osd crush remove\", \"name\": \"osd.88\"}]: dispatch\r\n2016-06-23 13:45:59.933294 mon.0 [INF] from='client.724418 :/0' entity='client.admin' cmd='[{\"prefix\": \"osd crush remove\", \"name\": \"osd.88\"}]': finished\r\n2016-06-23 13:45:59.936040 mon.0 [INF] osdmap e1103: 91 osds: 83 up, 83 in\r\n2016-06-23 13:46:00.233312 mon.1 [INF] from='client.? 192.168.36.7:0/954660534' entity='client.admin' cmd=[{\"prefix\": \"auth del\", \"entity\": \"osd.88\"}]: dispatch\r\n2016-06-23 13:46:00.234787 mon.0 [INF] from='client.724483 :/0' entity='client.admin' cmd=[{\"prefix\": \"auth del\", \"entity\": \"osd.88\"}]: dispatch\r\n2016-06-23 13:46:00.237446 mon.0 [INF] from='client.724483 :/0' entity='client.admin' cmd='[{\"prefix\": \"auth del\", \"entity\": \"osd.88\"}]': finished\r\n2016-06-23 13:46:00.474265 mon.0 [INF] from='client.? 192.168.36.7:0/4208656487' entity='client.admin' cmd=[{\"prefix\": \"osd rm\", \"ids\": [\"88\"]}]: dispatch\r\n2016-06-23 13:46:01.002949 mon.0 [INF] from='client.? 192.168.36.7:0/4208656487' entity='client.admin' cmd='[{\"prefix\": \"osd rm\", \"ids\": [\"88\"]}]': finished\r\n2016-06-23 13:46:01.008355 mon.0 [INF] osdmap e1104: 90 osds: 83 up, 83 in\r\n2016-06-23 13:46:13.467462 mon.2 [INF] from='client.? 192.168.36.6:0/3852514611' entity='osd.63' cmd=[{\"prefix\": \"osd crush create-or-move\", \"args\": [\"host=test1-stor02\", \"root=default\"], \"id\": 63, \"weight\": 0.0001}]: dispatch\r\n2016-06-23 13:46:13.468355 mon.0 [INF] from='client.724421 :/0' entity='osd.63' cmd=[{\"prefix\": \"osd crush create-or-move\", \"args\": [\"host=test1-stor02\", \"root=default\"], \"id\": 63, \"weight\": 0.0001}]: dispatch\r\n2016-06-23 13:46:15.476682 mon.1 [INF] from='client.? 192.168.36.6:0/365138351' entity='osd.63' cmd=[{\"prefix\": \"osd crush create-or-move\", \"args\": [\"host=test1-stor02\", \"root=default\"], \"id\": 63, \"weight\": 0.0001}]: dispatch\r\n2016-06-23 13:46:15.477345 mon.0 [INF] from='client.724486 :/0' entity='osd.63' cmd=[{\"prefix\": \"osd crush create-or-move\", \"args\": [\"host=test1-stor02\", \"root=default\"], \"id\": 63, \"weight\": 0.0001}]: dispatch\r\n2016-06-23 13:46:17.204182 mon.0 [INF] from='client.? 192.168.36.6:0/2354660382' entity='osd.63' cmd=[{\"prefix\": \"osd crush create-or-move\", \"args\": [\"host=test1-stor02\", \"root=default\"], \"id\": 63, \"weight\": 0.0001}]: dispatch\r\n2016-06-23 13:46:30.260836 mon.0 [INF] osdmap e1106: 90 osds: 82 up, 83 in\r\n",
+                "user": {
+                    "id": 3531,
+                    "name": "Yuri Gorshkov"
+                },
+                "user_data": {
+                    "created_on": "2016-06-21T15:08:14Z",
+                    "firstname": "Yuri",
+                    "id": 3531,
+                    "last_login_on": "2016-11-24T11:58:23Z",
+                    "lastname": "Gorshkov",
+                    "mail": "ygorshkov__smartlabs.tv"
+                }
+            },
+            {
+                "created_on": "2016-06-23T13:10:17Z",
+                "details": [],
+                "id": 73247,
+                "notes": "Also, I think that losing 12 OSD drives in a cluster simultaneously due to storage failure is _extremely_ unlikely ;). (though, given the recent events in my personal life I wouldn't be even that surprised by it - stuff happens, you know ;))",
+                "user": {
+                    "id": 3531,
+                    "name": "Yuri Gorshkov"
+                },
+                "user_data": {
+                    "created_on": "2016-06-21T15:08:14Z",
+                    "firstname": "Yuri",
+                    "id": 3531,
+                    "last_login_on": "2016-11-24T11:58:23Z",
+                    "lastname": "Gorshkov",
+                    "mail": "ygorshkov__smartlabs.tv"
+                }
+            },
+            {
+                "created_on": "2016-06-23T13:30:45Z",
+                "details": [],
+                "id": 73260,
+                "notes": "After the cluster started backfilling, we suddenly saw ~22 additional OSDs get out of the cluster with the same error:\r\n\r\n4: (abort()+0x148) [0x7fc24fbc7ce8]\r\n5: (ceph::__ceph_assert_fail(char const*, char const*, int, char const*)+0x267) [0x7fc2536ce797]\r\n6: (OSDService::get_map(unsigned int)+0x3d) [0x7fc2530ac93d]\r\n\r\n\r\n2016-06-23 14:03:19.049344 mon.0 [INF] osd.60 out (down for 301.028768)\r\n2016-06-23 14:03:19.049391 mon.0 [INF] osd.74 out (down for 300.076516)\r\n2016-06-23 14:03:19.116875 mon.0 [INF] osdmap e1253: 96 osds: 63 up, 71 in\r\n2016-06-23 14:03:20.145336 mon.0 [INF] osdmap e1254: 96 osds: 63 up, 71 in\r\n2016-06-23 14:03:21.133691 mon.0 [INF] osdmap e1255: 96 osds: 63 up, 71 in\r\n2016-06-23 14:03:16.743618 osd.85 [WRN] 2 slow requests, 2 included below; oldest blocked for > 30.502325 secs\r\n2016-06-23 14:03:16.743660 osd.85 [WRN] slow request 30.502325 seconds old, received at 2016-06-23 14:02:46.241154: osd_op(client.124348.0:117420 4.3768e783 (undecoded) ondisk+write+known_if_redirected e1249) currently waiting for active\r\n2016-06-23 14:03:16.743666 osd.85 [WRN] slow request 30.338302 seconds old, received at 2016-06-23 14:02:46.405176: osd_op(client.124348.0:117420 4.3768e783 (undecoded) ondisk+retry+write+known_if_redirected e1249) currently waiting for active\r\n2016-06-23 14:03:20.112443 osd.85 [INF] 4.3 starting backfill to osd.49 from (0'0,0'0] MAX to 1089'3230\r\n2016-06-23 14:03:20.118829 osd.85 [INF] 4.3 starting backfill to osd.53 from (0'0,0'0] MAX to 1089'3230",
+                "user": {
+                    "id": 3531,
+                    "name": "Yuri Gorshkov"
+                },
+                "user_data": {
+                    "created_on": "2016-06-21T15:08:14Z",
+                    "firstname": "Yuri",
+                    "id": 3531,
+                    "last_login_on": "2016-11-24T11:58:23Z",
+                    "lastname": "Gorshkov",
+                    "mail": "ygorshkov__smartlabs.tv"
+                }
+            },
+            {
+                "created_on": "2016-06-23T23:14:42Z",
+                "details": [],
+                "id": 73343,
+                "notes": "Yuri Gorshkov wrote:\r\n> Also, I think that losing 12 OSD drives in a cluster simultaneously due to storage failure is _extremely_ unlikely ;). (though, given the recent events in my personal life I wouldn't be even that surprised by it - stuff happens, you know ;))\r\n\r\nI'm certainly on the losing end if I attempt to argue 12 concurrent failures :)\r\n\r\nNevertheless, I am interested in the Input/output errors and their role in this. How many of these errors were seen on how many OSDs and what is the time line? I'd like to try and establish what was \"event zero\". I speculate that something has corrupted a map and that map has been populated to numerous OSDs causing them to fail on that map. is the last message in all the crashes \"get_map 845\" if debug is turned up to at least 20?\r\n",
+                "user": {
+                    "id": 2566,
+                    "name": "Brad Hubbard"
+                },
+                "user_data": {
+                    "created_on": "2015-05-11T17:53:44Z",
+                    "firstname": "Brad",
+                    "id": 2566,
+                    "last_login_on": "2016-02-18T02:39:10Z",
+                    "lastname": "Hubbard",
+                    "mail": "bhubbard__redhat.com"
+                }
+            },
+            {
+                "created_on": "2016-06-27T22:58:41Z",
+                "details": [],
+                "id": 73467,
+                "notes": "the EIO is coming from bluefs failing to mount.  which probably is a bug in bluefs or rocksdb, and not an error on the media.  If you can reproduce the failed restart with debug bluefs = 20 that'll give us some clue.\r\n\r\nNote that bluestore on master has diverged significantly from jewel already, and lots of known bugs in jewel we aren't ever going to fix... it just has to be stable enough to benchmark and give people a taste of what's to come.  If the bluefs mount failure looks concerning we'll want to try to reproduce it on master...",
+                "user": {
+                    "id": 3,
+                    "name": "Sage Weil"
+                },
+                "user_data": {
+                    "created_on": "2010-04-08T14:36:13Z",
+                    "firstname": "Sage",
+                    "id": 3,
+                    "last_login_on": "2016-05-02T20:34:31Z",
+                    "lastname": "Weil",
+                    "mail": "sage__newdream.net"
+                }
+            },
+            {
+                "created_on": "2016-06-28T03:51:49Z",
+                "details": [
+                    {
+                        "name": "assigned_to_id",
+                        "new_value": "2566",
+                        "property": "attr"
+                    },
+                    {
+                        "name": "3",
+                        "new_value": "bluestore",
+                        "old_value": "",
+                        "property": "cf"
+                    }
+                ],
+                "id": 73476,
+                "notes": "",
+                "user": {
+                    "id": 2566,
+                    "name": "Brad Hubbard"
+                },
+                "user_data": {
+                    "created_on": "2015-05-11T17:53:44Z",
+                    "firstname": "Brad",
+                    "id": 2566,
+                    "last_login_on": "2016-02-18T02:39:10Z",
+                    "lastname": "Hubbard",
+                    "mail": "bhubbard__redhat.com"
+                }
+            },
+            {
+                "created_on": "2016-07-27T15:33:40Z",
+                "details": [
+                    {
+                        "name": "fixed_version_id",
+                        "new_value": "516",
+                        "old_value": "519",
+                        "property": "attr"
+                    }
+                ],
+                "id": 75449,
+                "notes": "",
+                "user": {
+                    "id": 2544,
+                    "name": "Nathan Cutler"
+                },
+                "user_data": {
+                    "created_on": "2015-05-05T06:39:54Z",
+                    "firstname": "Nathan",
+                    "id": 2544,
+                    "last_login_on": "2016-11-28T10:50:29Z",
+                    "lastname": "Cutler",
+                    "mail": "presnypreklad__gmail.com"
+                }
+            },
+            {
+                "created_on": "2016-07-27T15:49:15Z",
+                "details": [
+                    {
+                        "name": "fixed_version_id",
+                        "old_value": "516",
+                        "property": "attr"
+                    }
+                ],
+                "id": 75464,
+                "notes": "",
+                "user": {
+                    "id": 2544,
+                    "name": "Nathan Cutler"
+                },
+                "user_data": {
+                    "created_on": "2015-05-05T06:39:54Z",
+                    "firstname": "Nathan",
+                    "id": 2544,
+                    "last_login_on": "2016-11-28T10:50:29Z",
+                    "lastname": "Cutler",
+                    "mail": "presnypreklad__gmail.com"
+                }
+            },
+            {
+                "created_on": "2016-08-11T12:28:15Z",
+                "details": [
+                    {
+                        "name": "2491",
+                        "new_value": "cephsml-osd.1.log",
+                        "property": "attachment"
+                    }
+                ],
+                "id": 76441,
+                "notes": "We were able to reproduce the bug on our OSDs. Apparently, if <pre>bluestore rocksdb options = recycle_log_file_num=16</pre> is set, then we're hitting this bug. Disabling this option wouldn't allow for OSD to start normally, but if the OSD was running without this option from the beginning, then the OSD works normally.\r\n\r\nAlso, we set <pre>bluestore bluefs = false</pre>, so it's almost definitely not a bluefs bug :)",
+                "user": {
+                    "id": 3531,
+                    "name": "Yuri Gorshkov"
+                },
+                "user_data": {
+                    "created_on": "2016-06-21T15:08:14Z",
+                    "firstname": "Yuri",
+                    "id": 3531,
+                    "last_login_on": "2016-11-24T11:58:23Z",
+                    "lastname": "Gorshkov",
+                    "mail": "ygorshkov__smartlabs.tv"
+                }
+            },
+            {
+                "created_on": "2016-08-11T12:55:41Z",
+                "details": [],
+                "id": 76442,
+                "notes": "Here is the archive of the OSD's data partition: http://eftp.smlabs.net/ygorshkov/tracker.ceph.com/tracker.ceph.com-160400-cephsml-1.tar.xz",
+                "user": {
+                    "id": 3531,
+                    "name": "Yuri Gorshkov"
+                },
+                "user_data": {
+                    "created_on": "2016-06-21T15:08:14Z",
+                    "firstname": "Yuri",
+                    "id": 3531,
+                    "last_login_on": "2016-11-24T11:58:23Z",
+                    "lastname": "Gorshkov",
+                    "mail": "ygorshkov__smartlabs.tv"
+                }
+            },
+            {
+                "created_on": "2016-08-29T03:00:48Z",
+                "details": [],
+                "id": 77676,
+                "notes": "$ zgrep bluefs$ cephsml-osd.33.log.gz\r\n   1/ 5 bluefs\r\n   1/ 5 bluefs\r\n\r\nCould we get logs at debug bluefs = 20 as Sage requested please?",
+                "user": {
+                    "id": 2566,
+                    "name": "Brad Hubbard"
+                },
+                "user_data": {
+                    "created_on": "2015-05-11T17:53:44Z",
+                    "firstname": "Brad",
+                    "id": 2566,
+                    "last_login_on": "2016-02-18T02:39:10Z",
+                    "lastname": "Hubbard",
+                    "mail": "bhubbard__redhat.com"
+                }
+            },
+            {
+                "created_on": "2016-10-14T02:01:59Z",
+                "details": [
+                    {
+                        "name": "18",
+                        "new_value": "0",
+                        "property": "cf"
+                    }
+                ],
+                "id": 79775,
+                "notes": "Given the fact that the Bluestore format and code has changed substantially since jewel and in the absence of further information I'm going to close this out if no one objects?",
+                "user": {
+                    "id": 2566,
+                    "name": "Brad Hubbard"
+                },
+                "user_data": {
+                    "created_on": "2015-05-11T17:53:44Z",
+                    "firstname": "Brad",
+                    "id": 2566,
+                    "last_login_on": "2016-02-18T02:39:10Z",
+                    "lastname": "Hubbard",
+                    "mail": "bhubbard__redhat.com"
+                }
+            },
+            {
+                "created_on": "2016-11-01T01:23:09Z",
+                "details": [
+                    {
+                        "name": "status_id",
+                        "new_value": "5",
+                        "old_value": "1",
+                        "property": "attr"
+                    }
+                ],
+                "id": 80580,
+                "notes": "",
+                "user": {
+                    "id": 2566,
+                    "name": "Brad Hubbard"
+                },
+                "user_data": {
+                    "created_on": "2015-05-11T17:53:44Z",
+                    "firstname": "Brad",
+                    "id": 2566,
+                    "last_login_on": "2016-02-18T02:39:10Z",
+                    "lastname": "Hubbard",
+                    "mail": "bhubbard__redhat.com"
+                }
+            }
+        ],
+        "priority": {
+            "id": 4,
+            "name": "Normal"
+        },
+        "project": {
+            "id": 1,
+            "name": "Ceph"
+        },
+        "spent_hours": 0.0,
+        "start_date": "2016-06-21",
+        "status": {
+            "id": 5,
+            "name": "Closed"
+        },
+        "subject": "Ceph OSD crashes suddenly after restart when using bluestore",
+        "tracker": {
+            "id": 1,
+            "name": "Bug"
+        },
+        "updated_on": "2016-11-01T01:23:09Z"
+    },
+    "origin": "http://tracker.ceph.com/",
+    "perceval_version": "0.5.0.dev1",
+    "tag": "http://tracker.ceph.com/",
+    "timestamp": 1480391834.936927,
+    "updated_on": 1477963389.0,
+    "uuid": "91064ab874941fa91f96af1f18f40cdf2afc983e"
+},
+{
+    "backend_name": "Redmine",
+    "backend_version": "0.5.1",
+    "category": "issue",
+    "data": {
+        "assigned_to": {
+            "id": 1047,
+            "name": "Haomai Wang"
+        },
+        "assigned_to_data": {
+            "created_on": "2013-07-14T02:53:35Z",
+            "firstname": "Haomai",
+            "id": 1047,
+            "last_login_on": "2015-11-03T03:30:33Z",
+            "lastname": "Wang",
+            "mail": "haomaiwang__gmail.com"
+        },
+        "attachments": [],
+        "author": {
+            "id": 1047,
+            "name": "Haomai Wang"
+        },
+        "author_data": {
+            "created_on": "2013-07-14T02:53:35Z",
+            "firstname": "Haomai",
+            "id": 1047,
+            "last_login_on": "2015-11-03T03:30:33Z",
+            "lastname": "Wang",
+            "mail": "haomaiwang__gmail.com"
+        },
+        "category": {
+            "id": 2,
+            "name": "OSD"
+        },
+        "changesets": [],
+        "closed_on": "2016-10-31T23:37:13Z",
+        "created_on": "2016-10-26T08:09:59Z",
+        "custom_fields": [
+            {
+                "id": 1,
+                "name": "Source",
+                "value": "other"
+            },
+            {
+                "id": 3,
+                "name": "Tags",
+                "value": ""
+            },
+            {
+                "id": 2,
+                "name": "Backport",
+                "value": "hammer,jewel"
+            },
+            {
+                "id": 13,
+                "name": "Regression",
+                "value": "0"
+            },
+            {
+                "id": 4,
+                "name": "Severity",
+                "value": "3 - minor"
+            },
+            {
+                "id": 5,
+                "name": "Reviewed",
+                "value": ""
+            },
+            {
+                "id": 9,
+                "multiple": true,
+                "name": "Affected Versions",
+                "value": []
+            },
+            {
+                "id": 10,
+                "multiple": true,
+                "name": "ceph-qa-suite",
+                "value": []
+            },
+            {
+                "id": 16,
+                "multiple": true,
+                "name": "Release",
+                "value": []
+            },
+            {
+                "id": 18,
+                "name": "Needs Doc",
+                "value": "0"
+            }
+        ],
+        "description": "",
+        "done_ratio": 0,
+        "id": 17713,
+        "journals": [
+            {
+                "created_on": "2016-10-26T08:10:09Z",
+                "details": [],
+                "id": 80394,
+                "notes": "https://github.com/ceph/ceph/pull/11382",
+                "user": {
+                    "id": 1047,
+                    "name": "Haomai Wang"
+                },
+                "user_data": {
+                    "created_on": "2013-07-14T02:53:35Z",
+                    "firstname": "Haomai",
+                    "id": 1047,
+                    "last_login_on": "2015-11-03T03:30:33Z",
+                    "lastname": "Wang",
+                    "mail": "haomaiwang__gmail.com"
+                }
+            },
+            {
+                "created_on": "2016-10-26T09:40:47Z",
+                "details": [
+                    {
+                        "name": "status_id",
+                        "new_value": "13",
+                        "old_value": "1",
+                        "property": "attr"
+                    },
+                    {
+                        "name": "2",
+                        "new_value": "hammer,jewel",
+                        "old_value": "",
+                        "property": "cf"
+                    }
+                ],
+                "id": 80403,
+                "notes": "",
+                "user": {
+                    "id": 2317,
+                    "name": "Kefu Chai"
+                },
+                "user_data": {
+                    "created_on": "2015-01-18T03:18:22Z",
+                    "firstname": "Kefu",
+                    "id": 2317,
+                    "last_login_on": "2016-11-24T17:28:22Z",
+                    "lastname": "Chai",
+                    "mail": "tchaikov__gmail.com"
+                }
+            },
+            {
+                "created_on": "2016-10-26T09:41:54Z",
+                "details": [
+                    {
+                        "name": "assigned_to_id",
+                        "new_value": "1047",
+                        "property": "attr"
+                    }
+                ],
+                "id": 80406,
+                "notes": "",
+                "user": {
+                    "id": 2317,
+                    "name": "Kefu Chai"
+                },
+                "user_data": {
+                    "created_on": "2015-01-18T03:18:22Z",
+                    "firstname": "Kefu",
+                    "id": 2317,
+                    "last_login_on": "2016-11-24T17:28:22Z",
+                    "lastname": "Chai",
+                    "mail": "tchaikov__gmail.com"
+                }
+            },
+            {
+                "created_on": "2016-10-31T23:37:13Z",
+                "details": [
+                    {
+                        "name": "status_id",
+                        "new_value": "3",
+                        "old_value": "13",
+                        "property": "attr"
+                    }
+                ],
+                "id": 80573,
+                "notes": "",
+                "user": {
+                    "id": 1332,
+                    "name": "Yuri Weinstein"
+                },
+                "user_data": {
+                    "created_on": "2013-12-15T15:52:39Z",
+                    "firstname": "Yuri",
+                    "id": 1332,
+                    "last_login_on": "2016-11-07T14:04:59Z",
+                    "lastname": "Weinstein",
+                    "mail": "yweinste__redhat.com"
+                }
+            },
+            {
+                "created_on": "2016-11-01T02:39:12Z",
+                "details": [
+                    {
+                        "name": "status_id",
+                        "new_value": "14",
+                        "old_value": "3",
+                        "property": "attr"
+                    }
+                ],
+                "id": 80582,
+                "notes": "",
+                "user": {
+                    "id": 2317,
+                    "name": "Kefu Chai"
+                },
+                "user_data": {
+                    "created_on": "2015-01-18T03:18:22Z",
+                    "firstname": "Kefu",
+                    "id": 2317,
+                    "last_login_on": "2016-11-24T17:28:22Z",
+                    "lastname": "Chai",
+                    "mail": "tchaikov__gmail.com"
+                }
+            },
+            {
+                "created_on": "2016-11-01T14:44:08Z",
+                "details": [
+                    {
+                        "name": "copied_to",
+                        "new_value": "17764",
+                        "property": "relation"
+                    }
+                ],
+                "id": 80608,
+                "notes": "",
+                "user": {
+                    "id": 789,
+                    "name": "Loic Dachary"
+                },
+                "user_data": {
+                    "created_on": "2013-01-06T11:54:16Z",
+                    "firstname": "Loic",
+                    "id": 789,
+                    "last_login_on": "2016-11-24T06:13:29Z",
+                    "lastname": "Dachary",
+                    "mail": "loic__dachary.org"
+                }
+            },
+            {
+                "created_on": "2016-11-01T14:44:13Z",
+                "details": [
+                    {
+                        "name": "copied_to",
+                        "new_value": "17765",
+                        "property": "relation"
+                    }
+                ],
+                "id": 80610,
+                "notes": "",
+                "user": {
+                    "id": 789,
+                    "name": "Loic Dachary"
+                },
+                "user_data": {
+                    "created_on": "2013-01-06T11:54:16Z",
+                    "firstname": "Loic",
+                    "id": 789,
+                    "last_login_on": "2016-11-24T06:13:29Z",
+                    "lastname": "Dachary",
+                    "mail": "loic__dachary.org"
+                }
+            }
+        ],
+        "priority": {
+            "id": 4,
+            "name": "Normal"
+        },
+        "project": {
+            "id": 1,
+            "name": "Ceph"
+        },
+        "relations": [
+            {
+                "delay": null,
+                "id": 2674,
+                "issue_id": 17713,
+                "issue_to_id": 17764,
+                "relation_type": "copied_to"
+            },
+            {
+                "delay": null,
+                "id": 2675,
+                "issue_id": 17713,
+                "issue_to_id": 17765,
+                "relation_type": "copied_to"
+            }
+        ],
+        "spent_hours": 0.0,
+        "start_date": "2016-10-26",
+        "status": {
+            "id": 14,
+            "name": "Pending Backport"
+        },
+        "subject": "collection_list shadow return value #",
+        "tracker": {
+            "id": 1,
+            "name": "Bug"
+        },
+        "updated_on": "2016-11-01T02:39:12Z"
+    },
+    "origin": "http://tracker.ceph.com/",
+    "perceval_version": "0.5.0.dev1",
+    "tag": "http://tracker.ceph.com/",
+    "timestamp": 1480391837.350012,
+    "updated_on": 1477967952.0,
+    "uuid": "624de88f7fedd5ed0f17716c6d58d2e5e3f9c3d3"
+},
+{
+    "backend_name": "Redmine",
+    "backend_version": "0.5.1",
+    "category": "issue",
+    "data": {
+        "assigned_to": {
+            "id": 2027,
+            "name": "Jason Dillaman"
+        },
+        "assigned_to_data": {
+            "created_on": "2014-09-02T05:20:07Z",
+            "firstname": "Jason",
+            "id": 2027,
+            "last_login_on": "2016-11-18T14:06:03Z",
+            "lastname": "Dillaman",
+            "mail": "dillaman__redhat.com"
+        },
+        "attachments": [],
+        "author": {
+            "id": 2027,
+            "name": "Jason Dillaman"
+        },
+        "author_data": {
+            "created_on": "2014-09-02T05:20:07Z",
+            "firstname": "Jason",
+            "id": 2027,
+            "last_login_on": "2016-11-18T14:06:03Z",
+            "lastname": "Dillaman",
+            "mail": "dillaman__redhat.com"
+        },
+        "created_on": "2016-10-31T14:48:06Z",
+        "custom_fields": [
+            {
+                "id": 1,
+                "name": "Source",
+                "value": "other"
+            },
+            {
+                "id": 3,
+                "name": "Tags",
+                "value": ""
+            },
+            {
+                "id": 2,
+                "name": "Backport",
+                "value": "jewel"
+            },
+            {
+                "id": 13,
+                "name": "Regression",
+                "value": "0"
+            },
+            {
+                "id": 4,
+                "name": "Severity",
+                "value": "3 - minor"
+            },
+            {
+                "id": 5,
+                "name": "Reviewed",
+                "value": ""
+            },
+            {
+                "id": 9,
+                "multiple": true,
+                "name": "Affected Versions",
+                "value": []
+            },
+            {
+                "id": 10,
+                "multiple": true,
+                "name": "ceph-qa-suite",
+                "value": []
+            },
+            {
+                "id": 16,
+                "multiple": true,
+                "name": "Release",
+                "value": []
+            },
+            {
+                "id": 18,
+                "name": "Needs Doc",
+                "value": "0"
+            }
+        ],
+        "description": "If the \"rbd_skip_partial_discard\" option is enabled, this test case will fail.",
+        "done_ratio": 0,
+        "id": 17750,
+        "journals": [
+            {
+                "created_on": "2016-10-31T15:10:34Z",
+                "details": [
+                    {
+                        "name": "status_id",
+                        "new_value": "13",
+                        "old_value": "2",
+                        "property": "attr"
+                    }
+                ],
+                "id": 80545,
+                "notes": "*PR*: https://github.com/ceph/ceph/pull/11703",
+                "user": {
+                    "id": 2027,
+                    "name": "Jason Dillaman"
+                },
+                "user_data": {
+                    "created_on": "2014-09-02T05:20:07Z",
+                    "firstname": "Jason",
+                    "id": 2027,
+                    "last_login_on": "2016-11-18T14:06:03Z",
+                    "lastname": "Dillaman",
+                    "mail": "dillaman__redhat.com"
+                }
+            },
+            {
+                "created_on": "2016-11-01T07:12:16Z",
+                "details": [
+                    {
+                        "name": "status_id",
+                        "new_value": "14",
+                        "old_value": "13",
+                        "property": "attr"
+                    }
+                ],
+                "id": 80585,
+                "notes": "",
+                "user": {
+                    "id": 2290,
+                    "name": "Mykola Golub"
+                },
+                "user_data": {
+                    "created_on": "2014-12-23T02:57:18Z",
+                    "firstname": "Mykola",
+                    "id": 2290,
+                    "last_login_on": "2016-11-18T13:21:21Z",
+                    "lastname": "Golub",
+                    "mail": "mgolub__mirantis.com"
+                }
+            },
+            {
+                "created_on": "2016-11-01T14:44:01Z",
+                "details": [
+                    {
+                        "name": "copied_to",
+                        "new_value": "17763",
+                        "property": "relation"
+                    }
+                ],
+                "id": 80606,
+                "notes": "",
+                "user": {
+                    "id": 789,
+                    "name": "Loic Dachary"
+                },
+                "user_data": {
+                    "created_on": "2013-01-06T11:54:16Z",
+                    "firstname": "Loic",
+                    "id": 789,
+                    "last_login_on": "2016-11-24T06:13:29Z",
+                    "lastname": "Dachary",
+                    "mail": "loic__dachary.org"
+                }
+            }
+        ],
+        "priority": {
+            "id": 4,
+            "name": "Normal"
+        },
+        "project": {
+            "id": 9,
+            "name": "rbd"
+        },
+        "relations": [
+            {
+                "delay": null,
+                "id": 2673,
+                "issue_id": 17750,
+                "issue_to_id": 17763,
+                "relation_type": "copied_to"
+            }
+        ],
+        "spent_hours": 0.0,
+        "start_date": "2016-10-31",
+        "status": {
+            "id": 14,
+            "name": "Pending Backport"
+        },
+        "subject": "TestLibRBD.DiscardAfterWrite doesn't handle \"rbd_skip_partial_discard = true\"",
+        "tracker": {
+            "id": 1,
+            "name": "Bug"
+        },
+        "updated_on": "2016-11-01T07:12:16Z"
+    },
+    "origin": "http://tracker.ceph.com/",
+    "perceval_version": "0.5.0.dev1",
+    "tag": "http://tracker.ceph.com/",
+    "timestamp": 1480391839.354452,
+    "updated_on": 1477984336.0,
+    "uuid": "feb87fb9d8530e5886b632429300a03f1bf29ba9"
+},
+{
+    "backend_name": "Redmine",
+    "backend_version": "0.5.1",
+    "category": "issue",
+    "data": {
+        "assigned_to": {
+            "id": 2027,
+            "name": "Jason Dillaman"
+        },
+        "assigned_to_data": {
+            "created_on": "2014-09-02T05:20:07Z",
+            "firstname": "Jason",
+            "id": 2027,
+            "last_login_on": "2016-11-18T14:06:03Z",
+            "lastname": "Dillaman",
+            "mail": "dillaman__redhat.com"
+        },
+        "attachments": [],
+        "author": {
+            "id": 2027,
+            "name": "Jason Dillaman"
+        },
+        "author_data": {
+            "created_on": "2014-09-02T05:20:07Z",
+            "firstname": "Jason",
+            "id": 2027,
+            "last_login_on": "2016-11-18T14:06:03Z",
+            "lastname": "Dillaman",
+            "mail": "dillaman__redhat.com"
+        },
+        "created_on": "2016-10-19T15:37:50Z",
+        "custom_fields": [
+            {
+                "id": 1,
+                "name": "Source",
+                "value": "other"
+            },
+            {
+                "id": 3,
+                "name": "Tags",
+                "value": ""
+            },
+            {
+                "id": 2,
+                "name": "Backport",
+                "value": "jewel"
+            },
+            {
+                "id": 13,
+                "name": "Regression",
+                "value": "0"
+            },
+            {
+                "id": 4,
+                "name": "Severity",
+                "value": "3 - minor"
+            },
+            {
+                "id": 5,
+                "name": "Reviewed",
+                "value": ""
+            },
+            {
+                "id": 9,
+                "multiple": true,
+                "name": "Affected Versions",
+                "value": []
+            },
+            {
+                "id": 10,
+                "multiple": true,
+                "name": "ceph-qa-suite",
+                "value": []
+            },
+            {
+                "id": 16,
+                "multiple": true,
+                "name": "Release",
+                "value": []
+            },
+            {
+                "id": 18,
+                "name": "Needs Doc",
+                "value": "0"
+            }
+        ],
+        "description": "When using the librbd API to switch between a snapshot and then back to the HEAD revision, the exclusive lock will be (partially) initialized if the image is in read-only mode. The exclusive lock should not be initialized when in read-only mode.",
+        "done_ratio": 0,
+        "id": 17618,
+        "journals": [
+            {
+                "created_on": "2016-10-19T16:05:32Z",
+                "details": [
+                    {
+                        "name": "status_id",
+                        "new_value": "13",
+                        "old_value": "2",
+                        "property": "attr"
+                    }
+                ],
+                "id": 80053,
+                "notes": "*PR*: https://github.com/ceph/ceph/pull/11559",
+                "user": {
+                    "id": 2027,
+                    "name": "Jason Dillaman"
+                },
+                "user_data": {
+                    "created_on": "2014-09-02T05:20:07Z",
+                    "firstname": "Jason",
+                    "id": 2027,
+                    "last_login_on": "2016-11-18T14:06:03Z",
+                    "lastname": "Dillaman",
+                    "mail": "dillaman__redhat.com"
+                }
+            },
+            {
+                "created_on": "2016-11-01T07:14:59Z",
+                "details": [
+                    {
+                        "name": "status_id",
+                        "new_value": "14",
+                        "old_value": "13",
+                        "property": "attr"
+                    }
+                ],
+                "id": 80586,
+                "notes": "",
+                "user": {
+                    "id": 2290,
+                    "name": "Mykola Golub"
+                },
+                "user_data": {
+                    "created_on": "2014-12-23T02:57:18Z",
+                    "firstname": "Mykola",
+                    "id": 2290,
+                    "last_login_on": "2016-11-18T13:21:21Z",
+                    "lastname": "Golub",
+                    "mail": "mgolub__mirantis.com"
+                }
+            },
+            {
+                "created_on": "2016-11-01T14:44:28Z",
+                "details": [
+                    {
+                        "name": "copied_to",
+                        "new_value": "17766",
+                        "property": "relation"
+                    }
+                ],
+                "id": 80612,
+                "notes": "",
+                "user": {
+                    "id": 789,
+                    "name": "Loic Dachary"
+                },
+                "user_data": {
+                    "created_on": "2013-01-06T11:54:16Z",
+                    "firstname": "Loic",
+                    "id": 789,
+                    "last_login_on": "2016-11-24T06:13:29Z",
+                    "lastname": "Dachary",
+                    "mail": "loic__dachary.org"
+                }
+            }
+        ],
+        "priority": {
+            "id": 4,
+            "name": "Normal"
+        },
+        "project": {
+            "id": 9,
+            "name": "rbd"
+        },
+        "relations": [
+            {
+                "delay": null,
+                "id": 2676,
+                "issue_id": 17618,
+                "issue_to_id": 17766,
+                "relation_type": "copied_to"
+            }
+        ],
+        "spent_hours": 0.0,
+        "start_date": "2016-10-19",
+        "status": {
+            "id": 14,
+            "name": "Pending Backport"
+        },
+        "subject": "Exclusive lock improperly initialized on read-only image when using snap_set API",
+        "tracker": {
+            "id": 1,
+            "name": "Bug"
+        },
+        "updated_on": "2016-11-01T07:14:59Z"
+    },
+    "origin": "http://tracker.ceph.com/",
+    "perceval_version": "0.5.0.dev1",
+    "tag": "http://tracker.ceph.com/",
+    "timestamp": 1480391839.725215,
+    "updated_on": 1477984499.0,
+    "uuid": "29c225b6f335d5502f28479c0635e1413e678426"
+}]

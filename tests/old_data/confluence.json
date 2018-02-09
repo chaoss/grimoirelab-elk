@@ -1,0 +1,1209 @@
+[{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/6824064/child",
+            "container": "/rest/api/space/copper",
+            "descendants": "/rest/api/content/6824064/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/copper"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/6824064",
+            "tinyui": "/x/gCBo",
+            "webui": "/display/copper/testing"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/6824064"
+                },
+                "representation": "storage",
+                "value": "<p>This page describes the current tests exercising Congress features, and the plans to integrate them into the Functest program for Colorado.</p><h2>FuncTest Integration</h2><p>The process to get these test cases integrated into FuncTest is (in development):</p><p>1) Clone functest repo and add enhancements below, but do not merge until fully tested</p><p>2) /testcases/features/copper.py: create new script in functest report</p><ul><li><span style=\"line-height: 1.42857;\">based upon e.g. /testcases/features/doctor.py</span></li><li>retrieves the test cases from the copper repo</li><li>executes the tests and cleans up</li><li>reports the result</li></ul><p><span style=\"line-height: 1.42857;\">3) exec_test.sh: add new section</span></p><ac:structured-macro ac:macro-id=\"b9004399-5df4-4cff-be01-544f42007a30\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[function run_test(){\ntest_name=$1\nserial_flag=\"\"\nif [ $serial == \"true\" ]; then\nserial_flag=\"-s\"\nfi\n\"copper\")\npython ${FUNCTEST_REPO_DIR}/testcases/features/copper.py $report\nsleep 10 # to let the instances terminate\n;;]]></ac:plain-text-body></ac:structured-macro><p><span style=\"line-height: 1.42857;\"><br /></span></p><p><span style=\"line-height: 1.42857;\">4) testcases.yaml: add new section</span></p><ac:structured-macro ac:macro-id=\"cd34fffe-4b71-440a-8c73-8b406ec0fe12\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[name: features\norder: 3\nci_loop: '(daily)|(weekly)'\ndescription : >-\nTest suites from feature projects\nintegrated in functest\ntestcases:\n-\nname: copper\ncriteria: 'success_rate == 100%'\ndescription: >-\nTest suite from Copper project.\ndependencies:\ninstaller: '(apex)|(joid)'\nscenario: '']]></ac:plain-text-body></ac:structured-macro><p>&nbsp;</p><p><span style=\"line-height: 1.42857;\">5) Test in isolation per </span><a href=\"http://artifacts.opnfv.org/functest/docs/configguide/configguide.html\">http://artifacts.opnfv.org/functest/docs/configguide/configguide.html</a></p><p>6) Test in community lab POD (full CI based deploy) post-install</p><p>7) Merge patches and test in CI</p><p>&nbsp;</p><h2 style=\"text-align: left;\">Test Cases</h2><p>Git repo link:&nbsp;<a href=\"https://git.opnfv.org/cgit/copper/tree/tests\" style=\"line-height: 1.42857;\">https://</a><a href=\"https://git.opnfv.org/cgit/copper/tree/tests\" style=\"line-height: 1.42857;\">git.opnfv.org/cgit/copper/tree/tests</a></p><table><tbody><tr><th>Test</th><th>Description</th><th>Tested/Planned Environment</th><th>Notes</th></tr><tr><td><a href=\"https://git.opnfv.org/cgit/copper/tree/tests/dmz.sh\">DMZ Placement</a></td><td><p>Pause VMs running in a DMZ zone, if the image running is not allowed to run in that zone.</p></td><td><p>Apex, JOID: Adhoc, FuncTest (in progress)</p></td><td><p>Policy rules tested:</p><p>1) create a dmz_server table entry for any active VM associated to the DMZ security group</p><p>openstack congress policy rule create test &quot;dmz_server(x) :- nova:servers(id=x,status='ACTIVE'), neutronv2:ports(id, device_id, status='ACTIVE'),&nbsp; neutronv2:security_group_port_bindings(id, sg), neutronv2:security_groups(sg,name='dmz')&quot; --name dmz_server</p><p>2) <span>find DMZ VMs are running images not tagged for &ldquo;allowed in DMZ&rdquo;</span></p><p>openstack congress policy rule create test &quot;dmz_placement_error(id) :- nova:servers(id,name,hostId,status,tenant_id,user_id,image,flavor,az,hh), not glancev2:tags(image,'dmz'), dmz_server(id)&quot; --name dmz_placement_error</p><p>3) <span>pause any VM that shows up in the <span>dmz_placement_error table</span></span></p><p><span>&nbsp;</span>openstack congress policy rule create test &quot;execute[nova:servers.pause(id)] :- dmz_placement_error(id), nova:servers(id,status='ACTIVE')&quot; --name paused_dmz_placement_error</p></td></tr><tr><td><a href=\"https://git.opnfv.org/cgit/copper/tree/tests/smtp_ingress.sh\">SMTP Ingress</a>&nbsp;</td><td>Identify VMs that have TCP port 25 open for ingress.</td><td><span>Apex, JOID: Adhoc, </span><span>FuncTest (in progress)</span></td><td><p><span>Policy rules tested:</span></p><p>1)&nbsp;create an smtp_ingress table entry for any VM in a security group with TCP port 25 open for ingress</p><p>openstack congress policy rule create test &quot;smtp_ingress(x) :- nova:servers(id=x,status='ACTIVE'), neutronv2:ports(port_id, status='ACTIVE'), neutronv2:security_groups(sg, tenant_id, sgn, sgd), neutronv2:security_group_port_bindings(port_id, sg), neutronv2:security_group_rules(sg, rule_id, tenant_id, remote_group_id, 'ingress', ethertype, 'tcp', port_range_min, port_range_max, remote_ip), lt(port_range_min, 26), gt(port_range_max, 24)&quot; --name smtp_ingress</p></td></tr><tr><td><a href=\"https://git.opnfv.org/cgit/copper/tree/tests/reserved_subnet.sh\">Reserved Subnet</a></td><td>Delete any subnets created in restricted network ranges.</td><td><span>Apex, JOID: Adhoc, </span><span>FuncTest (in progress)</span></td><td><p><span>Policy rules tested:</span></p><p><span>&nbsp;</span>1-4) create a reserved_subnet_error table entry for any subnet created with this CIDR</p><p>openstack congress policy rule create test &quot;reserved_subnet_error(x) :- neutronv2:subnets(id=x, cidr='10.7.1.0/24')&quot; --name rsv_subnet_adm</p><p>openstack congress policy rule create test &quot;reserved_subnet_error(x) :- neutronv2:subnets(id=x, cidr='10.7.12.0/24')&quot; --name rsv_subnet_prv</p><p>openstack congress policy rule create test &quot;reserved_subnet_error(x) :- neutronv2:subnets(id=x, cidr='10.7.13.0/24')&quot; --name rsv_subnet_stg</p><p>openstack congress policy rule create test &quot;reserved_subnet_error(x) :- neutronv2:subnets(id=x, cidr='10.7.14.0/24')&quot; --name rsv_subnet_mgm</p><p>5) delete any subnet that shows up in the reserved_subnet_error table&nbsp;</p><p><span>openstack congress policy rule create test &quot;execute[neutronv2:delete_subnet(x)] :- reserved_subnet_error(x)&quot; --name deleted_reserved_subnet_error</span></p></td></tr></tbody></table><h3>Test Database Data</h3><p>Current planned tests for the Colorado release are managed through &nbsp;the Swagger API UI at&nbsp;<a href=\"http://testresults.opnfv.org/test/swagger/spec.html#!/spec/update\">http://testresults.opnfv.org/test/swagger/spec.html#!/spec/update</a>. Details are below.&nbsp;</p><div><p>&nbsp;</p><table><tbody><tr><th>Test</th><th>Swagger API UI Data (for update of the database as needed)</th></tr><tr><td><a href=\"http://testresults.opnfv.org/test/api/v1/projects/copper/cases/dmz\">DMZ Placement</a></td><td><p>{<br /> &quot;name&quot;: &quot;dmz&quot;,<br /> &quot;url&quot;: &quot;<a href=\"https://git.opnfv.org/cgit/copper/plain/tests/dmz.sh\">https://git.opnfv.org/cgit/copper/plain/tests/dmz.sh</a>&quot;,<br /> &quot;description&quot;: &quot;An OpenStack Congress policy test. Sets up and validates policy creation and execution for: 1) Identifying VMs connected to a DMZ (currently identified through a specifically-named security group); 2) Identifying VMs connected per (1), which are by policy not allowed to be (currently implemented through an image tag intended to identify images that are 'authorized' i.e. tested and secure, to be DMZ-connected); 3) Reactively enforce the dmz placement rule by pausing VMs found to be in violation of the policy.&quot;<br /> }</p></td></tr><tr><td><a href=\"http://testresults.opnfv.org/test/api/v1/projects/copper/cases/smtp_ingress\">SMTP Ingress</a><span>&nbsp;</span></td><td><p>{<br /> &quot;name&quot;: &quot;smtp_ingress&quot;,<br /> &quot;url&quot;: &quot;<a href=\"https://git.opnfv.org/cgit/copper/plain/tests/smtp_ingress.sh\">https://git.opnfv.org/cgit/copper/plain/tests/smtp_ingress.sh</a>&quot;,<br /> &quot;description&quot;: &quot;An OpenStack Congress policy test. Sets up and validates policy creation and execution for: 1) Identifying VMs that have STMP (TCP port 25) open for ingress.&quot;<br /> }</p></td></tr><tr><td><a href=\"http://testresults.opnfv.org/test/api/v1/projects/copper/cases/reserved_subnet\">Reserved Subnet</a></td><td><p>{<br /> &quot;name&quot;: &quot;reserved_subnet&quot;,<br /> &quot;url&quot;: &quot;<a href=\"https://git.opnfv.org/cgit/copper/plain/tests/reserved_subnet.sh\">https://git.opnfv.org/cgit/copper/plain/tests/reserved_subnet.sh</a>&quot;,<br /> &quot;description&quot;: &quot;An OpenStack Congress policy test. Sets up and validates policy creation and execution for: 1) Detecting that a reserved subnet has been created, by mistake. 'Reserved' in this example means e.g. not intended for use by VMs.&quot;<br /> }</p></td></tr></tbody></table></div>"
+            }
+        },
+        "extensions": {
+            "position": 12
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/6824064/history"
+            },
+            "createdBy": {
+                "displayName": "Bryan Sullivan",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/1933958/user-avatar?version=1&modificationDate=1452734887000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d5521dc09301523dbdf88f0004",
+                "username": "blsaws"
+            },
+            "createdDate": "2016-06-15T20:00:35.000Z",
+            "latest": true
+        },
+        "id": "6824064",
+        "status": "current",
+        "title": "testing",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Bryan Sullivan",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/1933958/user-avatar?version=1&modificationDate=1452734887000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d5521dc09301523dbdf88f0004",
+                "username": "blsaws"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 5,
+            "when": "2016-07-20T02:26:09.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614733.314379,
+    "updated_on": 1468981569.0,
+    "uuid": "366e309f9b83b00b1d58d66b3c2e32ddedbdaada"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/2925736/child",
+            "container": "/rest/api/space/copper",
+            "descendants": "/rest/api/content/2925736/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/copper"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/2925736",
+            "tinyui": "/x/qKQs",
+            "webui": "/display/copper/Joid"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/2925736"
+                },
+                "representation": "storage",
+                "value": "<p>These are rough notes being developed as the Joid install environment for Copper is developed.</p><h2>Installing the Ubuntu-Based Jumphost</h2><p>Basic install guidelines:&nbsp;<ac:link><ri:page ri:content-title=\"Joid Get Started\" ri:space-key=\"joid\" /></ac:link>.</p><ul><li>This procedure uses as an example the JOID installer config for the 3-node, single-NIC, non-HA, bare metal install as described for Copper (Foreman). The JOID project repo has been updated with patches for this config, e.g.<ul><li>in folder <a href=\"https://git.opnfv.org/cgit/joid/tree/labconfig/att\">https://git.opnfv.org/cgit/joid/tree/labconfig/att</a></li></ul></li></ul><ul><li>Make sure you have good internet connectivity, as it's required for package install/updates etc.</li></ul><ul><li>Install Ubuntu 14.04.03 LTS desktop on the jumphost. Use a non-root user (opnfv, password you choose), which by default should be part of the sudoers group.<ul><li>If the jumphost is attached to a gateway with DHCP disabled (as described on the <a href=\"https://wiki.opnfv.org/copper/academy\">Academy main page</a>, you will need to assign the static IP to the primary ethernet interface during Ubuntu install (since network autoconfig will fail). Use these values:<ul><li>IP address: 192.168.10.2</li><li>Netmask: 255.255.255.0</li><li>Gateway 192.168.10.1</li><li>DNS: 8.8.8.8 8.8.4.4</li></ul></li></ul></li><li>Install prerequisites</li></ul><ac:structured-macro ac:macro-id=\"cf758074-37d4-4978-b150-2fb2d0ae8d06\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[sudo apt-get update\nsudo apt-get upgrade -y\nsudo apt-get install bridge-utils vlan git openssh-server -y\nmkdir ~/.ssh\nchmod 744 ~/.ssh\n]]></ac:plain-text-body></ac:structured-macro><ul><li>Create a bridge brAdm on eth0, by modifying /etc/network/interfaces file on jumphost. Subnet &quot;192.168.10.x&quot; is used here to avoid conflicts with commonly used subnets in LAN environments.</li></ul><ac:structured-macro ac:macro-id=\"8fe24d98-f661-4e4f-a882-cc6d90a6ca2a\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[(leave lo section as-is)\niface eth0 inet manual\nauto brAdm\niface brAdm inet static\naddress 192.168.10.2\nnetmask 255.255.255.0\nnetwork 192.168.10.1\nbroadcast 192.168.10.255\ngateway 192.168.10.1\n\ndns-nameservers 8.8.8.8 127.0.0.1\nbridge_ports eth0\n]]></ac:plain-text-body></ac:structured-macro><ul><li>If you installed Ubuntu desktop, you may need to disable Ubuntu Network Manager. In the case of static IP assignment during Ubuntu install as above, this will not be needed as the primary interface eth0 will be set to &quot;unmanaged&quot; by Network Manager.</li></ul><ac:structured-macro ac:macro-id=\"e1e9ce61-de07-4039-b4c9-4c4dd114e650\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[sudo stop network-manager\necho \"manual\" | sudo tee /etc/init/network-manager.override\n]]></ac:plain-text-body></ac:structured-macro><ul><li>Reboot</li></ul><h2>JOID Install</h2><ul><li>Clone the joid repo</li></ul><ac:structured-macro ac:macro-id=\"0a9ef61f-d3eb-4771-be5d-004c50fbc84e\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[mkdir ~/git\ncd git\ngit clone http://gerrit.opnfv.org/gerrit/joid.git\ncd joid\ngit checkout stable/brahmaputra ]]></ac:plain-text-body></ac:structured-macro><ul><li>Set the correct MAC addresses on the controller and compute nodes in the template <a class=\"ls-blob yaml\" href=\"https://git.opnfv.org/cgit/joid/tree/labconfig/att/virpod1/labconfig.yaml\">labconfig.yaml</a></li></ul><ac:structured-macro ac:macro-id=\"3f40920d-540e-4e68-bb70-8317a394b303\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[vi ~/git/joid/labconfig/att/virpod1/labconfig.yaml\n]]></ac:plain-text-body></ac:structured-macro><ul><li>Start MAAS and Juju bootstrap into two VMs on the jumphost</li></ul><ac:structured-macro ac:macro-id=\"274b5fe7-afaf-49ca-8521-3eab6da5ad18\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[cd ~/git/joid/ci\n./02-maasdeploy.sh attvirpod1\n]]></ac:plain-text-body></ac:structured-macro><ul><li>If MAAS install is successful, you will see the following result</li></ul><ac:structured-macro ac:macro-id=\"7abe463b-8d74-4426-9ea5-af4c36e78938\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[You are now logged in to the MAAS server at\nhttp://192.168.10.3/MAAS/api/1.0/ with the profile name 'maas'.\n]]></ac:plain-text-body></ac:structured-macro><ul><li>You should now be able to login to MAAS at&nbsp;<a href=\"http://192.168.10.5/MAAS\">http://192.168.10.5/MAAS</a> (ubuntu/ubuntu). However there may have been issues in the commissioning of the jumphost - verify the status of the jumphost in the MAAS Nodes screen is &quot;Ready&quot;. If you can't login to MAAS, or the jumphost node status is not &quot;Ready&quot;, the commissioning may have failed due to networking issues, e.g. brief internet service disruptions that can interfere with process steps. In that case, just restart the 02-maasdeploy.sh command.<ul><li>Some debugging hints for the MAAS VM<ul><li>ssh ubuntu@192.168.10.3</li><li>tail -f /var/log/cloud-init-output.log</li></ul></li></ul></li></ul><ul><li>When both nodes in the &quot;Ready&quot; state in the MAAS gui (they will have been powered off by MAAS in after completion), run the OPNFV deploy via Juju. Pick one of the SDN (-s) options. The example below uses the simplest (no SDN).</li></ul><ac:structured-macro ac:macro-id=\"4464c3f5-3856-46f8-8d95-39a66ff671a1\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[cd ~/git/joid/ci\n./deploy.sh -d trusty -o mitaka -s nosdn -t nonha -l attvirpod1\n]]></ac:plain-text-body></ac:structured-macro><ul><li>if the deploy times out and you output such as <a class=\"external-link\" href=\"https://etherpad.opnfv.org/p/copper-juju-deploy-timeout\" rel=\"nofollow\">https://etherpad.opnfv.org/p/copper-juju-deploy-timeout</a><ul><li><p>debug, correct the issue, clean the juju environment as below, power-off the controller and compute nodes, and rerun the previous step</p><ac:structured-macro ac:macro-id=\"e65b901e-4f3a-4727-b092-ee1d64fd3ea4\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[./clean.sh\n# use the following commands if clean.sh hangs\nrm -rf ~/.juju/environments\nrm -rf ~/.juju/ssh\n]]></ac:plain-text-body></ac:structured-macro></li></ul></li></ul><ul><li>The deploy.sh script will finish with lines such as the following, if successful</li></ul><ac:structured-macro ac:macro-id=\"fdd08ed0-6a5f-4468-afc4-34072fb616f7\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[2015-12-04 11:21:02 [INFO] deployer.cli: Deployment complete in 1709.63 seconds\n+ echo '... Deployment finished ....'\n... Deployment finished ....\n\n+ echo 'deploying finished'\ndeploying finished\n]]></ac:plain-text-body></ac:structured-macro><ul><li>However, it's likely not yet complete as the juju charms take a while (30 minutes or more) to fully configure and bring up the services to the &quot;active&quot; status. You can see the current status from the command:</li></ul><ac:structured-macro ac:macro-id=\"b992ccea-ad1c-4c31-9f50-831692e54904\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[watch juju status --format=tabular\n]]></ac:plain-text-body></ac:structured-macro><ul><li>Once all the services are either in state &quot;active&quot; or &quot;unknown&quot; (which just means that the JuJu charm for the service does not yet implement status reporting), install should be complete. When it completes, you can get the addresses of the installed services by the command:</li></ul><ac:structured-macro ac:macro-id=\"9a906781-fda2-4656-8c6f-7a7c8eadac7c\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[juju status --format=short\n]]></ac:plain-text-body></ac:structured-macro><ul><li>If for some reason the ./deploy.sh succeeded but you need to reclone JOID to get an update before deploying again, you can avoid deploying MAAS again with these commands:</li></ul><ac:structured-macro ac:macro-id=\"c5feeceb-e699-477b-8799-0d99bc8e204d\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[cp ~/.juju/encironments.yaml joid/ci/\ncd ~/git/joid/ci\n./clean.sh\n]]></ac:plain-text-body></ac:structured-macro><pre>&nbsp;</pre><h2>Verifying OPNFV Services are Operational</h2><p>Setup authentication for OpenStack CLI commands: On jumphost, from Horizon / Project / Compute / Access &amp; Security / API Access select &quot;Download OpenStack RC file, transfer to the controller root home directory, then execute it.&nbsp;</p><ac:structured-macro ac:macro-id=\"4f6f4e09-b58b-474d-a997-5756105ff319\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[source ~/git/joid/ci/cloud/admin-openrc]]></ac:plain-text-body></ac:structured-macro><p>&nbsp;</p><p>1) On the jumphost browse to, and verify that these services are active (e.g. per the example above):</p><ul><li>the MAAS UI at <a href=\"http://192.168.10.5/MAAS/\">http://192.168.10.5/MAAS/</a> (login: ubuntu/ubuntu)</li><li>OpenStack Horizon dashboard with account &quot;admin/openstack&quot;<ul><li><p>Note the openstack-dashboard address can be obtained by</p><ac:structured-macro ac:macro-id=\"45ded59d-d0c3-49fc-83cc-424d0dbf4908\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[sudo juju status --format=short | grep openstack-dashboard\n]]></ac:plain-text-body></ac:structured-macro></li></ul></li></ul><ul><li>OpenDaylight DLUX dashboard at <span class=\"external-link\">http://&lt;odl-controller address&gt;:8181/dlux/index.html</span> with account &quot;admin/admin&quot;<ul><li><p>Note the odl-controller address can be obtained by</p><ac:structured-macro ac:macro-id=\"27bc4d47-5fca-4615-b6c7-0e7925163370\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[sudo juju status --format=short | grep odl-controller\n]]></ac:plain-text-body></ac:structured-macro></li></ul></li></ul><h2>Verifying Services are Operational - Smoke Tests</h2><p>The following procedure will verify that the basic OPNFV services are operational.</p><ul><li>Clone the copper project repo:</li></ul><ac:structured-macro ac:macro-id=\"a95173ea-dacf-47b7-8465-d3a778fa8c42\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[mkdir ~/git\ncd ~/git\ngit clone https://gerrit.opnfv.org/gerrit/copper\n]]></ac:plain-text-body></ac:structured-macro><ul><li>Execute &quot;smoke01.sh&quot;, which uses the OpenStack CLI to<ul><li>Create a glance image (cirros)</li><li>Create public/private network/subnet</li><li>Create an external router, gateway, and interface</li><li><p>Boot two cirros instances on the private network</p><ac:structured-macro ac:macro-id=\"bc899aa2-0698-44e7-97d0-250bef275a76\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[cd ~/git/copper/tests/adhoc\nsource smoke01.sh\n]]></ac:plain-text-body></ac:structured-macro></li></ul></li></ul><ul><li>From Horizon / Project / Compute / Instances, select &quot;cirros-1&quot; and &quot;Console&quot;, and login with account &quot;cirros&quot; / &quot;cubswin:)&quot;. Ping address of cirros-2 as shown in Horizon, 192.168.10.1 (external router), and opnfv.org (to validate DNS operation).</li></ul><ul><li>Execute &quot;smoke01-clean.sh&quot; to delete all the changes from smoke01.sh.</li></ul><ac:structured-macro ac:macro-id=\"baaa0ec0-b568-41f6-acc8-228ee8e42a13\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[cd ~/git/copper/tests/adhoc\nsource smoke01-clean.sh\n]]></ac:plain-text-body></ac:structured-macro><p>&nbsp;</p><p>&nbsp;</p>"
+            }
+        },
+        "extensions": {
+            "position": 1
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/2925736/history"
+            },
+            "createdBy": {
+                "displayName": "Mark Beierl",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/1343490/user-avatar?version=2&modificationDate=1467932454000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d5521d22bb01521d2fd9110002",
+                "username": "mbeierl"
+            },
+            "createdDate": "2016-03-24T19:46:16.000Z",
+            "latest": true
+        },
+        "id": "2925736",
+        "status": "current",
+        "title": "Joid",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Bryan Sullivan",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/1933958/user-avatar?version=1&modificationDate=1452734887000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d5521dc09301523dbdf88f0004",
+                "username": "blsaws"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 9,
+            "when": "2016-07-20T02:51:14.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614747.295034,
+    "updated_on": 1468983074.0,
+    "uuid": "47f7d981339e7048267e330489ffaa07bd958d8d"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/2925751/child",
+            "container": "/rest/api/space/copper",
+            "descendants": "/rest/api/content/2925751/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/copper"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/2925751",
+            "tinyui": "/x/t6Qs",
+            "webui": "/display/copper/Academy"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/2925751"
+                },
+                "representation": "storage",
+                "value": "<h3>Copper sandbox (&quot;Academy&quot;)</h3><p>This is an effort to setup a basic functional assessment platform (a learning &quot;academy&quot;) based upon OPNFV, installed as a single node (e.g. a laptop with lots of memory) or multi-node environment. This will provide a means to learn, analyze, and further develop:</p><ul><li>the OPNFV install process, to find where/how we need to augment it for additional components (e.g. Congress)</li><li>the basic mechanisms supported by OPNFV components for VNF and service configuration</li><li>the mechanisms supported by the additional components for configuration policy management</li><li>use cases, demos, and techniques supporting the Copper scope</li></ul><p>The hardware used in this includes:</p><ul><li>3 Intel NUC i7 (NUC5i7RYH), each with 16GB RAM, 1TB HDD, 250MB SSD<ul><li>The diagram below shows three NUCs used for a single non-HA &quot;POD&quot;, i.e. jumphost, controller, and compute node hosts, with a single NIC on jumphost and compute nodes, two NICs on controller node (onboard ethernet, USB ethernet adapter)</li></ul></li><li>a router/gateway that isolates the OPNFV private network (single subnet) from the other LAN segments or the Internet, and any pesky DHCP servers that might be there<ul><li style=\"text-align: left;\">the private network can use any subnet; 192.168.10.0/24 is used below and in the procedures linked above<br /><br /></li></ul></li></ul><p>As shown in the diagrams below, an internet connection is assumed to be available. In some cases (e.g. hackfests etc) you may need to connect thru a wifi network. Because it may not be obvious how to do this with a fixed configuration, see&nbsp;<ac:link><ri:page ri:content-title=\"Connecting a Lab to the Internet via WiFi\" /></ac:link>.</p><p>See&nbsp;<ac:link><ri:page ri:content-title=\"Congress Test\" /><ac:plain-text-link-body><![CDATA[Congress test procedures]]></ac:plain-text-link-body></ac:link>&nbsp;for notes on testing Congress.</p><h2>Current Release (Colorado)</h2><h4>Multi-Node JOID-based install on 3 bare metal nodes (non-HA)</h4><p>Congress is now supported for JOID as a base install feature (all scenarios) and has been tested in virtual (single-node),&nbsp; multi-node Pharos-compliant labs, and the NUC-based multi-node/non-HA configuration shown below.</p><p><span>See </span><ac:link><ri:page ri:content-title=\"Joid\" /><ac:plain-text-link-body><![CDATA[Joid install procedure]]></ac:plain-text-link-body></ac:link><span> for the basic install, and </span><ac:link><ri:page ri:content-title=\"Joid Notes\" /><ac:plain-text-link-body><![CDATA[additional notes]]></ac:plain-text-link-body></ac:link><a href=\"https://wiki.opnfv.org/copper/academy/joid/notes\">.</a></p><p>See <a href=\"https://wiki.opnfv.org/display/copper/Congress+on+JOID\">Congress install procedure</a> for installation of OpenStack Congress in an LXC container on the JOID-based controller node.</p><p><ac:image ac:width=\"500px\"><ri:attachment ri:filename=\"copper_sandbox_joid.png\" /></ac:image></p><p><ac:link><ri:attachment ri:filename=\"academy.pptx\" /><ac:plain-text-link-body><![CDATA[(Link to Powerpoint source of the diagram above)]]></ac:plain-text-link-body></ac:link></p><h4>Multi-Node Apex-based install on 3 bare metal nodes (non-HA)</h4><p>Congress is now supported for Apex as a base install feature (all scenarios) and has been tested in virtual (single-node) and multi-node Pharos-compliant labs. <strong>However: Apex has not yet been verified on the multi-node/non-HA NUC configuration below.</strong> The last attempts to deploy Apex in this configuration failed due to wake-on-lan/PXE-boot issues, the root cause of which is not yet known.</p><p><ac:image ac:height=\"250\"><ri:attachment ri:filename=\"copper_sandbox_apex.png\" /></ac:image></p><h2>Previous Release (Brahmaputra)</h2><h4>Multi-Node Apex-based install on 3 bare metal nodes (non-HA)</h4><p>This is a work in progress. The target system is as described for JOID below.</p><p>See <ac:link><ri:page ri:content-title=\"Apex\" /><ac:plain-text-link-body><![CDATA[Apex install procedure]]></ac:plain-text-link-body></ac:link> for the basic install and notes on Congress installation.</p><p><ac:image ac:height=\"250\"><ri:attachment ri:filename=\"copper_sandbox_apex.png\" /></ac:image></p><h4>Multi-Node JOID-based install on 3 bare metal nodes (non-HA)</h4><p><span style=\"line-height: 1.42857;\">See </span><ac:link><ri:page ri:content-title=\"Joid\" /><ac:plain-text-link-body><![CDATA[Joid install procedure]]></ac:plain-text-link-body></ac:link><span style=\"line-height: 1.42857;\"> for the basic install, and </span><ac:link><ri:page ri:content-title=\"Joid Notes\" /><ac:plain-text-link-body><![CDATA[additional notes]]></ac:plain-text-link-body></ac:link><a href=\"https://wiki.opnfv.org/copper/academy/joid/notes\" style=\"line-height: 1.42857;\">.</a></p><p>See <a href=\"https://wiki.opnfv.org/display/copper/Congress+on+JOID\">Congress install procedure</a> for installation of OpenStack Congress in an LXC container on the JOID-based controller node.</p><p><ac:image ac:width=\"500px\"><ri:attachment ri:filename=\"copper_sandbox_joid.png\" /></ac:image></p><p><ac:link><ri:attachment ri:filename=\"academy.pptx\" /><ac:plain-text-link-body><![CDATA[(Link to Powerpoint source of the diagram above)]]></ac:plain-text-link-body></ac:link><a href=\"https://wiki.opnfv.org/_media/copper/academy_joid.pptx\"></a></p><h2>Previous Release (Arno)</h2><h4>Multi-Node Foreman-based install on 3 bare metal nodes (non-HA)</h4><p>See <ac:link><ri:page ri:content-title=\"Foreman\" /><ac:plain-text-link-body><![CDATA[Foreman install procedure]]></ac:plain-text-link-body></ac:link><a href=\"https://wiki.opnfv.org/copper/academy/foreman\">, </a><ac:link><ri:page ri:content-title=\"Foreman Verify\" /><ac:plain-text-link-body><![CDATA[install verification procedure]]></ac:plain-text-link-body></ac:link><a href=\"https://wiki.opnfv.org/copper/academy/foreman/verify\">, and </a><ac:link><ri:page ri:content-title=\"Foreman Notes\" /><ac:plain-text-link-body><![CDATA[additional notes]]></ac:plain-text-link-body></ac:link><a href=\"https://wiki.opnfv.org/copper/academy/foreman/notes\">.</a></p><p>The hardware used in this includes:</p><ul><li>3 Intel NUC i7 (NUC5i7RYH), each with 16GB RAM, 1TB HDD, 250MB SSD<ul><li>The diagram below shows three NUCs used for a single non-HA &quot;POD&quot;, i.e. jumphost, controller, and compute node hosts.</li><li>Note: the single ethernet port on the NUCs can be augmented thru USB-NIC adapters using the 4 USB ports</li></ul></li><li>a router/gateway that isolates the OPNFV private network (single subnet) from the other LAN segments or the Internet, and any pesky DHCP servers that might be there<ul><li>the private network can use any subnet; 192.168.1.0/24 is used below and in the procedures linked above</li></ul></li></ul><p><ac:image ac:width=\"500px\"><ri:attachment ri:filename=\"copper_sandbox_take_6.png\" /></ac:image></p><p><ac:link><ri:attachment ri:filename=\"academy_arno_foreman.pptx\" /><ac:plain-text-link-body><![CDATA[(Link to Powerpoint source of the diagram above)]]></ac:plain-text-link-body></ac:link><a href=\"https://wiki.opnfv.org/_media/copper/copper_work_items/academy.pptx\"></a></p><h4>Earlier efforts to build Academy</h4><p>For the record, you can review the (mostly failed) <a href=\"https://wiki.opnfv.org/copper/academy/previous\">e</a><ac:link><ri:page ri:content-title=\"Previous Attempts at Building Academy\" /><ac:plain-text-link-body><![CDATA[arlier attempts]]></ac:plain-text-link-body></ac:link><a href=\"https://wiki.opnfv.org/copper/academy/previous\">&nbsp;...</a></p>"
+            }
+        },
+        "extensions": {
+            "position": 1
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/2925751/history"
+            },
+            "createdBy": {
+                "displayName": "Mark Beierl",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/1343490/user-avatar?version=2&modificationDate=1467932454000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d5521d22bb01521d2fd9110002",
+                "username": "mbeierl"
+            },
+            "createdDate": "2016-03-24T19:46:33.000Z",
+            "latest": true
+        },
+        "id": "2925751",
+        "status": "current",
+        "title": "Academy",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Bryan Sullivan",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/1933958/user-avatar?version=1&modificationDate=1452734887000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d5521dc09301523dbdf88f0004",
+                "username": "blsaws"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 14,
+            "when": "2016-07-20T02:51:36.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614765.829707,
+    "updated_on": 1468983096.0,
+    "uuid": "81210a7a87768fbba7ee31a187c2d700c58b637c"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/2926548/child",
+            "container": "/rest/api/space/meetings",
+            "descendants": "/rest/api/content/2926548/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/meetings"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/2926548",
+            "tinyui": "/x/1Kcs",
+            "webui": "/display/meetings/Dovetail"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/2926548"
+                },
+                "representation": "storage",
+                "value": "<h1>DoveTail Team Meetings</h1><h2>Meeting Info</h2><ul><li>Weekly on Friday at <a href=\"http://www.timeanddate.com/worldclock/fixedtime.html?hour=14&amp;min=0&amp;sec=0\">1400-1500</a> UTC</li><li>Gotomeeting Access: <a class=\"external-link\" href=\"https://global.gotomeeting.com/join/458547813\" rel=\"nofollow\">https://global.gotomeeting.com/join/458547813</a></li><li>IRC channel: #opnfv-meeting@ Freenode (<a href=\"http://webchat.freenode.net/?channels=opnfv-meeting\">Web Chat</a>)</li></ul><h2>Intro &amp; Rules</h2><p>Meeting agendas and minutes are kept below below. If you would like to add an item to the agenda, please insert it into the appropriate meeting agenda (upcoming) and inform the chair. Please do NOT change past meeting minutes, if you believe there is an inaccuracy, please inform the chair.</p><h2>Upcoming Meetings</h2><h3>July 22, 2016</h3><p>agenda:</p><ol><li>Release status update</li><li>Hackfest - joint meeting with C&amp;C/Plugfest</li><li>Dovetail framework</li><li>Test plan(start point from C&amp;C): SFC, IPV6 and L3VPN</li></ol><h2>Past Meeting Minutes</h2><ul><li>July 15, 2015: <a href=\"https://wiki.opnfv.org/display/meetings/Dt+Minutes+20160715\">Minutes</a></li><li>July 8, 2016:&nbsp;<a href=\"https://wiki.opnfv.org/display/meetings/Dt+Minutes+20160708\">Minutes</a><a href=\"https://wiki.opnfv.org/display/meetings/Dt+Minutes+20160701\"></a></li><li>July 1, 2016: <a href=\"https://wiki.opnfv.org/display/meetings/Dt+Minutes+20160701\">Minutes</a></li><li>May 27, 2016: <a href=\"https://wiki.opnfv.org/display/meetings/Dt+Minutes+20160527\">Minutes</a></li><li>May 20, 2016: <a href=\"https://wiki.opnfv.org/pages/editpage.action?pageId=6825721\">Minutes</a></li><li>April 1, 2016</li><li>March 18,2016:the meeting has been canseled due to the Hackfest meeting</li><li>March 11, 2016: <ac:link><ri:page ri:content-title=\"Dt Minutes 20160311\" /><ac:plain-text-link-body><![CDATA[Minutes]]></ac:plain-text-link-body></ac:link></li><li>March 04, 2016: <ac:link><ri:page ri:content-title=\"Dt Minutes 20160304\" /><ac:plain-text-link-body><![CDATA[Minutes]]></ac:plain-text-link-body></ac:link></li><li>February 26, 2016: <ac:link><ri:page ri:content-title=\"Dt Minutes 20160226\" /><ac:plain-text-link-body><![CDATA[Minutes]]></ac:plain-text-link-body></ac:link></li><li>February 19, 2016: <ac:link><ri:page ri:content-title=\"Dt Minutes 20160219\" /><ac:plain-text-link-body><![CDATA[Minutes]]></ac:plain-text-link-body></ac:link></li><li>January 29, 2016: <ac:link><ri:page ri:content-title=\"Dt Minutes 20160128\" /><ac:plain-text-link-body><![CDATA[Minutes]]></ac:plain-text-link-body></ac:link></li><li>January 21, 2016: <ac:link><ri:page ri:content-title=\"Dt Minutes 20160121\" /><ac:plain-text-link-body><![CDATA[Minutes]]></ac:plain-text-link-body></ac:link></li><li>January 07, 2016: <ac:link><ri:page ri:content-title=\"Dt Minutes 20160107\" /><ac:plain-text-link-body><![CDATA[Minutes]]></ac:plain-text-link-body></ac:link></li></ul>"
+            }
+        },
+        "extensions": {
+            "position": "none"
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/2926548/history"
+            },
+            "createdBy": {
+                "displayName": "Mark Beierl",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/1343490/user-avatar?version=2&modificationDate=1467932454000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d5521d22bb01521d2fd9110002",
+                "username": "mbeierl"
+            },
+            "createdDate": "2016-03-24T19:58:13.000Z",
+            "latest": true
+        },
+        "id": "2926548",
+        "status": "current",
+        "title": "Dovetail",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Yu Yang (Gabriel)",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": true,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/images/icons/profilepics/default.png",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553af6aa90153b0845f06000f",
+                "username": "yuyang"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 12,
+            "when": "2016-07-20T06:22:58.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614781.291776,
+    "updated_on": 1468995778.0,
+    "uuid": "4312e6844341f85d2275df2bec7428c87e08f924"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/6826515/child",
+            "container": "/rest/api/space/security",
+            "descendants": "/rest/api/content/6826515/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/security"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/6826515",
+            "tinyui": "/x/Eypo",
+            "webui": "/display/security/OpenDayLight+SCAP+Work"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/6826515"
+                },
+                "representation": "storage",
+                "value": ""
+            }
+        },
+        "extensions": {
+            "position": "none"
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/6826515/history"
+            },
+            "createdBy": {
+                "displayName": "Luke Hinds",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/6816011/user-avatar?version=2&modificationDate=1459535020000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553c3b7db0153c752aaf6000a",
+                "username": "lukehinds"
+            },
+            "createdDate": "2016-07-20T08:34:28.000Z",
+            "latest": true
+        },
+        "id": "6826515",
+        "status": "current",
+        "title": "OpenDayLight SCAP Work",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Luke Hinds",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/6816011/user-avatar?version=2&modificationDate=1459535020000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553c3b7db0153c752aaf6000a",
+                "username": "lukehinds"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 1,
+            "when": "2016-07-20T08:34:28.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614782.430158,
+    "updated_on": 1469003668.0,
+    "uuid": "241de2fab1fd0f78606b83de2f2442742378e51a"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/6826519/child",
+            "container": "",
+            "descendants": "/rest/api/content/6826519/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/security"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/6826205?status=historical&version=3",
+            "tinyui": "/x/Fypo",
+            "webui": "/pages/viewpage.action?pageId=6826519"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/6826519"
+                },
+                "representation": "storage",
+                "value": "<h2><a href=\"https://wiki.opnfv.org/display/security/OpenSCAP+on+Ubuntu+14.04\">Ubuntu OpenSCAP / SCAP Page</a></h2><h2>OpenDayLight SCAP Work</h2><p>&nbsp;</p><h2>COPR repositories</h2><pre>https://copr.fedorainfracloud.org/coprs/openscapmaint/openscap-latest/</pre><p>&nbsp;</p>"
+            }
+        },
+        "extensions": {
+            "position": "none"
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/6826205/history"
+            },
+            "createdBy": {
+                "displayName": "Luke Hinds",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/6816011/user-avatar?version=2&modificationDate=1459535020000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553c3b7db0153c752aaf6000a",
+                "username": "lukehinds"
+            },
+            "createdDate": "2016-07-15T16:25:41.000Z",
+            "latest": false
+        },
+        "id": "6826205",
+        "status": "historical",
+        "title": "Security Scanning",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Luke Hinds",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/6816011/user-avatar?version=2&modificationDate=1459535020000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553c3b7db0153c752aaf6000a",
+                "username": "lukehinds"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 3,
+            "when": "2016-07-20T08:36:56.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614786.61358,
+    "updated_on": 1469003816.0,
+    "uuid": "f8755dcd9d9eb71bb144dfb0f745be4bf96a78fe"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/6826521/child",
+            "container": "",
+            "descendants": "/rest/api/content/6826521/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/security"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/6826205?status=historical&version=4",
+            "tinyui": "/x/GSpo",
+            "webui": "/pages/viewpage.action?pageId=6826521"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/6826521"
+                },
+                "representation": "storage",
+                "value": "<h2><a href=\"https://wiki.opnfv.org/display/security/OpenSCAP+on+Ubuntu+14.04\">Ubuntu OpenSCAP / SCAP Page</a></h2><h2><a href=\"https://wiki.opnfv.org/display/security/OpenDayLight+SCAP+Work\">OpenDayLight SCAP Work</a></h2><p>&nbsp;</p><h2>COPR repositories</h2><pre>https://copr.fedorainfracloud.org/coprs/openscapmaint/openscap-latest/</pre><p>&nbsp;</p>"
+            }
+        },
+        "extensions": {
+            "position": "none"
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/6826205/history"
+            },
+            "createdBy": {
+                "displayName": "Luke Hinds",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/6816011/user-avatar?version=2&modificationDate=1459535020000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553c3b7db0153c752aaf6000a",
+                "username": "lukehinds"
+            },
+            "createdDate": "2016-07-15T16:25:41.000Z",
+            "latest": false
+        },
+        "id": "6826205",
+        "status": "historical",
+        "title": "Security Scanning",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Luke Hinds",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/6816011/user-avatar?version=2&modificationDate=1459535020000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553c3b7db0153c752aaf6000a",
+                "username": "lukehinds"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 4,
+            "when": "2016-07-20T08:37:21.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614788.252899,
+    "updated_on": 1469003841.0,
+    "uuid": "0efddda54a4d00fdf35e76dd8bc2fdc3879d94b4"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/6826522/child",
+            "container": "",
+            "descendants": "/rest/api/content/6826522/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/security"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/6826205?status=historical&version=5",
+            "tinyui": "/x/Gipo",
+            "webui": "/pages/viewpage.action?pageId=6826522"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/6826522"
+                },
+                "representation": "storage",
+                "value": "<h2><a href=\"https://wiki.opnfv.org/display/security/OpenSCAP+on+Ubuntu+14.04\">Ubuntu OpenSCAP / SCAP Page</a></h2><h2><a href=\"https://wiki.opnfv.org/display/security/OpenDayLight+SCAP+Work\">OpenDayLight SCAP Work</a></h2><p>&nbsp;</p><h2>COPR repositories</h2><pre>https://copr.fedorainfracloud.org/coprs/openscapmaint/openscap-latest/ </pre><p>&nbsp;</p><h4>Fedora:</h4><p>&nbsp;</p><ac:structured-macro ac:macro-id=\"4fdcea50-d379-41c9-a49f-c9ef91fe1dcc\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[dnf copr enable user/project # needs dnf-plugins-core]]></ac:plain-text-body></ac:structured-macro><pre class=\"wiki\">&nbsp;</pre><h4 class=\"wiki\">CentOS:</h4><p>&nbsp;</p><ac:structured-macro ac:macro-id=\"8bfe8a88-1ab9-4154-a5d6-da426899128a\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[yum copr enable user/project # needs \u00c2\u00a0yum-plugin-copr]]></ac:plain-text-body></ac:structured-macro>"
+            }
+        },
+        "extensions": {
+            "position": "none"
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/6826205/history"
+            },
+            "createdBy": {
+                "displayName": "Luke Hinds",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/6816011/user-avatar?version=2&modificationDate=1459535020000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553c3b7db0153c752aaf6000a",
+                "username": "lukehinds"
+            },
+            "createdDate": "2016-07-15T16:25:41.000Z",
+            "latest": false
+        },
+        "id": "6826205",
+        "status": "historical",
+        "title": "Security Scanning",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Luke Hinds",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/6816011/user-avatar?version=2&modificationDate=1459535020000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553c3b7db0153c752aaf6000a",
+                "username": "lukehinds"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 5,
+            "when": "2016-07-20T09:45:56.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614789.490326,
+    "updated_on": 1469007956.0,
+    "uuid": "2332f1064d09f518422c51e592080d3f8457b850"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/6826205/child",
+            "container": "/rest/api/space/security",
+            "descendants": "/rest/api/content/6826205/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/security"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/6826205",
+            "tinyui": "/x/3Sho",
+            "webui": "/display/security/Security+Scanning"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/6826205"
+                },
+                "representation": "storage",
+                "value": "<h2><a href=\"https://wiki.opnfv.org/display/security/OpenSCAP+on+Ubuntu+14.04\">Ubuntu OpenSCAP / SCAP Page</a></h2><h2><a href=\"https://wiki.opnfv.org/display/security/OpenDayLight+SCAP+Work\">OpenDayLight SCAP Work</a></h2><p>&nbsp;</p><h2>COPR repositories</h2><pre>&nbsp;</pre><pre>https://copr.fedorainfracloud.org/coprs/openscapmaint/openscap-latest/ </pre><h4>Fedora:</h4><ac:structured-macro ac:macro-id=\"4fdcea50-d379-41c9-a49f-c9ef91fe1dcc\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[dnf copr enable user/project # needs dnf-plugins-core]]></ac:plain-text-body></ac:structured-macro><h4 class=\"wiki\">CentOS:</h4><ac:structured-macro ac:macro-id=\"8bfe8a88-1ab9-4154-a5d6-da426899128a\" ac:name=\"code\" ac:schema-version=\"1\"><ac:plain-text-body><![CDATA[yum copr enable user/project # needs \u00c2\u00a0yum-plugin-copr]]></ac:plain-text-body></ac:structured-macro>"
+            }
+        },
+        "extensions": {
+            "position": "none"
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/6826205/history"
+            },
+            "createdBy": {
+                "displayName": "Luke Hinds",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/6816011/user-avatar?version=2&modificationDate=1459535020000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553c3b7db0153c752aaf6000a",
+                "username": "lukehinds"
+            },
+            "createdDate": "2016-07-15T16:25:41.000Z",
+            "latest": true
+        },
+        "id": "6826205",
+        "status": "current",
+        "title": "Security Scanning",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Luke Hinds",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/6816011/user-avatar?version=2&modificationDate=1459535020000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553c3b7db0153c752aaf6000a",
+                "username": "lukehinds"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 6,
+            "when": "2016-07-20T09:46:15.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614790.895925,
+    "updated_on": 1469007975.0,
+    "uuid": "8e4ca519c0b1795ba74cc6bd04f7f75c7e47dae1"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/6826511/child",
+            "container": "",
+            "descendants": "/rest/api/content/6826511/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/meetings"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/6826509?status=historical&version=1",
+            "tinyui": "/x/Dypo",
+            "webui": "/pages/viewpage.action?pageId=6826511"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/6826511"
+                },
+                "representation": "storage",
+                "value": ""
+            }
+        },
+        "extensions": {
+            "position": "none"
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/6826509/history"
+            },
+            "createdBy": {
+                "displayName": "Yu Yang (Gabriel)",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": true,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/images/icons/profilepics/default.png",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553af6aa90153b0845f06000f",
+                "username": "yuyang"
+            },
+            "createdDate": "2016-07-20T06:14:27.000Z",
+            "latest": false
+        },
+        "id": "6826509",
+        "status": "historical",
+        "title": "Dt Minutes 20160715",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Yu Yang (Gabriel)",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": true,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/images/icons/profilepics/default.png",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553af6aa90153b0845f06000f",
+                "username": "yuyang"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 1,
+            "when": "2016-07-20T06:14:27.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614792.089838,
+    "updated_on": 1468995267.0,
+    "uuid": "5e44f41a58ff2f404d05460c6e3a4845f8f27fcd"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/6826523/child",
+            "container": "",
+            "descendants": "/rest/api/content/6826523/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/meetings"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/6826509?status=historical&version=2",
+            "tinyui": "/x/Gypo",
+            "webui": "/pages/viewpage.action?pageId=6826523"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/6826523"
+                },
+                "representation": "storage",
+                "value": "<h2>Minutes of DoveTail Discussion on July 15, 2016</h2><ul><li><code>Date and Time:</code>&nbsp;Friday at&nbsp;<a class=\"external-link\" href=\"http://www.timeanddate.com/worldclock/fixedtime.html?hour=13&amp;min=0&amp;sec=0\" rel=\"nofollow\">1400-1500</a>&nbsp;UTC, July 8, 2016</li><li><code>Convener</code>: Hongbo (Huawei)&nbsp;and Bin Hu(AT&amp;T)</li><li><code>Participants</code>:<ul><li><p>Prakash (Huawei)</p></li><li><p>Juh Lamers</p></li><li><p>Zeng Xin</p></li><li><p>Le Ma (BiiGroup)</p></li><li><p>Jha Oravinen</p></li><li><p>Chris Donley (Huawei)</p></li><li><p>Tetsuya Nakamura (Cablelabs)</p></li><li><p>Sajeev Manikkoth (IEEE)</p></li></ul></li></ul><p>Agenda:</p><ul><li style=\"list-style-type: none;background-image: none;\"><ul><li>Input from C&amp;C</li><li>Dovetail framework</li><li>Test plan(start point from C&amp;C): SFC, IPV6 and L3VPN&nbsp;</li></ul></li></ul><h2>Discussion &amp; Action Item&nbsp;</h2>"
+            }
+        },
+        "extensions": {
+            "position": "none"
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/6826509/history"
+            },
+            "createdBy": {
+                "displayName": "Yu Yang (Gabriel)",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": true,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/images/icons/profilepics/default.png",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553af6aa90153b0845f06000f",
+                "username": "yuyang"
+            },
+            "createdDate": "2016-07-20T06:14:27.000Z",
+            "latest": false
+        },
+        "id": "6826509",
+        "status": "historical",
+        "title": "Dt Minutes 20160715",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Yu Yang (Gabriel)",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": true,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/images/icons/profilepics/default.png",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553af6aa90153b0845f06000f",
+                "username": "yuyang"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 2,
+            "when": "2016-07-20T06:21:37.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614794.191694,
+    "updated_on": 1468995697.0,
+    "uuid": "247f58d963adea15fca4c22aa528e0fb9c4f9c0f"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/6826509/child",
+            "container": "/rest/api/space/meetings",
+            "descendants": "/rest/api/content/6826509/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/meetings"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/6826509",
+            "tinyui": "/x/DSpo",
+            "webui": "/display/meetings/Dt+Minutes+20160715"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/6826509"
+                },
+                "representation": "storage",
+                "value": "<h2>Minutes of DoveTail Discussion on July 15, 2016</h2><ul><li><code>Date and Time:</code>&nbsp;Friday at&nbsp;<a class=\"external-link\" href=\"http://www.timeanddate.com/worldclock/fixedtime.html?hour=13&amp;min=0&amp;sec=0\" rel=\"nofollow\">1400-1500</a>&nbsp;UTC, July 8, 2016</li><li><code>Convener</code>: Hongbo (Huawei)&nbsp;and Bin Hu(AT&amp;T)</li><li><code>Participants</code>:<ul><li><p>Prakash (Huawei)</p></li><li><p>Juh Lamers</p></li><li><p>Zeng Xin</p></li><li><p>Le Ma (BiiGroup)</p></li><li><p>Jha Oravinen</p></li><li><p>Chris Donley (Huawei)</p></li><li><p>Tetsuya Nakamura (Cablelabs)</p></li><li><p>Sajeev Manikkoth (IEEE)</p></li><li>Yu Yang (Huawei)</li></ul></li></ul><p>Agenda:</p><ul><li style=\"list-style-type: none;background-image: none;\"><ul><li>Input from C&amp;C</li><li>Dovetail framework</li><li>Test plan(start point from C&amp;C): SFC, IPV6 and L3VPN&nbsp;</li></ul></li></ul><h2>Discussion &amp; Action Item&nbsp;</h2><h3>Inputs from C&amp;C</h3><p>Discussion of the Compliance &amp; Verification Program (CVP) and &nbsp;high level guidance from C&amp;C, which include :</p><ul><li>C&amp;C Committe starting a compliance &amp; verification program<ul><li>Purpose: help build the market for OPNFV software, reduce adoption risks for end-users and decrease testing cost by verifying platform interfaces and components</li><li>Also hosting semi-annual plugfests</li></ul></li><li>Requesting that Dove tail develop test plans and automated test scripts supporting these events</li><li>Functional test program, supported by use cases, for HW and SW platforms<ul><li>not asking for performance tests</li></ul></li><li>Hardware platform<ul><li>Can OPNFV run on hardware under test?</li><li>Installer tests plus basic (vPing)</li></ul></li><li>Softwre platform<ul><li>&quot;black box&quot; functional tests</li><li>Use cases supported by Colorado release<ul><li>Layer3 VPN, IPv6 Overlays, SFC</li></ul></li></ul></li><li>We get the greatest legitimacy shen we have an external reference (e.g. ETSI NFV TST, IETF RFCs, etc.)</li><li>Can also draw from existing OPNFV testing projects and other OPNFV projects</li><li>Primary objective is to test commercial platforms (not just an OPNFV release)</li><li>Secondary objective is to support plugfests</li><li>Tertiary objective would e to re-use tests in upstream build systems</li><li>Timeline is also discussed<ul><li><div>Next Plugfest is Dec 5. Requsting beta versions of the test scripts in early Nov.</div><ul><li>Plugfest is NOT a compliance event, and results will not be reported</li><li>Good opportunity to test the scripts and familiarize participants with them</li></ul></li><li>Planning to start CVP testing in early Jan<ul><li>Need final versions prior to launch</li></ul></li></ul></li></ul><h3>Dovetail framework</h3><p><span>It is discussed the compliance and certification of Dovetail under this topic including</span></p><ul><li>Certification<ul><li><p><span style=\"color: rgb(55,58,54);\">A requirements that must be met by the implementation</span></p></li><li><p><span style=\"color: rgb(55,58,54);\">Show the value of official Release</span><strong><br /></strong></p></li></ul></li><li><p><span style=\"color: rgb(55,58,54);\"><span style=\"color: rgb(55,58,54);\">OPNFV Certification Options</span></span></p><ul><li><span style=\"color: rgb(55,58,54);\">Self-certification</span><ul><li><span style=\"color: rgb(55,58,54);\">Vendor conduct certification test and provide the test report to C&amp;C</span></li></ul></li><li><span style=\"color: rgb(55,58,54);\">3rd-Party &nbsp;Lab certification</span><ul><li><span style=\"color: rgb(55,58,54);\">Cerfification test conducted by authorized 3rd lab and provide the test report to C&amp;C</span></li></ul></li><li><span style=\"color: rgb(55,58,54);\">&nbsp;OPNFV Lab certification</span><ul><li><span style=\"color: rgb(55,58,54);\">Certification test conducted by OPNFV lab and provide the test report to C&amp;C</span></li></ul></li></ul></li><li><div>Test tool (e.g., tool, suite, and/or reference implementation)</div><ul><li><div><span style=\"color: rgb(55,58,54);\">a collection of combinations of legal and illegal inputs to the implementation being tested, together with a corresponding collection of &quot;expected results.&quot;</span></div></li></ul></li><li><div><span style=\"color: rgb(55,58,54);\">Procedures for&nbsp;testing<br /></span></div><ul><li><div><span style=\"color: rgb(55,58,54);\">Should be designed before testing<br /></span></div></li><li><div><div class=\"O1\">documentation of how the testing is to be done and the directions for the tester to follow</div></div></li></ul></li><li><div class=\"O1\"><span style=\"color: rgb(55,58,54);\">Organization(s) to do testing, issue certificates of validation, and arbitrate&nbsp;</span><span style=\"color: rgb(55,58,54);\">disputes</span></div><ul><li><span style=\"color: rgb(55,58,54);\">It is&nbsp;</span><span style=\"color: rgb(55,58,54);\">responsible for issuing certificates for products determined to be conformance</span><span style=\"color: rgb(55,58,54);\">.</span><span style=\"color: rgb(55,58,54);\"><br /></span></li></ul></li><li>Timeline is also discussed which request board approval<ul><li><div>Longer-item by Colorado release (Sept)</div><ul><li>Draft certification governace<ul><li>Guidelines, appeal process, etc.</li><li>Test result review and approval</li><li>Lab strategy (self-test, approved labs, etc.)</li><li>Identify and secure trademarks, draft usage policy</li></ul></li><li>Dovetail<ul><li>Formalize test plans</li><li>Create additional automation/scripts</li></ul></li></ul></li></ul></li><li>Ways for dovetail management: git and gerrit,&nbsp;JIRA and slides on wiki</li></ul><h3>Test plan(start point from C&amp;C): SFC, IPV6 and L3VPN</h3><p>A short discussion is carried out about the starting points of Dovetail test plan:</p><ul><li>It is agreed that SFC, IPv6 and L3VPN will be delivered in Release C</li><li>The test plan will be discussed in the Dovetail weekly meeting also about Release D&amp;E</li><li>An action item is assigned to hongbo to collect the test uses by next Friday</li><li>It is agreed that the used cases will be discussed next week</li></ul><p>&nbsp;</p><p>&nbsp;</p>"
+            }
+        },
+        "extensions": {
+            "position": "none"
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/6826509/history"
+            },
+            "createdBy": {
+                "displayName": "Yu Yang (Gabriel)",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": true,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/images/icons/profilepics/default.png",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553af6aa90153b0845f06000f",
+                "username": "yuyang"
+            },
+            "createdDate": "2016-07-20T06:14:27.000Z",
+            "latest": true
+        },
+        "id": "6826509",
+        "status": "current",
+        "title": "Dt Minutes 20160715",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Yu Yang (Gabriel)",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": true,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/images/icons/profilepics/default.png",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553af6aa90153b0845f06000f",
+                "username": "yuyang"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 3,
+            "when": "2016-07-20T09:47:03.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614795.423203,
+    "updated_on": 1469008023.0,
+    "uuid": "5a2bb4969449602c40287ad1f53c98a8246fbf17"
+},
+{
+    "backend_name": "Confluence",
+    "backend_version": "0.1.0",
+    "data": {
+        "_expandable": {
+            "ancestors": "",
+            "children": "/rest/api/content/2925932/child",
+            "container": "/rest/api/space/vsperf",
+            "descendants": "/rest/api/content/2925932/descendant",
+            "metadata": "",
+            "operations": "",
+            "space": "/rest/api/space/vsperf"
+        },
+        "_links": {
+            "base": "https://wiki.opnfv.org",
+            "collection": "/rest/api/content",
+            "context": "",
+            "self": "https://wiki.opnfv.org/rest/api/content/2925932",
+            "tinyui": "/x/bKUs",
+            "webui": "/display/vsperf/Vswitch+Work+Items"
+        },
+        "body": {
+            "_expandable": {
+                "anonymous_export_view": "",
+                "editor": "",
+                "export_view": "",
+                "styled_view": "",
+                "view": ""
+            },
+            "storage": {
+                "_expandable": {
+                    "content": "/rest/api/content/2925932"
+                },
+                "representation": "storage",
+                "value": "<h1>= vSwitch Performance Characterization for Telco NFV Use Cases - Candidate work items =</h1><h2>Candidate work items</h2><p>This section lists features which &quot;vswitchperf&quot; will develop. It is expected that the output here will fold into higher level OPNFV test projects (e.g. for system level functionality testing, specific VNF use-case tests, performance tests etc.) - which are in the process of being defined.</p><h3>Effort</h3><table><tbody><tr><th><p>Relative size</p></th><th><p>Days</p></th></tr><tr><td><p>XS</p></td><td><p>1</p></td></tr><tr><td><p>S</p></td><td><p>2</p></td></tr><tr><td><p>M</p></td><td><p>3</p></td></tr><tr><td><p>L</p></td><td><p>5</p></td></tr><tr><td><p>XL</p></td><td><p>8</p></td></tr><tr><td><p>TENT</p></td><td><p>13</p></td></tr></tbody></table><h3>Priority 1</h3><table><tbody><tr><th><p>Feature</p></th><th colspan=\"1\">Status</th><th><p>Description</p></th><th><p>Priority</p></th><th><p>JIRA</p></th><th><p>Effort</p></th><th><p>Impact</p></th></tr><tr><td><p>Moongen Integration</p></td><td colspan=\"1\">Done</td><td><p>Integrate Moongen with VSPERF</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>High</p></td></tr><tr><td><p>Traffic Gen control Utility</p></td><td colspan=\"1\">Done</td><td><p>Create a python utility that's capable of directly controlling the traffic generators supported by vsperf.</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>High</p></td></tr><tr><td><p>Implement the IMIX genome as a traffic gen API function and allow it to be configurable from the cli</p></td><td colspan=\"1\">&nbsp;</td><td><p>IMIX specification as an option to the traffic generator using <a href=\"http://tools.ietf.org/html/rfc6985\">RFC 6985</a></p></td><td><p>High</p></td><td><p>VSPERF-97</p></td><td><p>XL</p></td><td><p>Med</p></td></tr><tr><td><p>Yardstick integration</p></td><td colspan=\"1\">Done</td><td><p>Minimal integration complete</p></td><td><p>High</p></td><td><p>VSPERF-79</p></td><td><p>L</p></td><td><p>High</p></td></tr><tr><td><p>vSwitch None Option</p></td><td colspan=\"1\">Done</td><td><p>Implement a vswitch None option that allows you to setup the use case you want to test without a vswitch.</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>M</p></td><td><p>Low</p></td></tr><tr><td><p>Bypass/SR-IOV setup support</p></td><td colspan=\"1\">Done</td><td><p>Enable Bypass/SR-IOV setup support with vsperf for the no vswitch use case.</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>XL</p></td><td><p>Med</p></td></tr><tr><td><p>VXLAN, GRE, NVGRE /overlay integration tests.</p></td><td colspan=\"1\">Done</td><td><p>Port TOIT VXLAN tests to VSPERF</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>Med</p></td></tr><tr><td><p>QoS tests</p></td><td colspan=\"1\">&nbsp;</td><td><p>Port TOIT QoS tests to VSPERF</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>Med</p></td></tr><tr><td><p>VM 2 VM tests</p></td><td colspan=\"1\">Will need to push out</td><td><p>Enable VM-vswitch-VM - vhost user<br />Nailed down methodology&nbsp;</p></td><td><p>High</p></td><td><p>VSPERF-89</p></td><td><p>XL</p></td><td><p>High</p></td></tr><tr><td><p>Port all old toit integration tests to VSPERF</p></td><td colspan=\"1\">Done</td><td><p>&nbsp;</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>XL</p></td><td><p>Med</p></td></tr><tr><td><p>Any outstanding RFC2544 tests implementation</p></td><td colspan=\"1\">&nbsp;</td><td><p>Packetloss profile test implementation</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>Med</p></td></tr><tr><td><p>report frameloss % from IXIA</p></td><td colspan=\"1\">Done</td><td><p>&nbsp;</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>S</p></td><td><p>High</p></td></tr><tr><td><p>Exploration of a reference pipeline configuration for release C /supporting openstack/more realistic pipelines</p></td><td colspan=\"1\">Will be done through yardstick</td><td><p>we need to extend our support from the baseline deployment benchmarks to include more complex but realistic deployment scenarios for the vSwitch. In other words we need to be able to support integration with openstack. The activities that will be key to supporting this is: 1. Enabling end used to use our automated traffic generation scripts (either through the implementation of a separate control utility for the traffic gens or through supporting a NONE option for vSwitches and VNFs). 2. Integration with Yardstick. 3. Exploration of a suitable reference pipeline configuration (service chaining as a possible example). 4.Supporting a SW traffic generator</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>TENT</p></td><td><p>High</p></td></tr></tbody></table><h3>Priority 2</h3><table><tbody><tr><th><p>Feature</p></th><th colspan=\"1\">Status</th><th><p>Description</p></th><th><p>Priority</p></th><th><p>JIRA</p></th><th><p>Effort</p></th><th><p>Impact</p></th></tr><tr><td><p>Support TCP traffic in traffic gens</p></td><td colspan=\"1\">&nbsp;</td><td><p>Add TCP support to IxNET TCL script. (UDP is hardcoded)</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>M</p></td><td><p>Low</p></td></tr><tr><td><p>TCL script cleanup</p></td><td colspan=\"1\">&nbsp;</td><td><p>Remove TCL lines that can be generated by IxNet generate (highLevelStream 1500+ lines) items (Ongoing)</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>XL</p></td><td><p>Low</p></td></tr><tr><td><p>Migrate to IXIA python APIs instead of TCL scripts</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>XL</p></td><td><p>High</p></td></tr><tr><td><p>Detailed benchmark reporting and graphing.</p></td><td colspan=\"1\">&nbsp;</td><td><p>Is done through the OPNFV Results Dashboard</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>XL</p></td><td><p>High</p></td></tr><tr><td><p>IXIA RFC 5481 evaluation and study of scripts</p></td><td colspan=\"1\">In Progress</td><td><p>Study the IXIA scripts provided by IXIA and integrate them with the traffic gen utility in VSPERF - scripts are written for the IXIA Sw version supported by POD3 and will need to be tested there.</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>High</p></td></tr><tr><td><p>RFC2889 tests implementation</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>Med</p></td></tr><tr><td><p>deployment as a test argument</p></td><td colspan=\"1\">&nbsp;</td><td><p>remove the deployment from the test name - it's exploding our testcases config file, it should be passed as a parameter/list to the testcase which has an agnostic name and reported as part of the result.</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>M</p></td><td><p>Med</p></td></tr><tr><td><p>Fix OF table structure for PVP and PVVP to match P2P</p></td><td colspan=\"1\">&nbsp;</td><td><p>OF table structure used in VSPERF is not followed by PVP and PVVP scenarios (flows are just in first table)</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>XL</p></td><td><p>Med</p></td></tr><tr><td><p>Allow for configurable port numbers for frame modification</p></td><td colspan=\"1\">&nbsp;</td><td><p>physical port numbers are currently hardcoded in frame modification settings, so it can't be used easily with other deployments than P2P</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>Low</p></td></tr><tr><td><p>Update implementation for background load generation to run multiple instances of the background load.</p></td><td colspan=\"1\">&nbsp;</td><td><p>background load generated by stress(-ng) doesn't work well with isolcpus option; It has to be modified to run x instances of stress and pinpoint them to &quot;free&quot; cpus.</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>Med</p></td></tr><tr><td><p>Xena Networks traffic generator integration with VSPERF</p></td><td colspan=\"1\">Done</td><td><p>Integrate Xena with VSPERF</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>High</p></td></tr><tr><td><p>Decouple the controller from OVS</p></td><td colspan=\"1\">&nbsp;</td><td><p>Migrate OpenFlow dependency out of the controllers and down to the vswitches themselves to decouple the controller from OVS</p></td><td><p>Med</p></td><td><p>VSPERF-113</p></td><td><p>XL</p></td><td><p>High</p></td></tr><tr><td><p>L2, L3, L4 flows</p></td><td colspan=\"1\">&nbsp;</td><td><p>Extend test definitions and implementation to do L2, L3, and L4 level flow matching</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>TENT</p></td><td><p>High</p></td></tr><tr><td><p>Test Prioritization</p></td><td colspan=\"1\">Done</td><td><p>Establish a Wiki/JIRA story where we prioritize the tests to define and implement.</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>S</p></td><td><p>High</p></td></tr><tr><td><p>Common params for traffig gens</p></td><td colspan=\"1\">&nbsp;</td><td><p>leverage the terminology used in RFC 1242 and RFC 2285 to rename the parameters (both input and output) from traffic gens</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>M</p></td><td><p>High</p></td></tr><tr><td><p>Support vfio instead of igb_uio</p></td><td colspan=\"1\">Done</td><td><p>migrate DPDK setup to use vfio or enable vfio as an option</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>S</p></td><td><p>High</p></td></tr><tr><td><p>Report iteration results as well as aggregate results</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>S</p></td><td><p>High</p></td></tr></tbody></table><h3>Priority 3</h3><table><tbody><tr><th><p>Feature</p></th><th colspan=\"1\">Status</th><th><p>Description</p></th><th><p>Priority</p></th><th><p>JIRA</p></th><th><p>Effort</p></th><th><p>Impact</p></th></tr><tr><td><p>Single port traffic gen Source and Sink</p></td><td colspan=\"1\">&nbsp;</td><td><p>Single port traffic gen support (today we just use 2 ports)</p></td><td><p>Low</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>Low</p></td></tr><tr><td><p>pcap replay as an option for traffic gens.</p></td><td colspan=\"1\">&nbsp;</td><td><p>Implement a function to allow for pcap replay from the traffic gens supported by OPNFV (Priority 1 SW pkt Gens, Priority 2 IXIA &amp; Spirent)</p></td><td><p>Low</p></td><td><p>&nbsp;</p></td><td><p>L</p></td><td><p>Med</p></td></tr><tr><td><p>Fix UDP/TCP port error (Port 63 is hardcoded)</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>Low</p></td><td><p>&nbsp;</p></td><td><p>S</p></td><td><p>Low</p></td></tr><tr><td><p>Linux bridge as a switch</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>Low</p></td><td><p>&nbsp;</p></td><td><p>M</p></td><td><p>High</p></td></tr><tr><td><p>Kevin's recommendations for perf benchmarking</p></td><td colspan=\"1\">&nbsp;</td><td><p>TODO get these from Kevin</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>M</p></td><td><p>Low</p></td></tr><tr><td><p>Ciara's recommendations for vhost benchmarking</p></td><td colspan=\"1\">&nbsp;</td><td><p>TODO get these from Ciara</p></td><td><p>High</p></td><td><p>&nbsp;</p></td><td><p>M</p></td><td><p>Low</p></td></tr><tr><td><p>Investigate IXIA SDN + NFV testsuite: OpenFlow Switch Forwarding test</p></td><td colspan=\"1\">&nbsp;</td><td><p>Investigate the tests provided by the IXIA blackbook on SDN + NFV testing to see if there are test we can leverge</p></td><td><p>Low</p></td><td><p>VSPERF-84</p></td><td><p>L</p></td><td><p>Med</p></td></tr><tr><td><p>RFC 2544 Scalability tech debt - pre intstall flows on the vswitch</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>&nbsp;</p></td><td><p>VSPERF-83</p></td><td><p>M</p></td><td><p>Low</p></td></tr><tr><td><p>Vanilla OVS PVP/PVVP - differences in RX values for bidirectional flows</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>Med</p></td><td><p>VSPERF-117</p></td><td><p>L</p></td><td><p>Med</p></td></tr><tr><td><p>Add Spirent traffic gen virtual equipment to POD3</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>High</p></td><td><p>VSPERF-143</p></td><td><p>&nbsp;</p></td><td><p>&nbsp;</p></td></tr><tr><td><p>Add Spirent support for throughput mod vlan family of tests</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>Med</p></td><td><p>VSPERF-145</p></td><td><p>&nbsp;</p></td><td><p>&nbsp;</p></td></tr><tr><td><p>Add Spirent support for continuous traffic tests</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>Med</p></td><td><p>VSPERF-146</p></td><td><p>&nbsp;</p></td><td><p>&nbsp;</p></td></tr><tr><td><p>Add Spirent support for b2b family of tests</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>Med</p></td><td><p>VSPERF-144</p></td><td><p>&nbsp;</p></td><td><p>&nbsp;</p></td></tr><tr><td><p>Modify Spirent RFC2544 throughput test to use Spirent's REST API</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>Med</p></td><td><p>VSPERF-148</p></td><td><p>&nbsp;</p></td><td><p>&nbsp;</p></td></tr><tr><td><p>Add Spirent support for scalability family of tests</p></td><td colspan=\"1\">&nbsp;</td><td><p>&nbsp;</p></td><td><p>Med</p></td><td><p>VSPERF-147</p></td><td><p>&nbsp;</p></td><td><p>&nbsp;</p></td></tr><tr><td><p>Deployment Naming and extension</p></td><td colspan=\"1\">&nbsp;</td><td><p>we need to come up with a better naming scheme for our deployment scenarios, that&rsquo;s intuitive and extensible, we will work with new committers/contributors on this.</p></td><td><p>Med</p></td><td><p>&nbsp;</p></td><td><p>M</p></td><td><p>High</p></td></tr></tbody></table><h3>Activities and Tasks</h3><table><tbody><tr><th><p>Task</p></th><th><p>Description</p></th><th><p>Interested Committers/contributors</p></th></tr><tr><td><p>Test Case Specification</p></td><td><p>Generic specification (not vSwitch specific, or architecture specific). Requires a lot of work and diverse community involvement as Committers. The Test case specification must be absoutely generic - it may not even refer to any specific vSwitch implementation. This is the intent of the project - generic vSwitch characterization. The project will not prevent the creation of additional test configurations for different vSwitches - whether its kernel based data paths, or user space data paths, etc.</p></td><td><p>Intel (Maryam Tahhan), Dell (Wenjing Chu), Thomas Graf (Noiro Networks), Mark Lambe (AeroFlex), Christoph Meyer (Ericsson), Aihua Li (Huawei)</p></td></tr><tr><td><p>Project Repo Structure</p></td><td><p>Organize and maintain high level directory tree .</p></td><td><p>Aihua Li (Hauwei)</p></td></tr><tr><td><p>HW Specification</p></td><td><p>Need to describe the initial HW that can be available for use by this project. Linux Foundation virtual infrastructure probably not sufficient, will need to use the facilties of the OPNFV Performance and Test Lab infrastructure.</p></td><td><p>Trevor Cooper (Intel)</p></td></tr><tr><td><p>Test implementation and integration into framework</p></td><td><p>Implement test cases into test framework</p></td><td><p>Intel (Maryam Tahhan), Gene Schneider (Huawei), Madhu Challa (Noiro Networks), Dell (Name to follow from Wenjing), Wang Xiao, Chen Jinzhou ( Huawei ), Christoph Meyer (Ericsson)</p></td></tr><tr><td><p>&nbsp;</p></td><td><p>&nbsp;</p></td><td><p>&nbsp;</p></td></tr><tr><td><p>&nbsp;</p></td><td><p>&nbsp;</p></td><td><p>&nbsp;</p></td></tr></tbody></table>"
+            }
+        },
+        "extensions": {
+            "position": "none"
+        },
+        "history": {
+            "_expandable": {
+                "lastUpdated": "",
+                "nextVersion": "",
+                "previousVersion": ""
+            },
+            "_links": {
+                "self": "https://wiki.opnfv.org/rest/api/content/2925932/history"
+            },
+            "createdBy": {
+                "displayName": "Mark Beierl",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": false,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/download/attachments/1343490/user-avatar?version=2&modificationDate=1467932454000&api=v2",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d5521d22bb01521d2fd9110002",
+                "username": "mbeierl"
+            },
+            "createdDate": "2016-03-24T19:48:55.000Z",
+            "latest": true
+        },
+        "id": "2925932",
+        "status": "current",
+        "title": "Vswitch Work Items",
+        "type": "page",
+        "version": {
+            "by": {
+                "displayName": "Maryam Tahhan",
+                "profilePicture": {
+                    "height": 48,
+                    "isDefault": true,
+                    "path": "/s/en_GB/6210/96b66f73363ad6a4132228b496713b1df46ada86.9/_/images/icons/profilepics/default.png",
+                    "width": 48
+                },
+                "type": "known",
+                "userKey": "2c9e48d553c3b7db0153c806a397000c",
+                "username": "maryamtahhan"
+            },
+            "message": "",
+            "minorEdit": false,
+            "number": 5,
+            "when": "2016-07-20T14:48:17.000Z"
+        }
+    },
+    "origin": "https://wiki.opnfv.org/",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469614803.022751,
+    "updated_on": 1469026097.0,
+    "uuid": "2db414220f6a36e63b0e77c82e2a8515e754a569"
+}]

@@ -1,0 +1,141 @@
+[{
+    "backend_name": "MBox",
+    "backend_version": "0.4.0",
+    "data": {
+        "Date": "Mon, 01 Dec 2014 10:14:44 +0100",
+        "From": "jgb at gsyc.es (Jesus M. Gonzalez-Barahona)",
+        "In-Reply-To": "<CACRHdMa9XEkAjX4o=w--5-4q-Tb0ihRrg=z6Qxuk3NiDSwbmhg_at_mail.gmail.com>",
+        "Message-ID": "<1417425284.8160.121.camel_at_gsyc.es>",
+        "References": "<CACRHdMa9XEkAjX4o=w--5-4q-Tb0ihRrg=z6Qxuk3NiDSwbmhg_at_mail.gmail.com>",
+        "Subject": "[Metrics-grimoire] Introducing Gerrie - A crawler for Googles\n code review system Gerrit",
+        "body": {
+            "plain": "Hi, Andy,\n\nVery interesting! I've been playing a bit with pretty much the same\nstuff, but writing in Python. The results are, for now, at\n\nhttps://github.com/jgbarah/revisor\n\nI use a slightly different approach to yours (I guess). I have a tool\nfor getting the XML from the gerrit ssh site, another one for dumping it\nto the database, and then another one for checking / extracting the\ndata. The rationale is that once you have the XML file (which may be\nlong to obtain, due to limits on how many records per query you can get,\nand because of delays on the server side), you can re-run everything in\nyour site, without bothering the gerrit server.\n\nI was also playing a  bit with the gerrit HTTP interface. It is simpler\nto use (no need for a key, for example), but is is by far not as\ncomplete as the ssh one. So I reverted to the ssh interface.\n\nI love the fine documentation of your tool. Mine is just a poor proof of\nconcept. Thanks a lot for sharing it!\n\n[Just for the record, the Gerrit backend of bicho has also been improved\na bit during the last months]\n\nSaludos,\n\n\tJesus.\n\nOn Fri, 2014-11-28 at 17:42 +0100, Andy Grunwald wrote:\n> Hey everyone,\n> \n> \n> i want to introduce Gerrie [1] to you.\n> Gerrie is a crawler for Googles code review system Gerrit.\n> The Wikimedia and TYPO3 community uses Gerrit to improve and develop\n> various products like Mediawiki, Wiki-Extensions, Infrastructure,\n> TYPO3 CMS, Neos, Flow and so on. The Gerrit instances are located at\n> gerrit.wikimedia.org [2] and review.typo3.org [3].\n> \n> \n> During this activity a lot of interesting data will be created in the\n> background. Gerrie is a tool to transform this data into a RDBMS like\n> MySQL. After this you can create analysis with it with simple sql\n> queries.\n> \n> \n> To retrieve the data the SSH API of Gerrit will be used. The benefit\n> from this is you can use every Gerrit system to analyze like Wikimedia\n> [2] or TYPO3 [3]. What you need is to register there and enter your\n> public key there.\n> \n> \n> Gerrie is written in PHP and complete documented [4].\n> Even the database scheme is documented [5] to help you to analyze the\n> data. For a quickstart you can follow the documented Getting started\n> guide [6].\n> \n> \n> Results of this analysis are wide spreaded.\n> One use case can be for example a gamification analysis like the\n> Activity Monitor build upon TYPO3s Gerrit data for the TYPO3.CMS (main\n> content management system) product:\n> http://metrics.andygrunwald.com/statistics/gerrit/activity-monitor/analysis/59/\n> \n> \n> In this analysis every activity will results into points. Based on the\n> sum of the points a score list will be created. The background color\n> is determined by a hash function based on the users name. This mean:\n> Same Name = Same color.\n> Please take in mind: This does not reflect the contribution to the\n> community. This displays only activity by a user in a specific system.\n> \n> \n> I would love to see you as a kind of tester for this tool.\n> If you need help, do not hesitate to ask. I try to help as much as\n> possible.\n> \n> \n> Have fun during testing.\n> \n> \n> Cheers,\n> Andy\n> \n> \n> [1] Gerrie: https://github.com/andygrunwald/Gerrie\n> [2] gerrit.wikimedia.org: https://gerrit.wikimedia.org/\n> [3] review.typo3.org: https://review.typo3.org/\n> [4] Documentation: http://gerrie.readthedocs.org/en/latest/\n> [5] Database Schema:\n> http://gerrie.readthedocs.org/en/latest/database/index.html#schema\n> [6] Getting started:\n> http://gerrie.readthedocs.org/en/latest/getting_started/index.html \n> _______________________________________________\n> Metrics-Grimoire mailing list\n> Metrics-Grimoire at lists.libresoft.es\n> https://lists.libresoft.es/listinfo/metrics-grimoire\n\n-- \nhttp://twitter.com/jgbarah          http://gsyc.es/~jgb\n\n"
+        },
+        "unixfrom": "jgb at gsyc.es  Mon Dec  1 10:14:44 2014"
+    },
+    "origin": "http://example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469618459.047456,
+    "updated_on": 1417425284.0,
+    "uuid": "9a53abe792639b88c2c8e9c9016d63edcfde7939"
+},
+{
+    "backend_name": "MBox",
+    "backend_version": "0.4.0",
+    "data": {
+        "Date": "Mon, 1 Dec 2014 21:43:25 +0100",
+        "From": "andygrunwald at gmail.com (Andy Grunwald)",
+        "In-Reply-To": "<1417425284.8160.121.camel_at_gsyc.es>",
+        "Message-ID": "<CACRHdMZTOBni0Y_EB3idLC61VGs3ZSTMeeZgOvk=Cyeu9C03Rg_at_mail.gmail.com>",
+        "References": "<CACRHdMa9XEkAjX4o=w--5-4q-Tb0ihRrg=z6Qxuk3NiDSwbmhg_at_mail.gmail.com>\n\t<1417425284.8160.121.camel_at_gsyc.es>",
+        "Subject": "[Metrics-grimoire] Introducing Gerrie - A crawler for Googles\n code review system Gerrit",
+        "body": {
+            "plain": "Hey Jesus,\n\nthanks ;)\nI wonder: What is the difference between your \"revisor\" project and the\nGerrit backend of Bicho?\n\"Only\" the approach?\nOr is \"revisor\" one of those tools you mentioned (retrieving, dumping,\nextracting)?\n\nRegarding the query limit you are right.\nThe default query limit per SSH is 500 Changesets per query.\nThis number was hardcoded a long time in Gerrit and is now configurable.\nBut most systems does not change this.\nA query limit per HTTP can be defined per user account. But for most\nsystems a \"few\" HTTP requests are fine.\nNormally the Gerrit instances are not like a real SaaS (like Github) with\nlimited API requests. They do not care about some HTTP / SSH requests.\n\nYou are right. The HTTP API is more easy.\nBut i agree. Currently some information (still) missing on the HTTP\ninterface instead of the SSH interface.\nI focussed on the SSH API for the same reason.\nBut i am active on the Gerrit mailing list, too and asked them which will\nbe the main API in future. They said that the HTTP is the main one and SSH\nwill be obsolete more and more.\n\nThe documentation was a really hard part of this tool.\nI never expected to write documentation is such a big amount of work.\nBut the main reason to write this is to make contributions possible.\nOtherwise no one is able to use this tool.\nThe documentation is based on restructured text and ReadTheDocs.org.\nHere you can find some details:\nhttp://gerrie.readthedocs.org/en/latest/contributing/documentation.html\n\nI would love to see such a documentation for MetriceGrimoire tools as well.\nReadTheDocs has the origin in the python community as well.\nMaybe we can start this? What do you think?\n\nI plan to extend Gerrie more and more and to support HTTP as well.\nIncremental updates are possible right now.\nBut i have to see when this will be possible.\nIf you want to use this or got questions how i solved a detailed problem,\njust let me know.\n\nHave a nice day,\nAndy\n\n2014-12-01 10:14 GMT+01:00 Jesus M. Gonzalez-Barahona <jgb at gsyc.es>:\n\n> Hi, Andy,\n>\n> Very interesting! I've been playing a bit with pretty much the same\n> stuff, but writing in Python. The results are, for now, at\n>\n> https://github.com/jgbarah/revisor\n>\n> I use a slightly different approach to yours (I guess). I have a tool\n> for getting the XML from the gerrit ssh site, another one for dumping it\n> to the database, and then another one for checking / extracting the\n> data. The rationale is that once you have the XML file (which may be\n> long to obtain, due to limits on how many records per query you can get,\n> and because of delays on the server side), you can re-run everything in\n> your site, without bothering the gerrit server.\n>\n> I was also playing a  bit with the gerrit HTTP interface. It is simpler\n> to use (no need for a key, for example), but is is by far not as\n> complete as the ssh one. So I reverted to the ssh interface.\n>\n> I love the fine documentation of your tool. Mine is just a poor proof of\n> concept. Thanks a lot for sharing it!\n>\n> [Just for the record, the Gerrit backend of bicho has also been improved\n> a bit during the last months]\n>\n> Saludos,\n>\n>         Jesus.\n>\n> On Fri, 2014-11-28 at 17:42 +0100, Andy Grunwald wrote:\n> > Hey everyone,\n> >\n> >\n> > i want to introduce Gerrie [1] to you.\n> > Gerrie is a crawler for Googles code review system Gerrit.\n> > The Wikimedia and TYPO3 community uses Gerrit to improve and develop\n> > various products like Mediawiki, Wiki-Extensions, Infrastructure,\n> > TYPO3 CMS, Neos, Flow and so on. The Gerrit instances are located at\n> > gerrit.wikimedia.org [2] and review.typo3.org [3].\n> >\n> >\n> > During this activity a lot of interesting data will be created in the\n> > background. Gerrie is a tool to transform this data into a RDBMS like\n> > MySQL. After this you can create analysis with it with simple sql\n> > queries.\n> >\n> >\n> > To retrieve the data the SSH API of Gerrit will be used. The benefit\n> > from this is you can use every Gerrit system to analyze like Wikimedia\n> > [2] or TYPO3 [3]. What you need is to register there and enter your\n> > public key there.\n> >\n> >\n> > Gerrie is written in PHP and complete documented [4].\n> > Even the database scheme is documented [5] to help you to analyze the\n> > data. For a quickstart you can follow the documented Getting started\n> > guide [6].\n> >\n> >\n> > Results of this analysis are wide spreaded.\n> > One use case can be for example a gamification analysis like the\n> > Activity Monitor build upon TYPO3s Gerrit data for the TYPO3.CMS (main\n> > content management system) product:\n> >\n> http://metrics.andygrunwald.com/statistics/gerrit/activity-monitor/analysis/59/\n> >\n> >\n> > In this analysis every activity will results into points. Based on the\n> > sum of the points a score list will be created. The background color\n> > is determined by a hash function based on the users name. This mean:\n> > Same Name = Same color.\n> > Please take in mind: This does not reflect the contribution to the\n> > community. This displays only activity by a user in a specific system.\n> >\n> >\n> > I would love to see you as a kind of tester for this tool.\n> > If you need help, do not hesitate to ask. I try to help as much as\n> > possible.\n> >\n> >\n> > Have fun during testing.\n> >\n> >\n> > Cheers,\n> > Andy\n> >\n> >\n> > [1] Gerrie: https://github.com/andygrunwald/Gerrie\n> > [2] gerrit.wikimedia.org: https://gerrit.wikimedia.org/\n> > [3] review.typo3.org: https://review.typo3.org/\n> > [4] Documentation: http://gerrie.readthedocs.org/en/latest/\n> > [5] Database Schema:\n> > http://gerrie.readthedocs.org/en/latest/database/index.html#schema\n> > [6] Getting started:\n> > http://gerrie.readthedocs.org/en/latest/getting_started/index.html\n> > _______________________________________________\n> > Metrics-Grimoire mailing list\n> > Metrics-Grimoire at lists.libresoft.es\n> > https://lists.libresoft.es/listinfo/metrics-grimoire\n>\n> --\n> http://twitter.com/jgbarah          http://gsyc.es/~jgb\n>\n>\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <http://lists.libresoft.es/pipermail/metrics-grimoire/attachments/20141201/6c3c42df/attachment.htm>\n"
+        },
+        "unixfrom": "andygrunwald at gmail.com  Mon Dec  1 21:43:25 2014"
+    },
+    "origin": "http://example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469618459.051693,
+    "updated_on": 1417466605.0,
+    "uuid": "4443b14e5cc5580f9ff99029bba9087f158b0d93"
+},
+{
+    "backend_name": "MBox",
+    "backend_version": "0.4.0",
+    "data": {
+        "Date": "Mon, 1 Dec 2014 21:52:45 +0100",
+        "From": "andygrunwald at gmail.com (Andy Grunwald)",
+        "In-Reply-To": "<54789876.4060804_at_bitergia.com>",
+        "Message-ID": "<CACRHdMZXQFJ4zW4hs3fpBRvRQaJj8uA3o+2tR2X25MT-duSb2w_at_mail.gmail.com>",
+        "References": "<546A1668.6060304_at_bitergia.com>\n\t<CACRHdMZA5BA9X+bUXnB6W=DhQ-n_DLqQJeP3M1PxPy88cmGOzA_at_mail.gmail.com>\n\t<54789876.4060804_at_bitergia.com>",
+        "Subject": "[Metrics-grimoire] IRC bot to log messages",
+        "body": {
+            "plain": "Thanks.\nSo the pipeline looks like:\n\nIRC-Channel -> supybot -> Database -> IRCAnalysis ?\n\n2014-11-28 16:44 GMT+01:00 Luis Ca?as-D?az <lcanas at bitergia.com>:\n\n> On 23/11/14 16:38, Andy Grunwald wrote:\n>\n>> Hey Luis,\n>>\n>> such an analysis looks good ans useful.\n>> Are you talking about a new tool which will be created? Or are you\n>> talking about an existing tool to collect this data?\n>>\n>> In the MetricsGrimoire Namespace at Github i saw a tool like\n>> this: IRCAnalysis [1].\n>>\n>> In my opinion BenderBot [2] looks also quite good.\n>> One advantage of BenderBot is that you were able to collect data by\n>> RabbitMQ, which is quite useful in big irc channels.\n>>\n>\n> Hi Andy,\n> we are using supybot, which is quite simple and stores the information we\n> need. In any case thanks for the pointer :)\n>\n> IRCAnalysis is the tool Santiago created to parse the logs we gather. So\n> it will be used also to parse the info we got via supybot.\n>\n> Best!\n>\n>>\n>> Have a nice weekend,\n>> Andy\n>>\n>> [1] https://github.com/MetricsGrimoire/IRCAnalysis\n>> [2] https://github.com/jness/BenderBot\n>>\n>> 2014-11-17 16:38 GMT+01:00 Luis Ca?as-D?az <lcanas at bitergia.com\n>> <mailto:lcanas at bitergia.com>>:\n>>\n>>     Hi all,\n>>     we're adding a new service to our dashboard, its aim is to display\n>>     IRC metrics. In order to get that data we need a bot in charge of\n>>     storing the messages, dates and nicknames. I would love to add the\n>>     bot to the metrics grimoire channel and show the information on the\n>>     dashboard[0].\n>>\n>>     Is anyone against this?\n>>\n>>     [0] http://projects.bitergia.com/__grimoire\n>>     <http://projects.bitergia.com/grimoire>\n>>\n>>     Best!\n>>     --\n>>     Luis Ca?as-D?az\n>>     lcanas at bitergia.com <mailto:lcanas at bitergia.com> - Software Engineer\n>>     http://www.bitergia.com\n>>     \"Software metrics for your peace of mind\"\n>>     _________________________________________________\n>>     Metrics-Grimoire mailing list\n>>     Metrics-Grimoire at lists.__libresoft.es\n>>     <mailto:Metrics-Grimoire at lists.libresoft.es>\n>>     https://lists.libresoft.es/__listinfo/metrics-grimoire\n>>     <https://lists.libresoft.es/listinfo/metrics-grimoire>\n>>\n>>\n>>\n>\n> --\n> Luis Ca?as-D?az\n> lcanas at bitergia.com - Software Engineer\n> http://www.bitergia.com\n> \"Software metrics for your peace of mind\"\n>\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <http://lists.libresoft.es/pipermail/metrics-grimoire/attachments/20141201/6032e1dc/attachment.htm>\n"
+        },
+        "unixfrom": "andygrunwald at gmail.com  Mon Dec  1 21:52:45 2014"
+    },
+    "origin": "http://example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469618459.054706,
+    "updated_on": 1417467165.0,
+    "uuid": "254efe96b9d5108f6b076c19263725f9045be783"
+},
+{
+    "backend_name": "MBox",
+    "backend_version": "0.4.0",
+    "data": {
+        "Date": "Mon, 01 Dec 2014 23:38:27 +0100",
+        "From": "jgb at gsyc.es (Jesus M. Gonzalez-Barahona)",
+        "In-Reply-To": "<CACRHdMZXQFJ4zW4hs3fpBRvRQaJj8uA3o+2tR2X25MT-duSb2w_at_mail.gmail.com>",
+        "Message-ID": "<1417473507.4189.14.camel_at_gsyc.es>",
+        "References": "<546A1668.6060304_at_bitergia.com>\n\t<CACRHdMZA5BA9X+bUXnB6W=DhQ-n_DLqQJeP3M1PxPy88cmGOzA_at_mail.gmail.com>\n\t<54789876.4060804_at_bitergia.com>\n\t<CACRHdMZXQFJ4zW4hs3fpBRvRQaJj8uA3o+2tR2X25MT-duSb2w_at_mail.gmail.com>",
+        "Subject": "[Metrics-grimoire] IRC bot to log messages",
+        "body": {
+            "plain": "On Mon, 2014-12-01 at 21:52 +0100, Andy Grunwald wrote:\n> Thanks.\n> So the pipeline looks like:\n> \n> \n> IRC-Channel -> supybot -> Database -> IRCAnalysis ?\n\nYep.\n\n\tJesus.\n\n> 2014-11-28 16:44 GMT+01:00 Luis Ca?as-D?az <lcanas at bitergia.com>:\n>         On 23/11/14 16:38, Andy Grunwald wrote:\n>                 Hey Luis,\n>                 \n>                 such an analysis looks good ans useful.\n>                 Are you talking about a new tool which will be\n>                 created? Or are you\n>                 talking about an existing tool to collect this data?\n>                 \n>                 In the MetricsGrimoire Namespace at Github i saw a\n>                 tool like\n>                 this: IRCAnalysis [1].\n>                 \n>                 In my opinion BenderBot [2] looks also quite good.\n>                 One advantage of BenderBot is that you were able to\n>                 collect data by\n>                 RabbitMQ, which is quite useful in big irc channels.\n>         \n>         Hi Andy,\n>         we are using supybot, which is quite simple and stores the\n>         information we need. In any case thanks for the pointer :)\n>         \n>         IRCAnalysis is the tool Santiago created to parse the logs we\n>         gather. So it will be used also to parse the info we got via\n>         supybot.\n>         \n>         Best!\n>                 \n>                 Have a nice weekend,\n>                 Andy\n>                 \n>                 [1] https://github.com/MetricsGrimoire/IRCAnalysis\n>                 [2] https://github.com/jness/BenderBot\n>                 \n>                 2014-11-17 16:38 GMT+01:00 Luis Ca?as-D?az\n>                 <lcanas at bitergia.com\n>                 <mailto:lcanas at bitergia.com>>:\n>                 \n>                     Hi all,\n>                     we're adding a new service to our dashboard, its\n>                 aim is to display\n>                     IRC metrics. In order to get that data we need a\n>                 bot in charge of\n>                     storing the messages, dates and nicknames. I would\n>                 love to add the\n>                     bot to the metrics grimoire channel and show the\n>                 information on the\n>                     dashboard[0].\n>                 \n>                     Is anyone against this?\n>                 \n>                     [0] http://projects.bitergia.com/__grimoire\n>                     <http://projects.bitergia.com/grimoire>\n>                 \n>                     Best!\n>                     --\n>                     Luis Ca?as-D?az\n>                     lcanas at bitergia.com <mailto:lcanas at bitergia.com> -\n>                 Software Engineer\n>                     http://www.bitergia.com\n>                     \"Software metrics for your peace of mind\"\n>                     _________________________________________________\n>                     Metrics-Grimoire mailing list\n>                     Metrics-Grimoire at lists.__libresoft.es\n>                     <mailto:Metrics-Grimoire at lists.libresoft.es>\n>                 \n>                 https://lists.libresoft.es/__listinfo/metrics-grimoire\n>                 \n>                 <https://lists.libresoft.es/listinfo/metrics-grimoire>\n>                 \n>                 \n>         \n>         \n>         _______________________________________________\n>         Metrics-Grimoire mailing list\n>         Metrics-Grimoire at lists.libresoft.es\n>         https://lists.libresoft.es/listinfo/metrics-grimoire\n> \n> \n-- \nhttp://twitter.com/jgbarah          http://gsyc.es/~jgb\n\n"
+        },
+        "unixfrom": "jgb at gsyc.es  Mon Dec  1 23:38:27 2014"
+    },
+    "origin": "http://example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469618459.057238,
+    "updated_on": 1417473507.0,
+    "uuid": "13b32c8e6c7b34063f0598ccbc534b7094256eee"
+},
+{
+    "backend_name": "MBox",
+    "backend_version": "0.4.0",
+    "data": {
+        "Date": "Mon, 29 Dec 2014 12:53:51 -0500",
+        "From": "sumanah at panix.com (Sumana Harihareswara)",
+        "Message-ID": "<54A1952F.10808_at_panix.com>",
+        "Subject": "[Metrics-grimoire] ping",
+        "body": {
+            "plain": "-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA1\n\nHi! Is this list still active?\nhttp://lists.theopensourceway.org/mailman/listinfo/metrics-wg doesn't\nlink to archives anymore.\n- -- \nSumana Harihareswara\nhttp://brainwane.net\n-----BEGIN PGP SIGNATURE-----\nVersion: GnuPG v1\n\niQIcBAEBAgAGBQJUoZUvAAoJECR5sh+1fa+cCncP/A+5DnCm8tTnyjVzUQ6ILKNE\nYLlquxRAFVPgNt0+s6lyc1sSCOVHbtZ5Zu7CvJtN8XI+1uMe1U8VU6af/zpSxtZh\nGgKI2tHY1anNCLP72oBCyFZVenU7OvdJmpBFHAjerZm34ERIFLKBTZnBW1TeUsL4\nFd7Bkj9UOihfdElxLDpHImY8ytbIYPetNhnnQ67b65hkwLplAVucfPYAgCIDjT3Y\nLTrFIEM4T+STlcdHYpARJmk9i/ApDdAIQHw4SGIveZXX++29IpDdP7+MhLMRC4a3\nRRXTs2LbfRmZJRI+xKKw37U/zLqxjemuVddrxpUTe+03iohT5lbZy7vy80pe5rpL\npRiuKNdKEYf8KrkizinhPmGnOxGEAk9X0STbS3LwwrTzsX0iISJZJFzGBPQN/4ws\nAEKCH/n2VczGUCCd1y4U6//UxW6HVa6AwS8m8qZiRg19anFNVralgivnkDz+9KqS\nUZelp6TXCu4ebw3DZXYxmvCmNswXCYSvl0iDD5/bk+1SIi1cV5RD2qXWF4HWkTzF\nGewB2quYqLdcnEyYGYnYkYtehVbRhKTEiUUu+Dih5uYAD+hdE7wfqjJwKtpIGJdX\n+FS20Re+uE0ETwUhWueLlR5cz6CullgOJZUVFyLu0UwwG4SPYW8gn6MZU0EtWlkU\nYcaYyG/FM6eQe2voDv1N\n=O9rZ\n-----END PGP SIGNATURE-----\n"
+        },
+        "unixfrom": "sumanah at panix.com  Mon Dec 29 18:53:51 2014"
+    },
+    "origin": "http://example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469618459.05963,
+    "updated_on": 1419875631.0,
+    "uuid": "b0a9a946e2284fb79ae5c3e2bf7cbce45230e5c7"
+},
+{
+    "backend_name": "MBox",
+    "backend_version": "0.4.0",
+    "data": {
+        "Date": "Tue, 30 Dec 2014 06:44:55 +0100",
+        "From": "acs at bitergia.com (Alvaro del Castillo)",
+        "Message-ID": "<1419918295.4432.37.camel_at_bitboy>",
+        "Subject": "[Metrics-grimoire] Sybil support for Discourse",
+        "body": {
+            "plain": "Hi guys,\n\nI am defining how to support Discourse in Grimoire Platform and it seems\nthat adding a backend to Sybil could be the way to go.\n\nThe idea is to use  Discourse REST API\n\nhttps://meta.discourse.org/t/using-the-rest-api/21699\n\nand try to reuse the Sibyl data model, maybe extending it.\n\nThoughts?\n\nCheers\n-- \nAlvaro del Castillo San F?lix\nacs at bitergia.com - Chief Technical Officer (CTO)\nhttp://www.bitergia.com\n\"Software metrics for your peace of mind\"\n\n\n"
+        },
+        "unixfrom": "acs at bitergia.com  Tue Dec 30 06:44:55 2014"
+    },
+    "origin": "http://example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469618459.061791,
+    "updated_on": 1419918295.0,
+    "uuid": "7685206a86c6c3101b60a02e61c6297e4e1a6d57"
+},
+{
+    "backend_name": "MBox",
+    "backend_version": "0.4.0",
+    "data": {
+        "Date": "Tue, 30 Dec 2014 21:08:12 +0100",
+        "From": "acs at bitergia.com (Alvaro del Castillo)",
+        "Message-ID": "<1419970092.4432.52.camel_at_bitboy>",
+        "Subject": "[Metrics-grimoire] Bicho support for StoryBoard",
+        "body": {
+            "plain": "Hi guys,\n\nIn Bitergia we are creating a new backend for StoryBoard [0] task manager from OpenStack Foundation.\n\nIf you want to follow the development, just watch the branch:\n\nhttps://github.com/MetricsGrimoire/Bicho/tree/storyboard\n\nThe tracking issue is:\n\nhttps://github.com/MetricsGrimoire/Bicho/issues/141\n\nCheers\n\n[0] http://ci.openstack.org/storyboard/index.html\n-- \nAlvaro del Castillo San F?lix\nacs at bitergia.com - Chief Technical Officer (CTO)\nhttp://www.bitergia.com\n\"Software metrics for your peace of mind\"\n\n\n"
+        },
+        "unixfrom": "acs at bitergia.com  Tue Dec 30 21:08:12 2014"
+    },
+    "origin": "http://example.com",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469618459.064654,
+    "updated_on": 1419970092.0,
+    "uuid": "4f46af7479a98a11a84a9223bb8c597400c8d4bd"
+}]

@@ -1,0 +1,179 @@
+[
+{
+    "backend_name": "ReMo",
+    "backend_version": "0.4.0",
+    "category": "event",
+    "data": {
+        "categories": [],
+        "city": "Makassar",
+        "country": "Indonesia",
+        "description": "National event that will be held at Jakarta, Bandung, Semarang, Yogyakarta, Surabaya, and Makassar. It is all about computer exhibition, talkshow from many communities, booth activities, etc. This event will be held on June 6th - 10th, 2012.\r\n\r\nThe committee of the event will provide a booth and a talkshow session in the event. The booth and talkshow will be held on June 10th, 2012. ",
+        "end": "2012-06-10T11:00:00Z",
+        "estimated_attendance": 1000,
+        "external_link": "http://www.festivalkomputer.com/2012/index.php#makassar",
+        "hashtag": "#fki2012",
+        "initiative": null,
+        "lat": -5.15343584800353,
+        "lon": 119.404349327087,
+        "name": "Festival Komputer Indonesia 2012 - Makassar",
+        "owner": {
+            "_url": "https://reps.mozilla.org/api/remo/v1/users/180/",
+            "display_name": "Rara",
+            "first_name": "Irayani",
+            "last_name": "Queencyputri"
+        },
+        "planning_pad_url": "https://public.etherpad-mozilla.org/p/remo-festival-komputer-indonesia-2012-makassar",
+        "region": "South Sulawesi",
+        "remo_url": "https://reps.mozilla.org/e/festival-komputer-indonesia-2012-makassar/",
+        "start": "2012-06-06T02:00:00Z",
+        "timezone": "Asia/Makassar"
+    },
+    "offset": 0,
+    "origin": "https://reps.mozilla.org",
+    "perceval_version": "0.4.0.dev0",
+    "tag": "https://reps.mozilla.org",
+    "timestamp": 1476201540.868689,
+    "updated_on": 1339326000.0,
+    "uuid": "b64a0acdd7c3d7d5e6b85b8592367ccad04ad271"
+},
+{
+    "backend_name": "ReMo",
+    "backend_version": "0.4.0",
+    "category": "event",
+    "data": {
+        "categories": [
+            {
+                "name": "Localization"
+            },
+            {
+                "name": "People"
+            },
+            {
+                "name": "Recruiting"
+            },
+            {
+                "name": "User Engagement"
+            },
+            {
+                "name": "User Support"
+            }
+        ],
+        "city": "Paris",
+        "country": "France",
+        "description": "Meetup of the french-speaking mozilla contributors.",
+        "end": "2012-06-10T16:00:00Z",
+        "estimated_attendance": 50,
+        "external_link": "https://wiki.mozilla.org/MozFR-2012",
+        "hashtag": "#MozFR2012",
+        "initiative": null,
+        "lat": 48.86773543,
+        "lon": 2.34706163406,
+        "name": "MozFR 2012",
+        "owner": {
+            "_url": "https://reps.mozilla.org/api/remo/v1/users/287/",
+            "display_name": "kaze",
+            "first_name": "Fabien",
+            "last_name": "Cazenave"
+        },
+        "planning_pad_url": "https://public.etherpad-mozilla.org/p/remo-mozfr-2012",
+        "region": "Ploucardie Septentrionale",
+        "remo_url": "https://reps.mozilla.org/e/mozfr-2012/",
+        "start": "2012-06-09T07:00:00Z",
+        "timezone": "Europe/Paris"
+    },
+    "offset": 1,
+    "origin": "https://reps.mozilla.org",
+    "perceval_version": "0.4.0.dev0",
+    "tag": "https://reps.mozilla.org",
+    "timestamp": 1476201541.623522,
+    "updated_on": 1339344000.0,
+    "uuid": "48e26ff46cf0ae2cc910f5451181f90a8a1a8dfe"
+},
+{
+    "backend_name": "ReMo",
+    "backend_version": "0.4.0",
+    "category": "event",
+    "data": {
+        "categories": [],
+        "city": "Bangkalan, Madura",
+        "country": "Indonesia",
+        "description": "Blogilicious, is a seminar and workshop event in 7 cities in Indonesia with targeting of 200 bloggers per-city that aims to encourage young generation of Indonesia to be a \"positive blogger\" that that share positive contents/infos/news to Internet citizen. Blogilicious welcome Mozilla Indonesia as one if the community who support open source, user privacy, and internet safety. That's why Mozilla Indonesia were invited to Blogilicious in those 7 cities. ",
+        "end": "2012-07-08T05:00:00Z",
+        "estimated_attendance": 500,
+        "external_link": "http://blogiliciousid.com/",
+        "hashtag": "#Blogilicious #Madura",
+        "initiative": null,
+        "lat": -7.10975050957756,
+        "lon": 112.803153991699,
+        "name": "Blogilicious 2012 Madura",
+        "owner": {
+            "_url": "https://reps.mozilla.org/api/remo/v1/users/180/",
+            "display_name": "Rara",
+            "first_name": "Irayani",
+            "last_name": "Queencyputri"
+        },
+        "planning_pad_url": "https://public.etherpad-mozilla.org/p/remo-blogilicious-2012-madura",
+        "region": "East Java",
+        "remo_url": "https://reps.mozilla.org/e/blogilicious-2012-madura/",
+        "start": "2012-07-07T01:00:00Z",
+        "timezone": "Asia/Jakarta"
+    },
+    "offset": 2,
+    "origin": "https://reps.mozilla.org",
+    "perceval_version": "0.4.0.dev0",
+    "tag": "https://reps.mozilla.org",
+    "timestamp": 1476201542.417892,
+    "updated_on": 1341723600.0,
+    "uuid": "213a2278c1bb1ad6e63fdb9027a3e8726eb87725"
+},
+{
+    "backend_name": "ReMo",
+    "backend_version": "0.4.0",
+    "category": "event",
+    "data": {
+        "categories": [
+            {
+                "name": "Diversity and Inclusion"
+            },
+            {
+                "name": "Hive Network"
+            },
+            {
+                "name": "Mozilla Leadership Network"
+            },
+            {
+                "name": "Web Development"
+            }
+        ],
+        "city": "Pune",
+        "country": "India",
+        "description": "Summer Code Party for spreading web literacy.\r\n\r\nUse of Awesome webmaker tools like Thimble, Popcorn and X-Ray Goggles.\r\n\r\n1.Campus having 500 Computer systems,so we will create a Firefox install team to install Firefox on every machine in campus.\r\n\r\n2.AIMS campus having more than 450 Its students from computer science and application streams.\r\n3.Finding URDU language contributors for localization. 4.Finding Student Reps from the campus.",
+        "end": "2012-07-07T09:00:00Z",
+        "estimated_attendance": 500,
+        "external_link": "",
+        "hashtag": "#mozfestpune",
+        "initiative": null,
+        "lat": 18.505086914,
+        "lon": 73.875246048,
+        "name": "mozfestpune",
+        "owner": {
+            "_url": "https://reps.mozilla.org/api/remo/v1/users/288/",
+            "display_name": "FaisalAziz",
+            "first_name": "Faisal",
+            "last_name": "Aziz"
+        },
+        "planning_pad_url": "https://public.etherpad-mozilla.org/p/remo-mozfestpune",
+        "region": "Maharashtra",
+        "remo_url": "https://reps.mozilla.org/e/mozfestpune/",
+        "start": "2012-07-07T01:00:00Z",
+        "timezone": "Asia/Dili"
+    },
+    "offset": 3,
+    "origin": "https://reps.mozilla.org",
+    "perceval_version": "0.4.0.dev0",
+    "tag": "https://reps.mozilla.org",
+    "timestamp": 1476201543.413536,
+    "updated_on": 1341651600.0,
+    "uuid": "ff198d6fb45a9d6a406e6b45f1d352dbbfc5d98a"
+}
+]

@@ -1,46 +1,43 @@
-[
-{
+[{
     "backend_name": "Phabricator",
-    "backend_version": "0.2.0",
+    "backend_version": "0.7.0",
+    "category": "task",
     "data": {
         "attachments": {
             "projects": {
-                "projectPHIDs": [
-                    "PHID-PROJ-uciao3ovue2wd7jxlscl",
-                    "PHID-PROJ-ven7a7bo4b2q3yx3r3ua"
-                ]
+                "projectPHIDs": []
             }
         },
         "fields": {
             "authorData": {
-                "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                "image": "http://example.com/file/data/o",
                 "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "realName": "Fran Ca\u00f1as-D\u00edaz",
+                "realName": "John Doe",
                 "roles": [
                     "admin",
                     "verified",
                     "approved",
                     "activated"
                 ],
-                "uri": "https://test.phabricator.net/p/tlanas/",
-                "userName": "tlanas"
+                "uri": "http://example.com/p/jdoe/",
+                "userName": "jdoe"
             },
             "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
             "dateCreated": 1462297064,
             "dateModified": 1462306027,
-            "name": "Search cloud machine to host the service cauldron.io",
+            "name": "Tasks #69",
             "ownerData": {
-                "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                "image": "http://example.com/file/data/o",
                 "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "realName": "Fran Ca\u00f1as-D\u00edaz",
+                "realName": "John Doe",
                 "roles": [
                     "admin",
                     "verified",
                     "approved",
                     "activated"
                 ],
-                "uri": "https://test.phabricator.net/p/tlanas/",
-                "userName": "tlanas"
+                "uri": "http://example.com/p/jdoe/",
+                "userName": "jdoe"
             },
             "ownerPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
             "points": null,
@@ -63,40 +60,21 @@
         },
         "id": 69,
         "phid": "PHID-TASK-pkgx2kdx74u735zx43fd",
-        "projects": [
-            {
-                "fullName": "Systems",
-                "name": "Systems",
-                "phid": "PHID-PROJ-uciao3ovue2wd7jxlscl",
-                "status": "open",
-                "type": "PROJ",
-                "typeName": "Project",
-                "uri": "https://test.phabricator.net/tag/systems/"
-            },
-            {
-                "fullName": "cauldron.io",
-                "name": "cauldron.io",
-                "phid": "PHID-PROJ-ven7a7bo4b2q3yx3r3ua",
-                "status": "open",
-                "type": "PROJ",
-                "typeName": "Project",
-                "uri": "https://test.phabricator.net/tag/cauldron.io/"
-            }
-        ],
+        "projects": [],
         "transactions": [
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -110,20 +88,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "* machine at digitalocean 198.199.95.119\n* tlanas and maco have access",
+                "comments": "******",
                 "dateCreated": "1462306019",
                 "newValue": null,
                 "oldValue": null,
@@ -134,20 +112,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": ">>! In T69#1188, @tlanas wrote:\n> DigitalOcean Account:\n> * info@bitergia.com\n> * digitalocean113kas\n> * https://cloud.digitalocean.com\n> \n> Droplets with more than 16GB for Ram memory are disabled today .. https://cloud.digitalocean.com/support/tickets/1039745 Waiting for the support team\n\nSo won't have it by OSCON with digitalocean\n\n> In order to have the bigger droplets enabled on your account, we will require you to establish a billing history with us. \n> \n> This may take some time, as a full month of billing is required to establish a billing history. It appears that by July 1st, you will be able to deploy these droplets. \n\n",
+                "comments": "One more",
                 "dateCreated": "1462303959",
                 "newValue": null,
                 "oldValue": null,
@@ -158,20 +136,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "DigitalOcean Account:\n* info@bitergia.com\n* digitalocean113kas\n* https://cloud.digitalocean.com\n\nDroplets with more than 16GB for Ram memory are disabled today .. https://cloud.digitalocean.com/support/tickets/1039745 Waiting for the support team\n",
+                "comments": "Another comment",
                 "dateCreated": "1462302984",
                 "newValue": null,
                 "oldValue": null,
@@ -182,20 +160,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "Digital Ocean:\n* 32GBMemory\n* 12 CoreProcessor\n* 320GBSSD Disk\n* 7TBTransfer\n*  $ 320 / mo \n\nGigas.com\n* RAM: 32GB \n* CPU: 36 Cores \n* Disco SSD: 600GB \n* Transferencia: 4500GB\n* 920\u20ac\n\nWith DigitalOcean we could even have 64GB Memory for  $ 640 / mo ",
+                "comments": "A comment",
                 "dateCreated": "1462298401",
                 "newValue": null,
                 "oldValue": null,
@@ -206,17 +184,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -236,17 +214,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -264,17 +242,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -299,17 +277,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -323,17 +301,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -347,22 +325,22 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
                 "dateCreated": "1462297064",
-                "newValue": "So far we have two options:\n* digitalocean\n* gigas",
+                "newValue": "One awesome comment",
                 "oldValue": null,
                 "taskID": "69",
                 "transactionID": "1180",
@@ -371,17 +349,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -395,17 +373,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -419,17 +397,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -443,22 +421,22 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
                 "dateCreated": "1462297064",
-                "newValue": "Search cloud machine to host the service cauldron.io",
+                "newValue": "The first tittle",
                 "oldValue": null,
                 "taskID": "69",
                 "transactionID": "1176",
@@ -467,17 +445,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -492,53 +470,51 @@
         ],
         "type": "TASK"
     },
-    "origin": "https://test.phabricator.net",
-    "perceval_version": "0.3.1.dev0",
-    "timestamp": 1474883519.572051,
+    "origin": "http://example.com",
+    "perceval_version": "0.9.10",
+    "tag": "http://example.com",
+    "timestamp": 1518165682.59922,
     "updated_on": 1462306027.0,
-    "uuid": "184c926b022931ad5a37183729faf21667388343"
-},
-{
+    "uuid": "1b4c15d26068efcae83cd920bcada6003d2c4a6c"
+},{
     "backend_name": "Phabricator",
-    "backend_version": "0.2.0",
+    "backend_version": "0.7.0",
+    "category": "task",
     "data": {
         "attachments": {
             "projects": {
-                "projectPHIDs": [
-                    "PHID-PROJ-uciao3ovue2wd7jxlscl",
-                    "PHID-PROJ-ven7a7bo4b2q3yx3r3ua"
-                ]
+                "projectPHIDs": []
             }
         },
         "fields": {
             "authorData": {
-                "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                "image": "http://example.com/file/data/o",
                 "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "realName": "Fran Ca\u00f1as-D\u00edaz",
+                "realName": "John Doe",
                 "roles": [
                     "admin",
                     "verified",
                     "approved",
                     "activated"
                 ],
-                "uri": "https://test.phabricator.net/p/tlanas/",
-                "userName": "tlanas"
+                "uri": "http://example.com/p/jdoe/",
+                "userName": "jdoe"
             },
             "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
             "dateCreated": 1462379566,
             "dateModified": 1462464642,
-            "name": "Change the URL of cauldron.io",
+            "name": "Task #73",
             "ownerData": {
-                "image": "https://test.phabricator.net/file/data/k7f7s43kglluozpmactp/PHID-FILE-2r2iiblmvj63xhfkutmj/profile",
+                "image": "http://example.com/file/data/k",
                 "phid": "PHID-USER-mjr7pnwpg6slsnjcqki7",
-                "realName": "Alvaro del Castillo",
+                "realName": "Jane Smith",
                 "roles": [
                     "verified",
                     "approved",
                     "activated"
                 ],
-                "uri": "https://test.phabricator.net/p/maco/",
-                "userName": "maco"
+                "uri": "http://example.com/p/janesmith/",
+                "userName": "janesmith"
             },
             "ownerPHID": "PHID-USER-mjr7pnwpg6slsnjcqki7",
             "points": null,
@@ -561,40 +537,21 @@
         },
         "id": 73,
         "phid": "PHID-TASK-2do2po5nw6zv4aberm46",
-        "projects": [
-            {
-                "fullName": "Systems",
-                "name": "Systems",
-                "phid": "PHID-PROJ-uciao3ovue2wd7jxlscl",
-                "status": "open",
-                "type": "PROJ",
-                "typeName": "Project",
-                "uri": "https://test.phabricator.net/tag/systems/"
-            },
-            {
-                "fullName": "cauldron.io",
-                "name": "cauldron.io",
-                "phid": "PHID-PROJ-ven7a7bo4b2q3yx3r3ua",
-                "status": "open",
-                "type": "PROJ",
-                "typeName": "Project",
-                "uri": "https://test.phabricator.net/tag/cauldron.io/"
-            }
-        ],
+        "projects": [],
         "transactions": [
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -608,20 +565,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "Things to be done:\n[x] Redirect from django to dashboard.cauldron.io. Right now it is using the raw url for kibana at 5601\n[x] *.cauldron.io certificate\n[x] cauldron.io certificate (if not covered by the one above)\n[x] connect GELK with new ES",
+                "comments": "This",
                 "dateCreated": "1462433622",
                 "newValue": null,
                 "oldValue": null,
@@ -632,20 +589,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": ">>! In T73#1260, @jgb wrote:\n> es.bitergia.com seems to be wide open to the world:\n> \n> ```\n> jgb@expisito:/tmp$ curl 'http://es.cauldron.io/_cat/indices?v'\n> health status index                pri rep docs.count docs.deleted store.size pri.store.size \n> yellow open   github_issues_enrich   5   1      23798            0     24.5mb         24.5mb \n> yellow open   github_git             5   1     467791            0    671.9mb        671.9mb \n> yellow open   github                 5   1        597            0      172kb          172kb \n> yellow open   .kibana                1   1         18            0     54.7kb         54.7kb \n> yellow open   github_git_enrich      5   1     127608            0    185.4mb        185.4mb \n> yellow open   conf                   5   1        240            0    192.7kb        192.7kb \n> yellow open   github_issues          5   1      44098            0    143.3mb        143.3mb \n> ```\n\nIt is. We had issues with the self-signed certificate and we open it for the test. Will be securized as soon as we get the *.cauldron.io certificate",
+                "comments": "is a comment",
                 "dateCreated": "1462433583",
                 "newValue": null,
                 "oldValue": null,
@@ -655,20 +612,9 @@
                 "transactionType": "core:comment"
             },
             {
-                "authorData": {
-                    "image": "https://test.phabricator.net/file/data/dfnvjli2k42fr4gk6hes/PHID-FILE-uyrszduodyl6qwgmdr52/profile",
-                    "phid": "PHID-USER-bjxhrstz5fb5gkrojmev",
-                    "realName": "Jesus M. Gonzalez-Barahona",
-                    "roles": [
-                        "verified",
-                        "approved",
-                        "activated"
-                    ],
-                    "uri": "https://test.phabricator.net/p/jgb/",
-                    "userName": "jgb"
-                },
+                "authorData": null,
                 "authorPHID": "PHID-USER-bjxhrstz5fb5gkrojmev",
-                "comments": "es.bitergia.com seems to be wide open to the world:\n\n```\njgb@expisito:/tmp$ curl 'http://es.cauldron.io/_cat/indices?v'\nhealth status index                pri rep docs.count docs.deleted store.size pri.store.size \nyellow open   github_issues_enrich   5   1      23798            0     24.5mb         24.5mb \nyellow open   github_git             5   1     467791            0    671.9mb        671.9mb \nyellow open   github                 5   1        597            0      172kb          172kb \nyellow open   .kibana                1   1         18            0     54.7kb         54.7kb \nyellow open   github_git_enrich      5   1     127608            0    185.4mb        185.4mb \nyellow open   conf                   5   1        240            0    192.7kb        192.7kb \nyellow open   github_issues          5   1      44098            0    143.3mb        143.3mb \n```",
+                "comments": "that was",
                 "dateCreated": "1462397673",
                 "newValue": null,
                 "oldValue": null,
@@ -678,18 +624,7 @@
                 "transactionType": "core:comment"
             },
             {
-                "authorData": {
-                    "image": "https://test.phabricator.net/file/data/dfnvjli2k42fr4gk6hes/PHID-FILE-uyrszduodyl6qwgmdr52/profile",
-                    "phid": "PHID-USER-bjxhrstz5fb5gkrojmev",
-                    "realName": "Jesus M. Gonzalez-Barahona",
-                    "roles": [
-                        "verified",
-                        "approved",
-                        "activated"
-                    ],
-                    "uri": "https://test.phabricator.net/p/jgb/",
-                    "userName": "jgb"
-                },
+                "authorData": null,
                 "authorPHID": "PHID-USER-bjxhrstz5fb5gkrojmev",
                 "comments": null,
                 "dateCreated": "1462397673",
@@ -711,20 +646,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "Things to be done:\n[ ] Redirect from django to dashboard.cauldron.io. Right now it is using the raw url for kibana at 5601\n[ ] *.cauldron.io certificate\n[ ] cauldron.io certificate (if not covered by the one above)\n[ ] connect GELK with new ES",
+                "comments": "written",
                 "dateCreated": "1462382087",
                 "newValue": null,
                 "oldValue": null,
@@ -735,17 +670,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -759,20 +694,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "I set up the Bidek containers.\n\nNow we have two dashes with the same pass shown above:\n* https://dashboard.cauldron.io/edit/\n* https://dashboard.cauldron.io/",
+                "comments": "backwards",
                 "dateCreated": "1462381381",
                 "newValue": null,
                 "oldValue": null,
@@ -783,17 +718,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -813,20 +748,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "Nginx set up in cauldron.io machine for:\n* main web site http://cauldron.io\n* kibana https://dashboard.cauldron.io\n* es from https://es.cauldron.io\n\nNOTE: user and password will be ...\n\n",
+                "comments": "Newer one",
                 "dateCreated": "1462380267",
                 "newValue": null,
                 "oldValue": null,
@@ -837,17 +772,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -865,17 +800,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -900,17 +835,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -924,17 +859,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -948,22 +883,22 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
                 "dateCreated": "1462379566",
-                "newValue": "* Dashboards will be available from dashboard.cauldron.io\n* Main site will be available from cauldron.io\n",
+                "newValue": "A new description",
                 "oldValue": null,
                 "taskID": "73",
                 "transactionID": "1245",
@@ -972,17 +907,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -996,17 +931,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1020,17 +955,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1044,22 +979,22 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
                 "dateCreated": "1462379566",
-                "newValue": "Change the URL of cauldron.io",
+                "newValue": "New title",
                 "oldValue": null,
                 "taskID": "73",
                 "transactionID": "1241",
@@ -1068,17 +1003,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1093,56 +1028,41 @@
         ],
         "type": "TASK"
     },
-    "origin": "https://test.phabricator.net",
-    "perceval_version": "0.3.1.dev0",
-    "timestamp": 1474883519.573448,
+    "origin": "http://example.com",
+    "perceval_version": "0.9.10",
+    "tag": "http://example.com",
+    "timestamp": 1518165682.603955,
     "updated_on": 1462464642.0,
-    "uuid": "079e6acb3f871bf4ecca2b7fddfff155bd9600fa"
-},
-{
+    "uuid": "5487fc704f2d3c4e83ab0cd065512a181c1726cc"
+},{
     "backend_name": "Phabricator",
-    "backend_version": "0.2.0",
+    "backend_version": "0.7.0",
+    "category": "task",
     "data": {
         "attachments": {
             "projects": {
-                "projectPHIDs": [
-                    "PHID-PROJ-thh4qyctzf4qvhfwrxne",
-                    "PHID-PROJ-kqryivl2pwvnihfzdgg6"
-                ]
+                "projectPHIDs": []
             }
         },
         "fields": {
             "authorData": {
-                "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                "image": "http://example.com/file/data/o",
                 "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "realName": "Fran Ca\u00f1as-D\u00edaz",
+                "realName": "John Doe",
                 "roles": [
                     "admin",
                     "verified",
                     "approved",
                     "activated"
                 ],
-                "uri": "https://test.phabricator.net/p/tlanas/",
-                "userName": "tlanas"
+                "uri": "http://example.com/p/jdoe/",
+                "userName": "jdoe"
             },
             "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
             "dateCreated": 1462645103,
             "dateModified": 1462792338,
-            "name": "Kernelos vs. Community workaround for Kernelos",
-            "ownerData": {
-                "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
-                "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "realName": "Fran Ca\u00f1as-D\u00edaz",
-                "roles": [
-                    "admin",
-                    "verified",
-                    "approved",
-                    "activated"
-                ],
-                "uri": "https://test.phabricator.net/p/tlanas/",
-                "userName": "tlanas"
-            },
-            "ownerPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
+            "name": "Task #78",
+            "ownerPHID": null,
             "points": null,
             "policy": {
                 "edit": "users",
@@ -1163,40 +1083,21 @@
         },
         "id": 78,
         "phid": "PHID-TASK-d34l73jzhylrkd24qcyf",
-        "projects": [
-            {
-                "fullName": "Grimoire Lab",
-                "name": "Grimoire Lab",
-                "phid": "PHID-PROJ-thh4qyctzf4qvhfwrxne",
-                "status": "open",
-                "type": "PROJ",
-                "typeName": "Project",
-                "uri": "https://test.phabricator.net/tag/grimoire_lab/"
-            },
-            {
-                "fullName": "project: KernelOS dashboard 16/17",
-                "name": "project: KernelOS dashboard 16/17",
-                "phid": "PHID-PROJ-kqryivl2pwvnihfzdgg6",
-                "status": "open",
-                "type": "PROJ",
-                "typeName": "Project",
-                "uri": "https://test.phabricator.net/tag/project_kernelos_dashboard_16_17/"
-            }
-        ],
+        "projects": [],
         "transactions": [
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1210,20 +1111,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "I've enabled the **automatic update** without the Linux repo.\n\n```\ntlanas@sega:~$ ./launch-kernelos.sh \n```\n\nKudos to @maco and @jgb for the quick job! :D",
+                "comments": "Sixth",
                 "dateCreated": "1462655480",
                 "newValue": null,
                 "oldValue": null,
@@ -1234,20 +1135,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "Git data generated without Linux repo.\n\n```\nbitergia@72f7505b7e35:~/devel/mordred-kernelos/adhoc_scripts$ ./kernelos_git.sh\n```\n\nNOTE:  fields generated **author_org_kernelos** and **committer_org_kernelos**",
+                "comments": "Fifth",
                 "dateCreated": "1462654933",
                 "newValue": null,
                 "oldValue": null,
@@ -1258,20 +1159,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "Issues executing the Git enrichment. @maco this is how you can reproduce it\n\nWARNING: linux repo is disabled so far\n\n```\nbitergia@72f7505b7e35:~/devel/mordred-kernelos/adhoc_scripts$ ./kernelos_git.sh \n```\n\nLog:\n```\n2016-05-07 20:07:00,515 Rate limit pending: 4955\n2016-05-07 20:07:00,515 Vito Caputo <vito.caputo@kernelos.com> is vcaputo in github\n2016-05-07 20:07:01,014 Rate limit pending: 4954\nTraceback (most recent call last):\n  File \"/home/bitergia/devel/GrimoireELK-kernelos/utils/grimoire/elk/git.py\", line 145, in get_github_login\n    login = self.github_logins[user]\nKeyError: 'Huang <yewei.huang@transwarp.io>'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/home/bitergia/devel/GrimoireELK-kernelos/utils/grimoire/arthur.py\", line 288, in enrich_backend\n    enrich_count = enrich_items(ocean_backend, enrich_backend)\n  File \"/home/bitergia/devel/GrimoireELK-kernelos/utils/grimoire/arthur.py\", line 197, in enrich_items\n    enrich_backend.enrich_items(items_pack)\n  File \"/home/bitergia/devel/GrimoireELK-kernelos/utils/grimoire/elk/git.py\", line 295, in enrich_items\n    rich_commit = self.get_rich_commit(commit, kernelos_logins)\n  File \"/home/bitergia/devel/GrimoireELK-kernelos/utils/grimoire/elk/git.py\", line 244, in get_rich_commit\n    author_login = self.get_github_login(eitem[\"Author\"], \"author\", eitem['hash'], eitem['github_repo'])\n  File \"/home/bitergia/devel/GrimoireELK-kernelos/utils/grimoire/elk/git.py\", line 155, in get_github_login\n    author_login = commit_json['author']['login']\nTypeError: 'NoneType' object is not subscriptable\n2016-05-07 20:07:01,014 Error enriching ocean from git (): 'NoneType' object is not subscriptable\n2016-05-07 20:07:01,015 Done git \n2016-05-07 20:07:01,016 Queued enrich_backend job\n2016-05-07 20:07:01,016 <Job d82efe13-8e41-4a7b-a74e-6d7a48b40c6a: grimoire.arthur.enrich_backend('https://bitergia:B1t3r_Es.K1b@es.bitergia.com/kernelos', False, 'git', [''], 'git_kernelos', 'kernelos_pro', 'kernelos_sh', False)>\n2016-05-07 20:07:01,016 Finished in 0.64 min\n```\n",
+                "comments": "Fourth comment",
                 "dateCreated": "1462651560",
                 "newValue": null,
                 "oldValue": null,
@@ -1282,20 +1183,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "* github_kernelos_enrich deleted and generated again\n* aliases restored\n\n```\nbitergia@72f7505b7e35:~/mordred/bin$ curl -XDELETE \"https://bitergia:B1t3r_Es.K1b@es.bitergia.com/kernelos/github_kernelos_enrich\"\n\nbitergia@72f7505b7e35:~/devel/mordred-kernelos/adhoc_scripts$ ./kernelos_github.sh ~/mordred/conf/setup/kernelos.cfg \n\nbitergia@72f7505b7e35:~/devel/mordred-kernelos/adhoc_scripts$ curl -XPOST \"https://bitergia:****@es.bitergia.com/kernelos/_aliases\" -d'\n> {\n> \"actions\" : [\n> { \"add\" : { \"index\" : \"github_kernelos_enrich\", \"alias\" : \"github_issues_enrich\" } }\n> ]}'\n\n{\"acknowledged\":true}bitergia@72f7505b7e35:~/devel/mordred-kernelos/adhoc_scripts$ curl -XPOST \"https://bitergia:****@es.bitergia.com/kernelos/_aliases\" -d'\n{\n    \"actions\" : [\n        { \"add\" : { \"index\" : \"github_kernelos_enrich\", \"alias\" : \"github_issues_enrich\" } },\n        { \"add\" : { \"index\" : \"git_kernelos_enrich\", \"alias\" : \"github_git_enrich\" } },\n        { \"add\" : { \"index\" : \"github_issues_enrich\", \"alias\" : \"issues_created\" } },\n        { \"add\" : { \"index\" : \"github_issues_enrich\", \"alias\" : \"issues_updated\" } },\n        { \"add\" : { \"index\" : \"github_issues_enrich\", \"alias\" : \"issues_closed\" } },\n        { \"add\" : { \"index\" : \"github_git_enrich\", \"alias\" : \"git_commit\" } },\n        { \"add\" : { \"index\" : \"github_git_enrich\", \"alias\" : \"git_author\" } }\n    ]\n}'\n{\"acknowledged\":true}\n\n```\n\nNOTE: New fields available for issues: **user_org_kernelos** and **assignee_org_kernelos**\n",
+                "comments": "Third comment",
                 "dateCreated": "1462648302",
                 "newValue": null,
                 "oldValue": null,
@@ -1306,20 +1207,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "```\nbitergia@72f7505b7e35:~/devel/GrimoireELK-kernelos$ ls /home/bitergia/devel/GrimoireELK-kernelos/utils/kernelos-inc.members.json\n/home/bitergia/devel/GrimoireELK-kernelos/utils/kernelos-inc.members.json\n```\n```\nbitergia@72f7505b7e35:~/devel/GrimoireELK-kernelos$ git diff\ndiff --git a/grimoire/elk/git.py b/grimoire/elk/git.py\nindex 55311ce..1335867 100644\n--- a/grimoire/elk/git.py\n+++ b/grimoire/elk/git.py\n@@ -30,9 +30,9 @@ from dateutil import parser\n \n from grimoire.elk.enrich import Enrich\n \n-COREOS_INC_MEMBERS_FILE = \"/home/bitergia/devel/GrimoireELK/utils/kernelos-inc.members.json\"\n+COREOS_INC_MEMBERS_FILE = \"/home/bitergia/devel/GrimoireELK-kernelos/utils/kernelos-inc.members.json\"\n GITHUB_API_URL = \"https://api.github.com\"\n-GITHUB_API_TOKEN = ''\n+GITHUB_API_TOKEN = 'a2ffadd5f93bb4fbcb3f8be44b8f168c13279eaf'\n \n GITHUB = 'https://github.com/'\n \ndiff --git a/grimoire/elk/github.py b/grimoire/elk/github.py\nindex 0d98204..f8c3966 100644\n--- a/grimoire/elk/github.py\n+++ b/grimoire/elk/github.py\n@@ -35,7 +35,7 @@ from .utils import get_time_diff_days\n from grimoire.elk.enrich import Enrich\n \n GITHUB = 'https://github.com/'\n-COREOS_INC_MEMBERS_FILE = \"/home/bitergia/devel/GrimoireELK/utils/kernelos-inc.members.json\"\n+COREOS_INC_MEMBERS_FILE = \"/home/bitergia/devel/GrimoireELK-kernelos/utils/kernelos-inc.members.json\"\n \n class GitHubEnrich(Enrich):\n\n```\n\nI've also created an adhoc version of mordred.sh\n\n```\nbitergia@72f7505b7e35:~$ diff ~/mordred/bin/mordred.sh ~/devel/mordred-kernelos/bin/mordred.sh \n146c146\n<     cd ~/GrimoireELK/utils\n---\n>     cd ~/devel/GrimoireELK-kernelos/utils\n152c152\n<   cd ~/GrimoireELK/utils\n---\n>   cd ~/devel/GrimoireELK-kernelos/utils\n157c157\n<   cd ~/GrimoireELK/utils\n---\n>   cd ~/devel/GrimoireELK-kernelos/utils\n185c185\n<   cd ~/GrimoireELK/utils\n---\n>   cd ~/devel/GrimoireELK-kernelos/utils\n190c190\n<   cd ~/GrimoireELK/utils\n---\n>   cd ~/devel/GrimoireELK-kernelos/utils\n195c195\n<   cd ~/GrimoireELK/utils\n---\n>   cd ~/devel/GrimoireELK-kernelos/utils\n```\n\n\n```\nbitergia@72f7505b7e35:~$ diff mordred/adhoc_scripts/kernelos_github.sh devel/mordred-kernelos/adhoc_scripts/kernelos_github.sh \n13c13,14\n< REPOS=\"etcd rkt clair flannel fleet dex linux\"\n---\n> #REPOS=\"etcd rkt clair flannel fleet dex linux\"\n> REPOS=\"etcd rkt clair flannel fleet dex\"\n22c23\n< cd ~/GrimoireELK/utils\n---\n> cd ~/devel/GrimoireELK-kernelos/utils\n```",
+                "comments": "A new one and improved comment",
                 "dateCreated": "1462647844",
                 "newValue": null,
                 "oldValue": null,
@@ -1330,20 +1231,20 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
-                "comments": "NOTE: JSON file with kernelos members {F238}\n\nAlvaro said:\n* hay que trabajar con GrimoireELK en la rama kernelos\n* importante: https://github.com/grimoirelab/GrimoireELK/blob/kernelos/grimoire/elk/github.py#L38 , aqu\u00ed es donde hay que poner el JSON de KernelOS del listado de su gente\n* https://github.com/grimoirelab/GrimoireELK/blob/kernelos/grimoire/elk/git.py#L35  hay que meter el API TOKEN de GITHUB\n* si enriqueces con esto, te va a crear los campos de KernelOS/Community para author, committer, reporter y assignee\n* si todo va bien dile a jgb que los campos exactos son https://github.com/grimoirelab/GrimoireELK/blob/kernelos/grimoire/elk/git.py#L247\n** git: author_org_kernelos committer_org_kernelos \n** issues: user_org_kernelos assignee_org_kernelos\n\n\n",
+                "comments": "A comment",
                 "dateCreated": "1462645674",
                 "newValue": null,
                 "oldValue": null,
@@ -1354,17 +1255,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1382,17 +1283,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1417,17 +1318,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1441,17 +1342,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1465,22 +1366,22 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
                 "dateCreated": "1462645103",
-                "newValue": "We are adding an extra feature for Kernelos urgently. The aim is to have the information divided between Kernelos and Community (non-Kernelos) people. The input is a JSON with the people who belong to the private organization https://github.com/kernelos-inc.\n\nEverything should be ready by early morning (even before).",
+                "newValue": "New description",
                 "oldValue": null,
                 "taskID": "78",
                 "transactionID": "1340",
@@ -1489,17 +1390,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1513,17 +1414,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1537,17 +1438,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1561,22 +1462,22 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
                 "dateCreated": "1462645103",
-                "newValue": "Kernelos vs. Community workaround for Kernelos",
+                "newValue": "This is the tittle",
                 "oldValue": null,
                 "taskID": "78",
                 "transactionID": "1336",
@@ -1585,17 +1486,17 @@
             },
             {
                 "authorData": {
-                    "image": "https://test.phabricator.net/file/data/4qmunkpqxjrgftqmarlv/PHID-FILE-sg3fe35arm6ajrs67brq/profile",
+                    "image": "http://example.com/file/data/o",
                     "phid": "PHID-USER-2uk52xorcqb6sjvp467y",
-                    "realName": "Fran Ca\u00f1as-D\u00edaz",
+                    "realName": "John Doe",
                     "roles": [
                         "admin",
                         "verified",
                         "approved",
                         "activated"
                     ],
-                    "uri": "https://test.phabricator.net/p/tlanas/",
-                    "userName": "tlanas"
+                    "uri": "http://example.com/p/jdoe/",
+                    "userName": "jdoe"
                 },
                 "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
                 "comments": null,
@@ -1610,10 +1511,569 @@
         ],
         "type": "TASK"
     },
-    "origin": "https://test.phabricator.net",
-    "perceval_version": "0.3.1.dev0",
-    "timestamp": 1474883519.810636,
+    "origin": "http://example.com",
+    "perceval_version": "0.9.10",
+    "tag": "http://example.com",
+    "timestamp": 1518165682.604057,
     "updated_on": 1462792338.0,
-    "uuid": "cd404013da34f33f35ec35f4f6342b417e563674"
-}
-]
+    "uuid": "fa971157c4d0155652f94b673866abd83b929b27"
+},{
+    "backend_name": "Phabricator",
+    "backend_version": "0.7.0",
+    "category": "task",
+    "data": {
+        "attachments": {
+            "projects": {
+                "projectPHIDs": [
+                    "PHID-PROJ-zi2ndtoy3fh5pnbqzfdo",
+                    "PHID-PROJ-2qnt6thbrd7qnx5bitzy"
+                ]
+            }
+        },
+        "fields": {
+            "authorData": {
+                "image": "http://example.com/file/data/h",
+                "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                "realName": "Jane Doe",
+                "roles": [
+                    "admin",
+                    "verified",
+                    "approved",
+                    "activated"
+                ],
+                "uri": "http://example.com/p/jane/",
+                "userName": "jane"
+            },
+            "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+            "dateCreated": 1465815168,
+            "dateModified": 1467196707,
+            "name": "Task 296",
+            "ownerData": {
+                "image": "http://example.com/file/data/6",
+                "phid": "PHID-USER-pr5fcxy4xk5ofqsfqcfc",
+                "realName": "Jane Rae",
+                "roles": [
+                    "verified",
+                    "approved",
+                    "activated"
+                ],
+                "uri": "http://example.com/p/jrae/",
+                "userName": "jrae"
+            },
+            "ownerPHID": "PHID-USER-pr5fcxy4xk5ofqsfqcfc",
+            "points": null,
+            "policy": {
+                "edit": "users",
+                "view": "users"
+            },
+            "priority": {
+                "color": "yellow",
+                "name": "Low",
+                "subpriority": -338029833.48147,
+                "value": 25
+            },
+            "spacePHID": "PHID-SPCE-ik4ugs53e7kouufaltuu",
+            "status": {
+                "color": null,
+                "name": "Open",
+                "value": "open"
+            }
+        },
+        "id": 296,
+        "phid": "PHID-TASK-itt7lyrtbwo3bdek2u3e",
+        "projects": [
+            {
+                "fullName": "Team: Devel",
+                "name": "Team: Devel",
+                "phid": "PHID-PROJ-zi2ndtoy3fh5pnbqzfdo",
+                "status": "open",
+                "type": "PROJ",
+                "typeName": "Project",
+                "uri": "https://phabricator.bitergia.net/tag/team_devel/"
+            },
+            {
+                "fullName": "Bug report",
+                "name": "Bug report",
+                "phid": "PHID-PROJ-2qnt6thbrd7qnx5bitzy",
+                "status": "open",
+                "type": "PROJ",
+                "typeName": "Project",
+                "uri": "https://phabricator.bitergia.net/tag/bug_report/"
+            }
+        ],
+        "transactions": [
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/6",
+                    "phid": "PHID-USER-pr5fcxy4xk5ofqsfqcfc",
+                    "realName": "Jane Rae",
+                    "roles": [
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jrae/",
+                    "userName": "jrae"
+                },
+                "authorPHID": "PHID-USER-pr5fcxy4xk5ofqsfqcfc",
+                "comments": null,
+                "dateCreated": "1467196707",
+                "newValue": {
+                    "afterPHID": "PHID-TASK-ivlrol6stsi537lsshxm",
+                    "beforePHID": null,
+                    "columnPHIDs": [
+                        "PHID-PCOL-dbt3mnrmocumpfqfzu3w"
+                    ],
+                    "projectPHID": "PHID-PROJ-dd44hclhk7iboav6x7e4"
+                },
+                "oldValue": {
+                    "columnPHIDs": {
+                        "PHID-PCOL-joga2mjnalekgr5slbiw": "PHID-PCOL-joga2mjnalekgr5slbiw"
+                    },
+                    "projectPHID": "PHID-PROJ-dd44hclhk7iboav6x7e4"
+                },
+                "taskID": "296",
+                "transactionID": "8821",
+                "transactionPHID": "PHID-XACT-TASK-gva4ty36zx4ojcg",
+                "transactionType": "projectcolumn"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/6",
+                    "phid": "PHID-USER-pr5fcxy4xk5ofqsfqcfc",
+                    "realName": "Jane Rae",
+                    "roles": [
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jrae/",
+                    "userName": "jrae"
+                },
+                "authorPHID": "PHID-USER-pr5fcxy4xk5ofqsfqcfc",
+                "comments": "A comment",
+                "dateCreated": "1467196681",
+                "newValue": null,
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "8820",
+                "transactionPHID": "PHID-XACT-TASK-mghuh2mporpvjye",
+                "transactionType": "core:comment"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/6",
+                    "phid": "PHID-USER-pr5fcxy4xk5ofqsfqcfc",
+                    "realName": "Jane Rae",
+                    "roles": [
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jrae/",
+                    "userName": "jrae"
+                },
+                "authorPHID": "PHID-USER-pr5fcxy4xk5ofqsfqcfc",
+                "comments": null,
+                "dateCreated": "1466598205",
+                "newValue": null,
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "7800",
+                "transactionPHID": "PHID-XACT-TASK-v3gr3dbwrkeoapy",
+                "transactionType": "core:comment"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815171",
+                "newValue": {
+                    "afterPHID": null,
+                    "beforePHID": null,
+                    "columnPHIDs": [
+                        "PHID-PCOL-joga2mjnalekgr5slbiw"
+                    ],
+                    "projectPHID": "PHID-PROJ-dd44hclhk7iboav6x7e4"
+                },
+                "oldValue": {
+                    "columnPHIDs": {
+                        "PHID-PCOL-lfrrnk3pbd4bdcrqbgw4": "PHID-PCOL-lfrrnk3pbd4bdcrqbgw4"
+                    },
+                    "projectPHID": "PHID-PROJ-dd44hclhk7iboav6x7e4"
+                },
+                "taskID": "296",
+                "transactionID": "5451",
+                "transactionPHID": "PHID-XACT-TASK-lmeevrxm6t6s2ig",
+                "transactionType": "projectcolumn"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": [
+                    "PHID-USER-ojtcpympsmwenszuef7p"
+                ],
+                "oldValue": [],
+                "taskID": "296",
+                "transactionID": "5450",
+                "transactionPHID": "PHID-XACT-TASK-hq6l4bxshokys2e",
+                "transactionType": "core:subscribers"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": {
+                    "PHID-PROJ-dd44hclhk7iboav6x7e4": {
+                        "data": [],
+                        "dst": "PHID-PROJ-dd44hclhk7iboav6x7e4",
+                        "type": 41
+                    }
+                },
+                "oldValue": [],
+                "taskID": "296",
+                "transactionID": "5449",
+                "transactionPHID": "PHID-XACT-TASK-5v7qei7gt6tgydx",
+                "transactionType": "core:edge"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": "users",
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "5448",
+                "transactionPHID": "PHID-XACT-TASK-eomqtu3xtvi2dsu",
+                "transactionType": "core:edit-policy"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": "users",
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "5447",
+                "transactionPHID": "PHID-XACT-TASK-prjdth7kf4pl7zr",
+                "transactionType": "core:view-policy"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": "My description about the problem",
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "5446",
+                "transactionPHID": "PHID-XACT-TASK-5afdsajvnrzd7u4",
+                "transactionType": "description"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": 25,
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "5445",
+                "transactionPHID": "PHID-XACT-TASK-a2a4jhhyk5cp2vo",
+                "transactionType": "priority"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": "open",
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "5444",
+                "transactionPHID": "PHID-XACT-TASK-obutb4dwnuvxp5d",
+                "transactionType": "status"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": "PHID-USER-pr5fcxy4xk5ofqsfqcfc",
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "5443",
+                "transactionPHID": "PHID-XACT-TASK-tdrr5mrqoh4j5us",
+                "transactionType": "reassign"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": "Organize data tests files in folders",
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "5442",
+                "transactionPHID": "PHID-XACT-TASK-oen3wmvnwu6cd6b",
+                "transactionType": "title"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": "PHID-SPCE-ik4ugs53e7kouufaltuu",
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "5441",
+                "transactionPHID": "PHID-XACT-TASK-ht7lrdzaehordyt",
+                "transactionType": "core:space"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": {
+                    "columnPHIDs": [
+                        "PHID-PCOL-lfrrnk3pbd4bdcrqbgw4"
+                    ],
+                    "projectPHID": "PHID-PROJ-dd44hclhk7iboav6x7e4"
+                },
+                "oldValue": {
+                    "columnPHIDs": [],
+                    "projectPHID": "PHID-PROJ-dd44hclhk7iboav6x7e4"
+                },
+                "taskID": "296",
+                "transactionID": "5440",
+                "transactionPHID": "PHID-XACT-TASK-pud7bqpuns46eee",
+                "transactionType": "projectcolumn"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": "PHID-PCOL-lfrrnk3pbd4bdcrqbgw4",
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "5439",
+                "transactionPHID": "PHID-XACT-TASK-wync2cng44cncmb",
+                "transactionType": "column"
+            },
+            {
+                "authorData": {
+                    "fullName": "Herald",
+                    "name": "Herald",
+                    "phid": "PHID-APPS-PhabricatorHeraldApplication",
+                    "status": "open",
+                    "type": "APPS",
+                    "typeName": "Application",
+                    "uri": "https://phabricator.example.com/herald/"
+                },
+                "authorPHID": "PHID-APPS-PhabricatorHeraldApplication",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": null,
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "5438",
+                "transactionPHID": "PHID-XACT-TASK-tlrieajmjbvyvq3",
+                "transactionType": "core:create"
+            },
+            {
+                "authorData": {
+                    "image": "http://example.com/file/data/h",
+                    "phid": "PHID-USER-ojtcpympsmwenszuef7p",
+                    "realName": "Jane Doe",
+                    "roles": [
+                        "admin",
+                        "verified",
+                        "approved",
+                        "activated"
+                    ],
+                    "uri": "http://example.com/p/jane/",
+                    "userName": "jane"
+                },
+                "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+                "comments": null,
+                "dateCreated": "1465815168",
+                "newValue": null,
+                "oldValue": null,
+                "taskID": "296",
+                "transactionID": "5437",
+                "transactionPHID": "PHID-XACT-TASK-tlrieajmjbvyvq3",
+                "transactionType": "core:create"
+            }
+        ],
+        "type": "TASK"
+    },
+    "origin": "http://example.com",
+    "perceval_version": "0.9.10",
+    "tag": "http://example.com",
+    "timestamp": 1518165682.63387,
+    "updated_on": 1467196707.0,
+    "uuid": "e8fa3e4a4381d6fea3bcf5c848f599b87e7dc4a6"
+}]

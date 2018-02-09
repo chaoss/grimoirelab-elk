@@ -1,0 +1,3046 @@
+[{
+    "backend_name": "StackExchange",
+    "backend_version": "0.2.0",
+    "data": {
+        "answer_count": 2,
+        "answers": [
+            {
+                "answer_id": 38611682,
+                "body_markdown": "Is this what you are looking for:\r\nif `L =  [-0.4, 0.2, 0, 0.2, 0]`\r\n\r\n    AllCombi = itertools.permutations(L)\r\n\r\n    for each in AllCombi:\r\n        print each\r\n\r\n\r\n\r\n",
+                "can_flag": false,
+                "comment_count": 0,
+                "creation_date": 1469618876,
+                "down_vote_count": 2,
+                "is_accepted": false,
+                "last_activity_date": 1469618876,
+                "link": "http://stackoverflow.com/questions/38611467/python-get-every-possible-combination-of-weights-for-a-portfolio/38611682#38611682",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 1,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "aady",
+                    "link": "http://stackoverflow.com/users/2047752/aady",
+                    "profile_image": "https://www.gravatar.com/avatar/c89eeeb006a55046f0df0ca87d639a5c?s=128&d=identicon&r=PG",
+                    "reputation": 27,
+                    "user_id": 2047752,
+                    "user_type": "registered"
+                },
+                "question_id": 38611467,
+                "score": -2,
+                "tags": [],
+                "title": "Python: get every possible combination of weights for a portfolio",
+                "up_vote_count": 0
+            },
+            {
+                "answer_id": 38611752,
+                "body_markdown": "If you just want a list of all the combinations, use [`itertools.combinations`][1]:\r\n\r\n    w = [-0.4, -0.2, 0, 0.2, 0.4]\r\n    l = len(w)\r\n    \r\n    if __name__ == '__main__':\r\n        for i in xrange(1, l+1):\r\n            for p in itertools.combinations(w, i):\r\n                print p\r\n\r\nIf you want to count the different weights that can be created with these combinations, it's a bit more complicated.\r\n\r\n\r\nFirst, you generate permutations with 1, 2, 3, ... elements. Then you take the sum of them. Then you add the sum to the set (will no do anything if the number is already present, very fast operation). Finally you convert to a list and sort it.\r\n\r\n    from itertools import combinations\r\n    \r\n    def round_it(n, p):\r\n        \"\"\"rounds n, to have maximum p figures to the right of the comma\"\"\"\r\n        return int((10**p)*n)/float(10**p)\r\n    \r\n    w = [-0.4, -0.2, 0, 0.2, 0.4]\r\n    l = len(w)\r\n    res = set()\r\n    \r\n    if __name__ == '__main__':\r\n        for i in xrange(1, l+1):\r\n            for p in combinations(w, i):\r\n                res.add(round_it(sum(p), 3))\r\n        \r\n        print sorted(list(res))\r\n\r\n\r\n  [1]: http://stackoverflow.com/documentation/python/1564/itertools-module/9828/itertools-combinations#t=201607271138098681664",
+                "can_flag": false,
+                "comment_count": 0,
+                "creation_date": 1469619099,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469619561,
+                "last_edit_date": 1469619561,
+                "last_editor": {
+                    "accept_rate": 79,
+                    "badge_counts": {
+                        "bronze": 31,
+                        "gold": 0,
+                        "silver": 4
+                    },
+                    "display_name": "BusyAnt",
+                    "link": "http://stackoverflow.com/users/5018771/busyant",
+                    "profile_image": "https://www.gravatar.com/avatar/6dec254b17d75df0cfa8c42806cfca3f?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 590,
+                    "user_id": 5018771,
+                    "user_type": "registered"
+                },
+                "link": "http://stackoverflow.com/questions/38611467/python-get-every-possible-combination-of-weights-for-a-portfolio/38611752#38611752",
+                "owner": {
+                    "accept_rate": 79,
+                    "badge_counts": {
+                        "bronze": 31,
+                        "gold": 0,
+                        "silver": 4
+                    },
+                    "display_name": "BusyAnt",
+                    "link": "http://stackoverflow.com/users/5018771/busyant",
+                    "profile_image": "https://www.gravatar.com/avatar/6dec254b17d75df0cfa8c42806cfca3f?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 590,
+                    "user_id": 5018771,
+                    "user_type": "registered"
+                },
+                "question_id": 38611467,
+                "score": 0,
+                "tags": [],
+                "title": "Python: get every possible combination of weights for a portfolio",
+                "up_vote_count": 0
+            }
+        ],
+        "body_markdown": "I think this problem can be solved using either itertools or cartesian, but I'm fairly new to Python and am struggling to use these:\r\n\r\nI have a portfolio of 5 stocks, where each stock can have a weighting of -0.4, -0.2, 0, 0.2 or 0.4, with weightings adding up to 0. How do I create a function that produces a list of every possible combination of weights. e.g. [-0.4, 0.2, 0, 0.2, 0]... etc\r\n\r\nIdeally, the function would work for n stocks, as I will eventually want to do the same process for 50 stocks. ",
+        "can_close": false,
+        "can_flag": false,
+        "close_vote_count": 0,
+        "comment_count": 2,
+        "comments": [
+            {
+                "can_flag": false,
+                "comment_id": 64609951,
+                "creation_date": 1469619501,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38611467/python-get-every-possible-combination-of-weights-for-a-portfolio#comment64609951_38611467",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 28,
+                        "gold": 3,
+                        "silver": 13
+                    },
+                    "display_name": "PM 2Ring",
+                    "link": "http://stackoverflow.com/users/4014959/pm-2ring",
+                    "profile_image": "https://i.stack.imgur.com/GdqQJ.jpg?s=128&g=1",
+                    "reputation": 14923,
+                    "user_id": 4014959,
+                    "user_type": "registered"
+                },
+                "post_id": 38611467,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64609984,
+                "creation_date": 1469619550,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38611467/python-get-every-possible-combination-of-weights-for-a-portfolio#comment64609984_38611467",
+                "owner": {
+                    "accept_rate": 81,
+                    "badge_counts": {
+                        "bronze": 40,
+                        "gold": 1,
+                        "silver": 9
+                    },
+                    "display_name": "Rawing",
+                    "link": "http://stackoverflow.com/users/1222951/rawing",
+                    "profile_image": "https://www.gravatar.com/avatar/ed60dd64f209aae5c84ddd9081c0942a?s=128&d=identicon&r=PG",
+                    "reputation": 6402,
+                    "user_id": 1222951,
+                    "user_type": "registered"
+                },
+                "post_id": 38611467,
+                "post_type": "question",
+                "score": 0
+            }
+        ],
+        "creation_date": 1469618243,
+        "delete_vote_count": 0,
+        "down_vote_count": 0,
+        "favorite_count": 0,
+        "is_answered": false,
+        "last_activity_date": 1469619561,
+        "link": "http://stackoverflow.com/questions/38611467/python-get-every-possible-combination-of-weights-for-a-portfolio",
+        "owner": {
+            "badge_counts": {
+                "bronze": 2,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "Chris Waller",
+            "link": "http://stackoverflow.com/users/6644341/chris-waller",
+            "profile_image": "https://www.gravatar.com/avatar/14494a73895d34ba5cc8c58b236981c7?s=128&d=identicon&r=PG&f=1",
+            "reputation": 16,
+            "user_id": 6644341,
+            "user_type": "registered"
+        },
+        "question_id": 38611467,
+        "reopen_vote_count": 0,
+        "score": 3,
+        "tags": [
+            "python",
+            "list",
+            "itertools",
+            "cartesian-product"
+        ],
+        "title": "Python: get every possible combination of weights for a portfolio",
+        "up_vote_count": 3,
+        "view_count": 30
+    },
+    "origin": "stackoverflow",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619644.7069,
+    "updated_on": 1469619561.0,
+    "uuid": "0fd3068ee3b9dac0187f2208e220fadac120eb2f"
+},
+{
+    "backend_name": "StackExchange",
+    "backend_version": "0.2.0",
+    "data": {
+        "answer_count": 0,
+        "body_markdown": "I am a beginner student in a python coding class. I have the majority of the done and the program itself works, however I need to figure out a way to make the program ask if wants a subtraction or an adding problem, and if the user would like another question. I asked my teacher for assistance and he hasn't gotten back to me, so I'm simply trying to figure out and understand what exactly I need to do.\r\n\r\n    import random\r\n\r\n    x = int(input(\"Please enter an integer: \")) \r\n     if x < 0:\r\n    \r\n        x = 0\r\n    \r\n        print('Negative changed to zero')\r\n    \r\n     elif x == 0:\r\n    \r\n        print('Zero')\r\n    \r\n     elif x == 1:\r\n    \r\n         print('Single')\r\n    \r\n     else:\r\n    \r\n         print('More')    \r\n\r\n     maximum = 10 ** x;\r\n     maximum += 1\r\n     firstnum = random.randrange(1,maximum)       # return an int from 1 to 100\r\n\r\n     secondnum = random.randrange(1, maximum)\r\n\r\n     compsum = firstnum + secondnum           # adds the 2 random numbers together\r\n\r\n    #  print (compsum)                       # print for troubleshooting\r\n\r\n     print(\"What is the sum of\", firstnum, \" +\", secondnum, \"?\")    # presents problem to user\r\n\r\n     added = int(input(\"Your answer is: \"))   # gets user input\r\n\r\n     if added == compsum:                     # compares user input to real answer\r\n\r\n       print(\"You are correct!!!\")\r\n\r\n     else:\r\n\r\n       print (\"Sorry, you are incorrect\") ",
+        "can_close": false,
+        "can_flag": false,
+        "close_vote_count": 0,
+        "comment_count": 0,
+        "creation_date": 1469619535,
+        "delete_vote_count": 0,
+        "down_vote_count": 1,
+        "favorite_count": 0,
+        "is_answered": false,
+        "last_activity_date": 1469619535,
+        "link": "http://stackoverflow.com/questions/38611900/i-need-to-figure-out-how-to-make-my-program-repeat-python-coding-class",
+        "owner": {
+            "badge_counts": {
+                "bronze": 2,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "Packy502",
+            "link": "http://stackoverflow.com/users/6643935/packy502",
+            "profile_image": "https://www.gravatar.com/avatar/b877c8ffe79daaba779ce14c3fd1f4b4?s=128&d=identicon&r=PG&f=1",
+            "reputation": 2,
+            "user_id": 6643935,
+            "user_type": "registered"
+        },
+        "question_id": 38611900,
+        "reopen_vote_count": 0,
+        "score": -1,
+        "tags": [
+            "python"
+        ],
+        "title": "I need to figure out how to make my program repeat. (Python coding class)",
+        "up_vote_count": 0,
+        "view_count": 9
+    },
+    "origin": "stackoverflow",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619644.708539,
+    "updated_on": 1469619535.0,
+    "uuid": "3d23ae2ab783b939b354057b20671c55fa4f2187"
+},
+{
+    "backend_name": "StackExchange",
+    "backend_version": "0.2.0",
+    "data": {
+        "answer_count": 1,
+        "answers": [
+            {
+                "answer_id": 38611885,
+                "body_markdown": "As specified in the [documentation][1] calling `setParent` will just change the ownership of the `QDialog` widget. If you want the `QDialog` widget to be centered within it's parent, you need to pass the parent widget instance to the super constructor of your `QDialog`:\r\n\r\n    class ChildWnd(QDialog):\r\n\r\n        def __init__(self, parent_wnd):\r\n            super().__init__(parent_wnd)\r\n            self.init_ui()\r\n\r\n        def init_ui(self):\r\n            self.resize(200, 100)\r\n            self.show()\r\n\r\n  [1]: http://doc.qt.io/qt-5.7/qdialog.html",
+                "can_flag": false,
+                "comment_count": 0,
+                "creation_date": 1469619488,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469619488,
+                "link": "http://stackoverflow.com/questions/38611296/child-dialog-doesnt-show-up-in-pyqt5/38611885#38611885",
+                "owner": {
+                    "accept_rate": 60,
+                    "badge_counts": {
+                        "bronze": 14,
+                        "gold": 0,
+                        "silver": 4
+                    },
+                    "display_name": "Daniele Pantaleone",
+                    "link": "http://stackoverflow.com/users/3477005/daniele-pantaleone",
+                    "profile_image": "https://i.stack.imgur.com/PFkZf.png?s=128&g=1",
+                    "reputation": 870,
+                    "user_id": 3477005,
+                    "user_type": "registered"
+                },
+                "question_id": 38611296,
+                "score": 0,
+                "tags": [],
+                "title": "Child dialog doesn't show up in PyQt5",
+                "up_vote_count": 0
+            }
+        ],
+        "body_markdown": "<br>\r\n\r\nHi, I'm trying to make simple GUI application using PyQt5, Python 3.4 and Windows 7.\r\n\r\nBelow code works properly.  \r\n\r\n    # coding: utf-8\r\n    \r\n    import sys\r\n    from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog\r\n    \r\n\r\n    class MainWnd(QMainWindow):\r\n        def __init__(self):\r\n            super().__init__()\r\n            self.popup_dlg = None\r\n            self.init_ui()\r\n    \r\n        def init_ui(self):\r\n            self.setGeometry(100, 100, 300, 200)\r\n            self.show()\r\n    \r\n            self.popup_dlg = ChildWnd()\r\n    \r\n    \r\n    class ChildWnd(QDialog):\r\n        def __init__(self):\r\n            super().__init__()\r\n            self.init_ui()\r\n    \r\n        def init_ui(self):\r\n            self.resize(200, 100)\r\n            self.show()\r\n    \r\n    \r\n    if __name__ == \"__main__\":\r\n        app = QApplication(sys.argv)\r\n        mw = MainWnd()\r\n        sys.exit(app.exec_())\r\n\r\n\r\nTwo windows are created. One is main window and the other is child window(popup window). **But what I want is to make child window's default location is centered of main window**. \r\n\r\nSo I've modified the code like this.\r\n\r\n    # coding: utf-8\r\n    \r\n    import sys\r\n    from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog\r\n    \r\n    \r\n    class MainWnd(QMainWindow):\r\n        def __init__(self):\r\n            super().__init__()\r\n            self.popup_dlg = None\r\n            self.init_ui()\r\n    \r\n        def init_ui(self):\r\n            self.setGeometry(100, 100, 300, 200)\r\n            self.show()\r\n    \r\n            self.popup_dlg = ChildWnd(self)  # make instance with parent window argument.\r\n    \r\n    \r\n    class ChildWnd(QDialog):\r\n\r\n        def __init__(self, parent_wnd):\r\n            super().__init__()\r\n            self.setParent(parent_wnd)  # set child window's parent\r\n            self.init_ui()\r\n    \r\n        def init_ui(self):\r\n            self.resize(200, 100)\r\n            self.show()\r\n    \r\n    \r\n    if __name__ == \"__main__\":\r\n        app = QApplication(sys.argv)\r\n        mw = MainWnd()\r\n        sys.exit(app.exec_())\r\n\r\n\r\nBut this code makes problem. Child window doesn't show up. Only main window(=parent window) shows. In Qt's QDialog's manual, I found this.\r\n\r\n> but if it has a parent, its default location is centered on top of the\r\n> parent's top-level widget (if it is not top-level itself).\r\n\r\nThis is why I added the **setParent()**.\r\n\r\nWhat should I do?\r\n\r\nPlease help me!!\r\n\r\n\r\n",
+        "can_close": false,
+        "can_flag": false,
+        "close_vote_count": 0,
+        "comment_count": 3,
+        "comments": [
+            {
+                "can_flag": false,
+                "comment_id": 64609518,
+                "creation_date": 1469618897,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38611296/child-dialog-doesnt-show-up-in-pyqt5#comment64609518_38611296",
+                "owner": {
+                    "accept_rate": 60,
+                    "badge_counts": {
+                        "bronze": 14,
+                        "gold": 0,
+                        "silver": 4
+                    },
+                    "display_name": "Daniele Pantaleone",
+                    "link": "http://stackoverflow.com/users/3477005/daniele-pantaleone",
+                    "profile_image": "https://i.stack.imgur.com/PFkZf.png?s=128&g=1",
+                    "reputation": 870,
+                    "user_id": 3477005,
+                    "user_type": "registered"
+                },
+                "post_id": 38611296,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64609694,
+                "creation_date": 1469619149,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38611296/child-dialog-doesnt-show-up-in-pyqt5#comment64609694_38611296",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 5,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "passion053",
+                    "link": "http://stackoverflow.com/users/6192555/passion053",
+                    "profile_image": "https://i.stack.imgur.com/EPmTz.jpg?s=128&g=1",
+                    "reputation": 13,
+                    "user_id": 6192555,
+                    "user_type": "registered"
+                },
+                "post_id": 38611296,
+                "post_type": "question",
+                "reply_to_user": {
+                    "accept_rate": 60,
+                    "badge_counts": {
+                        "bronze": 14,
+                        "gold": 0,
+                        "silver": 4
+                    },
+                    "display_name": "Daniele Pantaleone",
+                    "link": "http://stackoverflow.com/users/3477005/daniele-pantaleone",
+                    "profile_image": "https://i.stack.imgur.com/PFkZf.png?s=128&g=1",
+                    "reputation": 870,
+                    "user_id": 3477005,
+                    "user_type": "registered"
+                },
+                "score": 1
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64609762,
+                "creation_date": 1469619253,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38611296/child-dialog-doesnt-show-up-in-pyqt5#comment64609762_38611296",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 5,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "passion053",
+                    "link": "http://stackoverflow.com/users/6192555/passion053",
+                    "profile_image": "https://i.stack.imgur.com/EPmTz.jpg?s=128&g=1",
+                    "reputation": 13,
+                    "user_id": 6192555,
+                    "user_type": "registered"
+                },
+                "post_id": 38611296,
+                "post_type": "question",
+                "reply_to_user": {
+                    "accept_rate": 60,
+                    "badge_counts": {
+                        "bronze": 14,
+                        "gold": 0,
+                        "silver": 4
+                    },
+                    "display_name": "Daniele Pantaleone",
+                    "link": "http://stackoverflow.com/users/3477005/daniele-pantaleone",
+                    "profile_image": "https://i.stack.imgur.com/PFkZf.png?s=128&g=1",
+                    "reputation": 870,
+                    "user_id": 3477005,
+                    "user_type": "registered"
+                },
+                "score": 0
+            }
+        ],
+        "creation_date": 1469617830,
+        "delete_vote_count": 0,
+        "down_vote_count": 0,
+        "favorite_count": 0,
+        "is_answered": false,
+        "last_activity_date": 1469619488,
+        "link": "http://stackoverflow.com/questions/38611296/child-dialog-doesnt-show-up-in-pyqt5",
+        "owner": {
+            "badge_counts": {
+                "bronze": 5,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "passion053",
+            "link": "http://stackoverflow.com/users/6192555/passion053",
+            "profile_image": "https://i.stack.imgur.com/EPmTz.jpg?s=128&g=1",
+            "reputation": 13,
+            "user_id": 6192555,
+            "user_type": "registered"
+        },
+        "question_id": 38611296,
+        "reopen_vote_count": 0,
+        "score": 0,
+        "tags": [
+            "python",
+            "pyqt",
+            "pyside"
+        ],
+        "title": "Child dialog doesn't show up in PyQt5",
+        "up_vote_count": 0,
+        "view_count": 5
+    },
+    "origin": "stackoverflow",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619644.709011,
+    "updated_on": 1469619488.0,
+    "uuid": "cd8d9f13bd06ea12a432ee5ecba9575820b023f0"
+},
+{
+    "backend_name": "StackExchange",
+    "backend_version": "0.2.0",
+    "data": {
+        "answer_count": 1,
+        "answers": [
+            {
+                "answer_id": 38611883,
+                "body_markdown": "This seems to work. You convert the solution to a string and then read it back in as an expression.\r\n\r\n    import sympy as sy\r\n    x, y = sy.symbols('x y')\r\n    exp1 = x + y*x + y**2\r\n    exp2 = sy.solveset(exp1, x)\r\n    exp2 = sy.sympify(str(exp2).replace('{','').replace('}',''))\r\n    exp2 - y",
+                "can_flag": false,
+                "comment_count": 0,
+                "creation_date": 1469619484,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469619484,
+                "link": "http://stackoverflow.com/questions/38602048/make-sympys-solveset-function-return-expression/38611883#38611883",
+                "owner": {
+                    "display_name": "Margaret Klymak",
+                    "link": "http://stackoverflow.com/users/6600255/margaret-klymak",
+                    "profile_image": "https://graph.facebook.com/1064384756986990/picture?type=large",
+                    "reputation": 1,
+                    "user_id": 6600255,
+                    "user_type": "registered"
+                },
+                "question_id": 38602048,
+                "score": 0,
+                "tags": [],
+                "title": "Make Sympy's solveset function return expression",
+                "up_vote_count": 0
+            }
+        ],
+        "body_markdown": "# Question\r\n\r\nI wanted to find a way to get `sympy`'s `solveset` function to return an expression that I can do further algebraic manipulation on. Failing this I want to convert the `solveset` output to a `sympy` expression or use an alternate function for a similar purpose.\r\n\r\n# Minimal working example\r\n    # Writing an expression that I will later solve.\r\n    import sympy as sy\r\n    x, y = sy.symbols('x y')\r\n    exp1 = x + y*x + y**2\r\n    # This returns a core.syymbol.Symbol\r\n    exp2 = sy.solveset(exp1, x)\r\n    # This returns a sets.sets.FiniteSet\r\n    # Now trying to subtract a further expression results in an error.\r\n    exp2 - y\r\n    # AttributeError: 'Symbol' object has no attribute '_complement'",
+        "can_close": false,
+        "can_flag": false,
+        "close_vote_count": 0,
+        "comment_count": 0,
+        "creation_date": 1469580573,
+        "delete_vote_count": 0,
+        "down_vote_count": 0,
+        "favorite_count": 0,
+        "is_answered": false,
+        "last_activity_date": 1469619484,
+        "link": "http://stackoverflow.com/questions/38602048/make-sympys-solveset-function-return-expression",
+        "owner": {
+            "accept_rate": 100,
+            "badge_counts": {
+                "bronze": 16,
+                "gold": 1,
+                "silver": 3
+            },
+            "display_name": "Stuart",
+            "link": "http://stackoverflow.com/users/3533721/stuart",
+            "profile_image": "https://i.stack.imgur.com/le8Lb.jpg?s=128&g=1",
+            "reputation": 390,
+            "user_id": 3533721,
+            "user_type": "registered"
+        },
+        "question_id": 38602048,
+        "reopen_vote_count": 0,
+        "score": 0,
+        "tags": [
+            "python",
+            "sympy"
+        ],
+        "title": "Make Sympy's solveset function return expression",
+        "up_vote_count": 0,
+        "view_count": 13
+    },
+    "origin": "stackoverflow",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619644.710309,
+    "updated_on": 1469619484.0,
+    "uuid": "72a0eb86efe3ce046899b7e26acb8f91ca555ada"
+},
+{
+    "backend_name": "StackExchange",
+    "backend_version": "0.2.0",
+    "data": {
+        "answer_count": 0,
+        "body_markdown": "I have divided a plane into identical rectangular cells, regularly distributed like in the figure shown \r\n\r\n\r\n\r\n[![enter image description here][1]][1]\r\n\r\n\r\n\r\nNow these rectangles belong to different groups and I would like to colour every group with a different colour. In the dataset I have the coordinates of the centroids of every rectangle and the group they belong to \r\n\r\n\r\n  [1]: http://i.stack.imgur.com/54fX7.png\r\n\r\n\r\n          X        Y    G\r\n        500295  152342  2\r\n        500295  157981  2\r\n        500295  163619  0\r\n        500295  169258  1\r\n        500295  174897  0\r\n        500295  180536  2\r\n        500295  186174  1\r\n        500295  191813  1\r\n        500295  197452  0\r\n        500295  203090  1\r\n        506851  152342  2\r\n        506851  157981  2\r\n        506851  163619  1\r\n        506851  169258  1\r\n        506851  174897  0\r\n        506851  180536  2\r\n\r\nI have read the dateset with pandas and now have the data in a DataFrame and set the side of the rectangle to 1. \r\n\r\n    import pandas as pd    \r\n    Centroid = pd.read_csv('data.csv')\r\n    Lx = 1\r\n    Ly = 1\r\nI literally have no experience in this and therefore this is all a have. People of the internet any help ?",
+        "can_close": false,
+        "can_flag": false,
+        "close_vote_count": 0,
+        "comment_count": 0,
+        "creation_date": 1469619444,
+        "delete_vote_count": 0,
+        "down_vote_count": 0,
+        "favorite_count": 0,
+        "is_answered": false,
+        "last_activity_date": 1469619444,
+        "link": "http://stackoverflow.com/questions/38611871/how-to-shade-rectangles-with-different-colours-in-python",
+        "owner": {
+            "accept_rate": 62,
+            "badge_counts": {
+                "bronze": 7,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "Duccio Piovani",
+            "link": "http://stackoverflow.com/users/4521095/duccio-piovani",
+            "profile_image": "https://graph.facebook.com/100003462692705/picture?type=large",
+            "reputation": 39,
+            "user_id": 4521095,
+            "user_type": "registered"
+        },
+        "question_id": 38611871,
+        "reopen_vote_count": 0,
+        "score": 0,
+        "tags": [
+            "python",
+            "pandas",
+            "matplotlib"
+        ],
+        "title": "How to shade Rectangles with different colours in Python.",
+        "up_vote_count": 0,
+        "view_count": 6
+    },
+    "origin": "stackoverflow",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619644.710882,
+    "updated_on": 1469619444.0,
+    "uuid": "1c949f650c228f2756e780945d219740fd1ac324"
+},
+{
+    "backend_name": "StackExchange",
+    "backend_version": "0.2.0",
+    "data": {
+        "answer_count": 4,
+        "answers": [
+            {
+                "answer_id": 38521182,
+                "body_markdown": "It's just a guess but... The Training set from Sk-Learn are **black numbers** on a **white background**. And you are trying to predict numbers which are white on a black background...\r\n\r\nI think you should either train on your training set, or train on the negative version of your pictures.\r\n\r\nI hope this help !",
+                "can_flag": false,
+                "comment_count": 1,
+                "comments": [
+                    {
+                        "can_flag": false,
+                        "comment_id": 64508533,
+                        "creation_date": 1469412233,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38519716/scikit-learn-svm-digit-recognition/38521182#comment64508533_38521182",
+                        "owner": {
+                            "accept_rate": 62,
+                            "badge_counts": {
+                                "bronze": 15,
+                                "gold": 0,
+                                "silver": 0
+                            },
+                            "display_name": "CLWONG",
+                            "link": "http://stackoverflow.com/users/6343552/clwong",
+                            "profile_image": "https://www.gravatar.com/avatar/a0ed439bcfb930befcb7e807370b3d7e?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 141,
+                            "user_id": 6343552,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38521182,
+                        "post_type": "answer",
+                        "score": 0
+                    }
+                ],
+                "creation_date": 1469174341,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469174341,
+                "link": "http://stackoverflow.com/questions/38519716/scikit-learn-svm-digit-recognition/38521182#38521182",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 5,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Robin Dupont",
+                    "link": "http://stackoverflow.com/users/5485049/robin-dupont",
+                    "profile_image": "https://lh5.googleusercontent.com/-A3z50fVe6xo/AAAAAAAAAAI/AAAAAAAAHis/wFawwrHyH2o/photo.jpg?sz=128",
+                    "reputation": 15,
+                    "user_id": 5485049,
+                    "user_type": "registered"
+                },
+                "question_id": 38519716,
+                "score": 0,
+                "tags": [],
+                "title": "Scikit-learn SVM digit recognition",
+                "up_vote_count": 0
+            },
+            {
+                "answer_id": 38576947,
+                "body_markdown": "My best bet would be that there is a problem with your data types and array shapes.\r\n\r\nIt looks like you are training on numpy arrays that are of the type `np.float64` (or possibly `np.float32` on 32 bit systems, I don't remember) and where each image has the shape `(64,)`.\r\n\r\nMeanwhile your input image for prediction, after the resizing operation in your code, is of type `uint8` and shape `(1, 64)`.\r\n\r\nI would first try changing the shape of your input image since dtype conversions often just work as you would expect. So change this line:\r\n\r\n`predicted = classifier.predict(img.reshape((1,img.shape[0]*img.shape[1] )))`\r\n\r\nto this:\r\n\r\n`predicted = classifier.predict(img.reshape(img.shape[0]*img.shape[1]))`\r\n\r\nIf that doesn't fix it, you can always try recasting the data type as well with \r\n\r\n`img = img.astype(digits.images.dtype)`.\r\n\r\nI hope that helps. Debugging by proxy is a lot harder than actually sitting in front of your computer :)\r\n\r\nEdit: According to the SciPy documentation, the training data contains integer values from 0 to 16. The values in your input image should be scaled to fit the same interval. (http://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_digits.html#sklearn.datasets.load_digits)",
+                "can_flag": false,
+                "comment_count": 2,
+                "comments": [
+                    {
+                        "can_flag": false,
+                        "comment_id": 64549490,
+                        "creation_date": 1469500823,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38519716/scikit-learn-svm-digit-recognition/38576947#comment64549490_38576947",
+                        "owner": {
+                            "accept_rate": 62,
+                            "badge_counts": {
+                                "bronze": 15,
+                                "gold": 0,
+                                "silver": 0
+                            },
+                            "display_name": "CLWONG",
+                            "link": "http://stackoverflow.com/users/6343552/clwong",
+                            "profile_image": "https://www.gravatar.com/avatar/a0ed439bcfb930befcb7e807370b3d7e?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 141,
+                            "user_id": 6343552,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38576947,
+                        "post_type": "answer",
+                        "score": 0
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64550701,
+                        "creation_date": 1469506150,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38519716/scikit-learn-svm-digit-recognition/38576947#comment64550701_38576947",
+                        "owner": {
+                            "badge_counts": {
+                                "bronze": 3,
+                                "gold": 0,
+                                "silver": 0
+                            },
+                            "display_name": "Dr K",
+                            "link": "http://stackoverflow.com/users/6235205/dr-k",
+                            "profile_image": "https://lh6.googleusercontent.com/-0qu2JwS2QT0/AAAAAAAAAAI/AAAAAAAAAE4/npR46BETaRM/photo.jpg?sz=128",
+                            "reputation": 66,
+                            "user_id": 6235205,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38576947,
+                        "post_type": "answer",
+                        "reply_to_user": {
+                            "accept_rate": 62,
+                            "badge_counts": {
+                                "bronze": 15,
+                                "gold": 0,
+                                "silver": 0
+                            },
+                            "display_name": "CLWONG",
+                            "link": "http://stackoverflow.com/users/6343552/clwong",
+                            "profile_image": "https://www.gravatar.com/avatar/a0ed439bcfb930befcb7e807370b3d7e?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 141,
+                            "user_id": 6343552,
+                            "user_type": "registered"
+                        },
+                        "score": 1
+                    }
+                ],
+                "creation_date": 1469478764,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469508100,
+                "last_edit_date": 1469508100,
+                "last_editor": {
+                    "badge_counts": {
+                        "bronze": 3,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Dr K",
+                    "link": "http://stackoverflow.com/users/6235205/dr-k",
+                    "profile_image": "https://lh6.googleusercontent.com/-0qu2JwS2QT0/AAAAAAAAAAI/AAAAAAAAAE4/npR46BETaRM/photo.jpg?sz=128",
+                    "reputation": 66,
+                    "user_id": 6235205,
+                    "user_type": "registered"
+                },
+                "link": "http://stackoverflow.com/questions/38519716/scikit-learn-svm-digit-recognition/38576947#38576947",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 3,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Dr K",
+                    "link": "http://stackoverflow.com/users/6235205/dr-k",
+                    "profile_image": "https://lh6.googleusercontent.com/-0qu2JwS2QT0/AAAAAAAAAAI/AAAAAAAAAE4/npR46BETaRM/photo.jpg?sz=128",
+                    "reputation": 66,
+                    "user_id": 6235205,
+                    "user_type": "registered"
+                },
+                "question_id": 38519716,
+                "score": 0,
+                "tags": [],
+                "title": "Scikit-learn SVM digit recognition",
+                "up_vote_count": 0
+            },
+            {
+                "answer_id": 38610838,
+                "body_markdown": "1) You need to create your own training set - based on data similar to what you will be making predictions. The call to `datasets.load_digits()` in scikit-learn is loading a preprocessed version of the MNIST Digits dataset, which, for all we know, could have very different images to the ones that you are trying to recognise.\r\n\r\n2) You need to set the parameters of your classifier properly. The call to `svm.SVC(gamma = 0.001)` is just choosing an arbitrary value of the gamma parameter in SVC, which may not be the best option. In addition, you are not configuring the C parameter - which is pretty important for SVMs. I'd bet that this is one of the reasons why your output is 'always 1'.\r\n\r\n3) Whatever final settings you choose for your model, you'll need to use a cross-validation scheme to ensure that the algorithm is effectively learning  \r\n\r\nThere's a lot of Machine Learning theory behind this, but, as a good start, I would really recommend to have a look at [SVM - scikit-learn][1] for a more in-depth description of how the SVC implementation in sickit-learn works, and  [GridSearchCV][2] for a simple technique for parameter setting.\r\n\r\n\r\n  [1]: http://scikit-learn.org/stable/modules/svm.html\r\n  [2]: http://scikit-learn.org/stable/modules/grid_search.html#grid-search",
+                "can_flag": false,
+                "comment_count": 0,
+                "creation_date": 1469616548,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469616548,
+                "link": "http://stackoverflow.com/questions/38519716/scikit-learn-svm-digit-recognition/38610838#38610838",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 7,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "carrdelling",
+                    "link": "http://stackoverflow.com/users/6014153/carrdelling",
+                    "profile_image": "https://www.gravatar.com/avatar/25bb601195a6fcd43da6a05a894c196f?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 160,
+                    "user_id": 6014153,
+                    "user_type": "registered"
+                },
+                "question_id": 38519716,
+                "score": 0,
+                "tags": [],
+                "title": "Scikit-learn SVM digit recognition",
+                "up_vote_count": 0
+            },
+            {
+                "answer_id": 38611859,
+                "body_markdown": "If you look at:\r\nhttp://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_digits.html#sklearn.datasets.load_digits\r\n\r\nyou can see that each point in the matrix as a value between 0-16.\r\n\r\nYou can try to transform the values of the image to between 0-16. I did it and now the prediction works well for the digit 9 but not for 8 and 6. It doesn't give 1 any more.\r\n\r\n    from sklearn import datasets, svm, metrics\r\n    import cv2\r\n    import numpy as np\r\n    \r\n    # Load digit database\r\n    digits = datasets.load_digits()\r\n    n_samples = len(digits.images)\r\n    data = digits.images.reshape((n_samples, -1))\r\n    \r\n    # Train SVM classifier\r\n    classifier = svm.SVC(gamma = 0.001)\r\n    classifier.fit(data[:n_samples], digits.target[:n_samples])\r\n    \r\n    # Read image \"9\"\r\n    img = cv2.imread(\"w1.jpg\")\r\n    img = img[:,:,0];\r\n    img = cv2.resize(img, (8, 8))\r\n    \r\n    # Normalize the values in the image to 0-16\r\n    minValueInImage = np.min(img)\r\n    maxValueInImage = np.max(img)\r\n    normaliizeImg = np.floor(np.divide((img - minValueInImage).astype(np.float),(maxValueInImage-minValueInImage).astype(np.float))*16)\r\n    \r\n    # Predict\r\n    predicted = classifier.predict(normaliizeImg.reshape((1,normaliizeImg.shape[0]*normaliizeImg.shape[1] )))\r\n    print predicted",
+                "can_flag": false,
+                "comment_count": 0,
+                "creation_date": 1469619410,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469619410,
+                "link": "http://stackoverflow.com/questions/38519716/scikit-learn-svm-digit-recognition/38611859#38611859",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 1,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Amitay Nachmani",
+                    "link": "http://stackoverflow.com/users/6631236/amitay-nachmani",
+                    "profile_image": "https://www.gravatar.com/avatar/6047c372917941f6961251e7d6967576?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 11,
+                    "user_id": 6631236,
+                    "user_type": "registered"
+                },
+                "question_id": 38519716,
+                "score": 0,
+                "tags": [],
+                "title": "Scikit-learn SVM digit recognition",
+                "up_vote_count": 0
+            }
+        ],
+        "body_markdown": "I want to make a program to **recognize the digit** in an image. I follow the tutorial in [scikit learn][1] .\r\n\r\nI can **train and fit the svm classifier** like the following.\r\n\r\nFirst, I import the libraries and dataset\r\n\r\n    from sklearn import datasets, svm, metrics\r\n    \r\n    digits = datasets.load_digits()\r\n    n_samples = len(digits.images)\r\n    data = digits.images.reshape((n_samples, -1))\r\n\r\nSecond, I create the SVM model and train it with the dataset.\r\n\r\n    classifier = svm.SVC(gamma = 0.001)\r\n    classifier.fit(data[:n_samples], digits.target[:n_samples])\r\n\r\n\r\n\r\nAnd then, I try to read my own image and use the function `predict()` to recognize the digit.\r\n\r\nHere is my image:\r\n[![enter image description here][2]][2]\r\n\r\n\r\n\r\nI **reshape** the image into (8, 8) and then convert it to a **1D array.**\r\n\r\n    img = misc.imread(\"w1.jpg\")\r\n    img = misc.imresize(img, (8, 8))\r\n    img = img[:, :, 0]\r\n\r\nFinally, when I print out the **prediction**, it returns \\[1]\r\n\r\n    predicted = classifier.predict(img.reshape((1,img.shape[0]*img.shape[1] )))\r\n    print predicted\r\n\r\nWhatever I user others images, it still returns \\[1]\r\n\r\n[![enter image description here][3]][3]\r\n[![enter image description here][4]][4]\r\n\r\nWhen I print out the \"**default\" dataset** of number \"9\", it looks like:[![enter image description here][5]][5]\r\n\r\n**My image** number \"9\" : \r\n\r\n[![enter image description here][6]][6]\r\n\r\nYou can see the non-zero number is quite large for my image.\r\n\r\nI dont know why. I am looking for help to solve my problem. Thanks\r\n\r\n\r\n  [1]: http://scikit-learn.org/stable/auto_examples/classification/plot_digits_classification.html\r\n  [2]: http://i.stack.imgur.com/0bgQX.jpg\r\n  [3]: http://i.stack.imgur.com/0LhHb.jpg\r\n  [4]: http://i.stack.imgur.com/caGUx.jpg\r\n  [5]: http://i.stack.imgur.com/90MOj.jpg\r\n  [6]: http://i.stack.imgur.com/RDg94.jpg",
+        "bounty_amount": 50,
+        "bounty_closes_date": 1470017076,
+        "bounty_user": {
+            "accept_rate": 62,
+            "badge_counts": {
+                "bronze": 15,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "CLWONG",
+            "link": "http://stackoverflow.com/users/6343552/clwong",
+            "profile_image": "https://www.gravatar.com/avatar/a0ed439bcfb930befcb7e807370b3d7e?s=128&d=identicon&r=PG&f=1",
+            "reputation": 141,
+            "user_id": 6343552,
+            "user_type": "registered"
+        },
+        "can_close": false,
+        "can_flag": false,
+        "close_vote_count": 0,
+        "comment_count": 0,
+        "creation_date": 1469169310,
+        "delete_vote_count": 0,
+        "down_vote_count": 1,
+        "favorite_count": 1,
+        "is_answered": false,
+        "last_activity_date": 1469619410,
+        "last_edit_date": 1469500607,
+        "last_editor": {
+            "accept_rate": 62,
+            "badge_counts": {
+                "bronze": 15,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "CLWONG",
+            "link": "http://stackoverflow.com/users/6343552/clwong",
+            "profile_image": "https://www.gravatar.com/avatar/a0ed439bcfb930befcb7e807370b3d7e?s=128&d=identicon&r=PG&f=1",
+            "reputation": 141,
+            "user_id": 6343552,
+            "user_type": "registered"
+        },
+        "link": "http://stackoverflow.com/questions/38519716/scikit-learn-svm-digit-recognition",
+        "notice": {
+            "body": "<p></p>",
+            "creation_date": 1469412276,
+            "owner_user_id": 6343552
+        },
+        "owner": {
+            "accept_rate": 62,
+            "badge_counts": {
+                "bronze": 15,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "CLWONG",
+            "link": "http://stackoverflow.com/users/6343552/clwong",
+            "profile_image": "https://www.gravatar.com/avatar/a0ed439bcfb930befcb7e807370b3d7e?s=128&d=identicon&r=PG&f=1",
+            "reputation": 141,
+            "user_id": 6343552,
+            "user_type": "registered"
+        },
+        "question_id": 38519716,
+        "reopen_vote_count": 0,
+        "score": 0,
+        "tags": [
+            "python",
+            "image",
+            "image-processing",
+            "scikit-learn"
+        ],
+        "title": "Scikit-learn SVM digit recognition",
+        "up_vote_count": 1,
+        "view_count": 68
+    },
+    "origin": "stackoverflow",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619644.711281,
+    "updated_on": 1469619410.0,
+    "uuid": "3fd0a729d5831d79366ad0ae41f3836993432e42"
+},
+{
+    "backend_name": "StackExchange",
+    "backend_version": "0.2.0",
+    "data": {
+        "answer_count": 4,
+        "answers": [
+            {
+                "answer_id": 38610524,
+                "body_markdown": "The `range` function can do this for you. In Python 2 it returns a list, in Python 3 it's a generator, but these differences don't matter for the code you need.\r\n\r\n    text = \"20934-21021\"\r\n    start, end = text.split(\"-\")\r\n    start = int(start) # needs error checks\r\n    end = int(end)     # as does this\r\n    result = \",\".join(str(i) for i in range(start, end+1))\r\n",
+                "can_flag": false,
+                "comment_count": 6,
+                "comments": [
+                    {
+                        "can_flag": false,
+                        "comment_id": 64607411,
+                        "creation_date": 1469615759,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610524#comment64607411_38610524",
+                        "owner": {
+                            "badge_counts": {
+                                "bronze": 8,
+                                "gold": 0,
+                                "silver": 1
+                            },
+                            "display_name": "Max Uppenkamp",
+                            "link": "http://stackoverflow.com/users/2102710/max-uppenkamp",
+                            "profile_image": "https://www.gravatar.com/avatar/6090dc62812bbe64fcbc309ef9c595a1?s=128&d=identicon&r=PG",
+                            "reputation": 205,
+                            "user_id": 2102710,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610524,
+                        "post_type": "answer",
+                        "score": 0
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64607502,
+                        "creation_date": 1469615911,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610524#comment64607502_38610524",
+                        "owner": {
+                            "accept_rate": 83,
+                            "badge_counts": {
+                                "bronze": 36,
+                                "gold": 3,
+                                "silver": 18
+                            },
+                            "display_name": "holdenweb",
+                            "link": "http://stackoverflow.com/users/146073/holdenweb",
+                            "profile_image": "https://www.gravatar.com/avatar/2c69ccb9eb83c7ef2ba155a850df68a9?s=128&d=identicon&r=PG",
+                            "reputation": 8103,
+                            "user_id": 146073,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610524,
+                        "post_type": "answer",
+                        "reply_to_user": {
+                            "badge_counts": {
+                                "bronze": 8,
+                                "gold": 0,
+                                "silver": 1
+                            },
+                            "display_name": "Max Uppenkamp",
+                            "link": "http://stackoverflow.com/users/2102710/max-uppenkamp",
+                            "profile_image": "https://www.gravatar.com/avatar/6090dc62812bbe64fcbc309ef9c595a1?s=128&d=identicon&r=PG",
+                            "reputation": 205,
+                            "user_id": 2102710,
+                            "user_type": "registered"
+                        },
+                        "score": 0
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64607601,
+                        "creation_date": 1469616042,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610524#comment64607601_38610524",
+                        "owner": {
+                            "badge_counts": {
+                                "bronze": 25,
+                                "gold": 2,
+                                "silver": 8
+                            },
+                            "display_name": "Iron Fist",
+                            "link": "http://stackoverflow.com/users/4244780/iron-fist",
+                            "profile_image": "https://i.stack.imgur.com/KUXr1.jpg?s=128&g=1",
+                            "reputation": 6827,
+                            "user_id": 4244780,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610524,
+                        "post_type": "answer",
+                        "score": 1
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64607820,
+                        "creation_date": 1469616411,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610524#comment64607820_38610524",
+                        "owner": {
+                            "accept_rate": 71,
+                            "badge_counts": {
+                                "bronze": 22,
+                                "gold": 1,
+                                "silver": 5
+                            },
+                            "display_name": "Ahsanul Haque",
+                            "link": "http://stackoverflow.com/users/5019169/ahsanul-haque",
+                            "profile_image": "https://www.gravatar.com/avatar/5d546860aba145b8c0450455f447cc88?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 3788,
+                            "user_id": 5019169,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610524,
+                        "post_type": "answer",
+                        "score": 1
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64608295,
+                        "creation_date": 1469617119,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610524#comment64608295_38610524",
+                        "owner": {
+                            "accept_rate": 68,
+                            "badge_counts": {
+                                "bronze": 158,
+                                "gold": 15,
+                                "silver": 141
+                            },
+                            "display_name": "VisioN",
+                            "link": "http://stackoverflow.com/users/1249581/vision",
+                            "profile_image": "https://www.gravatar.com/avatar/3c1eb4414da1008b585bb2939e4884bf?s=128&d=identicon&r=PG",
+                            "reputation": 84427,
+                            "user_id": 1249581,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610524,
+                        "post_type": "answer",
+                        "reply_to_user": {
+                            "accept_rate": 71,
+                            "badge_counts": {
+                                "bronze": 22,
+                                "gold": 1,
+                                "silver": 5
+                            },
+                            "display_name": "Ahsanul Haque",
+                            "link": "http://stackoverflow.com/users/5019169/ahsanul-haque",
+                            "profile_image": "https://www.gravatar.com/avatar/5d546860aba145b8c0450455f447cc88?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 3788,
+                            "user_id": 5019169,
+                            "user_type": "registered"
+                        },
+                        "score": 0
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64610037,
+                        "creation_date": 1469619622,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610524#comment64610037_38610524",
+                        "owner": {
+                            "accept_rate": 83,
+                            "badge_counts": {
+                                "bronze": 36,
+                                "gold": 3,
+                                "silver": 18
+                            },
+                            "display_name": "holdenweb",
+                            "link": "http://stackoverflow.com/users/146073/holdenweb",
+                            "profile_image": "https://www.gravatar.com/avatar/2c69ccb9eb83c7ef2ba155a850df68a9?s=128&d=identicon&r=PG",
+                            "reputation": 8103,
+                            "user_id": 146073,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610524,
+                        "post_type": "answer",
+                        "score": 0
+                    }
+                ],
+                "creation_date": 1469615658,
+                "down_vote_count": 2,
+                "is_accepted": false,
+                "last_activity_date": 1469615658,
+                "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610524#38610524",
+                "owner": {
+                    "accept_rate": 83,
+                    "badge_counts": {
+                        "bronze": 36,
+                        "gold": 3,
+                        "silver": 18
+                    },
+                    "display_name": "holdenweb",
+                    "link": "http://stackoverflow.com/users/146073/holdenweb",
+                    "profile_image": "https://www.gravatar.com/avatar/2c69ccb9eb83c7ef2ba155a850df68a9?s=128&d=identicon&r=PG",
+                    "reputation": 8103,
+                    "user_id": 146073,
+                    "user_type": "registered"
+                },
+                "question_id": 38610354,
+                "score": -1,
+                "tags": [],
+                "title": "How to convert a dash separated range to several entries with \"X\" when difference is 9 in Python",
+                "up_vote_count": 1
+            },
+            {
+                "answer_id": 38610561,
+                "body_markdown": "You can check if you passed the first tens and didn't go over the last tens.\r\n\r\n    import re\r\n    \r\n    text = \"20934-21021\"\r\n    startRange = re.findall(r'(\\d*)-', text)\r\n    endRange = re.findall(r'-(\\d*)', text)\r\n    \r\n    startRangeTens = (int(startRange[0]) / 10 + 1) * 10\r\n    endRangeTens = (int(endRange[0]) / 10) * 10\r\n    \r\n    currentNum = int(startRange[0])\r\n    while currentNum <= int(endRange[0]):\r\n        if currentNum >= startRangeTens and currentNum < endRangeTens:\r\n            print str(startRangeTens)[:-1] + \"X\"\r\n            startRangeTens = startRangeTens + 10\r\n            currentNum += 10\r\n        else:\r\n            print currentNum\r\n            currentNum += 1",
+                "can_flag": false,
+                "comment_count": 5,
+                "comments": [
+                    {
+                        "can_flag": false,
+                        "comment_id": 64607436,
+                        "creation_date": 1469615808,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610561#comment64607436_38610561",
+                        "owner": {
+                            "accept_rate": 50,
+                            "badge_counts": {
+                                "bronze": 47,
+                                "gold": 5,
+                                "silver": 21
+                            },
+                            "display_name": "TigerhawkT3",
+                            "link": "http://stackoverflow.com/users/2617068/tigerhawkt3",
+                            "profile_image": "https://i.stack.imgur.com/0nSBO.png?s=128&g=1",
+                            "reputation": 27665,
+                            "user_id": 2617068,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610561,
+                        "post_type": "answer",
+                        "score": 0
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64607446,
+                        "creation_date": 1469615823,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610561#comment64607446_38610561",
+                        "owner": {
+                            "badge_counts": {
+                                "bronze": 8,
+                                "gold": 0,
+                                "silver": 1
+                            },
+                            "display_name": "Max Uppenkamp",
+                            "link": "http://stackoverflow.com/users/2102710/max-uppenkamp",
+                            "profile_image": "https://www.gravatar.com/avatar/6090dc62812bbe64fcbc309ef9c595a1?s=128&d=identicon&r=PG",
+                            "reputation": 205,
+                            "user_id": 2102710,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610561,
+                        "post_type": "answer",
+                        "score": 0
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64607471,
+                        "creation_date": 1469615857,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610561#comment64607471_38610561",
+                        "owner": {
+                            "accept_rate": 83,
+                            "badge_counts": {
+                                "bronze": 36,
+                                "gold": 3,
+                                "silver": 18
+                            },
+                            "display_name": "holdenweb",
+                            "link": "http://stackoverflow.com/users/146073/holdenweb",
+                            "profile_image": "https://www.gravatar.com/avatar/2c69ccb9eb83c7ef2ba155a850df68a9?s=128&d=identicon&r=PG",
+                            "reputation": 8103,
+                            "user_id": 146073,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610561,
+                        "post_type": "answer",
+                        "score": 1
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64607472,
+                        "creation_date": 1469615858,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610561#comment64607472_38610561",
+                        "owner": {
+                            "accept_rate": 100,
+                            "badge_counts": {
+                                "bronze": 26,
+                                "gold": 0,
+                                "silver": 3
+                            },
+                            "display_name": "Slayther",
+                            "link": "http://stackoverflow.com/users/4936137/slayther",
+                            "profile_image": "https://www.gravatar.com/avatar/76fbc6426b4d21f177d05701324654c0?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 1546,
+                            "user_id": 4936137,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610561,
+                        "post_type": "answer",
+                        "score": 0
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64607598,
+                        "creation_date": 1469616039,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610561#comment64607598_38610561",
+                        "owner": {
+                            "accept_rate": 100,
+                            "badge_counts": {
+                                "bronze": 26,
+                                "gold": 0,
+                                "silver": 3
+                            },
+                            "display_name": "Slayther",
+                            "link": "http://stackoverflow.com/users/4936137/slayther",
+                            "profile_image": "https://www.gravatar.com/avatar/76fbc6426b4d21f177d05701324654c0?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 1546,
+                            "user_id": 4936137,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610561,
+                        "post_type": "answer",
+                        "score": 0
+                    }
+                ],
+                "creation_date": 1469615785,
+                "down_vote_count": 1,
+                "is_accepted": false,
+                "last_activity_date": 1469616412,
+                "last_edit_date": 1469616412,
+                "last_editor": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 26,
+                        "gold": 0,
+                        "silver": 3
+                    },
+                    "display_name": "Slayther",
+                    "link": "http://stackoverflow.com/users/4936137/slayther",
+                    "profile_image": "https://www.gravatar.com/avatar/76fbc6426b4d21f177d05701324654c0?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 1546,
+                    "user_id": 4936137,
+                    "user_type": "registered"
+                },
+                "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38610561#38610561",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 26,
+                        "gold": 0,
+                        "silver": 3
+                    },
+                    "display_name": "Slayther",
+                    "link": "http://stackoverflow.com/users/4936137/slayther",
+                    "profile_image": "https://www.gravatar.com/avatar/76fbc6426b4d21f177d05701324654c0?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 1546,
+                    "user_id": 4936137,
+                    "user_type": "registered"
+                },
+                "question_id": 38610354,
+                "score": -1,
+                "tags": [],
+                "title": "How to convert a dash separated range to several entries with \"X\" when difference is 9 in Python",
+                "up_vote_count": 0
+            },
+            {
+                "answer_id": 38611655,
+                "body_markdown": "Here is my proposed solution:\r\n\r\n    >>> def range_x(s):\r\n    \t    start, end = s.split('-')\r\n    \t    result = ''\r\n    \t    if start[-1] == '0':\r\n    \t\t    string1 = start[:-1]+'X'\r\n    \t    else:\r\n    \t\t    r1 = range(int(start[-1]), 10)\r\n    \t\t    string1 = ','.join(map(lambda i:start[:-1]+str(i), r1))\r\n    \t\r\n    \t    r2 = range(int(start[:-1])+1, int(end[:-1]))\r\n    \t    string2 = ','.join(map(lambda i: str(i) + 'X', r2))\r\n    \r\n    \t    if end[-1] == '0':\r\n    \t\t    string3 = end[:-1]+'X'\r\n    \t    else:\r\n    \t\t    r3 = range(0,int(end[-1])+1)\r\n    \t\t    string3 = ','.join(map(lambda i: end[:-1]+str(i), r3))\r\n    \t    result = ','.join([string1, string2, string3])\r\n    \t    return result\r\n    \r\n    >>> s = '20930-21020'\r\n    >>> range_x(s)\r\n    '2093X,2094X,2095X,2096X,2097X,2098X,2099X,2100X,2101X,2102X'\r\n    >>> s = '20934-21021'\r\n    >>> range_x(s)\r\n    '20934,20935,20936,20937,20938,20939,2094X,2095X,2096X,2097X,2098X,2099X,2100X,2101X,21020,21021'",
+                "can_flag": false,
+                "comment_count": 2,
+                "comments": [
+                    {
+                        "can_flag": false,
+                        "comment_id": 64609612,
+                        "creation_date": 1469619029,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38611655#comment64609612_38611655",
+                        "owner": {
+                            "accept_rate": 50,
+                            "badge_counts": {
+                                "bronze": 47,
+                                "gold": 5,
+                                "silver": 21
+                            },
+                            "display_name": "TigerhawkT3",
+                            "link": "http://stackoverflow.com/users/2617068/tigerhawkt3",
+                            "profile_image": "https://i.stack.imgur.com/0nSBO.png?s=128&g=1",
+                            "reputation": 27665,
+                            "user_id": 2617068,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38611655,
+                        "post_type": "answer",
+                        "score": 0
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64609896,
+                        "creation_date": 1469619427,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38611655#comment64609896_38611655",
+                        "owner": {
+                            "badge_counts": {
+                                "bronze": 25,
+                                "gold": 2,
+                                "silver": 8
+                            },
+                            "display_name": "Iron Fist",
+                            "link": "http://stackoverflow.com/users/4244780/iron-fist",
+                            "profile_image": "https://i.stack.imgur.com/KUXr1.jpg?s=128&g=1",
+                            "reputation": 6827,
+                            "user_id": 4244780,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38611655,
+                        "post_type": "answer",
+                        "reply_to_user": {
+                            "accept_rate": 50,
+                            "badge_counts": {
+                                "bronze": 47,
+                                "gold": 5,
+                                "silver": 21
+                            },
+                            "display_name": "TigerhawkT3",
+                            "link": "http://stackoverflow.com/users/2617068/tigerhawkt3",
+                            "profile_image": "https://i.stack.imgur.com/0nSBO.png?s=128&g=1",
+                            "reputation": 27665,
+                            "user_id": 2617068,
+                            "user_type": "registered"
+                        },
+                        "score": 0
+                    }
+                ],
+                "creation_date": 1469618807,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469619375,
+                "last_edit_date": 1469619375,
+                "last_editor": {
+                    "badge_counts": {
+                        "bronze": 25,
+                        "gold": 2,
+                        "silver": 8
+                    },
+                    "display_name": "Iron Fist",
+                    "link": "http://stackoverflow.com/users/4244780/iron-fist",
+                    "profile_image": "https://i.stack.imgur.com/KUXr1.jpg?s=128&g=1",
+                    "reputation": 6827,
+                    "user_id": 4244780,
+                    "user_type": "registered"
+                },
+                "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38611655#38611655",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 25,
+                        "gold": 2,
+                        "silver": 8
+                    },
+                    "display_name": "Iron Fist",
+                    "link": "http://stackoverflow.com/users/4244780/iron-fist",
+                    "profile_image": "https://i.stack.imgur.com/KUXr1.jpg?s=128&g=1",
+                    "reputation": 6827,
+                    "user_id": 4244780,
+                    "user_type": "registered"
+                },
+                "question_id": 38610354,
+                "score": 0,
+                "tags": [],
+                "title": "How to convert a dash separated range to several entries with \"X\" when difference is 9 in Python",
+                "up_vote_count": 0
+            },
+            {
+                "answer_id": 38611766,
+                "body_markdown": "Here is my solution. \r\n\r\nThere are places for optimization, but I tried to make it easy and straight forward. \r\n\r\n    a,b  = map(int, '20934-21021'.split('-'))\r\n    \r\n    output_str = ''\r\n    \r\n    \r\n    l = (a/10 + 1) * 10\r\n    u= (b/10) * 10\r\n    \r\n    output_str += ','.join(map(str, range(a,l)))\r\n    \r\n    output_str += ','\r\n    \r\n    lower = a/10 + 1\r\n    upper = b/10 -1\r\n    \r\n    \r\n    output_str +=','.join([\"{0}X\".format(i) for i in range(lower, upper+1)])\r\n    output_str += ','\r\n    \r\n    \r\n    output_str += ','.join(map(str,range(u, b+1)))\r\n    \r\n    print output_str\r\n\r\n\r\nOutput:\r\n\r\n    20934,20935,20936,20937,20938,20939,2094X,2095X,2096X,2097X,2098X,2099X,\r\n    2100X,2101X,21020,21021\r\n",
+                "can_flag": false,
+                "comment_count": 0,
+                "creation_date": 1469619141,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469619141,
+                "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc/38611766#38611766",
+                "owner": {
+                    "accept_rate": 71,
+                    "badge_counts": {
+                        "bronze": 22,
+                        "gold": 1,
+                        "silver": 5
+                    },
+                    "display_name": "Ahsanul Haque",
+                    "link": "http://stackoverflow.com/users/5019169/ahsanul-haque",
+                    "profile_image": "https://www.gravatar.com/avatar/5d546860aba145b8c0450455f447cc88?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 3788,
+                    "user_id": 5019169,
+                    "user_type": "registered"
+                },
+                "question_id": 38610354,
+                "score": 0,
+                "tags": [],
+                "title": "How to convert a dash separated range to several entries with \"X\" when difference is 9 in Python",
+                "up_vote_count": 0
+            }
+        ],
+        "body_markdown": "let me try to explain what I\u00b4m trying to do:\r\n\r\nI have a range like this: `20934-21021`\r\n\r\nI\u00b4m trying to figure out a way to get an output like:\r\n\r\n    20934,20935,20936,20937,20938,20939,2094X,2095X,2096X,2097X,2098X,2099X,2100X,2101X,21020,21021\r\n\r\nCurrently I\u00b4m just getting the difference between both numbers and getting the output increasing the number by one each time but I would be looking for something more appropriate. \r\n\r\nCurrent code:\r\n\r\n    import re\r\n\r\n    text = \"20934-21021\"\r\n    startRange = re.findall(r'(\\d*)-', text)\r\n    endRange = re.findall(r'-(\\d*)', text)\r\n    while int(startRange[0]) <= int(endRange[0]):\r\n        print int(startRange[0])\r\n        startRange[0]= int(startRange[0]) +1\r\n\r\n\r\nAny ideas?\r\n\r\nPS: values are stored in a list and using `findall` because the same line can contain several ranges.\r\n\r\n",
+        "can_close": false,
+        "can_flag": false,
+        "close_vote_count": 0,
+        "comment_count": 6,
+        "comments": [
+            {
+                "can_flag": false,
+                "comment_id": 64607202,
+                "creation_date": 1469615495,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc#comment64607202_38610354",
+                "owner": {
+                    "accept_rate": 86,
+                    "badge_counts": {
+                        "bronze": 66,
+                        "gold": 6,
+                        "silver": 37
+                    },
+                    "display_name": "Kasramvd",
+                    "link": "http://stackoverflow.com/users/2867928/kasramvd",
+                    "profile_image": "https://i.stack.imgur.com/09Fa2.jpg?s=128&g=1",
+                    "reputation": 50910,
+                    "user_id": 2867928,
+                    "user_type": "registered"
+                },
+                "post_id": 38610354,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64607275,
+                "creation_date": 1469615581,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc#comment64607275_38610354",
+                "owner": {
+                    "accept_rate": 50,
+                    "badge_counts": {
+                        "bronze": 47,
+                        "gold": 5,
+                        "silver": 21
+                    },
+                    "display_name": "TigerhawkT3",
+                    "link": "http://stackoverflow.com/users/2617068/tigerhawkt3",
+                    "profile_image": "https://i.stack.imgur.com/0nSBO.png?s=128&g=1",
+                    "reputation": 27665,
+                    "user_id": 2617068,
+                    "user_type": "registered"
+                },
+                "post_id": 38610354,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64607329,
+                "creation_date": 1469615648,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc#comment64607329_38610354",
+                "owner": {
+                    "accept_rate": 71,
+                    "badge_counts": {
+                        "bronze": 22,
+                        "gold": 1,
+                        "silver": 5
+                    },
+                    "display_name": "Ahsanul Haque",
+                    "link": "http://stackoverflow.com/users/5019169/ahsanul-haque",
+                    "profile_image": "https://www.gravatar.com/avatar/5d546860aba145b8c0450455f447cc88?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 3788,
+                    "user_id": 5019169,
+                    "user_type": "registered"
+                },
+                "post_id": 38610354,
+                "post_type": "question",
+                "reply_to_user": {
+                    "accept_rate": 50,
+                    "badge_counts": {
+                        "bronze": 47,
+                        "gold": 5,
+                        "silver": 21
+                    },
+                    "display_name": "TigerhawkT3",
+                    "link": "http://stackoverflow.com/users/2617068/tigerhawkt3",
+                    "profile_image": "https://i.stack.imgur.com/0nSBO.png?s=128&g=1",
+                    "reputation": 27665,
+                    "user_id": 2617068,
+                    "user_type": "registered"
+                },
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64607415,
+                "creation_date": 1469615767,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc#comment64607415_38610354",
+                "owner": {
+                    "accept_rate": 83,
+                    "badge_counts": {
+                        "bronze": 36,
+                        "gold": 3,
+                        "silver": 18
+                    },
+                    "display_name": "holdenweb",
+                    "link": "http://stackoverflow.com/users/146073/holdenweb",
+                    "profile_image": "https://www.gravatar.com/avatar/2c69ccb9eb83c7ef2ba155a850df68a9?s=128&d=identicon&r=PG",
+                    "reputation": 8103,
+                    "user_id": 146073,
+                    "user_type": "registered"
+                },
+                "post_id": 38610354,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64607421,
+                "creation_date": 1469615777,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc#comment64607421_38610354",
+                "owner": {
+                    "accept_rate": 50,
+                    "badge_counts": {
+                        "bronze": 47,
+                        "gold": 5,
+                        "silver": 21
+                    },
+                    "display_name": "TigerhawkT3",
+                    "link": "http://stackoverflow.com/users/2617068/tigerhawkt3",
+                    "profile_image": "https://i.stack.imgur.com/0nSBO.png?s=128&g=1",
+                    "reputation": 27665,
+                    "user_id": 2617068,
+                    "user_type": "registered"
+                },
+                "post_id": 38610354,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64607489,
+                "creation_date": 1469615893,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc#comment64607489_38610354",
+                "owner": {
+                    "accept_rate": 50,
+                    "badge_counts": {
+                        "bronze": 47,
+                        "gold": 5,
+                        "silver": 21
+                    },
+                    "display_name": "TigerhawkT3",
+                    "link": "http://stackoverflow.com/users/2617068/tigerhawkt3",
+                    "profile_image": "https://i.stack.imgur.com/0nSBO.png?s=128&g=1",
+                    "reputation": 27665,
+                    "user_id": 2617068,
+                    "user_type": "registered"
+                },
+                "post_id": 38610354,
+                "post_type": "question",
+                "score": 1
+            }
+        ],
+        "creation_date": 1469615204,
+        "delete_vote_count": 0,
+        "down_vote_count": 1,
+        "favorite_count": 0,
+        "is_answered": false,
+        "last_activity_date": 1469619375,
+        "last_edit_date": 1469618897,
+        "last_editor": {
+            "badge_counts": {
+                "bronze": 25,
+                "gold": 2,
+                "silver": 8
+            },
+            "display_name": "Iron Fist",
+            "link": "http://stackoverflow.com/users/4244780/iron-fist",
+            "profile_image": "https://i.stack.imgur.com/KUXr1.jpg?s=128&g=1",
+            "reputation": 6827,
+            "user_id": 4244780,
+            "user_type": "registered"
+        },
+        "link": "http://stackoverflow.com/questions/38610354/how-to-convert-a-dash-separated-range-to-several-entries-with-x-when-differenc",
+        "owner": {
+            "badge_counts": {
+                "bronze": 1,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "Morek",
+            "link": "http://stackoverflow.com/users/6644125/morek",
+            "profile_image": "https://www.gravatar.com/avatar/4d8f8358630c303a97169dd447abf1f5?s=128&d=identicon&r=PG&f=1",
+            "reputation": 1,
+            "user_id": 6644125,
+            "user_type": "registered"
+        },
+        "question_id": 38610354,
+        "reopen_vote_count": 0,
+        "score": -1,
+        "tags": [
+            "python",
+            "regex"
+        ],
+        "title": "How to convert a dash separated range to several entries with \"X\" when difference is 9 in Python",
+        "up_vote_count": 0,
+        "view_count": 29
+    },
+    "origin": "stackoverflow",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619644.713559,
+    "updated_on": 1469619375.0,
+    "uuid": "ced1ef3465f08ff5126d4969c89f2558c2666e3d"
+},
+{
+    "backend_name": "StackExchange",
+    "backend_version": "0.2.0",
+    "data": {
+        "answer_count": 1,
+        "answers": [
+            {
+                "answer_id": 38610803,
+                "body_markdown": "You can use `pandas` for this:\r\n\r\n    import pandas as pd\r\n    import numpy as np\r\n\r\n    m = np.array([[1,1,1], [1,2,3], [2,4,5], [1,1,1], [1,2,3], [1,1,1], [0,1,2]])\r\n\r\n    In [75]: np.where(pd.DataFrame(m).duplicated())[0]\r\n    Out[75]: array([3, 4, 5], dtype=int64)",
+                "can_flag": false,
+                "comment_count": 1,
+                "comments": [
+                    {
+                        "can_flag": false,
+                        "comment_id": 64609200,
+                        "creation_date": 1469618434,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610634/find-indices-of-duplicated-rows-in-python-ndarray/38610803#comment64609200_38610803",
+                        "owner": {
+                            "badge_counts": {
+                                "bronze": 4,
+                                "gold": 0,
+                                "silver": 0
+                            },
+                            "display_name": "thedlade",
+                            "link": "http://stackoverflow.com/users/5180732/thedlade",
+                            "profile_image": "https://www.gravatar.com/avatar/3771e592b39f741c9d5b5f0b1bf542f7?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 6,
+                            "user_id": 5180732,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38610803,
+                        "post_type": "answer",
+                        "score": 0
+                    }
+                ],
+                "creation_date": 1469616441,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469616441,
+                "link": "http://stackoverflow.com/questions/38610634/find-indices-of-duplicated-rows-in-python-ndarray/38610803#38610803",
+                "owner": {
+                    "accept_rate": 81,
+                    "badge_counts": {
+                        "bronze": 40,
+                        "gold": 2,
+                        "silver": 11
+                    },
+                    "display_name": "Colonel Beauvel",
+                    "link": "http://stackoverflow.com/users/3628236/colonel-beauvel",
+                    "profile_image": "https://i.stack.imgur.com/sMsia.jpg?s=128&g=1",
+                    "reputation": 19452,
+                    "user_id": 3628236,
+                    "user_type": "registered"
+                },
+                "question_id": 38610634,
+                "score": 1,
+                "tags": [],
+                "title": "Find indices of duplicated rows in python ndarray",
+                "up_vote_count": 1
+            }
+        ],
+        "body_markdown": "I coded the for loop to enumerate a multidimensional ndarray containing n rows of 28x28 pixel values.\r\n\r\nI am looking for the index of each row that is duplicated and the indices of the duplicates without redundancies.\r\n\r\nI found this code [here][1] (thanks unutbu) and modified it to read the ndarray, it works 70% of the time, however 30% of the time it is identifying the wrong images as duplicates. \r\n\r\nHow can it be improved to detect the correct rows?\r\n\r\n    def overlap_same(arr):\r\n    seen = []\r\n    dups = collections.defaultdict(list)\r\n    for i, item in enumerate(arr):\r\n        for j, orig in enumerate(seen):\r\n            if np.array_equal(item, orig):\r\n                dups[j].append(i)\r\n                break\r\n        else:\r\n            seen.append(item)\r\n    return dups\r\n\r\ne.g. return overlap_same(train) returns:\r\n\r\n    defaultdict(<type 'list'>, {34: [1388], 35: [1815], 583: [3045], 3208:\r\n    [4426], 626: [824], 507: [4438], 188: [338, 431, 540, 757, 765, 806,\r\n    808, 834, 882, 1515, 1539, 1715, 1725, 1789, 1841, 2038, 2081, 2165,\r\n    2170, 2300, 2455, 2683, 2733, 2957, 3290, 3293, 3311, 3373, 3446, 3542,\r\n    3565, 3890, 4110, 4197, 4206, 4364, 4371, 4734, 4851]})\r\n\r\nplotting some samples of the correct case on matplotlib gives:\r\n\r\n    fig = plt.figure()\r\n    a=fig.add_subplot(1,2,1)\r\n    plt.imshow(train[35])\r\n    a.set_title('train[35]')\r\n    a=fig.add_subplot(1,2,2)\r\n    plt.imshow(train[1815])\r\n    a.set_title('train[1815]')\r\n    plt.show\r\n\r\n[![train data 35 vs 1815][2]][2]\r\n\r\nwhich is correct\r\n\r\nHowever:\r\n\r\n    fig = plt.figure()\r\n    a=fig.add_subplot(1,2,1)\r\n    plt.imshow(train[3208])\r\n    a.set_title('train[3208]')\r\n    a=fig.add_subplot(1,2,2)\r\n    plt.imshow(train[4426])\r\n    a.set_title('train[4426]')\r\n    plt.show\r\n\r\n\r\n[![enter image description here][3]][3]\r\n\r\nis incorrect as they do not match\r\n\r\n\r\n  [1]: http://stackoverflow.com/questions/15787582/find-index-of-item-with-duplicates\r\n  [2]: http://i.stack.imgur.com/RVPMx.png\r\n  [3]: http://i.stack.imgur.com/XuHyu.png",
+        "can_close": false,
+        "can_flag": false,
+        "close_vote_count": 0,
+        "comment_count": 2,
+        "comments": [
+            {
+                "can_flag": false,
+                "comment_id": 64607648,
+                "creation_date": 1469616117,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610634/find-indices-of-duplicated-rows-in-python-ndarray#comment64607648_38610634",
+                "owner": {
+                    "accept_rate": 20,
+                    "badge_counts": {
+                        "bronze": 66,
+                        "gold": 10,
+                        "silver": 32
+                    },
+                    "display_name": "Divakar",
+                    "link": "http://stackoverflow.com/users/3293881/divakar",
+                    "profile_image": "https://i.stack.imgur.com/6ZYnq.jpg?s=128&g=1",
+                    "reputation": 65201,
+                    "user_id": 3293881,
+                    "user_type": "registered"
+                },
+                "post_id": 38610634,
+                "post_type": "question",
+                "score": 1
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64607738,
+                "creation_date": 1469616276,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610634/find-indices-of-duplicated-rows-in-python-ndarray#comment64607738_38610634",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 4,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "thedlade",
+                    "link": "http://stackoverflow.com/users/5180732/thedlade",
+                    "profile_image": "https://www.gravatar.com/avatar/3771e592b39f741c9d5b5f0b1bf542f7?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 6,
+                    "user_id": 5180732,
+                    "user_type": "registered"
+                },
+                "post_id": 38610634,
+                "post_type": "question",
+                "reply_to_user": {
+                    "accept_rate": 20,
+                    "badge_counts": {
+                        "bronze": 66,
+                        "gold": 10,
+                        "silver": 32
+                    },
+                    "display_name": "Divakar",
+                    "link": "http://stackoverflow.com/users/3293881/divakar",
+                    "profile_image": "https://i.stack.imgur.com/6ZYnq.jpg?s=128&g=1",
+                    "reputation": 65201,
+                    "user_id": 3293881,
+                    "user_type": "registered"
+                },
+                "score": 0
+            }
+        ],
+        "creation_date": 1469615987,
+        "delete_vote_count": 0,
+        "down_vote_count": 0,
+        "favorite_count": 0,
+        "is_answered": true,
+        "last_activity_date": 1469619276,
+        "last_edit_date": 1469619276,
+        "last_editor": {
+            "accept_rate": 92,
+            "badge_counts": {
+                "bronze": 91,
+                "gold": 4,
+                "silver": 42
+            },
+            "display_name": "Jaime",
+            "link": "http://stackoverflow.com/users/110026/jaime",
+            "profile_image": "https://www.gravatar.com/avatar/dce2259ff9b547103d54acf1ea622314?s=128&d=identicon&r=PG",
+            "reputation": 36361,
+            "user_id": 110026,
+            "user_type": "registered"
+        },
+        "link": "http://stackoverflow.com/questions/38610634/find-indices-of-duplicated-rows-in-python-ndarray",
+        "owner": {
+            "badge_counts": {
+                "bronze": 4,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "thedlade",
+            "link": "http://stackoverflow.com/users/5180732/thedlade",
+            "profile_image": "https://www.gravatar.com/avatar/3771e592b39f741c9d5b5f0b1bf542f7?s=128&d=identicon&r=PG&f=1",
+            "reputation": 6,
+            "user_id": 5180732,
+            "user_type": "registered"
+        },
+        "question_id": 38610634,
+        "reopen_vote_count": 0,
+        "score": 1,
+        "tags": [
+            "python",
+            "numpy",
+            "multidimensional-array",
+            "data-science"
+        ],
+        "title": "Find indices of duplicated rows in python ndarray",
+        "up_vote_count": 1,
+        "view_count": 23
+    },
+    "origin": "stackoverflow",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619644.718547,
+    "updated_on": 1469619276.0,
+    "uuid": "38007c9578f264ba2c43f903f2dda641f4102940"
+},
+{
+    "backend_name": "StackExchange",
+    "backend_version": "0.2.0",
+    "data": {
+        "accepted_answer_id": 38591464,
+        "answer_count": 2,
+        "answers": [
+            {
+                "answer_id": 38591128,
+                "body_markdown": "As comment above mentions you can use `split` in the bash shell:\r\n\r\n    split -b 20000m <path-to-your-file>",
+                "can_flag": false,
+                "comment_count": 2,
+                "comments": [
+                    {
+                        "can_flag": false,
+                        "comment_id": 64570578,
+                        "creation_date": 1469539558,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line/38591128#comment64570578_38591128",
+                        "owner": {
+                            "accept_rate": 100,
+                            "badge_counts": {
+                                "bronze": 8,
+                                "gold": 0,
+                                "silver": 0
+                            },
+                            "display_name": "Difender",
+                            "link": "http://stackoverflow.com/users/3314051/difender",
+                            "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 107,
+                            "user_id": 3314051,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38591128,
+                        "post_type": "answer",
+                        "score": 0
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64571172,
+                        "creation_date": 1469540296,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line/38591128#comment64571172_38591128",
+                        "owner": {
+                            "accept_rate": 20,
+                            "badge_counts": {
+                                "bronze": 6,
+                                "gold": 0,
+                                "silver": 1
+                            },
+                            "display_name": "JoshuaBox",
+                            "link": "http://stackoverflow.com/users/1382772/joshuabox",
+                            "profile_image": "https://www.gravatar.com/avatar/ada3baf40f7f8c6eab8676abb9058896?s=128&d=identicon&r=PG",
+                            "reputation": 51,
+                            "user_id": 1382772,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38591128,
+                        "post_type": "answer",
+                        "reply_to_user": {
+                            "accept_rate": 100,
+                            "badge_counts": {
+                                "bronze": 8,
+                                "gold": 0,
+                                "silver": 0
+                            },
+                            "display_name": "Difender",
+                            "link": "http://stackoverflow.com/users/3314051/difender",
+                            "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 107,
+                            "user_id": 3314051,
+                            "user_type": "registered"
+                        },
+                        "score": 0
+                    }
+                ],
+                "creation_date": 1469539473,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469539473,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line/38591128#38591128",
+                "owner": {
+                    "accept_rate": 20,
+                    "badge_counts": {
+                        "bronze": 6,
+                        "gold": 0,
+                        "silver": 1
+                    },
+                    "display_name": "JoshuaBox",
+                    "link": "http://stackoverflow.com/users/1382772/joshuabox",
+                    "profile_image": "https://www.gravatar.com/avatar/ada3baf40f7f8c6eab8676abb9058896?s=128&d=identicon&r=PG",
+                    "reputation": 51,
+                    "user_id": 1382772,
+                    "user_type": "registered"
+                },
+                "question_id": 38590805,
+                "score": 0,
+                "tags": [],
+                "title": "Splitting a big file into smaller ones basing on a line",
+                "up_vote_count": 0
+            },
+            {
+                "answer_id": 38591464,
+                "body_markdown": "You could do something like this:\r\n\r\n    import sys\r\n    \r\n    try:\r\n        _, size, file = sys.argv\r\n        size = int(size)\r\n    except ValueError:\r\n        sys.exit('Usage: splitter.py <size in bytes> <filename to split>')\r\n    \r\n    with open(file) as infile:\r\n        count = 0\r\n        current_size = 0\r\n        # you could do something more\r\n        # fancy with the name like use\r\n        # os.path.splitext\r\n        outfile = open(file+'_0', 'w+')\r\n        for line in infile:\r\n            if current_size > size and line.startswith('Recno'):\r\n                outfile.close()\r\n                count += 1\r\n                current_size = 0\r\n                outfile = open(file+'_{}'.format(count), 'w+')\r\n            current_size += len(line)\r\n            outfile.write(line)\r\n        outfile.close()",
+                "can_flag": false,
+                "comment_count": 1,
+                "comments": [
+                    {
+                        "can_flag": false,
+                        "comment_id": 64571984,
+                        "creation_date": 1469541327,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line/38591464#comment64571984_38591464",
+                        "owner": {
+                            "accept_rate": 100,
+                            "badge_counts": {
+                                "bronze": 8,
+                                "gold": 0,
+                                "silver": 0
+                            },
+                            "display_name": "Difender",
+                            "link": "http://stackoverflow.com/users/3314051/difender",
+                            "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 107,
+                            "user_id": 3314051,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38591464,
+                        "post_type": "answer",
+                        "score": 0
+                    }
+                ],
+                "creation_date": 1469540283,
+                "down_vote_count": 0,
+                "is_accepted": true,
+                "last_activity_date": 1469619083,
+                "last_edit_date": 1469619083,
+                "last_editor": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 8,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Difender",
+                    "link": "http://stackoverflow.com/users/3314051/difender",
+                    "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 107,
+                    "user_id": 3314051,
+                    "user_type": "registered"
+                },
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line/38591464#38591464",
+                "owner": {
+                    "accept_rate": 97,
+                    "badge_counts": {
+                        "bronze": 133,
+                        "gold": 6,
+                        "silver": 67
+                    },
+                    "display_name": "Wayne Werner",
+                    "link": "http://stackoverflow.com/users/344286/wayne-werner",
+                    "profile_image": "https://www.gravatar.com/avatar/3827b2facd01ed6a64a96df00d4b877a?s=128&d=identicon&r=PG",
+                    "reputation": 17393,
+                    "user_id": 344286,
+                    "user_type": "registered"
+                },
+                "question_id": 38590805,
+                "score": 1,
+                "tags": [],
+                "title": "Splitting a big file into smaller ones basing on a line",
+                "up_vote_count": 1
+            }
+        ],
+        "body_markdown": "I have a pretty big file (more than 20GB) and I'd like to split it into smaller ones, like multiple files of 2GB.\r\n\r\nOne thing is I have to split before a specific line:\r\n\r\nI'm using Python, but if there another solution in shell for example, I'm up for it.\r\n\r\nThis is how the big file looks like:\r\n\r\n`bigfile.txt` (20GB)\r\n\r\n    Recno:: 0\r\n    some data...\r\n\r\n    Recno:: 1\r\n    some data...\r\n\r\n    Recno:: 2\r\n    some data...\r\n\r\n    Recno:: 3\r\n    some data...\r\n\r\n    Recno:: 4\r\n    some data...\r\n\r\n    Recno:: 5\r\n    some data...\r\n\r\n    Recno:: x\r\n    some more data...\r\n\r\nThis is what I want:\r\n\r\n`file1.txt` (2 GB +/-)\r\n\r\n    Recno::0\r\n    some data...\r\n\r\n    Recno:: 1\r\n    some data...\r\n\r\n`file2.txt` (2GB +/-)\r\n\r\n    Recno:: 2\r\n    some data...\r\n\r\n    Recno:: 4\r\n    some data...\r\n\r\n    Recno:: 5\r\n    some data...\r\n\r\nAnd so on, and so on...\r\n\r\nThanks !",
+        "can_close": false,
+        "can_flag": false,
+        "close_vote_count": 0,
+        "closed_date": 1469540442,
+        "closed_details": {
+            "by_users": [
+                {
+                    "accept_rate": 90,
+                    "badge_counts": {
+                        "bronze": 259,
+                        "gold": 27,
+                        "silver": 191
+                    },
+                    "display_name": "poke",
+                    "link": "http://stackoverflow.com/users/216074/poke",
+                    "profile_image": "https://www.gravatar.com/avatar/609c93bafd659500f83fde04802a9be5?s=128&d=identicon&r=PG",
+                    "reputation": 122181,
+                    "user_id": 216074,
+                    "user_type": "registered"
+                },
+                {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 35,
+                        "gold": 5,
+                        "silver": 15
+                    },
+                    "display_name": "Petter Friberg",
+                    "link": "http://stackoverflow.com/users/5292302/petter-friberg",
+                    "profile_image": "https://www.gravatar.com/avatar/3b61b00d5bcb378f99eadff312544514?s=128&d=identicon&r=PG",
+                    "reputation": 7490,
+                    "user_id": 5292302,
+                    "user_type": "registered"
+                },
+                {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 86,
+                        "gold": 6,
+                        "silver": 51
+                    },
+                    "display_name": "martineau",
+                    "link": "http://stackoverflow.com/users/355230/martineau",
+                    "profile_image": "https://i.stack.imgur.com/VjcbL.jpg?s=128&g=1",
+                    "reputation": 37438,
+                    "user_id": 355230,
+                    "user_type": "registered"
+                },
+                {
+                    "accept_rate": 97,
+                    "badge_counts": {
+                        "bronze": 133,
+                        "gold": 6,
+                        "silver": 67
+                    },
+                    "display_name": "Wayne Werner",
+                    "link": "http://stackoverflow.com/users/344286/wayne-werner",
+                    "profile_image": "https://www.gravatar.com/avatar/3827b2facd01ed6a64a96df00d4b877a?s=128&d=identicon&r=PG",
+                    "reputation": 17393,
+                    "user_id": 344286,
+                    "user_type": "registered"
+                },
+                {
+                    "accept_rate": 95,
+                    "badge_counts": {
+                        "bronze": 198,
+                        "gold": 27,
+                        "silver": 155
+                    },
+                    "display_name": "fedorqui",
+                    "link": "http://stackoverflow.com/users/1983854/fedorqui",
+                    "profile_image": "https://i.stack.imgur.com/V8J69.jpg?s=128&g=1",
+                    "reputation": 102129,
+                    "user_id": 1983854,
+                    "user_type": "registered"
+                }
+            ],
+            "description": "This question appears to be off-topic. The users who voted to close gave this specific reason:<ul class=\"close-as-off-topic-status-list\"><li>&quot;Questions about <b>general computing hardware and software</b> are off-topic for Stack Overflow unless they directly involve tools used primarily for programming. You may be able to get help on <a href=\"http://superuser.com/about\">Super User</a>.&quot; &ndash; poke, Petter Friberg, martineau, fedorqui</li></ul>",
+            "on_hold": true,
+            "reason": "off-topic"
+        },
+        "closed_reason": "off-topic",
+        "comment_count": 14,
+        "comments": [
+            {
+                "can_flag": false,
+                "comment_id": 64569863,
+                "creation_date": 1469538607,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64569863_38590805",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 9,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Chris_Rands",
+                    "link": "http://stackoverflow.com/users/6260170/chris-rands",
+                    "profile_image": "https://www.gravatar.com/avatar/0caf9a0d28be362618ffc0223b301d6e?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 264,
+                    "user_id": 6260170,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "score": 1
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64569877,
+                "creation_date": 1469538629,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64569877_38590805",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 59,
+                        "gold": 5,
+                        "silver": 30
+                    },
+                    "display_name": "Tom Fenech",
+                    "link": "http://stackoverflow.com/users/2088135/tom-fenech",
+                    "profile_image": "https://i.stack.imgur.com/YB10Q.jpg?s=128&g=1",
+                    "reputation": 36059,
+                    "user_id": 2088135,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "score": 1
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64569978,
+                "creation_date": 1469538767,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64569978_38590805",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 8,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Difender",
+                    "link": "http://stackoverflow.com/users/3314051/difender",
+                    "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 107,
+                    "user_id": 3314051,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "reply_to_user": {
+                    "badge_counts": {
+                        "bronze": 9,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Chris_Rands",
+                    "link": "http://stackoverflow.com/users/6260170/chris-rands",
+                    "profile_image": "https://www.gravatar.com/avatar/0caf9a0d28be362618ffc0223b301d6e?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 264,
+                    "user_id": 6260170,
+                    "user_type": "registered"
+                },
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64570078,
+                "creation_date": 1469538890,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64570078_38590805",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 8,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Difender",
+                    "link": "http://stackoverflow.com/users/3314051/difender",
+                    "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 107,
+                    "user_id": 3314051,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "reply_to_user": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 59,
+                        "gold": 5,
+                        "silver": 30
+                    },
+                    "display_name": "Tom Fenech",
+                    "link": "http://stackoverflow.com/users/2088135/tom-fenech",
+                    "profile_image": "https://i.stack.imgur.com/YB10Q.jpg?s=128&g=1",
+                    "reputation": 36059,
+                    "user_id": 2088135,
+                    "user_type": "registered"
+                },
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64570123,
+                "creation_date": 1469538955,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64570123_38590805",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 9,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Chris_Rands",
+                    "link": "http://stackoverflow.com/users/6260170/chris-rands",
+                    "profile_image": "https://www.gravatar.com/avatar/0caf9a0d28be362618ffc0223b301d6e?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 264,
+                    "user_id": 6260170,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64570131,
+                "creation_date": 1469538968,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64570131_38590805",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 34,
+                        "gold": 5,
+                        "silver": 10
+                    },
+                    "display_name": "cricket_007",
+                    "link": "http://stackoverflow.com/users/2308683/cricket-007",
+                    "profile_image": "https://www.gravatar.com/avatar/eac16c9fc481cb6825f8b3a35f916b5c?s=128&d=identicon&r=PG",
+                    "reputation": 16215,
+                    "user_id": 2308683,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64570144,
+                "creation_date": 1469538986,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64570144_38590805",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 59,
+                        "gold": 5,
+                        "silver": 30
+                    },
+                    "display_name": "Tom Fenech",
+                    "link": "http://stackoverflow.com/users/2088135/tom-fenech",
+                    "profile_image": "https://i.stack.imgur.com/YB10Q.jpg?s=128&g=1",
+                    "reputation": 36059,
+                    "user_id": 2088135,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64570185,
+                "creation_date": 1469539042,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64570185_38590805",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 8,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Difender",
+                    "link": "http://stackoverflow.com/users/3314051/difender",
+                    "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 107,
+                    "user_id": 3314051,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "reply_to_user": {
+                    "badge_counts": {
+                        "bronze": 34,
+                        "gold": 5,
+                        "silver": 10
+                    },
+                    "display_name": "cricket_007",
+                    "link": "http://stackoverflow.com/users/2308683/cricket-007",
+                    "profile_image": "https://www.gravatar.com/avatar/eac16c9fc481cb6825f8b3a35f916b5c?s=128&d=identicon&r=PG",
+                    "reputation": 16215,
+                    "user_id": 2308683,
+                    "user_type": "registered"
+                },
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64570277,
+                "creation_date": 1469539168,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64570277_38590805",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 8,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Difender",
+                    "link": "http://stackoverflow.com/users/3314051/difender",
+                    "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 107,
+                    "user_id": 3314051,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "reply_to_user": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 59,
+                        "gold": 5,
+                        "silver": 30
+                    },
+                    "display_name": "Tom Fenech",
+                    "link": "http://stackoverflow.com/users/2088135/tom-fenech",
+                    "profile_image": "https://i.stack.imgur.com/YB10Q.jpg?s=128&g=1",
+                    "reputation": 36059,
+                    "user_id": 2088135,
+                    "user_type": "registered"
+                },
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64570373,
+                "creation_date": 1469539314,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64570373_38590805",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 8,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Thiago Baldim",
+                    "link": "http://stackoverflow.com/users/6095508/thiago-baldim",
+                    "profile_image": "https://www.gravatar.com/avatar/ffaffb33464a82fadb1a6b14f4d25961?s=128&d=identicon&r=PG",
+                    "reputation": 323,
+                    "user_id": 6095508,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64570393,
+                "creation_date": 1469539339,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64570393_38590805",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 8,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Difender",
+                    "link": "http://stackoverflow.com/users/3314051/difender",
+                    "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 107,
+                    "user_id": 3314051,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "reply_to_user": {
+                    "badge_counts": {
+                        "bronze": 8,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Thiago Baldim",
+                    "link": "http://stackoverflow.com/users/6095508/thiago-baldim",
+                    "profile_image": "https://www.gravatar.com/avatar/ffaffb33464a82fadb1a6b14f4d25961?s=128&d=identicon&r=PG",
+                    "reputation": 323,
+                    "user_id": 6095508,
+                    "user_type": "registered"
+                },
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64570414,
+                "creation_date": 1469539362,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64570414_38590805",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 8,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Difender",
+                    "link": "http://stackoverflow.com/users/3314051/difender",
+                    "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 107,
+                    "user_id": 3314051,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "reply_to_user": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 59,
+                        "gold": 5,
+                        "silver": 30
+                    },
+                    "display_name": "Tom Fenech",
+                    "link": "http://stackoverflow.com/users/2088135/tom-fenech",
+                    "profile_image": "https://i.stack.imgur.com/YB10Q.jpg?s=128&g=1",
+                    "reputation": 36059,
+                    "user_id": 2088135,
+                    "user_type": "registered"
+                },
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64570488,
+                "creation_date": 1469539455,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64570488_38590805",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 59,
+                        "gold": 5,
+                        "silver": 30
+                    },
+                    "display_name": "Tom Fenech",
+                    "link": "http://stackoverflow.com/users/2088135/tom-fenech",
+                    "profile_image": "https://i.stack.imgur.com/YB10Q.jpg?s=128&g=1",
+                    "reputation": 36059,
+                    "user_id": 2088135,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64570634,
+                "creation_date": 1469539621,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line#comment64570634_38590805",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 8,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Difender",
+                    "link": "http://stackoverflow.com/users/3314051/difender",
+                    "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 107,
+                    "user_id": 3314051,
+                    "user_type": "registered"
+                },
+                "post_id": 38590805,
+                "post_type": "question",
+                "reply_to_user": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 59,
+                        "gold": 5,
+                        "silver": 30
+                    },
+                    "display_name": "Tom Fenech",
+                    "link": "http://stackoverflow.com/users/2088135/tom-fenech",
+                    "profile_image": "https://i.stack.imgur.com/YB10Q.jpg?s=128&g=1",
+                    "reputation": 36059,
+                    "user_id": 2088135,
+                    "user_type": "registered"
+                },
+                "score": 0
+            }
+        ],
+        "creation_date": 1469538512,
+        "delete_vote_count": 0,
+        "down_vote_count": 1,
+        "favorite_count": 1,
+        "is_answered": true,
+        "last_activity_date": 1469619083,
+        "last_edit_date": 1469539315,
+        "last_editor": {
+            "accept_rate": 100,
+            "badge_counts": {
+                "bronze": 8,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "Difender",
+            "link": "http://stackoverflow.com/users/3314051/difender",
+            "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+            "reputation": 107,
+            "user_id": 3314051,
+            "user_type": "registered"
+        },
+        "link": "http://stackoverflow.com/questions/38590805/splitting-a-big-file-into-smaller-ones-basing-on-a-line",
+        "owner": {
+            "accept_rate": 100,
+            "badge_counts": {
+                "bronze": 8,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "Difender",
+            "link": "http://stackoverflow.com/users/3314051/difender",
+            "profile_image": "https://www.gravatar.com/avatar/4b9930fb3f7129dc91e0a7cde4262a26?s=128&d=identicon&r=PG&f=1",
+            "reputation": 107,
+            "user_id": 3314051,
+            "user_type": "registered"
+        },
+        "question_id": 38590805,
+        "reopen_vote_count": 0,
+        "score": 0,
+        "tags": [
+            "python",
+            "bash",
+            "shell",
+            "split"
+        ],
+        "title": "Splitting a big file into smaller ones basing on a line",
+        "up_vote_count": 1,
+        "view_count": 51
+    },
+    "origin": "stackoverflow",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619644.719958,
+    "updated_on": 1469619083.0,
+    "uuid": "f45f40cff2d6a271a05dac5bef15a34958ac1bf0"
+},
+{
+    "backend_name": "StackExchange",
+    "backend_version": "0.2.0",
+    "data": {
+        "answer_count": 3,
+        "answers": [
+            {
+                "answer_id": 38611271,
+                "body_markdown": "If you have a `matplotlib.Axes` object you can modify the ticks along the x-axis with `set_xticks`:\r\n\r\n    import matplotlib.pyplot as plt\r\n    plt.plot([0,1,5,77,86,97],range(6),'o-')\r\n    ax = plt.gca()\r\n    ax.set_xticks([1,5,77,86,97])\r\n\r\nwith output:\r\n\r\n[![enter image description here][1]][1]\r\n\r\n**EDIT**: assuming you want to plot the values equally separated (though at this point you really should be considering something like bar graphs with the numbers as labels), you could just make a fake x-axis and rename the ticks using `set_xticklabels`:\r\n\r\n    import matplotlib.pyplot as plt\r\n    x = range(5)\r\n    y = range(5)\r\n    real_x = [1,5,77,86,97]\r\n    plt.plot(x,y,'o-')\r\n    ax = plt.gca()\r\n    ax.set_xticks(x)\r\n    ax.set_xticklabels(real_x)\r\n\r\n[![enter image description here][2]][2]\r\n\r\n\r\n  [1]: http://i.stack.imgur.com/RtKRd.png\r\n  [2]: http://i.stack.imgur.com/pqYeI.png",
+                "can_flag": false,
+                "comment_count": 3,
+                "comments": [
+                    {
+                        "can_flag": false,
+                        "comment_id": 64609124,
+                        "creation_date": 1469618310,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610994/plot-some-numbers-in-x-axis-using-matplotlib-python/38611271#comment64609124_38611271",
+                        "owner": {
+                            "accept_rate": 60,
+                            "badge_counts": {
+                                "bronze": 7,
+                                "gold": 0,
+                                "silver": 0
+                            },
+                            "display_name": "Stack Over",
+                            "link": "http://stackoverflow.com/users/4391643/stack-over",
+                            "profile_image": "https://www.gravatar.com/avatar/d3d135c95c4c9a676c3149ebc800d908?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 60,
+                            "user_id": 4391643,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38611271,
+                        "post_type": "answer",
+                        "score": 0
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64609258,
+                        "creation_date": 1469618521,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610994/plot-some-numbers-in-x-axis-using-matplotlib-python/38611271#comment64609258_38611271",
+                        "owner": {
+                            "accept_rate": 89,
+                            "badge_counts": {
+                                "bronze": 26,
+                                "gold": 0,
+                                "silver": 2
+                            },
+                            "display_name": "M.T",
+                            "link": "http://stackoverflow.com/users/5422525/m-t",
+                            "profile_image": "https://www.gravatar.com/avatar/9fb3d7ac742a990084930a48b6001421?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 1410,
+                            "user_id": 5422525,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38611271,
+                        "post_type": "answer",
+                        "reply_to_user": {
+                            "accept_rate": 60,
+                            "badge_counts": {
+                                "bronze": 7,
+                                "gold": 0,
+                                "silver": 0
+                            },
+                            "display_name": "Stack Over",
+                            "link": "http://stackoverflow.com/users/4391643/stack-over",
+                            "profile_image": "https://www.gravatar.com/avatar/d3d135c95c4c9a676c3149ebc800d908?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 60,
+                            "user_id": 4391643,
+                            "user_type": "registered"
+                        },
+                        "score": 0
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64609535,
+                        "creation_date": 1469618926,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610994/plot-some-numbers-in-x-axis-using-matplotlib-python/38611271#comment64609535_38611271",
+                        "owner": {
+                            "accept_rate": 60,
+                            "badge_counts": {
+                                "bronze": 7,
+                                "gold": 0,
+                                "silver": 0
+                            },
+                            "display_name": "Stack Over",
+                            "link": "http://stackoverflow.com/users/4391643/stack-over",
+                            "profile_image": "https://www.gravatar.com/avatar/d3d135c95c4c9a676c3149ebc800d908?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 60,
+                            "user_id": 4391643,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38611271,
+                        "post_type": "answer",
+                        "score": 0
+                    }
+                ],
+                "creation_date": 1469617742,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469618929,
+                "last_edit_date": 1469618929,
+                "last_editor": {
+                    "accept_rate": 89,
+                    "badge_counts": {
+                        "bronze": 26,
+                        "gold": 0,
+                        "silver": 2
+                    },
+                    "display_name": "M.T",
+                    "link": "http://stackoverflow.com/users/5422525/m-t",
+                    "profile_image": "https://www.gravatar.com/avatar/9fb3d7ac742a990084930a48b6001421?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 1410,
+                    "user_id": 5422525,
+                    "user_type": "registered"
+                },
+                "link": "http://stackoverflow.com/questions/38610994/plot-some-numbers-in-x-axis-using-matplotlib-python/38611271#38611271",
+                "owner": {
+                    "accept_rate": 89,
+                    "badge_counts": {
+                        "bronze": 26,
+                        "gold": 0,
+                        "silver": 2
+                    },
+                    "display_name": "M.T",
+                    "link": "http://stackoverflow.com/users/5422525/m-t",
+                    "profile_image": "https://www.gravatar.com/avatar/9fb3d7ac742a990084930a48b6001421?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 1410,
+                    "user_id": 5422525,
+                    "user_type": "registered"
+                },
+                "question_id": 38610994,
+                "score": 1,
+                "tags": [],
+                "title": "Plot some numbers in x axis using matplotlib [Python]",
+                "up_vote_count": 1
+            },
+            {
+                "answer_id": 38611309,
+                "body_markdown": "How about masking x with y and then plotting it?\r\nlike:\r\n\r\n    pylap.plot(x[y != 0], y,\r\n                 'darkmagenta',                       # colour\r\n                 linestyle='',                      # line style\r\n                 linewidth=10,                       # line width\r\n                 marker = '+',\r\n                 mew=6, ms=12)\r\nOr if y contains more numbers != 0 and you only want to plot those listed above, just mask x with these numbers...",
+                "can_flag": false,
+                "comment_count": 0,
+                "creation_date": 1469617856,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469617856,
+                "link": "http://stackoverflow.com/questions/38610994/plot-some-numbers-in-x-axis-using-matplotlib-python/38611309#38611309",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 6,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Scotty1-",
+                    "link": "http://stackoverflow.com/users/6345518/scotty1",
+                    "profile_image": "https://www.gravatar.com/avatar/a6d9adbc6223791973c9da64f0cb1a8b?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 8,
+                    "user_id": 6345518,
+                    "user_type": "registered"
+                },
+                "question_id": 38610994,
+                "score": 0,
+                "tags": [],
+                "title": "Plot some numbers in x axis using matplotlib [Python]",
+                "up_vote_count": 0
+            },
+            {
+                "answer_id": 38611748,
+                "body_markdown": "That will do:\r\n\r\n    import matplotlib.pyplot as plt\r\n    x = y = list(range(100))\r\n    idx = [1,5,77,86,97]\r\n    new_y = [y[i] for i in idx]\r\n    plt.plot(range(len(idx)), new_y, 'o-')\r\n    plt.xticks(range(len(idx)),idx)\r\n    plt.show()\r\n\r\n[![output][1]][1]\r\n\r\n\r\n  [1]: http://i.stack.imgur.com/xbT2a.png\r\n\r\nIf you want only dots just remove the `-`:\r\n   \r\n    plt.plot(range(len(idx)), new_y, 'o')\r\n    #                              ---^---",
+                "can_flag": false,
+                "comment_count": 2,
+                "comments": [
+                    {
+                        "can_flag": false,
+                        "comment_id": 64609705,
+                        "creation_date": 1469619163,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610994/plot-some-numbers-in-x-axis-using-matplotlib-python/38611748#comment64609705_38611748",
+                        "owner": {
+                            "accept_rate": 89,
+                            "badge_counts": {
+                                "bronze": 26,
+                                "gold": 0,
+                                "silver": 2
+                            },
+                            "display_name": "M.T",
+                            "link": "http://stackoverflow.com/users/5422525/m-t",
+                            "profile_image": "https://www.gravatar.com/avatar/9fb3d7ac742a990084930a48b6001421?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 1410,
+                            "user_id": 5422525,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38611748,
+                        "post_type": "answer",
+                        "score": 1
+                    },
+                    {
+                        "can_flag": false,
+                        "comment_id": 64609907,
+                        "creation_date": 1469619445,
+                        "edited": false,
+                        "link": "http://stackoverflow.com/questions/38610994/plot-some-numbers-in-x-axis-using-matplotlib-python/38611748#comment64609907_38611748",
+                        "owner": {
+                            "badge_counts": {
+                                "bronze": 18,
+                                "gold": 0,
+                                "silver": 3
+                            },
+                            "display_name": "Ohad Eytan",
+                            "link": "http://stackoverflow.com/users/2069380/ohad-eytan",
+                            "profile_image": "https://www.gravatar.com/avatar/4fac5cb90925b4059b6b2c0885c9ffaf?s=128&d=identicon&r=PG",
+                            "reputation": 1646,
+                            "user_id": 2069380,
+                            "user_type": "registered"
+                        },
+                        "post_id": 38611748,
+                        "post_type": "answer",
+                        "reply_to_user": {
+                            "accept_rate": 89,
+                            "badge_counts": {
+                                "bronze": 26,
+                                "gold": 0,
+                                "silver": 2
+                            },
+                            "display_name": "M.T",
+                            "link": "http://stackoverflow.com/users/5422525/m-t",
+                            "profile_image": "https://www.gravatar.com/avatar/9fb3d7ac742a990084930a48b6001421?s=128&d=identicon&r=PG&f=1",
+                            "reputation": 1410,
+                            "user_id": 5422525,
+                            "user_type": "registered"
+                        },
+                        "score": 0
+                    }
+                ],
+                "creation_date": 1469619078,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469619636,
+                "last_edit_date": 1469619636,
+                "last_editor": {
+                    "badge_counts": {
+                        "bronze": 18,
+                        "gold": 0,
+                        "silver": 3
+                    },
+                    "display_name": "Ohad Eytan",
+                    "link": "http://stackoverflow.com/users/2069380/ohad-eytan",
+                    "profile_image": "https://www.gravatar.com/avatar/4fac5cb90925b4059b6b2c0885c9ffaf?s=128&d=identicon&r=PG",
+                    "reputation": 1646,
+                    "user_id": 2069380,
+                    "user_type": "registered"
+                },
+                "link": "http://stackoverflow.com/questions/38610994/plot-some-numbers-in-x-axis-using-matplotlib-python/38611748#38611748",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 18,
+                        "gold": 0,
+                        "silver": 3
+                    },
+                    "display_name": "Ohad Eytan",
+                    "link": "http://stackoverflow.com/users/2069380/ohad-eytan",
+                    "profile_image": "https://www.gravatar.com/avatar/4fac5cb90925b4059b6b2c0885c9ffaf?s=128&d=identicon&r=PG",
+                    "reputation": 1646,
+                    "user_id": 2069380,
+                    "user_type": "registered"
+                },
+                "question_id": 38610994,
+                "score": 1,
+                "tags": [],
+                "title": "Plot some numbers in x axis using matplotlib [Python]",
+                "up_vote_count": 1
+            }
+        ],
+        "body_markdown": "My question is related to the figure format generated using matplotlib library.\r\n\r\nSo, in x axis, I have the integers from 1 to 100, but in my code I plot just the data related to some numbers (e.g 1,5,77,86,97).\r\n\r\nAt end, my code shows me a figure with x axis from 1 to 100.\r\n\r\nCan I show just the needed numbers(1,5,77,86,97)?\r\n\r\nMy code is shown bellow:\r\n\r\n    def Plot(self,x,y, steps, nb,bool):  \r\n        if(bool == False):\r\n\r\n            labelfont = {\r\n                    'family' : 'sans-serif',  # (cursive, fantasy, monospace, serif)\r\n                    'color'  : 'black',       # html hex or colour name\r\n                    'weight' : 'normal',      # (normal, bold, bolder, lighter)\r\n                    'size'   : 20,            # default value:12\r\n                    }\r\n\r\n            titlefont = {\r\n                    'family' : 'serif',\r\n                    'color'  : 'black',\r\n                    'weight' : 'bold',\r\n                    'size'   : 20,\r\n                    }\r\n\r\n            x = np.array(x)\r\n            y = np.array(y)\r\n            pylab.plot(x, y,\r\n                     'darkmagenta',                       # colour\r\n                     linestyle='',                      # line style\r\n                     linewidth=10,                       # line width\r\n                     marker = '+',\r\n                     mew=6, ms=12)\r\n\r\n            axes = plt.gca()\r\n            axes.grid(True)\r\n            axes.set_xlim([1, x_max)            # x-axis bounds\r\n            axes.set_ylim([1, nb])              # y-axis bounds\r\n\r\n            pylab.title('Title' , fontdict=titlefont)\r\n            pylab.xlabel('x', fontdict=labelfont)\r\n            pylab.ylabel('y', fontdict=labelfont)\r\n\r\n            pylab.subplots_adjust(left=0.15)        # prevents overlapping of the y label\r\n        else:\r\n            test_steps.insert(0,\"\")\r\n            pylab.yticks(nb,  steps,rotation=0, size=10)\r\n            pylab.margins(0.2)\r\n            pylab.xticks(np.arange(0, x_max, 1.0),rotation=90, size=10)\r\n            # Tweak spacing to prevent clipping of tick-labels\r\n            pylab.subplots_adjust(bottom=0.15)\r\n            F = pylab.gcf()\r\n            DefaultSize = F.get_size_inches()\r\n            if x_max < 100 and len(steps) < 100:\r\n                Xx = 2.5\r\n                Yy = 2.5\r\n            elif x_max < 200 and len(steps) < 200:\r\n                Xx = 5\r\n                Yy = 5\r\n            elif ix_max < 300 and len(steps) < 300:\r\n                Xx = 8\r\n                Yy = 8\r\n            elif x_max < 400 and steps < 400:\r\n                Xx = 10\r\n                Yy = 10\r\n            elif x_max < 500 and steps < 500:\r\n                Xx = 12\r\n                Yy = 12\r\n            else:\r\n                Xx = 15\r\n                Yy = 15\r\n            F.set_size_inches((DefaultSize[0]*Xx , DefaultSize[1]*Yy))\r\n            F.savefig('Out.png', bbox_inches='tight')\r\n            pylab.close(F)\r\n",
+        "can_close": false,
+        "can_flag": false,
+        "close_vote_count": 0,
+        "comment_count": 2,
+        "comments": [
+            {
+                "can_flag": false,
+                "comment_id": 64608365,
+                "creation_date": 1469617219,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610994/plot-some-numbers-in-x-axis-using-matplotlib-python#comment64608365_38610994",
+                "owner": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 20,
+                        "gold": 1,
+                        "silver": 6
+                    },
+                    "display_name": "DavidG",
+                    "link": "http://stackoverflow.com/users/5851928/davidg",
+                    "profile_image": "https://www.gravatar.com/avatar/a108205f3620cbf490cb5e6ecd20ebb2?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 930,
+                    "user_id": 5851928,
+                    "user_type": "registered"
+                },
+                "post_id": 38610994,
+                "post_type": "question",
+                "score": 1
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64608742,
+                "creation_date": 1469617761,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610994/plot-some-numbers-in-x-axis-using-matplotlib-python#comment64608742_38610994",
+                "owner": {
+                    "accept_rate": 60,
+                    "badge_counts": {
+                        "bronze": 7,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "Stack Over",
+                    "link": "http://stackoverflow.com/users/4391643/stack-over",
+                    "profile_image": "https://www.gravatar.com/avatar/d3d135c95c4c9a676c3149ebc800d908?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 60,
+                    "user_id": 4391643,
+                    "user_type": "registered"
+                },
+                "post_id": 38610994,
+                "post_type": "question",
+                "reply_to_user": {
+                    "accept_rate": 100,
+                    "badge_counts": {
+                        "bronze": 20,
+                        "gold": 1,
+                        "silver": 6
+                    },
+                    "display_name": "DavidG",
+                    "link": "http://stackoverflow.com/users/5851928/davidg",
+                    "profile_image": "https://www.gravatar.com/avatar/a108205f3620cbf490cb5e6ecd20ebb2?s=128&d=identicon&r=PG&f=1",
+                    "reputation": 930,
+                    "user_id": 5851928,
+                    "user_type": "registered"
+                },
+                "score": 0
+            }
+        ],
+        "creation_date": 1469616928,
+        "delete_vote_count": 0,
+        "down_vote_count": 2,
+        "favorite_count": 0,
+        "is_answered": true,
+        "last_activity_date": 1469619636,
+        "last_edit_date": 1469617589,
+        "last_editor": {
+            "accept_rate": 60,
+            "badge_counts": {
+                "bronze": 7,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "Stack Over",
+            "link": "http://stackoverflow.com/users/4391643/stack-over",
+            "profile_image": "https://www.gravatar.com/avatar/d3d135c95c4c9a676c3149ebc800d908?s=128&d=identicon&r=PG&f=1",
+            "reputation": 60,
+            "user_id": 4391643,
+            "user_type": "registered"
+        },
+        "link": "http://stackoverflow.com/questions/38610994/plot-some-numbers-in-x-axis-using-matplotlib-python",
+        "owner": {
+            "accept_rate": 60,
+            "badge_counts": {
+                "bronze": 7,
+                "gold": 0,
+                "silver": 0
+            },
+            "display_name": "Stack Over",
+            "link": "http://stackoverflow.com/users/4391643/stack-over",
+            "profile_image": "https://www.gravatar.com/avatar/d3d135c95c4c9a676c3149ebc800d908?s=128&d=identicon&r=PG&f=1",
+            "reputation": 60,
+            "user_id": 4391643,
+            "user_type": "registered"
+        },
+        "question_id": 38610994,
+        "reopen_vote_count": 0,
+        "score": -2,
+        "tags": [
+            "python",
+            "matplotlib"
+        ],
+        "title": "Plot some numbers in x axis using matplotlib [Python]",
+        "up_vote_count": 0,
+        "view_count": 14
+    },
+    "origin": "stackoverflow",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619644.724721,
+    "updated_on": 1469619636.0,
+    "uuid": "e897d834e39e0c7b6b265d0479aaf96b08bf640f"
+},
+{
+    "backend_name": "StackExchange",
+    "backend_version": "0.2.0",
+    "data": {
+        "answer_count": 1,
+        "answers": [
+            {
+                "answer_id": 38611934,
+                "body_markdown": "You can try this;\r\n\r\n    user@host:/tmp/pythontest$ cat start.sh\r\n    #!/bin/sh\r\n    /usr/bin/python /tmp/pythontest/$1 &\r\n    \r\n    user@host:/tmp/pythontest$ ./start.sh test1.py\r\n    user@host:/tmp/pythontest$ ./start.sh test1.py\r\n    user@host:/tmp/pythontest$ ./start.sh test1.py\r\n    \r\n    user@host:/tmp/pythontest$ ps -ef | grep -i python\r\n    user   19447  2062  0 14:37 pts/32   00:00:00 /usr/bin/python /tmp/pythontest/test1.py\r\n    user   19449  2062  0 14:37 pts/32   00:00:00 /usr/bin/python /tmp/pythontest/test1.py\r\n    user   19451  2062  0 14:37 pts/32   00:00:00 /usr/bin/python /tmp/pythontest/test1.py\r\n    user   19454 11980  0 14:38 pts/32   00:00:00 grep --color=auto -i python\r\n    \r\nSecond field is pid number.\r\n\r\n    \r\n    user@host:/tmp/pythontest$ kill -9 19449\r\n    \r\n    user@host:/tmp/pythontest$ ps -ef | grep -i python\r\n    user   19447  2062  0 14:37 pts/32   00:00:00 /usr/bin/python /tmp/pythontest/test1.py\r\n    user   19451  2062  0 14:37 pts/32   00:00:00 /usr/bin/python /tmp/pythontest/test1.py\r\n    user   19457 11980  0 14:38 pts/32   00:00:00 grep --color=auto -i python\r\n\r\n\r\n",
+                "can_flag": false,
+                "comment_count": 0,
+                "creation_date": 1469619616,
+                "down_vote_count": 0,
+                "is_accepted": false,
+                "last_activity_date": 1469619616,
+                "link": "http://stackoverflow.com/questions/38610351/ubuntu-nuhup-shutdown-specific-script/38611934#38611934",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 11,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "M. Dogru",
+                    "link": "http://stackoverflow.com/users/6518219/m-dogru",
+                    "profile_image": "https://i.stack.imgur.com/3AsDB.png?s=128&g=1",
+                    "reputation": 383,
+                    "user_id": 6518219,
+                    "user_type": "registered"
+                },
+                "question_id": 38610351,
+                "score": 0,
+                "tags": [],
+                "title": "Ubuntu nuhup shutdown specific script",
+                "up_vote_count": 0
+            }
+        ],
+        "body_markdown": "lets say we do:\r\n\r\n> sudo nohup ./start.sh process1\r\n> \r\n> sudo nohup ./start.sh process2\r\n> \r\n> sudo nohup ./start.sh process3\r\n\r\n./start.sh is running a python file that loops forever.\r\n\r\nNow, how do I kill the 'process2'?\r\n\r\nI can do `killall python` and all of them would be shutdown.\r\nIs it possible to kill 'proccess2' spesifically somehow mark it or something?\r\n\r\nThank you.\r\n\r\n\r\n ",
+        "can_close": false,
+        "can_flag": false,
+        "close_vote_count": 1,
+        "comment_count": 3,
+        "comments": [
+            {
+                "can_flag": false,
+                "comment_id": 64608357,
+                "creation_date": 1469617205,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610351/ubuntu-nuhup-shutdown-specific-script#comment64608357_38610351",
+                "owner": {
+                    "badge_counts": {
+                        "bronze": 11,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "M. Dogru",
+                    "link": "http://stackoverflow.com/users/6518219/m-dogru",
+                    "profile_image": "https://i.stack.imgur.com/3AsDB.png?s=128&g=1",
+                    "reputation": 383,
+                    "user_id": 6518219,
+                    "user_type": "registered"
+                },
+                "post_id": 38610351,
+                "post_type": "question",
+                "score": 0
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64608952,
+                "creation_date": 1469618076,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610351/ubuntu-nuhup-shutdown-specific-script#comment64608952_38610351",
+                "owner": {
+                    "accept_rate": 95,
+                    "badge_counts": {
+                        "bronze": 76,
+                        "gold": 9,
+                        "silver": 40
+                    },
+                    "display_name": "andlrc",
+                    "link": "http://stackoverflow.com/users/887539/andlrc",
+                    "profile_image": "https://www.gravatar.com/avatar/5baef9617bdee6db2f534c118bcbccee?s=128&d=identicon&r=PG",
+                    "reputation": 27269,
+                    "user_id": 887539,
+                    "user_type": "registered"
+                },
+                "post_id": 38610351,
+                "post_type": "question",
+                "score": 2
+            },
+            {
+                "can_flag": false,
+                "comment_id": 64609459,
+                "creation_date": 1469618806,
+                "edited": false,
+                "link": "http://stackoverflow.com/questions/38610351/ubuntu-nuhup-shutdown-specific-script#comment64609459_38610351",
+                "owner": {
+                    "accept_rate": 77,
+                    "badge_counts": {
+                        "bronze": 16,
+                        "gold": 1,
+                        "silver": 3
+                    },
+                    "display_name": "Alice",
+                    "link": "http://stackoverflow.com/users/937464/alice",
+                    "profile_image": "https://www.gravatar.com/avatar/f4e03d0dc74a5dbf09300a717068ba7b?s=128&d=identicon&r=PG",
+                    "reputation": 474,
+                    "user_id": 937464,
+                    "user_type": "registered"
+                },
+                "post_id": 38610351,
+                "post_type": "question",
+                "reply_to_user": {
+                    "badge_counts": {
+                        "bronze": 11,
+                        "gold": 0,
+                        "silver": 0
+                    },
+                    "display_name": "M. Dogru",
+                    "link": "http://stackoverflow.com/users/6518219/m-dogru",
+                    "profile_image": "https://i.stack.imgur.com/3AsDB.png?s=128&g=1",
+                    "reputation": 383,
+                    "user_id": 6518219,
+                    "user_type": "registered"
+                },
+                "score": 0
+            }
+        ],
+        "creation_date": 1469615191,
+        "delete_vote_count": 0,
+        "down_vote_count": 0,
+        "favorite_count": 0,
+        "is_answered": false,
+        "last_activity_date": 1469619616,
+        "link": "http://stackoverflow.com/questions/38610351/ubuntu-nuhup-shutdown-specific-script",
+        "owner": {
+            "accept_rate": 77,
+            "badge_counts": {
+                "bronze": 16,
+                "gold": 1,
+                "silver": 3
+            },
+            "display_name": "Alice",
+            "link": "http://stackoverflow.com/users/937464/alice",
+            "profile_image": "https://www.gravatar.com/avatar/f4e03d0dc74a5dbf09300a717068ba7b?s=128&d=identicon&r=PG",
+            "reputation": 474,
+            "user_id": 937464,
+            "user_type": "registered"
+        },
+        "question_id": 38610351,
+        "reopen_vote_count": 0,
+        "score": 0,
+        "tags": [
+            "python",
+            "linux",
+            "bash",
+            "ubuntu",
+            "nohup"
+        ],
+        "title": "Ubuntu nuhup shutdown specific script",
+        "up_vote_count": 0,
+        "view_count": 10
+    },
+    "origin": "stackoverflow",
+    "perceval_version": "0.2.0",
+    "timestamp": 1469619644.727543,
+    "updated_on": 1469619616.0,
+    "uuid": "ef65ce34d85581b05197713c3ab57858dee43bea"
+}]

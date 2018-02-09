@@ -107,9 +107,9 @@ class TestBackends(unittest.TestCase):
                 ocean_backend = connectors[con][1](perceval_backend)
                 elastic_ocean = get_elastic(es_con, es_index, clean, ocean_backend)
                 ocean_backend.set_elastic(elastic_ocean)
-                inserted = self.__data2es(items, ocean_backend)
 
-                self.assertTrue(len(items), inserted)
+                inserted = self.__data2es(items, ocean_backend)
+                self.assertEqual(len(items), inserted)
 
     def test_data_load_error(self):
         """Test whether an exception is thrown when inserting data intO"""
@@ -169,10 +169,10 @@ class TestBackends(unittest.TestCase):
             if sortinghat:
                 # Load SH identities
                 load_identities(ocean_backend, enrich_backend)
+            raw_count = len([item for item in ocean_backend.fetch()])
             enrich_count = enrich_backend.enrich_items(ocean_backend)
 
-            if enrich_count is not None:
-                logging.info("Total items enriched %i ", enrich_count)
+            self.assertEqual(raw_count, enrich_count)
 
     def test_enrich_sh(self):
         """Test enrich all sources with SortingHat"""
