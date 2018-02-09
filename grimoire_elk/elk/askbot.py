@@ -326,8 +326,10 @@ class AskbotEnrich(Enrich):
         ncomments = 0
         rich_item_answers = []
         rich_item_comments = []
+        nitems = 0
 
         for item in items:
+            nitems += 1
             (answers, comments) = self.get_rich_item_answers_comments(item)
             rich_item_answers += answers
             rich_item_comments += comments
@@ -335,8 +337,19 @@ class AskbotEnrich(Enrich):
         if rich_item_answers:
             nanswers = self.elastic.bulk_upload(rich_item_answers,
                                                 self.get_field_unique_id_answer())
+
+            if nanswers != len(rich_item_answers):
+                missing = len(rich_item_answers) - nanswers
+                logger.error("%s/%s missing answers for Askbot",
+                             str(missing), str(len(rich_item_answers)))
+
         if rich_item_comments:
             ncomments += self.elastic.bulk_upload(rich_item_comments,
                                                   self.get_field_unique_id_comment())
-        logger.info("Total answers enriched: %i", nanswers)
-        logger.info("Total comments enriched: %i", ncomments)
+
+            if ncomments != len(rich_item_comments):
+                missing = len(rich_item_comments) - nanswers
+                logger.error("%s/%s missing comments for Askbot",
+                             str(missing), str(len(rich_item_comments)))
+
+        return nitems
