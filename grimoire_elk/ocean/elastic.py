@@ -204,7 +204,6 @@ class ElasticOcean(ElasticItems):
         self.feed_items(items)
 
     def feed_items(self, items):
-
         task_init = datetime.now()
 
         items_pack = []  # to feed item in packs
@@ -248,4 +247,18 @@ class ElasticOcean(ElasticItems):
         field_id = self.get_field_unique_id()
 
         inserted = self.elastic.bulk_upload_sync(json_items, field_id)
+
+        if len(json_items) != inserted:
+            missing = len(json_items) - inserted
+            info = json_items[0]
+
+            name = info['backend_name']
+            version = info['backend_version']
+            origin = info['origin']
+
+            logger.warning("%s/%s missing JSON items for backend %s [ver. %s], origin %s",
+                           str(missing),
+                           str(len(json_items)),
+                           name, version, origin)
+
         return inserted
