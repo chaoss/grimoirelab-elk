@@ -120,8 +120,10 @@ class GitEnrich(Enrich):
         return "Author"
 
     def get_field_unique_id(self):
-        # Field available in the enriched item
-        return "git_uuid"
+        # "git_uuid" must be available in the enriched item
+        # Don't use it until we have re-enriched all git indexes in production
+        # return "git_uuid"
+        return "uuid"
 
     def get_fields_uuid(self):
         return ["author_uuid", "committer_uuid"]
