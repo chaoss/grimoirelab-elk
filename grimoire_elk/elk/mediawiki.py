@@ -236,6 +236,7 @@ class MediaWikiEnrich(Enrich):
         current = 0
         bulk_json = ""
         total = 0
+        nitems = 0
 
         url = self.elastic.index_url + '/items/_bulk'
 
@@ -243,6 +244,7 @@ class MediaWikiEnrich(Enrich):
 
         items = ocean_backend.fetch()
         for item in items:
+            nitems += 1
             rich_item_reviews = self.get_rich_item_reviews(item)
             for enrich_review in rich_item_reviews:
                 if current >= max_items:
@@ -257,4 +259,4 @@ class MediaWikiEnrich(Enrich):
                 total += 1
         self.requests.put(url, data=bulk_json)
 
-        return total
+        return nitems
