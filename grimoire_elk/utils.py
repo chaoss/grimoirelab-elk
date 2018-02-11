@@ -344,6 +344,7 @@ def get_params_parser():
     parser.add_argument('--scroll-size', default=100, type=int,
                         help="Number of items to get from Elasticsearch when scrolling.")
     parser.add_argument('--arthur', action='store_true', help="Read items from arthur redis queue")
+    parser.add_argument('--pair-programming', action='store_true', help="Do pair programming in git enrich")
     parser.add_argument('backend', help=argparse.SUPPRESS)
     parser.add_argument('backend_args', nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)

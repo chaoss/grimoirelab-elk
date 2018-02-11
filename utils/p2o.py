@@ -79,6 +79,7 @@ if __name__ == '__main__':
                 logging.info("Backend feed completed")
 
             if args.enrich or args.enrich_only:
+                unaffiliated_group = None
                 enrich_backend(url, clean, args.backend, args.backend_args,
                                args.index, args.index_enrich,
                                args.db_projects_map, args.json_projects_map,
@@ -91,7 +92,8 @@ if __name__ == '__main__':
                                args.refresh_projects, args.refresh_identities,
                                args.author_id, args.author_uuid,
                                args.filter_raw, args.filters_raw_prefix,
-                               args.jenkins_rename_file)
+                               args.jenkins_rename_file, unaffiliated_group,
+                               args.pair_programming)
                 logging.info("Enrich backend completed")
             elif args.events_enrich:
                 logging.info("Enrich option is needed for events_enrich")

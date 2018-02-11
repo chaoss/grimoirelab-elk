@@ -39,7 +39,6 @@ from .ocean.conf import ConfOcean
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
 from .elk.utils import get_last_enrich, grimoire_con
-from .elk.git import GitEnrich
 
 
 logger = logging.getLogger(__name__)
@@ -479,7 +478,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                    do_refresh_projects=False, do_refresh_identities=False,
                    author_id=None, author_uuid=None, filter_raw=None,
                    filters_raw_prefix=None, jenkins_rename_file=None,
-                   unaffiliated_group=None):
+                   unaffiliated_group=None, pair_programming=False):
     """ Enrich Ocean index """
 
     backend = None
@@ -527,6 +526,8 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             enrich_backend.set_jenkins_rename_file(jenkins_rename_file)
         if unaffiliated_group:
             enrich_backend.unaffiliated_group = unaffiliated_group
+        if pair_programming:
+            enrich_backend.pair_programming = pair_programming
 
         # filter_raw must be converted from the string param to a dict
         filter_raw_dict = {}
@@ -570,11 +571,6 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
                                  'value': author_uuid}
 
             logger.info("Refreshing identities fields in %s", enrich_backend.elastic.index_url)
-
-            # Hack to support pair programming git indexes
-            if isinstance(enrich_backend, GitEnrich):
-                eitems = refresh_identities(enrich_backend, filter_author)
-                enrich_backend.check_pair_programming(eitems)
 
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_identities(enrich_backend, filter_author)
