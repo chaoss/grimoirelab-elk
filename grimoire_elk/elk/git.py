@@ -91,13 +91,11 @@ class GitEnrich(Enrich):
     # REGEX to extract authors from a multi author commit: several authors present
     # in the Author field in the commit. Used if self.pair_programming is True
     AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) and (?P<last_author>.* .*) (?P<email>.*)')
-    # Temporal hack to use pair programing only in CloudFoundry (cloudfoundry and cloudfoundry-incubator)
-    CLOUDFOUNDRY_URL = 'https://github.com/cloudfoundry'
 
     roles = ['Author', 'Commit']
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
-                 db_user='', db_password='', db_host=''):
+                 db_user='', db_password='', db_host='', pair_programming=False):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
 
@@ -111,7 +109,7 @@ class GitEnrich(Enrich):
         self.rate_limit = None
         self.rate_limit_reset_ts = None
         self.min_rate_to_sleep = 100  # if pending rate < 100 sleep
-        self.pair_programming = False
+        self.pair_programming = pair_programming
 
     def set_github_token(self, token):
         self.github_token = token
@@ -150,10 +148,6 @@ class GitEnrich(Enrich):
         """ Return the identities from an item.
             If the repo is in GitHub, get the usernames from GitHub. """
         identities = []
-
-        # Temporal hack until all is integrated in mordred and p2o
-        if self.CLOUDFOUNDRY_URL in item['origin']:
-            self.pair_programming = True
 
         def add_sh_github_identity(user, user_field, rol):
             """ Add a new github identity to SH if it does not exists """
@@ -454,11 +448,6 @@ class GitEnrich(Enrich):
             eitem.update(get_pair_programming_metrics(eitem, nauthors))
         return eitem
 
-    def check_pair_programming(self, items):
-        if any(items) and self.CLOUDFOUNDRY_URL in next(items)['origin']:
-            self.pair_programming = True
-
-
     def enrich_items(self, ocean_backend, events=False):
         """ Implementation supporting signed-off and multiauthor/committer commits.
         """
@@ -477,8 +466,6 @@ class GitEnrich(Enrich):
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
-        items = ocean_backend.fetch()
-        self.check_pair_programming(items)
         items = ocean_backend.fetch()
 
         for item in items:
