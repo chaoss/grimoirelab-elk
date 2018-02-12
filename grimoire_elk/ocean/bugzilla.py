@@ -35,9 +35,6 @@ class Mapping(BaseMapping):
     def get_elastic_mappings(es_major):
         """Get Elasticsearch mapping.
 
-        Non dynamic discovery of type for:
-            * data.long_desc.thetext.__text__
-
         :param es_major: major version of Elasticsearch, as string
         :returns:        dictionary with a key, 'items', with the mapping
         """
@@ -49,6 +46,14 @@ class Mapping(BaseMapping):
                     "data": {
                         "properties": {
                             "long_desc": {
+                                "properties": {
+                                    "thetext": {
+                                        "dynamic":false,
+                                        "properties": {}
+                                    }
+                                }
+                            },
+                            "short_desc": {
                                 "dynamic":false,
                                 "properties": {}
                             }
