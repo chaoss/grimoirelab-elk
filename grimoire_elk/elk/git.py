@@ -65,8 +65,8 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                    "message_analyzed": {
-                      "type": "text",
-                      "fielddata": true
+                        "type": "text",
+                        "index": true
                    }
                }
             }"""
@@ -75,8 +75,8 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                    "message_analyzed": {
-                      "type": "string",
-                      "index": "analyzed"
+                        "type": "string",
+                        "index": "analyzed"
                    }
                }
             }"""

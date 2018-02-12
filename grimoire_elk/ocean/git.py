@@ -40,21 +40,21 @@ class Mapping(BaseMapping):
         """
 
         if es_major == '2':
-            # Keep compatibility with 2.x mappings
             mapping = '''
-             {
-                "dynamic":true,
-                "properties": {
-                    "data": {
+                     {
+                        "dynamic":true,
                         "properties": {
-                            "message": {
-                                "type": "string"
+                            "data": {
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "index": "analyzed"
+                                    }
+                                }
                             }
                         }
                     }
-                }
-            }
-            '''
+                    '''
         else:
             mapping = '''
              {
@@ -63,14 +63,15 @@ class Mapping(BaseMapping):
                     "data": {
                         "properties": {
                             "message": {
-                                "type": "text"
+                                "type": "text",
+                                "index": true
                             }
                         }
                     }
                 }
             }
             '''
-            print
+
         return {"items": mapping}
 
 
