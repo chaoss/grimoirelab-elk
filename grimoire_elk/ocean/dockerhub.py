@@ -24,10 +24,67 @@
 #
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
+
+
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != '2':
+            mapping = '''
+                     {
+                        "dynamic":true,
+                            "properties": {
+                                "data": {
+                                    "properties": {
+                                        "description": {
+                                            "type": "text",
+                                            "index": true
+                                        },
+                                        "full_description": {
+                                            "type": "text",
+                                            "index": true
+                                        }
+                                    }
+                                }
+                            }
+                    }
+                    '''
+        else:
+            mapping = '''
+             {
+                "dynamic":true,
+                    "properties": {
+                        "data": {
+                            "properties": {
+                                "description": {
+                                    "type": "string",
+                                    "index": "analyzed"
+                                },
+                                "full_description": {
+                                    "type": "string",
+                                    "index": "analyzed"
+                                }
+                            }
+                        }
+                    }
+            }
+            '''
+
+        return {"items": mapping}
 
 
 class DockerHubOcean(ElasticOcean):
     """DockerHub Ocean feeder"""
+
+    mapping = Mapping
 
     @classmethod
     def get_perceval_params_from_url(cls, url):
