@@ -49,8 +49,9 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "fullDisplayName_analyzed": {
-                      "type": "text"
-                      }
+                        "type": "text",
+                        "index": true
+                    }
                }
             } """
         else:
@@ -58,9 +59,9 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "fullDisplayName_analyzed": {
-                      "type": "string",
-                      "index": "analyzed"
-                      }
+                        "type": "string",
+                        "index": "analyzed"
+                    }
                }
             } """
 
