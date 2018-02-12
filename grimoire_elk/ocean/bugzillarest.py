@@ -35,9 +35,6 @@ class Mapping(BaseMapping):
     def get_elastic_mappings(es_major):
         """Get Elasticsearch mapping.
 
-        Non dynamic discovery of type for:
-            * data.comments.text
-
         :param es_major: major version of Elasticsearch, as string
         :returns:        dictionary with a key, 'items', with the mapping
         """
@@ -50,7 +47,32 @@ class Mapping(BaseMapping):
                         "properties": {
                             "comments": {
                                 "dynamic":false,
-                                "properties": {}
+                                "properties": {
+                                    "raw_text": {
+                                        "type": "text",
+                                        "index": false
+                                    },
+                                    "text": {
+                                        "type": "text",
+                                        "index": false
+                                    }
+                                }
+                            },
+                            "attachments": {
+                                "properties": {
+                                    "description" : {
+                                        "type": "text",
+                                        "index": false
+                                    },
+                                    "summary" : {
+                                        "type": "text",
+                                        "index": false
+                                    }
+                                }
+                            },
+                            "summary": {
+                                "type": "text",
+                                "index": false
                             }
                         }
                     }
