@@ -45,30 +45,40 @@ class Mapping(BaseMapping):
 
         if es_major != '2':
             mapping = """
-            {
-                "properties": {
-                    "description_analyzed": {
-                      "type": "text"
-                      },
-                    "full_description_analyzed": {
-                      "type": "text"
-                    }
-               }
-            } """
+                    {
+                        "properties": {
+                            "description": {
+                                "type": "text",
+                                "index": true
+                            },
+                            "description_analyzed": {
+                                "type": "text",
+                                "index": true
+                            },
+                            "full_description_analyzed": {
+                                "type": "text",
+                                "index": true
+                            }
+                       }
+                    } """
         else:
             mapping = """
-            {
-                "properties": {
-                    "description_analyzed": {
-                      "type": "string",
-                      "index": "analyzed"
-                      },
-                    "full_description_analyzed": {
-                      "type": "string",
-                      "index": "analyzed"
-                    }
-               }
-            } """
+                    {
+                        "properties": {
+                            "description": {
+                                "type": "string",
+                                "index": "analyzed"
+                            },
+                            "description_analyzed": {
+                                "type": "string",
+                                "index": "analyzed"
+                            },
+                            "full_description_analyzed": {
+                                "type": "string",
+                                "index": "analyzed"
+                            }
+                       }
+                    } """
 
         return {"items": mapping}
 
