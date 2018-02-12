@@ -35,8 +35,6 @@ class Mapping(BaseMapping):
     def get_elastic_mappings(es_major):
         """Get Elasticsearch mapping.
 
-        Ensure data.commitMessage is string, since it can be very large
-
         :param es_major: major version of Elasticsearch, as string
         :returns:        dictionary with a key, 'items', with the mapping
         """
@@ -50,7 +48,32 @@ class Mapping(BaseMapping):
                     "data": {
                         "properties": {
                             "commitMessage": {
-                                "type": "string"
+                                "type": "string",
+                                "index": "analyzed"
+                            },
+                            "subject": {
+                                "type": "text",
+                                "index": true
+                            },
+                            "comments": {
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "index": "analyzed"
+                                    }
+                                }
+                            },
+                            "patchSets": {
+                                "properties": {
+                                    "approvals": {
+                                        "properties": {
+                                            "description": {
+                                                "type": "string",
+                                                "index": "analyzed"
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -65,7 +88,32 @@ class Mapping(BaseMapping):
                     "data": {
                         "properties": {
                             "commitMessage": {
-                                "type": "text"
+                                "type": "text",
+                                "index": true
+                            },
+                            "subject": {
+                                "type": "text",
+                                "index": true
+                            },
+                            "comments": {
+                                "properties": {
+                                    "message": {
+                                        "type": "text",
+                                        "index": true
+                                    }
+                                }
+                            },
+                            "patchSets": {
+                                "properties": {
+                                    "approvals": {
+                                        "properties": {
+                                            "description": {
+                                                "type": "text",
+                                                "index": true
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

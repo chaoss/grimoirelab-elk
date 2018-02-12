@@ -44,13 +44,18 @@ class Mapping(BaseMapping):
         :param es_major: major version of Elasticsearch, as string
         :returns:        dictionary with a key, 'items', with the mapping
         """
-
-        if es_major != '2':
+        if es_major == '2':
+            # Keep compatibility with 2.x mappings
             mapping = """
             {
                 "properties": {
                    "summary_analyzed": {
-                      "type": "text"
+                      "type": "string",
+                      "index": "analyzed"
+                   },
+                   "summary": {
+                      "type": "string",
+                      "index": "analyzed"
                    },
                    "timeopen": {
                       "type": "double"
@@ -63,8 +68,12 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                    "summary_analyzed": {
-                      "type": "string",
-                      "index": "analyzed"
+                      "type": "text",
+                      "index": false
+                   },
+                   "summary": {
+                      "type": "text",
+                      "index": false
                    },
                    "timeopen": {
                       "type": "double"
