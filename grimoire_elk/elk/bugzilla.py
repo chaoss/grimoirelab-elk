@@ -31,6 +31,7 @@ from datetime import datetime
 from dateutil import parser
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 from .utils import get_time_diff_days
 
@@ -38,7 +39,32 @@ from .utils import get_time_diff_days
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = """
+        {
+            "properties": {
+               "main_description": {
+                   "type": "text",
+                   "index": false
+               }
+            }
+        }
+        """
+
+        return {"items": mapping}
+
+
 class BugzillaEnrich(Enrich):
+    mapping = Mapping
 
     roles = ['assigned_to', 'reporter', 'qa_contact']
 
