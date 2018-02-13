@@ -25,6 +25,9 @@ before_install:
 # install:
 #   - ./setup.py install
 
+before_script:
+  - sleep 15
+
 script:
   - flake8 .
   - mysqladmin -u root create test_sh
