@@ -24,10 +24,67 @@
 #
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
+
+
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != 2:
+            mapping = '''
+             {
+                "dynamic":true,
+                    "properties": {
+                        "data": {
+                            "properties": {
+                                "Subject": {
+                                    "type": "text",
+                                    "index": true
+                                },
+                                "body": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                }
+                            }
+                        }
+                    }
+            }
+            '''
+        else:
+            mapping = '''
+             {
+                "dynamic":true,
+                    "properties": {
+                        "data": {
+                            "properties": {
+                                "Subject": {
+                                    "type": "string",
+                                    "index": "analyzed
+                                },
+                                "body": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                }
+                            }
+                        }
+                    }
+            }
+            '''
+
+        return {"items": mapping}
 
 
 class NNTPOcean(ElasticOcean):
     """NNTP Ocean feeder"""
+
+    mapping = Mapping
 
     @classmethod
     def get_perceval_params_from_url(cls, url):

@@ -22,10 +22,59 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+from ..elastic_mapping import Mapping as BaseMapping
 from .mbox import MBoxEnrich
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        geopoints type is not created in dynamic mapping
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        if es_major != 2:
+            mapping = """
+            {
+                "properties": {
+                    "Subject": {
+                        "type": "text",
+                        "index": true
+                    },
+                    "Subject_analyzed": {
+                        "type": "text",
+                        "index": true
+                    }
+                }
+            }
+            """
+        else:
+            mapping = """
+            {
+                "properties": {
+                    "Subject": {
+                        "type": "string",
+                        "index": "analyzed"
+                    },
+                    "Subject_analyzed": {
+                        "type": "string",
+                        "index": "analyzed"
+                    }
+                }
+            }
+            """
+
+        return {"items": mapping}
+
+
 class NNTPEnrich(MBoxEnrich):
+
+    mapping = Mapping
 
     def get_project_repository(self, eitem):
         # origin: news.mozilla.org-mozilla.community.drumbeat
