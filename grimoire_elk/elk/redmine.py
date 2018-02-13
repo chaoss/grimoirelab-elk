@@ -47,13 +47,22 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
+        if es_major != 2:
             mapping = """
             {
                 "properties": {
                     "description_analyzed": {
-                      "type": "text"
-                      }
+                        "type": "text",
+                        "index": true
+                    },
+                    "description": {
+                        "type": "text",
+                        "index": true
+                    },
+                    "subject": {
+                        "type": "text",
+                        "index": true
+                    }
                }
             } """
         else:
@@ -61,9 +70,17 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "description_analyzed": {
-                      "type": "string",
-                      "index": "analyzed"
-                      }
+                        "type": "string",
+                        "index": "analyzed"
+                    },
+                    "description": {
+                        "type": "string",
+                        "index": "analyzed"
+                    },
+                    "subject": {
+                        "type": "string",
+                        "index": "analyzed"
+                    }
                }
             } """
 
