@@ -22,9 +22,43 @@
 #
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
+
+
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        Non dynamic discovery of type for:
+            * data.answers.answered_by
+            * data.author
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "description": {
+                                "type": "text",
+                                "index": false
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
+        return {"items": mapping}
 
 
 class ReMoOcean(ElasticOcean):
     """ReMo API v2 Ocean feeder"""
 
-    pass
+    mapping = Mapping
