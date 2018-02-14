@@ -47,9 +47,13 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "text_analyzed": {
-                      "type": "text",
-                      "fielddata": true
-                      }
+                        "type": "text",
+                        "fielddata": true
+                    },
+                    "user_data_bot": {
+                        "type": "long",
+                        "index": "analyzed"
+                    }
                }
             } """
         else:
@@ -57,9 +61,13 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "text_analyzed": {
-                      "type": "string",
-                      "index": "analyzed"
-                      }
+                        "type": "string",
+                        "index": "analyzed"
+                    },
+                    "user_data_bot": {
+                        "type": "long",
+                        "index": "analyzed"
+                    }
                }
             } """
 
@@ -197,14 +205,13 @@ class SlackEnrich(Enrich):
             if field in channel and channel[field]:
                 eitem['channel_' + field] = 1
 
-        eitem = self.__convert_booleans(eitem)
-
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
 
+        eitem = self.__convert_booleans(eitem)
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "message"))
 
         return eitem
