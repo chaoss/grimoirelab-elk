@@ -75,7 +75,6 @@ from .elk.functest import FunctestEnrich
 from .elk.git import GitEnrich
 from .elk.github import GitHubEnrich
 from .elk.gerrit import GerritEnrich
-from .elk.gmane import GmaneEnrich
 from .elk.hyperkitty import HyperKittyEnrich
 from .elk.jenkins import JenkinsEnrich
 from .elk.jira import JiraEnrich
@@ -107,7 +106,6 @@ from perceval.backends.core.dockerhub import DockerHub, DockerHubCommand
 from perceval.backends.core.gerrit import Gerrit, GerritCommand
 from perceval.backends.core.git import Git, GitCommand
 from perceval.backends.core.github import GitHub, GitHubCommand
-from perceval.backends.core.gmane import Gmane, GmaneCommand
 from perceval.backends.core.jenkins import Jenkins, JenkinsCommand
 from perceval.backends.core.jira import Jira, JiraCommand
 from perceval.backends.core.hyperkitty import HyperKitty, HyperKittyCommand
@@ -197,7 +195,6 @@ def get_connectors():
             "gerrit": [Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git": [Git, GitOcean, GitEnrich, GitCommand],
             "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
-            "gmane": [Gmane, MBoxOcean, GmaneEnrich, GmaneCommand],
             "hyperkitty": [HyperKitty, MBoxOcean, HyperKittyEnrich, HyperKittyCommand],
             "jenkins": [Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira": [Jira, JiraOcean, JiraEnrich, JiraCommand],
