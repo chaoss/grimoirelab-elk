@@ -38,7 +38,7 @@ from grimoire_elk.utils import get_connectors, get_elastic
 
 
 CONFIG_FILE = 'tests.conf'
-NUMBER_BACKENDS = 31
+NUMBER_BACKENDS = 30
 DB_SORTINGHAT = "test_sh"
 DB_PROJECTS = "test_projects"
 
