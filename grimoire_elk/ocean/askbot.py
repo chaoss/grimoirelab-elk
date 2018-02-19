@@ -32,31 +32,52 @@ class Mapping(BaseMapping):
     def get_elastic_mappings(es_major):
         """Get Elasticsearch mapping.
 
-        Non dynamic discovery of type for:
-            * data.answers.answered_by
-            * data.author
-
         :param es_major: major version of Elasticsearch, as string
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
         mapping = '''
          {
-            "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "answers": {
-                                "dynamic":false,
-                                "properties": {}
-                            },
-                            "author": {
-                                "dynamic":false,
-                                "properties": {}
+            "properties": {
+                "data": {
+                    "dynamic":true,
+                    "properties": {
+                        "answers": {
+                            "dynamic":false,
+                            "properties": {
+                                "comments": {
+                                    "properties": {
+                                        "html": {
+                                            "type": "text",
+                                            "index": true
+                                        }
+                                    }
+                                },
+                                "summary": {
+                                    "type": "text",
+                                    "index": true
+                                }
                             }
+                        },
+                        "author": {
+                            "dynamic":false,
+                            "properties": {}
+                        },
+                        "comments": {
+                            "properties": {
+                                "html": {
+                                    "type": "text",
+                                    "index": true
+                                }
+                            }
+                        },
+                        "summary": {
+                            "type": "text",
+                            "index": false
                         }
                     }
                 }
+            }
         }
         '''
 
