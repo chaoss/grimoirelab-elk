@@ -42,24 +42,28 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
+        if es_major != 2:
             mapping = """
             {
                 "properties": {
-                    "Event Description": {
-                      "type": "text"
-                      },
-                    "Event Creation": {
-                      "type": "text"
-                      },
-                    "Feedback from Attendees": {
-                      "type": "text"
-                      },
-                    "Your Feedback": {
-                      "type": "text"
-                      },
+                    "Event_Description": {
+                        "type": "text",
+                        "index": true
+                    },
+                    "Event_Creations": {
+                        "type": "text",
+                        "index": true
+                    },
+                    "Feedback_from_Attendees": {
+                        "type": "text",
+                        "index": true
+                    },
+                    "Your_Feedback": {
+                        "type": "text",
+                        "index": true
+                    },
                     "geolocation": {
-                       "type": "geo_point"
+                        "type": "geo_point"
                     }
                }
             } """
@@ -67,24 +71,24 @@ class Mapping(BaseMapping):
             mapping = """
             {
                 "properties": {
-                    "Event Description": {
-                      "type": "string",
-                      "index": "analyzed"
-                      },
-                    "Event Creation": {
-                      "type": "string",
-                      "index": "analyzed"
-                      },
-                    "Feedback from Attendees": {
-                      "type": "string",
-                      "index": "analyzed"
-                      },
-                    "Your Feedback": {
-                      "type": "string",
-                      "index": "analyzed"
-                      },
+                    "Event_Description": {
+                        "type": "string",
+                        "index": "analyzed"
+                    },
+                    "Event_Creations": {
+                        "type": "string",
+                        "index": "analyzed"
+                    },
+                    "Feedback_from_Attendees": {
+                        "type": "string",
+                        "index": "analyzed"
+                    },
+                    "Your_Feedback": {
+                        "type": "string",
+                        "index": "analyzed"
+                    },
                     "geolocation": {
-                       "type": "geo_point"
+                        "type": "geo_point"
                     }
                }
             } """
