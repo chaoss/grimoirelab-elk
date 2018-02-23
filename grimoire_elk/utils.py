@@ -55,7 +55,7 @@ from .ocean.nntp import NNTPOcean
 from .ocean.phabricator import PhabricatorOcean
 from .ocean.pipermail import PipermailOcean
 from .ocean.redmine import RedmineOcean
-from .ocean.remo2 import ReMoOcean
+from .ocean.remo import ReMoOcean
 from .ocean.rss import RSSOcean
 from .ocean.slack import SlackOcean
 from .ocean.stackexchange import StackExchangeOcean
@@ -87,7 +87,7 @@ from .elk.nntp import NNTPEnrich
 from .elk.phabricator import PhabricatorEnrich
 from .elk.redmine import RedmineEnrich
 # from .elk.remo import ReMoEnrich
-from .elk.remo2 import ReMoEnrich
+from .elk.remo import ReMoEnrich
 from .elk.rss import RSSEnrich
 from .elk.pipermail import PipermailEnrich
 from .elk.slack import SlackEnrich
