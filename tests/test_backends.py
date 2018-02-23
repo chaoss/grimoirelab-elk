@@ -25,6 +25,8 @@ import configparser
 import json
 import logging
 import os
+from os.path import isfile, join
+import requests
 import sys
 import unittest
 
@@ -38,29 +40,22 @@ from grimoire_elk.utils import get_connectors, get_elastic
 
 
 CONFIG_FILE = 'tests.conf'
-NUMBER_BACKENDS = 30
 DB_SORTINGHAT = "test_sh"
 DB_PROJECTS = "test_projects"
 
 
-class TestBackends(unittest.TestCase):
-    """Functional tests for GrimoireELK Backends"""
+def test_connector(all, connector):
+    decision = False
+    if all == 'true':
+        decision = True
+    elif all == 'false' and connector == 'true':
+        decision = True
 
-    def test_init(self):
-        """Test whether the backends can be loaded """
-        self.assertEqual(len(get_connectors()), NUMBER_BACKENDS)
+    return decision
 
-    def test_read_data(self):
-        """Test load all sources JSON"""
-        config = configparser.ConfigParser()
-        config.read(CONFIG_FILE)
-        connectors = get_connectors()
-        # Check we have data for all the data sources
-        for con in sorted(connectors.keys()):
-            with open(os.path.join("data", con + ".json")) as f:
-                json.load(f)
 
-    def __ocean_item(self, item):
+def data2es(items, ocean):
+    def ocean_item(item):
         # Hack until we decide the final id to use
         if 'uuid' in item:
             item['ocean-unique-id'] = item['uuid']
@@ -76,99 +71,162 @@ class TestBackends(unittest.TestCase):
         if 'timestamp' in item:
             ts = datetime.fromtimestamp(item['timestamp'])
             item['metadata__timestamp'] = ts.isoformat()
+
         return item
 
-    def __data2es(self, items, ocean):
-        items_pack = []  # to feed item in packs
+    items_pack = []  # to feed item in packs
 
-        for item in items:
-            item = self.__ocean_item(item)
-            if len(items_pack) >= ocean.elastic.max_items_bulk:
-                ocean._items_to_es(items_pack)
-                items_pack = []
-            items_pack.append(item)
-        inserted = ocean._items_to_es(items_pack)
-        return inserted
+    for item in items:
+        item = ocean_item(item)
+        if len(items_pack) >= ocean.elastic.max_items_bulk:
+            ocean._items_to_es(items_pack)
+            items_pack = []
+        items_pack.append(item)
+    inserted = ocean._items_to_es(items_pack)
 
-    def test_data_load(self):
-        """Test load all sources JSON data into ES"""
+    return inserted
 
-        config = configparser.ConfigParser()
-        config.read(CONFIG_FILE)
-        es_con = dict(config.items('ElasticSearch'))['url']
-        logging.info("Loading data in: %s", es_con)
-        connectors = get_connectors()
-        for con in sorted(connectors.keys()):
+
+def refresh_identities(enrich_backend):
+    total = 0
+
+    for eitem in enrich_backend.fetch():
+        roles = None
+        try:
+            roles = enrich_backend.roles
+        except AttributeError:
+            pass
+        new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
+        eitem.update(new_identities)
+        total += 1
+
+    logging.info("Identities refreshed for %i eitems", total)
+
+
+def refresh_projects(enrich_backend):
+    total = 0
+
+    for eitem in enrich_backend.fetch():
+        new_project = enrich_backend.get_item_project(eitem)
+        eitem.update(new_project)
+        total += 1
+
+    logging.info("Project refreshed for %i eitems", total)
+
+
+class TestBackends(unittest.TestCase):
+    """Functional tests for GrimoireELK Backends"""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.config = configparser.ConfigParser()
+        cls.config.read(CONFIG_FILE)
+        cls.es_con = dict(cls.config.items('ElasticSearch'))['url']
+        cls.connectors = get_connectors()
+
+        # Sorting hat settings
+        cls.db_user = ''
+        cls.db_password = ''
+        if 'Database' in cls.config:
+            if 'user' in cls.config['Database']:
+                cls.db_user = cls.config['Database']['user']
+            if 'password' in cls.config['Database']:
+                cls.db_password = cls.config['Database']['password']
+
+    @classmethod
+    def tearDownClass(cls):
+        """Delete indexes"""
+
+        es_command = cls.es_con + "/test*"
+        requests.delete(es_command)
+
+    def test_connectors_presence(self):
+        """Test whether all ocean connectors have their corresponding elk ones"""
+
+        ocean_path = "../grimoire_elk/ocean"
+        elk_path = "../grimoire_elk/elk"
+
+        excluded = ['utils.py', "__init__.py", "sortinghat.py",
+                    "mbox_study_kip.py", "elastic.py", "projects.py",
+                    "enrich.py", "database.py", "conf.py",
+                    "launchpad.py", "gitlab.py", "puppetforge.py"]
+
+        ocean_connectors = [f.replace(".py", "") for f in os.listdir(ocean_path)
+                            if isfile(join(ocean_path, f)) and f not in excluded]
+        elk_connectors = [f.replace(".py", "") for f in os.listdir(elk_path)
+                          if isfile(join(elk_path, f)) and f not in excluded]
+
+        self.assertTrue(all([oc in self.connectors.keys() for oc in ocean_connectors]))
+        self.assertTrue(all([ec in self.connectors.keys() for ec in elk_connectors]))
+
+    def test_connectors_data(self):
+        """Test all connectors have test data"""
+
+        for con in sorted(self.connectors.keys()):
+            with open(os.path.join("data", con + ".json")) as f:
+                json.load(f)
+
+    def test_items_to_es(self):
+        """Test whether JSON items are properly inserted into ES"""
+
+        check_connectors = dict(self.config.items('Connectors'))
+
+        logging.info("Loading data in: %s", self.es_con)
+        for con in sorted(self.connectors.keys()):
+
+            if not test_connector(check_connectors['all'], check_connectors[con]):
+                continue
+
             with open(os.path.join("data", con + ".json")) as f:
                 items = json.load(f)
                 es_index = "test_" + con
                 clean = True
                 perceval_backend = None
-                ocean_backend = connectors[con][1](perceval_backend)
-                elastic_ocean = get_elastic(es_con, es_index, clean, ocean_backend)
+                ocean_backend = self.connectors[con][1](perceval_backend)
+                elastic_ocean = get_elastic(self.es_con, es_index, clean, ocean_backend)
                 ocean_backend.set_elastic(elastic_ocean)
 
-                inserted = self.__data2es(items, ocean_backend)
+                inserted = data2es(items, ocean_backend)
                 self.assertEqual(len(items), inserted)
 
-    def test_data_load_error(self):
-        """Test whether an exception is thrown when inserting data intO"""
+    def test_enrich_items(self, sortinghat=False, projects=False):
+        """Test whether raw indexes are properly enriched"""
 
-        config = configparser.ConfigParser()
-        config.read(CONFIG_FILE)
-        es_con = dict(config.items('ElasticSearch'))['url']
-        logging.info("Loading data in: %s", es_con)
-        connector = get_connectors()['functest']
-        with open(os.path.join("data", "functest_wrong.json")) as f:
-            items = json.load(f)
-            es_index = "test_functest"
-            clean = True
-            perceval_backend = None
-            ocean_backend = connector[1](perceval_backend)
-            elastic_ocean = get_elastic(es_con, es_index, clean, ocean_backend)
-            ocean_backend.set_elastic(elastic_ocean)
+        check_connectors = dict(self.config.items('Connectors'))
 
-            inserted = self.__data2es(items, ocean_backend)
-            self.assertGreater(len(items), inserted)
+        logging.info("Enriching data in: %s", self.es_con)
+        for con in sorted(self.connectors.keys()):
 
-    def test_enrich(self, sortinghat=False, projects=False):
-        """Test enrich all sources"""
-        config = configparser.ConfigParser()
-        config.read(CONFIG_FILE)
-        es_con = dict(config.items('ElasticSearch'))['url']
-        db_user = ''
-        db_password = ''
-        if 'Database' in config:
-            if 'user' in config['Database']:
-                db_user = config['Database']['user']
-            if 'password' in config['Database']:
-                db_password = config['Database']['password']
-        logging.info("Enriching data in: %s", es_con)
-        connectors = get_connectors()
-        for con in sorted(connectors.keys()):
+            if not test_connector(check_connectors['all'], check_connectors[con]):
+                continue
+
             perceval_backend = None
             ocean_index = "test_" + con
             enrich_index = "test_" + con + "_enrich"
+
             clean = False
-            ocean_backend = connectors[con][1](perceval_backend)
-            elastic_ocean = get_elastic(es_con, ocean_index, clean, ocean_backend)
+            ocean_backend = self.connectors[con][1](perceval_backend)
+            elastic_ocean = get_elastic(self.es_con, ocean_index, clean, ocean_backend)
             ocean_backend.set_elastic(elastic_ocean)
             clean = True
+
             if not sortinghat and not projects:
-                enrich_backend = connectors[con][2]()
+                enrich_backend = self.connectors[con][2]()
             elif sortinghat and not projects:
-                enrich_backend = connectors[con][2](db_sortinghat=DB_SORTINGHAT,
-                                                    db_user=db_user,
-                                                    db_password=db_password)
+                enrich_backend = self.connectors[con][2](db_sortinghat=DB_SORTINGHAT,
+                                                         db_user=self.db_user,
+                                                         db_password=self.db_password)
             elif not sortinghat and projects:
-                enrich_backend = connectors[con][2](db_projects_map=DB_PROJECTS,
-                                                    db_user=db_user,
-                                                    db_password=db_password)
-            elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
+                enrich_backend = self.connectors[con][2](db_projects_map=DB_PROJECTS,
+                                                         db_user=self.db_user,
+                                                         db_password=self.db_password)
+            elastic_enrich = get_elastic(self.es_con, enrich_index, clean, enrich_backend)
             enrich_backend.set_elastic(elastic_enrich)
+
+            # Load SH identities
             if sortinghat:
-                # Load SH identities
                 load_identities(ocean_backend, enrich_backend)
+
             raw_count = len([item for item in ocean_backend.fetch()])
             enrich_count = enrich_backend.enrich_items(ocean_backend)
 
@@ -177,90 +235,43 @@ class TestBackends(unittest.TestCase):
     def test_enrich_sh(self):
         """Test enrich all sources with SortingHat"""
 
-        self.test_enrich(sortinghat=True)
+        self.test_enrich_items(sortinghat=True)
 
     def test_enrich_projects(self):
         """Test enrich all sources with Projects"""
 
-        self.test_enrich(projects=True)
-
-    def __refresh_identities(self, enrich_backend):
-        total = 0
-
-        for eitem in enrich_backend.fetch():
-            roles = None
-            try:
-                roles = enrich_backend.roles
-            except AttributeError:
-                pass
-            new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
-            eitem.update(new_identities)
-            total += 1
-        logging.info("Identities refreshed for %i eitems", total)
+        self.test_enrich_items(projects=True)
 
     def test_refresh_identities(self):
         """Test refresh identities for all sources"""
-        # self.test_enrich_sh() # Load the identities in ES
-        config = configparser.ConfigParser()
-        config.read(CONFIG_FILE)
-        es_con = dict(config.items('ElasticSearch'))['url']
-        db_user = ''
-        db_password = ''
-        if 'Database' in config:
-            if 'user' in config['Database']:
-                db_user = config['Database']['user']
-            if 'password' in config['Database']:
-                db_password = config['Database']['password']
 
-        logging.info("Refreshing data in: %s", es_con)
-        connectors = get_connectors()
-        for con in sorted(connectors.keys()):
+        logging.info("Refreshing data in: %s", self.es_con)
+        for con in sorted(self.connectors.keys()):
             enrich_index = "test_" + con + "_enrich"
-            enrich_backend = connectors[con][2](db_sortinghat=DB_SORTINGHAT,
-                                                db_user=db_user,
-                                                db_password=db_password)
+            enrich_backend = self.connectors[con][2](db_sortinghat=DB_SORTINGHAT,
+                                                     db_user=self.db_user,
+                                                     db_password=self.db_password)
             clean = False
-            elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
+            elastic_enrich = get_elastic(self.es_con, enrich_index, clean, enrich_backend)
             enrich_backend.set_elastic(elastic_enrich)
+
             logging.info("Refreshing identities fields in enriched index %s", elastic_enrich.index_url)
-            self.__refresh_identities(enrich_backend)
-
-    def __refresh_projects(self, enrich_backend):
-        total = 0
-
-        for eitem in enrich_backend.fetch():
-            new_project = enrich_backend.get_item_project(eitem)
-            eitem.update(new_project)
-            total += 1
-
-        logging.info("Project refreshed for %i eitems", total)
+            refresh_identities(enrich_backend)
 
     def test_refresh_project(self):
         """Test refresh project field for all sources"""
-        # self.test_enrich_sh() # Load the identities in ES
-        config = configparser.ConfigParser()
-        config.read(CONFIG_FILE)
-        es_con = dict(config.items('ElasticSearch'))['url']
-        db_user = ''
-        db_password = ''
-        if 'Database' in config:
-            if 'user' in config['Database']:
-                db_user = config['Database']['user']
-            if 'password' in config['Database']:
-                db_password = config['Database']['password']
 
-        logging.info("Refreshing data in: %s", es_con)
-        connectors = get_connectors()
-        for con in sorted(connectors.keys()):
+        logging.info("Refreshing data in: %s", self.es_con)
+        for con in sorted(self.connectors.keys()):
             enrich_index = "test_" + con + "_enrich"
-            enrich_backend = connectors[con][2](db_projects_map=DB_PROJECTS,
-                                                db_user=db_user,
-                                                db_password=db_password)
+            enrich_backend = self.connectors[con][2](db_projects_map=DB_PROJECTS,
+                                                     db_user=self.db_user,
+                                                     db_password=self.db_password)
             clean = False
-            elastic_enrich = get_elastic(es_con, enrich_index, clean, enrich_backend)
+            elastic_enrich = get_elastic(self.es_con, enrich_index, clean, enrich_backend)
             enrich_backend.set_elastic(elastic_enrich)
             logging.info("Refreshing projects fields in enriched index %s", elastic_enrich.index_url)
-            self.__refresh_projects(enrich_backend)
+            refresh_projects(enrich_backend)
 
 
 if __name__ == "__main__":
