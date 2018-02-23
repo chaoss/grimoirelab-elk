@@ -33,5 +33,4 @@ script:
   - mysqladmin -u root create test_sh
   - mysqladmin -u root create test_projects
   - mysql -u root test_projects < tests/test_projects.sql
-  - echo -e "[ElasticSearch]\nurl=http://localhost:9200" > tests/tests.conf
   - cd tests && ./run_tests.py
