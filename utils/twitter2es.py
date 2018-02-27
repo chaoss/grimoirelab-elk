@@ -30,6 +30,7 @@ import os
 
 from dateutil import parser
 
+from grimoire_elk.ocean.twitter import TwitterOcean
 from grimoire_elk.elk.elastic import ElasticSearch
 
 
@@ -77,7 +78,7 @@ if __name__ == '__main__':
 
     logging.info("Importing tweets from %s to %s/%s", args.json_dir, args.elastic_url, args.index)
 
-    elastic = ElasticSearch(args.elastic_url, args.index)
+    elastic = ElasticSearch(args.elastic_url, args.index, mappings=TwitterOcean.mapping)
 
     total = 0
 

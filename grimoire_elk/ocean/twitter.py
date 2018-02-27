@@ -22,10 +22,67 @@
 #
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
+
+
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = '''
+         {
+            "dynamic":true,
+            "properties": {
+                "user": {
+                    "dynamic":false,
+                    "properties": {
+                        "entities": {
+                            "properties": {}
+                        }
+                    }
+                },
+                "hashtags": {
+                    "dynamic":false,
+                    "properties": {
+                        "indices": {
+                            "properties": {}
+                        }
+                    }
+                },
+                "metadata": {
+                    "dynamic":false,
+                    "properties": {}
+                },
+                "entities": {
+                    "properties": {
+                        "symbols": {
+                            "properties": {}
+                        },
+                        "urls": {
+                            "properties": {}
+                        },
+                        "user_mentions": {
+                            "properties": {}
+                        }
+                    }
+                }
+            }
+        }
+        '''
+
+        return {"items": mapping}
 
 
 class TwitterOcean(ElasticOcean):
     """Twitter Ocean feeder"""
+
+    mapping = Mapping
 
     # To easy checking for this class
     is_twitter_ocean = True
