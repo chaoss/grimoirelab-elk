@@ -53,12 +53,12 @@ class ElasticOcean(ElasticItems):
         parser.add_argument("--elastic_url-enrich",
                             help="Host with elastic search and enriched indexes")
 
-    def __init__(self, perceval_backend, from_date=None, fetch_cache=False,
+    def __init__(self, perceval_backend, from_date=None, fetch_archive=False,
                  project=None, insecure=True, offset=None):
 
         super().__init__(perceval_backend, from_date, insecure, offset)
 
-        self.fetch_cache = fetch_cache  # fetch from cache
+        self.fetch_archive = fetch_archive  # fetch from archive
         self.project = project  # project to be used for this data source
 
     def set_elastic_url(self, url):
@@ -133,8 +133,8 @@ class ElasticOcean(ElasticItems):
     def feed(self, from_date=None, from_offset=None, category=None, latest_items=None, arthur_items=None):
         """ Feed data in Elastic from Perceval or Arthur """
 
-        if self.fetch_cache:
-            items = self.perceval_backend.fetch_from_cache()
+        if self.fetch_archive:
+            items = self.perceval_backend.fetch_from_archive()
             self.feed_items(items)
             return
         elif arthur_items:

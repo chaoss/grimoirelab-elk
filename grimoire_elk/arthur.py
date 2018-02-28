@@ -34,7 +34,9 @@ from datetime import datetime
 from dateutil import parser
 
 from arthur.common import Q_STORAGE_ITEMS
+from perceval.backend import find_signature_parameters
 
+from .errors import ELKError
 from .ocean.conf import ConfOcean
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
@@ -88,7 +90,8 @@ def feed_backend_arthur(backend_name, backend_params):
     connector = get_connector_from_name(backend_name)
     klass = connector[3]  # BackendCmd for the connector
 
-    backend_cmd = klass(*backend_params)
+    backend_cmd = init_backend(klass(*backend_params))
+
     tag = backend_cmd.backend.tag
     logger.debug("Getting items for %s.", tag)
 
@@ -98,14 +101,12 @@ def feed_backend_arthur(backend_name, backend_params):
             yield item
 
 
-def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
+def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None, arthur=False):
     """ Feed Ocean with backend data """
 
     backend = None
-    repo = {}    # repository data to be stored in conf
-    repo['backend_name'] = backend_name
-    repo['backend_params'] = backend_params
+    repo = {'backend_name': backend_name, 'backend_params': backend_params}  # repository data to be stored in conf
 
     if es_index:
         clean = False  # don't remove index, it could be shared
@@ -116,28 +117,36 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
     klass = connector[3]  # BackendCmd for the connector
 
     try:
-        backend_cmd = klass(*backend_params)
-
-        backend = backend_cmd.backend
-        ocean_backend = connector[1](backend, fetch_cache=fetch_cache, project=project)
-
-        logger.info("Feeding Ocean from %s (%s)", backend_name, backend.origin)
+        logger.info("Feeding Ocean from %s (%s)", backend_name, es_index)
 
         if not es_index:
-            es_index = backend_name + "_" + backend.origin
-        elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
-
-        ocean_backend.set_elastic(elastic_ocean)
-
-        ConfOcean.set_elastic(elastic_ocean)
+            logger.error("Raw index not defined for %s", backend_name)
 
         repo['repo_update_start'] = datetime.now().isoformat()
+
+        backend_cmd = klass(*backend_params)
+
+        if backend_cmd.archive_manager and backend_cmd.parsed_args.fetch_archive:
+            raise ELKError(cause="Fetch archive not supported")
 
         # perceval backends fetch params
         offset = None
         from_date = None
         category = None
         latest_items = None
+
+        parsed_args = vars(backend_cmd.parsed_args)
+        init_args = find_signature_parameters(backend_cmd.BACKEND,
+                                              parsed_args)
+        archive = backend_cmd.archive_manager.create_archive() if backend_cmd.archive_manager else None
+        init_args['archive'] = archive
+        backend_cmd.backend = backend_cmd.BACKEND(**init_args)
+        backend = backend_cmd.backend
+
+        ocean_backend = connector[1](backend, fetch_archive=fetch_archive, project=project)
+        elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
+        ocean_backend.set_elastic(elastic_ocean)
+        ConfOcean.set_elastic(elastic_ocean)
 
         signature = inspect.signature(backend.fetch)
 
@@ -215,7 +224,7 @@ def feed_backend(url, clean, fetch_cache, backend_name, backend_params,
     repo['project'] = project
 
     if es_index:
-        unique_id = es_index + "_" + backend.origin
+        unique_id = es_index
         ConfOcean.add_repo(unique_id, repo)
     else:
         logger.debug("Repository not added to Ocean because errors.")
@@ -427,7 +436,9 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
     connector = get_connectors()[enrich_backend.get_connector_name()]
 
     if backend_cmd:
+        backend_cmd = init_backend(backend_cmd)
         backend = backend_cmd.backend
+
         signature = inspect.signature(backend.fetch)
         if 'from_date' in signature.parameters:
             ocean_backend = connector[1](backend, from_date=last_enrich)
@@ -500,7 +511,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
         backend_cmd = None
         if klass:
             # Data is retrieved from Perceval
-            backend_cmd = klass(*backend_params)
+            backend_cmd = init_backend(klass(*backend_params))
             backend = backend_cmd.backend
 
         if ocean_index_enrich:
@@ -612,3 +623,17 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             logger.error("Error enriching ocean %s", ex)
 
     logger.info("Done %s ", backend_name)
+
+
+def init_backend(backend_cmd):
+    """Init backend within the backend_cmd"""
+
+    try:
+        backend_cmd.backend
+    except AttributeError:
+        parsed_args = vars(backend_cmd.parsed_args)
+        init_args = find_signature_parameters(backend_cmd.BACKEND,
+                                              parsed_args)
+        backend_cmd.backend = backend_cmd.BACKEND(**init_args)
+
+    return backend_cmd
