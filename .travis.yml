@@ -21,6 +21,10 @@ before_install:
   - pip install sortinghat
   - pip install PyMySQL
   - pip install httpretty==0.8.6
+  - pip install cereslib
+  - pip install elasticsearch==5.5.1
+  - pip install elasticsearch-dsl==5.3.0
+  - pip install grimoirelab-toolkit
 
 # install:
 #   - ./setup.py install
