@@ -33,6 +33,8 @@ from datetime import datetime as dt
 from dateutil import parser
 from functools import lru_cache
 
+from perceval.backend import find_signature_parameters
+
 from ..elastic_items import ElasticItems
 from ..errors import ELKError
 
@@ -169,7 +171,12 @@ class Enrich(ElasticItems):
         if not klass:
             # Non perceval backends can not be configured
             return
+
         backend_cmd = klass(*self.backend_params)
+        parsed_args = vars(backend_cmd.parsed_args)
+        init_args = find_signature_parameters(backend_cmd.BACKEND,
+                                              parsed_args)
+        backend_cmd.backend = backend_cmd.BACKEND(**init_args)
         self.perceval_backend = backend_cmd.backend
 
     def __convert_json_to_projects_map(self, json):
