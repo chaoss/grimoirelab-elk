@@ -31,6 +31,9 @@ import sys
 import requests
 
 from dateutil import parser
+from elasticsearch import Elasticsearch
+
+from .study_ceres_aoc import areas_of_code, ESPandasConnector
 
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
@@ -100,7 +103,9 @@ class GitEnrich(Enrich):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
 
-        self.studies = [self.enrich_demography]
+        self.studies = []
+        self.studies.append(self.enrich_demography)
+        self.studies.append(self.enrich_areas_of_code)
 
         # GitHub API management
         self.github_token = None
@@ -698,3 +703,19 @@ class GitEnrich(Enrich):
         self.elastic.bulk_upload(author_items, "_item_id")
 
         logger.debug("Completed demography enrich from %s" % (self.elastic.index_url))
+
+    def enrich_areas_of_code(self, enrich_backend, no_incremental=False):
+        logger.info("[Areas of Code] Starting study")
+
+        # Creating connections
+        es = Elasticsearch([self.elastic.url])
+        in_conn = ESPandasConnector(es_conn=es, es_index="git_areas_of_code-raw", sort_on='metadata__timestamp')
+        out_conn = ESPandasConnector(es_conn=es, es_index="git_aoc", sort_on='metadata__timestamp', read_only=False)
+
+        if no_incremental:
+            logger.info("[Areas of Code] Creating out ES index")
+            # Initialize out index
+            out_conn.create_index('mappings/git_aoc.json')
+
+        areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
+        logger.info("[Areas of Code] End")
