@@ -34,9 +34,8 @@ from datetime import datetime
 from dateutil import parser
 
 from arthur.common import Q_STORAGE_ITEMS
-from perceval.backend import find_signature_parameters
+from perceval.backend import find_signature_parameters, Archive
 
-from .errors import ELKError
 from .ocean.conf import ConfOcean
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
@@ -124,21 +123,23 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
 
         repo['repo_update_start'] = datetime.now().isoformat()
 
-        backend_cmd = klass(*backend_params)
-
-        if backend_cmd.archive_manager and backend_cmd.parsed_args.fetch_archive:
-            raise ELKError(cause="Fetch archive not supported")
-
         # perceval backends fetch params
         offset = None
         from_date = None
         category = None
         latest_items = None
 
+        backend_cmd = klass(*backend_params)
+
         parsed_args = vars(backend_cmd.parsed_args)
         init_args = find_signature_parameters(backend_cmd.BACKEND,
                                               parsed_args)
-        archive = backend_cmd.archive_manager.create_archive() if backend_cmd.archive_manager else None
+
+        if backend_cmd.archive_manager and fetch_archive:
+            archive = Archive(parsed_args['archive_path'])
+        else:
+            archive = backend_cmd.archive_manager.create_archive() if backend_cmd.archive_manager else None
+
         init_args['archive'] = archive
         backend_cmd.backend = backend_cmd.BACKEND(**init_args)
         backend = backend_cmd.backend
@@ -148,7 +149,10 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         ocean_backend.set_elastic(elastic_ocean)
         ConfOcean.set_elastic(elastic_ocean)
 
-        signature = inspect.signature(backend.fetch)
+        if fetch_archive:
+            signature = inspect.signature(backend.fetch_from_archive)
+        else:
+            signature = inspect.signature(backend.fetch)
 
         if 'from_date' in signature.parameters:
             try:
