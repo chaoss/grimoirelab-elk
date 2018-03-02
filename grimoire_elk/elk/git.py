@@ -35,8 +35,9 @@ from dateutil import parser
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 
+
 try:
-    from .sortinghat import SortingHat
+    from .sortinghat_gelk import SortingHat
     SORTINGHAT_LIBS = True
 except ImportError:
     SORTINGHAT_LIBS = False
