@@ -569,10 +569,21 @@ class GitEnrich(Enrich):
 
     def enrich_demography(self, enrich_backend, no_incremental=False):
 
-        logger.info("Doing demography enrich for %s", self.elastic.index_url)
+        from_date = None
+
+        if no_incremental:
+            from_date = None
+        else:
+            from_date = self.elastic.get_last_date('author_max_date')
+
+        logger.info("Doing demography enrich from %s since %s",
+                    self.elastic.index_url, from_date)
+
         time.sleep(1)  # HACK: Wait until git enrich index has been written
 
-        date_field = self.get_incremental_date()
+        # date_field = self.get_incremental_date()
+        date_field = 'utc_commit'
+        filter_last_demography_date = ''
 
         # Don't use commits before DEMOGRAPHY_COMMIT_MIN_DATE
         filters = '''
@@ -581,23 +592,44 @@ class GitEnrich(Enrich):
         }
         ''' % (date_field, DEMOGRAPHY_COMMIT_MIN_DATE)
 
+        # Include also commits received since the last demography study
+        if from_date:
+            from_date = from_date.isoformat()
+
+            filter_last_demography_date = '''
+            , {"range":
+                {"%s": {"gte": "%s"}}
+            }
+            ''' % (date_field, from_date)
+
         # Only commits not already processed by demography study so it
         # must not contains the extra fields author_min_date/author_max_date
+        # or it should be included in new commits
         query = """
         "query": {
             "bool": {
-                "must": [%s],
-                "must_not": [
-                    {"exists": {
-                        "field": "author_min_date"
-                    }},
-                    {"exists": {
-                        "field": "author_max_date"
-                    }}
+                "must": [
+                    %s,
+                    {"bool":
+                        {"should": [
+                            {"bool": {
+                                "must_not": [
+                                    {"exists": {
+                                        "field": "author_min_date"
+                                    }},
+                                    {"exists": {
+                                        "field": "author_max_date"
+                                    }}
+                                ]}
+                            }
+                            %s
+                            ]
+                        }
+                    }
                 ]
             }
         },
-        """ % (filters)
+        """ % (filters, filter_last_demography_date)
 
         # First, get the min and max commit date for all the authors
         # Limit aggregations: https://github.com/elastic/elasticsearch/issues/18838
@@ -615,19 +647,19 @@ class GitEnrich(Enrich):
               "aggs": {
                 "min": {
                   "min": {
-                    "field": "utc_commit"
+                    "field": "%s"
                   }
                 },
                 "max": {
                   "max": {
-                    "field": "utc_commit"
+                    "field": "%s"
                   }
                 }
               }
             }
           }
         }
-        """ % (query)
+        """ % (query, date_field, date_field)
 
         logger.debug(es_query)
 
