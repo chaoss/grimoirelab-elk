@@ -33,7 +33,7 @@ from grimoire_elk.ocean.elastic import ElasticOcean
 from grimoire_elk.ocean.conf import ConfOcean
 from grimoire_elk.utils import get_elastic, config_logging, get_connector_from_name
 
-from grimoire_elk.elk.sortinghat import SortingHat
+from grimoire_elk.elk.sortinghat_gelk import SortingHat
 
 
 def get_params():

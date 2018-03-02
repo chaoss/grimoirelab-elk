@@ -58,7 +58,7 @@ try:
     from sortinghat import api, utils
     from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
 
-    from .sortinghat import SortingHat
+    from .sortinghat_gelk import SortingHat
 
     SORTINGHAT_LIBS = True
 except ImportError:

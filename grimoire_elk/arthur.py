@@ -379,7 +379,7 @@ def refresh_identities(enrich_backend, filter_author=None):
 
 def load_identities(ocean_backend, enrich_backend):
     try:
-        from .elk.sortinghat import SortingHat
+        from .elk.sortinghat_gelk import SortingHat
     except ImportError:
         logger.warning("SortingHat not available.")
 
