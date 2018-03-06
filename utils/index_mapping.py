@@ -30,7 +30,7 @@ import sys
 
 import requests
 
-from grimoire_elk.elk.elastic import ElasticSearch
+from grimoire_elk.elastic import ElasticSearch
 from grimoire_elk.utils import get_connectors, get_connector_name_from_cls_name
 
 DEFAULT_LIMIT = 1000
