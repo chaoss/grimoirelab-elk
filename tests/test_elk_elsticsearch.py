@@ -30,7 +30,7 @@ import httpretty
 if '..' not in sys.path:
     sys.path.insert(0, '..')
 
-from grimoire_elk.elk.elastic import ElasticSearch, ElasticConnectException
+from grimoire_elk.elastic import ElasticSearch, ElasticConnectException
 
 
 class TestElasticSearch(unittest.TestCase):
