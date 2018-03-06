@@ -36,7 +36,6 @@ from functools import lru_cache
 from perceval.backend import find_signature_parameters
 
 from ..elastic_items import ElasticItems
-from ..errors import ELKError
 
 from .utils import grimoire_con
 from .. import __version__

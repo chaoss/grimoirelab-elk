@@ -219,7 +219,6 @@ class StackExchangeEnrich(Enrich):
         max_items = self.elastic.max_items_bulk
         current = 0
         total = 0
-        nitems = 0
         bulk_json = ""
 
         url = self.elastic.index_url + '/items/_bulk'
@@ -228,9 +227,8 @@ class StackExchangeEnrich(Enrich):
 
         items = ocean_backend.fetch()
         for item in items:
-            nitems += 1
             if current >= max_items:
-                self.requests.put(url, data=bulk_json)
+                total += self.elastic.safe_put_bulk(url, bulk_json)
                 bulk_json = ""
                 current = 0
 
@@ -240,7 +238,6 @@ class StackExchangeEnrich(Enrich):
                 (rich_item[self.get_field_unique_id()])
             bulk_json += data_json + "\n"  # Bulk document
             current += 1
-            total += 1
             # Time to enrich also de answers
             if 'answers' in item['data']:
                 for answer in item['data']['answers']:
@@ -251,8 +248,8 @@ class StackExchangeEnrich(Enrich):
                          rich_answer['answer_id'])
                     bulk_json += data_json + "\n"  # Bulk document
                     current += 1
-                    total += 1
 
-        self.requests.put(url, data=bulk_json)
+        if current > 0:
+            total += self.elastic.safe_put_bulk(url, bulk_json)
 
-        return nitems
+        return total
