@@ -27,20 +27,16 @@ import argparse
 import json
 import logging
 import sys
+from datetime import datetime
+from os import path
+from time import sleep
 
 import MySQLdb
 import requests
-
-from datetime import datetime
-from os import path
-
 from dateutil import parser
 
-from time import sleep
-
-from grimoire_elk.elk.elastic import ElasticSearch, ElasticConnectException
+from grimoire_elk.elastic import ElasticSearch, ElasticConnectException
 from grimoire_elk.utils import config_logging
-
 
 GITHUB_URL = "https://github.com/"
 GITHUB_API_URL = "https://api.github.com"
