@@ -35,6 +35,7 @@ from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 
 
+GEOLOCATION_INDEX = '/github/'
 GITHUB = 'https://github.com/'
 logger = logging.getLogger(__name__)
 
@@ -225,15 +226,16 @@ class GitHubEnrich(Enrich):
     def geo_locations_to_es(self):
         max_items = self.elastic.max_items_bulk
         current = 0
+        total = 0
         bulk_json = ""
 
-        url = self.elastic.url + "/github/geolocations/_bulk"
+        url = self.elastic.url + GEOLOCATION_INDEX + "geolocations/_bulk"
 
         logger.debug("Adding geoloc to %s (in %i packs)" % (url, max_items))
 
         for loc in self.geolocations:
             if current >= max_items:
-                self.requests.put(url, data=bulk_json)
+                total += self.elastic.safe_put_bulk(url, bulk_json)
                 bulk_json = ""
                 current = 0
 
@@ -250,9 +252,12 @@ class GitHubEnrich(Enrich):
             bulk_json += data_json + "\n"  # Bulk document
             current += 1
 
-        self.requests.put(url, data=bulk_json)
+        if current > 0:
+            total += self.elastic.safe_put_bulk(url, bulk_json)
 
         logger.debug("Adding geoloc to ES Done")
+
+        return total
 
     def get_project_repository(self, eitem):
         repo = eitem['origin']
