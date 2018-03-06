@@ -24,26 +24,24 @@
 #
 
 import argparse
-from datetime import datetime
 import logging
+from datetime import datetime
 from os import sys
 
-from grimoire_elk.elk.elastic import ElasticSearch
-from grimoire_elk.elk.elastic import ElasticConnectException
+from perceval.backends.bugzilla import Bugzilla
+from perceval.backends.gerrit import Gerrit
+from perceval.backends.github import GitHub
 
+from grimoire_elk.elastic import ElasticConnectException
+from grimoire_elk.elastic import ElasticSearch
 from grimoire_elk.elk.bugzilla import BugzillaEnrich
 from grimoire_elk.elk.gerrit import GerritEnrich
 from grimoire_elk.elk.github import GitHubEnrich
 from grimoire_elk.elk.sortinghat_gelk import SortingHat
-
 from grimoire_elk.ocean.bugzilla import BugzillaOcean
+from grimoire_elk.ocean.elastic import ElasticOcean
 from grimoire_elk.ocean.gerrit import GerritOcean
 from grimoire_elk.ocean.github import GitHubOcean
-from grimoire_elk.ocean.elastic import ElasticOcean
-
-from perceval.backends.bugzilla import Bugzilla
-from perceval.backends.github import GitHub
-from perceval.backends.gerrit import Gerrit
 
 
 def get_connector_from_name(name, connectors):
