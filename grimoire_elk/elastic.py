@@ -33,8 +33,8 @@ from time import time, sleep
 
 import requests
 
-from ..errors import ELKError
-from .utils import unixtime_to_datetime, grimoire_con
+from grimoire_elk.errors import ELKError
+from grimoire_elk.elk.utils import unixtime_to_datetime, grimoire_con
 
 
 logger = logging.getLogger(__name__)
@@ -134,13 +134,13 @@ class ElasticSearch(object):
             map_dict = mappings.get_elastic_mappings(es_major=self.major)
             self.create_mappings(map_dict)
 
-    def _safe_put_bulk(self, url, bulk_json):
+    def safe_put_bulk(self, url, bulk_json):
         """ Bulk PUT controlling unicode issues """
 
         headers = {"Content-Type": "application/x-ndjson"}
 
         try:
-            res = self.requests.put(url, data=bulk_json, headers=headers)
+            res = self.requests.put(url + '?refresh=true', data=bulk_json, headers=headers)
             res.raise_for_status()
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
@@ -167,6 +167,7 @@ class ElasticSearch(object):
         except ELKError:
             pass
 
+        logger.info("%i items uploaded to ES (%s)", inserted_items, url)
         return inserted_items
 
     def bulk_upload(self, items, field_id):
@@ -187,7 +188,7 @@ class ElasticSearch(object):
         for item in items:
             if current >= self.max_items_bulk:
                 task_init = time()
-                new_items += self._safe_put_bulk(url, bulk_json)
+                new_items += self.safe_put_bulk(url, bulk_json)
                 current = 0
                 json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                 logger.debug("bulk packet sent (%.2f sec, %i total, %.2f MB)"
@@ -197,10 +198,12 @@ class ElasticSearch(object):
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
             bulk_json += data_json + "\n"  # Bulk document
             current += 1
-        new_items += self._safe_put_bulk(url, bulk_json)
-        json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
-        logger.debug("bulk packet sent (%.2f sec prev, %i total, %.2f MB)"
-                     % (time() - task_init, new_items, json_size))
+
+        if current > 0:
+            new_items += self.safe_put_bulk(url, bulk_json)
+            json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
+            logger.debug("bulk packet sent (%.2f sec prev, %i total, %.2f MB)"
+                         % (time() - task_init, new_items, json_size))
 
         return new_items
 
