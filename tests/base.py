@@ -23,7 +23,6 @@
 
 import configparser
 import json
-import time
 import os
 import requests
 import sys
