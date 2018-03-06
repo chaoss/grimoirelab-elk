@@ -142,7 +142,6 @@ class DockerHubEnrich(Enrich):
         must be created """
 
         max_items = self.elastic.max_items_bulk
-        nitems = 0
         current = 0
         total = 0
         bulk_json = ""
@@ -154,13 +153,9 @@ class DockerHubEnrich(Enrich):
 
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
-        headers = {"Content-Type": "application/json"}
-
         for item in items:
-            nitems += 1
             if current >= max_items:
-                r = self.requests.put(url, data=bulk_json, headers=headers)
-                r.raise_for_status()
+                total += self.elastic.safe_put_bulk(url, bulk_json)
                 json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                 logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
                 bulk_json = ""
@@ -172,7 +167,6 @@ class DockerHubEnrich(Enrich):
                 (item[self.get_field_unique_id()])
             bulk_json += data_json + "\n"  # Bulk document
             current += 1
-            total += 1
 
             if rich_item['id'] not in images_items:
                 # Let's transform the rich_event in a rich_image
@@ -187,12 +181,12 @@ class DockerHubEnrich(Enrich):
                     rich_item['is_event'] = 0
                     images_items[rich_item['id']] = rich_item
 
+        if current > 0:
+            total += self.elastic.safe_put_bulk(url, bulk_json)
+
         if total == 0:
             # No items enriched, nothing to upload to ES
             return total
-
-        r = self.requests.put(url, data=bulk_json, headers=headers)
-        r.raise_for_status()
 
         # Time to upload the images enriched items. The id is uuid+"_image"
         # Normally we are enriching events for a unique image so all images
@@ -203,9 +197,6 @@ class DockerHubEnrich(Enrich):
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                 (data['id'] + "_image")
             bulk_json += data_json + "\n"  # Bulk document
-            total += 1
 
-        r = self.requests.put(url, data=bulk_json, headers=headers)
-        r.raise_for_status()
-
-        return nitems
+        total += self.elastic.safe_put_bulk(url, bulk_json)
+        return total
