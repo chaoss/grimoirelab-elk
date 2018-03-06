@@ -318,7 +318,6 @@ class AskbotEnrich(Enrich):
         return (answers_enrich, comments_enrich)
 
     def enrich_items(self, ocean_backend):
-        items = ocean_backend.fetch()
         nitems = super(AskbotEnrich, self).enrich_items(ocean_backend)
         logger.info("Total questions enriched: %i", nitems)
 
@@ -354,4 +353,4 @@ class AskbotEnrich(Enrich):
                 logger.error("%s/%s missing comments for Askbot",
                              str(missing), str(len(rich_item_comments)))
 
-        return nitems
+        return nitems + nanswers + ncomments
