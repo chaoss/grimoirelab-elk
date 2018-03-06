@@ -30,8 +30,8 @@ import os
 
 from dateutil import parser
 
+from grimoire_elk.elastic import ElasticSearch
 from grimoire_elk.ocean.twitter import TwitterOcean
-from grimoire_elk.elk.elastic import ElasticSearch
 
 
 def get_params():
