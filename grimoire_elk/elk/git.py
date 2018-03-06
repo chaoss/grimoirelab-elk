@@ -496,8 +496,7 @@ class GitEnrich(Enrich):
 
             if current >= max_items:
                 try:
-                    res = self.requests.put(url, data=bulk_json, headers=headers)
-                    res.raise_for_status()
+                    total += self.elastic.safe_put_bulk(url, bulk_json)
                     json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                     logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
                 except UnicodeEncodeError:
@@ -505,7 +504,7 @@ class GitEnrich(Enrich):
                     logger.error("Unicode error in enriched items")
                     logger.debug(bulk_json)
                     safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
-                    self.requests.put(url, data=safe_json, headers=headers)
+                    total += self.elastic.safe_put_bulk(url, safe_json)
                 bulk_json = ""
                 current = 0
 
@@ -515,7 +514,6 @@ class GitEnrich(Enrich):
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_item[unique_field])
             bulk_json += data_json + "\n"  # Bulk document
             current += 1
-            total += 1
 
             if self.pair_programming:
                 # Multi author support
@@ -534,7 +532,6 @@ class GitEnrich(Enrich):
                         bulk_json += '{"index" : {"_id" : "%s" } }\n' % rich_item['git_uuid']
                         bulk_json += data_json + "\n"  # Bulk document
                         current += 1
-                        total += 1
                         total_multi_author += 1
 
                 if rich_item['Signed-off-by_number'] > 0:
@@ -556,16 +553,15 @@ class GitEnrich(Enrich):
                         bulk_json += '{"index" : {"_id" : "%s" } }\n' % rich_item['git_uuid']
                         bulk_json += data_json + "\n"  # Bulk document
                         current += 1
-                        total += 1
                         total_signed_off += 1
                         nsg += 1
+
+        if current > 0:
+            total += self.elastic.safe_put_bulk(url, bulk_json)
 
         if total == 0:
             # No items enriched, nothing to upload to ES
             return total
-
-        r = self.requests.put(url, data=bulk_json, headers=headers)
-        r.raise_for_status()
 
         if self.pair_programming:
             logger.info("Signed-off commits generated: %i", total_signed_off)
