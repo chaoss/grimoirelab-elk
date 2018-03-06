@@ -25,13 +25,75 @@
 
 import argparse
 import logging
-import requests
 import sys
 
+import requests
 from dateutil import parser
 
-from .ocean.elastic import ElasticOcean
-
+from grimoire_elk.elastic import ElasticConnectException
+from grimoire_elk.elastic import ElasticSearch
+# Connectors for Perceval
+from perceval.backends.core.askbot import Askbot, AskbotCommand
+from perceval.backends.core.bugzilla import Bugzilla, BugzillaCommand
+from perceval.backends.core.bugzillarest import BugzillaREST, BugzillaRESTCommand
+from perceval.backends.core.confluence import Confluence, ConfluenceCommand
+from perceval.backends.core.discourse import Discourse, DiscourseCommand
+from perceval.backends.core.dockerhub import DockerHub, DockerHubCommand
+from perceval.backends.core.gerrit import Gerrit, GerritCommand
+from perceval.backends.core.git import Git, GitCommand
+from perceval.backends.core.github import GitHub, GitHubCommand
+from perceval.backends.core.hyperkitty import HyperKitty, HyperKittyCommand
+from perceval.backends.core.jenkins import Jenkins, JenkinsCommand
+from perceval.backends.core.jira import Jira, JiraCommand
+from perceval.backends.core.mbox import MBox, MBoxCommand
+from perceval.backends.core.mediawiki import MediaWiki, MediaWikiCommand
+from perceval.backends.core.meetup import Meetup, MeetupCommand
+from perceval.backends.core.nntp import NNTP, NNTPCommand
+from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
+from perceval.backends.core.pipermail import Pipermail, PipermailCommand
+from perceval.backends.core.redmine import Redmine, RedmineCommand
+from perceval.backends.core.rss import RSS, RSSCommand
+from perceval.backends.core.slack import Slack, SlackCommand
+from perceval.backends.core.stackexchange import StackExchange, StackExchangeCommand
+from perceval.backends.core.supybot import Supybot, SupybotCommand
+from perceval.backends.core.telegram import Telegram, TelegramCommand
+from perceval.backends.mozilla.crates import Crates, CratesCommand
+from perceval.backends.mozilla.kitsune import Kitsune, KitsuneCommand
+from perceval.backends.mozilla.mozillaclub import MozillaClub, MozillaClubCommand
+from perceval.backends.mozilla.remo import ReMo, ReMoCommand
+from perceval.backends.opnfv.functest import Functest, FunctestCommand
+# Connectors for EnrichOcean
+from .elk.askbot import AskbotEnrich
+from .elk.bugzilla import BugzillaEnrich
+from .elk.bugzillarest import BugzillaRESTEnrich
+from .elk.confluence import ConfluenceEnrich
+from .elk.crates import CratesEnrich
+from .elk.discourse import DiscourseEnrich
+from .elk.dockerhub import DockerHubEnrich
+from .elk.functest import FunctestEnrich
+from .elk.gerrit import GerritEnrich
+from .elk.git import GitEnrich
+from .elk.github import GitHubEnrich
+from .elk.hyperkitty import HyperKittyEnrich
+from .elk.jenkins import JenkinsEnrich
+from .elk.jira import JiraEnrich
+from .elk.kitsune import KitsuneEnrich
+from .elk.mbox import MBoxEnrich
+from .elk.mediawiki import MediaWikiEnrich
+from .elk.meetup import MeetupEnrich
+from .elk.mozillaclub import MozillaClubEnrich
+from .elk.nntp import NNTPEnrich
+from .elk.phabricator import PhabricatorEnrich
+from .elk.pipermail import PipermailEnrich
+from .elk.redmine import RedmineEnrich
+# from .elk.remo import ReMoEnrich
+from .elk.remo import ReMoEnrich
+from .elk.rss import RSSEnrich
+from .elk.slack import SlackEnrich
+from .elk.stackexchange import StackExchangeEnrich
+from .elk.supybot import SupybotEnrich
+from .elk.telegram import TelegramEnrich
+from .elk.twitter import TwitterEnrich
 # Connectors for Ocean
 from .ocean.askbot import AskbotOcean
 from .ocean.bugzilla import BugzillaOcean
@@ -40,6 +102,7 @@ from .ocean.confluence import ConfluenceOcean
 from .ocean.crates import CratesOcean
 from .ocean.discourse import DiscourseOcean
 from .ocean.dockerhub import DockerHubOcean
+from .ocean.elastic import ElasticOcean
 from .ocean.functest import FunctestOcean
 from .ocean.gerrit import GerritOcean
 from .ocean.git import GitOcean
@@ -62,75 +125,6 @@ from .ocean.stackexchange import StackExchangeOcean
 from .ocean.supybot import SupybotOcean
 from .ocean.telegram import TelegramOcean
 from .ocean.twitter import TwitterOcean
-
-# Connectors for EnrichOcean
-from .elk.askbot import AskbotEnrich
-from .elk.bugzilla import BugzillaEnrich
-from .elk.bugzillarest import BugzillaRESTEnrich
-from .elk.confluence import ConfluenceEnrich
-from .elk.crates import CratesEnrich
-from .elk.dockerhub import DockerHubEnrich
-from .elk.discourse import DiscourseEnrich
-from .elk.functest import FunctestEnrich
-from .elk.git import GitEnrich
-from .elk.github import GitHubEnrich
-from .elk.gerrit import GerritEnrich
-from .elk.hyperkitty import HyperKittyEnrich
-from .elk.jenkins import JenkinsEnrich
-from .elk.jira import JiraEnrich
-from .elk.kitsune import KitsuneEnrich
-from .elk.mbox import MBoxEnrich
-from .elk.mediawiki import MediaWikiEnrich
-from .elk.meetup import MeetupEnrich
-from .elk.mozillaclub import MozillaClubEnrich
-from .elk.nntp import NNTPEnrich
-from .elk.phabricator import PhabricatorEnrich
-from .elk.redmine import RedmineEnrich
-# from .elk.remo import ReMoEnrich
-from .elk.remo import ReMoEnrich
-from .elk.rss import RSSEnrich
-from .elk.pipermail import PipermailEnrich
-from .elk.slack import SlackEnrich
-from .elk.stackexchange import StackExchangeEnrich
-from .elk.supybot import SupybotEnrich
-from .elk.telegram import TelegramEnrich
-from .elk.twitter import TwitterEnrich
-
-# Connectors for Perceval
-from perceval.backends.core.askbot import Askbot, AskbotCommand
-from perceval.backends.core.bugzilla import Bugzilla, BugzillaCommand
-from perceval.backends.core.bugzillarest import BugzillaREST, BugzillaRESTCommand
-from perceval.backends.core.discourse import Discourse, DiscourseCommand
-from perceval.backends.core.confluence import Confluence, ConfluenceCommand
-from perceval.backends.core.dockerhub import DockerHub, DockerHubCommand
-from perceval.backends.core.gerrit import Gerrit, GerritCommand
-from perceval.backends.core.git import Git, GitCommand
-from perceval.backends.core.github import GitHub, GitHubCommand
-from perceval.backends.core.jenkins import Jenkins, JenkinsCommand
-from perceval.backends.core.jira import Jira, JiraCommand
-from perceval.backends.core.hyperkitty import HyperKitty, HyperKittyCommand
-from perceval.backends.core.mbox import MBox, MBoxCommand
-from perceval.backends.core.mediawiki import MediaWiki, MediaWikiCommand
-from perceval.backends.core.meetup import Meetup, MeetupCommand
-from perceval.backends.core.nntp import NNTP, NNTPCommand
-from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
-from perceval.backends.core.pipermail import Pipermail, PipermailCommand
-from perceval.backends.core.redmine import Redmine, RedmineCommand
-from perceval.backends.core.rss import RSS, RSSCommand
-from perceval.backends.core.slack import Slack, SlackCommand
-from perceval.backends.core.stackexchange import StackExchange, StackExchangeCommand
-from perceval.backends.core.supybot import Supybot, SupybotCommand
-from perceval.backends.core.telegram import Telegram, TelegramCommand
-from perceval.backends.mozilla.crates import Crates, CratesCommand
-from perceval.backends.mozilla.kitsune import Kitsune, KitsuneCommand
-from perceval.backends.mozilla.mozillaclub import MozillaClub, MozillaClubCommand
-from perceval.backends.mozilla.remo import ReMo, ReMoCommand
-from perceval.backends.opnfv.functest import Functest, FunctestCommand
-
-
-from .elk.elastic import ElasticSearch
-from .elk.elastic import ElasticConnectException
-
 
 logger = logging.getLogger(__name__)
 
