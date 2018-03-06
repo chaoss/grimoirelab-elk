@@ -24,14 +24,15 @@
 #
 
 import argparse
-from datetime import datetime
 import logging
-import requests
 import sys
+from datetime import datetime
 
-from grimoire_elk.elk.elastic import ElasticSearch, ElasticConnectException, ElasticWriteException
-from grimoire_elk.ocean.elastic import ElasticOcean
+import requests
+
+from grimoire_elk.elastic import ElasticSearch, ElasticConnectException, ElasticWriteException
 from grimoire_elk.ocean.conf import ConfOcean
+from grimoire_elk.ocean.elastic import ElasticOcean
 
 
 def get_elastic():
