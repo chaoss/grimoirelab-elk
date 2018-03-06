@@ -43,9 +43,6 @@ from .. import __version__
 
 logger = logging.getLogger(__name__)
 
-HEADERS_JSON = {"Content-Type": "application/json"}
-
-
 try:
     import pymysql
     MYSQL_LIBS = True
@@ -332,8 +329,7 @@ class Enrich(ElasticItems):
         for item in items:
             if current >= max_items:
                 try:
-                    r = self.requests.put(url, headers=HEADERS_JSON, data=bulk_json)
-                    r.raise_for_status()
+                    total += self.elastic.safe_put_bulk(url, bulk_json)
                     json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                     logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
                 except UnicodeEncodeError:
@@ -341,7 +337,7 @@ class Enrich(ElasticItems):
                     logger.error("Unicode error in enriched items")
                     logger.debug(bulk_json)
                     safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
-                    self.requests.put(url, headers=HEADERS_JSON, data=safe_json)
+                    total += self.elastic.safe_put_bulk(url, safe_json)
                 bulk_json = ""
                 current = 0
 
@@ -352,7 +348,6 @@ class Enrich(ElasticItems):
                     (item[self.get_field_unique_id()])
                 bulk_json += data_json + "\n"  # Bulk document
                 current += 1
-                total += 1
             else:
                 rich_events = self.get_rich_events(item)
                 for rich_event in rich_events:
@@ -362,34 +357,15 @@ class Enrich(ElasticItems):
                          rich_event[self.get_field_event_unique_id()])
                     bulk_json += data_json + "\n"  # Bulk document
                     current += 1
-                    total += 1
+
+        if current > 0:
+            total += self.elastic.safe_put_bulk(url, bulk_json)
 
         if total == 0:
             # No items enriched, nothing to upload to ES
             return total
 
-        r = self.requests.put(url, data=bulk_json, headers=HEADERS_JSON)
-        r.raise_for_status()
-        result = r.json()
-
-        failed_items = []
-        if result['errors']:
-            # Due to multiple errors that may be thrown when inserting bulk data, only the first error is returned
-            failed_items = [item['index'] for item in result['items'] if 'error' in item['index']]
-            error = str(failed_items[0]['error'])
-
-            logger.error("Failed to enrich data ES: %s, %s", error, url)
-
-        inserted_items = len(result['items']) - len(failed_items)
-
-        # The exception is currently not thrown to avoid stopping elk uploading processes
-        try:
-            if failed_items:
-                raise ELKError(cause=error)
-        except ELKError:
-            pass
-
-        return inserted_items
+        return total
 
     def get_connector_name(self):
         """ Find the name for the current connector """
