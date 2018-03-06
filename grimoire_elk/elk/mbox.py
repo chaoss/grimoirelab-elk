@@ -232,7 +232,7 @@ class MBoxEnrich(Enrich):
 
         for item in items:
             if current >= max_items:
-                self.requests.put(url, data=bulk_json)
+                total += self.elastic.safe_put_bulk(url, bulk_json)
                 bulk_json = ""
                 current = 0
 
@@ -242,14 +242,18 @@ class MBoxEnrich(Enrich):
                 (rich_item[self.get_field_unique_id()])
             bulk_json += data_json + "\n"  # Bulk document
             current += 1
-            total += 1
+
+        if current == 0:
+            return total
+
         try:
-            self.requests.put(url, data=bulk_json)
+            total += self.elastic.safe_put_bulk(url, bulk_json)
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
             logger.error("Encoding error ... converting bulk to iso-8859-1")
             bulk_json = bulk_json.encode('iso-8859-1', 'ignore')
-            self.requests.put(url, data=bulk_json)
+
+            total += self.elastic.safe_put_bulk(url, bulk_json)
 
         return total
 
