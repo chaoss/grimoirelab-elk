@@ -555,7 +555,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
             logger.info("Refreshing project field in %s", enrich_backend.elastic.index_url)
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_projects(enrich_backend)
-            enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
+            enrich_backend.elastic.bulk_upload(eitems, field_id)
         elif do_refresh_identities:
 
             filter_author = None
@@ -570,7 +570,7 @@ def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
 
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_identities(enrich_backend, filter_author)
-            enrich_backend.elastic.bulk_upload_sync(eitems, field_id)
+            enrich_backend.elastic.bulk_upload(eitems, field_id)
         else:
             clean = False  # Don't remove ocean index when enrich
             elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
