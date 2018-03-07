@@ -341,10 +341,10 @@ def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
     uid_field = find_uuid(elastic_url, in_index)
     backend = find_perceval_backend(elastic_url, in_index)
     if search_after:
-        total = elastic_out.bulk_upload_sync(fetch(elastic_in, backend, limit,
-                                                   search_after_value, scroll=False), uid_field)
+        total = elastic_out.bulk_upload(fetch(elastic_in, backend, limit,
+                                              search_after_value, scroll=False), uid_field)
     else:
-        total = elastic_out.bulk_upload_sync(fetch(elastic_in, backend, limit), uid_field)
+        total = elastic_out.bulk_upload(fetch(elastic_in, backend, limit), uid_field)
 
     logging.info("Total items copied: %i", total)
 
