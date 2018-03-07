@@ -439,12 +439,12 @@ def kafka_kip(enrich):
 
     # First iteration with the basic fields
     eitems = add_kip_fields(enrich)
-    enrich.elastic.bulk_upload_sync(eitems, enrich.get_field_unique_id())
+    enrich.elastic.bulk_upload(eitems, enrich.get_field_unique_id())
 
     # Second iteration with the final time and status fields
     eitems = add_kip_time_status_fields(enrich)
-    enrich.elastic.bulk_upload_sync(eitems, enrich.get_field_unique_id())
+    enrich.elastic.bulk_upload(eitems, enrich.get_field_unique_id())
 
     # Third iteration to compute the end status field for all KIPs
     eitems = add_kip_final_status_field(enrich)
-    enrich.elastic.bulk_upload_sync(eitems, enrich.get_field_unique_id())
+    enrich.elastic.bulk_upload(eitems, enrich.get_field_unique_id())
