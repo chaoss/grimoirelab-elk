@@ -343,6 +343,8 @@ class GitEnrich(Enrich):
         eitem["utc_author"] = (author_date - author_date.utcoffset()).replace(tzinfo=None).isoformat()
         eitem["utc_commit"] = (commit_date - commit_date.utcoffset()).replace(tzinfo=None).isoformat()
         eitem["tz"] = int(author_date.strftime("%z")[0:3])
+        # Compute time to commit
+        eitem["time_to_commit"] = (eitem["utc_commit"] - eitem["utc_author"]).hours()
         # Other enrichment
         eitem["repo_name"] = item["origin"]
         # Number of files touched
