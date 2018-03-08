@@ -146,6 +146,8 @@ class Enrich(ElasticItems):
         self.backend_params = None
         # Label used during enrichment for identities without a known affiliation
         self.unaffiliated_group = 'Unknown'
+        # Label used during enrichment for identities with no gender info
+        self.unknown_gender = 'Unknown'
 
     def set_elastic_url(self, url):
         """ Elastic URL """
@@ -579,6 +581,8 @@ class Enrich(ElasticItems):
             rol + "_name": empty_field,
             rol + "_user_name": empty_field,
             rol + "_domain": empty_field,
+            rol + "_gender": empty_field,
+            rol + "_gender_acc": None,
             rol + "_org_name": empty_field,
             rol + "_bot": False
         }
@@ -612,9 +616,20 @@ class Enrich(ElasticItems):
         profile = self.get_profile_sh(eitem_sh[rol + "_uuid"])
 
         if profile:
-            eitem_sh[rol + "_name"] = profile['name']
-            if profile['email']:
+            if 'name' in profile:
+                eitem_sh[rol + "_name"] = profile['name']
+            if 'email' in profile and profile['email']:
                 eitem_sh[rol + "_domain"] = self.get_email_domain(profile['email'])
+            if 'gender' in profile and profile['gender']:
+                eitem_sh[rol + "_gender"] = profile['gender']
+            else:
+                eitem_sh[rol + "_gender"] = self.unknown_gender
+
+            if 'gender_acc' in profile and profile['gender_acc']:
+                eitem_sh[rol + "_gender_acc"] = profile['gender_acc']
+            else:
+                eitem_sh[rol + "_gender_acc"] = 0
+
         elif not profile and sh_id:
             logger.warning("Can't find SH identity profile: %s", sh_id)
 
@@ -629,6 +644,8 @@ class Enrich(ElasticItems):
         if u.profile:
             profile['name'] = u.profile.name
             profile['email'] = u.profile.email
+            profile['gender'] = u.profile.gender
+            profile['gender_acc'] = u.profile.gender_acc
 
         return profile
 
