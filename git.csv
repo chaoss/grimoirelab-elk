@@ -54,3 +54,4 @@ url_id,keyword
 utc_author,date
 utc_commit,date
 uuid,keyword
+time_to_commit,long
