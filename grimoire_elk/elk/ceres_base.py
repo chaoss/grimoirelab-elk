@@ -225,6 +225,7 @@ class ESConnector(Connector):
             raise IOError("Cannot write, Connector created as Read Only")
 
         if delete:
+            logger.info("Deleting index " + self._es_index)
             self._es_conn.indices.delete(self._es_index, ignore=[400, 404])
 
         # Read Mapping
