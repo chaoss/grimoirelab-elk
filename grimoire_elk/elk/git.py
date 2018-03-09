@@ -743,7 +743,10 @@ class GitEnrich(Enrich):
         if no_incremental:
             logger.info("[Areas of Code] Creating out ES index")
             # Initialize out index
-            out_conn.create_index('mappings/git_aoc.json')
+            import pkg_resources
+
+            filename = pkg_resources.resource_filename('grimoire_elk', 'elk/mappings/git_aoc.json')
+            out_conn.create_index(filename)
 
         areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
         logger.info("[Areas of Code] End")
