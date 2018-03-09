@@ -62,6 +62,9 @@
         "file_path_list": {
           "type": "keyword"
         },
+        "git_author_domain": {
+          "type": "keyword"
+        },
         "grimoire_creation_date": {
           "type": "date"
         },
