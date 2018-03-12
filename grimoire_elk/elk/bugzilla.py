@@ -64,7 +64,8 @@ class Mapping(BaseMapping):
 
 
 class BugzillaEnrich(Enrich):
-    mapping = Mapping
+
+    # mapping = Mapping
 
     roles = ['assigned_to', 'reporter', 'qa_contact']
 

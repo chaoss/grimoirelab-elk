@@ -50,14 +50,6 @@ class Mapping(BaseMapping):
                                 "journals": {
                                     "dynamic":false,
                                     "properties": {}
-                                },
-                                "description": {
-                                    "type": "text",
-                                    "index": true
-                                },
-                                "subject": {
-                                    "type": "text",
-                                    "index": true
                                 }
                             }
                         }
@@ -74,14 +66,6 @@ class Mapping(BaseMapping):
                                     "journals": {
                                         "dynamic":false,
                                         "properties": {}
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "index": "analyzed
-                                    },
-                                    "subject": {
-                                        "type": "string",
-                                        "index": "analyzed
                                     }
                                 }
                             }

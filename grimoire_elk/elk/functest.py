@@ -86,6 +86,13 @@ class FunctestEnrich(Enrich):
             if 'duration' in func_test['details']:
                 eitem['duration'] = func_test['details']['duration']
 
+        if 'duration' not in eitem:
+            eitem['duration'] = None
+        if 'failures' not in eitem:
+            eitem['failures'] = None
+        if 'tests' not in eitem:
+            eitem['tests'] = None
+
         eitem.update(self.get_grimoire_fields(func_test['start_date'], "func_test"))
 
         # The project is a field already included in the raw data

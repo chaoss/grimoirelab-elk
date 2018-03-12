@@ -37,48 +37,23 @@ class Mapping(BaseMapping):
         """
 
         mapping = '''
-         {
-            "properties": {
-                "data": {
+                 {
                     "dynamic":true,
-                    "properties": {
-                        "answers": {
-                            "dynamic":false,
-                            "properties": {
-                                "comments": {
-                                    "properties": {
-                                        "html": {
-                                            "type": "text",
-                                            "index": true
-                                        }
+                        "properties": {
+                            "data": {
+                                "properties": {
+                                    "answers": {
+                                        "dynamic":false,
+                                        "properties": {}
+                                    },
+                                    "author": {
+                                        "dynamic":false,
+                                        "properties": {}
                                     }
-                                },
-                                "summary": {
-                                    "type": "text",
-                                    "index": true
                                 }
                             }
-                        },
-                        "author": {
-                            "dynamic":false,
-                            "properties": {}
-                        },
-                        "comments": {
-                            "properties": {
-                                "html": {
-                                    "type": "text",
-                                    "index": true
-                                }
-                            }
-                        },
-                        "summary": {
-                            "type": "text",
-                            "index": false
                         }
-                    }
                 }
-            }
-        }
         '''
 
         return {"items": mapping}
