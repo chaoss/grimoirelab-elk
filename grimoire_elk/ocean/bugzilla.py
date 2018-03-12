@@ -46,14 +46,6 @@ class Mapping(BaseMapping):
                     "data": {
                         "properties": {
                             "long_desc": {
-                                "properties": {
-                                    "thetext": {
-                                        "dynamic":false,
-                                        "properties": {}
-                                    }
-                                }
-                            },
-                            "short_desc": {
                                 "dynamic":false,
                                 "properties": {}
                             }

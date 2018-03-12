@@ -52,16 +52,7 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "description_analyzed": {
-                        "type": "text",
-                        "index": true
-                    },
-                    "description": {
-                        "type": "text",
-                        "index": true
-                    },
-                    "subject": {
-                        "type": "text",
-                        "index": true
+                        "type": "text"
                     }
                }
             } """
@@ -70,14 +61,6 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "description_analyzed": {
-                        "type": "string",
-                        "index": "analyzed"
-                    },
-                    "description": {
-                        "type": "string",
-                        "index": "analyzed"
-                    },
-                    "subject": {
                         "type": "string",
                         "index": "analyzed"
                     }

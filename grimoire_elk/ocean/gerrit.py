@@ -48,32 +48,7 @@ class Mapping(BaseMapping):
                     "data": {
                         "properties": {
                             "commitMessage": {
-                                "type": "string",
-                                "index": "analyzed"
-                            },
-                            "subject": {
-                                "type": "text",
-                                "index": true
-                            },
-                            "comments": {
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "index": "analyzed"
-                                    }
-                                }
-                            },
-                            "patchSets": {
-                                "properties": {
-                                    "approvals": {
-                                        "properties": {
-                                            "description": {
-                                                "type": "string",
-                                                "index": "analyzed"
-                                            }
-                                        }
-                                    }
-                                }
+                                "type": "string"
                             }
                         }
                     }
@@ -88,32 +63,7 @@ class Mapping(BaseMapping):
                     "data": {
                         "properties": {
                             "commitMessage": {
-                                "type": "text",
-                                "index": true
-                            },
-                            "subject": {
-                                "type": "text",
-                                "index": true
-                            },
-                            "comments": {
-                                "properties": {
-                                    "message": {
-                                        "type": "text",
-                                        "index": true
-                                    }
-                                }
-                            },
-                            "patchSets": {
-                                "properties": {
-                                    "approvals": {
-                                        "properties": {
-                                            "description": {
-                                                "type": "text",
-                                                "index": true
-                                            }
-                                        }
-                                    }
-                                }
+                                "type": "text"
                             }
                         }
                     }

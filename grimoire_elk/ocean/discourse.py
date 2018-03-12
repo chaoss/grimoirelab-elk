@@ -84,4 +84,4 @@ class Mapping(BaseMapping):
 class DiscourseOcean(ElasticOcean):
     """Discourse Ocean feeder"""
 
-    mapping = Mapping
+    # mapping = Mapping

@@ -46,19 +46,19 @@ class Mapping(BaseMapping):
             mapping = """
             {
                 "properties": {
-                    "Event_Description": {
+                    "Event Description": {
                         "type": "text",
                         "index": true
                     },
-                    "Event_Creations": {
+                    "Event Creations": {
                         "type": "text",
                         "index": true
                     },
-                    "Feedback_from_Attendees": {
+                    "Feedback from Attendees": {
                         "type": "text",
                         "index": true
                     },
-                    "Your_Feedback": {
+                    "Your Feedback": {
                         "type": "text",
                         "index": true
                     },
@@ -71,19 +71,19 @@ class Mapping(BaseMapping):
             mapping = """
             {
                 "properties": {
-                    "Event_Description": {
+                    "Event Description": {
                         "type": "string",
                         "index": "analyzed"
                     },
-                    "Event_Creations": {
+                    "Event Creations": {
                         "type": "string",
                         "index": "analyzed"
                     },
-                    "Feedback_from_Attendees": {
+                    "Feedback from Attendees": {
                         "type": "string",
                         "index": "analyzed"
                     },
-                    "Your_Feedback": {
+                    "Your Feedback": {
                         "type": "string",
                         "index": "analyzed"
                     },

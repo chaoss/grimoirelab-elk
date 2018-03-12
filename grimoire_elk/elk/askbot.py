@@ -49,12 +49,10 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "author_badges": {
-                      "type": "text",
-                      "index": true
+                      "type": "text"
                     },
                     "summary": {
-                      "type": "text",
-                      "index": true
+                      "type": "text"
                     }
                }
             } """

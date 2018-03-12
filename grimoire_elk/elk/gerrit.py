@@ -53,10 +53,6 @@ class Mapping(BaseMapping):
                       "type": "string",
                       "index": "analyzed"
                    },
-                   "summary": {
-                      "type": "string",
-                      "index": "analyzed"
-                   },
                    "timeopen": {
                       "type": "double"
                    }
@@ -68,12 +64,7 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                    "summary_analyzed": {
-                      "type": "text",
-                      "index": false
-                   },
-                   "summary": {
-                      "type": "text",
-                      "index": false
+                      "type": "text"
                    },
                    "timeopen": {
                       "type": "double"

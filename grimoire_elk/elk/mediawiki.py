@@ -49,12 +49,7 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "title_analyzed": {
-                        "type": "text",
-                        "index": true
-                    },
-                    "revision_comment": {
-                        "type": "text",
-                        "index": true
+                        "type": "text"
                     }
                }
             } """
@@ -65,10 +60,6 @@ class Mapping(BaseMapping):
                         "title_analyzed": {
                             "type": "string",
                              "index": "analyzed"
-                        },
-                        "revision_comment": {
-                            "type": "string",
-                            "index": "analyzed"
                         }
                    }
                 } """
