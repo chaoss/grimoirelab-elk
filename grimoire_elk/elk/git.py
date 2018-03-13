@@ -28,11 +28,13 @@ import re
 import time
 import sys
 
+import pkg_resources
 import requests
 
 from dateutil import parser
 from elasticsearch import Elasticsearch
 
+from grimoire_elk.elk.study_ceres_onion import ESOnionConnector, onion_study
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
 
 from .enrich import Enrich, metadata
@@ -106,6 +108,7 @@ class GitEnrich(Enrich):
         self.studies = []
         self.studies.append(self.enrich_demography)
         self.studies.append(self.enrich_areas_of_code)
+        self.studies.append(self.enrich_onion)
 
         # GitHub API management
         self.github_token = None
@@ -743,10 +746,27 @@ class GitEnrich(Enrich):
         if no_incremental:
             logger.info("[Areas of Code] Creating out ES index")
             # Initialize out index
-            import pkg_resources
-
             filename = pkg_resources.resource_filename('grimoire_elk', 'elk/mappings/git_aoc.json')
             out_conn.create_index(filename)
 
         areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
         logger.info("[Areas of Code] End")
+
+    def enrich_onion(self, enrich_backend, no_incremental=False):
+        logger.info("[Onion] Starting study")
+
+        # Creating connections
+        es = Elasticsearch([self.elastic.url])
+        in_conn = ESOnionConnector(es_conn=es, es_index="git_onion-src", timeframe_field='grimoire_creation_date',
+                                   sort_on='metadata__timestamp')
+        out_conn = ESOnionConnector(es_conn=es, es_index="git_onion-enriched", timeframe_field='grimoire_creation_date',
+                                    sort_on='metadata__timestamp', read_only=False)
+
+        # Onion currently does not support incremental option
+        logger.info("[Onion] Creating out ES index")
+        # Initialize out index
+        filename = pkg_resources.resource_filename('grimoire_elk', 'elk/mappings/git_onion.json')
+        out_conn.create_index(filename, delete=out_conn.exists())
+
+        onion_study(in_conn=in_conn, out_conn=out_conn)
+        logger.info("[Onion] End")
