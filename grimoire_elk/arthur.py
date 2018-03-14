@@ -36,7 +36,6 @@ from dateutil import parser
 from arthur.common import Q_STORAGE_ITEMS
 from perceval.backend import find_signature_parameters, Archive
 
-from .ocean.conf import ConfOcean
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
 from .elk.utils import get_last_enrich, grimoire_con
@@ -147,7 +146,6 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         ocean_backend = connector[1](backend, fetch_archive=fetch_archive, project=project)
         elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
-        ConfOcean.set_elastic(elastic_ocean)
 
         if fetch_archive:
             signature = inspect.signature(backend.fetch_from_archive)
@@ -216,23 +214,6 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         else:
             logger.error("Error feeding ocean %s" % ex)
             traceback.print_exc()
-
-        repo['success'] = False
-        repo['error'] = str(ex)
-    else:
-        repo['success'] = True
-
-    repo['repo_update'] = datetime.now().isoformat()
-    repo['index'] = es_index
-    repo['index_enrich'] = es_index_enrich
-    repo['project'] = project
-
-    if es_index:
-        unique_id = es_index
-        ConfOcean.add_repo(unique_id, repo)
-    else:
-        logger.debug("Repository not added to Ocean because errors.")
-        logger.debug(backend_params)
 
     logger.info("Done %s " % (backend_name))
 
