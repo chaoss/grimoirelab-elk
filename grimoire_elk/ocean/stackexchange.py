@@ -37,29 +37,54 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '''
-         {
-            "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "body_markdown": {
-                                "type": "text",
-                                "index": false
-                            },
-                            "answers": {
-                                "properties": {
-                                    "body_markdown": {
-                                        "type": "text",
-                                        "index": false
+        if es_major != '2':
+            mapping = '''
+                     {
+                        "dynamic":true,
+                            "properties": {
+                                "data": {
+                                    "properties": {
+                                        "body_markdown": {
+                                            "type": "text",
+                                            "index": true
+                                        },
+                                        "answers": {
+                                            "properties": {
+                                                "body_markdown": {
+                                                    "type": "text",
+                                                    "index": true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                    }
+                    '''
+        else:
+            mapping = '''
+             {
+                "dynamic":true,
+                    "properties": {
+                        "data": {
+                            "properties": {
+                                "body_markdown": {
+                                    "type": "string",
+                                    "index": "analyzed"
+                                },
+                                "answers": {
+                                    "properties": {
+                                        "body_markdown": {
+                                            "type": "string",
+                                            "index": "analyzed"
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-        }
-        '''
+            }
+            '''
 
         return {"items": mapping}
 
