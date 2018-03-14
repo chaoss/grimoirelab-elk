@@ -39,22 +39,22 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major == '2':
-            # Keep compatibility with 2.x mappings
+        if es_major != '2':
             mapping = '''
-             {
-                "dynamic":true,
-                "properties": {
-                    "data": {
+                     {
+                        "dynamic":true,
                         "properties": {
-                            "commitMessage": {
-                                "type": "string"
+                            "data": {
+                                "properties": {
+                                    "commitMessage": {
+                                        "type": "text"
+                                    }
+                                }
                             }
                         }
                     }
-                }
-            }
-            '''
+                    '''
+
         else:
             mapping = '''
              {
@@ -63,7 +63,7 @@ class Mapping(BaseMapping):
                     "data": {
                         "properties": {
                             "commitMessage": {
-                                "type": "text"
+                                "type": "string"
                             }
                         }
                     }
