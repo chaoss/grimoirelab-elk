@@ -26,6 +26,7 @@
 import logging
 
 from datetime import datetime
+from urllib.parse import quote_plus
 
 from dateutil import parser
 
@@ -110,15 +111,15 @@ class BugzillaRESTEnrich(Enrich):
         eitem_project = {}
         ds_name = self.get_connector_name()  # data source name in projects map
 
-        component = eitem['component']
         url = eitem['origin']
-        product = eitem['product']
+        component = eitem['component'].replace(" ", "+")
+        product = eitem['product'].replace(" ", "+")
 
         repo_comp = url + "/buglist.cgi?product=" + product + "&component=" + component
-        repo_comp1 = url + "/buglist.cgi?component=" + component + "&product=" + product
+        repo_comp_prod = url + "/buglist.cgi?component=" + component + "&product=" + product
         repo_product = url + "/buglist.cgi?product=" + product
 
-        for repo in [repo_comp, repo_comp1, repo_product, url]:
+        for repo in [repo_comp, repo_comp_prod, repo_product, url]:
             if repo in self.prjs_map[ds_name]:
                 project = self.prjs_map[ds_name][repo]
                 break

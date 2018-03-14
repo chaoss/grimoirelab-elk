@@ -1,0 +1,201 @@
+{
+    "took": 210,
+    "timed_out": false,
+    "_shards": {
+        "total": 1,
+        "successful": 5,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": 1,
+        "max_score": 1.0,
+        "hits": [
+            {
+                "_index": "bugzillarest-raw",
+                "_type": "items",
+                "_id": "833b30a83a79bfac47f450964154371d8b623f67",
+                "_score": 1.0,
+                "_source": {
+                    "metadata__updated_on": "2018-03-07T15:55:05+00:00",
+                    "uuid": "833b30a83a79bfac47f450964154371d8b623f67",
+                    "updated_on": 1520438105.0,
+                    "backend_name": "BugzillaREST",
+                    "data": {
+                        "keywords": [],
+                        "alias": null,
+                        "cf_tracking_seamonkey253": "---",
+                        "cf_status_firefox_esr52": "---",
+                        "cf_tracking_firefox_relnote": "---",
+                        "assigned_to": "stoyan.moz@gmx.com",
+                        "cf_status_firefox61": "---",
+                        "qa_contact": "",
+                        "history": [
+                            {
+                                "when": "2018-03-07T15:52:46Z",
+                                "who": "francesco.lodolo@gmail.com",
+                                "changes": [
+                                    {
+                                        "attachment_id": 8956847,
+                                        "removed": "bg.txt",
+                                        "added": "Differences for Bulgarian (bg)",
+                                        "field_name": "attachments.description"
+                                    }
+                                ]
+                            },
+                            {
+                                "when": "2018-03-07T15:55:05Z",
+                                "who": "stoyan.moz@gmx.com",
+                                "changes": [
+                                    {
+                                        "removed": "",
+                                        "added": "stoyan.moz@gmx.com",
+                                        "field_name": "cc"
+                                    },
+                                    {
+                                        "removed": "nobody@mozilla.org",
+                                        "added": "stoyan.moz@gmx.com",
+                                        "field_name": "assigned_to"
+                                    }
+                                ]
+                            }
+                        ],
+                        "depends_on": [],
+                        "resolution": "",
+                        "id": 1443817,
+                        "flags": [],
+                        "cf_qa_whiteboard": "",
+                        "cf_status_seamonkey249": "---",
+                        "see_also": [],
+                        "creation_time": "2018-03-07T15:50:30Z",
+                        "cc": [
+                            "gandalf@aviary.pl",
+                            "lebedel.delphine@gmail.com",
+                            "stoyan.moz@gmx.com"
+                        ],
+                        "cf_status_firefox60": "---",
+                        "severity": "normal",
+                        "mentors_detail": [],
+                        "cf_fx_points": "---",
+                        "op_sys": "Unspecified",
+                        "comment_count": 1,
+                        "priority": "--",
+                        "attachments": [
+                            {
+                                "last_change_time": "2018-03-07T15:52:46Z",
+                                "content_type": "text/plain",
+                                "is_obsolete": 0,
+                                "attacher": "francesco.lodolo@gmail.com",
+                                "summary": "Differences for Bulgarian (bg)",
+                                "creator": "francesco.lodolo@gmail.com",
+                                "is_private": 0,
+                                "description": "Differences for Bulgarian (bg)",
+                                "flags": [],
+                                "bug_id": 1443817,
+                                "id": 8956847,
+                                "creation_time": "2018-03-07T15:50:30Z",
+                                "size": 9024,
+                                "is_patch": 0,
+                                "file_name": "bg.txt"
+                            }
+                        ],
+                        "cf_status_seamonkey253": "---",
+                        "cf_status_seamonkey258": "---",
+                        "version": "unspecified",
+                        "whiteboard": "",
+                        "cc_detail": [
+                            {
+                                "name": "gandalf@aviary.pl",
+                                "id": 41270,
+                                "real_name": "Zibi Braniecki [:gandalf][:zibi]",
+                                "email": "gandalf@aviary.pl"
+                            },
+                            {
+                                "name": "lebedel.delphine@gmail.com",
+                                "id": 314838,
+                                "real_name": "Delphine Leb\u00e9del [:delphine - use Need Info]",
+                                "email": "lebedel.delphine@gmail.com"
+                            },
+                            {
+                                "name": "stoyan.moz@gmx.com",
+                                "id": 316498,
+                                "real_name": "Stoyan Dimitrov [:stoyan]",
+                                "email": "stoyan.moz@gmx.com"
+                            }
+                        ],
+                        "cf_status_firefox59": "---",
+                        "target_milestone": "---",
+                        "platform": "Unspecified",
+                        "mentors": [],
+                        "assigned_to_detail": {
+                            "name": "stoyan.moz@gmx.com",
+                            "id": 316498,
+                            "real_name": "Stoyan Dimitrov [:stoyan]",
+                            "email": "stoyan.moz@gmx.com"
+                        },
+                        "votes": 0,
+                        "component": "bg / Bulgarian",
+                        "cf_user_story": "",
+                        "dupe_of": null,
+                        "cf_tracking_firefox61": "---",
+                        "is_open": true,
+                        "creator_detail": {
+                            "name": "francesco.lodolo@gmail.com",
+                            "id": 130462,
+                            "real_name": "Francesco Lodolo [:flod]",
+                            "email": "francesco.lodolo@gmail.com"
+                        },
+                        "groups": [],
+                        "cf_tracking_firefox60": "---",
+                        "url": "",
+                        "cf_blocking_fennec": "---",
+                        "cf_fx_iteration": "---",
+                        "blocks": [
+                            1416148
+                        ],
+                        "last_change_time": "2018-03-07T15:55:05Z",
+                        "is_cc_accessible": true,
+                        "cf_tracking_firefox59": "---",
+                        "cf_tracking_firefox_esr52": "---",
+                        "cf_status_seamonkey257esr": "---",
+                        "cf_tracking_seamonkey258": "---",
+                        "comments": [
+                            {
+                                "time": "2018-03-07T15:50:30Z",
+                                "raw_text": "Translations for both language and region names are available in CLDR, but right now we ask all our localization teams to provide their own translations for them.\n\nFor reference, language names are used in preferences to set up the Accept Language setting (Language section in General), but also in the context menu for dictionaries.\n\nIn the long term, we'd like to use CLDR as a source for this data; for this reason we're investigating the differences between our localizations and CLDR, spot checking some languages.\n\nSo far we've started with French and Italian, finding that most times CLDR had the right information. As a next step, we decided to move to other languages, with different scripts or higher percentage of differences:\n* There are 203 language names in Mozilla, 91 (44.83%) have a different translation compared to CLDR. That's slightly under average (46%).\n* There are 272 region names in Mozilla, 45 (16,54%) have a different translation compared to CLDR. That's below average (31%).\n\nhttps://hg.mozilla.org/l10n-central/bg/file/default/toolkit/chrome/global/regionNames.properties\nhttps://hg.mozilla.org/l10n-central/bg/file/default/toolkit/chrome/global/languageNames.properties\n\nHere's the ask:\n- Can you go through the list of differences, and explain the reason for such differences?\n- Would the CLDR names need to be adapted to be used in Firefox?\n- Can the CLDR data be improved?\n\nOne more note: some language and region names differ between Mozilla and CLDR. As a consequence, translation will be different. For example, \"Southern Sotho\" vs \"Sotho, Southern\", or \"Caribbean Netherlands\" vs \"Bonaire, Sint Eustatius, and Saba\".\n\nSee also bug 1434854 (Italian) for an example of the discussion about differences, and links to support changes to be reported back to CLDR.",
+                                "author": "francesco.lodolo@gmail.com",
+                                "creator": "francesco.lodolo@gmail.com",
+                                "text": "Created attachment 8956847\nDifferences for Bulgarian (bg)\n\nTranslations for both language and region names are available in CLDR, but right now we ask all our localization teams to provide their own translations for them.\n\nFor reference, language names are used in preferences to set up the Accept Language setting (Language section in General), but also in the context menu for dictionaries.\n\nIn the long term, we'd like to use CLDR as a source for this data; for this reason we're investigating the differences between our localizations and CLDR, spot checking some languages.\n\nSo far we've started with French and Italian, finding that most times CLDR had the right information. As a next step, we decided to move to other languages, with different scripts or higher percentage of differences:\n* There are 203 language names in Mozilla, 91 (44.83%) have a different translation compared to CLDR. That's slightly under average (46%).\n* There are 272 region names in Mozilla, 45 (16,54%) have a different translation compared to CLDR. That's below average (31%).\n\nhttps://hg.mozilla.org/l10n-central/bg/file/default/toolkit/chrome/global/regionNames.properties\nhttps://hg.mozilla.org/l10n-central/bg/file/default/toolkit/chrome/global/languageNames.properties\n\nHere's the ask:\n- Can you go through the list of differences, and explain the reason for such differences?\n- Would the CLDR names need to be adapted to be used in Firefox?\n- Can the CLDR data be improved?\n\nOne more note: some language and region names differ between Mozilla and CLDR. As a consequence, translation will be different. For example, \"Southern Sotho\" vs \"Sotho, Southern\", or \"Caribbean Netherlands\" vs \"Bonaire, Sint Eustatius, and Saba\".\n\nSee also bug 1434854 (Italian) for an example of the discussion about differences, and links to support changes to be reported back to CLDR.",
+                                "is_private": false,
+                                "id": 13111219,
+                                "bug_id": 1443817,
+                                "attachment_id": 8956847,
+                                "count": 0,
+                                "creation_time": "2018-03-07T15:50:30Z",
+                                "tags": []
+                            }
+                        ],
+                        "status": "NEW",
+                        "summary": "[bg] Verify language and region names from CLDR",
+                        "cf_last_resolved": null,
+                        "creator": "francesco.lodolo@gmail.com",
+                        "cf_tracking_seamonkey249": "---",
+                        "product": "Mozilla Localizations",
+                        "classification": "Client Software",
+                        "is_confirmed": true,
+                        "cf_crash_signature": "",
+                        "is_creator_accessible": true,
+                        "cf_tracking_seamonkey257esr": "---"
+                    },
+                    "timestamp": 1521061028.12419,
+                    "category": "bug",
+                    "perceval_version": "0.9.12",
+                    "backend_version": "0.8.2",
+                    "tag": "https://bugzilla.mozilla.org",
+                    "metadata__timestamp": "2018-03-14T20:57:08.124190+00:00",
+                    "origin": "https://bugzilla.mozilla.org"
+                }
+            }
+        ]
+    }
+}
