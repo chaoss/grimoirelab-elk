@@ -37,7 +37,7 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != 2:
+        if es_major != '2':
             mapping = '''
              {
                 "dynamic":true,
@@ -67,32 +67,32 @@ class Mapping(BaseMapping):
             '''
         else:
             mapping = '''
-                     {
-                        "dynamic":true,
+             {
+                "dynamic":true,
+                    "properties": {
+                        "data": {
                             "properties": {
-                                "data": {
+                                "comments": {
                                     "properties": {
-                                        "comments": {
+                                        "comment": {
+                                            "type": "string",
+                                            "index": "analyzed"
+                                        },
+                                        "member": {
                                             "properties": {
-                                                "comment": {
+                                                "bio": {
                                                     "type": "string",
                                                     "index": "analyzed"
-                                                },
-                                                "member": {
-                                                    "properties": {
-                                                        "bio": {
-                                                            "type": "string",
-                                                            "index": "analyzed"
-                                                        }
-                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
+                        }
                     }
-                    '''
+            }
+            '''
 
         return {"items": mapping}
 
