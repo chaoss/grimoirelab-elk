@@ -37,7 +37,7 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != 2:
+        if es_major != '2':
             mapping = '''
              {
                 "dynamic":true,
@@ -66,7 +66,7 @@ class Mapping(BaseMapping):
                             "properties": {
                                 "Subject": {
                                     "type": "string",
-                                    "index": "analyzed
+                                    "index": "analyzed"
                                 },
                                 "body": {
                                     "dynamic":false,
