@@ -39,21 +39,38 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '''
-         {
-            "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "description": {
-                                "type": "text",
-                                "index": false
+        if es_major != '2':
+            mapping = '''
+                     {
+                        "dynamic":true,
+                            "properties": {
+                                "data": {
+                                    "properties": {
+                                        "description": {
+                                            "type": "text",
+                                            "index": true
+                                        }
+                                    }
+                                }
+                            }
+                    }
+                    '''
+        else:
+            mapping = '''
+             {
+                "dynamic":true,
+                    "properties": {
+                        "data": {
+                            "properties": {
+                                "description": {
+                                    "type": "string",
+                                    "index": "analyzed"
+                                }
                             }
                         }
                     }
-                }
-        }
-        '''
+            }
+            '''
 
         return {"items": mapping}
 
