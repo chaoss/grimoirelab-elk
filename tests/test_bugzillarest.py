@@ -22,10 +22,13 @@
 #     Valerio Cosentino <valcos@bitergia.com>
 #
 
+import json
 import logging
 import unittest
 
 from base import TestBaseBackend
+
+from grimoire_elk.elk.bugzillarest import BugzillaRESTEnrich
 
 
 class TestBugzillaRest(TestBaseBackend):
@@ -74,6 +77,22 @@ class TestBugzillaRest(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_get_project(self):
+        """ Test the project mapping """
+
+        # Test Mozilla projects mapping that it a bit tricky
+        # The component and product fields used for the mapping
+        # must contain both with " " converted to "+"
+        rawitems = open("data/bugzillarest-item-bulgarian.json").read()
+        rawitem = json.loads(rawitems)['hits']['hits'][0]["_source"]
+
+        # Create the enricher
+        enricher = BugzillaRESTEnrich(json_projects_map="data/bugzillarest-projects.json")
+        # Enrich the item
+        eitem = enricher.get_rich_item(rawitem)
+        # Check the project
+        self.assertEqual(eitem['project'], "Localization")
 
 
 if __name__ == "__main__":
