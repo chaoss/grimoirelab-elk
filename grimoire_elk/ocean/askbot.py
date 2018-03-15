@@ -49,6 +49,14 @@ class Mapping(BaseMapping):
                                     "author": {
                                         "dynamic":false,
                                         "properties": {}
+                                    },
+                                    "comments": {
+                                        "dynamic":false,
+                                        "properties": {}
+                                    },
+                                    "summary": {
+                                        "type": "text",
+                                        "index": true
                                     }
                                 }
                             }
