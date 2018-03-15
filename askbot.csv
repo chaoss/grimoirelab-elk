@@ -15,6 +15,7 @@ comment_count,long
 first_answer,long
 grimoire_creation_date,date
 id,long
+is_accepted_answer,long
 is_askbot_answer,long
 is_askbot_comment,long
 is_askbot_question,long
@@ -25,8 +26,10 @@ metadata__timestamp,date
 metadata__updated_on,date
 ocean-unique-id,keyword
 origin,keyword
+question_accepted_answer_id,long
 question_answer_count,long
 question_answer_ids,long
+question_has_accepted_answer,long
 question_last_activity_at,date
 question_last_activity_by_id,long
 question_last_activity_by_username,keyword
