@@ -26,8 +26,6 @@
 import logging
 
 from datetime import datetime
-from urllib.parse import quote_plus
-
 from dateutil import parser
 
 from .enrich import Enrich, metadata, DEFAULT_PROJECT
