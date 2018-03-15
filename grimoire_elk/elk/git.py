@@ -345,7 +345,7 @@ class GitEnrich(Enrich):
         eitem["tz"] = int(author_date.strftime("%z")[0:3])
         # Compute time to commit
         time_to_commit_delta = parser.parse(eitem["utc_commit"]) - parser.parse(eitem["utc_author"])
-        eitem["time_to_commit_hours"] = round(time_to_commit_delta.seconds/3600, 2)
+        eitem["time_to_commit_hours"] = round(time_to_commit_delta.seconds / 3600, 2)
         # Other enrichment
         eitem["repo_name"] = item["origin"]
         # Number of files touched
