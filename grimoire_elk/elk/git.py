@@ -334,6 +334,7 @@ class GitEnrich(Enrich):
                 eitem[map_fields[fn]] = commit[fn]
             else:
                 eitem[map_fields[fn]] = None
+        eitem['message'] = commit['message'][:self.KEYWORD_MAX_SIZE]
         eitem['hash_short'] = eitem['hash'][0:6]
         # Enrich dates
         author_date = parser.parse(commit["AuthorDate"])
