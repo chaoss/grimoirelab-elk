@@ -164,8 +164,8 @@ class AskbotEnrich(Enrich):
             # answers ordered by time
             first_answer_time = unixtime_to_datetime(float(question['answers'][0]["added_at"]))
             eitem['time_to_reply'] = get_time_diff_days(added_at, first_answer_time)
-            eitem['has_accepted_answer'] = 1 if question['accepted_answer_id'] else 0
-            eitem['accepted_answer_id'] = question['accepted_answer_id']
+            eitem['question_has_accepted_answer'] = 1 if question['accepted_answer_id'] else 0
+            eitem['question_accepted_answer_id'] = question['accepted_answer_id']
 
         if question['author'] and type(question['author']) is dict:
             eitem['author_askbot_user_name'] = question['author']['username']
@@ -275,6 +275,7 @@ class AskbotEnrich(Enrich):
             eanswer['author_url'] += answer['answered_by']['username']
 
         eanswer['summary'] = answer['summary']
+        eanswer['is_accepted_answer'] = 1 if answer['accepted'] else 0
         eanswer['score'] = answer['score']
         if 'is_correct' in answer:
             eanswer['is_correct'] = 1
