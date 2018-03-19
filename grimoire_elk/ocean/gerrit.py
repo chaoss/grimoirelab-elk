@@ -41,19 +41,19 @@ class Mapping(BaseMapping):
 
         if es_major != '2':
             mapping = '''
-                     {
-                        "dynamic":true,
+             {
+                "dynamic":true,
+                "properties": {
+                    "data": {
                         "properties": {
-                            "data": {
-                                "properties": {
-                                    "commitMessage": {
-                                        "type": "text"
-                                    }
-                                }
+                            "commitMessage": {
+                                "type": "text"
                             }
                         }
                     }
-                    '''
+                }
+            }
+            '''
 
         else:
             mapping = '''
