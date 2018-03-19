@@ -84,4 +84,4 @@ class Mapping(BaseMapping):
 class MediaWikiOcean(ElasticOcean):
     """MediaWiki Ocean feeder"""
 
-    # mapping = Mapping
+    mapping = Mapping
