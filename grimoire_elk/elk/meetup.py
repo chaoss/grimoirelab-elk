@@ -43,7 +43,7 @@ class Mapping(BaseMapping):
         :param es_major: major version of Elasticsearch, as string
         :returns:        dictionary with a key, 'items', with the mapping
         """
-        if es_major != 2:
+        if es_major != "2":
             mapping = """
             {
                 "properties": {
