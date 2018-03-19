@@ -199,6 +199,7 @@ class GerritEnrich(Enrich):
         for fn in map_fields:
             eitem[map_fields[fn]] = review[fn]
         eitem["summary_analyzed"] = eitem["summary"]
+        eitem["summary"] = eitem["summary"][:self.KEYWORD_MAX_SIZE]
         eitem["name"] = None
         eitem["domain"] = None
         if 'name' in review['owner']:
@@ -208,6 +209,11 @@ class GerritEnrich(Enrich):
                     eitem["domain"] = review['owner']['email'].split("@")[1]
         # New fields generated for enrichment
         eitem["patchsets"] = len(review["patchSets"])
+
+        # Limit the size of comment messages
+        if review['comments']:
+            for comment in review['comments']:
+                comment['message'] = comment['message'][:self.KEYWORD_MAX_SIZE]
 
         # Time to add the time diffs
         createdOn_date = parser.parse(review['createdOn'])
