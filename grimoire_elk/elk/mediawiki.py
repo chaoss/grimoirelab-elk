@@ -44,7 +44,7 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != 2:
+        if es_major != "2":
             mapping = """
             {
                 "properties": {
@@ -158,6 +158,9 @@ class MediaWikiEnrich(Enrich):
                     erevision["revision_" + f] = rev[f]
                 else:
                     erevision["revision_" + f] = None
+
+            erevision["revision_comment"] = rev["comment"][:self.KEYWORD_MAX_SIZE]
+
             if self.sortinghat:
                 erevision.update(self.get_review_sh(rev, item))
 
@@ -170,6 +173,7 @@ class MediaWikiEnrich(Enrich):
             erevision["iscreated"] = 0
             erevision["creation_date"] = None
             erevision["isrevision"] = 0
+
             if rev['parentid'] == 0:
                 erevision["iscreated"] = 1
                 erevision["creation_date"] = rev['timestamp']
