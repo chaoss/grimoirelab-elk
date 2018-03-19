@@ -41,20 +41,20 @@ class Mapping(BaseMapping):
         """
 
         mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "journals": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                }
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "journals": {
+                                "dynamic":false,
+                                "properties": {}
                             }
                         }
                     }
-            }
-            '''
+                }
+        }
+        '''
 
         return {"items": mapping}
 
