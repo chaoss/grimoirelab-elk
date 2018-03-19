@@ -41,45 +41,45 @@ class Mapping(BaseMapping):
 
         if es_major != '2':
             mapping = '''
-                     {
-                        "dynamic":true,
+             {
+                "dynamic":true,
+                    "properties": {
+                        "data": {
                             "properties": {
-                                "data": {
+                                "comments": {
+                                    "dynamic":false,
                                     "properties": {
-                                        "comments": {
-                                            "dynamic":false,
-                                            "properties": {
-                                                "raw_text": {
-                                                    "type": "text",
-                                                    "index": true
-                                                },
-                                                "text": {
-                                                    "type": "text",
-                                                    "index": true
-                                                }
-                                            }
+                                        "raw_text": {
+                                            "type": "text",
+                                            "index": true
                                         },
-                                        "attachments": {
-                                            "properties": {
-                                                "description" : {
-                                                    "type": "text",
-                                                    "index": true
-                                                },
-                                                "summary" : {
-                                                    "type": "text",
-                                                    "index": true
-                                                }
-                                            }
-                                        },
-                                        "summary": {
+                                        "text": {
                                             "type": "text",
                                             "index": true
                                         }
                                     }
+                                },
+                                "attachments": {
+                                    "properties": {
+                                        "description" : {
+                                            "type": "text",
+                                            "index": true
+                                        },
+                                        "summary" : {
+                                            "type": "text",
+                                            "index": true
+                                        }
+                                    }
+                                },
+                                "summary": {
+                                    "type": "text",
+                                    "index": true
                                 }
                             }
+                        }
                     }
-                    '''
+            }
+            '''
         else:
             mapping = '''
              {
