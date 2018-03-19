@@ -47,7 +47,7 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != 2:
+        if es_major != "2":
             mapping = """
             {
                 "properties": {
@@ -130,7 +130,9 @@ class RedmineEnrich(Enrich):
                 eitem[f] = ticket[f]
             else:
                 eitem[f] = None
+        eitem['subject'] = eitem['subject'][:self.KEYWORD_MAX_SIZE]
         eitem['description_analyzed'] = eitem['description']
+        eitem['description'] = eitem['description'][:self.KEYWORD_MAX_SIZE]
         # Fields which names are translated
         map_fields = {"due_date": "estimated_closing_date",
                       "created_on": "creation_date",
