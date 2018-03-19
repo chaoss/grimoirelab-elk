@@ -48,6 +48,30 @@ class Mapping(BaseMapping):
                         "properties": {
                             "commitMessage": {
                                 "type": "text"
+                            },
+                            "comments": {
+                                "properties": {
+                                    "message": {
+                                        "type": "text",
+                                        "index": true
+                                    }
+                                }
+                            },
+                            "subject": {
+                                "type": "text",
+                                "index": true
+                            },
+                            "patchSets": {
+                                "properties": {
+                                    "approvals": {
+                                        "properties": {
+                                            "description": {
+                                                "type": "text",
+                                                "index": true
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -64,6 +88,31 @@ class Mapping(BaseMapping):
                         "properties": {
                             "commitMessage": {
                                 "type": "string"
+                            },
+                            "comments": {
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "index": "anaylzed"
+                                    }
+                                }
+                            },
+                            "subject": {
+                                "type": "string",
+                                "index": "anaylzed"
+                            },
+                            ,
+                            "patchSets": {
+                                "properties": {
+                                    "approvals": {
+                                        "properties": {
+                                            "description": {
+                                                "type": "string",
+                                                "index": "anaylzed"
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
