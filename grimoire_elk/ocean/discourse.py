@@ -39,45 +39,45 @@ class Mapping(BaseMapping):
 
         if es_major != '2':
             mapping = '''
-                     {
-                        "dynamic":true,
+             {
+                "dynamic":true,
+                    "properties": {
+                        "data": {
                             "properties": {
-                                "data": {
+                                "details": {
                                     "properties": {
-                                        "details": {
+                                        "suggested_topics": {
+                                            "dynamic": false,
                                             "properties": {
-                                                "suggested_topics": {
-                                                    "dynamic": false,
-                                                    "properties": {
-                                                        "slug": {
-                                                            "type": "text",
-                                                            "index": true
-                                                        },
-                                                        "title": {
-                                                            "type": "text",
-                                                            "index": true
-                                                        }
-                                                    }
+                                                "slug": {
+                                                    "type": "text",
+                                                    "index": true
+                                                },
+                                                "title": {
+                                                    "type": "text",
+                                                    "index": true
                                                 }
                                             }
-                                        },
-                                        "fancy_title": {
-                                            "type": "text",
-                                            "index": true
-                                        },
-                                        "slug": {
-                                            "type": "text",
-                                            "index": true
-                                        },
-                                        "title": {
-                                            "type": "text",
-                                            "index": true
                                         }
                                     }
+                                },
+                                "fancy_title": {
+                                    "type": "text",
+                                    "index": true
+                                },
+                                "slug": {
+                                    "type": "text",
+                                    "index": true
+                                },
+                                "title": {
+                                    "type": "text",
+                                    "index": true
                                 }
                             }
+                        }
                     }
-                    '''
+            }
+            '''
         else:
             mapping = '''
              {
