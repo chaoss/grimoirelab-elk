@@ -37,31 +37,31 @@ class Mapping(BaseMapping):
         """
 
         mapping = '''
-                 {
-                    "dynamic":true,
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
                         "properties": {
-                            "data": {
-                                "properties": {
-                                    "answers": {
-                                        "dynamic":false,
-                                        "properties": {}
-                                    },
-                                    "author": {
-                                        "dynamic":false,
-                                        "properties": {}
-                                    },
-                                    "comments": {
-                                        "dynamic":false,
-                                        "properties": {}
-                                    },
-                                    "summary": {
-                                        "type": "text",
-                                        "index": true
-                                    }
-                                }
+                            "answers": {
+                                "dynamic":false,
+                                "properties": {}
+                            },
+                            "author": {
+                                "dynamic":false,
+                                "properties": {}
+                            },
+                            "comments": {
+                                "dynamic":false,
+                                "properties": {}
+                            },
+                            "summary": {
+                                "type": "text",
+                                "index": true
                             }
                         }
+                    }
                 }
+        }
         '''
 
         return {"items": mapping}
