@@ -39,28 +39,28 @@ class Mapping(BaseMapping):
 
         if es_major != '2':
             mapping = '''
-                     {
-                        "dynamic":true,
+             {
+                "dynamic":true,
+                    "properties": {
+                        "data": {
                             "properties": {
-                                "data": {
+                                "body_markdown": {
+                                    "type": "text",
+                                    "index": true
+                                },
+                                "answers": {
                                     "properties": {
                                         "body_markdown": {
                                             "type": "text",
                                             "index": true
-                                        },
-                                        "answers": {
-                                            "properties": {
-                                                "body_markdown": {
-                                                    "type": "text",
-                                                    "index": true
-                                                }
-                                            }
                                         }
                                     }
                                 }
                             }
+                        }
                     }
-                    '''
+            }
+            '''
         else:
             mapping = '''
              {
