@@ -42,23 +42,23 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != 2:
+        if es_major != "2":
             mapping = """
             {
                 "properties": {
-                    "Event Description": {
+                    "Event_Description": {
                         "type": "text",
                         "index": true
                     },
-                    "Event Creations": {
+                    "Event_Creations": {
                         "type": "text",
                         "index": true
                     },
-                    "Feedback from Attendees": {
+                    "Feedback_from_Attendees": {
                         "type": "text",
                         "index": true
                     },
-                    "Your Feedback": {
+                    "Your_Feedback": {
                         "type": "text",
                         "index": true
                     },
@@ -71,19 +71,19 @@ class Mapping(BaseMapping):
             mapping = """
             {
                 "properties": {
-                    "Event Description": {
+                    "Event_Description": {
                         "type": "string",
                         "index": "analyzed"
                     },
-                    "Event Creations": {
+                    "Event_Creations": {
                         "type": "string",
                         "index": "analyzed"
                     },
-                    "Feedback from Attendees": {
+                    "Feedback_from_Attendees": {
                         "type": "string",
                         "index": "analyzed"
                     },
-                    "Your Feedback": {
+                    "Your_Feedback": {
                         "type": "string",
                         "index": "analyzed"
                     },
