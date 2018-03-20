@@ -109,7 +109,7 @@ class MBoxEnrich(Enrich):
     def get_sh_identity(self, item, identity_field=None):
         # "From": "hwalsh at wikiledia.net (Heat Walsh)"
 
-        identity = {}
+        identity = {f: None for f in ['email', 'name', 'username']}
 
         from_data = item
         if 'data' in item and type(item) == dict:
@@ -118,6 +118,8 @@ class MBoxEnrich(Enrich):
         # First desofuscate the email
         EMAIL_OBFUSCATION_PATTERNS = [' at ', '_at_', ' en ']
         for pattern in EMAIL_OBFUSCATION_PATTERNS:
+            if not from_data:
+                return identity
             if from_data.find(pattern) != -1:
                 from_data = from_data.replace(pattern, '@')
 
