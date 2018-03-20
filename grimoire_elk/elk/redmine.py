@@ -132,7 +132,10 @@ class RedmineEnrich(Enrich):
                 eitem[f] = None
         eitem['subject'] = eitem['subject'][:self.KEYWORD_MAX_SIZE]
         eitem['description_analyzed'] = eitem['description']
-        eitem['description'] = eitem['description'][:self.KEYWORD_MAX_SIZE]
+
+        if eitem['description']:
+            eitem['description'] = eitem['description'][:self.KEYWORD_MAX_SIZE]
+
         # Fields which names are translated
         map_fields = {"due_date": "estimated_closing_date",
                       "created_on": "creation_date",
