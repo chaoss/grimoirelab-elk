@@ -26,6 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
+from grimoire_elk.elk.mbox import MBoxEnrich
 
 
 class TestMbox(TestBaseBackend):
@@ -74,6 +75,17 @@ class TestMbox(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_empty_identity(self):
+        """ Test support for from value with None"""
+        enricher = MBoxEnrich()
+
+        empty_identity = {f: None for f in ['email', 'name', 'username']}
+        from_value = None
+
+        item = {'data': {"author": None}}
+
+        self.assertDictEqual(empty_identity, enricher.get_sh_identity(item, "author"))
 
 
 if __name__ == "__main__":
