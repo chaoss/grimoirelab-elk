@@ -30,7 +30,7 @@ import unittest
 if '..' not in sys.path:
     sys.path.insert(0, '..')
 
-from grimoire_elk.elk.jira import JiraEnrich
+from grimoire_elk.enriched.jira import JiraEnrich
 
 
 class TestEnrichJira(unittest.TestCase):
