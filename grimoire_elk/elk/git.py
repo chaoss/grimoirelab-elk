@@ -28,6 +28,7 @@ import re
 import time
 import sys
 
+import pkg_resources
 import requests
 
 from dateutil import parser
@@ -741,16 +742,16 @@ class GitEnrich(Enrich):
 
         # Creating connections
         es = Elasticsearch([self.elastic.url])
-        in_conn = ESPandasConnector(es_conn=es, es_index="git_areas_of_code-raw", sort_on='metadata__timestamp')
-        out_conn = ESPandasConnector(es_conn=es, es_index="git_aoc", sort_on='metadata__timestamp', read_only=False)
+        in_conn = ESPandasConnector(es_conn=es, es_index="git_aoc-raw", sort_on='metadata__timestamp')
+        out_conn = ESPandasConnector(es_conn=es, es_index="git_aoc-enriched", sort_on='metadata__timestamp',
+                                     read_only=False)
 
-        if no_incremental:
+        exists_index = out_conn.exists()
+        if no_incremental or not exists_index:
             logger.info("[Areas of Code] Creating out ES index")
             # Initialize out index
-            import pkg_resources
-
             filename = pkg_resources.resource_filename('grimoire_elk', 'elk/mappings/git_aoc.json')
-            out_conn.create_index(filename)
+            out_conn.create_index(filename, delete=exists_index)
 
         areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
         logger.info("[Areas of Code] End")
