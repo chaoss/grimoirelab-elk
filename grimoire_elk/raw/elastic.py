@@ -30,7 +30,7 @@ import inspect
 import logging
 
 from datetime import datetime
-from ..elk.utils import unixtime_to_datetime, get_repository_filter
+from ..enriched.utils import unixtime_to_datetime, get_repository_filter
 from ..elastic_items import ElasticItems
 from ..elastic_mapping import Mapping
 
