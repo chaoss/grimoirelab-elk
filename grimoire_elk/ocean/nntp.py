@@ -88,7 +88,17 @@ class NNTPOcean(ElasticOcean):
 
     @classmethod
     def get_perceval_params_from_url(cls, url):
-        # In the url the NNTP server and the group are included
+        # In the url the NNTP host and the group are included
         params = url.split()
+
+        return params
+
+    @classmethod
+    def get_arthur_params_from_url(cls, url):
+        # In the url the NNTP host and the group are included
+
+        params = url.split()
+        """ Get the arthur params given a URL for the data source """
+        params = {"host": params[0], "group": params[1]}
 
         return params

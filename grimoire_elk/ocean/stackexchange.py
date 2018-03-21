@@ -109,3 +109,15 @@ class StackExchangeOcean(ElasticOcean):
         params.append(url)
 
         return params
+
+    @classmethod
+    def get_arthur_params_from_url(cls, url):
+        params = []
+
+        tokens = url.replace('https://', '').replace('http://', '').split('/')
+        tag = tokens[-1]
+        site = tokens[0]
+
+        params = {"site": site, "tagged": tag}
+
+        return params
