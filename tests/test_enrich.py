@@ -26,7 +26,7 @@ import unittest
 
 from unittest.mock import MagicMock
 
-from grimoire_elk.elk.enrich import Enrich
+from grimoire_elk.enriched.enrich import Enrich
 from sortinghat.db.model import UniqueIdentity, Profile
 
 # Make sure we use our code and not any other could we have installed
