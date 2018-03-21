@@ -34,14 +34,14 @@ from perceval.backends.github import GitHub
 
 from grimoire_elk.elastic import ElasticConnectException
 from grimoire_elk.elastic import ElasticSearch
-from grimoire_elk.elk.bugzilla import BugzillaEnrich
-from grimoire_elk.elk.gerrit import GerritEnrich
-from grimoire_elk.elk.github import GitHubEnrich
-from grimoire_elk.elk.sortinghat_gelk import SortingHat
-from grimoire_elk.ocean.bugzilla import BugzillaOcean
-from grimoire_elk.ocean.elastic import ElasticOcean
-from grimoire_elk.ocean.gerrit import GerritOcean
-from grimoire_elk.ocean.github import GitHubOcean
+from grimoire_elk.enriched.bugzilla import BugzillaEnrich
+from grimoire_elk.enriched.gerrit import GerritEnrich
+from grimoire_elk.enriched.github import GitHubEnrich
+from grimoire_elk.enriched.sortinghat_gelk import SortingHat
+from grimoire_elk.raw.bugzilla import BugzillaOcean
+from grimoire_elk.raw.elastic import ElasticOcean
+from grimoire_elk.raw.gerrit import GerritOcean
+from grimoire_elk.raw.github import GitHubOcean
 
 
 def get_connector_from_name(name, connectors):
