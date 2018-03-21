@@ -21,7 +21,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from grimoire_elk.ocean.elastic import ElasticOcean
+from grimoire_elk.raw.elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 
 
