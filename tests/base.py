@@ -33,7 +33,7 @@ from datetime import datetime
 if '..' not in sys.path:
     sys.path.insert(0, '..')
 
-from grimoire_elk.arthur import load_identities
+from grimoire_elk.elk import load_identities
 from grimoire_elk.utils import get_connectors, get_elastic
 
 
