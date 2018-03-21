@@ -28,10 +28,10 @@ import tempfile
 
 import requests
 
-from grimoire_elk.arthur import load_identities
-from grimoire_elk.elk.gerrit import GerritEnrich
-from grimoire_elk.elk.git import GitEnrich
-from grimoire_elk.elk.utils import grimoire_con
+from grimoire_elk.feeder import load_identities
+from grimoire_elk.enriched.gerrit import GerritEnrich
+from grimoire_elk.enriched.git import GitEnrich
+from grimoire_elk.enriched.utils import grimoire_con
 
 logger = logging.getLogger(__name__)
 
