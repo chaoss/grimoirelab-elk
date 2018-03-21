@@ -27,4 +27,10 @@ from .elastic import ElasticOcean
 class TelegramOcean(ElasticOcean):
     """Telegram Ocean feeder"""
 
-    pass
+    @classmethod
+    def get_arthur_params_from_url(cls, url):
+        # The URL is directly the name of the bot
+
+        params = {"bot": url}
+
+        return params

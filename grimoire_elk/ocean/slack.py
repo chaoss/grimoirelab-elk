@@ -63,3 +63,11 @@ class SlackOcean(ElasticOcean):
     """Slack Ocean feeder"""
 
     mapping = Mapping
+
+    @classmethod
+    def get_arthur_params_from_url(cls, url):
+        # The URL is directly the slack group
+
+        params = {"channel": url}
+
+        return params
