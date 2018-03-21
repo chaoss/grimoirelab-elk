@@ -39,7 +39,7 @@ from urllib.parse import quote_plus
 import smtplib
 from email.mime.text import MIMEText
 
-from grimoire_elk.ocean.elastic import ElasticOcean
+from grimoire_elk.raw.elastic import ElasticOcean
 from grimoire_elk.utils import config_logging
 
 GITHUB_URL = "https://github.com/"
