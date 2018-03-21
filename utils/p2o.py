@@ -28,7 +28,7 @@ import time
 from datetime import datetime
 from os import sys
 
-from grimoire_elk.arthur import feed_backend, enrich_backend
+from grimoire_elk.elk import feed_backend, enrich_backend
 from grimoire_elk.elastic import ElasticSearch
 from grimoire_elk.elastic_items import ElasticItems
 from grimoire_elk.utils import get_params_parser, config_logging
