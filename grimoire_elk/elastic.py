@@ -32,7 +32,7 @@ from time import time
 import requests
 
 from grimoire_elk.errors import ELKError
-from grimoire_elk.elk.utils import unixtime_to_datetime, grimoire_con
+from grimoire_elk.enriched.utils import unixtime_to_datetime, grimoire_con
 
 
 logger = logging.getLogger(__name__)
