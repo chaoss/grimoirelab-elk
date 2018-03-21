@@ -25,7 +25,7 @@
 import json
 import logging
 
-from grimoire_elk.elk.enrich import Enrich
+from grimoire_elk.enriched.enrich import Enrich
 from ..elastic_mapping import Mapping as BaseMapping
 
 
