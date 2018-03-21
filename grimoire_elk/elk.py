@@ -38,7 +38,7 @@ from perceval.backend import find_signature_parameters, Archive
 
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
-from .elk.utils import get_last_enrich, grimoire_con
+from .enriched.utils import get_last_enrich, grimoire_con
 
 
 logger = logging.getLogger(__name__)
@@ -360,7 +360,7 @@ def refresh_identities(enrich_backend, filter_author=None):
 
 def load_identities(ocean_backend, enrich_backend):
     try:
-        from .elk.sortinghat_gelk import SortingHat
+        from .enriched.sortinghat_gelk import SortingHat
     except ImportError:
         logger.warning("SortingHat not available.")
 
