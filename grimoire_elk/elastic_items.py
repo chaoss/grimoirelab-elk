@@ -28,7 +28,7 @@
 import json
 import logging
 
-from .elk.utils import get_repository_filter, grimoire_con
+from .enriched.utils import get_repository_filter, grimoire_con
 from .elastic_mapping import Mapping
 
 logger = logging.getLogger(__name__)
