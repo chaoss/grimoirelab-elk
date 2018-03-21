@@ -28,7 +28,7 @@ import logging
 
 from os import sys
 
-from grimoire_elk.ocean.elastic import ElasticOcean
+from grimoire_elk.raw.elastic import ElasticOcean
 from grimoire_elk.panels import create_dashboard
 from grimoire_elk.utils import config_logging
 
