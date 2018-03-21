@@ -27,7 +27,7 @@ from cereslib.dfutils.filter import FilterRows
 from cereslib.enrich.enrich import FileType, FilePath, ToUTF8
 from cereslib.events.events import Git, Events
 
-from grimoire_elk.elk.ceres_base import ESConnector, CeresBase
+from grimoire_elk.enriched.ceres_base import ESConnector, CeresBase
 
 
 logger = logging.getLogger(__name__)
