@@ -25,21 +25,18 @@
 import json
 import logging
 import re
-import time
 import sys
+import time
 
 import pkg_resources
 import requests
-
 from dateutil import parser
 from elasticsearch import Elasticsearch
 
-from grimoire_elk.elk.study_ceres_onion import ESOnionConnector, onion_study
-from .study_ceres_aoc import areas_of_code, ESPandasConnector
-
+from grimoire_elk.enriched.study_ceres_onion import ESOnionConnector, onion_study
 from .enrich import Enrich, metadata
+from .study_ceres_aoc import areas_of_code, ESPandasConnector
 from ..elastic_mapping import Mapping as BaseMapping
-
 
 try:
     from .sortinghat_gelk import SortingHat
