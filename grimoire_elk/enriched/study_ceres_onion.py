@@ -28,7 +28,7 @@ from elasticsearch_dsl import Search, Q
 
 from cereslib.enrich.enrich import Onion
 
-from grimoire_elk.elk.ceres_base import ESConnector, CeresBase
+from grimoire_elk.enriched.ceres_base import ESConnector, CeresBase
 
 
 logger = logging.getLogger(__name__)
