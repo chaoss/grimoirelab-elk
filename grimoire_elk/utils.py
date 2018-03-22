@@ -132,6 +132,9 @@ kibiter_version = None
 
 
 def get_connector_from_name(name):
+
+    # Remove extra data from data source section: remo:activities
+    name = name.split(":")[0]
     found = None
     connectors = get_connectors()
 
