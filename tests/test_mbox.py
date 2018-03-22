@@ -26,9 +26,9 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.mbox import MBoxOcean
 
-from grimoire_elk.elk.mbox import MBoxEnrich
+from grimoire_elk.raw.mbox import MBoxOcean
+from grimoire_elk.enriched.mbox import MBoxEnrich
 
 
 class TestMbox(TestBaseBackend):
