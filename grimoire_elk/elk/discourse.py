@@ -58,7 +58,7 @@ class Mapping(BaseMapping):
 
 class DiscourseEnrich(Enrich):
 
-    # mapping = Mapping
+    mapping = Mapping
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
