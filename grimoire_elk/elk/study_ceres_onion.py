@@ -322,6 +322,7 @@ class OnionStudy(CeresBase):
         # Add metadata: enriched on timestamp
         df_onion['metadata__enriched_on'] = datetime.utcnow().isoformat()
         df_onion['data_source'] = self.data_source
+        df_onion['grimoire_creation_date'] = df_onion[ESOnionConnector.TIMEFRAME]
 
         logger.info("[Onion] Final new events: " + str(len(df_onion)))
 
