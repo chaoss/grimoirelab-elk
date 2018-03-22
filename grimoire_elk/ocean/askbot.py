@@ -36,33 +36,62 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '''
-         {
-            "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "answers": {
-                                "dynamic":false,
-                                "properties": {}
-                            },
-                            "author": {
-                                "dynamic":false,
-                                "properties": {}
-                            },
-                            "comments": {
-                                "dynamic":false,
-                                "properties": {}
-                            },
-                            "summary": {
-                                "type": "text",
-                                "index": true
+        if es_major != '2':
+            mapping = '''
+             {
+                "dynamic":true,
+                    "properties": {
+                        "data": {
+                            "properties": {
+                                "answers": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                },
+                                "author": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                },
+                                "comments": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                },
+                                "summary": {
+                                    "type": "text",
+                                    "index": true
+                                }
                             }
                         }
                     }
-                }
-        }
-        '''
+            }
+            '''
+        else:
+            mapping = '''
+             {
+                "dynamic":true,
+                    "properties": {
+                        "data": {
+                            "properties": {
+                                "answers": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                },
+                                "author": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                },
+                                "comments": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                },
+                                "summary": {
+                                    "type": "string",
+                                    "index": "analyzed"
+                                }
+                            }
+                        }
+                    }
+            }
+            '''
 
         return {"items": mapping}
 
