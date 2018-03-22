@@ -30,9 +30,13 @@ import sys
 
 from datetime import datetime as dt
 
+import pkg_resources
 from dateutil import parser
 from functools import lru_cache
 
+from elasticsearch import Elasticsearch
+
+from grimoire_elk.elk.study_ceres_onion import ESOnionConnector, onion_study
 from perceval.backend import find_signature_parameters
 
 from ..elastic_items import ElasticItems
@@ -795,3 +799,29 @@ class Enrich(ElasticItems):
             logger.error(ex)
 
         return sh_ids
+
+    def enrich_onion(self, enrich_backend, in_index, out_index, data_source, contribs_field,
+                     timeframe_field, sort_on, no_incremental=False):
+
+        logger.info("[Onion] Starting study")
+
+        # Creating connections
+        es = Elasticsearch([self.elastic.url])
+        in_conn = ESOnionConnector(es_conn=es, es_index=in_index,
+                                   contribs_field=contribs_field,
+                                   timeframe_field=timeframe_field,
+                                   sort_on_field=sort_on)
+        out_conn = ESOnionConnector(es_conn=es, es_index=out_index,
+                                    contribs_field=contribs_field,
+                                    timeframe_field=timeframe_field,
+                                    sort_on_field=sort_on, read_only=False)
+
+        # Onion currently does not support incremental option
+        logger.info("[Onion] Creating out ES index")
+        # Initialize out index
+        filename = pkg_resources.resource_filename('grimoire_elk', 'elk/mappings/onion.json')
+        out_conn.create_index(filename, delete=out_conn.exists())
+
+        onion_study(in_conn=in_conn, out_conn=out_conn, data_source=data_source)
+
+        logger.info("[Onion] This is the end.")
