@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.remo import ReMoOcean
+from grimoire_elk.raw.remo import ReMoOcean
 
 
 class TestRemo(TestBaseBackend):
