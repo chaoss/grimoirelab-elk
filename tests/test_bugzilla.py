@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.bugzilla import BugzillaOcean
+from grimoire_elk.raw.bugzilla import BugzillaOcean
 
 
 class TestBugzilla(TestBaseBackend):
