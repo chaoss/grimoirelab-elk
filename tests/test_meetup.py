@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.meetup import MeetupOcean
+from grimoire_elk.raw.meetup import MeetupOcean
 
 
 class TestMeetup(TestBaseBackend):
