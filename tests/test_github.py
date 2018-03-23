@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.github import GitHubOcean
+from grimoire_elk.raw.github import GitHubOcean
 
 
 class TestGit(TestBaseBackend):
