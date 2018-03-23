@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.telegram import TelegramOcean
+from grimoire_elk.raw.telegram import TelegramOcean
 
 
 class TestTelegram(TestBaseBackend):
