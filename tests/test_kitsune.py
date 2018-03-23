@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.kitsune import KitsuneOcean
+from grimoire_elk.raw.kitsune import KitsuneOcean
 
 
 class TestKitsune(TestBaseBackend):
