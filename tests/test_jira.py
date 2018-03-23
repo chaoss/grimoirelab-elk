@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.jenkins import JenkinsOcean
+from grimoire_elk.raw.jenkins import JenkinsOcean
 
 
 class TestJira(TestBaseBackend):
