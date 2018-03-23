@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.supybot import SupybotOcean
+from grimoire_elk.raw.supybot import SupybotOcean
 
 
 class TestSupybot(TestBaseBackend):
