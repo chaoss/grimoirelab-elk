@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.confluence import ConfluenceOcean
+from grimoire_elk.raw.confluence import ConfluenceOcean
 
 
 class TestConfluence(TestBaseBackend):
