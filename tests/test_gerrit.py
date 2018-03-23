@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.gerrit import GerritOcean
+from grimoire_elk.raw.gerrit import GerritOcean
 
 
 class TestGerrit(TestBaseBackend):
