@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.nntp import NNTPOcean
+from grimoire_elk.raw.nntp import NNTPOcean
 
 
 class TestNNTPClub(TestBaseBackend):
