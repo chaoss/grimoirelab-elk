@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.pipermail import PipermailOcean
+from grimoire_elk.raw.pipermail import PipermailOcean
 
 
 class TestPipermail(TestBaseBackend):
