@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.stackexchange import StackExchangeOcean
+from grimoire_elk.raw.stackexchange import StackExchangeOcean
 
 
 class TestStackexchange(TestBaseBackend):
