@@ -33,7 +33,7 @@ from dateutil import parser
 from grimoire_elk.elastic import ElasticConnectException
 from grimoire_elk.elastic import ElasticSearch
 # Connectors for Perceval
-from grimoire_elk.ocean.hyperkitty import HyperKittyOcean
+from grimoire_elk.raw.hyperkitty import HyperKittyOcean
 from perceval.backends.core.askbot import Askbot, AskbotCommand
 from perceval.backends.core.bugzilla import Bugzilla, BugzillaCommand
 from perceval.backends.core.bugzillarest import BugzillaREST, BugzillaRESTCommand
