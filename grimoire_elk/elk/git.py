@@ -763,7 +763,7 @@ class GitEnrich(Enrich):
                      data_source='git',
                      contribs_field='hash',
                      timeframe_field='grimoire_creation_date',
-                     sort_on='metadata__timestamp'):
+                     sort_on_field='metadata__timestamp'):
 
         super().enrich_onion(enrich_backend=enrich_backend,
                              in_index=in_index,
@@ -771,5 +771,5 @@ class GitEnrich(Enrich):
                              data_source=data_source,
                              contribs_field=contribs_field,
                              timeframe_field=timeframe_field,
-                             sort_on=sort_on,
+                             sort_on_field=sort_on_field,
                              no_incremental=no_incremental)

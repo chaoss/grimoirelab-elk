@@ -243,7 +243,7 @@ class ESOnionConnector(ESConnector):
         s.aggs.bucket(self.TIMEFRAME, 'date_histogram', field=self._timeframe_field, interval='quarter') \
             .metric(self.LATEST_TS, 'max', field=self._sort_on_field)\
             .bucket(self.AUTHOR_UUID, 'terms', field=self.AUTHOR_UUID, size=1000) \
-            .metric(self.CONTRIBUTIONS, 'cardinality', field=self.contribs_field)\
+            .metric(self.CONTRIBUTIONS, 'cardinality', field=self.contribs_field, precision_threshold=40000)\
             .bucket(self.AUTHOR_NAME, 'terms', field=self.AUTHOR_NAME, size=1)
 
         return s
