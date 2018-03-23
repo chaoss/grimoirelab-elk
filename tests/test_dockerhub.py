@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.dockerhub import DockerHubOcean
+from grimoire_elk.raw.dockerhub import DockerHubOcean
 
 
 class TestDockerhub(TestBaseBackend):
