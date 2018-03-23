@@ -27,6 +27,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
+from grimoire_elk.ocean.bugzillarest import BugzillaRESTOcean
 
 from grimoire_elk.elk.bugzillarest import BugzillaRESTEnrich
 
@@ -93,6 +94,14 @@ class TestBugzillaRest(TestBaseBackend):
         eitem = enricher.get_rich_item(rawitem)
         # Check the project
         self.assertEqual(eitem['project'], "Localization")
+
+    def test_arthur_params(self):
+        """Test the extraction of arthur params from an URL"""
+
+        with open("data/projects-release.json") as projects_filename:
+            url = json.load(projects_filename)['grimoire']['bugzillarest'][0]
+            arthur_params = {'uri': 'https://bugzilla.mozilla.org', 'url': 'https://bugzilla.mozilla.org'}
+            self.assertDictEqual(arthur_params, BugzillaRESTOcean.get_arthur_params_from_url(url))
 
 
 if __name__ == "__main__":

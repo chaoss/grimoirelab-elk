@@ -21,11 +21,12 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-
+import json
 import logging
 import unittest
 
 from base import TestBaseBackend
+from grimoire_elk.ocean.github import GitHubOcean
 
 
 class TestGit(TestBaseBackend):
@@ -76,6 +77,14 @@ class TestGit(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_arthur_params(self):
+        """Test the extraction of arthur params from an URL"""
+
+        with open("data/projects-release.json") as projects_filename:
+            url = json.load(projects_filename)['grimoire']['github'][0]
+            arthur_params = {'owner': 'chaoss', 'repository': 'grimoirelab-perceval'}
+            self.assertDictEqual(arthur_params, GitHubOcean.get_arthur_params_from_url(url))
 
 
 if __name__ == "__main__":

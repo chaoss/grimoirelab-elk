@@ -21,11 +21,12 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-
+import json
 import logging
 import unittest
 
 from base import TestBaseBackend
+from grimoire_elk.ocean.bugzilla import BugzillaOcean
 
 
 class TestBugzilla(TestBaseBackend):
@@ -75,6 +76,14 @@ class TestBugzilla(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_arthur_params(self):
+        """Test the extraction of arthur params from an URL"""
+
+        with open("data/projects-release.json") as projects_filename:
+            bugzilla_url = json.load(projects_filename)['grimoire']['bugzilla'][0]
+            arthur_params = {'uri': 'https://bugs.eclipse.org/bugs/', 'url': 'https://bugs.eclipse.org/bugs/'}
+            self.assertDictEqual(arthur_params, BugzillaOcean.get_arthur_params_from_url(bugzilla_url))
 
 
 if __name__ == "__main__":

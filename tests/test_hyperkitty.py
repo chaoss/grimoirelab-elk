@@ -21,11 +21,13 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-
+import json
 import logging
 import unittest
 
 from base import TestBaseBackend
+
+from grimoire_elk.ocean.hyperkitty import HyperKittyOcean
 
 
 class TestHyperkitty(TestBaseBackend):
@@ -74,6 +76,15 @@ class TestHyperkitty(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_arthur_params(self):
+        """Test the extraction of arthur params from an URL"""
+
+        with open("data/projects-release.json") as projects_filename:
+            url = json.load(projects_filename)['grimoire']['hyperkitty'][0]
+            arthur_params = {'uri': 'https://lists.mailman3.org/archives/list/mailman-users@mailman3.org',
+                             'url': 'https://lists.mailman3.org/archives/list/mailman-users@mailman3.org'}
+            self.assertDictEqual(arthur_params, HyperKittyOcean.get_arthur_params_from_url(url))
 
 
 if __name__ == "__main__":
