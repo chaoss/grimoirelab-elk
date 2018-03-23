@@ -33,6 +33,7 @@ from dateutil import parser
 from grimoire_elk.elastic import ElasticConnectException
 from grimoire_elk.elastic import ElasticSearch
 # Connectors for Perceval
+from grimoire_elk.ocean.hyperkitty import HyperKittyOcean
 from perceval.backends.core.askbot import Askbot, AskbotCommand
 from perceval.backends.core.bugzilla import Bugzilla, BugzillaCommand
 from perceval.backends.core.bugzillarest import BugzillaREST, BugzillaRESTCommand
@@ -192,7 +193,7 @@ def get_connectors():
             "gerrit": [Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git": [Git, GitOcean, GitEnrich, GitCommand],
             "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
-            "hyperkitty": [HyperKitty, MBoxOcean, HyperKittyEnrich, HyperKittyCommand],
+            "hyperkitty": [HyperKitty, HyperKittyOcean, HyperKittyEnrich, HyperKittyCommand],
             "jenkins": [Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira": [Jira, JiraOcean, JiraEnrich, JiraCommand],
             "kitsune": [Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
