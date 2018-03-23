@@ -21,11 +21,13 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-
+import json
 import logging
 import unittest
 
 from base import TestBaseBackend
+from grimoire_elk.ocean.mbox import MBoxOcean
+
 from grimoire_elk.elk.mbox import MBoxEnrich
 
 
@@ -86,6 +88,14 @@ class TestMbox(TestBaseBackend):
         item = {'data': {"author": None}}
 
         self.assertDictEqual(empty_identity, enricher.get_sh_identity(item, "author"))
+
+    def test_arthur_params(self):
+        """Test the extraction of arthur params from an URL"""
+
+        with open("data/projects-release.json") as projects_filename:
+            url = json.load(projects_filename)['grimoire']['mbox'][0]
+            arthur_params = {'dirpath': '/home/bitergia/.perceval/mbox', 'uri': 'metrics-grimoire'}
+            self.assertDictEqual(arthur_params, MBoxOcean.get_arthur_params_from_url(url))
 
 
 if __name__ == "__main__":

@@ -21,11 +21,12 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-
+import json
 import logging
 import unittest
 
 from base import TestBaseBackend
+from grimoire_elk.ocean.meetup import MeetupOcean
 
 
 class TestMeetup(TestBaseBackend):
@@ -74,6 +75,14 @@ class TestMeetup(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_arthur_params(self):
+        """Test the extraction of arthur params from an URL"""
+
+        with open("data/projects-release.json") as projects_filename:
+            url = json.load(projects_filename)['grimoire']['meetup'][0]
+            arthur_params = {'group': 'South-East-Puppet-User-Group'}
+            self.assertDictEqual(arthur_params, MeetupOcean.get_arthur_params_from_url(url))
 
 
 if __name__ == "__main__":
