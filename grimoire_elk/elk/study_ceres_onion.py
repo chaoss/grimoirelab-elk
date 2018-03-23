@@ -49,20 +49,22 @@ class ESOnionConnector(ESConnector):
     :param self._read_only: True to avoid unwanted writes.
     """
 
-    AUTHOR_UUID = 'author_uuid'
-    COMMITS = 'unique_commits'
-    LATEST_TS = 'latest_ts'
     AUTHOR_NAME = 'author_name'
+    AUTHOR_ORG = 'author_org_name'
+    AUTHOR_UUID = 'author_uuid'
+    CONTRIBUTIONS = 'contributions'
+    LATEST_TS = 'latest_ts'
     TIMEFRAME = 'timeframe'
     TIMESTAMP = 'metadata__timestamp'
     PROJECT = 'project'
-    ORG = 'author_org_name'
 
-    def __init__(self, es_conn, es_index, timeframe_field='grimoire_creation_date',
-                 sort_on='metadata__timestamp', read_only=True):
+    def __init__(self, es_conn, es_index, contribs_field,
+                 timeframe_field='grimoire_creation_date',
+                 sort_on_field='metadata__timestamp', read_only=True):
 
-        super().__init__(es_conn, es_index, sort_on, read_only)
+        super().__init__(es_conn, es_index, sort_on_field, read_only)
 
+        self.contribs_field = contribs_field
         self._timeframe_field = timeframe_field
 
     def read_block(self, size=None, from_date=None):
@@ -82,8 +84,8 @@ class ESOnionConnector(ESConnector):
 
             date_range = {self._timeframe_field: {'gte': quarter.start_time, 'lte': quarter.end_time}}
 
-            orgs = self.__list_uniques(date_range, 'author_org_name')
-            projects = self.__list_uniques(date_range, 'project')
+            orgs = self.__list_uniques(date_range, self.AUTHOR_ORG)
+            projects = self.__list_uniques(date_range, self.PROJECT)
 
             # Get global data
             s = self.__build_search(date_range)
@@ -143,7 +145,8 @@ class ESOnionConnector(ESConnector):
         docs = []
         for row_index in rows.keys():
             row = rows[row_index]
-            item_id = row['author_org_name'] + '_' + row['project'] + '_' + row['timeframe'] + '_' + row['author_uuid']
+            item_id = row[self.AUTHOR_ORG] + '_' + row[self.PROJECT] + '_' \
+                + row[self.TIMEFRAME] + '_' + row[self.AUTHOR_UUID]
             item_id = item_id.replace(' ', '').lower()
 
             doc = {
@@ -184,7 +187,7 @@ class ESOnionConnector(ESConnector):
         if from_date:
             # Work around to solve conversion problem of '__' to '.' in field name
             q = Q('range')
-            q.__setattr__(self._sort_on, {'gte': from_date})
+            q.__setattr__(self._sort_on_field, {'gte': from_date})
             s = s.filter(q)
 
         # from:to parameters (=> from: 0, size: 0)
@@ -238,10 +241,10 @@ class ESOnionConnector(ESConnector):
         # We are not keeping all metadata__* fields because we are grouping commits by author, so we can only
         # store one value per author.
         s.aggs.bucket(self.TIMEFRAME, 'date_histogram', field=self._timeframe_field, interval='quarter') \
-            .metric(self.LATEST_TS, 'max', field='metadata__timestamp')\
-            .bucket(self.AUTHOR_UUID, 'terms', field='author_uuid', size=1000) \
-            .metric(self.COMMITS, 'cardinality', field='hash')\
-            .bucket(self.AUTHOR_NAME, 'terms', field='author_name', size=1)
+            .metric(self.LATEST_TS, 'max', field=self._sort_on_field)\
+            .bucket(self.AUTHOR_UUID, 'terms', field=self.AUTHOR_UUID, size=1000) \
+            .metric(self.CONTRIBUTIONS, 'cardinality', field=self.contribs_field, precision_threshold=40000)\
+            .bucket(self.AUTHOR_NAME, 'terms', field=self.AUTHOR_NAME, size=1)
 
         return s
 
@@ -256,7 +259,7 @@ class ESOnionConnector(ESConnector):
         date_list = []
         uuid_list = []
         name_list = []
-        commit_list = []
+        contribs_list = []
         latest_ts_list = []
         logger.debug("[Onion] timing: " + timing.key_as_string)
 
@@ -265,13 +268,13 @@ class ESOnionConnector(ESConnector):
             date_list.append(timing.key_as_string)
             uuid_list.append(author.key)
             name_list.append(author[self.AUTHOR_NAME].buckets[0].key)
-            commit_list.append(author[self.COMMITS].value)
+            contribs_list.append(author[self.CONTRIBUTIONS].value)
 
         df = pandas.DataFrame()
         df[self.TIMEFRAME] = date_list
         df[self.AUTHOR_UUID] = uuid_list
         df[self.AUTHOR_NAME] = name_list
-        df[self.COMMITS] = commit_list
+        df[self.CONTRIBUTIONS] = contribs_list
         df[self.TIMESTAMP] = latest_ts_list
 
         if not project_name:
@@ -280,7 +283,7 @@ class ESOnionConnector(ESConnector):
 
         if not org_name:
             org_name = "_Global_"
-        df[self.ORG] = org_name
+        df[self.AUTHOR_ORG] = org_name
 
         return df
 
@@ -295,9 +298,11 @@ class OnionStudy(CeresBase):
     :param self._out: ESOnionConnector to write processed items to.
     """
 
-    def __init__(self, in_connector, out_connector):
+    def __init__(self, in_connector, out_connector, data_source):
 
         super().__init__(in_connector, out_connector, None)
+
+        self.data_source = data_source
 
     def process(self, items_block):
         """Process a DataFrame to compute Onion.
@@ -308,26 +313,30 @@ class OnionStudy(CeresBase):
         logger.info("[Onion] Authors to process: " + str(len(items_block)))
 
         onion_enrich = Onion(items_block)
-        df_onion = onion_enrich.enrich(ESOnionConnector.AUTHOR_UUID, ESOnionConnector.COMMITS)
+        df_onion = onion_enrich.enrich(member_column=ESOnionConnector.AUTHOR_UUID,
+                                       events_column=ESOnionConnector.CONTRIBUTIONS)
 
         # Get and store Quarter as String
         df_onion['quarter'] = df_onion[ESOnionConnector.TIMEFRAME].map(lambda x: str(pandas.Period(x, 'Q')))
 
         # Add metadata: enriched on timestamp
         df_onion['metadata__enriched_on'] = datetime.utcnow().isoformat()
+        df_onion['data_source'] = self.data_source
+        df_onion['grimoire_creation_date'] = df_onion[ESOnionConnector.TIMEFRAME]
 
         logger.info("[Onion] Final new events: " + str(len(df_onion)))
 
         return self.ProcessResults(processed=len(df_onion), out_items=df_onion)
 
 
-def onion_study(in_conn, out_conn):
+def onion_study(in_conn, out_conn, data_source):
     """Build and index for onion from a given Git index.
 
     :param in_conn: ESPandasConnector to read from.
     :param out_conn: ESPandasConnector to write to.
+    :param data_source: name of the date source to generate onion from.
     :return: number of documents written in ElasticSearch enriched index.
     """
-    onion = OnionStudy(in_connector=in_conn, out_connector=out_conn)
+    onion = OnionStudy(in_connector=in_conn, out_connector=out_conn, data_source=data_source)
     ndocs = onion.analyze()
     return ndocs
