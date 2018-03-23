@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.functest import FunctestOcean
+from grimoire_elk.raw.functest import FunctestOcean
 
 
 class TestFunctest(TestBaseBackend):
