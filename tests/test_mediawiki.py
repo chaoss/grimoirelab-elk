@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.mediawiki import MediaWikiOcean
+from grimoire_elk.raw.mediawiki import MediaWikiOcean
 
 
 class TestMediawiki(TestBaseBackend):
