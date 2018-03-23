@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.discourse import DiscourseOcean
+from grimoire_elk.raw.discourse import DiscourseOcean
 
 
 class TestDiscourse(TestBaseBackend):
