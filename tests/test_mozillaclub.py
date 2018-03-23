@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.mozillaclub import MozillaClubOcean
+from grimoire_elk.raw.mozillaclub import MozillaClubOcean
 
 
 class TestMozillaClub(TestBaseBackend):
