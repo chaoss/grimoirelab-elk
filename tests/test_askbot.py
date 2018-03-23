@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.askbot import AskbotOcean
+from grimoire_elk.raw.askbot import AskbotOcean
 
 
 class TestAskbot(TestBaseBackend):
