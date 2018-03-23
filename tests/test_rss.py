@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.rss import RSSOcean
+from grimoire_elk.raw.rss import RSSOcean
 
 
 class TestRSS(TestBaseBackend):
