@@ -27,9 +27,9 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.bugzillarest import BugzillaRESTOcean
+from grimoire_elk.raw.bugzillarest import BugzillaRESTOcean
 
-from grimoire_elk.elk.bugzillarest import BugzillaRESTEnrich
+from grimoire_elk.enriched.bugzillarest import BugzillaRESTEnrich
 
 
 class TestBugzillaRest(TestBaseBackend):
