@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.phabricator import PhabricatorOcean
+from grimoire_elk.raw.phabricator import PhabricatorOcean
 
 
 class TestPhabricator(TestBaseBackend):
