@@ -26,7 +26,7 @@
 import logging
 
 from .elastic import ElasticOcean
-from ..elastic_mapping import Mapping as BaseMapping
+from grimoire_elk.elastic_mapping import Mapping as BaseMapping
 
 
 logger = logging.getLogger(__name__)
