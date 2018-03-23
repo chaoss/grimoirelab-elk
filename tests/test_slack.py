@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.slack import SlackOcean
+from grimoire_elk.raw.slack import SlackOcean
 
 
 class TestSlack(TestBaseBackend):
