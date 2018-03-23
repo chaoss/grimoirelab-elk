@@ -27,7 +27,7 @@ import unittest
 
 from base import TestBaseBackend
 
-from grimoire_elk.ocean.hyperkitty import HyperKittyOcean
+from grimoire_elk.raw.hyperkitty import HyperKittyOcean
 
 
 class TestHyperkitty(TestBaseBackend):
