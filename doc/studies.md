@@ -55,7 +55,7 @@ Index named `git_aoc-enriched` with following fields:
 * repository
 
 ## Onion Study
-This study process information from a Git enriched index and computes Onion metric on that.
+This study process information from an enriched index and computes Onion metric on that.
 
 Onion model split contributors in three groups:
 * **Core**: those contributing 80% of the activity (commits in this case). 
@@ -80,28 +80,69 @@ Onion metric is calculated with different levels of granularity:
 * By **project**: split data by project.
 * By **organization and project**: splits data by organization and project.
 
-
-
 ### Requirements:
-It expects to find an input index named `git_onion-src`, a git enriched index containing 
-data to compute onion on.
+It expects to find an input index named:
+* **Git**:  `git_onion-src`, should be a git enriched index containing data to compute onion on.
+* **GitHub Issues**: `github_issues_onion-src`, should be a GitHub enriched index containing only issues.
+* **GitHub Pull Requests**: `github_prs_onion-src`, should be a GitHub enriched index containing only Pull Requests.
+
+To allow using an index containing all GitHub information mixed, you must create the following aliases:
+```
+curl -XPOST https://user:pass@host/path_to_data/_aliases -d '
+{
+    "actions" : [
+        {
+            "add" : {
+                 "index" : "github_issues",
+                 "alias" : "github_issues_onion-src",
+                 "filter" : {
+                    "terms" : { 
+                    "pull_request" : [
+                        "false"
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}'
+```
+```
+curl -XPOST https://user:pass@host/path_to_data/_aliases -d '
+{
+
+"actions" : [
+    {
+        "add" : {
+             "index" : "github_issues",
+             "alias" : "github_prs_onion-src",
+             "filter" : {
+                "terms" : { 
+                "pull_request" : [
+                    "true"
+                    ]
+                }
+            }
+        }
+    }
+]
+}'
+
+``` 
+
+These **indices should contain only those authors you want to compute onion on**. If needed, you can use a filtered
+alias to exclude some of them. In a similar way as shown above for GitHub Issues and Pull Requests, you could
+filtering out, for instance, **bots** and **empty commits** in Git.
+
 
 ### Results: 
 
-Index named `git_onion-enriched` with following fields:
+As output you will get an index following our [onion index fields convention](https://github.com/chaoss/grimoirelab-elk/blob/master/schema/onion.csv).
+This index will be named:
+* **Git**: `git_onion-enriched`.
+* **GitHub Issues**: `github_issues_onion-enriched`.
+* **GitHub Pull Requests**: `github_prs_onion-enriched`.
 
-* author_name: author name.
-* author_org_name: organization name.
-* author_uuid: author UUID from sortinghat.
-* cum_net_sum: sum of commits used to computed onion.
-* metadata__enriched_on: index time in this index.
-* metadata__timestamp: when most recent item of current quarter was written in ElasticSearch (index time in source RAW index).
-* percent_cum_net_sum: percentage corresponding to above's field.
-* onion_role: core, regular or casual.
-* project: project name.
-* quarter: quarter as String following format YYYYQN.
-* timeframe: date corresponding to quarter start.
-* unique_commits: number of commits made by the corresponding author.
 
 ## Running studies from p2o
 Running studies from p2o is possible by using `--only-enrich` and `--only-studies` parameters. Other parameters

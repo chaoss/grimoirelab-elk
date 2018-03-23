@@ -29,9 +29,6 @@
         "metadata__timestamp": {
           "type": "date"
         },
-        "metadata__updated_on": {
-          "type": "date"
-        },
         "onion_role": {
           "type": "keyword"
         },
