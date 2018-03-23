@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.crates import CratesOcean
+from grimoire_elk.raw.crates import CratesOcean
 
 
 class TestCrates(TestBaseBackend):
