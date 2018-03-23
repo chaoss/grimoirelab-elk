@@ -26,7 +26,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.ocean.redmine import RedmineOcean
+from grimoire_elk.raw.redmine import RedmineOcean
 
 
 class TestRedmine(TestBaseBackend):
