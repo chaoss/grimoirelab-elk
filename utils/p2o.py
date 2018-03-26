@@ -31,17 +31,7 @@ from os import sys
 from grimoire_elk.elk import feed_backend, enrich_backend
 from grimoire_elk.elastic import ElasticSearch
 from grimoire_elk.elastic_items import ElasticItems
-from grimoire_elk.utils import get_params_parser, config_logging
-
-
-def get_params():
-    ''' Get params definition from ElasticOcean and from all the backends '''
-
-    parser = get_params_parser()
-
-    args = parser.parse_args()
-
-    return args
+from grimoire_elk.utils import get_params, config_logging
 
 
 if __name__ == '__main__':
@@ -70,11 +60,6 @@ if __name__ == '__main__':
                              args.backend, args.backend_args,
                              args.index, args.index_enrich, args.project,
                              args.arthur)
-
-                # Wait for one second, to ensure bulk write reflects in searches
-                # https://www.elastic.co/guide/en/elasticsearch/reference/6.1/docs-refresh.html
-                # (there are better ways of doing this, but for now...)
-                time.sleep(1)
                 logging.info("Backend feed completed")
 
             if args.enrich or args.enrich_only:
