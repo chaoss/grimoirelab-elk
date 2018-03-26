@@ -52,6 +52,7 @@ from perceval.backends.core.meetup import Meetup, MeetupCommand
 from perceval.backends.core.nntp import NNTP, NNTPCommand
 from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.core.pipermail import Pipermail, PipermailCommand
+from perceval.backends.puppet.puppetforge import PuppetForge, PuppetForgeCommand
 from perceval.backends.core.redmine import Redmine, RedmineCommand
 from perceval.backends.core.rss import RSS, RSSCommand
 from perceval.backends.core.slack import Slack, SlackCommand
@@ -86,8 +87,8 @@ from .enriched.mozillaclub import MozillaClubEnrich
 from .enriched.nntp import NNTPEnrich
 from .enriched.phabricator import PhabricatorEnrich
 from .enriched.pipermail import PipermailEnrich
+from .enriched.puppetforge import PuppetForgeEnrich
 from .enriched.redmine import RedmineEnrich
-# from .elk.remo import ReMoEnrich
 from .enriched.remo import ReMoEnrich
 from .enriched.rss import RSSEnrich
 from .enriched.slack import SlackEnrich
@@ -118,6 +119,7 @@ from .raw.mozillaclub import MozillaClubOcean
 from .raw.nntp import NNTPOcean
 from .raw.phabricator import PhabricatorOcean
 from .raw.pipermail import PipermailOcean
+from .raw.puppetforge import PuppetForgeOcean
 from .raw.redmine import RedmineOcean
 from .raw.remo import ReMoOcean
 from .raw.rss import RSSOcean
@@ -204,6 +206,7 @@ def get_connectors():
             "nntp": [NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
             "phabricator": [Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail": [Pipermail, PipermailOcean, PipermailEnrich, PipermailCommand],
+            "puppetforge": [PuppetForge, PuppetForgeOcean, PuppetForgeEnrich, PuppetForgeCommand],
             "redmine": [Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo": [ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "rss": [RSS, RSSOcean, RSSEnrich, RSSCommand],
@@ -352,10 +355,16 @@ def get_params_parser():
 
 
 def get_params():
-    ''' Get params definition from ElasticOcean and from all the backends '''
+    """ Get params definition from ElasticOcean and from all the backends """
 
     parser = get_params_parser()
     args = parser.parse_args()
+
+    if not args.enrich_only and not args.only_identities and not args.only_studies:
+        if not args.index:
+            # Check that the raw index name is defined
+            print("[error] --index <name> param is required when collecting items from raw")
+            sys.exit(1)
 
     return args
 
