@@ -93,22 +93,21 @@ class Mapping(BaseMapping):
                                 "properties": {
                                     "message": {
                                         "type": "string",
-                                        "index": "anaylzed"
+                                        "index": "analyzed"
                                     }
                                 }
                             },
                             "subject": {
                                 "type": "string",
-                                "index": "anaylzed"
+                                "index": "analyzed"
                             },
-                            ,
                             "patchSets": {
                                 "properties": {
                                     "approvals": {
                                         "properties": {
                                             "description": {
                                                 "type": "string",
-                                                "index": "anaylzed"
+                                                "index": "analyzed"
                                             }
                                         }
                                     }
