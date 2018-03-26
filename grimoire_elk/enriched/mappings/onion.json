@@ -2,12 +2,6 @@
   "mappings": {
     "item": {
       "properties": {
-        "timeframe": {
-          "type": "date"
-        },
-        "quarter": {
-          "type": "keyword"
-        },
         "author_name": {
           "type": "keyword"
         },
@@ -17,16 +11,13 @@
         "author_uuid": {
           "type": "keyword"
         },
-        "commits": {
+        "contributions": {
           "type": "long"
         },
         "cum_net_sum": {
           "type": "long"
         },
-        "percent_cum_net_sum": {
-          "type": "float"
-        },
-        "onion_role": {
+        "data_source": {
           "type": "keyword"
         },
         "grimoire_creation_date": {
@@ -38,11 +29,20 @@
         "metadata__timestamp": {
           "type": "date"
         },
-        "metadata__updated_on": {
-          "type": "date"
+        "onion_role": {
+          "type": "keyword"
+        },
+        "percent_cum_net_sum": {
+          "type": "float"
         },
         "project": {
           "type": "keyword"
+        },
+        "quarter": {
+          "type": "keyword"
+        },
+        "timeframe": {
+          "type": "date"
         }
       }
     }

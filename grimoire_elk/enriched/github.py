@@ -99,6 +99,10 @@ class GitHubEnrich(Enrich):
                  db_user='', db_password='', db_host=''):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
+
+        self.studies = []
+        self.studies.append(self.enrich_onion)
+
         self.users = {}  # cache users
         self.location = {}  # cache users location
         self.location_not_found = []  # location not found in map api
@@ -376,6 +380,35 @@ class GitHubEnrich(Enrich):
         self.geo_locations_to_es()  # Update geolocations in Elastic
 
         return total
+
+    def enrich_onion(self, enrich_backend, no_incremental=False,
+                     in_index_iss='github_issues_onion-src',
+                     in_index_prs='github_prs_onion-src',
+                     out_index_iss='github_issues_onion-enriched',
+                     out_index_prs='github_prs_onion-enriched',
+                     data_source_iss='github-issues',
+                     data_source_prs='github-prs',
+                     contribs_field='uuid',
+                     timeframe_field='grimoire_creation_date',
+                     sort_on_field='metadata__timestamp'):
+
+        super().enrich_onion(enrich_backend=enrich_backend,
+                             in_index=in_index_iss,
+                             out_index=out_index_iss,
+                             data_source=data_source_iss,
+                             contribs_field=contribs_field,
+                             timeframe_field=timeframe_field,
+                             sort_on_field=sort_on_field,
+                             no_incremental=no_incremental)
+
+        super().enrich_onion(enrich_backend=enrich_backend,
+                             in_index=in_index_prs,
+                             out_index=out_index_prs,
+                             data_source=data_source_prs,
+                             contribs_field=contribs_field,
+                             timeframe_field=timeframe_field,
+                             sort_on_field=sort_on_field,
+                             no_incremental=no_incremental)
 
 
 class GitHubUser(object):

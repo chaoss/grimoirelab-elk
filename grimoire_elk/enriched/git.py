@@ -765,8 +765,8 @@ class GitEnrich(Enrich):
 
         # Creating connections
         es = Elasticsearch([self.elastic.url])
-        in_conn = ESPandasConnector(es_conn=es, es_index="git_aoc-raw", sort_on='metadata__timestamp')
-        out_conn = ESPandasConnector(es_conn=es, es_index="git_aoc-enriched", sort_on='metadata__timestamp',
+        in_conn = ESPandasConnector(es_conn=es, es_index="git_aoc-raw", sort_on_field='metadata__timestamp')
+        out_conn = ESPandasConnector(es_conn=es, es_index="git_aoc-enriched", sort_on_field='metadata__timestamp',
                                      read_only=False)
 
         exists_index = out_conn.exists()
@@ -779,21 +779,19 @@ class GitEnrich(Enrich):
         areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
         logger.info("[Areas of Code] End")
 
-    def enrich_onion(self, enrich_backend, no_incremental=False):
-        logger.info("[Onion] Starting study")
+    def enrich_onion(self, enrich_backend, no_incremental=False,
+                     in_index='git_onion-src',
+                     out_index='git_onion-enriched',
+                     data_source='git',
+                     contribs_field='hash',
+                     timeframe_field='grimoire_creation_date',
+                     sort_on_field='metadata__timestamp'):
 
-        # Creating connections
-        es = Elasticsearch([self.elastic.url])
-        in_conn = ESOnionConnector(es_conn=es, es_index="git_onion-src", timeframe_field='grimoire_creation_date',
-                                   sort_on='metadata__timestamp')
-        out_conn = ESOnionConnector(es_conn=es, es_index="git_onion-enriched", timeframe_field='grimoire_creation_date',
-                                    sort_on='metadata__timestamp', read_only=False)
-
-        # Onion currently does not support incremental option
-        logger.info("[Onion] Creating out ES index")
-        # Initialize out index
-        filename = pkg_resources.resource_filename('grimoire_elk', 'elk/mappings/git_onion.json')
-        out_conn.create_index(filename, delete=out_conn.exists())
-
-        onion_study(in_conn=in_conn, out_conn=out_conn)
-        logger.info("[Onion] End")
+        super().enrich_onion(enrich_backend=enrich_backend,
+                             in_index=in_index,
+                             out_index=out_index,
+                             data_source=data_source,
+                             contribs_field=contribs_field,
+                             timeframe_field=timeframe_field,
+                             sort_on_field=sort_on_field,
+                             no_incremental=no_incremental)
