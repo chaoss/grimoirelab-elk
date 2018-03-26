@@ -211,7 +211,7 @@ class GerritEnrich(Enrich):
         eitem["patchsets"] = len(review["patchSets"])
 
         # Limit the size of comment messages
-        if review['comments']:
+        if 'comments' in review:
             for comment in review['comments']:
                 comment['message'] = comment['message'][:self.KEYWORD_MAX_SIZE]
 
