@@ -314,6 +314,16 @@ class Enrich(ElasticItems):
         return self.enrich_items(items, events=True)
 
     def enrich_items(self, ocean_backend, events=False):
+        """
+        Enrich the items fetched from ocean_backend generator
+        generating enriched items/events which are uploaded to the Elasticsearch index for
+        this Enricher (self).
+
+        :param ocean_backend: Ocean backend object to fetch the items from
+        :param events: enrich items or enrich events
+        :return: total number of enriched items/events uploaded to Elasticsearch
+        """
+
         max_items = self.elastic.max_items_bulk
         current = 0
         total = 0
@@ -362,10 +372,6 @@ class Enrich(ElasticItems):
 
         if current > 0:
             total += self.elastic.safe_put_bulk(url, bulk_json)
-
-        if total == 0:
-            # No items enriched, nothing to upload to ES
-            return total
 
         return total
 
