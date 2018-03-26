@@ -117,13 +117,14 @@ class PuppetForgeEnrich(Enrich):
         eitem["owner_module_count"] = entry['owner_data']['module_count']
         eitem["module_downloads"] = entry['downloads']
         eitem["release_count"] = len(entry['releases'])
-        eitem["module_version"] = entry['current_release']['version']
-        eitem["version"] = entry['current_release']['version']
-        eitem["validation_score"] = entry['current_release']['validation_score']
-        eitem["tags"] = entry['current_release']['tags']
-        eitem["license"] = entry['current_release']['metadata']['license']
-        eitem["source_url"] = entry['current_release']['metadata']['source']
-        eitem["summary"] = entry['current_release']['metadata']['summary']
+        if 'current_release' in entry:
+            eitem["module_version"] = entry['current_release']['version']
+            eitem["version"] = entry['current_release']['version']
+            eitem["validation_score"] = entry['current_release']['validation_score']
+            eitem["tags"] = entry['current_release']['tags']
+            eitem["license"] = entry['current_release']['metadata']['license']
+            eitem["source_url"] = entry['current_release']['metadata']['source']
+            eitem["summary"] = entry['current_release']['metadata']['summary']
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
@@ -180,6 +181,8 @@ class PuppetForgeEnrich(Enrich):
         return events
 
     def enrich_items(self, ocean_backend):
-        super(PuppetForgeEnrich, self).enrich_items(ocean_backend)
+        total = super(PuppetForgeEnrich, self).enrich_items(ocean_backend)
         # Always generate also the events
         super(PuppetForgeEnrich, self).enrich_items(ocean_backend, events=True)
+
+        return total  # return just the enriched items, not the events
