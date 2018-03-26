@@ -30,12 +30,16 @@ import sys
 
 from datetime import datetime as dt
 
+import pkg_resources
 from dateutil import parser
 from functools import lru_cache
+
+from elasticsearch import Elasticsearch
 
 from perceval.backend import find_signature_parameters
 
 from ..elastic_items import ElasticItems
+from .study_ceres_onion import ESOnionConnector, onion_study
 
 from .utils import grimoire_con
 from .. import __version__
@@ -233,7 +237,7 @@ class Enrich(ElasticItems):
                     db_projects.append(project)
                 if project not in json:
                     logger.error("Project not found in JSON ", project)
-                    raise
+                    raise NotFoundError("Project not found in JSON " + project)
                 else:
                     if ds == 'mls':
                         repo_mls = repository.split("/")[-1]
@@ -795,3 +799,30 @@ class Enrich(ElasticItems):
             logger.error(ex)
 
         return sh_ids
+
+    def enrich_onion(self, enrich_backend, in_index, out_index, data_source, contribs_field,
+                     timeframe_field, sort_on_field, no_incremental=False):
+
+        logger.info("[Onion] Starting study")
+
+        # Creating connections
+        es = Elasticsearch([self.elastic.url])
+        in_conn = ESOnionConnector(es_conn=es, es_index=in_index,
+                                   contribs_field=contribs_field,
+                                   timeframe_field=timeframe_field,
+                                   sort_on_field=sort_on_field)
+        out_conn = ESOnionConnector(es_conn=es, es_index=out_index,
+                                    contribs_field=contribs_field,
+                                    timeframe_field=timeframe_field,
+                                    sort_on_field=sort_on_field,
+                                    read_only=False)
+
+        # Onion currently does not support incremental option
+        logger.info("[Onion] Creating out ES index")
+        # Initialize out index
+        filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/onion.json')
+        out_conn.create_index(filename, delete=out_conn.exists())
+
+        onion_study(in_conn=in_conn, out_conn=out_conn, data_source=data_source)
+
+        logger.info("[Onion] This is the end.")

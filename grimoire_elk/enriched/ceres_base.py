@@ -137,15 +137,15 @@ class ESConnector(Connector):
 
     :param self._es_conn: ElasticSearch connection for reading from/writing to.
     :param self._es_index: ElasticSearch index for reading from/writing to.
-    :param self._sort_on: date field to sort results, important for incremental process.
+    :param self._sort_on_field: date field to sort results, important for incremental process.
     :param self._read_only: True to avoid unwanted writes.
     """
 
-    def __init__(self, es_conn, es_index, sort_on='metadata__timestamp', read_only=True):
+    def __init__(self, es_conn, es_index, sort_on_field='metadata__timestamp', read_only=True):
 
         self._es_conn = es_conn
         self._es_index = es_index
-        self._sort_on = sort_on
+        self._sort_on_field = sort_on_field
         self._read_only = read_only
 
     def read_item(self, from_date=None):
@@ -247,14 +247,14 @@ class ESConnector(Connector):
         search = Search(using=self._es_conn, index=self._es_index)
         # from:to parameters (=> from: 0, size: 0)
         search = search[0:0]
-        search = search.aggs.metric('max_date', 'max', field=self._sort_on)
+        search = search.aggs.metric('max_date', 'max', field=self._sort_on_field)
 
         try:
             response = search.execute()
 
             aggs = response.to_dict()['aggregations']
             if aggs['max_date']['value'] is None:
-                logger.debug("No data for " + self._sort_on + " field found in " + self._es_index + " index")
+                logger.debug("No data for " + self._sort_on_field + " field found in " + self._es_index + " index")
 
             else:
                 # Incremental case: retrieve items from last item in ES write index
@@ -285,11 +285,11 @@ class ESConnector(Connector):
         """
 
         if from_date:
-            query = {"range": {self._sort_on: {"gte": from_date}}}
+            query = {"range": {self._sort_on_field: {"gte": from_date}}}
         else:
             query = {"match_all": {}}
 
-        sort = [{self._sort_on: {"order": "asc"}}]
+        sort = [{self._sort_on_field: {"order": "asc"}}]
 
         search_query = {
             "query": query,
