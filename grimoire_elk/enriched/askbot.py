@@ -278,6 +278,7 @@ class AskbotEnrich(Enrich):
 
         eanswer['summary'] = answer['summary']
         eanswer['is_accepted_answer'] = 1 if answer['accepted'] else 0
+        eanswer['answer_status'] = "accepted" if answer['accepted'] else "not_accepted"
         eanswer['score'] = answer['score']
         if 'is_correct' in answer:
             eanswer['is_correct'] = 1
