@@ -28,7 +28,7 @@ import tempfile
 
 import requests
 
-from grimoire_elk.feeder import load_identities
+from grimoire_elk.elk import load_identities
 from grimoire_elk.enriched.gerrit import GerritEnrich
 from grimoire_elk.enriched.git import GitEnrich
 from grimoire_elk.enriched.utils import grimoire_con
