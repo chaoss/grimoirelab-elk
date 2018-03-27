@@ -33,6 +33,8 @@ import requests
 from dateutil import parser
 from elasticsearch import Elasticsearch
 
+from grimoire_elk.enriched.study_ceres_onion import ESOnionConnector, onion_study
+from grimoirelab.toolkit.datetime import datetime_to_utc, str_to_datetime
 from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
 from ..elastic_mapping import Mapping as BaseMapping
@@ -319,6 +321,10 @@ class GitEnrich(Enrich):
         eitem['git_uuid'] = eitem['uuid']
         # The real data
         commit = item['data']
+
+        self.__fix_field_date(commit, 'AuthorDate')
+        self.__fix_field_date(commit, 'CommitDate')
+
         # data fields to copy
         copy_fields = ["message", "Author"]
         for f in copy_fields:
@@ -339,16 +345,21 @@ class GitEnrich(Enrich):
 
         eitem['hash_short'] = eitem['hash'][0:6]
         # Enrich dates
-        author_date = parser.parse(commit["AuthorDate"])
-        commit_date = parser.parse(commit["CommitDate"])
+        author_date = str_to_datetime(commit["AuthorDate"])
+        commit_date = str_to_datetime(commit["CommitDate"])
+
         eitem["author_date"] = author_date.replace(tzinfo=None).isoformat()
         eitem["commit_date"] = commit_date.replace(tzinfo=None).isoformat()
-        eitem["utc_author"] = (author_date - author_date.utcoffset()).replace(tzinfo=None).isoformat()
-        eitem["utc_commit"] = (commit_date - commit_date.utcoffset()).replace(tzinfo=None).isoformat()
+
+        eitem["utc_author"] = datetime_to_utc(author_date).replace(tzinfo=None).isoformat()
+        eitem["utc_commit"] = datetime_to_utc(commit_date).replace(tzinfo=None).isoformat()
+
         eitem["tz"] = int(author_date.strftime("%z")[0:3])
+
         # Compute time to commit
-        time_to_commit_delta = parser.parse(eitem["utc_commit"]) - parser.parse(eitem["utc_author"])
+        time_to_commit_delta = datetime_to_utc(author_date) - datetime_to_utc(commit_date)
         eitem["time_to_commit_hours"] = round(time_to_commit_delta.seconds / 3600, 2)
+
         # Other enrichment
         eitem["repo_name"] = item["origin"]
         # Number of files touched
@@ -415,6 +426,17 @@ class GitEnrich(Enrich):
             eitem = self.__add_pair_programming_metrics(commit, eitem)
 
         return eitem
+
+    def __fix_field_date(self, item, attribute):
+        """Fix possible errors in the field date"""
+
+        field_date = str_to_datetime(item[attribute])
+
+        try:
+            _ = int(field_date.strftime("%z")[0:3])
+        except ValueError:
+            logger.warning("%s in commit %s has a wrong format", attribute, item['commit'])
+            item[attribute] = field_date.replace(tzinfo=None).isoformat()
 
     def __add_pair_programming_metrics(self, commit, eitem):
 

@@ -166,6 +166,8 @@ class AskbotEnrich(Enrich):
             eitem['time_to_reply'] = get_time_diff_days(added_at, first_answer_time)
             eitem['question_has_accepted_answer'] = 1 if question['accepted_answer_id'] else 0
             eitem['question_accepted_answer_id'] = question['accepted_answer_id']
+        else:
+            eitem['question_has_accepted_answer'] = 0
 
         if question['author'] and type(question['author']) is dict:
             eitem['author_askbot_user_name'] = question['author']['username']
@@ -276,6 +278,7 @@ class AskbotEnrich(Enrich):
 
         eanswer['summary'] = answer['summary']
         eanswer['is_accepted_answer'] = 1 if answer['accepted'] else 0
+        eanswer['answer_status'] = "accepted" if answer['accepted'] else "not_accepted"
         eanswer['score'] = answer['score']
         if 'is_correct' in answer:
             eanswer['is_correct'] = 1
