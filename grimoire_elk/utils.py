@@ -52,7 +52,7 @@ from perceval.backends.core.meetup import Meetup, MeetupCommand
 from perceval.backends.core.nntp import NNTP, NNTPCommand
 from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.core.pipermail import Pipermail, PipermailCommand
-from perceval.backends.puppet.puppetforge import PuppetForge, PuppetForgeCommand
+# from perceval.backends.puppet.puppetforge import PuppetForge, PuppetForgeCommand
 from perceval.backends.core.redmine import Redmine, RedmineCommand
 from perceval.backends.core.rss import RSS, RSSCommand
 from perceval.backends.core.slack import Slack, SlackCommand
@@ -206,7 +206,7 @@ def get_connectors():
             "nntp": [NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
             "phabricator": [Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail": [Pipermail, PipermailOcean, PipermailEnrich, PipermailCommand],
-            "puppetforge": [PuppetForge, PuppetForgeOcean, PuppetForgeEnrich, PuppetForgeCommand],
+#            "puppetforge": [PuppetForge, PuppetForgeOcean, PuppetForgeEnrich, PuppetForgeCommand],
             "redmine": [Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo": [ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "rss": [RSS, RSSOcean, RSSEnrich, RSSCommand],
