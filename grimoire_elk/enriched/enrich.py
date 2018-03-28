@@ -812,7 +812,7 @@ class Enrich(ElasticItems):
         logger.info("[Onion] Starting study")
 
         # Creating connections
-        es = Elasticsearch([self.elastic.url])
+        es = Elasticsearch([self.elastic.url], timeout=100)
         in_conn = ESOnionConnector(es_conn=es, es_index=in_index,
                                    contribs_field=contribs_field,
                                    timeframe_field=timeframe_field,
