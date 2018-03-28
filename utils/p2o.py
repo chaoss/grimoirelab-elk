@@ -24,7 +24,6 @@
 #
 
 import logging
-import time
 from datetime import datetime
 from os import sys
 
