@@ -30,10 +30,8 @@ import time
 
 import pkg_resources
 import requests
-from dateutil import parser
 from elasticsearch import Elasticsearch
 
-from grimoire_elk.enriched.study_ceres_onion import ESOnionConnector, onion_study
 from grimoirelab.toolkit.datetime import datetime_to_utc, str_to_datetime
 from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
@@ -764,7 +762,7 @@ class GitEnrich(Enrich):
         logger.info("[Areas of Code] Starting study")
 
         # Creating connections
-        es = Elasticsearch([self.elastic.url])
+        es = Elasticsearch([self.elastic.url], timeout=100)
         in_conn = ESPandasConnector(es_conn=es, es_index="git_aoc-raw", sort_on_field='metadata__timestamp')
         out_conn = ESPandasConnector(es_conn=es, es_index="git_aoc-enriched", sort_on_field='metadata__timestamp',
                                      read_only=False)
