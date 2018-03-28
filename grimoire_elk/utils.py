@@ -87,7 +87,7 @@ from .enriched.mozillaclub import MozillaClubEnrich
 from .enriched.nntp import NNTPEnrich
 from .enriched.phabricator import PhabricatorEnrich
 from .enriched.pipermail import PipermailEnrich
-from .enriched.puppetforge import PuppetForgeEnrich
+# from .enriched.puppetforge import PuppetForgeEnrich
 from .enriched.redmine import RedmineEnrich
 from .enriched.remo import ReMoEnrich
 from .enriched.rss import RSSEnrich
@@ -119,7 +119,7 @@ from .raw.mozillaclub import MozillaClubOcean
 from .raw.nntp import NNTPOcean
 from .raw.phabricator import PhabricatorOcean
 from .raw.pipermail import PipermailOcean
-from .raw.puppetforge import PuppetForgeOcean
+# from .raw.puppetforge import PuppetForgeOcean
 from .raw.redmine import RedmineOcean
 from .raw.remo import ReMoOcean
 from .raw.rss import RSSOcean
@@ -206,7 +206,7 @@ def get_connectors():
             "nntp": [NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
             "phabricator": [Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail": [Pipermail, PipermailOcean, PipermailEnrich, PipermailCommand],
-#            "puppetforge": [PuppetForge, PuppetForgeOcean, PuppetForgeEnrich, PuppetForgeCommand],
+            # "puppetforge": [PuppetForge, PuppetForgeOcean, PuppetForgeEnrich, PuppetForgeCommand],
             "redmine": [Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo": [ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
             "rss": [RSS, RSSOcean, RSSEnrich, RSSCommand],
