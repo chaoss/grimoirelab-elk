@@ -93,6 +93,7 @@ class GitEnrich(Enrich):
     # REGEX to extract authors from a multi author commit: several authors present
     # in the Author field in the commit. Used if self.pair_programming is True
     AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) and (?P<last_author>.* .*) (?P<email>.*)')
+    AUTHOR_P2P_NEW_REGEX = re.compile(r"Co-authored-by:(?P<first_authors>.* .*)<(?P<email>.*)>\n?")
 
     roles = ['Author', 'Commit']
 
@@ -144,6 +145,11 @@ class GitEnrich(Enrich):
             authors = m.group('first_authors').split(",")
             authors = [author.strip() for author in authors]
             authors += [m.group('last_author')]
+
+        n = self.AUTHOR_P2P_NEW_REGEX.findall(authors_str)
+        if n:
+            for i in n:
+                authors += [i[0]]
         # Remove duplicates
         authors = list(set(authors))
 
@@ -185,7 +191,8 @@ class GitEnrich(Enrich):
         if item['data']['Author']:
             # Check multi authors commits
             m = self.AUTHOR_P2P_REGEX.match(item['data']["Author"])
-            if m and self.pair_programming:
+            n = self.AUTHOR_P2P_NEW_REGEX.match(item['data']["Author"])
+            if (m or n) and self.pair_programming:
                 authors = self.__get_authors(item['data']["Author"])
                 for author in authors:
                     user = self.get_sh_identity(author)
@@ -197,7 +204,8 @@ class GitEnrich(Enrich):
                     add_sh_github_identity(user, 'Author', 'author')
         if item['data']['Commit']:
             m = self.AUTHOR_P2P_REGEX.match(item['data']["Commit"])
-            if m and self.pair_programming:
+            n = self.AUTHOR_P2P_NEW_REGEX.match(item['data']["Author"])
+            if (m or n) and self.pair_programming:
                 committers = self.__get_authors(item['data']['Commit'])
                 for committer in committers:
                     user = self.get_sh_identity(committer)
@@ -505,13 +513,15 @@ class GitEnrich(Enrich):
                 # First we need to add the authors field to all commits
                 # Check multi author
                 m = self.AUTHOR_P2P_REGEX.match(item['data']['Author'])
-                if m:
+                n = self.AUTHOR_P2P_NEW_REGEX.match(item['data']['Author'])
+                if m or n:
                     logger.debug("Multiauthor detected. Creating one commit " +
                                  "per author: %s", item['data']['Author'])
                     item['data']['authors'] = self.__get_authors(item['data']['Author'])
                     item['data']['Author'] = item['data']['authors'][0]
                 m = self.AUTHOR_P2P_REGEX.match(item['data']['Commit'])
-                if m:
+                n = self.AUTHOR_P2P_NEW_REGEX.match(item['data']['Author'])
+                if m or n:
                     logger.debug("Multicommitter detected: using just the first committer")
                     item['data']['committers'] = self.__get_authors(item['data']['Commit'])
                     item['data']['Commit'] = item['data']['committers'][0]
