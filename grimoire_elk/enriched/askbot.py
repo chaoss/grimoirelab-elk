@@ -139,6 +139,9 @@ class AskbotEnrich(Enrich):
 
         question = item['data']
 
+        if 'accepted_answer_id' not in question:
+            question['accepted_answer_id'] = None
+
         # Fields that are the same in item and eitem
         copy_fields = ["id", "url", "title", "summary", "score"]
         for f in copy_fields:

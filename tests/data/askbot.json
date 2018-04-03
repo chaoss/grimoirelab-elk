@@ -2610,7 +2610,6 @@
     "backend_version": "0.4.0",
     "category": "question",
     "data": {
-        "accepted_answer_id": null,
         "added_at": "1270788444",
         "answer_count": 1,
         "answer_ids": [
