@@ -72,6 +72,19 @@ class Mapping(BaseMapping):
                                 "title": {
                                     "type": "text",
                                     "index": true
+                                },
+                                "post_stream": {
+                                    "dynamic": false,
+                                    "properties": {
+                                        "posts": {
+                                            "properties": {
+                                                "cooked": {
+                                                    "type": "text",
+                                                    "index": true
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -113,6 +126,19 @@ class Mapping(BaseMapping):
                                 "title": {
                                     "type": "string",
                                     "index": "analyzed"
+                                },
+                                "post_stream": {
+                                    "dynamic": false,
+                                    "properties": {
+                                        "posts": {
+                                            "properties": {
+                                                "cooked": {
+                                                    "type": "string",
+                                                    "index": "analyzed"
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
