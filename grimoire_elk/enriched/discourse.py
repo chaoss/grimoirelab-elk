@@ -27,7 +27,6 @@ import logging
 from .utils import get_time_diff_days, grimoire_con
 
 from .enrich import Enrich, metadata
-from ..elastic_mapping import Mapping as BaseMapping
 
 logger = logging.getLogger(__name__)
 
