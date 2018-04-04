@@ -29,45 +29,13 @@ from datetime import datetime
 from dateutil import parser
 
 from .enrich import Enrich, metadata, DEFAULT_PROJECT
-from ..elastic_mapping import Mapping as BaseMapping
-
 from .utils import get_time_diff_days
 
 
 logger = logging.getLogger(__name__)
 
 
-class Mapping(BaseMapping):
-
-    @staticmethod
-    def get_elastic_mappings(es_major):
-        """Get Elasticsearch mapping.
-
-        :param es_major: major version of Elasticsearch, as string
-        :returns:        dictionary with a key, 'items', with the mapping
-        """
-
-        mapping = """
-        {
-            "properties": {
-               "summary": {
-                   "type": "text",
-                   "index": false
-               },
-               "main_description": {
-                   "type": "text",
-                   "index": false
-               }
-            }
-        }
-        """
-
-        return {"items": mapping}
-
-
 class BugzillaRESTEnrich(Enrich):
-
-    mapping = Mapping
 
     roles = ['assigned_to_detail', 'qa_contact_detail', 'creator_detail']
 
@@ -158,9 +126,9 @@ class BugzillaRESTEnrich(Enrich):
         eitem["id"] = issue['id']
         eitem["status"] = issue['status']
         if "summary" in issue:
-            eitem["summary"] = issue['summary']
+            eitem["summary"] = issue['summary'][:self.KEYWORD_MAX_SIZE]
             # Share the name field with bugzilla and share the panel
-            eitem["main_description"] = eitem["summary"]
+            eitem["main_description"] = eitem["summary"][:self.KEYWORD_MAX_SIZE]
         # Component and product
         eitem["component"] = issue['component']
         eitem["product"] = issue['product']
