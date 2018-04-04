@@ -49,6 +49,10 @@ class Mapping(BaseMapping):
                             "extensions": {
                                 "dynamic":false,
                                 "properties": {}
+                            },
+                            "body": {
+                                "dynamic":false,
+                                "properties": {}
                             }
                         }
                     }
