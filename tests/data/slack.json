@@ -3,6 +3,28 @@
     "backend_version": "0.4.0",
     "category": "message",
     "data": {
+        "attachments": [
+            {
+                "author_icon": "https://avatars.slack-edge.com/2017-01-27/XXXXX.jpg",
+                "author_id": "U0FRC7LR1",
+                "author_link": "https://bitergia.slack.com/team/U0FRC7LR1",
+                "author_name": "bugsbunny",
+                "author_subname": "bugsbunny",
+                "channel_id": "C095YQBRR",
+                "channel_name": "general",
+                "color": "D0D0D0",
+                "fallback": "[April 4th, 2018 4:56 PM] pipeline",
+                "footer": "Posted in #general",
+                "from_url": "https://bitergia.slack.com/archives/C095YQBRR/p1522853808202695",
+                "is_msg_unfurl": true,
+                "is_share": true,
+                "mrkdwn_in": [
+                    "text"
+                ],
+                "text": "and as regards the design note pages they still apply",
+                "ts": "1522873808.000695"
+            }
+        ],
         "channel_info": {
             "created": 1480595743,
             "creator": "U0001",
