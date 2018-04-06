@@ -159,7 +159,8 @@ class MediaWikiEnrich(Enrich):
                 else:
                     erevision["revision_" + f] = None
 
-            erevision["revision_comment"] = rev["comment"][:self.KEYWORD_MAX_SIZE]
+            if "comment" in rev:
+                erevision["revision_comment"] = rev["comment"][:self.KEYWORD_MAX_SIZE]
 
             if self.sortinghat:
                 erevision.update(self.get_review_sh(rev, item))
