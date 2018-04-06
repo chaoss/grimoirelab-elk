@@ -333,7 +333,7 @@
         "criteria": "PASS",
         "details": {
             "errors": "",
-            "failures": 0,
+            "failures": [],
             "skipped": "2017-06-01 10:51:23.615 399 INFO opnfv-tempest [-] {0} tempest.scenario.test_server_multinode.TestServerMultinode",
             "tests": 119
         },
@@ -601,7 +601,7 @@
         "criteria": "PASS",
         "details": {
             "errors": [],
-            "failures": []
+            "failures": null
         },
         "installer": "daisy",
         "pod_name": "zte-virtual1",
@@ -629,7 +629,8 @@
         "criteria": "PASS",
         "details": {
             "errors": [],
-            "failures": []
+            "failures": ["tempest.api.identity.admin.v3.test_credentials.CredentialsTestJSON",
+                         "tempest.api.identity.admin.v3.test_domains.DefaultDomainTestJSON.test_default_domain_exists"]
         },
         "installer": "daisy",
         "pod_name": "zte-virtual1",
