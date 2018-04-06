@@ -82,7 +82,12 @@ class FunctestEnrich(Enrich):
                     # Only propagate tests if it is a number
                     eitem['tests'] = func_test['details']['tests']
             if 'failures' in func_test['details']:
-                eitem['failures'] = func_test['details']['failures']
+
+                if type(func_test['details']['failures']) == list:
+                    eitem['failures'] = len(func_test['details']['failures'])
+                else:
+                    eitem['failures'] = func_test['details']['failures']
+
             if 'duration' in func_test['details']:
                 eitem['duration'] = func_test['details']['duration']
 
