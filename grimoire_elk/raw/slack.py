@@ -49,6 +49,18 @@ class Mapping(BaseMapping):
                                 "attachments": {
                                     "dynamic":false,
                                     "properties": {}
+                                },
+                                "channel_info": {
+                                    "properties": {
+                                        "latest": {
+                                            "dynamic": false,
+                                            "properties": {}
+                                        }
+                                    }
+                                },
+                                "root": {
+                                   "dynamic":false,
+                                    "properties": {}
                                 }
                             }
                         }
