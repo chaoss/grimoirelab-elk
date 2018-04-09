@@ -13,46 +13,11 @@ This study splits each commit in several items by touched file. It makes possibl
 granularity. 
 
 ### Requirements
-It expects to find an input index named `git_aoc-raw`, a git enriched index containing 
-data to compute onion on.
+It expects to find an input index named `git_aoc-raw`, a git raw index containing 
+data to apply this study on.
 
 ### Results
-Index named `git_aoc-enriched` with following fields:
-
-* addedlines
-* author_bot
-* author_domain
-* author_id
-* author_name
-* author_org_name
-* author_user_name
-* author_uuid
-* committer
-* committer_date
-* date
-* eventtype
-* file_dir_name: path in which the file is located, not including file name.
-* file_ext: file extension.
-* file_name: file name with extension.
-* file_path_list: list of splitted path parts.
-* fileaction: action performed by the commit over the file.
-* filepath: complete file path.
-* files: number of files touched by the same commit this file is included in.
-* filetype: `Code` or `Other`, based on file extension.
-* git_author_domain
-* grimoire_creation_date
-* hash
-* id
-* message
-* metadata__enriched_on
-* metadata__timestamp
-* metadata__updated_on
-* owner
-* perceval_uuid
-* project
-* project_1
-* removedlines
-* repository
+As output you will get an index following our [areas of code index fields convention](https://github.com/chaoss/grimoirelab-elk/blob/master/schema/areas_of_code.csv). This index will be named `git_aoc-enriched`.
 
 ## Onion Study
 This study process information from an enriched index and computes Onion metric on that.
