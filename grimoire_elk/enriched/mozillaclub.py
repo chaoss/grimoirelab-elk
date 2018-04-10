@@ -47,20 +47,16 @@ class Mapping(BaseMapping):
             {
                 "properties": {
                     "Event_Description": {
-                        "type": "text",
-                        "index": true
+                        "type": "keyword"
                     },
                     "Event_Creations": {
-                        "type": "text",
-                        "index": true
+                        "type": "keyword"
                     },
                     "Feedback_from_Attendees": {
-                        "type": "text",
-                        "index": true
+                        "type": "keyword"
                     },
                     "Your_Feedback": {
-                        "type": "text",
-                        "index": true
+                        "type": "keyword"
                     },
                     "geolocation": {
                         "type": "geo_point"
@@ -73,19 +69,19 @@ class Mapping(BaseMapping):
                 "properties": {
                     "Event_Description": {
                         "type": "string",
-                        "index": "analyzed"
+                        "index": "not_analyzed"
                     },
                     "Event_Creations": {
                         "type": "string",
-                        "index": "analyzed"
+                        "index": "not_analyzed"
                     },
                     "Feedback_from_Attendees": {
                         "type": "string",
-                        "index": "analyzed"
+                        "index": "not_analyzed"
                     },
                     "Your_Feedback": {
                         "type": "string",
-                        "index": "analyzed"
+                        "index": "not_analyzed"
                     },
                     "geolocation": {
                         "type": "geo_point"
@@ -143,6 +139,18 @@ class MozillaClubEnrich(Enrich):
                 eitem[f] = None
         # The real data
         event = item['data']
+
+        if "Event Description" in event and event["Event Description"]:
+            event["Event Description"] = event["Event Description"][:self.KEYWORD_MAX_SIZE]
+
+        if "Event Creations" in event and event["Event Creations"]:
+            event["Event Creations"] = event["Event Creations"][:self.KEYWORD_MAX_SIZE]
+
+        if "Feedback from Attendees" in event and event["Feedback from Attendees"]:
+            event["Feedback from Attendees"] = event["Feedback from Attendees"][:self.KEYWORD_MAX_SIZE]
+
+        if "Your Feedback" in event and event["Your Feedback"]:
+            event["Your Feedback"] = event["Your Feedback"][:self.KEYWORD_MAX_SIZE]
 
         # just copy all fields converting in field names spaces to _
         for f in event:
