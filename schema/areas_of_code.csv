@@ -1,7 +1,7 @@
 name,type,aggregatable,description
 addedlines,long,true,"Number of lines added in this file by this commit (only in this file, not the whole commit)."
 author_bot,boolean,true,"True if the given author is identified as a bot."
-author_domain,keyword,true,"Domain associated to the author in sortinhat profile."
+author_domain,keyword,true,"Domain associated to the author in sortinghat profile."
 author_id,keyword,true,"Author Id from sortinghat."
 author_name,keyword,true,"Author name."
 author_org_name,keyword,true,"Organization name."

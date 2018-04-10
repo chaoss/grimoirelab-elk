@@ -120,4 +120,15 @@ p2o --only-enrich --only-studies --db-sortinghat DBNAME --db-host DBHOST --db-us
 ```
 
 ## Running studies from Mordred
-Mordred has its own configuration to enable studies. Please check [Mordred config documentation](https://github.com/chaoss/grimoirelab-mordred/config.md).
+Mordred has its own configuration [Mordred config documentation](https://github.com/chaoss/grimoirelab-mordred/blob/master/doc/config.md).
+
+The studies are enabled per data source.
+
+For executing Areas of Code Study and Onion studies for git:
+
+```
+[git]
+raw_index = git-raw
+enriched_index = git
+studies = [enrich_areas_of_code, enrich_onion]
+```
