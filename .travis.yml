@@ -16,6 +16,7 @@ before_install:
   - pip install perceval
   - pip install perceval-mozilla
   - pip install perceval-opnfv
+  - pip install perceval-puppet
   - pip install pandas==0.18.1
   - pip install redis
   - pip install sortinghat
