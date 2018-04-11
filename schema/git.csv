@@ -1,57 +1,41 @@
-name,type
-author_bot,boolean
-Author_bot,boolean
-author_date,date
-author_domain,keyword
-Author_domain,keyword
-author_id,keyword
-Author_id,keyword
-Author,keyword
-author_max_date,date
-author_min_date,date
-author_name,keyword
-Author_name,keyword
-author_org_name,keyword
-Author_org_name,keyword
-author_uuid,keyword
-Author_uuid,keyword
-Commit_bot,boolean
-commit_date,date
-Commit_domain,keyword
-Commit_id,keyword
-Commit_name,keyword
-Commit_org_name,keyword
-committer_domain,keyword
-Committer,keyword
-committer_name,keyword
-Commit_uuid,keyword
-files,long
-github_repo,keyword
-grimoire_creation_date,date
-hash,keyword
-hash_short,keyword
-is_git_commit,long
-_item_id,keyword
-lines_added,long
-lines_changed,long
-lines_removed,long
-message_analyzed,text
-message,keyword
-metadata__enriched_on,date
-metadata__gelk_backend_name,keyword
-metadata__gelk_version,keyword
-metadata__timestamp,date
-metadata__updated_on,date
-ocean-unique-id,keyword
-origin,keyword
-project_1,keyword
-project,keyword
-repo_name,keyword
-tag,keyword
-title,keyword
-tz,long
-url_id,keyword
-utc_author,date
-utc_commit,date
-uuid,keyword
-time_to_commit,long
+name,type,aggregatable,description
+author_bot,boolean,true,"True if the given author is identified as a bot."
+author_date,date,true,"Author date (when the original author made the commit)."
+author_domain,keyword,true,"Domain associated to the author in sortinghat profile."
+author_id,keyword,true,"Author Id from sortinghat."
+author_max_date,date,true,"Date of most recent commit made by this author."
+author_min_date,date,true,"Date of the firts commit made by this author."
+author_name,keyword,true,"Author name."
+author_org_name,keyword,true,"Organization name."
+author_uuid,keyword,true,"Author UUID from sortinghat."
+commit_date,date,true,"Date when commiter made this commit."
+committer_domain,keyword,true,"Commiter domain."
+committer_name,keyword,true,"Commiter name."
+files,long,true,"Number of files touched by this commit."
+github_repo,keyword,true,"GitHub repository, if applies."
+grimoire_creation_date,date,true,"Commit date (when the original author made the commit)."
+hash,keyword,true,"Commit hash."
+hash_short,keyword,true,"Shorten commit hash."
+is_git_commit,long,true,"Field containing '1' that allows to sum fields when concatenating with other indexes."
+lines_added,long,true,"Number of lines added by this commit."
+lines_changed,long,true,"Number of lines changed by this commit."
+lines_removed,long,true,"Number of lines removed by this commit."
+message_analyzed,text,false,"Commit message split by terms to allow searching."
+message,keyword,true,"Commit message as a single String."
+metadata__enriched_on,date,true,"Date when the item was enriched."
+metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich information."
+metadata__gelk_version,keyword,true,"Version of the backend used to enrich information."
+metadata__timestamp,date,true,"Date when the item was stored in RAW index."
+metadata__updated_on,date,true,"Date when the item was updated in its original data source."
+ocean-unique-id,keyword,true,"Unique identifier for all of the datasets in the information lake."
+origin,keyword,true,"Original URL where the repository was retrieved from."
+project_1,keyword,true,"Project (if more than one level is allowed in project hierarchy)"
+project,keyword,true,"Project."
+repo_name,keyword,true,"Repository name."
+tag,keyword,true,"Perceval tag."
+title,keyword,true,"Commit title."
+tz,long,true,"Timezone in which the commit was made by its original author."
+utc_author,date,true,"Author date in UTC."
+utc_commit,date,true,"Commit date in UTC."
+uuid,keyword,true,"Perceval UUID."
+time_to_commit_hours,long,true,"Time in hours from author date (when commit was originally created) to commit date (when the commit was made to the repository)."
