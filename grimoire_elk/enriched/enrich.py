@@ -68,6 +68,7 @@ except ImportError:
 
 DEFAULT_PROJECT = 'Main'
 DEFAULT_DB_USER = 'root'
+CUSTOM_META_PREFIX = 'cm'
 
 
 def metadata(func):
@@ -116,22 +117,22 @@ class Enrich(ElasticItems):
             self.sortinghat = True
 
         self.prjs_map = None  # mapping beetween repositories and projects
-        json_projects = None
+        self.json_projects = None
 
         if json_projects_map:
             with open(json_projects_map) as data_file:
-                json_projects = json.load(data_file)
+                self.json_projects = json.load(data_file)
                 # If we have JSON projects always use them for mapping
-                self.prjs_map = self.__convert_json_to_projects_map(json_projects)
-        if not json_projects:
+                self.prjs_map = self.__convert_json_to_projects_map(self.json_projects)
+        if not self.json_projects:
             if db_projects_map and not MYSQL_LIBS:
                 raise RuntimeError("Projects configured but MySQL libraries not available.")
-            if db_projects_map and not json_projects:
+            if db_projects_map and not self.json_projects:
                 self.prjs_map = self.__get_projects_map(db_projects_map,
                                                         db_user, db_password,
                                                         db_host)
 
-        if self.prjs_map and json_projects:
+        if self.prjs_map and self.json_projects:
             # logger.info("Comparing db and json projects")
             # self.__compare_projects_map(self.prjs_map, self.json_projects)
             pass
@@ -505,9 +506,13 @@ class Enrich(ElasticItems):
 
         return eitem_project_levels
 
-    def get_item_project(self, eitem):
-        """ Get project mapping enrichment field """
-        eitem_project = {}
+    def find_item_project(self, eitem):
+        """
+        Find the project for a enriched item
+        :param eitem: enriched item for which to find the project
+        :return: the project entry (a dictionary)
+        """
+
         ds_name = self.get_connector_name()  # data source name in projects map
         repository = self.get_project_repository(eitem)
         try:
@@ -528,6 +533,17 @@ class Enrich(ElasticItems):
                             project = self.prjs_map[ds_name][ds_repo]
                             break
 
+        return project
+
+    def get_item_project(self, eitem):
+        """
+        Get the project name related to the eitem
+        :param eitem: enriched item for which to find the project
+        :return: a dictionary with the project data
+        """
+        eitem_project = {}
+        project = self.find_item_project(eitem)
+
         if project is None:
             project = DEFAULT_PROJECT
 
@@ -535,10 +551,36 @@ class Enrich(ElasticItems):
         # Time to add the project levels: eclipse.platform.releng.aggregator
         eitem_project.update(self.add_project_levels(project))
 
+        # And now time to add the metadata
+        eitem_project.update(self.get_item_metadata(eitem))
+
         return eitem_project
 
-    # Sorting Hat stuff to be moved to SortingHat class
+    def get_item_metadata(self, eitem):
+        """
+        In the projects.json file, inside each project, there is a field called "meta" which has a
+        dictionary with fields to be added to the enriched items for this project.
 
+        This fields must be added with the prefix cm_ (custom metadata).
+
+        This method fetch the metadata fields for the project in which the eitem is included.
+
+        :param eitem: enriched item to search metadata for
+        :return: a dictionary with the metadata fields
+        """
+
+        eitem_metadata = {}
+
+        # Get the project entry for the item, which includes the metadata
+        project = self.find_item_project(eitem)
+
+        if project and 'meta' in self.json_projects[project]:
+            meta_fields = self.json_projects[project]['meta']
+            eitem_metadata = {CUSTOM_META_PREFIX + "_" + field: value for field, value in meta_fields.items()}
+
+        return eitem_metadata
+
+    # Sorting Hat stuff to be moved to SortingHat class
     def get_sh_identity(self, item, identity_field):
         """ Empty identity. Real implementation in each data source. """
         identity = {}
