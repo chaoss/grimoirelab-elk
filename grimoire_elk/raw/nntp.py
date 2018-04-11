@@ -37,42 +37,16 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
-            mapping = '''
+        mapping = '''
              {
                 "dynamic":true,
                     "properties": {
                         "data": {
-                            "properties": {
-                                "Subject": {
-                                    "type": "text",
-                                    "index": true
-                                },
-                                "body": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                }
-                            }
-                        }
-                    }
-            }
-            '''
-        else:
-            mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "Subject": {
-                                    "type": "string",
-                                    "index": "analyzed"
-                                },
-                                "body": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                }
-                            }
+                            "dynamic":false,
+                            "properties": {}
+                        },
+                        "updated_on": {
+                            "type": "long"
                         }
                     }
             }

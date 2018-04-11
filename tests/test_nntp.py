@@ -29,7 +29,7 @@ from base import TestBaseBackend
 from grimoire_elk.raw.nntp import NNTPOcean
 
 
-class TestNNTPClub(TestBaseBackend):
+class TestNNTP(TestBaseBackend):
     """Test NNTP backend"""
 
     connector = "nntp"
