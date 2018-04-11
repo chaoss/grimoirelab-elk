@@ -25,8 +25,8 @@
 import json
 import logging
 
+from requests.structures import CaseInsensitiveDict
 from dateutil import parser
-
 import email.utils
 
 from .enrich import Enrich, metadata
@@ -150,11 +150,7 @@ class MBoxEnrich(Enrich):
             else:
                 eitem[f] = None
         # The real data
-        message = item['data']
-
-        if 'DATE' in message:
-            message['Date'] = message['DATE']
-            message.pop('DATE', None)
+        message = CaseInsensitiveDict(item['data'])
 
         # Fields that are the same in message and eitem
         copy_fields = ["Date", "From", "Subject", "Message-ID"]
@@ -176,6 +172,9 @@ class MBoxEnrich(Enrich):
         # Enrich dates
         eitem["email_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
         eitem["list"] = item["origin"]
+
+        if 'Subject' in message and message['Subject']:
+            eitem['Subject'] = eitem['Subject'][:self.KEYWORD_MAX_SIZE]
 
         # Root message
         if 'In-Reply-To' in message:
