@@ -576,7 +576,8 @@ class Enrich(ElasticItems):
 
         if project and 'meta' in self.json_projects[project]:
             meta_fields = self.json_projects[project]['meta']
-            eitem_metadata = {CUSTOM_META_PREFIX + "_" + field: value for field, value in meta_fields.items()}
+            if isinstance(meta_fields, dict):
+                eitem_metadata = {CUSTOM_META_PREFIX + "_" + field: value for field, value in meta_fields.items()}
 
         return eitem_metadata
 
