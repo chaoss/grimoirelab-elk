@@ -1,42 +1,42 @@
 name,type
-author_bot,boolean
-author_domain,keyword
-author_id,keyword
-author_name,keyword
-author_org_name,keyword
-author_user_name,keyword
-author_uuid,keyword
-branch,keyword
-closed,date
-domain,keyword
-githash,keyword
-grimoire_creation_date,date
-is_gerrit_review,long
-metadata__enriched_on,date
-metadata__gelk_backend_name,keyword
-metadata__gelk_version,keyword
-metadata__timestamp,date
-metadata__updated_on,date
-name,keyword
-number,keyword
-ocean-unique-id,keyword
-opened,date
-origin,keyword
-owner_bot,boolean
-owner_domain,keyword
-owner_id,keyword
-owner_name,keyword
-owner_org_name,keyword
-owner_user_name,keyword
-owner_uuid,keyword
-patchsets,long
-project_1,keyword
-project,keyword
-repository,keyword
-status,keyword
-summary_analyzed,text
-summary,keyword
-tag,keyword
-timeopen,double
-url,keyword
-uuid,keyword
+author_bot,boolean,true,"True if the given author is identified as a bot."
+author_domain,keyword,true,"Domain associated to the author in sortinghat profile."
+author_id,keyword,true,"Author Id from sortinghat."
+author_name,keyword,true,"Author name."
+author_org_name,keyword,true,"Organization the author belongs to."
+author_user_name,keyword,true,"Author user name."
+author_uuid,keyword,true,"Author unique identifier from sortinghat."
+branch,keyword,true,"Development branch created for this changeset."
+closed,date,true,"Closing date of the changeset."
+domain,keyword,true,"Domain of the developer sending the changeset."
+githash,keyword,true,"Hash of the commit included in the changeset."
+grimoire_creation_date,date,true,"Commit creation date."
+is_gerrit_review,long,true,"Field containing '1' that allows to sum fields when concatenating with other indexes."
+metadata__enriched_on,date,true,"Date when the item was enriched."
+metadata__gelk_backend_name,keyword,true,"Grimoire-ELK backend name."
+metadata__gelk_version,keyword,true,"Grimoire-ELK version."
+metadata__timestamp,date,true,"Date when the item was stored in RAW index."
+metadata__updated_on,date,true,"Date when the item was updated in its originaldata source."
+name,keyword,true,"Changeset submitter name."
+number,keyword,true,"Gerrit changeset unique identifier."
+ocean-unique-id,keyword,true,"Unique identifier for all of the datasets in the information lake."
+opened,date,true,"Changeset sent date."
+origin,keyword,true,"Original URL where the changeset was retrieved."
+owner_bot,boolean,true,"True if the given author is identified as a bot."
+owner_domain,keyword,true,"Domain associated to the author in sortinghat profile."
+owner_id,keyword,true,"Author Id from sortinghat."
+owner_name,keyword,true,"Author name."
+owner_org_name,keyword,true,"Organization the author belongs to."
+owner_user_name,keyword,true,"Author user name in the Gerrit system."
+owner_uuid,keyword,true,"Author unique identifier from sortinghat."
+patchsets,long,true,"Number of patchsets/iterations involved in the changeset."
+project_1,keyword,true,"Second level project hierarchy (typically not used in Gerrit)."
+project,keyword,true,"First level project hierarchy."
+repository,keyword,true,"Repository (project in Gerrit terminology) where the changeset is sent."
+status,keyword,true,"Gerrit status such as Abandoned, Merged or Open. The actual value depends on the instance of Gerrit."
+summary_analyzed,text,false,"Text summary added by the developer. This is typically the commit message. This field is tokenized for searching purposes."
+summary,keyword,true,"Text summary added by the developer. This is typically the commit message."
+tag,keyword,true,"Perceval tag."
+timeopen,double,true,"Time that the changeset has been opened in days."
+url,keyword,true,"Full URL pointing to the changesetFull URL pointing to the changeset."
+uuid,keyword,true,"Perceval UUID"
