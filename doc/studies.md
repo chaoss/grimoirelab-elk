@@ -19,6 +19,8 @@ data to apply this study on.
 ### Results
 As output you will get an index following our [areas of code index fields convention](https://github.com/chaoss/grimoirelab-elk/blob/master/schema/areas_of_code.csv). This index will be named `git_aoc-enriched`.
 
+Additionally, an alias named `git_areas_of_code` pointing to above's index is created if it doesn't exist.
+
 ## Onion Study
 This study process information from an enriched index and computes Onion metric on that.
 
@@ -107,6 +109,29 @@ This index will be named:
 * **Git**: `git_onion-enriched`.
 * **GitHub Issues**: `github_issues_onion-enriched`.
 * **GitHub Pull Requests**: `github_prs_onion-enriched`.
+
+Finally, an alias named `all_onion` is automatically created, including all of the above mentioned indices:
+```
+> GET _alias/all_onion
+
+{
+  "github_issues_onion-enriched": {
+    "aliases": {
+      "all_onion": {}
+    }
+  },
+  "git_onion-enriched": {
+    "aliases": {
+      "all_onion": {}
+    }
+  },
+  "github_prs_onion-enriched": {
+    "aliases": {
+      "all_onion": {}
+    }
+  }
+}
+```
 
 
 ## Running studies from p2o
