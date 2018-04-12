@@ -874,4 +874,10 @@ class Enrich(ElasticItems):
 
         onion_study(in_conn=in_conn, out_conn=out_conn, data_source=data_source)
 
+        # Create alias if output index exists (index is always created from scratch, so
+        # alias need to be created each time)
+        if out_conn.exists():
+            logger.info("[Onion] Creating alias: all_onion")
+            out_conn.create_alias('all_onion')
+
         logger.info("[Onion] This is the end.")
