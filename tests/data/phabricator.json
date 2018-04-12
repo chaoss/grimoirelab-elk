@@ -23,6 +23,7 @@
                 "userName": "jdoe"
             },
             "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
+            "custom.dev:deadline": 1464306027,
             "dateCreated": 1462297064,
             "dateModified": 1462306027,
             "name": "Tasks #69",
@@ -501,6 +502,7 @@
                 "userName": "jdoe"
             },
             "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
+            "custom.dev:deadline": 1462494642,
             "dateCreated": 1462379566,
             "dateModified": 1462464642,
             "name": "Task #73",
@@ -1059,6 +1061,7 @@
                 "userName": "jdoe"
             },
             "authorPHID": "PHID-USER-2uk52xorcqb6sjvp467y",
+            "custom.dev:deadline": 1462306057,
             "dateCreated": 1462645103,
             "dateModified": 1462792338,
             "name": "Task #78",
@@ -1545,6 +1548,7 @@
                 "userName": "jane"
             },
             "authorPHID": "PHID-USER-ojtcpympsmwenszuef7p",
+            "custom.dev:deadline": 1468196707,
             "dateCreated": 1465815168,
             "dateModified": 1467196707,
             "name": "Task 296",

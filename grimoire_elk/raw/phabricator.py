@@ -74,8 +74,11 @@ class PhabricatorOcean(ElasticOcean):
     mapping = Mapping
 
     def _fix_item(self, item):
-        # https://discuss.elastic.co/t/field-name-cannot-contain/33251/16
-        if 'custom.external_reference' in item["data"]['fields']:
-            item["data"]['fields']["custom_external_reference"] = item["data"]['fields'].pop("custom.external_reference")
-        if 'custom.security_topic' in item["data"]['fields']:
-            item["data"]['fields']["custom_security_topic"] = item["data"]['fields'].pop("custom.security_topic")
+        # fields cannot contain dots in ES 2.2. For consistency reason, this fix is applied also
+        # to more recent versions of ES
+
+        for field in item["data"]["fields"]:
+            if '.' in field:
+                undotted_field = field.replace('.', '_')
+                item["data"]["fields"][undotted_field] = item["data"]["fields"][field]
+                item["data"]['fields'].pop(field)
