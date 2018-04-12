@@ -785,6 +785,15 @@ class GitEnrich(Enrich):
             out_conn.create_index(filename, delete=exists_index)
 
         areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
+
+        # Create alias if output index exists and alias does not
+        if out_conn.exists():
+            if not out_conn.exists_alias('git_areas_of_code'):
+                logger.info("[Areas of Code] Creating alias: git_areas_of_code")
+                out_conn.create_alias('git_areas_of_code')
+            else:
+                logger.info("[Areas of Code] Alias already exists: git_areas_of_code.")
+
         logger.info("[Areas of Code] End")
 
     def enrich_onion(self, enrich_backend, no_incremental=False,
