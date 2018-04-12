@@ -60,6 +60,12 @@ def data2es(items, ocean):
             ts = datetime.fromtimestamp(item['timestamp'])
             item['metadata__timestamp'] = ts.isoformat()
 
+        # the _fix_item does not apply to the test data for Twitter
+        try:
+            ocean._fix_item(item)
+        except KeyError:
+            pass
+
         return item
 
     items_pack = []  # to feed item in packs
