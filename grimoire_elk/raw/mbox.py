@@ -85,3 +85,11 @@ class MBoxOcean(ElasticOcean):
         params = {"dirpath": params[1], "uri": params[0]}
 
         return params
+
+    def _fix_item(self, item):
+        # Remove all custom fields to avoid the 1000 fields limit in ES
+
+        fields = list(item["data"].keys())
+        for field in fields:
+            if field.lower().startswith("x-"):
+                item["data"].pop(field)
