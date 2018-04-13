@@ -38,6 +38,7 @@ from perceval.backend import find_signature_parameters, Archive
 
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
+from .enriched.sortinghat_gelk import SortingHat
 from .enriched.utils import get_last_enrich, grimoire_con
 
 
@@ -359,13 +360,9 @@ def refresh_identities(enrich_backend, filter_author=None):
 
 
 def load_identities(ocean_backend, enrich_backend):
-    try:
-        from .enriched.sortinghat_gelk import SortingHat
-    except ImportError:
-        logger.warning("SortingHat not available.")
-
     # First we add all new identities to SH
     items_count = 0
+    identities_count = 0
     new_identities = []
 
     # Support that ocean_backend is a list of items (old API)
@@ -381,18 +378,34 @@ def load_identities(ocean_backend, enrich_backend):
         for identity in identities:
             if identity not in new_identities:
                 new_identities.append(identity)
-        if items_count % 100 == 0:
-            logger.debug("Processed %i items identities (%i identities) from %s",
-                         items_count, len(new_identities),
-                         enrich_backend.get_connector_name())
-    logger.debug("TOTAL ITEMS: %i", items_count)
 
-    logger.info("Total new identities to be checked %i", len(new_identities))
+        if items_count % 500 == 0:
+            inserted_identities = load_bulk_identities(items_count,
+                                                       new_identities,
+                                                       enrich_backend.sh_db,
+                                                       enrich_backend.get_connector_name())
+            identities_count += inserted_identities
+            new_identities = []
 
-    SortingHat.add_identities(enrich_backend.sh_db, new_identities,
-                              enrich_backend.get_connector_name())
+    if new_identities:
+        inserted_identities = load_bulk_identities(items_count,
+                                                   new_identities,
+                                                   enrich_backend.sh_db,
+                                                   enrich_backend.get_connector_name())
+        identities_count += inserted_identities
 
-    return len(new_identities)
+    return identities_count
+
+
+def load_bulk_identities(items_count, new_identities, sh_db, connector_name):
+    identities_count = len(new_identities)
+
+    SortingHat.add_identities(sh_db, new_identities, connector_name)
+
+    logger.debug("Processed %i items identities (%i identities) from %s",
+                 items_count, len(new_identities), connector_name)
+
+    return identities_count
 
 
 def enrich_items(ocean_backend, enrich_backend, events=False):
