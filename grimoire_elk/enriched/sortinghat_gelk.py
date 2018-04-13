@@ -115,7 +115,11 @@ class SortingHat(object):
         total = 0
 
         for identity in identities:
-            cls.add_identity(db, identity, backend)
-            total += 1
+            try:
+                cls.add_identity(db, identity, backend)
+                total += 1
+            except Exception as e:
+                logger.error("Unexcepted error when adding identities: %s" % e)
+                continue
 
         logger.info("Total identities added to SH: %i", total)
