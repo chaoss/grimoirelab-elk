@@ -82,27 +82,43 @@ class TestLoadIdentities(unittest.TestCase):
     def _test_load_identities(self, items=10):
         """Test whether fetched items are properly loaded to ES"""
 
+        items_count = 0
+        identities_count = 0
+
         start = datetime.datetime.now().timestamp()
         new_identities = []
 
         for i in range(items):
+            items_count += 1
             identities = create_fake_identities()
 
             for identity in identities:
                 if identity not in new_identities:
                     new_identities.append(identity)
 
-        next = datetime.datetime.now().timestamp()
-        print("create %s identities: %s" % (len(new_identities), next - start))
+            if items_count % 500 == 0:
+                inserted_identities = self.load_bulk_identities(items_count,
+                                                                new_identities,
+                                                                self.enrich_backend.sh_db,
+                                                                self.enrich_backend.get_connector_name())
+                identities_count += inserted_identities
+                new_identities = []
 
-        SortingHat.add_identities(self.enrich_backend.sh_db, new_identities,
-                                  self.enrich_backend.get_connector_name())
+        if new_identities:
+            inserted_identities = self.load_bulk_identities(items_count,
+                                                            new_identities,
+                                                            self.enrich_backend.sh_db,
+                                                            self.enrich_backend.get_connector_name())
+            identities_count += inserted_identities
 
         stop = datetime.datetime.now().timestamp()
-        print("add identities: %s" % (stop - next))
-        print("end load identities: %s" % (stop - start))
-
         self.assertLess((stop - start), 5.0)
+
+    def load_bulk_identities(self, items_count, new_identities, sh_db, connector_name):
+        identities_count = len(new_identities)
+        SortingHat.add_identities(sh_db, new_identities, connector_name)
+
+        return identities_count
 
     def test_load_identities(self):
 
