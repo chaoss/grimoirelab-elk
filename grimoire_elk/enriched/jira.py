@@ -194,7 +194,7 @@ class JiraEnrich(Enrich):
         eitem['author_email'] = None
         eitem['creation_date'] = issue["fields"]['created']
 
-        if 'description' in issue["fields"]:
+        if 'description' in issue["fields"] and issue["fields"]['description']:
             eitem['main_description'] = issue["fields"]['description'][:self.KEYWORD_MAX_SIZE]
 
         eitem['isssue_type'] = issue["fields"]['issuetype']['name']
