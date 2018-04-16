@@ -58,6 +58,13 @@ class Mapping(BaseMapping):
                                             "index": true
                                         }
                                     }
+                                },
+                                "changelog": {
+                                    "properties": {
+                                        "histories": {
+                                            "properties": {}
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -80,6 +87,13 @@ class Mapping(BaseMapping):
                                         "description": {
                                             "type": "string",
                                             "index": "analyzed"
+                                        }
+                                    }
+                                },
+                                "changelog": {
+                                    "properties": {
+                                        "histories": {
+                                            "properties": {}
                                         }
                                     }
                                 }
