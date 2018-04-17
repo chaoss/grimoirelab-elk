@@ -61,8 +61,7 @@ class Mapping(BaseMapping):
                                         "items": {
                                             "properties": {
                                                 "comment": {
-                                                    "type": "text",
-                                                    "index": false
+                                                    "type": "text"
                                                 }
                                             }
                                         }
@@ -94,7 +93,7 @@ class Mapping(BaseMapping):
                                             "properties": {
                                                 "comment": {
                                                     "type": "string",
-                                                    "index": "not_analyzed"
+                                                    "index": "analyzed"
                                                 }
                                             }
                                         }
