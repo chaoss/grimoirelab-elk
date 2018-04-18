@@ -78,7 +78,7 @@ setup(name="grimoire-elk",
       test_suite='tests',
       scripts=["utils/p2o.py"],
       install_requires=['perceval>=0.9.6', 'perceval-mozilla>=0.1.4', 'perceval-opnfv>=0.1.2', 'perceval-puppet>=0.1.4',
-                        'kingarthur>=0.1.1', 'cereslib>=0.1.0', 'grimoirelab-toolkit>=0.1.4',
+                        'kingarthur>=0.1.1', 'cereslib>=0.1.0', 'grimoirelab-toolkit>=0.1.4', 'sortinghat>=0.6.2',
                         'elasticsearch>=5.5.2', 'elasticsearch-dsl>=5.3.0'],
       zip_safe=False
       )
