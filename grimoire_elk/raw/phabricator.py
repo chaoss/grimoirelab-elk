@@ -56,6 +56,10 @@ class Mapping(BaseMapping):
                                     "properties": {
                                         "subpriority" : {"type": "float"}
                                      }
+                                 },
+                                 "description": {
+                                    "dynamic":false,
+                                    "properties": {}
                                  }
                              }
                          }
