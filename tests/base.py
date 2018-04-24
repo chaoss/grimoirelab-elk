@@ -27,19 +27,29 @@ import os
 import requests
 import sys
 import unittest
-
 from datetime import datetime
+
+from elasticsearch import Elasticsearch
 
 if '..' not in sys.path:
     sys.path.insert(0, '..')
 
 from grimoire_elk.elk import load_identities
 from grimoire_elk.utils import get_connectors, get_elastic
-
+from tests.model import ESMapping
 
 CONFIG_FILE = 'tests.conf'
 DB_SORTINGHAT = "test_sh"
 DB_PROJECTS = "test_projects"
+SCHEMA_DIR = '../schema/'
+
+
+def load_mapping(enrich_index, csv_name):
+
+    cvs_path = os.path.join(SCHEMA_DIR, csv_name + '.csv')
+    cvs_mapping = ESMapping.from_csv(enrich_index, cvs_path)
+
+    return cvs_mapping
 
 
 def data2es(items, ocean):
@@ -117,6 +127,7 @@ class TestBaseBackend(unittest.TestCase):
         cls.config.read(CONFIG_FILE)
         cls.es_con = dict(cls.config.items('ElasticSearch'))['url']
         cls.connectors = get_connectors()
+        cls.maxDiff = None
 
         # Sorting hat settings
         cls.db_user = ''
@@ -183,8 +194,26 @@ class TestBaseBackend(unittest.TestCase):
 
         raw_count = len([item for item in ocean_backend.fetch()])
         enrich_count = enrich_backend.enrich_items(ocean_backend)
+        self._test_csv_mappings(sortinghat)
 
         return {'raw': raw_count, 'enrich': enrich_count}
+
+    def _test_csv_mappings(self, sortinghat):
+        """Test whether the mappings in the CSV are successfully met"""
+
+        result = {}
+
+        if not sortinghat:
+            return result
+
+        csv_mapping = load_mapping(self.enrich_index, self.connector)
+        client = Elasticsearch(self.es_con, timeout=30)
+        mapping_json = client.indices.get_mapping(index=self.enrich_index)
+        es_mapping = ESMapping.from_json(index_name=self.enrich_index,
+                                         mapping_json=mapping_json)
+
+        result = csv_mapping.compare_properties(es_mapping)
+        self.assertEqual(result['msg'], "")
 
     def _test_refresh_identities(self):
         """Test refresh identities"""
