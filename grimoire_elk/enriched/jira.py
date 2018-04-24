@@ -176,22 +176,15 @@ class JiraEnrich(Enrich):
         eitem['changes'] = issue['changelog']['total']
         if issue["fields"]["assignee"]:
             eitem['assignee'] = issue["fields"]["assignee"]["displayName"]
-            eitem['assignee_email'] = None
-            if ("creator" in issue["fields"] and issue["fields"]["creator"] and
-                "emailAddress" in issue["fields"]["creator"]):
-                eitem['assignee_email'] = issue["fields"]["assignee"]["emailAddress"]
             if "timeZone" in issue["fields"]["assignee"]:
                 eitem['assignee_tz'] = issue["fields"]["assignee"]["timeZone"]
 
         if issue["fields"]["creator"] and "creator" in issue["fields"]:
             eitem['author_name'] = issue["fields"]["creator"]["displayName"]
-            if "emailAddress" in issue["fields"]["creator"]:
-                eitem['author_email'] = issue["fields"]["creator"]["emailAddress"]
             eitem['author_login'] = issue["fields"]["creator"]["name"]
             if "timeZone" in issue["fields"]["creator"]:
                 eitem['author_tz'] = issue["fields"]["creator"]["timeZone"]
 
-        eitem['author_email'] = None
         eitem['creation_date'] = issue["fields"]['created']
 
         if 'description' in issue["fields"] and issue["fields"]['description']:
@@ -216,9 +209,6 @@ class JiraEnrich(Enrich):
 
         if 'reporter' in issue['fields'] and issue['fields']['reporter']:
             eitem['reporter_name'] = issue['fields']['reporter']['displayName']
-            eitem['reporter_email'] = None
-            if "emailAddress" in issue["fields"]["reporter"]:
-                eitem['reporter_email'] = issue['fields']['reporter']['emailAddress']
             eitem['reporter_login'] = issue['fields']['reporter']['name']
             if "timeZone" in issue["fields"]["reporter"]:
                 eitem['reporter_tz'] = issue["fields"]["reporter"]["timeZone"]
