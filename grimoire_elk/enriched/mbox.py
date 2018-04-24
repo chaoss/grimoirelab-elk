@@ -153,7 +153,7 @@ class MBoxEnrich(Enrich):
         message = CaseInsensitiveDict(item['data'])
 
         # Fields that are the same in message and eitem
-        copy_fields = ["Date", "From", "Subject", "Message-ID"]
+        copy_fields = ["Date", "Subject", "Message-ID"]
         for f in copy_fields:
             if f in message:
                 eitem[f] = message[f]

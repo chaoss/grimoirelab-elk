@@ -332,14 +332,14 @@ class GitEnrich(Enrich):
         self.__fix_field_date(commit, 'CommitDate')
 
         # data fields to copy
-        copy_fields = ["message", "Author"]
+        copy_fields = ["message"]
         for f in copy_fields:
             if f in commit:
                 eitem[f] = commit[f]
             else:
                 eitem[f] = None
         # Fields which names are translated
-        map_fields = {"commit": "hash", "message": "message_analyzed", "Commit": "Committer"}
+        map_fields = {"commit": "hash", "message": "message_analyzed"}
         for fn in map_fields:
             if fn in commit:
                 eitem[map_fields[fn]] = commit[fn]
