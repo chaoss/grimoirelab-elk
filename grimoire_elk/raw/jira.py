@@ -61,6 +61,7 @@ class Mapping(BaseMapping):
                             "changelog": {
                                 "properties": {
                                     "histories": {
+                                        "dynamic":false,
                                         "properties": {}
                                     }
                                 }
