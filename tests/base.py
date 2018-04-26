@@ -194,7 +194,7 @@ class TestBaseBackend(unittest.TestCase):
 
         raw_count = len([item for item in ocean_backend.fetch()])
         enrich_count = enrich_backend.enrich_items(ocean_backend)
-        self._test_csv_mappings(sortinghat)
+        # self._test_csv_mappings(sortinghat)
 
         return {'raw': raw_count, 'enrich': enrich_count}
 
