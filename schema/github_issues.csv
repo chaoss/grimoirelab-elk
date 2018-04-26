@@ -7,7 +7,6 @@ assignee_data_org_name,keyword
 assignee_data_user_name,keyword
 assignee_data_uuid,keyword
 assignee_domain,keyword
-assignee_email,keyword
 assignee_geolocation,geo_point
 assignee_location,keyword
 assignee_login,keyword
@@ -57,7 +56,6 @@ user_data_org_name,keyword
 user_data_user_name,keyword
 user_data_uuid,keyword
 user_domain,keyword
-user_email,keyword
 user_geolocation,geo_point
 user_location,keyword
 user_login,keyword
