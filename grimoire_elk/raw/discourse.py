@@ -37,51 +37,49 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
-            mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "details": {
-                                    "properties": {
-                                        "suggested_topics": {
-                                            "dynamic": false,
-                                            "properties": {
-                                                "slug": {
-                                                    "type": "text",
-                                                    "index": true
-                                                },
-                                                "title": {
-                                                    "type": "text",
-                                                    "index": true
-                                                }
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "details": {
+                                "properties": {
+                                    "suggested_topics": {
+                                        "dynamic": false,
+                                        "properties": {
+                                            "slug": {
+                                                "type": "text",
+                                                "index": true
+                                            },
+                                            "title": {
+                                                "type": "text",
+                                                "index": true
                                             }
                                         }
                                     }
-                                },
-                                "fancy_title": {
-                                    "type": "text",
-                                    "index": true
-                                },
-                                "slug": {
-                                    "type": "text",
-                                    "index": true
-                                },
-                                "title": {
-                                    "type": "text",
-                                    "index": true
-                                },
-                                "post_stream": {
-                                    "dynamic": false,
-                                    "properties": {
-                                        "posts": {
-                                            "properties": {
-                                                "cooked": {
-                                                    "type": "text",
-                                                    "index": true
-                                                }
+                                }
+                            },
+                            "fancy_title": {
+                                "type": "text",
+                                "index": true
+                            },
+                            "slug": {
+                                "type": "text",
+                                "index": true
+                            },
+                            "title": {
+                                "type": "text",
+                                "index": true
+                            },
+                            "post_stream": {
+                                "dynamic": false,
+                                "properties": {
+                                    "posts": {
+                                        "properties": {
+                                            "cooked": {
+                                                "type": "text",
+                                                "index": true
                                             }
                                         }
                                     }
@@ -89,62 +87,9 @@ class Mapping(BaseMapping):
                             }
                         }
                     }
-            }
-            '''
-        else:
-            mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "details": {
-                                    "properties": {
-                                        "suggested_topics": {
-                                            "dynamic": false,
-                                            "properties": {
-                                                "slug": {
-                                                    "type": "string",
-                                                    "index": "analyzed"
-                                                },
-                                                "title": {
-                                                    "type": "string",
-                                                    "index": "analyzed"
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                "fancy_title": {
-                                    "type": "string",
-                                    "index": "analyzed"
-                                },
-                                "slug": {
-                                    "type": "string",
-                                    "index": "analyzed"
-                                },
-                                "title": {
-                                    "type": "string",
-                                    "index": "analyzed"
-                                },
-                                "post_stream": {
-                                    "dynamic": false,
-                                    "properties": {
-                                        "posts": {
-                                            "properties": {
-                                                "cooked": {
-                                                    "type": "string",
-                                                    "index": "analyzed"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
-            '''
+                }
+        }
+        '''
 
         return {"items": mapping}
 
