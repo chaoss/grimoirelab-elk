@@ -47,40 +47,22 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
-            mapping = """
-            {
-                "properties": {
-                    "main_description_analyzed": {
-                      "type": "text"
-                    },
-                    "assigned_to_roles": {
-                      "type": "text",
-                      "fielddata": true
-                     },
-                    "tags_analyzed": {
-                      "type": "text",
-                      "fielddata": true
-                     }
-               }
-            } """
-        else:
-            mapping = """
-            {
-                "properties": {
-                    "main_description_analyzed": {
-                      "type": "string",
-                      "index": "analyzed"
-                    },
-                    "assigned_to_roles": {
-                      "type": "string"
-                     },
-                    "tags_analyzed": {
-                      "type": "string",
-                      "index": "analyzed"
-                     }
-               }
-            } """
+        mapping = """
+        {
+            "properties": {
+                "main_description_analyzed": {
+                  "type": "text"
+                },
+                "assigned_to_roles": {
+                  "type": "text",
+                  "fielddata": true
+                 },
+                "tags_analyzed": {
+                  "type": "text",
+                  "fielddata": true
+                 }
+           }
+        } """
 
         return {"items": mapping}
 
