@@ -43,46 +43,26 @@ class Mapping(BaseMapping):
         :param es_major: major version of Elasticsearch, as string
         :returns:        dictionary with a key, 'items', with the mapping
         """
-        if es_major != "2":
-            mapping = """
-            {
-                "properties": {
-                    "description_analyzed": {
-                        "type": "text",
-                        "index": true
-                    },
-                    "comment": {
-                        "type": "text",
-                        "index": true
-                    },
-                    "venue_geolocation": {
-                        "type": "geo_point"
-                    },
-                    "group_geolocation": {
-                        "type": "geo_point"
-                    }
-               }
-            } """
-        else:
-            mapping = """
-                {
-                    "properties": {
-                        "description_analyzed": {
-                            "type": "string",
-                            "index": "analyzed"
-                        },
-                        "comment": {
-                            "type": "string",
-                            "index": "analyzed"
-                        },
-                        "venue_geolocation": {
-                            "type": "geo_point"
-                        },
-                        "group_geolocation": {
-                            "type": "geo_point"
-                        }
-                   }
-                } """
+
+        mapping = """
+        {
+            "properties": {
+                "description_analyzed": {
+                    "type": "text",
+                    "index": true
+                },
+                "comment": {
+                    "type": "text",
+                    "index": true
+                },
+                "venue_geolocation": {
+                    "type": "geo_point"
+                },
+                "group_geolocation": {
+                    "type": "geo_point"
+                }
+           }
+        } """
 
         return {"items": mapping}
 

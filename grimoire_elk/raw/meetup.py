@@ -37,25 +37,23 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
-            mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "comments": {
-                                    "properties": {
-                                        "comment": {
-                                            "type": "text",
-                                            "index": true
-                                        },
-                                        "member": {
-                                            "properties": {
-                                                "bio": {
-                                                    "type": "text",
-                                                    "index": true
-                                                }
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "comments": {
+                                "properties": {
+                                    "comment": {
+                                        "type": "text",
+                                        "index": true
+                                    },
+                                    "member": {
+                                        "properties": {
+                                            "bio": {
+                                                "type": "text",
+                                                "index": true
                                             }
                                         }
                                     }
@@ -63,36 +61,9 @@ class Mapping(BaseMapping):
                             }
                         }
                     }
-            }
-            '''
-        else:
-            mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "comments": {
-                                    "properties": {
-                                        "comment": {
-                                            "type": "string",
-                                            "index": "analyzed"
-                                        },
-                                        "member": {
-                                            "properties": {
-                                                "bio": {
-                                                    "type": "string",
-                                                    "index": "analyzed"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
-            '''
+                }
+        }
+        '''
 
         return {"items": mapping}
 
