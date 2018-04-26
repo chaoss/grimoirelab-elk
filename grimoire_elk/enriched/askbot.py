@@ -44,32 +44,17 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
-            mapping = """
-            {
-                "properties": {
-                    "author_badges": {
-                      "type": "text"
-                    },
-                    "summary": {
-                      "type": "text"
-                    }
-               }
-            } """
-        else:
-            mapping = """
-            {
-                "properties": {
-                    "author_badges": {
-                      "type": "string",
-                      "index": "analyzed"
-                    },
-                    "summary": {
-                      "type": "string",
-                      "index": "analyzed"
-                    }
-               }
-            } """
+        mapping = """
+        {
+            "properties": {
+                "author_badges": {
+                  "type": "text"
+                },
+                "summary": {
+                  "type": "text"
+                }
+           }
+        } """
 
         return {"items": mapping}
 
