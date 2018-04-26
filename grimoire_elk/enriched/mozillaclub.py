@@ -42,52 +42,26 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != "2":
-            mapping = """
-            {
-                "properties": {
-                    "Event_Description": {
-                        "type": "keyword"
-                    },
-                    "Event_Creations": {
-                        "type": "keyword"
-                    },
-                    "Feedback_from_Attendees": {
-                        "type": "keyword"
-                    },
-                    "Your_Feedback": {
-                        "type": "keyword"
-                    },
-                    "geolocation": {
-                        "type": "geo_point"
-                    }
-               }
-            } """
-        else:
-            mapping = """
-            {
-                "properties": {
-                    "Event_Description": {
-                        "type": "string",
-                        "index": "not_analyzed"
-                    },
-                    "Event_Creations": {
-                        "type": "string",
-                        "index": "not_analyzed"
-                    },
-                    "Feedback_from_Attendees": {
-                        "type": "string",
-                        "index": "not_analyzed"
-                    },
-                    "Your_Feedback": {
-                        "type": "string",
-                        "index": "not_analyzed"
-                    },
-                    "geolocation": {
-                        "type": "geo_point"
-                    }
-               }
-            } """
+        mapping = """
+        {
+            "properties": {
+                "Event_Description": {
+                    "type": "keyword"
+                },
+                "Event_Creations": {
+                    "type": "keyword"
+                },
+                "Feedback_from_Attendees": {
+                    "type": "keyword"
+                },
+                "Your_Feedback": {
+                    "type": "keyword"
+                },
+                "geolocation": {
+                    "type": "geo_point"
+                }
+           }
+        } """
 
         return {"items": mapping}
 
