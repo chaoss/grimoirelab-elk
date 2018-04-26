@@ -39,88 +39,46 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
-            mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "comments": {
-                                    "dynamic":false,
-                                    "properties": {
-                                        "raw_text": {
-                                            "type": "text",
-                                            "index": true
-                                        },
-                                        "text": {
-                                            "type": "text",
-                                            "index": true
-                                        }
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "comments": {
+                                "dynamic":false,
+                                "properties": {
+                                    "raw_text": {
+                                        "type": "text",
+                                        "index": true
+                                    },
+                                    "text": {
+                                        "type": "text",
+                                        "index": true
                                     }
-                                },
-                                "attachments": {
-                                    "properties": {
-                                        "description" : {
-                                            "type": "text",
-                                            "index": true
-                                        },
-                                        "summary" : {
-                                            "type": "text",
-                                            "index": true
-                                        }
-                                    }
-                                },
-                                "summary": {
-                                    "type": "text",
-                                    "index": true
                                 }
+                            },
+                            "attachments": {
+                                "properties": {
+                                    "description" : {
+                                        "type": "text",
+                                        "index": true
+                                    },
+                                    "summary" : {
+                                        "type": "text",
+                                        "index": true
+                                    }
+                                }
+                            },
+                            "summary": {
+                                "type": "text",
+                                "index": true
                             }
                         }
                     }
-            }
-            '''
-        else:
-            mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "comments": {
-                                    "dynamic":false,
-                                    "properties": {
-                                        "raw_text": {
-                                            "type": "string",
-                                            "index": "analyzed"
-                                        },
-                                        "text": {
-                                            "type": "string",
-                                            "index": "analyzed"
-                                        }
-                                    }
-                                },
-                                "attachments": {
-                                    "properties": {
-                                        "description" : {
-                                            "type": "string",
-                                            "index": "analyzed"
-                                        },
-                                        "summary" : {
-                                            "type": "string",
-                                            "index": "analyzed"
-                                        }
-                                    }
-                                },
-                                "summary": {
-                                    "type": "string",
-                                    "index": "analyzed"
-                                }
-                            }
-                        }
-                    }
-            }
-            '''
+                }
+        }
+        '''
 
         return {"items": mapping}
 
