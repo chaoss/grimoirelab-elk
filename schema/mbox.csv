@@ -12,7 +12,6 @@ email_date,date
 From_bot,boolean
 From_domain,keyword
 From_id,keyword
-From,keyword
 From_name,keyword
 From_org_name,keyword
 From_uuid,keyword

@@ -1,7 +1,6 @@
 name,type
 assignee_bot,boolean
 assignee_domain,keyword
-assignee_email,keyword
 assignee_id,keyword
 assignee,keyword
 assignee_name,keyword
@@ -51,7 +50,6 @@ project,keyword
 project_name,keyword
 reporter_bot,boolean
 reporter_domain,keyword
-reporter_email,keyword
 reporter_id,keyword
 reporter_login,keyword
 reporter_name,keyword
