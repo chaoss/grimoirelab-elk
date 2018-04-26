@@ -52,39 +52,21 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
-            mapping = """
-            {
-                "properties": {
-                   "assignee_geolocation": {
-                       "type": "geo_point"
-                   },
-                   "user_geolocation": {
-                       "type": "geo_point"
-                   },
-                   "title_analyzed": {
-                     "type": "text"
-                   }
-                }
+        mapping = """
+        {
+            "properties": {
+               "assignee_geolocation": {
+                   "type": "geo_point"
+               },
+               "user_geolocation": {
+                   "type": "geo_point"
+               },
+               "title_analyzed": {
+                 "type": "text"
+               }
             }
-            """
-        else:
-            mapping = """
-            {
-                "properties": {
-                   "assignee_geolocation": {
-                       "type": "geo_point"
-                   },
-                   "user_geolocation": {
-                       "type": "geo_point"
-                   },
-                   "title_analyzed": {
-                      "type": "string",
-                      "index": "analyzed"
-                   }
-                }
-            }
-            """
+        }
+        """
 
         return {"items": mapping}
 
