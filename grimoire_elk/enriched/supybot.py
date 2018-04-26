@@ -43,26 +43,15 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
-            mapping = """
-            {
-                "properties": {
-                    "body_analyzed": {
-                      "type": "text",
-                      "fielddata": true
-                      }
-               }
-            } """
-        else:
-            mapping = """
-            {
-                "properties": {
-                    "body_analyzed": {
-                      "type": "string",
-                      "index": "analyzed"
-                      }
-               }
-            } """
+        mapping = """
+        {
+            "properties": {
+                "body_analyzed": {
+                  "type": "text",
+                  "fielddata": true
+                  }
+           }
+        } """
 
         return {"items": mapping}
 
