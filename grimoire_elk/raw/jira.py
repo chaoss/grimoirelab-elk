@@ -40,68 +40,36 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
-            mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "renderedFields": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                },
-                                "fields": {
-                                    "properties": {
-                                        "description": {
-                                            "type": "text",
-                                            "index": true
-                                        }
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "renderedFields": {
+                                "dynamic":false,
+                                "properties": {}
+                            },
+                            "fields": {
+                                "properties": {
+                                    "description": {
+                                        "type": "text",
+                                        "index": true
                                     }
-                                },
-                                "changelog": {
-                                    "properties": {
-                                        "histories": {
-                                            "properties": {}
-                                        }
+                                }
+                            },
+                            "changelog": {
+                                "properties": {
+                                    "histories": {
+                                        "properties": {}
                                     }
                                 }
                             }
                         }
                     }
-            }
-            '''
-        else:
-            mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "renderedFields": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                },
-                                "fields": {
-                                    "properties": {
-                                        "description": {
-                                            "type": "string",
-                                            "index": "analyzed"
-                                        }
-                                    }
-                                },
-                                "changelog": {
-                                    "properties": {
-                                        "histories": {
-                                            "properties": {}
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
-            '''
+                }
+        }
+        '''
 
         return {"items": mapping}
 
