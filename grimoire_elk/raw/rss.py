@@ -37,54 +37,29 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
-            mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "content": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                },
-                                "summary_detail": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                },
-                                "summary": {
-                                    "type": "text",
-                                    "index": true
-                                }
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "content": {
+                                "dynamic":false,
+                                "properties": {}
+                            },
+                            "summary_detail": {
+                                "dynamic":false,
+                                "properties": {}
+                            },
+                            "summary": {
+                                "type": "text",
+                                "index": true
                             }
                         }
                     }
-            }
-            '''
-        else:
-            mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "content": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                },
-                                "summary_detail": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                },
-                                "summary": {
-                                    "type": "string",
-                                    "index": "analyzed"
-                                }
-                            }
-                        }
-                    }
-            }
-            '''
+                }
+        }
+        '''
 
         return {"items": mapping}
 
