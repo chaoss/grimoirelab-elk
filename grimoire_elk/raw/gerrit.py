@@ -39,36 +39,34 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        if es_major != '2':
-            mapping = '''
-             {
-                "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "commitMessage": {
-                                "type": "text"
-                            },
-                            "comments": {
-                                "properties": {
-                                    "message": {
-                                        "type": "text",
-                                        "index": true
-                                    }
+        mapping = '''
+         {
+            "dynamic":true,
+            "properties": {
+                "data": {
+                    "properties": {
+                        "commitMessage": {
+                            "type": "text"
+                        },
+                        "comments": {
+                            "properties": {
+                                "message": {
+                                    "type": "text",
+                                    "index": true
                                 }
-                            },
-                            "subject": {
-                                "type": "text",
-                                "index": true
-                            },
-                            "patchSets": {
-                                "properties": {
-                                    "approvals": {
-                                        "properties": {
-                                            "description": {
-                                                "type": "text",
-                                                "index": true
-                                            }
+                            }
+                        },
+                        "subject": {
+                            "type": "text",
+                            "index": true
+                        },
+                        "patchSets": {
+                            "properties": {
+                                "approvals": {
+                                    "properties": {
+                                        "description": {
+                                            "type": "text",
+                                            "index": true
                                         }
                                     }
                                 }
@@ -77,47 +75,8 @@ class Mapping(BaseMapping):
                     }
                 }
             }
-            '''
-
-        else:
-            mapping = '''
-             {
-                "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "commitMessage": {
-                                "type": "string"
-                            },
-                            "comments": {
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "index": "analyzed"
-                                    }
-                                }
-                            },
-                            "subject": {
-                                "type": "string",
-                                "index": "analyzed"
-                            },
-                            "patchSets": {
-                                "properties": {
-                                    "approvals": {
-                                        "properties": {
-                                            "description": {
-                                                "type": "string",
-                                                "index": "analyzed"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            '''
+        }
+        '''
 
         return {"items": mapping}
 
