@@ -223,6 +223,8 @@ class DiscourseEnrich(Enrich):
         eitem['score'] = first_post['score']
         eitem['reply_count'] = first_post['reply_count']
 
+        eitem['question_has_accepted_answer'] = 0
+        eitem['question_accepted_answer_id'] = None
         # First reply time
         eitem['time_from_question'] = None
         firt_post_time = None
@@ -230,6 +232,10 @@ class DiscourseEnrich(Enrich):
             firt_post_time = first_post['created_at']
             second_post_time = topic['post_stream']['posts'][1]['created_at']
             eitem['first_reply_time'] = get_time_diff_days(firt_post_time, second_post_time)
+            answers_id = [p['id'] for p in topic['post_stream']['posts']
+                          if 'accepted_answer' in p and p['accepted_answer']]
+            eitem['question_accepted_answer_id'] = answers_id[0] if answers_id else None
+            eitem['question_has_accepted_answer'] = 1 if eitem['question_accepted_answer_id'] else 0
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(first_post, date_field="created_at"))
