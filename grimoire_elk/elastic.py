@@ -205,28 +205,6 @@ class ElasticSearch(object):
 
         return new_items
 
-    @classmethod
-    def global_mapping(cls):
-        """ Return the global mapping to be used always """
-
-        # By default all strings are not analyzed
-        not_analyze_strings = """
-        {
-          "dynamic_templates": [
-            { "notanalyzed": {
-                  "match": "*",
-                  "match_mapping_type": "string",
-                  "mapping": {
-                      "type":        "string",
-                      "index":       "not_analyzed"
-                  }
-               }
-            }
-          ]
-        } """
-
-        return not_analyze_strings
-
     def create_mappings(self, mappings):
 
         headers = {"Content-Type": "application/json"}
@@ -280,7 +258,7 @@ class ElasticSearch(object):
             try:
                 res.raise_for_status()
             except requests.exceptions.HTTPError:
-                logger.warning("Can't add mapping %s: %s", url_map, self.global_mapping())
+                logger.warning("Can't add mapping %s: %s", url_map, not_analyze_strings)
 
     def get_last_date(self, field, filters_=[]):
         '''
