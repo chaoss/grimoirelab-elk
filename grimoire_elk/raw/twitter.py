@@ -40,17 +40,17 @@ class Mapping(BaseMapping):
             "dynamic":true,
             "properties": {
                 "user": {
-                    "dynamic":false,
                     "properties": {
                         "entities": {
+                            "dynamic":false,
                             "properties": {}
                         }
                     }
                 },
                 "hashtags": {
-                    "dynamic":false,
                     "properties": {
                         "indices": {
+                            "dynamic":false,
                             "properties": {}
                         }
                     }
@@ -61,16 +61,39 @@ class Mapping(BaseMapping):
                 },
                 "entities": {
                     "properties": {
+                        "media": {
+                            "dynamic":false,
+                            "properties": {}
+                        },
                         "symbols": {
+                            "dynamic":false,
                             "properties": {}
                         },
                         "urls": {
+                            "dynamic":false,
                             "properties": {}
                         },
                         "user_mentions": {
+                            "dynamic":false,
                             "properties": {}
                         }
                     }
+                },
+                "extended_entities": {
+                    "dynamic":false,
+                    "properties": {}
+                },
+                "extended_tweet": {
+                    "dynamic":false,
+                    "properties": {}
+                },
+                "quoted_status": {
+                    "dynamic":false,
+                    "properties": {}
+                },
+                "retweeted_status": {
+                    "dynamic":false,
+                    "properties": {}
                 }
             }
         }
