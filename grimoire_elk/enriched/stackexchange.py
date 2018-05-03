@@ -76,6 +76,9 @@ class StackExchangeEnrich(Enrich):
             # for answers
             user = item[identity_field]
 
+        if 'display_name' not in user:
+            user['display_name'] = ''
+
         identity['username'] = user['display_name']
         identity['email'] = None
         identity['name'] = user['display_name']
