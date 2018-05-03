@@ -66,7 +66,7 @@ class TwitterEnrich(Enrich):
         return "user"
 
     def get_field_date(self):
-        return "created_at"
+        return "@timestamp"
 
     def get_field_unique_id(self):
         return "id_str"
@@ -138,17 +138,18 @@ class TwitterEnrich(Enrich):
                 eitem[f] = tweet[f]
             else:
                 eitem[f] = None
-        # Date fields
-        eitem["created_at"] = parser.parse(tweet["created_at"]).isoformat()
+
         # Fields which names are translated
-        map_fields = {"@timestamp": "timestamp",
-                      "@version": "version"
-                      }
+        map_fields = {"@version": "version"}
         for f in map_fields:
             if f in tweet:
                 eitem[map_fields[f]] = tweet[f]
             else:
                 eitem[map_fields[f]] = None
+        # Date fields
+        eitem["created_at"] = parser.parse(tweet["created_at"]).isoformat()
+        eitem["@timestamp"] = parser.parse(tweet["@timestamp"]).isoformat()
+        eitem["metadata__timestamp"] = eitem["@timestamp"]
 
         # data fields to copy from user
         copy_fields = ["created_at", "description", "followers_count",
