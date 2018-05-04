@@ -114,6 +114,12 @@ class DiscourseEnrich(Enrich):
             if nanswers == 1:
                 eanswer['first_answer'] = 1
 
+            if 'accepted_answer' not in answer:
+                answer['accepted_answer'] = False
+
+            eanswer['is_accepted_answer'] = 1 if answer['accepted_answer'] else 0
+            eanswer['answer_status'] = "accepted" if answer['accepted_answer'] else "not_accepted"
+
         return answers_enrich
 
     def __collect_categories(self, origin):
