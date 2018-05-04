@@ -267,7 +267,11 @@ class ESOnionConnector(ESConnector):
             latest_ts_list.append(timing[self.LATEST_TS].value_as_string)
             date_list.append(timing.key_as_string)
             uuid_list.append(author.key)
-            name_list.append(author[self.AUTHOR_NAME].buckets[0].key)
+            if author[self.AUTHOR_NAME] and author[self.AUTHOR_NAME].buckets \
+                    and len(author[self.AUTHOR_NAME].buckets) > 0:
+                name_list.append(author[self.AUTHOR_NAME].buckets[0].key)
+            else:
+                name_list.append("Unknown")
             contribs_list.append(author[self.CONTRIBUTIONS].value)
 
         df = pandas.DataFrame()
