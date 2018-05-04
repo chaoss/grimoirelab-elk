@@ -69,12 +69,11 @@ class BugzillaRESTEnrich(Enrich):
     def get_item_project(self, eitem):
         """ Get project mapping enrichment field.
 
-        Twitter mappings is pretty special so it needs a special
+        Bugzillarest mapping is pretty special so it needs a special
         implementacion.
         """
 
         project = None
-        eitem_project = {}
         ds_name = self.get_connector_name()  # data source name in projects map
 
         url = eitem['origin']
