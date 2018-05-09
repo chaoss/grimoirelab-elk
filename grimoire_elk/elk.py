@@ -473,7 +473,7 @@ def do_studies(enrich_backend, no_incremental=False):
             study(enrich_backend, no_incremental)
     except Exception as e:
         logger.error("Problem executing study %s", study)
-        traceback.print_exc()
+        raise e
 
 
 def enrich_backend(url, clean, backend_name, backend_params, ocean_index=None,
