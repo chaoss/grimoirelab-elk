@@ -668,7 +668,7 @@ class GitEnrich(Enrich):
           "aggs": {
             "author": {
               "terms": {
-                "field": "Author",
+                "field": "author_id",
                 "size": 10000
               },
               "aggs": {
@@ -710,7 +710,7 @@ class GitEnrich(Enrich):
                 "bool": {
                     "must": [
                         {"term":
-                            { "Author" : ""  }
+                            { "author_id" : ""  }
                         }
                         ]
                 }
@@ -723,7 +723,7 @@ class GitEnrich(Enrich):
         for author in authors:
             # print("%s: %s %s" % (author['key'], author['min']['value_as_string'], author['max']['value_as_string']))
             # Time to add all the commits (items) from this author
-            author_query_json['query']['bool']['must'][0]['term']['Author'] = author['key']
+            author_query_json['query']['bool']['must'][0]['term']['author_id'] = author['key']
             author_query_str = json.dumps(author_query_json)
             r = self.requests.post(self.elastic.index_url + "/_search?size=10000",
                                    data=author_query_str, headers=HEADER_JSON,
