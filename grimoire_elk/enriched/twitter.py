@@ -25,6 +25,7 @@
 import logging
 
 from dateutil import parser
+from requests.structures import CaseInsensitiveDict
 
 from .enrich import Enrich, metadata, DEFAULT_PROJECT
 from ..elastic_mapping import Mapping as BaseMapping
@@ -109,8 +110,10 @@ class TwitterEnrich(Enrich):
             return eitem_project
 
         for tag in eitem['hashtags_analyzed']:
-            if tag in self.prjs_map[ds_name]:
-                project = self.prjs_map[ds_name][tag]
+            # lcanas: hashtag provided in projects.json file should not be case sensitive T6876
+            tags2project = CaseInsensitiveDict(self.prjs_map[ds_name])
+            if tag in tags2project:
+                project = tags2project[tag]
                 break
 
         if project is None:
