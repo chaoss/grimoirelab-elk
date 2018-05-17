@@ -76,6 +76,13 @@ class TestGit(TestBaseBackend):
         result = self._test_refresh_project()
         # ... ?
 
+    def test_demography_study(self):
+        """ Test that the demography study works correctly """
+        enriched_backend = self._test_studies(test_studies=['enrich_demography'])
+        for item in enriched_backend.fetch():
+            self.assertTrue('author_min_date' in item.keys())
+            self.assertTrue('author_max_date' in item.keys())
+
     def test_arthur_params(self):
         """Test the extraction of arthur params from an URL"""
 
