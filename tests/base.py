@@ -261,3 +261,31 @@ class TestBaseBackend(unittest.TestCase):
 
         total = refresh_projects(enrich_backend)
         return total
+
+    def _test_studies(self, test_studies=None):
+        """Test the execution of studies"""
+
+        # populate raw index
+        perceval_backend = None
+        clean = True
+        ocean_backend = self.connectors[self.connector][1](perceval_backend)
+        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, ocean_backend)
+        ocean_backend.set_elastic(elastic_ocean)
+        data2es(self.items, ocean_backend)
+
+        # populate enriched index
+        enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
+                                                            db_user=self.db_user,
+                                                            db_password=self.db_password)
+
+        elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, enrich_backend)
+        enrich_backend.set_elastic(elastic_enrich)
+        enrich_backend.enrich_items(ocean_backend)
+
+        for study in enrich_backend.studies:
+            if test_studies:
+                if study.__name__ not in test_studies:
+                    continue
+            study(enrich_backend)
+
+        return enrich_backend
