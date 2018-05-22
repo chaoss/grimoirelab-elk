@@ -189,8 +189,8 @@ class StackExchangeEnrich(Enrich):
                 else:
                     eitem[f] = None
 
-            answer['is_accepted_answer'] = 1 if answer['is_accepted'] else 0
-            answer['answer_status'] = "accepted" if answer['is_accepted'] else "not_accepted"
+            eitem['is_accepted_answer'] = 1 if answer['is_accepted'] else 0
+            eitem['answer_status'] = "accepted" if answer['is_accepted'] else "not_accepted"
 
             eitem["question_tags"] = question_tags
             eitem["question_tags_analyzed"] = question_tags
