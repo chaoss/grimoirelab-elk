@@ -47,6 +47,10 @@ class Mapping(BaseMapping):
                 "properties": {
                     "data": {
                         "properties": {
+                            "_class" : {
+                                "type" : "string",
+                                "index" : "not_analyzed"
+                            },
                             "runs": {
                                 "dynamic":false,
                                 "properties": {}
@@ -55,16 +59,76 @@ class Mapping(BaseMapping):
                                 "dynamic":false,
                                 "properties": {}
                             },
+                            "building" : {
+                                "type" : "boolean"
+                            },
+                            "builtOn" : {
+                                "type" : "string",
+                                "index" : "not_analyzed"
+                            },
                             "changeSet": {
                                 "properties": {
                                     "items": {
                                         "properties": {
                                             "comment": {
-                                                "type": "text"
+                                                "type": "string",
+                                                "index": "analyzed"
                                             }
                                         }
                                     }
                                 }
+                            },
+                            "description" : {
+                                "type" : "string",
+                                "index" : "not_analyzed"
+                            },
+                            "displayName" : {
+                                "type" : "string",
+                                "index" : "not_analyzed"
+                            },
+                            "duration" : {
+                                "type" : "long"
+                            },
+                            "estimatedDuration" : {
+                                "type" : "long"
+                            },
+                            "executor" : {
+                                "type" : "object"
+                            },
+                            "fullDisplayName" : {
+                                "type" : "string",
+                                "index" : "not_analyzed"
+                            },
+                            "id" : {
+                                "type" : "string",
+                                "index" : "not_analyzed"
+                            },
+                              "keepLog" : {
+                                "type" : "boolean"
+                            },
+                              "number" : {
+                                "type" : "long"
+                            },
+                            "queueId" : {
+                                "type" : "long"
+                            },
+                            "result" : {
+                                "type" : "string",
+                                "index" : "not_analyzed"
+                            },
+                            "runs": {
+                                "dynamic":false,
+                                "properties": {}
+                            },
+                            "subBuilds" : {
+                                "type" : "object"
+                            },
+                            "timestamp" : {
+                                "type" : "long"
+                            },
+                            "url" : {
+                                "type" : "string",
+                                "index" : "not_analyzed"
                             }
                         }
                     }
