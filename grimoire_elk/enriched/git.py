@@ -757,13 +757,16 @@ class GitEnrich(Enrich):
 
         logger.debug("Completed demography enrich from %s" % (self.elastic.index_url))
 
-    def enrich_areas_of_code(self, enrich_backend, no_incremental=False):
+    def enrich_areas_of_code(self, enrich_backend, no_incremental=False,
+                             in_index="git-raw",
+                             out_index="git_aoc-enriched",
+                             sort_on_field='metadata__timestamp'):
         logger.info("[Areas of Code] Starting study")
 
         # Creating connections
         es = Elasticsearch([self.elastic.url], timeout=100)
-        in_conn = ESPandasConnector(es_conn=es, es_index="git_aoc-raw", sort_on_field='metadata__timestamp')
-        out_conn = ESPandasConnector(es_conn=es, es_index="git_aoc-enriched", sort_on_field='metadata__timestamp',
+        in_conn = ESPandasConnector(es_conn=es, es_index=in_index, sort_on_field=sort_on_field)
+        out_conn = ESPandasConnector(es_conn=es, es_index=out_index, sort_on_field=sort_on_field,
                                      read_only=False)
 
         exists_index = out_conn.exists()
