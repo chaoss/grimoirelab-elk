@@ -40,6 +40,8 @@ def get_params():
                         help="perceval data source (git, github ...)")
     parser.add_argument('-v', '--version', dest='version', required=True,
                         help="Major Elasticsearch version for the mapping (2, 5, 6")
+    parser.add_argument('--index-raw', required=True, help="Name of the raw index to be imported")
+    parser.add_argument('--index-enriched', required=True, help="Name of the enriched index to be imported")
     args = parser.parse_args()
 
     return args
@@ -135,3 +137,16 @@ if __name__ == '__main__':
     mappings = find_ds_mapping(ARGS.data_source, ARGS.version)
 
     print(json.dumps(mappings, indent=True))
+
+    # Let's generate two files, <backend>-mapping-raw.json <backend>-mapping-enriched.json
+    raw_dict = mappings['raw'][0]
+    raw_dict.update(mappings['raw'][1])
+    raw_full = {ARGS.index_raw: {"mappings": {"items": raw_dict}}}
+    with open(ARGS.data_source + "-mapping-raw.json", "w") as fmap:
+        json.dump(raw_full, fmap, indent=True)
+
+    enriched_dict = mappings['enriched'][0]
+    enriched_dict.update(mappings['enriched'][1])
+    enriched_full = {ARGS.index_enriched: {"mappings": {"items": enriched_dict}}}
+    with open(ARGS.data_source + "-mapping-enriched.json", "w") as fmap:
+        json.dump(enriched_full, fmap, indent=True)
