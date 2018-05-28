@@ -136,16 +136,11 @@ class BugzillaEnrich(Enrich):
         if "assigned_to" in issue:
             if "name" in issue["assigned_to"][0]:
                 eitem["assigned"] = issue["assigned_to"][0]["name"]
-            if "__text__" in issue["assigned_to"][0]:
-                eitem["assignee_email"] = issue["assigned_to"][0]["__text__"]
 
         if "reporter" in issue:
             if "name" in issue["reporter"][0]:
                 eitem["reporter_name"] = issue["reporter"][0]["name"]
                 eitem["author_name"] = issue["reporter"][0]["name"]
-            if "__text__" in issue["reporter"][0]:
-                eitem["reporter_email"] = issue["reporter"][0]["__text__"]
-                eitem["author_email"] = issue["reporter"][0]["__text__"]
 
         date_ts = parser.parse(issue['creation_ts'][0]['__text__'])
         eitem['creation_date'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
