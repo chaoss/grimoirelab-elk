@@ -67,7 +67,7 @@ class TwitterEnrich(Enrich):
         return "user"
 
     def get_field_date(self):
-        return "@timestamp"
+        return "created_at"
 
     def get_field_unique_id(self):
         return "id_str"
