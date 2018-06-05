@@ -190,7 +190,7 @@ class JiraEnrich(Enrich):
         if 'description' in issue["fields"] and issue["fields"]['description']:
             eitem['main_description'] = issue["fields"]['description'][:self.KEYWORD_MAX_SIZE]
 
-        eitem['isssue_type'] = issue["fields"]['issuetype']['name']
+        eitem['issue_type'] = issue["fields"]['issuetype']['name']
         eitem['issue_description'] = issue["fields"]['issuetype']['description']
 
         if 'labels' in issue['fields']:
