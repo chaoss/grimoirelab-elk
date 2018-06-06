@@ -154,7 +154,7 @@ class StackExchangeEnrich(Enrich):
             eitem['question_has_accepted_answer'] = 0
             eitem['question_accepted_answer_id'] = None
 
-            if question['answer_count'] > 1:
+            if question['answer_count'] >= 1:
                 answers_id = [p['answer_id'] for p in question['answers']
                               if 'is_accepted' in p and p['is_accepted']]
                 eitem['question_accepted_answer_id'] = answers_id[0] if answers_id else None
