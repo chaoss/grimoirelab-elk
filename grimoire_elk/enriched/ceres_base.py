@@ -50,6 +50,9 @@ class Connector:
     def write(self, items):
         raise NotImplementedError
 
+    def latest_date(self):
+        raise NotImplementedError
+
 
 class CeresBase:
     """Base class to process items and create enriched indexes.
