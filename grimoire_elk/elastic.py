@@ -236,6 +236,15 @@ class ElasticSearch(object):
                               "index":       "not_analyzed"
                           }
                        }
+                    },
+                    { "formatdate": {
+                          "match": "*",
+                          "match_mapping_type": "date",
+                          "mapping": {
+                              "type": "date",
+                              "format" : "strict_date_optional_time||epoch_millis"
+                          }
+                       }
                     }
                   ]
                 } """
@@ -249,6 +258,15 @@ class ElasticSearch(object):
                           "match_mapping_type": "string",
                           "mapping": {
                               "type":        "keyword"
+                          }
+                       }
+                    },
+                    { "formatdate": {
+                          "match": "*",
+                          "match_mapping_type": "date",
+                          "mapping": {
+                              "type": "date",
+                              "format" : "strict_date_optional_time||epoch_millis"
                           }
                        }
                     }
