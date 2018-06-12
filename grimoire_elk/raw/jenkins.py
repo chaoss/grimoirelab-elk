@@ -48,8 +48,7 @@ class Mapping(BaseMapping):
                     "data": {
                         "properties": {
                             "_class" : {
-                                "type" : "string",
-                                "index" : "not_analyzed"
+                                "type" : "keyword"
                             },
                             "runs": {
                                 "dynamic":false,
@@ -63,28 +62,24 @@ class Mapping(BaseMapping):
                                 "type" : "boolean"
                             },
                             "builtOn" : {
-                                "type" : "string",
-                                "index" : "not_analyzed"
+                                "type" : "keyword"
                             },
                             "changeSet": {
                                 "properties": {
                                     "items": {
                                         "properties": {
                                             "comment": {
-                                                "type": "string",
-                                                "index": "analyzed"
+                                                "type": "text"
                                             }
                                         }
                                     }
                                 }
                             },
                             "description" : {
-                                "type" : "string",
-                                "index" : "not_analyzed"
+                                "type" : "keyword"
                             },
                             "displayName" : {
-                                "type" : "string",
-                                "index" : "not_analyzed"
+                                "type" : "keyword"
                             },
                             "duration" : {
                                 "type" : "long"
@@ -96,12 +91,10 @@ class Mapping(BaseMapping):
                                 "type" : "object"
                             },
                             "fullDisplayName" : {
-                                "type" : "string",
-                                "index" : "not_analyzed"
+                                "type" : "keyword"
                             },
                             "id" : {
-                                "type" : "string",
-                                "index" : "not_analyzed"
+                                "type" : "keyword"
                             },
                               "keepLog" : {
                                 "type" : "boolean"
@@ -113,12 +106,7 @@ class Mapping(BaseMapping):
                                 "type" : "long"
                             },
                             "result" : {
-                                "type" : "string",
-                                "index" : "not_analyzed"
-                            },
-                            "runs": {
-                                "dynamic":false,
-                                "properties": {}
+                                "type" : "keyword"
                             },
                             "subBuilds" : {
                                 "type" : "object"
@@ -127,8 +115,7 @@ class Mapping(BaseMapping):
                                 "type" : "long"
                             },
                             "url" : {
-                                "type" : "string",
-                                "index" : "not_analyzed"
+                                "type" : "keyword"
                             }
                         }
                     }
