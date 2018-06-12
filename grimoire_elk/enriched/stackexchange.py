@@ -122,7 +122,9 @@ class StackExchangeEnrich(Enrich):
 
             eitem["type"] = 'question'
             eitem["author"] = None
-            if 'owner' in question:
+            if 'owner' in question and question['owner']['user_type'] == "does_not_exist":
+                logger.warning("question without owner: %s", question['question_id'])
+            else:
                 eitem["author"] = question['owner']['display_name']
                 eitem["author_link"] = None
                 if 'link' in question['owner']:
@@ -130,8 +132,6 @@ class StackExchangeEnrich(Enrich):
                 eitem["reputation"] = None
                 if 'reputation' in question['owner']:
                     eitem["author_reputation"] = question['owner']['reputation']
-            else:
-                logger.warning("question without owner: ", question['question_id'])
 
             # data fields to copy
             copy_fields = common_fields + ['answer_count']
