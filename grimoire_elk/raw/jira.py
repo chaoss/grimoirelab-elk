@@ -43,32 +43,37 @@ class Mapping(BaseMapping):
         mapping = '''
          {
             "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "renderedFields": {
-                                "dynamic":false,
-                                "properties": {}
-                            },
-                            "fields": {
-                                "properties": {
-                                    "description": {
-                                        "type": "text",
-                                        "index": true
-                                    }
+            "properties": {
+                "data": {
+                    "properties": {
+                        "renderedFields": {
+                            "dynamic":false,
+                            "properties": {}
+                        },
+                        "operations": {
+                            "dynamic":false,
+                            "properties": {}
+                        },
+                        "fields": {
+                            "dynamic":true,
+                            "properties": {
+                                "description": {
+                                    "type": "text",
+                                    "index": true
                                 }
-                            },
-                            "changelog": {
-                                "properties": {
-                                    "histories": {
-                                        "dynamic":false,
-                                        "properties": {}
-                                    }
+                            }
+                        },
+                        "changelog": {
+                            "properties": {
+                                "histories": {
+                                    "dynamic":false,
+                                    "properties": {}
                                 }
                             }
                         }
                     }
                 }
+            }
         }
         '''
 
@@ -84,3 +89,14 @@ class JiraOcean(ElasticOcean):
     def get_arthur_params_from_url(cls, url):
         """ Get the arthur params given a URL for the data source """
         return {"url": url}
+
+    def _fix_item(self, item):
+        # Remove all custom fields to avoid the 1000 fields limit in ES
+
+        if "fields" not in item["data"]:
+            return
+
+        fields = list(item["data"]["fields"].keys())
+        for field in fields:
+            if field.lower().startswith("customfield_"):
+                item["data"]["fields"].pop(field)
