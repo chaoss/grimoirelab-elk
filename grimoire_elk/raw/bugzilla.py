@@ -57,6 +57,10 @@ class Mapping(BaseMapping):
                                         "index": true
                                     }
                                 }
+                            },
+                            "activity": {
+                                "dynamic": false,
+                                "properties": {}
                             }
                         }
                     }
