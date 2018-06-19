@@ -29,7 +29,7 @@ import traceback
 
 from sortinghat import api
 from sortinghat.db.model import Identity
-from sortinghat.exceptions import AlreadyExistsError, WrappedValueError
+from sortinghat.exceptions import AlreadyExistsError, InvalidValueError
 
 
 logger = logging.getLogger(__name__)
@@ -83,7 +83,7 @@ class SortingHat(object):
 
         except AlreadyExistsError as ex:
             uuid = ex.uuid
-        except WrappedValueError as ex:
+        except InvalidValueError as ex:
             logger.warning("Trying to add a None identity. Ignoring it.")
         except UnicodeEncodeError as ex:
             logger.warning("UnicodeEncodeError. Ignoring it. %s %s %s",
