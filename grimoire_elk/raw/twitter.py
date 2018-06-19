@@ -107,12 +107,10 @@ class TwitterOcean(ElasticOcean):
 
     mapping = Mapping
 
-    # To easy checking for this class
-    is_twitter_ocean = True
+    @classmethod
+    def get_arthur_params_from_url(cls, query):
+        # The query is directly passed to the Twitter API
 
-    def get_field_date(self):
-        """ Field with the update in the JSON items. Now the same in all. """
-        return "@timestamp"
+        params = {"query": query}
 
-    def _fix_item(self, item):
-        item["uuid"] = item["data"]["id"]
+        return params
