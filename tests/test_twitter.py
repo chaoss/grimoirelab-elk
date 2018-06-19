@@ -39,29 +39,29 @@ class TestTwitter(TestBaseBackend):
         """Test whether JSON items are properly inserted into ES"""
 
         result = self._test_items_to_raw()
-        self.assertEqual(result['items'], 3)
-        self.assertEqual(result['raw'], 3)
+        self.assertEqual(result['items'], 5)
+        self.assertEqual(result['raw'], 5)
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
-        self.assertEqual(result['raw'], 3)
-        self.assertEqual(result['enrich'], 3)
+        self.assertEqual(result['raw'], 5)
+        self.assertEqual(result['enrich'], 5)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
-        self.assertEqual(result['raw'], 3)
-        self.assertEqual(result['enrich'], 3)
+        self.assertEqual(result['raw'], 5)
+        self.assertEqual(result['enrich'], 5)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
-        self.assertEqual(result['raw'], 3)
-        self.assertEqual(result['enrich'], 3)
+        self.assertEqual(result['raw'], 5)
+        self.assertEqual(result['enrich'], 5)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
