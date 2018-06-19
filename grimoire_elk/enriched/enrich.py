@@ -56,7 +56,7 @@ except ImportError:
 try:
     from sortinghat.db.database import Database
     from sortinghat import api, utils
-    from sortinghat.exceptions import AlreadyExistsError, NotFoundError, WrappedValueError
+    from sortinghat.exceptions import AlreadyExistsError, NotFoundError, InvalidValueError
 
     from .sortinghat_gelk import SortingHat
 
@@ -833,7 +833,7 @@ class Enrich(ElasticItems):
             sh_ids['id'] = utils.uuid(backend_name, email=iden['email'],
                                       name=iden['name'], username=iden['username'])
             sh_ids['uuid'] = u.uuid
-        except WrappedValueError:
+        except InvalidValueError:
             logger.warning("None Identity found %s", backend_name)
             logger.warning(identity)
         except NotFoundError:
