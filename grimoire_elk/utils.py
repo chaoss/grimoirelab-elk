@@ -52,6 +52,7 @@ from perceval.backends.core.meetup import Meetup, MeetupCommand
 from perceval.backends.core.nntp import NNTP, NNTPCommand
 from perceval.backends.core.phabricator import Phabricator, PhabricatorCommand
 from perceval.backends.core.pipermail import Pipermail, PipermailCommand
+from perceval.backends.core.twitter import Twitter, TwitterCommand
 from perceval.backends.puppet.puppetforge import PuppetForge, PuppetForgeCommand
 from perceval.backends.core.redmine import Redmine, RedmineCommand
 from perceval.backends.core.rss import RSS, RSSCommand
@@ -215,7 +216,7 @@ def get_connectors():
                               StackExchangeEnrich, StackExchangeCommand],
             "supybot": [Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
             "telegram": [Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
-            "twitter": [None, TwitterOcean, TwitterEnrich, None]
+            "twitter": [Twitter, TwitterOcean, TwitterEnrich, TwitterCommand]
             }  # Will come from Registry
 
 
