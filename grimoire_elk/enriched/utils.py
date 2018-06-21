@@ -117,6 +117,13 @@ def unixtime_to_datetime(ut):
     return dt
 
 
+def get_immutable_backends():
+    """List the names of the immutable backends, which are those ones that
+    do not allow for updates of their items"""
+
+    return ["MBox", "NNTP", "Pipermail", "Supybot"]
+
+
 def grimoire_con(insecure=True, conn_retries=21, total=21):
     conn = requests.Session()
     # {backoff factor} * (2 ^ ({number of total retries} - 1))
