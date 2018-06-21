@@ -132,6 +132,30 @@ class ElasticSearch(object):
             map_dict = mappings.get_elastic_mappings(es_major=self.major)
             self.create_mappings(map_dict)
 
+    def get_elastic_item(self, uuid):
+        """Get an item in the index related to the backend according to its uuid"""
+
+        headers = {"Content-Type": "application/json"}
+        query_data = '''{
+          "query": {
+            "term": {"uuid": "%s"}
+          },
+          "size": "1"
+        }''' % uuid
+
+        url = self.index_url + "/_search"
+        item = None
+        try:
+            res = self.requests.get(url, data=query_data, headers=headers)
+            res.raise_for_status()
+            rjson = res.json()
+            item = rjson['hits']['hits'][0]['_source']
+        except Exception:
+            # The index could not exists yet or it could be empty
+            logger.warning("No JSON found in %s" % self.index_url)
+
+        return item
+
     def safe_put_bulk(self, url, bulk_json):
         """ Bulk PUT controlling unicode issues """
 
