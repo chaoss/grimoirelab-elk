@@ -156,6 +156,24 @@ class ElasticSearch(object):
 
         return item
 
+    @staticmethod
+    def equal_items(item_a, item_b):
+        if 'data' in item_a:
+            a = item_a
+            signa = a['uuid'] + str(a['updated_on'])
+        else:
+            a = item_a
+            signa = a['uuid'] + str(a['metadata__updated_on'])
+
+        if 'data' in item_b:
+            b = item_b
+            signb = b['uuid'] + str(b['updated_on'])
+        else:
+            b = item_b
+            signb = b['uuid'] + str(b['metadata__updated_on'])
+
+        return signa == signb
+
     def safe_put_bulk(self, url, bulk_json):
         """ Bulk PUT controlling unicode issues """
 
