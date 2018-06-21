@@ -41,7 +41,7 @@ from perceval.backend import find_signature_parameters
 from ..elastic_items import ElasticItems
 from .study_ceres_onion import ESOnionConnector, onion_study
 
-from .utils import grimoire_con
+from .utils import grimoire_con, get_immutable_backends
 from .. import __version__
 
 logger = logging.getLogger(__name__)
@@ -343,7 +343,19 @@ class Enrich(ElasticItems):
         if events:
             logger.debug("Adding events items")
 
+        first = True
         for item in items:
+
+            if first and self.perceval_backend.__class__.__name__ in get_immutable_backends():
+                first = False
+                last_item = self.elastic.get_elastic_item(item["uuid"])
+                if not last_item:
+                    continue
+
+                if self.elastic.equal_items(self.get_rich_item(item), last_item):
+                    logger.info("First item already in index %s, it will be skipped", self.elastic.index)
+                    continue
+
             if current >= max_items:
                 try:
                     total += self.elastic.safe_put_bulk(url, bulk_json)
