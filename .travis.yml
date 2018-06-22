@@ -12,20 +12,13 @@ services:
 before_install:
   - pip install flake8
   - pip install coveralls
-  - pip install kingarthur
-  - pip install perceval
-  - pip install perceval-mozilla
-  - pip install perceval-opnfv
-  - pip install perceval-puppet
   - pip install pandas==0.18.1
   - pip install redis
-  - pip install sortinghat
   - pip install PyMySQL
   - pip install httpretty==0.8.6
-  - pip install cereslib
   - pip install elasticsearch==5.5.1
   - pip install elasticsearch-dsl==5.3.0
-  - pip install grimoirelab-toolkit
+  - pip install -r "requirements.txt"
 
 #install:
 #   - ./setup.py install
