@@ -63,6 +63,8 @@ class RedmineEnrich(Enrich):
 
     mapping = Mapping
 
+    roles = ['assigned_to', 'author']
+
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
@@ -84,17 +86,21 @@ class RedmineEnrich(Enrich):
         if rol + "_data" in data:
             if 'mail' in data[rol + "_data"]:
                 identity['email'] = data[rol + "_data"]['mail']
-        identity['username'] = data[rol]['id']
-        identity['name'] = data[rol]['name']
+        if rol in data:
+            identity['username'] = data[rol]['id']
+            identity['name'] = data[rol]['name']
         return identity
 
     def get_item_sh(self, item):
         """ Add sorting hat enrichment fields for the author of the item """
 
-        eitem = {}  # Item enriched
+        eitem = {}
 
-        identity = self.get_sh_identity(item['data'], 'author')
-        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
+        for rol in self.roles:
+            identity = self.get_sh_identity(item['data'], rol)
+            sh_identity = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]), rol=rol)
+            if rol + "_uuid" in sh_identity and sh_identity[rol + "_uuid"]:
+                eitem.update(sh_identity)
 
         return eitem
 
