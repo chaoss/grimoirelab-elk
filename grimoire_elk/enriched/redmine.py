@@ -26,8 +26,6 @@ import logging
 
 from datetime import datetime
 
-from dateutil import parser
-
 from .enrich import Enrich
 from ..elastic_mapping import Mapping as BaseMapping
 
@@ -63,6 +61,8 @@ class RedmineEnrich(Enrich):
 
     mapping = Mapping
 
+    roles = ['assigned_to', 'author']
+
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
@@ -80,23 +80,23 @@ class RedmineEnrich(Enrich):
 
     def get_sh_identity(self, data, rol):
         identity = {}
+
         identity['email'] = None
+        identity['username'] = None
+        identity['name'] = None
+
+        if 'data' in data:
+            # data is the full raw item from perceval
+            data = data['data']
+
         if rol + "_data" in data:
             if 'mail' in data[rol + "_data"]:
                 identity['email'] = data[rol + "_data"]['mail']
-        identity['username'] = data[rol]['id']
-        identity['name'] = data[rol]['name']
+        if rol in data:
+            identity['username'] = data[rol]['id']
+            identity['name'] = data[rol]['name']
+
         return identity
-
-    def get_item_sh(self, item):
-        """ Add sorting hat enrichment fields for the author of the item """
-
-        eitem = {}  # Item enriched
-
-        identity = self.get_sh_identity(item['data'], 'author')
-        eitem = self.get_item_sh_fields(identity, parser.parse(item[self.get_field_date()]))
-
-        return eitem
 
     def get_rich_item(self, item):
         eitem = {}
@@ -134,7 +134,7 @@ class RedmineEnrich(Enrich):
                 eitem[map_fields[fn]] = ticket[fn]
         # Common format
         common = ['category', 'fixed_version', 'priority', 'project', 'status',
-                  'tracker', 'author', 'assigned_to']
+                  'tracker', 'author']
         for f in common:
             if f in ticket:
                 eitem[f + '_id'] = ticket[f]['id']
@@ -165,7 +165,7 @@ class RedmineEnrich(Enrich):
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "job"))
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item))
+            eitem.update(self.get_item_sh(item, self.roles))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
