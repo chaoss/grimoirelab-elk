@@ -28,6 +28,7 @@ import logging
 import re
 
 from datetime import datetime
+from dateutil import parser
 
 from .utils import get_time_diff_days
 
@@ -249,6 +250,20 @@ class GitHubEnrich(Enrich):
         repo = eitem['origin']
         return repo
 
+    def get_time_to_first_attention(self, item):
+        """Get the first date at which a comment or reaction was made to the issue by someone
+        other than the user who created the issue
+        """
+        comment_dates = [parser.parse(comment['created_at']).replace(tzinfo=None) for comment
+                         in item['comments_data'] if item['user']['login'] != comment['user']['login']]
+        reaction_dates = [parser.parse(reaction['created_at']).replace(tzinfo=None) for reaction
+                          in item['reactions_data'] if item['user']['login'] != reaction['user']['login']]
+        reaction_dates.extend(comment_dates)
+        if reaction_dates:
+            return min(reaction_dates)
+        else:
+            return None
+
     @metadata
     def get_rich_item(self, item):
         rich_issue = {}
@@ -342,6 +357,11 @@ class GitHubEnrich(Enrich):
 
         if 'project' in item:
             rich_issue['project'] = item['project']
+
+        rich_issue['time_to_first_attention'] = None
+        if issue['comments'] + issue['reactions']['total_count'] != 0:
+            rich_issue['time_to_first_attention'] = \
+                get_time_diff_days(issue['created_at'], self.get_time_to_first_attention(issue))
 
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], "issue"))
 
