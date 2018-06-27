@@ -39,7 +39,7 @@ from perceval.backend import find_signature_parameters, Archive
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
 from .enriched.sortinghat_gelk import SortingHat
-from .enriched.utils import get_last_enrich, grimoire_con
+from .enriched.utils import get_last_enrich, grimoire_con, get_immutable_backends
 
 
 logger = logging.getLogger(__name__)
@@ -371,7 +371,20 @@ def load_identities(ocean_backend, enrich_backend):
     else:
         items = ocean_backend.fetch()
 
+    first = True
+
     for item in items:
+
+        if first and ocean_backend.perceval_backend.__class__.__name__ in get_immutable_backends():
+            first = False
+            last_item = ocean_backend.elastic.get_elastic_item(item["uuid"])
+            if not last_item:
+                continue
+
+            if ocean_backend.elastic.equal_items(item, last_item):
+                logger.info("First item already in index %s, it will be skipped", ocean_backend.elastic.index)
+                continue
+
         items_count += 1
         # Get identities from new items to be added to SortingHat
         identities = enrich_backend.get_identities(item)

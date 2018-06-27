@@ -30,7 +30,7 @@ import inspect
 import logging
 
 from datetime import datetime
-from ..enriched.utils import unixtime_to_datetime, get_repository_filter
+from ..enriched.utils import unixtime_to_datetime, get_repository_filter, get_immutable_backends
 from ..elastic_items import ElasticItems
 from ..elastic_mapping import Mapping
 
@@ -210,9 +210,22 @@ class ElasticOcean(ElasticItems):
         drop = 0
         added = 0
 
+        first = True
+
         for item in items:
             # print("%s %s" % (item['url'], item['lastUpdated_date']))
             # Add date field for incremental analysis if needed
+
+            if first and self.perceval_backend.__class__.__name__ in get_immutable_backends():
+                first = False
+                last_item = self.elastic.get_elastic_item(item["uuid"])
+                if not last_item:
+                    continue
+
+                if self.elastic.equal_items(item, last_item):
+                    logger.info("First item already in index %s, it will be skipped", self.elastic.index)
+                    continue
+
             self.add_update_date(item)
             self._fix_item(item)
             if self.project:
