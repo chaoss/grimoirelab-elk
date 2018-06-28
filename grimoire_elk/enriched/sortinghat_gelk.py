@@ -82,7 +82,7 @@ class SortingHat(object):
             api.edit_profile(db, uuid, **profile)
 
         except AlreadyExistsError as ex:
-            uuid = ex.uuid
+            uuid = ex.eid
         except InvalidValueError as ex:
             logger.warning("Trying to add a None identity. Ignoring it.")
         except UnicodeEncodeError as ex:
