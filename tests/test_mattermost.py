@@ -82,7 +82,7 @@ class TestMattermost(TestBaseBackend):
         with open("data/projects-release.json") as projects_filename:
             # https://chat.openshift.io 8j366ft5affy3p36987pcugaoa
             url = json.load(projects_filename)['grimoire']['mattermost'][0]
-            arthur_params = {'channel': '8j366ft5affy3p36987pcugaoa', 'uri': 'https://chat.openshift.io',
+            arthur_params = {'channel': '8j366ft5affy3p36987pcugaoa',
                              'url': 'https://chat.openshift.io'}
             self.assertDictEqual(arthur_params, MattermostOcean.get_arthur_params_from_url(url))
 
