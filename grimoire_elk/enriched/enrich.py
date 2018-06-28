@@ -56,7 +56,7 @@ except ImportError:
 try:
     from sortinghat.db.database import Database
     from sortinghat import api, utils
-    from sortinghat.exceptions import AlreadyExistsError, NotFoundError, InvalidValueError
+    from sortinghat.exceptions import NotFoundError, InvalidValueError
 
     from .sortinghat_gelk import SortingHat
 
@@ -823,16 +823,13 @@ class Enrich(ElasticItems):
                 iden[field] = identity[field]
 
         try:
-            # Find the uuid for a given id. A bit hacky in SH yet
-            api.add_identity(self.sh_db, backend_name,
-                             iden['email'], iden['name'],
-                             iden['username'])
-        except AlreadyExistsError as ex:
-            uuid = ex.eid
-            u = api.unique_identities(self.sh_db, uuid)[0]
-            sh_ids['id'] = utils.uuid(backend_name, email=iden['email'],
-                                      name=iden['name'], username=iden['username'])
-            sh_ids['uuid'] = u.uuid
+            # Find the uuid for a given id.
+            id = utils.uuid(backend_name, email=iden['email'],
+                            name=iden['name'], username=iden['username'])
+            with self.sh_db.connect() as session:
+                identity_found = api.find_identity(session, id)
+                sh_ids['id'] = identity_found.id
+                sh_ids['uuid'] = identity_found.uuid
         except InvalidValueError:
             logger.warning("None Identity found %s", backend_name)
             logger.warning(identity)
