@@ -60,6 +60,9 @@
             "https://jira.opnfv.org"
         ],
         "kitsune": [""],
+        "mattermost": [
+            "https://chat.openshift.io 8j366ft5affy3p36987pcugaoa"
+        ],
         "mbox": [
             "metrics-grimoire /home/bitergia/.perceval/mbox"
         ],
