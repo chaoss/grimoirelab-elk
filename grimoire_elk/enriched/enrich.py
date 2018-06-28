@@ -828,7 +828,7 @@ class Enrich(ElasticItems):
                              iden['email'], iden['name'],
                              iden['username'])
         except AlreadyExistsError as ex:
-            uuid = ex.uuid
+            uuid = ex.eid
             u = api.unique_identities(self.sh_db, uuid)[0]
             sh_ids['id'] = utils.uuid(backend_name, email=iden['email'],
                                       name=iden['name'], username=iden['username'])
