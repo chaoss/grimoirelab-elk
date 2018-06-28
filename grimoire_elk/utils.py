@@ -46,6 +46,7 @@ from perceval.backends.core.github import GitHub, GitHubCommand
 from perceval.backends.core.hyperkitty import HyperKitty, HyperKittyCommand
 from perceval.backends.core.jenkins import Jenkins, JenkinsCommand
 from perceval.backends.core.jira import Jira, JiraCommand
+from perceval.backends.core.mattermost import Mattermost, MattermostCommand
 from perceval.backends.core.mbox import MBox, MBoxCommand
 from perceval.backends.core.mediawiki import MediaWiki, MediaWikiCommand
 from perceval.backends.core.meetup import Meetup, MeetupCommand
@@ -81,6 +82,7 @@ from .enriched.hyperkitty import HyperKittyEnrich
 from .enriched.jenkins import JenkinsEnrich
 from .enriched.jira import JiraEnrich
 from .enriched.kitsune import KitsuneEnrich
+from .enriched.mattermost import MattermostEnrich
 from .enriched.mbox import MBoxEnrich
 from .enriched.mediawiki import MediaWikiEnrich
 from .enriched.meetup import MeetupEnrich
@@ -113,6 +115,7 @@ from .raw.github import GitHubOcean
 from .raw.jenkins import JenkinsOcean
 from .raw.jira import JiraOcean
 from .raw.kitsune import KitsuneOcean
+from .raw.mattermost import MattermostOcean
 from .raw.mbox import MBoxOcean
 from .raw.mediawiki import MediaWikiOcean
 from .raw.meetup import MeetupOcean
@@ -200,6 +203,7 @@ def get_connectors():
             "jenkins": [Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira": [Jira, JiraOcean, JiraEnrich, JiraCommand],
             "kitsune": [Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
+            "mattermost": [Mattermost, MattermostOcean, MattermostEnrich, MattermostCommand],
             "mbox": [MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
             "mediawiki": [MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
             "meetup": [Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
