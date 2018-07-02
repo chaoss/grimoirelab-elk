@@ -25,6 +25,7 @@ import json
 import logging
 import unittest
 
+import requests
 from base import TestBaseBackend
 from grimoire_elk.raw.mattermost import MattermostOcean
 
@@ -63,6 +64,10 @@ class TestMattermost(TestBaseBackend):
         result = self._test_raw_to_enrich(projects=True)
         self.assertEqual(result['raw'], 89)
         self.assertEqual(result['enrich'], 89)
+
+        res = requests.get(self.es_con + "/" + self.enrich_index + "/_search")
+        for eitem in res.json()['hits']['hits']:
+            self.assertEqual(eitem['_source']['project'], "grimoire")
 
     def test_refresh_identities(self):
         """Test refresh identities"""

@@ -97,6 +97,11 @@ class MattermostEnrich(Enrich):
 
         return identities
 
+    def get_project_repository(self, eitem):
+        # https://chat.openshift.io/8j366ft5affy3p36987pcugaoa
+        tokens = eitem['origin'].rsplit("/", 1)
+        return tokens[0] + " " + tokens[1]
+
     @metadata
     def get_rich_item(self, item):
         eitem = {}
