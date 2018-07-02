@@ -25,6 +25,7 @@ import json
 import logging
 import unittest
 
+import requests
 from base import TestBaseBackend
 from grimoire_elk.raw.slack import SlackOcean
 
@@ -64,6 +65,10 @@ class TestSlack(TestBaseBackend):
         self.assertEqual(result['raw'], 9)
         self.assertEqual(result['enrich'], 9)
 
+        res = requests.get(self.es_con + "/" + self.enrich_index + "/_search")
+        for eitem in res.json()['hits']['hits']:
+            self.assertEqual(eitem['_source']['project'], "grimoire")
+
     def test_refresh_identities(self):
         """Test refresh identities"""
 
@@ -81,7 +86,7 @@ class TestSlack(TestBaseBackend):
 
         with open("data/projects-release.json") as projects_filename:
             url = json.load(projects_filename)['grimoire']['slack'][0]
-            arthur_params = {'channel': 'C7LSGB0AU'}
+            arthur_params = {'channel': 'C011DUKE8'}
             self.assertDictEqual(arthur_params, SlackOcean.get_arthur_params_from_url(url))
 
 

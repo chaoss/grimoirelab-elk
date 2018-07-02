@@ -31,6 +31,8 @@ from ..elastic_mapping import Mapping as BaseMapping
 
 logger = logging.getLogger(__name__)
 
+SLACK_URL = "https://slack.com/"
+
 
 class Mapping(BaseMapping):
 
@@ -95,6 +97,11 @@ class SlackEnrich(Enrich):
         identities.append(identity)
 
         return identities
+
+    def get_project_repository(self, eitem):
+        repo = eitem['origin']
+        repo = repo.replace(SLACK_URL, "")  # only the channel id is included for the mapping
+        return repo
 
     @metadata
     def get_rich_item(self, item):
