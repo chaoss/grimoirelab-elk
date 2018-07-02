@@ -41,6 +41,7 @@ from tests.model import ESMapping
 CONFIG_FILE = 'tests.conf'
 DB_SORTINGHAT = "test_sh"
 DB_PROJECTS = "test_projects"
+FILE_PROJECTS = "data/projects-release.json"
 SCHEMA_DIR = '../schema/'
 
 
@@ -181,7 +182,7 @@ class TestBaseBackend(unittest.TestCase):
                                                                 db_user=self.db_user,
                                                                 db_password=self.db_password)
         elif not sortinghat and projects:
-            enrich_backend = self.connectors[self.connector][2](db_projects_map=DB_PROJECTS,
+            enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
                                                                 db_user=self.db_user,
                                                                 db_password=self.db_password)
 
