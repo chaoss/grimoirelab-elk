@@ -764,7 +764,7 @@ class GitEnrich(Enrich):
         logger.info("[Areas of Code] Starting study")
 
         # Creating connections
-        es = Elasticsearch([self.elastic.url], timeout=100)
+        es = Elasticsearch([self.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
         in_conn = ESPandasConnector(es_conn=es, es_index=in_index, sort_on_field=sort_on_field)
         out_conn = ESPandasConnector(es_conn=es, es_index=out_index, sort_on_field=sort_on_field,
                                      read_only=False)
