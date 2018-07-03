@@ -103,7 +103,7 @@ class Enrich(ElasticItems):
                  db_user='', db_password='', db_host='', insecure=True):
 
         perceval_backend = None
-        super().__init__(perceval_backend, insecure=True)
+        super().__init__(perceval_backend, insecure=insecure)
 
         self.sortinghat = False
         if db_user == '':
@@ -852,7 +852,7 @@ class Enrich(ElasticItems):
         logger.info("[Onion] Starting study")
 
         # Creating connections
-        es = Elasticsearch([self.elastic.url], timeout=100)
+        es = Elasticsearch([self.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
         in_conn = ESOnionConnector(es_conn=es, es_index=in_index,
                                    contribs_field=contribs_field,
                                    timeframe_field=timeframe_field,
