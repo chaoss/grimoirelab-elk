@@ -77,6 +77,16 @@ class MattermostOcean(ElasticOcean):
     mapping = Mapping
 
     @classmethod
+    def get_perceval_params_from_url(cls, url):
+        """ Get the perceval params given a URL for the data source """
+        params = []
+
+        dparam = cls.get_arthur_params_from_url(url)
+        params.append(dparam['url'])
+        params.append(dparam['channel'])
+        return params
+
+    @classmethod
     def get_arthur_params_from_url(cls, url):
         # The URL is the mattermost URL and the [id of the channel
         data = url.split()
