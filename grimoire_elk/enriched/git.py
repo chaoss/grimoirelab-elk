@@ -594,7 +594,7 @@ class GitEnrich(Enrich):
 
         return total
 
-    def enrich_demography(self, enrich_backend, no_incremental=False):
+    def enrich_demography(self, ocean_backend, enrich_backend, no_incremental=False):
 
         from_date = None
 
@@ -757,16 +757,17 @@ class GitEnrich(Enrich):
 
         logger.debug("Completed demography enrich from %s" % (self.elastic.index_url))
 
-    def enrich_areas_of_code(self, enrich_backend, no_incremental=False,
+    def enrich_areas_of_code(self, ocean_backend, enrich_backend, no_incremental=False,
                              in_index="git-raw",
                              out_index="git_aoc-enriched",
                              sort_on_field='metadata__timestamp'):
         logger.info("[Areas of Code] Starting study")
 
         # Creating connections
-        es = Elasticsearch([self.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
-        in_conn = ESPandasConnector(es_conn=es, es_index=in_index, sort_on_field=sort_on_field)
-        out_conn = ESPandasConnector(es_conn=es, es_index=out_index, sort_on_field=sort_on_field,
+        es_in = Elasticsearch([ocean_backend.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
+        es_out = Elasticsearch([enrich_backend.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
+        in_conn = ESPandasConnector(es_conn=es_in, es_index=in_index, sort_on_field=sort_on_field)
+        out_conn = ESPandasConnector(es_conn=es_out, es_index=out_index, sort_on_field=sort_on_field,
                                      read_only=False)
 
         exists_index = out_conn.exists()
@@ -788,7 +789,7 @@ class GitEnrich(Enrich):
 
         logger.info("[Areas of Code] End")
 
-    def enrich_onion(self, enrich_backend, no_incremental=False,
+    def enrich_onion(self, ocean_backend, enrich_backend, no_incremental=False,
                      in_index='git_onion-src',
                      out_index='git_onion-enriched',
                      data_source='git',
