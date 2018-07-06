@@ -263,8 +263,8 @@ class TestBaseBackend(unittest.TestCase):
         total = refresh_projects(enrich_backend)
         return total
 
-    def _test_studies(self, test_studies=None):
-        """Test the execution of studies"""
+    def _test_study(self, test_study):
+        """Test the execution of a study"""
 
         # populate raw index
         perceval_backend = None
@@ -284,9 +284,7 @@ class TestBaseBackend(unittest.TestCase):
         enrich_backend.enrich_items(ocean_backend)
 
         for study in enrich_backend.studies:
-            if test_studies:
-                if study.__name__ not in test_studies:
-                    continue
-            study(ocean_backend, enrich_backend)
+            if test_study == study.__name__:
+                found = (study, ocean_backend, enrich_backend)
 
-        return enrich_backend
+        return found
