@@ -379,7 +379,8 @@ class GitHubEnrich(Enrich):
 
         return total
 
-    def enrich_onion(self, enrich_backend, no_incremental=False,
+    def enrich_onion(self, ocean_backend, enrich_backend,
+                     no_incremental=False,
                      in_index_iss='github_issues_onion-src',
                      in_index_prs='github_prs_onion-src',
                      out_index_iss='github_issues_onion-enriched',
