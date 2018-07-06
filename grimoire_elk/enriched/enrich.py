@@ -846,13 +846,13 @@ class Enrich(ElasticItems):
 
         return sh_ids
 
-    def enrich_onion(self, enrich_backend, in_index, out_index, data_source, contribs_field,
-                     timeframe_field, sort_on_field, no_incremental=False):
+    def enrich_onion(self, enrich_backend, in_index, out_index, data_source,
+                     contribs_field, timeframe_field, sort_on_field, no_incremental=False):
 
         logger.info("[Onion] Starting study")
 
         # Creating connections
-        es = Elasticsearch([self.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
+        es = Elasticsearch([enrich_backend.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
         in_conn = ESOnionConnector(es_conn=es, es_index=in_index,
                                    contribs_field=contribs_field,
                                    timeframe_field=timeframe_field,
