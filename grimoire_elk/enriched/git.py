@@ -755,7 +755,7 @@ class GitEnrich(Enrich):
 
         self.elastic.bulk_upload(author_items, "_item_id")
 
-        logger.debug("Completed demography enrich from %s" % (self.elastic.index_url))
+        logger.info("Completed demography enrich from %s" % (self.elastic.index_url))
 
     def enrich_areas_of_code(self, ocean_backend, enrich_backend, no_incremental=False,
                              in_index="git-raw",
