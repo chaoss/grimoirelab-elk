@@ -287,6 +287,6 @@ class TestBaseBackend(unittest.TestCase):
             if test_studies:
                 if study.__name__ not in test_studies:
                     continue
-            study(enrich_backend)
+            study(ocean_backend, enrich_backend)
 
         return enrich_backend
