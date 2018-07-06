@@ -28,7 +28,8 @@ import unittest
 from base import TestBaseBackend
 
 from grimoire_elk.raw.mbox import MBoxOcean
-from grimoire_elk.enriched.mbox import MBoxEnrich
+from grimoire_elk.enriched.mbox import (logger,
+                                        MBoxEnrich)
 
 
 class TestMbox(TestBaseBackend):
@@ -88,6 +89,15 @@ class TestMbox(TestBaseBackend):
         item = {'data': {"author": None}}
 
         self.assertDictEqual(empty_identity, enricher.get_sh_identity(item, "author"))
+
+    def test_kafka_kip_study(self):
+        """ Test that the kafka kip study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('kafka_kip')
+        with self.assertLogs(logger, level='INFO') as cm:
+            study(ocean_backend, enrich_backend)
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.mbox:[Kafka KIP] Starting study')
+            self.assertEqual(cm.output[1], 'INFO:grimoire_elk.enriched.mbox:[Kafka KIP] End')
 
     def test_arthur_params(self):
         """Test the extraction of arthur params from an URL"""
