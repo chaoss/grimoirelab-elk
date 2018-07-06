@@ -23,10 +23,13 @@
 #
 import json
 import logging
+import requests
+import time
 import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.raw.git import GitOcean
+from grimoire_elk.enriched.git import logger
 
 
 class TestGit(TestBaseBackend):
@@ -78,10 +81,37 @@ class TestGit(TestBaseBackend):
 
     def test_demography_study(self):
         """ Test that the demography study works correctly """
-        enriched_backend = self._test_studies(test_studies=['enrich_demography'])
-        for item in enriched_backend.fetch():
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_demography')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+            study(ocean_backend, enrich_backend)
+
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.git:Doing demography enrich '
+                                           'from http://localhost:9200/test_git_enrich since None')
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.git:Completed demography '
+                                            'enrich from http://localhost:9200/test_git_enrich')
+
+        for item in enrich_backend.fetch():
             self.assertTrue('author_min_date' in item.keys())
             self.assertTrue('author_max_date' in item.keys())
+
+    def test_onion_study(self):
+        """ Test that the onion study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_onion')
+        study(ocean_backend, enrich_backend, in_index='test_git_enrich')
+
+        url = "http://localhost:9200/_aliases"
+        response = requests.get(url).json()
+        self.assertTrue('git_onion-enriched' in response)
+
+        time.sleep(1)
+
+        url = "http://localhost:9200/git_onion-enriched/_count"
+        response = requests.get(url).json()
+
+        self.assertGreater(response['count'], 0)
 
     def test_arthur_params(self):
         """Test the extraction of arthur params from an URL"""
