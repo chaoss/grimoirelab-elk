@@ -466,14 +466,14 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
     return ocean_backend
 
 
-def do_studies(enrich_backend, studies_args):
+def do_studies(ocean_backend, enrich_backend, studies_args):
     for study in enrich_backend.studies:
         selected_studies = [(s['name'], s['params']) for s in studies_args if s['type'] == study.__name__]
 
         for (name, params) in selected_studies:
             logger.info("Starting study: %s, params %s", name, str(params))
             try:
-                study(enrich_backend, **params)
+                study(ocean_backend, enrich_backend, **params)
             except Exception as e:
                 logger.error("Problem executing study %s, %s", name, str(e))
                 raise e
@@ -568,7 +568,7 @@ def enrich_backend(url, clean, backend_name, backend_params,
 
         if only_studies:
             logger.info("Running only studies (no SH and no enrichment)")
-            do_studies(enrich_backend, studies_args)
+            do_studies(ocean_backend, enrich_backend, studies_args)
         elif do_refresh_projects:
             logger.info("Refreshing project field in %s", enrich_backend.elastic.index_url)
             field_id = enrich_backend.get_field_unique_id()
@@ -615,7 +615,7 @@ def enrich_backend(url, clean, backend_name, backend_params,
                     if enrich_count is not None:
                         logger.info("Total events enriched %i ", enrich_count)
                 if studies:
-                    do_studies(enrich_backend, studies_args)
+                    do_studies(ocean_backend, enrich_backend, studies_args)
 
     except Exception as ex:
         logger.error("%s", traceback.format_exc())
