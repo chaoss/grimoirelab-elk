@@ -245,4 +245,7 @@ class MBoxEnrich(Enrich):
 
     def kafka_kip(self, ocean_backend, enrich_backend, no_incremental=False):
         # KIP study is not incremental
+
+        logger.info("[Kafka KIP] Starting study")
         kafka_kip(self)
+        logger.info("[Kafka KIP] End")
