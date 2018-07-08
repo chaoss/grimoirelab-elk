@@ -52,6 +52,19 @@ class Mapping(BaseMapping):
                                     }
                                 }
                             },
+                            "review_comments_data": {
+                                "dynamic":false,
+                                "properties": {
+                                    "body": {
+                                        "type": "text",
+                                        "index": true
+                                    },
+                                   "diff_hunk": {
+                                       "type": "text",
+                                       "index": true
+                                   }
+                                }
+                            },
                             "body": {
                                 "type": "text",
                                 "index": true
