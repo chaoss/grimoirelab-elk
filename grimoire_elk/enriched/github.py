@@ -266,6 +266,59 @@ class GitHubEnrich(Enrich):
 
     @metadata
     def get_rich_item(self, item):
+
+        rich_item = {}
+        if item['category'] == 'issue':
+            rich_item = self.__get_rich_issue(item)
+        elif item['category'] == 'pull_request':
+            rich_item = self.__get_rich_pull(item)
+        else:
+            logger.error("rich item not defined for GitHub category %s", item['category'])
+
+        return rich_item
+
+    def enrich_items(self, items):
+        total = super(GitHubEnrich, self).enrich_items(items)
+
+        logger.debug("Updating GitHub users geolocations in Elastic")
+        self.geo_locations_to_es()  # Update geolocations in Elastic
+
+        return total
+
+    def enrich_onion(self, ocean_backend, enrich_backend,
+                     no_incremental=False,
+                     in_index_iss='github_issues_onion-src',
+                     in_index_prs='github_prs_onion-src',
+                     out_index_iss='github_issues_onion-enriched',
+                     out_index_prs='github_prs_onion-enriched',
+                     data_source_iss='github-issues',
+                     data_source_prs='github-prs',
+                     contribs_field='uuid',
+                     timeframe_field='grimoire_creation_date',
+                     sort_on_field='metadata__timestamp'):
+
+        super().enrich_onion(enrich_backend=enrich_backend,
+                             in_index=in_index_iss,
+                             out_index=out_index_iss,
+                             data_source=data_source_iss,
+                             contribs_field=contribs_field,
+                             timeframe_field=timeframe_field,
+                             sort_on_field=sort_on_field,
+                             no_incremental=no_incremental)
+
+        super().enrich_onion(enrich_backend=enrich_backend,
+                             in_index=in_index_prs,
+                             out_index=out_index_prs,
+                             data_source=data_source_prs,
+                             contribs_field=contribs_field,
+                             timeframe_field=timeframe_field,
+                             sort_on_field=sort_on_field,
+                             no_incremental=no_incremental)
+
+    def __get_rich_pull(self, item):
+        return {}
+
+    def __get_rich_issue(self, item):
         rich_issue = {}
 
         for f in self.RAW_FIELDS_COPY:
@@ -370,44 +423,6 @@ class GitHubEnrich(Enrich):
             rich_issue.update(self.get_item_sh(item, self.roles))
 
         return rich_issue
-
-    def enrich_items(self, items):
-        total = super(GitHubEnrich, self).enrich_items(items)
-
-        logger.debug("Updating GitHub users geolocations in Elastic")
-        self.geo_locations_to_es()  # Update geolocations in Elastic
-
-        return total
-
-    def enrich_onion(self, ocean_backend, enrich_backend,
-                     no_incremental=False,
-                     in_index_iss='github_issues_onion-src',
-                     in_index_prs='github_prs_onion-src',
-                     out_index_iss='github_issues_onion-enriched',
-                     out_index_prs='github_prs_onion-enriched',
-                     data_source_iss='github-issues',
-                     data_source_prs='github-prs',
-                     contribs_field='uuid',
-                     timeframe_field='grimoire_creation_date',
-                     sort_on_field='metadata__timestamp'):
-
-        super().enrich_onion(enrich_backend=enrich_backend,
-                             in_index=in_index_iss,
-                             out_index=out_index_iss,
-                             data_source=data_source_iss,
-                             contribs_field=contribs_field,
-                             timeframe_field=timeframe_field,
-                             sort_on_field=sort_on_field,
-                             no_incremental=no_incremental)
-
-        super().enrich_onion(enrich_backend=enrich_backend,
-                             in_index=in_index_prs,
-                             out_index=out_index_prs,
-                             data_source=data_source_prs,
-                             contribs_field=contribs_field,
-                             timeframe_field=timeframe_field,
-                             sort_on_field=sort_on_field,
-                             no_incremental=no_incremental)
 
 
 class GitHubUser(object):
