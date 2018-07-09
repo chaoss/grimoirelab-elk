@@ -23,7 +23,7 @@
 
 import logging
 from collections import namedtuple
-from grimoirelab.toolkit import datetime
+from grimoirelab_toolkit import datetime
 
 from elasticsearch import helpers
 from elasticsearch.exceptions import NotFoundError
