@@ -32,7 +32,7 @@ import pkg_resources
 import requests
 from elasticsearch import Elasticsearch
 
-from grimoirelab.toolkit.datetime import datetime_to_utc, str_to_datetime
+from grimoirelab_toolkit.datetime import datetime_to_utc, str_to_datetime
 from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
 from ..elastic_mapping import Mapping as BaseMapping
