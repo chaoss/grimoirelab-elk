@@ -78,6 +78,7 @@ from .enriched.functest import FunctestEnrich
 from .enriched.gerrit import GerritEnrich
 from .enriched.git import GitEnrich
 from .enriched.github import GitHubEnrich
+from .enriched.github_prs import GitHubPRsEnrich
 from .enriched.hyperkitty import HyperKittyEnrich
 from .enriched.jenkins import JenkinsEnrich
 from .enriched.jira import JiraEnrich
@@ -112,6 +113,7 @@ from .raw.functest import FunctestOcean
 from .raw.gerrit import GerritOcean
 from .raw.git import GitOcean
 from .raw.github import GitHubOcean
+from .raw.github_prs import GitHubPRsOcean
 from .raw.jenkins import JenkinsOcean
 from .raw.jira import JiraOcean
 from .raw.kitsune import KitsuneOcean
@@ -199,6 +201,7 @@ def get_connectors():
             "gerrit": [Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git": [Git, GitOcean, GitEnrich, GitCommand],
             "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
+            "github_prs": [GitHub, GitHubPRsOcean, GitHubPRsEnrich, GitHubCommand],
             "hyperkitty": [HyperKitty, HyperKittyOcean, HyperKittyEnrich, HyperKittyCommand],
             "jenkins": [Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira": [Jira, JiraOcean, JiraEnrich, JiraCommand],
