@@ -467,6 +467,13 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
 
 
 def do_studies(ocean_backend, enrich_backend, studies_args):
+    """
+
+    :param ocean_backend: backend to access raw items
+    :param enrich_backend: backend to access enriched items
+    :param studies_args: list of studies to be executed
+    :return: None
+    """
     for study in enrich_backend.studies:
         selected_studies = [(s['name'], s['params']) for s in studies_args if s['type'] == study.__name__]
 
