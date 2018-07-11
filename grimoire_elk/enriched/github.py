@@ -56,6 +56,9 @@ class Mapping(BaseMapping):
         mapping = """
         {
             "properties": {
+               "merge_author_geolocation": {
+                   "type": "geo_point"
+               },
                "assignee_geolocation": {
                    "type": "geo_point"
                },
@@ -76,7 +79,8 @@ class GitHubEnrich(Enrich):
 
     mapping = Mapping
 
-    roles = ['assignee_data', 'user_data']
+    issue_roles = ['assignee_data', 'user_data']
+    pr_roles = ['merged_by_data', 'user_data']
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
@@ -103,15 +107,20 @@ class GitHubEnrich(Enrich):
         return "grimoire_creation_date"
 
     def get_fields_uuid(self):
-        return ["assignee_uuid", "user_uuid"]
+        return ["assignee_uuid", "user_uuid", "merge_author_uuid"]
 
     def get_identities(self, item):
         """ Return the identities from an item """
         identities = []
 
+        category = item['category']
         item = item['data']
 
-        for identity in ['user', 'assignee']:
+        identity_types = ['user', 'assignee']
+        if category == "pull_request":
+            identity_types = ['user', 'merged_by']
+
+        for identity in identity_types:
             if item[identity]:
                 # In user_data we have the full user data
                 user = self.get_sh_identity(item[identity + "_data"])
@@ -261,8 +270,17 @@ class GitHubEnrich(Enrich):
         reaction_dates.extend(comment_dates)
         if reaction_dates:
             return min(reaction_dates)
-        else:
-            return None
+        return None
+
+    def get_time_to_merge_request_response(self, item):
+        """Get the first date at which a review was made on the PR by someone
+        other than the user who created the PR
+        """
+        review_dates = [parser.parse(review['created_at']).replace(tzinfo=None) for review in
+                        item['review_comments_data'] if item['user']['login'] != review['user']['login']]
+        if review_dates:
+            return min(review_dates)
+        return None
 
     @metadata
     def get_rich_item(self, item):
@@ -316,7 +334,117 @@ class GitHubEnrich(Enrich):
                              no_incremental=no_incremental)
 
     def __get_rich_pull(self, item):
-        return {}
+        rich_pr = {}
+
+        for f in self.RAW_FIELDS_COPY:
+            if f in item:
+                rich_pr[f] = item[f]
+            else:
+                rich_pr[f] = None
+        # The real data
+        pull_request = item['data']
+
+        rich_pr['time_to_close_days'] = \
+            get_time_diff_days(pull_request['created_at'], pull_request['closed_at'])
+
+        if pull_request['state'] != 'closed':
+            rich_pr['time_open_days'] = \
+                get_time_diff_days(pull_request['created_at'], datetime.utcnow())
+        else:
+            rich_pr['time_open_days'] = rich_pr['time_to_close_days']
+
+        rich_pr['user_login'] = pull_request['user']['login']
+        user = pull_request['user_data']
+
+        if user is not None and user:
+            rich_pr['user_name'] = user['name']
+            rich_pr['author_name'] = user['name']
+            if user['email']:
+                rich_pr["user_domain"] = self.get_email_domain(user['email'])
+            rich_pr['user_org'] = user['company']
+            rich_pr['user_location'] = user['location']
+            rich_pr['user_geolocation'] = self.get_geo_point(user['location'])
+        else:
+            rich_pr['user_name'] = None
+            rich_pr["user_domain"] = None
+            rich_pr['user_org'] = None
+            rich_pr['user_location'] = None
+            rich_pr['user_geolocation'] = None
+            rich_pr['author_name'] = None
+
+        merged_by = None
+
+        if pull_request['merged_by'] is not None:
+            merged_by = pull_request['merged_by_data']
+            rich_pr['merge_author_login'] = pull_request['merged_by']['login']
+            rich_pr['merge_author_name'] = merged_by['name']
+            if merged_by['email']:
+                rich_pr["merge_author_domain"] = self.get_email_domain(merged_by['email'])
+            rich_pr['merge_author_org'] = merged_by['company']
+            rich_pr['merge_author_location'] = merged_by['location']
+            rich_pr['merge_author_geolocation'] = \
+                self.get_geo_point(merged_by['location'])
+        else:
+            rich_pr['merge_author_name'] = None
+            rich_pr['merge_author_login'] = None
+            rich_pr["merge_author_domain"] = None
+            rich_pr['merge_author_org'] = None
+            rich_pr['merge_author_location'] = None
+            rich_pr['merge_author_geolocation'] = None
+
+        rich_pr['id'] = pull_request['id']
+        rich_pr['id_in_repo'] = pull_request['html_url'].split("/")[-1]
+        rich_pr['repository'] = pull_request['html_url'].rsplit("/", 2)[0]
+        rich_pr['title'] = pull_request['title']
+        rich_pr['title_analyzed'] = pull_request['title']
+        rich_pr['state'] = pull_request['state']
+        rich_pr['created_at'] = pull_request['created_at']
+        rich_pr['updated_at'] = pull_request['updated_at']
+        rich_pr['merged'] = pull_request['merged']
+        rich_pr['merged_at'] = pull_request['merged_at']
+        rich_pr['closed_at'] = pull_request['closed_at']
+        rich_pr['url'] = pull_request['html_url']
+        labels = ''
+        if 'labels' in pull_request:
+            for label in pull_request['labels']:
+                if 'name' in pull_request:
+                    labels += pull_request['name'] + ";;"
+        if labels != '':
+            labels[:-2]
+        rich_pr['labels'] = labels
+
+        rich_pr['pull_request'] = True
+        rich_pr['item_type'] = 'pull request'
+
+        rich_pr['github_repo'] = rich_pr['repository'].replace(GITHUB, '')
+        rich_pr['github_repo'] = re.sub('.git$', '', rich_pr['github_repo'])
+        rich_pr["url_id"] = rich_pr['github_repo'] + "/pull/" + rich_pr['id_in_repo']
+
+        # GMD code development metrics
+        rich_pr['forks'] = pull_request['base']['repo']['forks_count']
+        rich_pr['code_merge_duration'] = \
+            get_time_diff_days(pull_request['created_at'], pull_request['merged_at'])
+        rich_pr['num_review_comments'] = pull_request['review_comments']
+
+        rich_pr['time_to_merge_request_response'] = None
+        if pull_request['review_comments'] != 0:
+            min_review_date = self.get_time_to_merge_request_response(pull_request)
+            rich_pr['time_to_merge_request_response'] = \
+                get_time_diff_days(pull_request['created_at'], min_review_date)
+
+        if self.prjs_map:
+            rich_pr.update(self.get_item_project(rich_pr))
+
+        if 'project' in item:
+            rich_pr['project'] = item['project']
+
+        rich_pr.update(self.get_grimoire_fields(pull_request['created_at'], "pull_request"))
+
+        if self.sortinghat:
+            item[self.get_field_date()] = rich_pr[self.get_field_date()]
+            rich_pr.update(self.get_item_sh(item, self.pr_roles))
+
+        return rich_pr
 
     def __get_rich_issue(self, item):
         rich_issue = {}
@@ -420,7 +548,7 @@ class GitHubEnrich(Enrich):
 
         if self.sortinghat:
             item[self.get_field_date()] = rich_issue[self.get_field_date()]
-            rich_issue.update(self.get_item_sh(item, self.roles))
+            rich_issue.update(self.get_item_sh(item, self.issue_roles))
 
         return rich_issue
 
