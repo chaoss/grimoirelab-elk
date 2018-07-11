@@ -595,7 +595,88 @@ class GitEnrich(Enrich):
         return total
 
     def enrich_demography(self, ocean_backend, enrich_backend, no_incremental=False):
+        """
 
+        The goal of the algorithm is to add to all enriched items the first and last date
+        in which the author of the item had activity in the data source. In the case of git
+        the fields author_min_date and author_max_date are added.
+
+        In order to implement the algorithm first, the possible min and max data are found for
+        all the authors. To have the incremental support, only the new commits (or the commits without
+        a author_min_date or author_max_date) are evaluated in order to find the authors which
+        have updated information.
+
+        For all the authors detected in the previous step, all her commits are updated with fresh
+        author_min_date or author_max_date.
+
+        :param ocean_backend: backend from which to read the raw items
+        :param enrich_backend:  backend from which to read the enriched items
+        :param no_incremental: run the study in incremental mode or not
+        :return: None
+        """
+
+        def get_authors_dates(base_query="", date_field="utc_commit"):
+            """
+            Get the aggregation of author with their min and max activity dates
+
+            :param base_query: base query used to find the items to aggregate
+            :param date_field: field used to find the mix and max dates for the author's activity
+            :return: the query to be executed to get the authors mixn and max aggregation data
+            """
+
+            # Limit aggregations: https://github.com/elastic/elasticsearch/issues/18838
+            # 10000 seems to be a sensible number of the number of people in git
+
+            es_query = """
+            {
+              %s
+              "size": 0,
+              "aggs": {
+                "author": {
+                  "terms": {
+                    "field": "author_uuid",
+                    "size": 10000
+                  },
+                  "aggs": {
+                    "min": {
+                      "min": {
+                        "field": "%s"
+                      }
+                    },
+                    "max": {
+                      "max": {
+                        "field": "%s"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            """ % (base_query, date_field, date_field)
+
+            return es_query
+
+        # The first step is always to find the current min and max date for all the authors
+
+        authors_current_data = {}
+
+        es_query = get_authors_dates()
+        r = self.requests.post(self.elastic.index_url + "/_search",
+                               data=es_query, headers=HEADER_JSON,
+                               verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logger.error("Error getting authors mix and max date. Demography aborted.")
+            logger.error(ex)
+            return
+
+        for author_current in r.json()['aggregations']['author']['buckets']:
+            authors_current_data[author_current['key']] = author_current
+
+        #
+        # Now get the list of authors which min and max date should be checked and updated
+        #
         from_date = None
 
         if no_incremental:
@@ -658,35 +739,8 @@ class GitEnrich(Enrich):
         },
         """ % (filters, filter_last_demography_date)
 
-        # First, get the min and max commit date for all the authors
-        # Limit aggregations: https://github.com/elastic/elasticsearch/issues/18838
-        # 10000 seems to be a sensible number of the number of people in git
-        es_query = """
-        {
-          %s
-          "size": 0,
-          "aggs": {
-            "author": {
-              "terms": {
-                "field": "author_uuid",
-                "size": 10000
-              },
-              "aggs": {
-                "min": {
-                  "min": {
-                    "field": "%s"
-                  }
-                },
-                "max": {
-                  "max": {
-                    "field": "%s"
-                  }
-                }
-              }
-            }
-          }
-        }
-        """ % (query, date_field, date_field)
+        # First, get the min and max commit date for all the authors in the new commits
+        es_query = get_authors_dates(query, date_field)
 
         logger.debug(es_query)
 
@@ -704,6 +758,9 @@ class GitEnrich(Enrich):
 
         author_items = []  # items from author with new date fields added
         nauthors_done = 0
+
+        # Sort the items
+        author_query_sort = ', "sort": { "%s": { "order": "asc" }}' % date_field
         author_query = """
         {
             "query": {
@@ -715,10 +772,13 @@ class GitEnrich(Enrich):
                         ]
                 }
             }
-
+            %s
         }
-        """
+        """ % author_query_sort
+
         author_query_json = json.loads(author_query)
+
+        logger.debug("Template for querying authors commits:\n %s", author_query_json)
 
         for author in authors:
             # print("%s: %s %s" % (author['key'], author['min']['value_as_string'], author['max']['value_as_string']))
@@ -736,9 +796,14 @@ class GitEnrich(Enrich):
                 continue
             for item in r.json()["hits"]["hits"]:
                 new_item = item['_source']
-                new_item["author_max_date"] = author['max']['value_as_string']
-                if "author_min_date" not in new_item or not new_item['author_min_date']:
+                if author['max']['value'] > authors_current_data[author['key']]['max']['value']:
+                    new_item["author_max_date"] = author['max']['value_as_string']
+                else:
+                    new_item["author_max_date"] = authors_current_data[author['key']]['max']['value_as_string']
+                if author['min']['value'] < authors_current_data[author['key']]['min']['value']:
                     new_item["author_min_date"] = author['min']['value_as_string']
+                else:
+                    new_item["author_min_date"] = authors_current_data[author['key']]['min']['value_as_string']
                 # In p2p the ids are created during enrichment
                 new_item["_item_id"] = item['_id']
                 author_items.append(new_item)
