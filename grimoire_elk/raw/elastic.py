@@ -228,7 +228,7 @@ class ElasticOcean(ElasticItems):
 
         total_time_min = (datetime.now() - task_init).total_seconds() / 60
 
-        logger.debug("Added %i items to ocean", added)
+        logger.debug("Added %i items to index %s", added, self.elastic.index)
         logger.debug("Dropped %i items using drop_item filter" % (drop))
         logger.info("Finished in %.2f min" % (total_time_min))
 
