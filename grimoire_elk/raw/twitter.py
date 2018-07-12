@@ -39,61 +39,65 @@ class Mapping(BaseMapping):
          {
             "dynamic":true,
             "properties": {
-                "user": {
+                "data": {
                     "properties": {
+                        "user": {
+                            "properties": {
+                                "entities": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                }
+                            }
+                        },
+                        "hashtags": {
+                            "properties": {
+                                "indices": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                }
+                            }
+                        },
+                        "metadata": {
+                            "dynamic":false,
+                            "properties": {}
+                        },
                         "entities": {
+                            "properties": {
+                                "media": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                },
+                                "symbols": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                },
+                                "urls": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                },
+                                "user_mentions": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                }
+                            }
+                        },
+                        "extended_entities": {
+                            "dynamic":false,
+                            "properties": {}
+                        },
+                        "extended_tweet": {
+                            "dynamic":false,
+                            "properties": {}
+                        },
+                        "quoted_status": {
+                            "dynamic":false,
+                            "properties": {}
+                        },
+                        "retweeted_status": {
                             "dynamic":false,
                             "properties": {}
                         }
                     }
-                },
-                "hashtags": {
-                    "properties": {
-                        "indices": {
-                            "dynamic":false,
-                            "properties": {}
-                        }
-                    }
-                },
-                "metadata": {
-                    "dynamic":false,
-                    "properties": {}
-                },
-                "entities": {
-                    "properties": {
-                        "media": {
-                            "dynamic":false,
-                            "properties": {}
-                        },
-                        "symbols": {
-                            "dynamic":false,
-                            "properties": {}
-                        },
-                        "urls": {
-                            "dynamic":false,
-                            "properties": {}
-                        },
-                        "user_mentions": {
-                            "dynamic":false,
-                            "properties": {}
-                        }
-                    }
-                },
-                "extended_entities": {
-                    "dynamic":false,
-                    "properties": {}
-                },
-                "extended_tweet": {
-                    "dynamic":false,
-                    "properties": {}
-                },
-                "quoted_status": {
-                    "dynamic":false,
-                    "properties": {}
-                },
-                "retweeted_status": {
-                    "dynamic":false,
-                    "properties": {}
                 }
             }
         }
