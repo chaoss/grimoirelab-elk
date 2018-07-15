@@ -18,7 +18,7 @@
 # Authors:
 #   Alberto Pérez García-Plaza <alpgarcia@bitergia.com>
 #
-
+import hashlib
 import logging
 
 from elasticsearch import helpers
@@ -42,6 +42,19 @@ class ESPandasConnector(ESConnector):
 
     Writing is also ready to work directly with Pandas dataframes.
     """
+
+    @staticmethod
+    def make_hashcode(uuid, filepath, file_event):
+        """Generate a SHA1 based on the given arguments.
+        :param uuid: perceval uuid of the item
+        :param filepath: path of the corresponding file
+        :param file_event: commit file event
+        :returns: a SHA1 hash code
+        """
+
+        content = ':'.join([uuid, filepath, file_event])
+        hashcode = hashlib.sha1(content.encode('utf-8'))
+        return hashcode.hexdigest()
 
     def read_item(self, from_date=None):
         """Read items one by one.
@@ -103,8 +116,7 @@ class ESPandasConnector(ESConnector):
         docs = []
         for row_index in rows.keys():
             row = rows[row_index]
-            item_id = row[Events.PERCEVAL_UUID] + "_" + row[Git.FILE_PATH] +\
-                "_" + row[Git.FILE_EVENT]
+            item_id = self.make_hashcode(row[Events.PERCEVAL_UUID], row[Git.FILE_PATH], row[Git.FILE_EVENT])
             doc = {
                 "_index": self._es_index,
                 "_type": "item",
