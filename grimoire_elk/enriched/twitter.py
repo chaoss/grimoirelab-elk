@@ -66,9 +66,6 @@ class TwitterEnrich(Enrich):
     def get_field_author(self):
         return "user"
 
-    def get_field_date(self):
-        return "created_at"
-
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
         identity['username'] = None
@@ -78,9 +75,13 @@ class TwitterEnrich(Enrich):
         if identity_field is None:
             identity_field = self.get_field_author()
 
-        if identity_field in item:
-            identity['username'] = item[identity_field]['screen_name']
-            identity['name'] = item[identity_field]['name']
+        tweet = item  # by default a specific user dict is expected
+        if 'data' in item and type(item) == dict:
+            tweet = item['data']
+
+        if identity_field in tweet:
+            identity['username'] = tweet[identity_field]['screen_name']
+            identity['name'] = tweet[identity_field]['name']
         return identity
 
     def get_identities(self, item):
@@ -174,10 +175,10 @@ class TwitterEnrich(Enrich):
         eitem['url'] += "/status/" + tweet['id_str']
         eitem['user_url_twitter'] = "http://twitter.com/" + tweet['user']['screen_name']
 
-        if self.sortinghat:
-            eitem.update(self.get_item_sh(tweet))
+        eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "tweet"))
 
-        eitem.update(self.get_grimoire_fields(tweet["created_at"], "twitter"))
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
