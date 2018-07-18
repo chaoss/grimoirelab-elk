@@ -1,4 +1,4 @@
-# Welcome to GrimoireELK [![Build Status](https://travis-ci.org/grimoirelab/GrimoireELK.svg?branch=master)](https://travis-ci.org/grimoirelab/GrimoireELK)[![Coverage Status](https://coveralls.io/repos/github/chaoss/grimoirelab-elk/badge.svg?branch=master)](https://coveralls.io/github/chaoss/grimoirelab-elk?branch=master)
+# Welcome to GrimoireELK [![Build Status](https://travis-ci.org/chaoss/grimoirelab-elk.svg?branch=master)](https://travis-ci.org/chaoss/grimoirelab-elk)[![Coverage Status](https://coveralls.io/repos/github/chaoss/grimoirelab-elk/badge.svg?branch=master)](https://coveralls.io/github/chaoss/grimoirelab-elk?branch=master)
 
 GrimoireELK is an evolving prototype of the *Grimoire Open Development Analytics platform*. 
 
