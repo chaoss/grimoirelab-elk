@@ -24,9 +24,71 @@
 #
 
 from .elastic import ElasticOcean
+from ..elastic_mapping import Mapping as BaseMapping
+
+
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "notes_data": {
+                                "dynamic":false,
+                                "properties": {
+                                    "body": {
+                                        "type": "text",
+                                        "index": true
+                                    }
+                                }
+                            },
+                            "description": {
+                                "type": "text",
+                                "index": true
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
+        return {"items": mapping}
 
 
 class GitLabOcean(ElasticOcean):
     """GitLab Ocean feeder"""
 
-    pass
+    mapping = Mapping
+
+    @classmethod
+    def get_arthur_params_from_url(cls, url):
+        """ Get the arthur params given a URL for the data source """
+        params = {}
+
+        owner = url.split('/')[-2]
+        repository = url.split('/')[-1]
+        # params.append('--owner')
+        params['owner'] = owner
+        # params.append('--repository')
+        params['repository'] = repository
+        return params
+
+    @classmethod
+    def get_perceval_params_from_url(cls, url):
+        """ Get the perceval params given a URL for the data source """
+        params = []
+
+        dparam = cls.get_arthur_params_from_url(url)
+        params.append(dparam['owner'])
+        params.append(dparam['repository'])
+        return params
