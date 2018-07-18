@@ -38,6 +38,9 @@
         "github": [
             "https://github.com/chaoss/grimoirelab-perceval"
         ],
+        "gitlab": [
+            "https://gitlab.com/inkscape/inkscape-web"
+        ],
         "google_hits": [
             ""
         ],
