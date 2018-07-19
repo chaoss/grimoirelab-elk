@@ -44,6 +44,7 @@ from perceval.backends.core.gerrit import Gerrit, GerritCommand
 from perceval.backends.core.git import Git, GitCommand
 from perceval.backends.core.github import GitHub, GitHubCommand
 from perceval.backends.core.gitlab import GitLab, GitLabCommand
+from perceval.backends.core.groupsio import Groupsio, GroupsioCommand
 from perceval.backends.core.hyperkitty import HyperKitty, HyperKittyCommand
 from perceval.backends.core.jenkins import Jenkins, JenkinsCommand
 from perceval.backends.core.jira import Jira, JiraCommand
@@ -80,6 +81,7 @@ from .enriched.gerrit import GerritEnrich
 from .enriched.git import GitEnrich
 from .enriched.github import GitHubEnrich
 from .enriched.gitlab import GitLabEnrich
+from .enriched.groupsio import GroupsioEnrich
 from .enriched.hyperkitty import HyperKittyEnrich
 from .enriched.jenkins import JenkinsEnrich
 from .enriched.jira import JiraEnrich
@@ -115,6 +117,7 @@ from .raw.gerrit import GerritOcean
 from .raw.git import GitOcean
 from .raw.github import GitHubOcean
 from .raw.gitlab import GitLabOcean
+from .raw.groupsio import GroupsioOcean
 from .raw.jenkins import JenkinsOcean
 from .raw.jira import JiraOcean
 from .raw.kitsune import KitsuneOcean
@@ -203,6 +206,7 @@ def get_connectors():
             "git": [Git, GitOcean, GitEnrich, GitCommand],
             "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
             "gitlab": [GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
+            "groupsio": [Groupsio, GroupsioOcean, GroupsioEnrich, GroupsioCommand],
             "hyperkitty": [HyperKitty, HyperKittyOcean, HyperKittyEnrich, HyperKittyCommand],
             "jenkins": [Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira": [Jira, JiraOcean, JiraEnrich, JiraCommand],
