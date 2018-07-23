@@ -189,9 +189,6 @@ class ElasticItems():
             order_field = None
             if self.perceval_backend:
                 order_field = self.get_incremental_date()
-            elif hasattr(self, 'is_twitter_ocean'):
-                # TwitterOcean, order field is special
-                order_field = '@timestamp'
             if order_field is not None:
                 order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
 
