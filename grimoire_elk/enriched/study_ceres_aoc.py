@@ -140,6 +140,8 @@ class AreasOfCode(CeresBase):
     :param self._git_enrich: GitEnrich object to manage SortingHat affiliations.
     """
 
+    MESSAGE_MAX_SIZE = 80
+
     def __init__(self, in_connector, out_connector, block_size, git_enrich):
 
         super().__init__(in_connector, out_connector, block_size)
@@ -170,6 +172,9 @@ class AreasOfCode(CeresBase):
             events_df = data_filtered.filter_(["filepath"], "-")
 
             logger.info("New events filtered: " + str(len(events_df)))
+
+            events_df['message'] = events_df['message'].str.slice(stop=AreasOfCode.MESSAGE_MAX_SIZE)
+            logger.info("Remove message content")
 
             # Add filetype info
             enriched_filetype = FileType(events_df)
