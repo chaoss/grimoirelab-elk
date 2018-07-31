@@ -164,27 +164,28 @@ class AreasOfCode(CeresBase):
 
         logger.info("New events: " + str(len(events_df)))
 
-        # Filter information
-        data_filtered = FilterRows(events_df)
-        events_df = data_filtered.filter_(["filepath"], "-")
+        if len(events_df) > 0:
+            # Filter information
+            data_filtered = FilterRows(events_df)
+            events_df = data_filtered.filter_(["filepath"], "-")
 
-        logger.info("New events filtered: " + str(len(events_df)))
+            logger.info("New events filtered: " + str(len(events_df)))
 
-        # Add filetype info
-        enriched_filetype = FileType(events_df)
-        events_df = enriched_filetype.enrich('filepath')
+            # Add filetype info
+            enriched_filetype = FileType(events_df)
+            events_df = enriched_filetype.enrich('filepath')
 
-        logger.info("New Filetype events: " + str(len(events_df)))
+            logger.info("New Filetype events: " + str(len(events_df)))
 
-        # Split filepath info
-        enriched_filepath = FilePath(events_df)
-        events_df = enriched_filepath.enrich('filepath')
+            # Split filepath info
+            enriched_filepath = FilePath(events_df)
+            events_df = enriched_filepath.enrich('filepath')
 
-        logger.info("New Filepath events: " + str(len(events_df)))
+            logger.info("New Filepath events: " + str(len(events_df)))
 
-        # Deal with surrogates
-        convert = ToUTF8(events_df)
-        events_df = convert.enrich(["owner"])
+            # Deal with surrogates
+            convert = ToUTF8(events_df)
+            events_df = convert.enrich(["owner"])
 
         logger.info("Final new events: " + str(len(events_df)))
 
