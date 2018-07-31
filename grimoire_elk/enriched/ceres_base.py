@@ -95,8 +95,11 @@ class CeresBase:
             process_results = self.process(item_block)
             total_processed += process_results.processed
 
-            self._out.write(process_results.out_items)
-            total_written += len(process_results.out_items)
+            if len(process_results.out_items) > 0:
+                self._out.write(process_results.out_items)
+                total_written += len(process_results.out_items)
+            else:
+                logger.info("No new items to be written this time.")
 
             logger.info(
                 "Items read/to be written/total read/total processed/total written: " +
