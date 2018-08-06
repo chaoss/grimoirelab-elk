@@ -25,9 +25,12 @@
 import json
 import logging
 import re
+import time
 
+import requests
 from datetime import datetime
-from dateutil import parser
+
+from grimoirelab_toolkit.datetime import str_to_datetime
 
 from .utils import get_time_diff_days
 
@@ -88,6 +91,7 @@ class GitHubEnrich(Enrich):
 
         self.studies = []
         self.studies.append(self.enrich_onion)
+        self.studies.append(self.enrich_pull_requests)
 
         self.users = {}  # cache users
         self.location = {}  # cache users location
@@ -262,10 +266,10 @@ class GitHubEnrich(Enrich):
         """Get the first date at which a comment or reaction was made to the issue by someone
         other than the user who created the issue
         """
-        comment_dates = [parser.parse(comment['created_at']).replace(tzinfo=None) for comment
-                         in item['comments_data'] if item['user']['login'] != comment['user']['login']]
-        reaction_dates = [parser.parse(reaction['created_at']).replace(tzinfo=None) for reaction
-                          in item['reactions_data'] if item['user']['login'] != reaction['user']['login']]
+        comment_dates = [str_to_datetime(comment['created_at']) for comment in item['comments_data']
+                         if item['user']['login'] != comment['user']['login']]
+        reaction_dates = [str_to_datetime(reaction['created_at']) for reaction in item['reactions_data']
+                          if item['user']['login'] != reaction['user']['login']]
         reaction_dates.extend(comment_dates)
         if reaction_dates:
             return min(reaction_dates)
@@ -275,11 +279,25 @@ class GitHubEnrich(Enrich):
         """Get the first date at which a review was made on the PR by someone
         other than the user who created the PR
         """
-        review_dates = [parser.parse(review['created_at']).replace(tzinfo=None) for review in
-                        item['review_comments_data'] if item['user']['login'] != review['user']['login']]
+        review_dates = [str_to_datetime(review['created_at']) for review in item['review_comments_data']
+                        if item['user']['login'] != review['user']['login']]
         if review_dates:
             return min(review_dates)
         return None
+
+    def get_latest_comment_date(self, item):
+        """Get the date of the latest comment on the issue/pr"""
+
+        comment_dates = [str_to_datetime(comment['created_at']) for comment in item['comments_data']]
+        if comment_dates:
+            return max(comment_dates)
+        return None
+
+    def get_num_commenters(self, item):
+        """Get the number of unique people who commented on the issue/pr"""
+
+        commenters = [comment['user']['login'] for comment in item['comments_data']]
+        return len(set(commenters))
 
     @metadata
     def get_rich_item(self, item):
@@ -331,6 +349,164 @@ class GitHubEnrich(Enrich):
                              timeframe_field=timeframe_field,
                              sort_on_field=sort_on_field,
                              no_incremental=no_incremental)
+
+    def enrich_pull_requests(self, ocean_backend, enrich_backend, raw_issues_index="github_issues_raw"):
+        """
+        The purpose of this Study is to add additional fields to the pull_requests only index.
+        Basically to calculate some of the metrics from Code Development under GMD metrics:
+        https://github.com/chaoss/wg-gmd/blob/master/2_Growth-Maturity-Decline.md#code-development
+
+        When data from the pull requests category is fetched using perceval,
+        some additional fields such as "number_of_comments" that are made on the PR
+        cannot be calculated as the data related to comments is not fetched.
+        When data from the issues category is fetched, then every item is considered as an issue
+        and PR specific data such as "review_comments" are not fetched.
+
+        Items (pull requests) from the raw issues index are queried and data from those items
+        are used to add fields in the corresponding pull request in the pull requests only index.
+        The ids are matched in both the indices.
+
+        :param ocean_backend: backend from which to read the raw items
+        :param enrich_backend:  backend from which to read the enriched items
+        :param raw_issues_index: the raw issues index from which the data for PRs is to be extracted
+        :return: None
+        """
+
+        HEADER_JSON = {"Content-Type": "application/json"}
+
+        # issues raw index from which the data will be extracted
+        github_issues_raw_index = ocean_backend.elastic_url + "/" + raw_issues_index
+        issues_index_search_url = github_issues_raw_index + "/_search"
+
+        # pull_requests index search url in which the data is to be updated
+        enrich_index_search_url = self.elastic.index_url + "/_search"
+
+        logger.info("Doing enrich_pull_request study for index {}".format(self.elastic.index_url))
+        time.sleep(1)  # HACK: Wait until git enrich index has been written
+
+        def make_request(url, error_msg, data=None, req_type="GET"):
+            """
+            Make a request to the given url. The request can be of type GET or a POST.
+            If the request raises an error, display that error using the custom error msg.
+
+            :param url: URL to make the GET request to
+            :param error_msg: custom error message for logging purposes
+            :param data: data to be sent with the POST request
+                         optional if type="GET" else compulsory
+            :param req_type: the type of request to be made: GET or POST
+                         default: GET
+            :return r: requests object
+            """
+
+            r = None
+            if req_type == "GET":
+                r = self.requests.get(url, headers=HEADER_JSON,
+                                      verify=False)
+            elif req_type == "POST" and data is not None:
+                r = self.requests.post(url, data=data, headers=HEADER_JSON,
+                                       verify=False)
+            try:
+                r.raise_for_status()
+            except requests.exceptions.HTTPError as ex:
+                logger.error(error_msg)
+                logger.error(ex)
+                return
+
+            return r
+
+        # Check if the github issues raw index exists, if not raise an error and abort
+        error_msg = "Invalid index provided for enrich_pull_requests study. Aborting."
+        make_request(issues_index_search_url, error_msg)
+
+        # get the number of pull requests in the pull_requests index
+        # https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-count.html
+        # Example:
+        # epoch      timestamp count
+        # 1533454641 13:07:21  276
+        count_url = enrich_backend.elastic_url + "/_cat/count/" + enrich_backend.elastic.index + "?v"
+        error_msg = "Cannot fetch number of items in {} Aborting.".format(enrich_backend.elastic.index)
+        r = make_request(count_url, error_msg)
+        num_pull_requests = int(r.text.split()[-1])
+
+        # get all the ids that are in the enriched pull requests index which will be used later
+        # to pull requests data from the issue having the same id in the raw_issues_index
+        pull_requests_ids = []
+        size = 10000  # Default number of items that can be queried from elasticsearch at a time
+        i = 0  # counter
+        while num_pull_requests > 0:
+            fetch_id_in_repo_query = """
+            {
+                "_source": ["id_in_repo"],
+                "from": %s,
+                "size": %s
+            }
+            """ % (i, size)
+
+            error_msg = "Error extracting id_in_repo from {}. Aborting.".format(self.elastic.index_url)
+            r = make_request(enrich_index_search_url, error_msg, fetch_id_in_repo_query, "POST")
+            id_in_repo_json = r.json()["hits"]["hits"]
+            pull_requests_ids.extend([item["_source"]["id_in_repo"] for item in id_in_repo_json])
+            i += size
+            num_pull_requests -= size
+
+        # get pull requests data from the github_issues_raw and pull_requests only
+        # index using specific id for each of the item
+        query = """
+        {
+            "query": {
+                "bool": {
+                    "must": [{
+                                "match": {
+                                    %s: %s
+                                }
+                            }]
+                        }
+                    }
+            }
+        """
+        num_enriched = 0  # counter to count the number of PRs enriched
+        pull_requests = []
+
+        for pr_id in pull_requests_ids:
+            # retrieve the data from the issues index
+            issue_query = query % ('"data.number"', pr_id)
+            error_msg = "Id {} doesnot exists in {}. Aborting.".format(pr_id, github_issues_raw_index)
+            r = make_request(issues_index_search_url, error_msg, issue_query, "POST")
+            issue = r.json()["hits"]["hits"][0]["_source"]["data"]
+
+            # retrieve the data from the pull_requests index
+            pr_query = query % ('"id_in_repo"', pr_id)
+            error_msg = "Id {} doesnot exists in {}. Aborting.".format(pr_id, self.elastic.index_url)
+            r = make_request(enrich_index_search_url, error_msg, pr_query, "POST")
+            pull_request_data = r.json()["hits"]["hits"][0]
+            pull_request = pull_request_data['_source']
+            pull_request["_item_id"] = pull_request_data['_id']
+
+            # Add the necessary fields
+            reaction_time = get_time_diff_days(str_to_datetime(issue['created_at']),
+                                               self.get_time_to_first_attention(issue))
+            if not reaction_time:
+                reaction_time = 0
+            if pull_request["time_to_merge_request_response"]:
+                reaction_time = min(pull_request["time_to_merge_request_response"], reaction_time)
+            pull_request["time_to_merge_request_response"] = reaction_time
+
+            pull_request['num_comments'] = issue['comments']
+
+            # should latest reviews be considered as well?
+            pull_request['pr_comment_duration'] = get_time_diff_days(str_to_datetime(issue['created_at']),
+                                                                     self.get_latest_comment_date(issue))
+            pull_request['pr_comment_diversity'] = self.get_num_commenters(issue)
+
+            pull_requests.append(pull_request)
+            if len(pull_requests) >= self.elastic.max_items_bulk:
+                self.elastic.bulk_upload(pull_requests, "_item_id")
+                pull_requests = []
+
+            num_enriched += 1
+            logger.info("pull_requests processed %i/%i", num_enriched, len(pull_requests_ids))
+
+        self.elastic.bulk_upload(pull_requests, "_item_id")
 
     def __get_rich_pull(self, item):
         rich_pr = {}
@@ -421,15 +597,15 @@ class GitHubEnrich(Enrich):
 
         # GMD code development metrics
         rich_pr['forks'] = pull_request['base']['repo']['forks_count']
-        rich_pr['code_merge_duration'] = \
-            get_time_diff_days(pull_request['created_at'], pull_request['merged_at'])
+        rich_pr['code_merge_duration'] = get_time_diff_days(pull_request['created_at'],
+                                                            pull_request['merged_at'])
         rich_pr['num_review_comments'] = pull_request['review_comments']
 
         rich_pr['time_to_merge_request_response'] = None
         if pull_request['review_comments'] != 0:
             min_review_date = self.get_time_to_merge_request_response(pull_request)
             rich_pr['time_to_merge_request_response'] = \
-                get_time_diff_days(pull_request['created_at'], min_review_date)
+                get_time_diff_days(str_to_datetime(pull_request['created_at']), min_review_date)
 
         if self.prjs_map:
             rich_pr.update(self.get_item_project(rich_pr))
@@ -541,7 +717,8 @@ class GitHubEnrich(Enrich):
         rich_issue['time_to_first_attention'] = None
         if issue['comments'] + issue['reactions']['total_count'] != 0:
             rich_issue['time_to_first_attention'] = \
-                get_time_diff_days(issue['created_at'], self.get_time_to_first_attention(issue))
+                get_time_diff_days(str_to_datetime(issue['created_at']),
+                                   self.get_time_to_first_attention(issue))
 
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], "issue"))
 

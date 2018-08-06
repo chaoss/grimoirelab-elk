@@ -600,7 +600,7 @@ class GitEnrich(Enrich):
         in which the author of the item had activity in the data source. In the case of git
         the fields author_min_date and author_max_date are added.
 
-        In order to implement the algorithm first, the possible min and max data are found for
+        In order to implement the algorithm first, the possible min and max date are found for
         all the authors. To have the incremental support, only the new commits (or the commits without
         a author_min_date or author_max_date) are evaluated in order to find the authors which
         have updated information.
