@@ -181,7 +181,10 @@ class SlackEnrich(Enrich):
         eitem['channel_name'] = channel['name']
         eitem['channel_id'] = channel['id']
         eitem['channel_created'] = channel['created']
-        eitem['channel_member_count'] = len(channel['members'])
+        # Due to a Slack API change, the list of members is returned paginated, thus the new attribute `num_members`
+        # has been added to the Slack Perceval backend. In order to avoid breaking changes, the former
+        # variable `members` is kept and used only if `num_members` is not present in the input item.
+        eitem['channel_member_count'] = channel['num_members'] if 'num_members' in channel else len(channel['members'])
         if 'topic' in channel:
             eitem['channel_topic'] = channel['topic']
         if 'purpose' in channel:

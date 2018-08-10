@@ -51,6 +51,16 @@ class TestSlack(TestBaseBackend):
         self.assertEqual(result['raw'], 9)
         self.assertEqual(result['enrich'], 9)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['channel_member_count'], 3)
+
+        for item in self.items[1:]:
+            eitem = enrich_backend.get_rich_item(item)
+            self.assertEqual(eitem['channel_member_count'], 4565)
+
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
