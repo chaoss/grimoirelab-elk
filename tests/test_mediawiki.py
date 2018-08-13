@@ -50,6 +50,14 @@ class TestMediawiki(TestBaseBackend):
         self.assertEqual(result['raw'], 3)
         self.assertEqual(result['enrich'], 8)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitems = enrich_backend.get_rich_item_reviews(item)
+
+        for ei in eitems:
+            self.assertEqual(ei['url'], 'https://wiki.mozilla.org/Main_Page/QA/NoMore404s')
+
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
