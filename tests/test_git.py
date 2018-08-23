@@ -53,6 +53,17 @@ class TestGit(TestBaseBackend):
         self.assertEqual(result['raw'], 9)
         self.assertEqual(result['enrich'], 9)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['committer_name'], 'Unknown')
+
+        for item in self.items[1:]:
+            eitem = enrich_backend.get_rich_item(item)
+            self.assertNotEqual(eitem['committer_name'], 'Unknown')
+            self.assertNotEqual(eitem['author_name'], 'Unknown')
+
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
