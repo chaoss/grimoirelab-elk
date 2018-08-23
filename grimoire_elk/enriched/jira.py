@@ -39,7 +39,7 @@ class JiraEnrich(Enrich):
     roles = ["assignee", "reporter", "creator"]
 
     def get_fields_uuid(self):
-        return ["assigned_to_uuid", "reporter_uuid"]
+        return ["assignee_uuid", "reporter_uuid"]
 
     def get_field_author(self):
         return "reporter"
@@ -49,19 +49,16 @@ class JiraEnrich(Enrich):
 
         identity = {}
 
-        for field in ['name', 'email', 'username']:
-            # Basic fields in Sorting Hat
-            identity[field] = None
-
-        if item is None:
-            return identity
-
         user = item
         if 'data' in item and type(item) == dict:
             user = item['data']['fields'][identity_field]
 
-        if user is None:
+        if not user:
             return identity
+
+        identity['name'] = None
+        identity['username'] = None
+        identity['email'] = None
 
         if 'displayName' in user:
             identity['name'] = user['displayName']
@@ -69,6 +66,7 @@ class JiraEnrich(Enrich):
             identity['username'] = user['name']
         if 'emailAddress' in user:
             identity['email'] = user['emailAddress']
+
         return identity
 
     def get_project_repository(self, eitem):
@@ -164,15 +162,15 @@ class JiraEnrich(Enrich):
         issue = item['data']
 
         # Fields that are the same in item and eitem
-        copy_fields = ["assigned_to", "reporter"]
+        copy_fields = ["assignee", "reporter"]
         for f in copy_fields:
             if f in issue:
                 eitem[f] = issue[f]
             else:
                 eitem[f] = None
 
-        # dizquierdo requirements T146
         eitem['changes'] = issue['changelog']['total']
+
         if issue["fields"]["assignee"]:
             eitem['assignee'] = issue["fields"]["assignee"]["displayName"]
             if "timeZone" in issue["fields"]["assignee"]:
