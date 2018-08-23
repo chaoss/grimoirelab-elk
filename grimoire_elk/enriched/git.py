@@ -229,6 +229,9 @@ class GitEnrich(Enrich):
         identity['email'] = email
         identity['name'] = name
 
+        if not identity['username'] and not identity['email']:
+            identity['name'] = 'Unknown'
+
         return identity
 
     def get_project_repository(self, eitem):
