@@ -88,9 +88,9 @@ class TestGit(TestBaseBackend):
             study(ocean_backend, enrich_backend)
 
             self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.git:Doing demography enrich '
-                                           'from http://localhost:9200/test_git_enrich since None')
+                                           'from ' + self.es_con + '/test_git_enrich since None')
             self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.git:Completed demography '
-                                            'enrich from http://localhost:9200/test_git_enrich')
+                                            'enrich from ' + self.es_con + '/test_git_enrich')
 
         for item in enrich_backend.fetch():
             self.assertTrue('author_min_date' in item.keys())
@@ -102,14 +102,14 @@ class TestGit(TestBaseBackend):
         study, ocean_backend, enrich_backend = self._test_study('enrich_onion')
         study(ocean_backend, enrich_backend, in_index='test_git_enrich')
 
-        url = "http://localhost:9200/_aliases"
-        response = requests.get(url).json()
+        url = self.es_con + "/_aliases"
+        response = requests.get(url, verify=False).json()
         self.assertTrue('git_onion-enriched' in response)
 
         time.sleep(1)
 
-        url = "http://localhost:9200/git_onion-enriched/_count"
-        response = requests.get(url).json()
+        url = self.es_con + "/git_onion-enriched/_count"
+        response = requests.get(url, verify=False).json()
 
         self.assertGreater(response['count'], 0)
 

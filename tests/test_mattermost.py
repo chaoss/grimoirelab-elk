@@ -65,7 +65,7 @@ class TestMattermost(TestBaseBackend):
         self.assertEqual(result['raw'], 89)
         self.assertEqual(result['enrich'], 89)
 
-        res = requests.get(self.es_con + "/" + self.enrich_index + "/_search")
+        res = requests.get(self.es_con + "/" + self.enrich_index + "/_search", verify=False)
         for eitem in res.json()['hits']['hits']:
             self.assertEqual(eitem['_source']['project'], "grimoire")
 
