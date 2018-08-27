@@ -406,20 +406,7 @@
             "aggregatetimeestimate": null,
             "aggregatetimeoriginalestimate": null,
             "aggregatetimespent": null,
-            "assignee": {
-                "active": true,
-                "avatarUrls": {
-                    "16x16": "https://secure.gravatar.com/avatar/9563a6aa56787546aa5801b81afd25ca?d=mm&s=16",
-                    "24x24": "https://secure.gravatar.com/avatar/9563a6aa56787546aa5801b81afd25ca?d=mm&s=24",
-                    "32x32": "https://secure.gravatar.com/avatar/9563a6aa56787546aa5801b81afd25ca?d=mm&s=32",
-                    "48x48": "https://secure.gravatar.com/avatar/9563a6aa56787546aa5801b81afd25ca?d=mm&s=48"
-                },
-                "displayName": "Ethan Brown",
-                "key": "ethan",
-                "name": "ethan",
-                "self": "https://tickets.puppetlabs.com/rest/api/2/user?username=ethan",
-                "timeZone": "America/Los_Angeles"
-            },
+            "assignee": {},
             "components": [],
             "created": "2016-07-26T14:25:28.000-0700",
             "creator": {
