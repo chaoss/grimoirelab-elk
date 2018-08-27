@@ -57,6 +57,21 @@ class TestJira(TestBaseBackend):
         self.assertEqual(result['raw'], 5)
         self.assertEqual(result['enrich'], 5)
 
+        enrich_backend = self.connectors[self.connector][2]()
+        enrich_backend.sortinghat = True
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['assignee_name'], 'Unassigned')
+        self.assertEqual(eitem['assignee_org_name'], 'Unassigned')
+        self.assertEqual(eitem['assignee_user_name'], 'Unassigned')
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertNotEqual(eitem['assignee_name'], 'Unassigned')
+        self.assertNotEqual(eitem['assignee_org_name'], 'Unassigned')
+        self.assertNotEqual(eitem['assignee_user_name'], 'Unassigned')
+
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
