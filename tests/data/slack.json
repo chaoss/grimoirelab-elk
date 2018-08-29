@@ -87,7 +87,7 @@
             "is_primary_owner": false,
             "is_restricted": false,
             "is_ultra_restricted": false,
-            "name": "dizquierdo",
+            "name": null,
             "profile": {
                 "avatar_hash": "ge557006561e",
                 "email": "dizquierdo@example.com",
@@ -97,7 +97,7 @@
                 "image_48": "https://secure.gravatar.com",
                 "image_512": "https://secure.gravatar.com",
                 "image_72": "https://secure.gravatar.com",
-                "real_name": "",
+                "real_name": null,
                 "real_name_normalized": ""
             },
             "real_name": "",
