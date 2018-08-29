@@ -69,6 +69,8 @@ DEFAULT_PROJECT = 'Main'
 DEFAULT_DB_USER = 'root'
 CUSTOM_META_PREFIX = 'cm'
 
+SH_UNKNOWN_VALUE = 'Unknown'
+
 
 def metadata(func):
     """Add metadata to an item.
@@ -614,7 +616,7 @@ class Enrich(ElasticItems):
 
         enrollments = self.get_enrollments(uuid)
         enroll = self.unaffiliated_group
-        if len(enrollments) > 0:
+        if enrollments:
             for enrollment in enrollments:
                 if not item_date:
                     enroll = enrollment.organization.name
@@ -776,11 +778,29 @@ class Enrich(ElasticItems):
                 identity = self.get_sh_identity(item, rol)
                 eitem_sh.update(self.get_item_sh_fields(identity, item_date, rol=rol))
 
+                if not eitem_sh[rol + '_org_name']:
+                    eitem_sh[rol + '_org_name'] = SH_UNKNOWN_VALUE
+
+                if not eitem_sh[rol + '_name']:
+                    eitem_sh[rol + '_name'] = SH_UNKNOWN_VALUE
+
+                if not eitem_sh[rol + '_user_name']:
+                    eitem_sh[rol + '_user_name'] = SH_UNKNOWN_VALUE
+
         # Add the author field common in all data sources
         rol_author = 'author'
         if author_field in users_data and author_field != rol_author:
             identity = self.get_sh_identity(item, author_field)
             eitem_sh.update(self.get_item_sh_fields(identity, item_date, rol=rol_author))
+
+            if not eitem_sh['author_org_name']:
+                eitem_sh['author_org_name'] = SH_UNKNOWN_VALUE
+
+            if not eitem_sh['author_name']:
+                eitem_sh['author_name'] = SH_UNKNOWN_VALUE
+
+            if not eitem_sh['author_user_name']:
+                eitem_sh['author_user_name'] = SH_UNKNOWN_VALUE
 
         return eitem_sh
 
