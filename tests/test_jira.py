@@ -62,15 +62,15 @@ class TestJira(TestBaseBackend):
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
-        self.assertEqual(eitem['assignee_name'], 'Unassigned')
-        self.assertEqual(eitem['assignee_org_name'], 'Unassigned')
-        self.assertEqual(eitem['assignee_user_name'], 'Unassigned')
+        self.assertEqual(eitem['assignee_name'], 'Unknown')
+        self.assertEqual(eitem['assignee_org_name'], 'Unknown')
+        self.assertEqual(eitem['assignee_user_name'], 'Unknown')
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
-        self.assertNotEqual(eitem['assignee_name'], 'Unassigned')
-        self.assertNotEqual(eitem['assignee_org_name'], 'Unassigned')
-        self.assertNotEqual(eitem['assignee_user_name'], 'Unassigned')
+        self.assertNotEqual(eitem['assignee_name'], 'Unknown')
+        self.assertEqual(eitem['assignee_org_name'], 'Unknown')
+        self.assertNotEqual(eitem['assignee_user_name'], 'Unknown')
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
