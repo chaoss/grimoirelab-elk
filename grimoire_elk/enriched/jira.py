@@ -257,15 +257,6 @@ class JiraEnrich(Enrich):
         if self.sortinghat:
             eitem.update(self.get_item_sh(item, self.roles))
 
-            if not eitem['assignee_name']:
-                eitem['assignee_name'] = 'Unassigned'
-
-            if not eitem['assignee_org_name']:
-                eitem['assignee_org_name'] = 'Unassigned'
-
-            if not eitem['assignee_user_name']:
-                eitem['assignee_user_name'] = 'Unassigned'
-
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
 
