@@ -68,6 +68,27 @@ class TestSlack(TestBaseBackend):
         self.assertEqual(result['raw'], 9)
         self.assertEqual(result['enrich'], 9)
 
+        enrich_backend = self.connectors[self.connector][2]()
+        enrich_backend.sortinghat = True
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_name'], 'Unknown')
+        self.assertEqual(eitem['author_user_name'], 'Unknown')
+        self.assertEqual(eitem['author_org_name'], 'Unknown')
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertTrue('author_name' not in eitem)
+        self.assertTrue('author_user_name' not in eitem)
+        self.assertTrue('author_org_name' not in eitem)
+
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertNotEqual(eitem['author_name'], 'Unknown')
+        self.assertNotEqual(eitem['author_user_name'], 'Unknown')
+        self.assertEqual(eitem['author_org_name'], 'Unknown')
+
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
