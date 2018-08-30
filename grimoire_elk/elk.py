@@ -378,13 +378,13 @@ def load_identities(ocean_backend, enrich_backend):
             if identity not in new_identities:
                 new_identities.append(identity)
 
-        if items_count % 500 == 0:
-            inserted_identities = load_bulk_identities(items_count,
-                                                       new_identities,
-                                                       enrich_backend.sh_db,
-                                                       enrich_backend.get_connector_name())
-            identities_count += inserted_identities
-            new_identities = []
+            if len(new_identities) > 100:
+                inserted_identities = load_bulk_identities(items_count,
+                                                           new_identities,
+                                                           enrich_backend.sh_db,
+                                                           enrich_backend.get_connector_name())
+                identities_count += inserted_identities
+                new_identities = []
 
     if new_identities:
         inserted_identities = load_bulk_identities(items_count,
