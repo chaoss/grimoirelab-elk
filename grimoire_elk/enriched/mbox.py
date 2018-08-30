@@ -81,14 +81,12 @@ class MBoxEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         item = item['data']
         for identity in ['From']:
             if identity in item and item[identity]:
                 user = self.get_sh_identity(item[identity])
-                identities.append(user)
-        return identities
+                yield user
 
     def get_sh_identity(self, item, identity_field=None):
         # "From": "hwalsh at wikiledia.net (Heat Walsh)"
