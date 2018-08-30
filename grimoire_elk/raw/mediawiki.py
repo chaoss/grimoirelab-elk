@@ -63,3 +63,21 @@ class MediaWikiOcean(ElasticOcean):
     """MediaWiki Ocean feeder"""
 
     mapping = Mapping
+
+    @classmethod
+    def get_perceval_params_from_url(cls, urls):
+        """ Get the perceval params given the URLs for the data source """
+        params = []
+
+        dparam = cls.get_arthur_params_from_url(urls)
+        params.append(dparam["url"])
+
+        return params
+
+    @classmethod
+    def get_arthur_params_from_url(cls, urls):
+        # The URLs are  the API URL and the wiki URL
+        # We just need the API URL
+        data = urls.split()
+
+        return {"url": data[0]}
