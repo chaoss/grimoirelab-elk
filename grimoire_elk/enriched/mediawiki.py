@@ -157,7 +157,20 @@ class MediaWikiEnrich(Enrich):
                 eitem.update(self.get_item_project(erevision))
 
             # And now some calculated fields
-            erevision["url"] = erevision["page_origin"] + "/" + erevision["page_title"]
+            if self.prjs_map and "mediawiki" in self.prjs_map:
+                for repo in self.prjs_map["mediawiki"].keys():
+                    if erevision["page_origin"] in repo:
+                        urls = repo.split()
+                        # If only one URL is given, then we consider same URL for API and web server
+                        if len(urls) == 1:
+                            erevision["url"] = urls[0] + "/" + erevision["page_title"]
+                        elif len(urls) == 2:
+                            erevision["url"] = urls[1] + "/" + erevision["page_title"]
+                        else:
+                            raise ValueError("Parameter value not supported in projects.json for mediawiki: " + repo)
+            else:
+                erevision["url"] = erevision["page_origin"] + "/" + erevision["page_title"]
+
             erevision["url"] = erevision["url"].replace(" ", "_")
             erevision["iscreated"] = 0
             erevision["creation_date"] = None

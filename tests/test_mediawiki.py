@@ -72,6 +72,25 @@ class TestMediawiki(TestBaseBackend):
         self.assertEqual(result['raw'], 3)
         self.assertEqual(result['enrich'], 8)
 
+        enrich_backend = self.connectors[self.connector][2](json_projects_map="data/projects-release.json",
+                                                            db_user=self.db_user,
+                                                            db_password=self.db_password)
+        item = self.items[0]
+        eitems = enrich_backend.get_rich_item_reviews(item)
+
+        for ei in eitems:
+            self.assertEqual(ei['url'], 'https://wiki.mozilla.org/view/Main_Page/QA/NoMore404s')
+
+        # Test when only one URL is given in projects JSON file
+        enrich_backend = self.connectors[self.connector][2](json_projects_map="data/projects-release-mediawiki-uc2.json",
+                                                            db_user=self.db_user,
+                                                            db_password=self.db_password)
+        item = self.items[0]
+        eitems = enrich_backend.get_rich_item_reviews(item)
+
+        for ei in eitems:
+            self.assertEqual(ei['url'], 'https://wiki.mozilla.org/Main_Page/QA/NoMore404s')
+
     def test_refresh_identities(self):
         """Test refresh identities"""
 
@@ -89,7 +108,12 @@ class TestMediawiki(TestBaseBackend):
 
         with open("data/projects-release.json") as projects_filename:
             url = json.load(projects_filename)['grimoire']['mediawiki'][0]
-            arthur_params = {'uri': 'https://wiki.mozilla.org', 'url': 'https://wiki.mozilla.org'}
+            arthur_params = {'url': 'https://wiki.mozilla.org'}
+            self.assertDictEqual(arthur_params, MediaWikiOcean.get_arthur_params_from_url(url))
+
+        with open("data/projects-release-mediawiki-uc2.json") as projects_filename:
+            url = json.load(projects_filename)['grimoire']['mediawiki'][0]
+            arthur_params = {'url': 'https://wiki.mozilla.org'}
             self.assertDictEqual(arthur_params, MediaWikiOcean.get_arthur_params_from_url(url))
 
 

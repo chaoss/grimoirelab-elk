@@ -111,9 +111,9 @@
         "type": "edit",
         "update": 1466557537.0
     },
-    "origin": "http://example.com",
+    "origin": "https://wiki.mozilla.org/",
     "perceval_version": "0.9.10",
-    "tag": "http://example.com",
+    "tag": "https://wiki.mozilla.org/",
     "timestamp": 1518170803.375229,
     "updated_on": 1466557537.0,
     "uuid": "528aa927f40d8e46a1e9f456fa318bf9f8a38105"
