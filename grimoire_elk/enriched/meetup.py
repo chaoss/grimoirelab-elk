@@ -76,25 +76,21 @@ class MeetupEnrich(Enrich):
     def get_identities(self, item):
         ''' Return the identities from an item '''
 
-        identities = []
         item = item['data']
-
-        identities = []
 
         # Creators
         if 'event_hosts' in item:
             user = self.get_sh_identity(item['event_hosts'][0])
-            identities.append(user)
+            yield user
 
         # rsvps
         for rsvp in item['rsvps']:
             user = self.get_sh_identity(rsvp['member'])
-            identities.append(user)
+            yield user
         # Comments
         for comment in item['comments']:
             user = self.get_sh_identity(comment['member'])
-            identities.append(user)
-        return identities
+            yield user
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {'username': None, 'email': None, 'name': None}
@@ -268,12 +264,11 @@ class MeetupEnrich(Enrich):
         return sh_fields
 
     def get_rich_item_comments(self, item):
-        comments_enrich = []
         if 'comments' in item['data']:
             for comment in item['data']['comments']:
                 ecomment = self.get_rich_item(item)  # reuse all fields from item
                 if not ecomment or 'id' not in ecomment:
-                    return comments_enrich
+                    return
                 created = unixtime_to_datetime(comment['created'] / 1000).isoformat()
                 ecomment['url'] = comment['link']
                 ecomment['id'] = comment['id']
@@ -293,23 +288,21 @@ class MeetupEnrich(Enrich):
                 ecomment['member_id'] = member['id']
                 ecomment['member_name'] = member['name']
                 ecomment['member_url'] = "https://www.meetup.com/members/" + str(member['id'])
-                comments_enrich.append(ecomment)
 
                 if self.sortinghat:
                     ecomment.update(self.get_item_sh(comment))
 
-        return comments_enrich
+                yield ecomment
 
     def get_field_unique_id_comment(self):
         return "id"
 
     def get_rich_item_rsvps(self, item):
-        rsvps_enrich = []
         if 'rsvps' in item['data']:
             for rsvp in item['data']['rsvps']:
                 ersvp = self.get_rich_item(item)  # reuse all fields from item
                 if not ersvp or 'id' not in ersvp:
-                    return rsvps_enrich
+                    return
                 ersvp['type'] = 'rsvp'
                 created = unixtime_to_datetime(rsvp['created'] / 1000).isoformat()
                 ersvp.update(self.get_grimoire_fields(created, ersvp['type']))
@@ -335,9 +328,7 @@ class MeetupEnrich(Enrich):
                 if self.sortinghat:
                     ersvp.update(self.get_item_sh(rsvp))
 
-                rsvps_enrich.append(ersvp)
-
-        return rsvps_enrich
+                yield ersvp
 
     def get_field_unique_id_rsvps(self):
         return "id"
@@ -349,33 +340,32 @@ class MeetupEnrich(Enrich):
 
         # And now for each item we want also the rsvps and comments items
         items = ocean_backend.fetch()
-        ncom = 0
+        ncomments = 0
+        icomments = 0
         nrsvps = 0
+        irsvps = 0
         nitems = 0
-        rich_item_comments = []
-        rich_item_rsvps = []
 
         for item in items:
             nitems += 1
-            rich_item_comments += self.get_rich_item_comments(item)
-            rich_item_rsvps += self.get_rich_item_rsvps(item)
+            ncomments += len(item['data']['comments'])
+            rich_item_comments = self.get_rich_item_comments(item)
+            icomments += self.elastic.bulk_upload(rich_item_comments,
+                                                  self.get_field_unique_id_comment())
 
-        if rich_item_comments:
-            ncom += self.elastic.bulk_upload(rich_item_comments,
-                                             self.get_field_unique_id_comment())
-
-            if ncom != len(rich_item_comments):
-                missing = len(rich_item_comments) - ncom
-                logger.error("%s/%s missing comments for Meetup",
-                             str(missing), str(len(rich_item_comments)))
-
-        if rich_item_rsvps:
-            nrsvps += self.elastic.bulk_upload(rich_item_rsvps,
+            nrsvps += len(item['data']['rsvps'])
+            rich_item_rsvps = self.get_rich_item_rsvps(item)
+            irsvps += self.elastic.bulk_upload(rich_item_rsvps,
                                                self.get_field_unique_id_rsvps())
 
-            if nrsvps != len(rich_item_rsvps):
-                missing = len(rich_item_rsvps) - nrsvps
+            if ncomments != icomments:
+                missing = ncomments - icomments
+                logger.error("%s/%s missing comments for Meetup",
+                             str(missing), str(len(ncomments)))
+
+            if nrsvps != irsvps:
+                missing = nrsvps - irsvps
                 logger.error("%s/%s missing rsvps for Meetup",
-                             str(missing), str(len(rich_item_rsvps)))
+                             str(missing), str(len(nrsvps)))
 
         return nitems
