@@ -361,11 +361,11 @@ class MeetupEnrich(Enrich):
             if ncomments != icomments:
                 missing = ncomments - icomments
                 logger.error("%s/%s missing comments for Meetup",
-                             str(missing), str(len(ncomments)))
+                             str(missing), str(ncomments))
 
             if nrsvps != irsvps:
                 missing = nrsvps - irsvps
                 logger.error("%s/%s missing rsvps for Meetup",
-                             str(missing), str(len(nrsvps)))
+                             str(missing), str(nrsvps))
 
         return nitems
