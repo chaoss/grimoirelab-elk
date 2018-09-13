@@ -26,7 +26,8 @@ import logging
 import re
 
 from datetime import datetime
-from dateutil import parser
+
+from grimoirelab_toolkit.datetime import str_to_datetime
 
 from .utils import get_time_diff_days
 
@@ -69,6 +70,7 @@ class GitLabEnrich(Enrich):
     mapping = Mapping
 
     issue_roles = ['author', 'assignee']
+    merge_roles = ['author']
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
@@ -129,9 +131,9 @@ class GitLabEnrich(Enrich):
         """Get the first date at which a comment or reaction was made to the issue by someone
         other than the user who created the issue
         """
-        comment_dates = [parser.parse(comment['created_at']).replace(tzinfo=None) for comment
+        comment_dates = [str_to_datetime(comment['created_at']).replace(tzinfo=None) for comment
                          in item['notes_data'] if item['author']['username'] != comment['author']['username']]
-        reaction_dates = [parser.parse(reaction['created_at']).replace(tzinfo=None) for reaction
+        reaction_dates = [str_to_datetime(reaction['created_at']).replace(tzinfo=None) for reaction
                           in item['award_emoji_data'] if item['author']['username'] != reaction['user']['username']]
         reaction_dates.extend(comment_dates)
         if reaction_dates:
@@ -140,6 +142,18 @@ class GitLabEnrich(Enrich):
 
     @metadata
     def get_rich_item(self, item):
+
+        rich_item = {}
+        if item['category'] == 'issue':
+            rich_item = self.__get_rich_issue(item)
+        elif item['category'] == 'merge_request':
+            rich_item = self.__get_rich_merge(item)
+        else:
+            logger.error("rich item not defined for GitLab category %s", item['category'])
+
+        return rich_item
+
+    def __get_rich_issue(self, item):
 
         rich_issue = {}
 
@@ -198,7 +212,7 @@ class GitLabEnrich(Enrich):
             rich_issue['assignee_location'] = None
 
         rich_issue['id'] = issue['id']
-        rich_issue['id_in_repo'] = issue['web_url'].split("/")[-1]
+        rich_issue['id_in_repo'] = issue['iid']
         rich_issue['repository'] = issue['web_url'].rsplit("/", 2)[0]
         rich_issue['title'] = issue['title']
         rich_issue['title_analyzed'] = issue['title']
@@ -237,3 +251,109 @@ class GitLabEnrich(Enrich):
             rich_issue.update(self.get_item_sh(item, self.issue_roles))
 
         return rich_issue
+
+    def __get_rich_merge(self, item):
+        rich_mr = {}
+
+        for f in self.RAW_FIELDS_COPY:
+            if f in item:
+                rich_mr[f] = item[f]
+            else:
+                rich_mr[f] = None
+        # The real data
+        merge_request = item['data']
+
+        rich_mr['time_to_close_days'] = \
+            get_time_diff_days(merge_request['created_at'], merge_request['closed_at'])
+
+        if merge_request['state'] != 'closed':
+            rich_mr['time_open_days'] = \
+                get_time_diff_days(merge_request['created_at'], datetime.utcnow())
+        else:
+            rich_mr['time_open_days'] = rich_mr['time_to_close_days']
+
+        rich_mr['author_username'] = merge_request['author']['username']
+        author = merge_request['author']
+
+        if author:
+            rich_mr['author_name'] = author['name']
+            if 'email' in author and author['email']:
+                rich_mr["author_domain"] = self.get_email_domain(author['email'])
+            if 'organization' in author and author['organization']:
+                rich_mr['author_org'] = author['organization']
+            if 'location' in author and author['location']:
+                rich_mr['author_location'] = author['location']
+        else:
+            rich_mr['author_username'] = None
+            rich_mr['author_name'] = None
+            rich_mr["author_domain"] = None
+            rich_mr['author_org'] = None
+            rich_mr['author_location'] = None
+
+        merged_by = None
+
+        if merge_request['merged_by'] is not None:
+            merged_by = merge_request['merged_by']
+            rich_mr['merge_author_login'] = merged_by['username']
+            rich_mr['merge_author_name'] = merged_by['name']
+            if 'email' in merged_by and merged_by['email']:
+                rich_mr["merge_author_domain"] = self.get_email_domain(merged_by['email'])
+            if 'organization' in merged_by and merged_by['organization']:
+                rich_mr['merge_author_org'] = merged_by['organization']
+            if 'location' in merged_by and merged_by['location']:
+                rich_mr['merge_author_location'] = merged_by['location']
+        else:
+            rich_mr['merge_author_name'] = None
+            rich_mr['merge_author_login'] = None
+            rich_mr["merge_author_domain"] = None
+            rich_mr['merge_author_org'] = None
+            rich_mr['merge_author_location'] = None
+
+        rich_mr['id'] = merge_request['id']
+        rich_mr['id_in_repo'] = merge_request['iid']
+        rich_mr['repository'] = merge_request['web_url'].rsplit("/", 2)[0]
+        rich_mr['title'] = merge_request['title']
+        rich_mr['title_analyzed'] = merge_request['title']
+        rich_mr['state'] = merge_request['state']
+        rich_mr['created_at'] = merge_request['created_at']
+        rich_mr['updated_at'] = merge_request['updated_at']
+        rich_mr['url'] = merge_request['web_url']
+        rich_mr['merged'] = True if rich_mr['state'] else False
+        rich_mr['num_notes'] = len(merge_request['notes_data'])
+
+        labels = ''
+        if 'labels' in merge_request:
+            for label in merge_request['labels']:
+                labels += label + ";;"
+        rich_mr['labels'] = labels
+
+        rich_mr['merge_request'] = True
+        rich_mr['item_type'] = 'merge_request request'
+
+        # GMD code development metrics
+        rich_mr['code_merge_duration'] = get_time_diff_days(merge_request['created_at'],
+                                                            merge_request['merged_at'])
+        rich_mr['num_versions'] = len(merge_request['versions_data'])
+
+        rich_mr['gitlab_repo'] = rich_mr['repository'].replace(GITLAB, '')
+        rich_mr['gitlab_repo'] = re.sub('.git$', '', rich_mr['gitlab_repo'])
+        rich_mr["url_id"] = merge_request['web_url'].replace(GITLAB, '')
+
+        rich_mr['time_to_first_attention'] = None
+        if len(merge_request['notes_data']) + len(merge_request['award_emoji_data']) != 0:
+            rich_mr['time_to_first_attention'] = \
+                get_time_diff_days(merge_request['created_at'], self.get_time_to_first_attention(merge_request))
+
+        if self.prjs_map:
+            rich_mr.update(self.get_item_project(rich_mr))
+
+        if 'project' in item:
+            rich_mr['project'] = item['project']
+
+        rich_mr.update(self.get_grimoire_fields(merge_request['created_at'], "merge_request"))
+
+        if self.sortinghat:
+            item[self.get_field_date()] = rich_mr[self.get_field_date()]
+            rich_mr.update(self.get_item_sh(item, self.merge_roles))
+
+        return rich_mr
