@@ -181,7 +181,7 @@ class StackExchangeEnrich(Enrich):
                 eitem["author_reputation"] = answer['owner']['reputation']
 
             # data fields to copy
-            copy_fields = common_fields + ["creation_date", "is_accepted", "answer_id"]
+            copy_fields = common_fields + ["origin", "tag", "creation_date", "is_accepted", "answer_id"]
             for f in copy_fields:
                 if f in answer:
                     eitem[f] = answer[f]
@@ -244,6 +244,10 @@ class StackExchangeEnrich(Enrich):
             # Time to enrich also de answers
             if 'answers' in item['data']:
                 for answer in item['data']['answers']:
+                    # Copy mandatory raw fields
+                    answer['origin'] = item['origin']
+                    answer['tag'] = item['tag']
+
                     rich_answer = self.get_rich_item(answer, kind='answer', question_tags=rich_item['question_tags'])
                     data_json = json.dumps(rich_answer)
                     bulk_json += '{"index" : {"_id" : "%i_%i" } }\n' % \

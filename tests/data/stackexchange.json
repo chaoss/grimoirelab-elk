@@ -168,6 +168,7 @@
     },
     "origin": "stackoverflow",
     "perceval_version": "0.2.0",
+    "tag": "stackoverflow-test",
     "timestamp": 1469619644.7069,
     "updated_on": 1469619561.0,
     "uuid": "0fd3068ee3b9dac0187f2208e220fadac120eb2f"
@@ -214,6 +215,7 @@
     },
     "origin": "stackoverflow",
     "perceval_version": "0.2.0",
+    "tag": "stackoverflow-test",
     "timestamp": 1469619644.708539,
     "updated_on": 1469619535.0,
     "uuid": "3d23ae2ab783b939b354057b20671c55fa4f2187"
@@ -318,7 +320,7 @@
     },
     "origin": "stackoverflow",
     "perceval_version": "0.9.10",
-    "tag": "stackoverflow",
+    "tag": "stackoverflow-test",
     "timestamp": 1518165823.432987,
     "updated_on": 1459975066.0,
     "uuid": "43953bd75d1d4dbedb457059acb4b79fcf6712a8"
