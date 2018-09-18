@@ -59,7 +59,7 @@ class MediaWikiEnrich(Enrich):
 
     mapping = Mapping
 
-    def get_field_unique_id_review(self):
+    def get_field_unique_id(self):
         return "revision_revid"
 
     def get_identities(self, item):
@@ -183,9 +183,7 @@ class MediaWikiEnrich(Enrich):
                 erevision["isrevision"] = 1
             erevision["page_last_edited_date"] = eitem['last_edited_date']
 
-            erevisions.append(erevision)
-
-        return erevisions
+            yield erevision
 
     @metadata
     def get_rich_item(self, item):
@@ -231,11 +229,8 @@ class MediaWikiEnrich(Enrich):
         return eitem
 
     def enrich_items(self, items):
-        if True:
-            # Hack: by default we use events in MediaWiki
-            return self.enrich_events(items)
-        else:
-            super(MediaWikiEnrich, self).enrich_items(items)
+        # Enrich always events for MediaWiki items
+        return self.enrich_events(items)
 
     def enrich_events(self, ocean_backend):
         max_items = self.elastic.max_items_bulk
@@ -257,7 +252,7 @@ class MediaWikiEnrich(Enrich):
                     current = 0
                 data_json = json.dumps(enrich_review)
                 bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                    (enrich_review[self.get_field_unique_id_review()])
+                    (enrich_review[self.get_field_unique_id()])
                 bulk_json += data_json + "\n"  # Bulk document
                 current += 1
 
