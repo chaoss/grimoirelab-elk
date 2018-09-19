@@ -199,15 +199,15 @@ class TestEnrich(unittest.TestCase):
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(identity=identity)
-        self.assertEqual(eitem_sh['author_id'], self.empty_item['author_id'])
-        self.assertEqual(eitem_sh['author_uuid'], self.empty_item['author_uuid'])
-        self.assertEqual(eitem_sh['author_name'], self.empty_item['author_name'])
-        self.assertEqual(eitem_sh['author_user_name'], self.empty_item['author_user_name'])
-        self.assertEqual(eitem_sh['author_domain'], self.empty_item['author_domain'])
-        self.assertEqual(eitem_sh['author_gender'], self.empty_item['author_gender'])
-        self.assertEqual(eitem_sh['author_gender_acc'], self.empty_item['author_gender_acc'])
-        self.assertEqual(eitem_sh['author_org_name'], self.empty_item['author_org_name'])
-        self.assertEqual(eitem_sh['author_bot'], self.empty_item['author_bot'])
+        self.assertEqual(eitem_sh['author_id'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_uuid'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_user_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_domain'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_gender'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_gender_acc'], None)
+        self.assertEqual(eitem_sh['author_org_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_bot'], False)
 
         # 2. No uuid field
         sh_ids = {
@@ -217,15 +217,15 @@ class TestEnrich(unittest.TestCase):
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(identity=identity)
-        self.assertEqual(eitem_sh['author_id'], self.empty_item['author_id'])
-        self.assertEqual(eitem_sh['author_uuid'], self.empty_item['author_uuid'])
-        self.assertEqual(eitem_sh['author_name'], self.empty_item['author_name'])
-        self.assertEqual(eitem_sh['author_user_name'], self.empty_item['author_user_name'])
-        self.assertEqual(eitem_sh['author_domain'], self.empty_item['author_domain'])
-        self.assertEqual(eitem_sh['author_gender'], self.empty_item['author_gender'])
-        self.assertEqual(eitem_sh['author_gender_acc'], self.empty_item['author_gender_acc'])
-        self.assertEqual(eitem_sh['author_org_name'], self.empty_item['author_org_name'])
-        self.assertEqual(eitem_sh['author_bot'], self.empty_item['author_bot'])
+        self.assertEqual(eitem_sh['author_id'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_uuid'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_user_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_domain'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_gender'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_gender_acc'], None)
+        self.assertEqual(eitem_sh['author_org_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_bot'], False)
 
     def test_get_item_sh_fields_identity_no_profile(self):
         """Test retrieval when no profile data is found or data is not what we expected"""
@@ -519,15 +519,15 @@ class TestEnrich(unittest.TestCase):
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(sh_id=sh_id)
-        self.assertEqual(eitem_sh['author_id'], self.empty_item['author_id'])
-        self.assertEqual(eitem_sh['author_uuid'], self.empty_item['author_uuid'])
-        self.assertEqual(eitem_sh['author_name'], self.empty_item['author_name'])
-        self.assertEqual(eitem_sh['author_user_name'], self.empty_item['author_user_name'])
-        self.assertEqual(eitem_sh['author_domain'], self.empty_item['author_domain'])
-        self.assertEqual(eitem_sh['author_gender'], self.empty_item['author_gender'])
-        self.assertEqual(eitem_sh['author_gender_acc'], self.empty_item['author_gender_acc'])
-        self.assertEqual(eitem_sh['author_org_name'], self.empty_item['author_org_name'])
-        self.assertEqual(eitem_sh['author_bot'], self.empty_item['author_bot'])
+        self.assertEqual(eitem_sh['author_id'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_uuid'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_user_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_domain'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_gender'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_gender_acc'], None)
+        self.assertEqual(eitem_sh['author_org_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_bot'], False)
 
         # 2. uuid is an empty string
 
@@ -535,15 +535,15 @@ class TestEnrich(unittest.TestCase):
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(sh_id=sh_id)
-        self.assertEqual(eitem_sh['author_id'], self.empty_item['author_id'])
-        self.assertEqual(eitem_sh['author_uuid'], self.empty_item['author_uuid'])
-        self.assertEqual(eitem_sh['author_name'], self.empty_item['author_name'])
-        self.assertEqual(eitem_sh['author_user_name'], self.empty_item['author_user_name'])
-        self.assertEqual(eitem_sh['author_domain'], self.empty_item['author_domain'])
-        self.assertEqual(eitem_sh['author_gender'], self.empty_item['author_gender'])
-        self.assertEqual(eitem_sh['author_gender_acc'], self.empty_item['author_gender_acc'])
-        self.assertEqual(eitem_sh['author_org_name'], self.empty_item['author_org_name'])
-        self.assertEqual(eitem_sh['author_bot'], self.empty_item['author_bot'])
+        self.assertEqual(eitem_sh['author_id'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_uuid'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_user_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_domain'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_gender'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_gender_acc'], None)
+        self.assertEqual(eitem_sh['author_org_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem_sh['author_bot'], False)
 
     def test_no_params(self):
         """Neither identity nor sh_id are passed as arguments"""

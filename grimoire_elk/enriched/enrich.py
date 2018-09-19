@@ -626,10 +626,10 @@ class Enrich(ElasticItems):
                     break
         return enroll
 
-    def __get_item_sh_fields_empty(self, rol):
+    def __get_item_sh_fields_empty(self, rol, undefined=False):
         """ Return a SH identity with all fields to empty_field """
         # If empty_field is None, the fields do not appear in index patterns
-        empty_field = ''
+        empty_field = '' if not undefined else '-- UNDEFINED --'
         return {
             rol + "_id": empty_field,
             rol + "_uuid": empty_field,
@@ -665,7 +665,7 @@ class Enrich(ElasticItems):
 
         # If the identity does not exists return and empty identity
         if rol + "_uuid" not in eitem_sh or not eitem_sh[rol + "_uuid"]:
-            return self.__get_item_sh_fields_empty(rol)
+            return self.__get_item_sh_fields_empty(rol, undefined=True)
 
         # Get the SH profile to use first this data
         profile = self.get_profile_sh(eitem_sh[rol + "_uuid"])
