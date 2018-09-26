@@ -787,6 +787,12 @@ class GitEnrich(Enrich):
             r = self.requests.post(self.elastic.index_url + "/_search?size=10000",
                                    data=author_query_str, headers=HEADER_JSON,
                                    verify=False)
+            try:
+                r.raise_for_status()
+            except requests.exceptions.HTTPError as ex:
+                logger.error("Error getting commits for author %s.", author['key'])
+                logger.error(ex)
+                return
 
             if "hits" not in r.json():
                 logger.error("Can't find commits for %s", author['key'])
