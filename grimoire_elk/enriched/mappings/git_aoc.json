@@ -1,6 +1,6 @@
 {
   "mappings": {
-    "item": {
+    "items": {
       "properties": {
         "addedlines": {
           "type": "long"
@@ -108,6 +108,9 @@
           "type": "long"
         },
         "repository": {
+          "type": "keyword"
+        },
+        "uuid": {
           "type": "keyword"
         }
       }
