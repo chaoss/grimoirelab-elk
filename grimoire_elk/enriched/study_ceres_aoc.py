@@ -116,9 +116,10 @@ class ESPandasConnector(ESConnector):
         for row_index in rows.keys():
             row = rows[row_index]
             item_id = self.make_hashcode(row[Events.PERCEVAL_UUID], row[Git.FILE_PATH], row[Git.FILE_EVENT])
+            row['uuid'] = item_id
             doc = {
                 "_index": self._es_index,
-                "_type": "item",
+                "_type": "items",
                 "_id": item_id,
                 "_source": row
             }
