@@ -38,6 +38,7 @@ from ..elastic_mapping import Mapping as BaseMapping
 logger = logging.getLogger(__name__)
 
 GITLAB = 'https://gitlab.com/'
+NO_MILESTONE_TAG = "-empty-"
 
 
 class Mapping(BaseMapping):
@@ -233,6 +234,8 @@ class GitLabEnrich(Enrich):
         rich_issue['gitlab_repo'] = re.sub('.git$', '', rich_issue['gitlab_repo'])
         rich_issue["url_id"] = issue['web_url'].replace(GITLAB, '')
 
+        rich_issue['milestone'] = issue['milestone']['title'] if issue['milestone'] else NO_MILESTONE_TAG
+
         if self.prjs_map:
             rich_issue.update(self.get_item_project(rich_issue))
 
@@ -343,6 +346,8 @@ class GitLabEnrich(Enrich):
         if len(merge_request['notes_data']) + len(merge_request['award_emoji_data']) != 0:
             rich_mr['time_to_first_attention'] = \
                 get_time_diff_days(merge_request['created_at'], self.get_time_to_first_attention(merge_request))
+
+        rich_mr['milestone'] = merge_request['milestone']['title'] if merge_request['milestone'] else NO_MILESTONE_TAG
 
         if self.prjs_map:
             rich_mr.update(self.get_item_project(rich_mr))
