@@ -26,9 +26,10 @@ import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.raw.gitlab import GitLabOcean
+from grimoire_elk.enriched.gitlab import NO_MILESTONE_TAG
 
 
-class TestGit(TestBaseBackend):
+class TestGitLab(TestBaseBackend):
     """Test GitLab backend"""
 
     connector = "gitlab"
@@ -52,6 +53,24 @@ class TestGit(TestBaseBackend):
         self.assertGreater(result['raw'], 0)
         self.assertGreater(result['enrich'], 0)
         self.assertEqual(result['raw'], result['enrich'])
+
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['milestone'], "8.17")
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['milestone'], NO_MILESTONE_TAG)
+
+        item = self.items[4]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['milestone'], "8.17")
+
+        item = self.items[5]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['milestone'], NO_MILESTONE_TAG)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
