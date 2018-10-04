@@ -29,6 +29,7 @@ from datetime import datetime
 
 from grimoirelab_toolkit.datetime import str_to_datetime
 
+from ..errors import ELKError
 from .utils import get_time_diff_days
 
 from .enrich import Enrich, metadata
@@ -39,6 +40,8 @@ logger = logging.getLogger(__name__)
 
 GITLAB = 'https://gitlab.com/'
 NO_MILESTONE_TAG = "-empty-"
+GITLAB_MERGES = "gitlab-merges"
+GITLAB_ISSUES = "gitlab-issues"
 
 
 class Mapping(BaseMapping):
@@ -79,6 +82,8 @@ class GitLabEnrich(Enrich):
                          db_user, db_password, db_host)
 
         self.users = {}  # cache users
+        self.studies = []
+        self.studies.append(self.enrich_onion)
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -362,3 +367,24 @@ class GitLabEnrich(Enrich):
             rich_mr.update(self.get_item_sh(item, self.merge_roles))
 
         return rich_mr
+
+    def enrich_onion(self, ocean_backend, enrich_backend,
+                     in_index, out_index, data_source=None, no_incremental=False,
+                     contribs_field='uuid',
+                     timeframe_field='grimoire_creation_date',
+                     sort_on_field='metadata__timestamp'):
+
+        if not data_source:
+            raise ELKError(cause="Missing data_source attribute")
+
+        if data_source not in [GITLAB_MERGES, GITLAB_ISSUES]:
+            logger.warning("data source value %s should be: %s or %s", data_source, GITLAB_ISSUES, GITLAB_MERGES)
+
+        super().enrich_onion(enrich_backend=enrich_backend,
+                             in_index=in_index,
+                             out_index=out_index,
+                             data_source=data_source,
+                             contribs_field=contribs_field,
+                             timeframe_field=timeframe_field,
+                             sort_on_field=sort_on_field,
+                             no_incremental=no_incremental)
