@@ -872,6 +872,7 @@ class Enrich(ElasticItems):
 
         # Creating connections
         es = Elasticsearch([enrich_backend.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
+
         in_conn = ESOnionConnector(es_conn=es, es_index=in_index,
                                    contribs_field=contribs_field,
                                    timeframe_field=timeframe_field,
@@ -881,6 +882,10 @@ class Enrich(ElasticItems):
                                     timeframe_field=timeframe_field,
                                     sort_on_field=sort_on_field,
                                     read_only=False)
+
+        if not in_conn.exists():
+            logger.info("[Onion] Missing index %s", in_index)
+            return
 
         # Onion currently does not support incremental option
         logger.info("[Onion] Creating out ES index")
