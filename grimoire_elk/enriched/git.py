@@ -83,6 +83,8 @@ class GitEnrich(Enrich):
     AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) and (?P<last_author>.* .*) (?P<email>.*)')
     AUTHOR_P2P_NEW_REGEX = re.compile(r"Co-authored-by:(?P<first_authors>.* .*)<(?P<email>.*)>\n?")
 
+    GIT_AOC_ENRICHED = "git_aoc-enriched"
+
     roles = ['Author', 'Commit']
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
@@ -829,7 +831,7 @@ class GitEnrich(Enrich):
 
     def enrich_areas_of_code(self, ocean_backend, enrich_backend, no_incremental=False,
                              in_index="git-raw",
-                             out_index="git_aoc-enriched",
+                             out_index=GIT_AOC_ENRICHED,
                              sort_on_field='metadata__timestamp'):
         logger.info("[Areas of Code] Starting study")
 
