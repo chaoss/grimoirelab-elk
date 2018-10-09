@@ -22,11 +22,11 @@ import logging
 from datetime import datetime
 
 import pandas
-from elasticsearch import helpers
+from elasticsearch import helpers, NotFoundError
 from elasticsearch_dsl import Search, Q
 
 from cereslib.enrich.enrich import Onion
-
+from grimoirelab_toolkit import datetime as gl_dt
 from grimoire_elk.enriched.ceres_base import ESConnector, CeresBase
 
 
@@ -175,6 +175,38 @@ class ESOnionConnector(ESConnector):
         # TODO exception and error handling
         helpers.bulk(self._es_conn, docs)
         logger.info("[Onion] Written: " + str(len(docs)))
+
+    def latest_enrichment_date(self):
+        """Get the most recent enrichment date.
+
+        :return: latest date based on `metadata__enriched_on` field,
+                 None if no values found for that field.
+
+        :raises NotFoundError: index not found in ElasticSearch
+        """
+        latest_date = None
+
+        search = Search(using=self._es_conn, index=self._es_index)
+        # from:to parameters (=> from: 0, size: 0)
+        search = search[0:0]
+        search = search.aggs.metric('max_date', 'max', field='metadata__enriched_on')
+
+        try:
+            response = search.execute()
+
+            aggs = response.to_dict()['aggregations']
+            if aggs['max_date']['value'] is None:
+                logger.debug("No data for metadata__enriched_on field found in " + self._es_index + " index")
+
+            else:
+                # Incremental case: retrieve items from last item in ES write index
+                max_date = aggs['max_date']['value_as_string']
+                latest_date = gl_dt.str_to_datetime(max_date)
+
+        except NotFoundError as nfe:
+            raise nfe
+
+        return latest_date
 
     def __quarters(self, from_date=None):
         """Get a set of quarters with available items from a given index date.
