@@ -330,7 +330,8 @@ class GitHubEnrich(Enrich):
                      data_source_prs='github-prs',
                      contribs_field='uuid',
                      timeframe_field='grimoire_creation_date',
-                     sort_on_field='metadata__timestamp'):
+                     sort_on_field='metadata__timestamp',
+                     seconds=Enrich.ONION_INTERVAL):
 
         super().enrich_onion(enrich_backend=enrich_backend,
                              in_index=in_index_iss,
@@ -339,7 +340,8 @@ class GitHubEnrich(Enrich):
                              contribs_field=contribs_field,
                              timeframe_field=timeframe_field,
                              sort_on_field=sort_on_field,
-                             no_incremental=no_incremental)
+                             no_incremental=no_incremental,
+                             seconds=seconds)
 
         super().enrich_onion(enrich_backend=enrich_backend,
                              in_index=in_index_prs,
@@ -348,7 +350,8 @@ class GitHubEnrich(Enrich):
                              contribs_field=contribs_field,
                              timeframe_field=timeframe_field,
                              sort_on_field=sort_on_field,
-                             no_incremental=no_incremental)
+                             no_incremental=no_incremental,
+                             seconds=seconds)
 
     def enrich_pull_requests(self, ocean_backend, enrich_backend, raw_issues_index="github_issues_raw"):
         """

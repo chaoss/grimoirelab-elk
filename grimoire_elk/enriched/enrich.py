@@ -27,7 +27,7 @@ import functools
 import logging
 import sys
 
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 
 import pkg_resources
 from dateutil import parser
@@ -36,6 +36,7 @@ from functools import lru_cache
 from elasticsearch import Elasticsearch
 
 from perceval.backend import find_signature_parameters
+from grimoirelab_toolkit import datetime as gl_dt
 
 from ..elastic_items import ElasticItems
 from .study_ceres_onion import ESOnionConnector, onion_study
@@ -99,6 +100,8 @@ class Enrich(ElasticItems):
     RAW_FIELDS_COPY = ["metadata__updated_on", "metadata__timestamp",
                        "offset", "origin", "tag", "uuid"]
     KEYWORD_MAX_SIZE = 30000  # this control allows to avoid max_bytes_length_exceeded_exception
+
+    ONION_INTERVAL = seconds = 3600 * 24 * 7
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host='', insecure=True):
@@ -866,7 +869,8 @@ class Enrich(ElasticItems):
         return sh_ids
 
     def enrich_onion(self, enrich_backend, in_index, out_index, data_source,
-                     contribs_field, timeframe_field, sort_on_field, no_incremental=False):
+                     contribs_field, timeframe_field, sort_on_field,
+                     seconds=ONION_INTERVAL, no_incremental=False):
 
         logger.info("[Onion] Starting study")
 
@@ -886,6 +890,20 @@ class Enrich(ElasticItems):
         if not in_conn.exists():
             logger.info("[Onion] Missing index %s", in_index)
             return
+
+        # Check last execution date
+        latest_date = None
+        if out_conn.exists():
+            latest_date = out_conn.latest_enrichment_date()
+
+        if latest_date:
+            logger.info("[Onion] Latest enrichment date: " + latest_date.isoformat())
+            now = gl_dt.datetime_utcnow()
+            update_after = latest_date + timedelta(seconds=seconds)
+            logger.info("[Onion] Update after date: " + update_after.isoformat())
+            if update_after >= now:
+                logger.info("[Onion] Too soon to update. Next update will be at " + update_after.isoformat())
+                return
 
         # Onion currently does not support incremental option
         logger.info("[Onion] Creating out ES index")

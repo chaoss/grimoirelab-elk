@@ -372,7 +372,8 @@ class GitLabEnrich(Enrich):
                      in_index, out_index, data_source=None, no_incremental=False,
                      contribs_field='uuid',
                      timeframe_field='grimoire_creation_date',
-                     sort_on_field='metadata__timestamp'):
+                     sort_on_field='metadata__timestamp',
+                     seconds=Enrich.ONION_INTERVAL):
 
         if not data_source:
             raise ELKError(cause="Missing data_source attribute")
@@ -387,4 +388,5 @@ class GitLabEnrich(Enrich):
                              contribs_field=contribs_field,
                              timeframe_field=timeframe_field,
                              sort_on_field=sort_on_field,
-                             no_incremental=no_incremental)
+                             no_incremental=no_incremental,
+                             seconds=seconds)
