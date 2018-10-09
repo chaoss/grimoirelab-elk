@@ -284,12 +284,12 @@ class ESConnector(Connector):
 
         return self._es_conn.indices.put_alias(index=self._es_index, name=alias_name)
 
-    def exists_alias(self, alias_name):
+    def exists_alias(self, alias_name, index_name=None):
         """Check whether or not the given alias exists
 
         :return: True if alias already exist"""
 
-        return self._es_conn.indices.exists_alias(name=alias_name)
+        return self._es_conn.indices.exists_alias(index=index_name, name=alias_name)
 
     def _build_search_query(self, from_date):
         """Build an ElasticSearch search query to retrieve items for read methods.
