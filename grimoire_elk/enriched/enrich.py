@@ -25,6 +25,7 @@
 import json
 import functools
 import logging
+import requests
 import sys
 
 from datetime import datetime as dt, timedelta
@@ -71,6 +72,8 @@ DEFAULT_DB_USER = 'root'
 CUSTOM_META_PREFIX = 'cm'
 
 SH_UNKNOWN_VALUE = 'Unknown'
+
+HEADER_JSON = {"Content-Type": "application/json"}
 
 
 def metadata(func):
@@ -920,3 +923,135 @@ class Enrich(ElasticItems):
             out_conn.create_alias('all_onion')
 
         logger.info("[Onion] This is the end.")
+
+    def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
+                          author_field="author_uuid"):
+        """
+        The goal of the algorithm is to add to all enriched items the first and last date
+        (i.e., demography_min_date, demography_max_date) of the author activities.
+
+        In order to implement the algorithm first, the min and max dates (based on the date_field attribute)
+        are retrieved for all authors. Then, demography_min_date and demography_max_date attributes are
+        updated in all items.
+
+        :param ocean_backend: backend from which to read the raw items
+        :param enrich_backend:  backend from which to read the enriched items
+        :param date_field: field used to find the mix and max dates for the author's activity
+        :param author_field: field of the author
+
+        :return: None
+        """
+        logger.info("[Demography] Starting study %s" % self.elastic.index_url)
+
+        # The first step is to find the current min and max date for all the authors
+        authors_min_max_data = {}
+
+        es_query = Enrich.authors_min_max_dates(date_field, author_field=author_field)
+        r = self.requests.post(self.elastic.index_url + "/_search",
+                               data=es_query, headers=HEADER_JSON,
+                               verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logger.error("Error getting authors mix and max date. Demography aborted.")
+            logger.error(ex)
+            return
+
+        for author in r.json()['aggregations']['author']['buckets']:
+            authors_min_max_data[author['key']] = author
+
+        # Then we update the min max dates of all authors
+        for author_key in authors_min_max_data:
+            author_min_date = authors_min_max_data[author_key]['min']['value_as_string']
+            author_max_date = authors_min_max_data[author_key]['max']['value_as_string']
+
+            es_update = Enrich.update_author_min_max_date(author_min_date, author_max_date,
+                                                          author_key, author_field=author_field)
+
+            r = self.requests.post(self.elastic.index_url + "/_update_by_query",
+                                   data=es_update, headers=HEADER_JSON,
+                                   verify=False)
+            try:
+                r.raise_for_status()
+            except requests.exceptions.HTTPError as ex:
+                logger.error("Error updating mix and max date for author %s. Demography aborted." % author_key)
+                logger.error(ex)
+                return
+
+        logger.info("[Demography] End %s" % self.elastic.index_url)
+
+    @staticmethod
+    def authors_min_max_dates(date_field, author_field="author_uuid"):
+        """
+        Get the aggregation of author with their min and max activity dates
+
+        :param date_field: field used to find the mix and max dates for the author's activity
+        :param author_field: field of the author
+
+        :return: the query to be executed to get the authors min and max aggregation data
+        """
+
+        # Limit aggregations: https://github.com/elastic/elasticsearch/issues/18838
+        # 20000 seems to be a sensible number of the number of people in git
+
+        es_query = """
+        {
+          "size": 0,
+          "aggs": {
+            "author": {
+              "terms": {
+                "field": "%s",
+                "size": 20000
+              },
+              "aggs": {
+                "min": {
+                  "min": {
+                    "field": "%s"
+                  }
+                },
+                "max": {
+                  "max": {
+                    "field": "%s"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """ % (author_field, date_field, date_field)
+
+        return es_query
+
+    @staticmethod
+    def update_author_min_max_date(min_date, max_date, target_author, author_field="author_uuid"):
+        """
+        Get the query to update demography_min_date and demography_max_date of a given author
+
+        :param min_date: new demography_min_date
+        :param max_date: new demography_max_date
+        :param target_author: target author to be updated
+        :param author_field: author field
+
+        :return: the query to be executed to update demography data of an author
+        """
+
+        es_query = '''
+        {
+          "script": {
+            "source":
+            "ctx._source.demography_min_date = params.min_date;ctx._source.demography_max_date = params.max_date;",
+            "lang": "painless",
+            "params": {
+                "min_date": "%s",
+                "max_date": "%s"
+            }
+          },
+          "query": {
+            "term": {
+              "%s": "%s"
+            }
+          }
+        }
+        ''' % (min_date, max_date, author_field, target_author)
+
+        return es_query
