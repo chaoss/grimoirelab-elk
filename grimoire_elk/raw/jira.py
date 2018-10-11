@@ -87,7 +87,29 @@ class JiraOcean(ElasticOcean):
     @classmethod
     def get_arthur_params_from_url(cls, url):
         """ Get the arthur params given a URL for the data source """
-        return {"url": url}
+        params = {}
+
+        tokens = url.split(' ')
+        params['url'] = tokens[0]
+
+        if len(tokens) > 1:
+            params['project'] = tokens[1]
+
+        return params
+
+    @classmethod
+    def get_perceval_params_from_url(cls, url):
+        """ Get the perceval params given a URL for the data source """
+        params = []
+
+        dparam = cls.get_arthur_params_from_url(url)
+        params.append(dparam['url'])
+
+        if 'project' in dparam:
+            params.append("--project")
+            params.append(dparam['project'])
+
+        return params
 
     def _fix_item(self, item):
         # Remove all custom fields to avoid the 1000 fields limit in ES
