@@ -29,7 +29,7 @@ import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.raw.git import GitOcean
-from grimoire_elk.enriched.git import logger
+from grimoire_elk.enriched.enrich import logger
 
 
 class TestGit(TestBaseBackend):
@@ -110,16 +110,19 @@ class TestGit(TestBaseBackend):
         study, ocean_backend, enrich_backend = self._test_study('enrich_demography')
 
         with self.assertLogs(logger, level='INFO') as cm:
-            study(ocean_backend, enrich_backend)
 
-            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.git:Doing demography enrich '
-                                           'from ' + self.es_con + '/test_git_enrich since None')
-            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.git:Completed demography '
-                                            'enrich from ' + self.es_con + '/test_git_enrich')
+            if study.__name__ == "enrich_demography":
+                study(ocean_backend, enrich_backend, date_field="utc_commit")
 
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[Demography] Starting study ' +
+                             self.es_con + '/test_git_enrich')
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:[Demography] End ' +
+                             self.es_con + '/test_git_enrich')
+
+        time.sleep(1)  # HACK: Wait until git enrich index has been written
         for item in enrich_backend.fetch():
-            self.assertTrue('author_min_date' in item.keys())
-            self.assertTrue('author_max_date' in item.keys())
+            self.assertTrue('demography_min_date' in item.keys())
+            self.assertTrue('demography_max_date' in item.keys())
 
     def test_onion_study(self):
         """ Test that the onion study works correctly """
