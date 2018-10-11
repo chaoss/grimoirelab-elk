@@ -10,14 +10,15 @@ services:
   - mysql
 
 before_install:
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.1.0.deb && sudo dpkg -i --force-confnew elasticsearch-6.1.0.deb && sudo service elasticsearch restart
   - pip install flake8
   - pip install coveralls
   - pip install pandas==0.18.1
   - pip install redis
   - pip install PyMySQL
   - pip install httpretty==0.8.6
-  - pip install elasticsearch==5.5.1
-  - pip install elasticsearch-dsl==5.3.0
+  - pip install elasticsearch==6.1.1
+  - pip install elasticsearch-dsl==6.1.0
   - pip install -r "requirements.txt"
 
 #install:
