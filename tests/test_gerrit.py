@@ -23,10 +23,12 @@
 #
 import json
 import logging
+import time
 import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.raw.gerrit import GerritOcean
+from grimoire_elk.enriched.enrich import logger
 
 
 class TestGerrit(TestBaseBackend):
@@ -49,6 +51,26 @@ class TestGerrit(TestBaseBackend):
         result = self._test_raw_to_enrich()
         self.assertEqual(result['raw'], 5)
         self.assertEqual(result['enrich'], 5)
+
+    def test_demography_study(self):
+        """ Test that the demography study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_demography')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_demography":
+                study(ocean_backend, enrich_backend, date_field="grimoire_creation_date")
+
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[Demography] Starting study ' +
+                             self.es_con + '/test_gerrit_enrich')
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:[Demography] End ' +
+                             self.es_con + '/test_gerrit_enrich')
+
+        time.sleep(1)  # HACK: Wait until git enrich index has been written
+        for item in enrich_backend.fetch():
+            self.assertTrue('demography_min_date' in item.keys())
+            self.assertTrue('demography_max_date' in item.keys())
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
