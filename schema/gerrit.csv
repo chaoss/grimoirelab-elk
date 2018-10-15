@@ -1,4 +1,4 @@
-name,type
+name,type,bool,description
 author_bot,boolean,true,"True if the given author is identified as a bot."
 author_domain,keyword,true,"Domain associated to the author in sortinghat profile."
 author_id,keyword,true,"Author Id from sortinghat."
