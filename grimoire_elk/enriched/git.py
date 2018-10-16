@@ -148,7 +148,6 @@ class GitEnrich(Enrich):
     def get_identities(self, item):
         """ Return the identities from an item.
             If the repo is in GitHub, get the usernames from GitHub. """
-        identities = []
 
         def add_sh_github_identity(user, user_field, rol):
             """ Add a new github identity to SH if it does not exists """
@@ -186,10 +185,10 @@ class GitEnrich(Enrich):
                 authors = self.__get_authors(item['data']["Author"])
                 for author in authors:
                     user = self.get_sh_identity(author)
-                    identities.append(user)
+                    yield user
             else:
                 user = self.get_sh_identity(item['data']["Author"])
-                identities.append(user)
+                yield user
                 if self.github_token:
                     add_sh_github_identity(user, 'Author', 'author')
         if item['data']['Commit']:
@@ -199,19 +198,17 @@ class GitEnrich(Enrich):
                 committers = self.__get_authors(item['data']['Commit'])
                 for committer in committers:
                     user = self.get_sh_identity(committer)
-                    identities.append(user)
+                    yield user
             else:
                 user = self.get_sh_identity(item['data']['Commit'])
-                identities.append(user)
+                yield user
                 if self.github_token:
                     add_sh_github_identity(user, 'Commit', 'committer')
         if 'Signed-off-by' in item['data'] and self.pair_programming:
             signers = item['data']["Signed-off-by"]
             for signer in signers:
                 user = self.get_sh_identity(signer)
-                identities.append(user)
-
-        return identities
+                yield user
 
     def get_sh_identity(self, item, identity_field=None):
         # John Smith <john.smith@bitergia.com>
