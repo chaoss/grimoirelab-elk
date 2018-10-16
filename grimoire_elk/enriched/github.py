@@ -580,13 +580,8 @@ class GitHubEnrich(Enrich):
         rich_pr['merged_at'] = pull_request['merged_at']
         rich_pr['closed_at'] = pull_request['closed_at']
         rich_pr['url'] = pull_request['html_url']
-        labels = ''
-        if 'labels' in pull_request:
-            for label in pull_request['labels']:
-                if 'name' in pull_request:
-                    labels += pull_request['name'] + ";;"
-        if labels != '':
-            labels[:-2]
+        labels = []
+        [labels.append(label['name']) for label in pull_request['labels'] if 'labels' in pull_request]
         rich_pr['labels'] = labels
 
         rich_pr['pull_request'] = True
@@ -691,12 +686,8 @@ class GitHubEnrich(Enrich):
         rich_issue['updated_at'] = issue['updated_at']
         rich_issue['closed_at'] = issue['closed_at']
         rich_issue['url'] = issue['html_url']
-        labels = ''
-        if 'labels' in issue:
-            for label in issue['labels']:
-                labels += label['name'] + ";;"
-        if labels != '':
-            labels[:-2]
+        labels = []
+        [labels.append(label['name']) for label in issue['labels'] if 'labels' in issue]
         rich_issue['labels'] = labels
 
         rich_issue['pull_request'] = True
