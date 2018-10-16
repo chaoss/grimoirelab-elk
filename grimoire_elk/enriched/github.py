@@ -113,8 +113,7 @@ class GitHubEnrich(Enrich):
         return ["assignee_uuid", "user_uuid", "merge_author_uuid"]
 
     def get_identities(self, item):
-        """ Return the identities from an item """
-        identities = []
+        """Return the identities from an item"""
 
         category = item['category']
         item = item['data']
@@ -128,8 +127,7 @@ class GitHubEnrich(Enrich):
                 # In user_data we have the full user data
                 user = self.get_sh_identity(item[identity + "_data"])
                 if user:
-                    identities.append(user)
-        return identities
+                    yield user
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
