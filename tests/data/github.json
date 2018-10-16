@@ -39,7 +39,7 @@
                 "hireable": null,
                 "html_url": "https://github.com/zhquan_example",
                 "id": 1,
-                "location": "",
+                "location": null,
                 "login": "zhquan_example",
                 "name": "zhquan_example",
                 "organizations": [
@@ -121,7 +121,7 @@
                     "hireable": null,
                     "html_url": "https://github.com/zhquan_example",
                     "id": 1,
-                    "location": "",
+                    "location": null,
                     "login": "zhquan_example",
                     "name": "zhquan_example",
                     "organizations": [
@@ -227,7 +227,7 @@
                                 "hireable": null,
                                 "html_url": "https://github.com/zhquan_example",
                                 "id": 1,
-                                "location": "",
+                                "location": null,
                                 "login": "zhquan_example",
                                 "name": "zhquan_example",
                                 "organizations": [
@@ -311,7 +311,7 @@
                                 "hireable": null,
                                 "html_url": "https://github.com/zhquan_example",
                                 "id": 1,
-                                "location": "",
+                                "location": null,
                                 "login": "zhquan_example",
                                 "name": "zhquan_example",
                                 "organizations": [
@@ -394,7 +394,7 @@
                         "hireable": null,
                         "html_url": "https://github.com/zhquan_example",
                         "id": 1,
-                        "location": "",
+                        "location": null,
                         "login": "zhquan_example",
                         "name": "zhquan_example",
                         "organizations": [
@@ -507,7 +507,7 @@
                 "hireable": null,
                 "html_url": "https://github.com/zhquan_example",
                 "id": 1,
-                "location": "",
+                "location": null,
                 "login": "zhquan_example",
                 "name": "zhquan_example",
                 "organizations": [
@@ -916,7 +916,7 @@
                 "hireable": null,
                 "html_url": "https://github.com/zhquan_example",
                 "id": 1,
-                "location": "",
+                "location": null,
                 "login": "zhquan_example",
                 "name": "zhquan_example",
                 "organizations": [
@@ -959,6 +959,26 @@
                 "updated_at": "2016-01-01T01:00:00Z",
                 "url": "https://api.github.com/users/zhquan_example"
             },
+            "labels": [
+              {
+                "id": 208045946,
+                "node_id": "MDU6TGFiZWwyMDgwNDU5NDY=",
+                "url": "https://api.github.com/repos/octocat/Hello-World/labels/bug",
+                "name": "bug",
+                "description": "Houston, we have a problem",
+                "color": "f29513",
+                "default": true
+              },
+              {
+                "id": 208045946,
+                "node_id": "MDU6TGFiZWwyMDgwNDU5NDZ=",
+                "url": "https://api.github.com/repos/octocat/Hello-World/labels/feature",
+                "name": "feature",
+                "description": "Houston, we don't have a problem",
+                "color": "f29515",
+                "default": true
+              }
+            ],
             "milestone": null,
             "number": 1,
             "patch_url": "https://github.com/zhquan_example/repo/pull/1.patch",
@@ -1002,7 +1022,7 @@
                     "hireable": null,
                     "html_url": "https://github.com/zhquan_example",
                     "id": 1,
-                    "location": "",
+                    "location": null,
                     "login": "zhquan_example",
                     "name": "zhquan_example",
                     "organizations": [
@@ -1123,7 +1143,7 @@
                         "hireable": null,
                         "html_url": "https://github.com/zhquan_example",
                         "id": 1,
-                        "location": "",
+                        "location": null,
                         "login": "zhquan_example",
                         "name": "zhquan_example",
                         "organizations": [
@@ -1243,7 +1263,7 @@
                                 "hireable": null,
                                 "html_url": "https://github.com/zhquan_example",
                                 "id": 1,
-                                "location": "",
+                                "location": null,
                                 "login": "zhquan_example",
                                 "name": "zhquan_example",
                                 "organizations": [
@@ -1327,7 +1347,7 @@
                                 "hireable": null,
                                 "html_url": "https://github.com/zhquan_example",
                                 "id": 1,
-                                "location": "",
+                                "location": null,
                                 "login": "zhquan_example",
                                 "name": "zhquan_example",
                                 "organizations": [
@@ -1411,7 +1431,7 @@
                                 "hireable": null,
                                 "html_url": "https://github.com/zhquan_example",
                                 "id": 1,
-                                "location": "",
+                                "location": null,
                                 "login": "zhquan_example",
                                 "name": "zhquan_example",
                                 "organizations": [
@@ -1495,7 +1515,7 @@
                                 "hireable": null,
                                 "html_url": "https://github.com/zhquan_example",
                                 "id": 1,
-                                "location": "",
+                                "location": null,
                                 "login": "zhquan_example",
                                 "name": "zhquan_example",
                                 "organizations": [
@@ -1579,7 +1599,7 @@
                                 "hireable": null,
                                 "html_url": "https://github.com/zhquan_example",
                                 "id": 1,
-                                "location": "",
+                                "location": null,
                                 "login": "zhquan_example",
                                 "name": "zhquan_example",
                                 "organizations": [
@@ -1662,7 +1682,7 @@
                         "hireable": null,
                         "html_url": "https://github.com/zhquan_example",
                         "id": 1,
-                        "location": "",
+                        "location": null,
                         "login": "zhquan_example",
                         "name": "zhquan_example",
                         "organizations": [
@@ -1749,7 +1769,7 @@
                 "hireable": null,
                 "html_url": "https://github.com/zhquan_example",
                 "id": 1,
-                "location": "",
+                "location": null,
                 "login": "zhquan_example",
                 "name": "zhquan_example",
                 "organizations": [
