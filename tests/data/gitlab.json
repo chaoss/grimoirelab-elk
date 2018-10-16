@@ -917,7 +917,10 @@
             "force_remove_source_branch": null,
             "id": 9620987,
             "iid": 3126,
-            "labels": [],
+            "labels": [
+                "CI/CD",
+                "Deliverable"
+            ],
             "latest_build_finished_at": "2018-05-04T10:28:21.549Z",
             "latest_build_started_at": "2018-05-04T10:26:08.923Z",
             "merge_commit_sha": "6a7d8e34f972ede6913a7f919b9270c18d7ea62e",

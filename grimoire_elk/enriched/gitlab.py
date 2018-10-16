@@ -227,13 +227,7 @@ class GitLabEnrich(Enrich):
         rich_issue['updated_at'] = issue['updated_at']
         rich_issue['closed_at'] = issue['closed_at']
         rich_issue['url'] = issue['web_url']
-        labels = ''
-        if 'labels' in issue:
-            for label in issue['labels']:
-                labels += label + ";;"
-        if labels != '':
-            labels[:-2]
-        rich_issue['labels'] = labels
+        rich_issue['labels'] = issue['labels']
 
         rich_issue['gitlab_repo'] = rich_issue['repository'].replace(GITLAB, '')
         rich_issue['gitlab_repo'] = re.sub('.git$', '', rich_issue['gitlab_repo'])
@@ -329,11 +323,7 @@ class GitLabEnrich(Enrich):
         rich_mr['merged'] = True if rich_mr['state'] else False
         rich_mr['num_notes'] = len(merge_request['notes_data'])
 
-        labels = ''
-        if 'labels' in merge_request:
-            for label in merge_request['labels']:
-                labels += label + ";;"
-        rich_mr['labels'] = labels
+        rich_mr['labels'] = merge_request['labels']
 
         rich_mr['merge_request'] = True
         rich_mr['item_type'] = 'merge_request request'

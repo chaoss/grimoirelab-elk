@@ -59,18 +59,30 @@ class TestGitLab(TestBaseBackend):
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['milestone'], "8.17")
+        self.assertEqual(eitem['labels'], [])
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['milestone'], NO_MILESTONE_TAG)
+        self.assertEqual(eitem['labels'], [])
+
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['labels'], ['CI/CD', 'Deliverable'])
 
         item = self.items[4]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['milestone'], "8.17")
+        self.assertEqual(eitem['labels'], [])
 
         item = self.items[5]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['milestone'], NO_MILESTONE_TAG)
+        self.assertEqual(eitem['labels'], [])
+
+        item = self.items[6]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['labels'], ['CI/CD', 'Deliverable'])
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
