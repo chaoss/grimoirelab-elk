@@ -29,7 +29,11 @@ import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.raw.git import GitOcean
-from grimoire_elk.enriched.enrich import logger
+from grimoire_elk.enriched.enrich import (logger,
+                                          DEMOGRAPHICS_ALIAS)
+
+
+HEADER_JSON = {"Content-Type": "application/json"}
 
 
 class TestGit(TestBaseBackend):
@@ -123,6 +127,10 @@ class TestGit(TestBaseBackend):
         for item in enrich_backend.fetch():
             self.assertTrue('demography_min_date' in item.keys())
             self.assertTrue('demography_max_date' in item.keys())
+
+        r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
+                                                headers=HEADER_JSON, verify=False)
+        self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
 
     def test_onion_study(self):
         """ Test that the onion study works correctly """
