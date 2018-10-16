@@ -21,16 +21,23 @@
 #     Alberto Perez Garcia-Plaza <alpgarcia@bitergia.com>
 #
 
+import configparser
+import requests
 import sys
 import unittest
-
 from unittest.mock import MagicMock
 
-from grimoire_elk.enriched.enrich import Enrich
+from grimoire_elk.enriched.enrich import (Enrich,
+                                          DEMOGRAPHICS_ALIAS,
+                                          HEADER_JSON,
+                                          logger)
 from sortinghat.db.model import UniqueIdentity, Profile
+from grimoire_elk.utils import get_connectors, get_elastic
 
 # Make sure we use our code and not any other could we have installed
 sys.path.insert(0, '..')
+
+CONFIG_FILE = 'tests.conf'
 
 
 class TestEnrich(unittest.TestCase):
@@ -565,6 +572,39 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender_acc'], self.empty_item['author_gender_acc'])
         self.assertEqual(eitem_sh['author_org_name'], self.empty_item['author_org_name'])
         self.assertEqual(eitem_sh['author_bot'], self.empty_item['author_bot'])
+
+    def test_add_alias(self):
+        """Test whether add_alias properly works"""
+
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE)
+        es_con = dict(config.items('ElasticSearch'))['url']
+
+        tmp_index = "test-add-aliases"
+        tmp_index_url = es_con + "/" + tmp_index
+
+        enrich_backend = get_connectors()["git"][2]()
+        elastic_enrich = get_elastic(es_con, tmp_index, True, enrich_backend)
+        self._enrich.set_elastic(elastic_enrich)
+
+        # add alias
+        with self.assertLogs(logger, level='INFO') as cm:
+            self._enrich.add_alias(DEMOGRAPHICS_ALIAS)
+
+        self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:Alias ' + DEMOGRAPHICS_ALIAS +
+                         ' created on ' + tmp_index_url + '.')
+
+        r = self._enrich.requests.get(self._enrich.elastic.index_url + "/_alias", headers=HEADER_JSON, verify=False)
+        self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[self._enrich.elastic.index]['aliases'])
+
+        # add alias again
+        with self.assertLogs(logger, level='INFO') as cm:
+            self._enrich.add_alias(DEMOGRAPHICS_ALIAS)
+
+        self.assertEqual(cm.output[0], 'WARNING:grimoire_elk.enriched.enrich:Alias ' + DEMOGRAPHICS_ALIAS +
+                         ' already exists on ' + tmp_index_url + '.')
+
+        requests.delete(tmp_index_url, verify=False)
 
 
 if __name__ == '__main__':
