@@ -78,23 +78,23 @@ class BugzillaEnrich(Enrich):
         return repo
 
     def get_identities(self, item):
-        ''' Return the identities from an item '''
-
-        identities = []
+        """Return the identities from an item"""
 
         for rol in self.roles:
             if rol in item['data']:
-                identities.append(self.get_sh_identity(item["data"][rol]))
+                user = self.get_sh_identity(item["data"][rol])
+                yield user
 
         if 'activity' in item["data"]:
             for event in item["data"]['activity']:
                 event_user = [{"__text__": event['Who']}]
-                identities.append(self.get_sh_identity(event_user))
+                user = self.get_sh_identity(event_user)
+                yield user
+
         if 'long_desc' in item["data"]:
             for comment in item["data"]['long_desc']:
-                identities.append(self.get_sh_identity(comment['who']))
-
-        return identities
+                user = self.get_sh_identity(comment['who'])
+                yield user
 
     @metadata
     def get_rich_item(self, item):
