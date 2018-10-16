@@ -93,36 +93,38 @@ class GerritEnrich(Enrich):
         return repo
 
     def get_identities(self, item):
-        ''' Return the identities from an item '''
-
-        identities = []
+        """Return the identities from an item"""
 
         item = item['data']
 
         # Changeset owner
         user = item['owner']
-        identities.append(self.get_sh_identity(user))
+        identity = self.get_sh_identity(user)
+        yield identity
 
         # Patchset uploader and author
         if 'patchSets' in item:
             for patchset in item['patchSets']:
                 user = patchset['uploader']
-                identities.append(self.get_sh_identity(user))
+                identity = self.get_sh_identity(user)
+                yield identity
                 if 'author' in patchset:
                     user = patchset['author']
-                    identities.append(self.get_sh_identity(user))
+                    identity = self.get_sh_identity(user)
+                    yield identity
                 if 'approvals' in patchset:
                     # Approvals by
                     for approval in patchset['approvals']:
                         user = approval['by']
-                        identities.append(self.get_sh_identity(user))
+                        identity = self.get_sh_identity(user)
+                        yield identity
+
         # Comments reviewers
         if 'comments' in item:
             for comment in item['comments']:
                 user = comment['reviewer']
-                identities.append(self.get_sh_identity(user))
-
-        return identities
+                identity = self.get_sh_identity(user)
+                yield identity
 
     def get_item_id(self, eitem):
         """ Return the item_id linked to this enriched eitem """
