@@ -95,7 +95,8 @@ class MattermostEnrich(Enrich):
 
             identity['name'] = composed_name if composed_name else None
         if 'email' in from_:
-            identity['email'] = from_['email']
+            email = from_['email']
+            identity['email'] = email if email else None
         return identity
 
     def get_identities(self, item):
