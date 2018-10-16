@@ -80,8 +80,20 @@ class MattermostEnrich(Enrich):
 
         identity['username'] = from_['username']
         identity['name'] = from_['username']
+
         if 'first_name' in from_:
-            identity['name'] = from_['first_name'] + " " + from_['last_name']
+            name_parts = []
+            first_name = from_.get('first_name')
+            if first_name:
+                name_parts.append(first_name)
+
+            last_name = from_.get('last_name')
+            if last_name:
+                name_parts.append(last_name)
+
+            composed_name = ' '.join(name_parts)
+
+            identity['name'] = composed_name if composed_name else None
         if 'email' in from_:
             identity['email'] = from_['email']
         return identity
