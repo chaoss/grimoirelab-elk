@@ -72,6 +72,7 @@ DEFAULT_DB_USER = 'root'
 CUSTOM_META_PREFIX = 'cm'
 
 SH_UNKNOWN_VALUE = 'Unknown'
+DEMOGRAPHICS_ALIAS = 'demographics'
 
 HEADER_JSON = {"Content-Type": "application/json"}
 
@@ -974,11 +975,61 @@ class Enrich(ElasticItems):
             try:
                 r.raise_for_status()
             except requests.exceptions.HTTPError as ex:
-                logger.error("Error updating mix and max date for author %s. Demography aborted." % author_key)
+                logger.error("Error updating mix and max date for author %s. Demography aborted.", author_key)
                 logger.error(ex)
                 return
 
-        logger.info("[Demography] End %s" % self.elastic.index_url)
+        self.add_alias(DEMOGRAPHICS_ALIAS)
+
+        logger.info("[Demography] End %s", self.elastic.index_url)
+
+    def add_alias(self, alias_name):
+        """
+        Add an alias to the index set in the elastic obj
+
+        :param alias_name: name of the alias
+
+        :returns: None
+        """
+        # check alias doesn't exist
+        r = self.requests.get(self.elastic.index_url + "/_alias", headers=HEADER_JSON, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logger.warning("Something went wrong when retrieving aliases on %s. Alias not set.",
+                           self.elastic.index_url)
+            logger.warning(ex)
+            return
+
+        aliases = r.json()[self.elastic.index]['aliases']
+        if alias_name in aliases:
+            logger.warning("Alias %s already exists on %s.", alias_name, self.elastic.index_url)
+            return
+
+        # add alias
+        alias_data = """
+        {
+            "actions": [
+                {
+                    "add": {
+                        "index": "%s",
+                        "alias": "%s"
+                    }
+                }
+            ]
+        }
+        """ % (self.elastic.index, alias_name)
+
+        r = self.requests.post(self.elastic.url + "/_aliases", headers=HEADER_JSON, verify=False, data=alias_data)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logger.warning("Something went wrong when adding an alias on %s. Alias not set.",
+                           self.elastic.index_url)
+            logger.warning(ex)
+            return
+
+        logger.info("Alias %s created on %s.", alias_name, self.elastic.index_url)
 
     @staticmethod
     def authors_min_max_dates(date_field, author_field="author_uuid"):
@@ -992,7 +1043,7 @@ class Enrich(ElasticItems):
         """
 
         # Limit aggregations: https://github.com/elastic/elasticsearch/issues/18838
-        # 20000 seems to be a sensible number of the number of people in git
+        # 30000 seems to be a sensible number of the number of people in git
 
         es_query = """
         {
@@ -1001,7 +1052,7 @@ class Enrich(ElasticItems):
             "author": {
               "terms": {
                 "field": "%s",
-                "size": 20000
+                "size": 30000
               },
               "aggs": {
                 "min": {
