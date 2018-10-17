@@ -110,7 +110,7 @@
         ],
         "artifacts": [],
         "building": false,
-        "builtOn": "intel-pod7",
+        "builtOn": "intel-pod7-23555",
         "changeSet": {
             "items": [
                 {

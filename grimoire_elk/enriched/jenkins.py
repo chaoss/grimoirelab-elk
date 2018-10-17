@@ -23,6 +23,7 @@
 
 import csv
 import logging
+import re
 
 from dateutil import parser
 
@@ -63,11 +64,12 @@ class JenkinsEnrich(Enrich):
     MAIN_NODE_NAME = "main"
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
-                 db_user='', db_password='', db_host=''):
+                 db_user='', db_password='', db_host='', node_regex=None):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
         self.nodes_rename_file = None
         self.nodes_rename = {}
+        self.node_regex = node_regex
 
     def set_jenkins_rename_file(self, nodes_rename_file):
         """ File with nodes renaming mapping:
@@ -167,6 +169,21 @@ class JenkinsEnrich(Enrich):
 
         return extra_fields
 
+    def extract_builton(self, built_on, regex):
+        """Extracts node name using a regular expression. Node name is expected to
+        be group 1.
+        """
+        pattern = re.compile(regex, re.M | re.I)
+        match = pattern.search(built_on)
+        if match and len(match.groups()) >= 1:
+            node_name = match.group(1)
+        else:
+            msg = "Node name not extracted, using builtOn as it is: " + regex + ":" + built_on
+            logger.warning(msg)
+            node_name = built_on
+
+        return node_name
+
     @metadata
     def get_rich_item(self, item):
         eitem = {}
@@ -192,6 +209,12 @@ class JenkinsEnrich(Enrich):
         # Nodes renaming
         if eitem["builtOn"] in self.nodes_rename:
             eitem["builtOn"] = self.nodes_rename[eitem["builtOn"]]
+
+        # Rename nodes if regex is provided
+        if self.node_regex:
+            eitem["builtOn"] = self.extract_builton(eitem["builtOn"],
+                                                    self.node_regex)
+
         # Fields which names are translated
         map_fields = {"fullDisplayName": "fullDisplayName_analyzed",
                       "number": "build"
