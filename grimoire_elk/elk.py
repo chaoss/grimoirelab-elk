@@ -498,6 +498,7 @@ def enrich_backend(url, clean, backend_name, backend_params,
                    author_id=None, author_uuid=None, filter_raw=None,
                    filters_raw_prefix=None, jenkins_rename_file=None,
                    unaffiliated_group=None, pair_programming=False,
+                   node_regex=False,
                    studies_args=None):
     """ Enrich Ocean index """
 
@@ -548,6 +549,8 @@ def enrich_backend(url, clean, backend_name, backend_params,
             enrich_backend.unaffiliated_group = unaffiliated_group
         if pair_programming:
             enrich_backend.pair_programming = pair_programming
+        if node_regex:
+            enrich_backend.node_regex = node_regex
 
         # filter_raw must be converted from the string param to a dict
         filter_raw_dict = {}
