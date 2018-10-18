@@ -115,6 +115,11 @@ class JenkinsEnrich(Enrich):
 
         return identities
 
+    def has_identities(self):
+        """ Return whether the enriched items contains identities """
+
+        return False
+
     def get_fields_from_job_name(self, job_name):
         """Analyze a Jenkins job name, producing a dictionary
 
