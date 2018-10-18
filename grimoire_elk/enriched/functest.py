@@ -39,6 +39,11 @@ class FunctestEnrich(Enrich):
 
         return identities
 
+    def has_identities(self):
+        """ Return whether the enriched items contains identities """
+
+        return False
+
     def get_field_author(self):
         # In Functest there is no identities support
         return None
