@@ -37,6 +37,11 @@ class GoogleHitsEnrich(Enrich):
 
         return identities
 
+    def has_identities(self):
+        """ Return whether the enriched items contains identities """
+
+        return False
+
     @metadata
     def get_rich_item(self, item):
         eitem = {}
