@@ -53,6 +53,12 @@ class TestGoogleHits(TestBaseBackend):
         self.assertGreater(result['enrich'], 0)
         self.assertEqual(result['raw'], result['enrich'])
 
+    def test_has_identities(self):
+        """Test whether has_identities works"""
+
+        enrich_backend = self.connectors[self.connector][2]()
+        self.assertFalse(enrich_backend.has_identities())
+
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 

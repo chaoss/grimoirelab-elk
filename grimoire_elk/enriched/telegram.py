@@ -79,7 +79,7 @@ class TelegramEnrich(Enrich):
 
         message = item['data']['message']
         identity = self.get_sh_identity(message['from'])
-        
+
         yield identity
 
     @metadata
