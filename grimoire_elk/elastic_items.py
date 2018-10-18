@@ -90,29 +90,26 @@ class ElasticItems():
 
         logger.debug("Creating a elastic items generator.")
 
-        elastic_scroll_id = None
+        scroll_id = None
+        page = self.get_elastic_items(scroll_id, _filter=_filter)
+        scroll_id = page["_scroll_id"]
+        scroll_size = page['hits']['total']
 
-        while True:
-            rjson = self.get_elastic_items(elastic_scroll_id, _filter=_filter)
+        if scroll_size == 0:
+            logger.warning("No results found from %s", self.elastic.index_url)
+            return
 
-            if rjson and "_scroll_id" in rjson:
-                elastic_scroll_id = rjson["_scroll_id"]
+        while scroll_size > 0:
 
-            if rjson and "hits" in rjson:
-                received = len(rjson["hits"]["hits"])
-                if received == 0:
-                    logger.debug("Fetching from %s: done receiving",
-                                 self.elastic.index_url)
-                    break
-                logger.debug("Fetching from %s: %d received",
-                             self.elastic.index_url, received)
-                for hit in rjson["hits"]["hits"]:
-                    eitem = hit['_source']
-                    yield eitem
-            else:
-                logger.warning("No results found from %s", self.elastic.index_url)
-                break
-        return
+            logger.debug("Fetching from %s: %d received", self.elastic.index_url, len(page['hits']['hits']))
+            for item in page['hits']['hits']:
+                eitem = item['_source']
+                yield eitem
+
+            page = self.get_elastic_items(scroll_id, _filter=_filter)
+            scroll_size = len(page['hits']['hits'])
+
+        logger.debug("Fetching from %s: done receiving", self.elastic.index_url)
 
     def get_elastic_items(self, elastic_scroll_id=None, _filter=None):
         """ Get the items from the index related to the backend applying and
