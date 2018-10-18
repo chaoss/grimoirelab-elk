@@ -50,6 +50,12 @@ class TestFunctest(TestBaseBackend):
         self.assertEqual(result['raw'], 27)
         self.assertEqual(result['enrich'], 27)
 
+    def test_has_identities(self):
+        """Test whether has_identities works"""
+
+        enrich_backend = self.connectors[self.connector][2]()
+        self.assertFalse(enrich_backend.has_identities())
+
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
