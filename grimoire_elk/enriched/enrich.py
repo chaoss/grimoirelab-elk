@@ -409,6 +409,11 @@ class Enrich(ElasticItems):
         """ Return the identities from an item """
         raise NotImplementedError
 
+    def has_identities(self):
+        """ Return whether the enriched items contains identities """
+
+        return True
+
     def get_email_domain(self, email):
         domain = None
         try:

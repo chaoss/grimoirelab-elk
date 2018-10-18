@@ -573,6 +573,11 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_org_name'], self.empty_item['author_org_name'])
         self.assertEqual(eitem_sh['author_bot'], self.empty_item['author_bot'])
 
+    def test_has_identities(self):
+        """Test whether has_identities works"""
+
+        self.assertTrue(self._enrich.has_identities())
+
     def test_add_alias(self):
         """Test whether add_alias properly works"""
 
