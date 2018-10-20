@@ -86,19 +86,17 @@ class StackExchangeEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         item = item['data']
 
         for identity in ['owner']:
             if identity in item and item[identity]:
                 user = self.get_sh_identity(item[identity])
-                identities.append(user)
+                yield user
             if 'answers' in item:
                 for answer in item['answers']:
                     user = self.get_sh_identity(answer[identity])
-                    identities.append(user)
-        return identities
+                    yield user
 
     @metadata
     def get_rich_item(self, item, kind='question', question_tags=None):
