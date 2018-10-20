@@ -86,9 +86,7 @@ class JiraEnrich(Enrich):
         return users_data
 
     def get_identities(self, item):
-        ''' Return the identities from an item '''
-
-        identities = []
+        """Return the identities from an item"""
 
         item = item['data']
 
@@ -96,9 +94,8 @@ class JiraEnrich(Enrich):
             if field not in item["fields"]:
                 continue
             if item["fields"][field]:
-                identities.append(self.get_sh_identity(item["fields"][field]))
-
-        return identities
+                user = self.get_sh_identity(item["fields"][field])
+                yield user
 
     @staticmethod
     def fix_value_null(value):
