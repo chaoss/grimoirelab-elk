@@ -64,15 +64,14 @@ class RedmineEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         data = item['data']
         if 'assigned_to' in data:
-            identities.append(self.get_sh_identity(data, 'assigned_to'))
-        identities.append(self.get_sh_identity(data, 'author'))
+            user = self.get_sh_identity(data, 'assigned_to')
+            yield user
+        author = self.get_sh_identity(data, 'author')
+        yield author
         # TODO: identities in journals not added yet
-
-        return identities
 
     def get_field_author(self):
         return "author"
