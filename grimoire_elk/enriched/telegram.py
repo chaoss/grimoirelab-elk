@@ -76,15 +76,11 @@ class TelegramEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         message = item['data']['message']
-
         identity = self.get_sh_identity(message['from'])
-
-        identities.append(identity)
-
-        return identities
+        
+        yield identity
 
     @metadata
     def get_rich_item(self, item):
