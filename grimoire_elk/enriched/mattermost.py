@@ -101,13 +101,9 @@ class MattermostEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         identity = self.get_sh_identity(item)
-
-        identities.append(identity)
-
-        return identities
+        yield identity
 
     def get_project_repository(self, eitem):
         # https://chat.openshift.io/8j366ft5affy3p36987pcugaoa
