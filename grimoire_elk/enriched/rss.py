@@ -65,12 +65,9 @@ class RSSEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         user = self.get_sh_identity(item, self.get_field_author())
-        identities.append(user)
-
-        return identities
+        yield user
 
     def get_field_author(self):
         return 'author'
