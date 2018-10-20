@@ -46,12 +46,10 @@ class BugzillaRESTEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         for rol in self.roles:
             if rol in item['data']:
-                identities.append(self.get_sh_identity(item["data"][rol]))
-        return identities
+                yield self.get_sh_identity(item["data"][rol])
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
