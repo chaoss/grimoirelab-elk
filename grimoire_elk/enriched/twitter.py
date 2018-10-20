@@ -85,14 +85,11 @@ class TwitterEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         item = item['data']
-
         user = self.get_sh_identity(item)
-        identities.append(user)
 
-        return identities
+        yield user
 
     def get_item_project(self, eitem):
         """ Get project mapping enrichment field.
