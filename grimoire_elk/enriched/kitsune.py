@@ -86,7 +86,6 @@ class KitsuneEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         item = item['data']
 
@@ -94,12 +93,11 @@ class KitsuneEnrich(Enrich):
             # Todo: questions has also involved and solved_by
             if identity in item and item[identity]:
                 user = self.get_sh_identity(item[identity])
-                identities.append(user)
+                yield user
             if 'answers_data' in item:
                 for answer in item['answers_data']:
                     user = self.get_sh_identity(answer[identity])
-                    identities.append(user)
-        return identities
+                    yield user
 
     @metadata
     def get_rich_item(self, item, kind='question'):
