@@ -82,13 +82,10 @@ class MozillaClubEnrich(Enrich):
         return "uuid"
 
     def get_identities(self, item):
-        ''' Return the identities from an item '''
+        """Return the identities from an item"""
 
-        identities = []
-
-        identities.append(self.get_sh_identity(item, self.get_field_author()))
-
-        return identities
+        user = self.get_sh_identity(item, self.get_field_author())
+        yield user
 
     def get_sh_identity(self, item, identity_field):
         identity = {}
