@@ -86,17 +86,14 @@ class PhabricatorEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         if 'authorData' in item['data']['fields']:
             user = self.get_sh_identity(item['data']['fields']['authorData'])
-            identities.append(user)
+            yield user
 
         if 'ownerData' in item['data']['fields']:
             user = self.get_sh_identity(item['data']['fields']['ownerData'])
-            identities.append(user)
-
-        return identities
+            yield user
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
