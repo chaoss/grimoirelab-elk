@@ -89,13 +89,9 @@ class SlackEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         identity = self.get_sh_identity(item)
-
-        identities.append(identity)
-
-        return identities
+        yield identity
 
     def get_project_repository(self, eitem):
         repo = eitem['origin']
