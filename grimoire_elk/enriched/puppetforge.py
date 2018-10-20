@@ -44,17 +44,14 @@ class PuppetForgeEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         user = self.get_sh_identity(item, self.get_field_author())
-        identities.append(user)
+        yield user
 
         # Get the identities from the releases
         for release in item['data']['releases']:
             user = self.get_sh_identity(release['module'], self.get_field_author())
-            identities.append(user)
-
-        return identities
+            yield user
 
     def get_field_author(self):
         return 'owner'
