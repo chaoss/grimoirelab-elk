@@ -75,8 +75,7 @@ class MediaWikiEnrich(Enrich):
 
         for revision in revisions:
             user = self.get_sh_identity(revision)
-            identities.append(user)
-        return identities
+            yield user
 
     def get_field_author(self):
         return 'user'
