@@ -61,12 +61,9 @@ class ConfluenceEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         field = self.get_field_author()
-        identities.append(self.get_sh_identity(item, field))
-
-        return identities
+        yield self.get_sh_identity(item, field)
 
     def get_project_repository(self, eitem):
         return str(eitem['space'])
