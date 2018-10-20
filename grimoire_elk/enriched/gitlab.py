@@ -100,15 +100,13 @@ class GitLabEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         item = item['data']
         for identity in self.issue_roles:
             if item[identity]:
                 user = self.get_sh_identity(item[identity])
                 if user:
-                    identities.append(user)
-        return identities
+                    yield user
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
