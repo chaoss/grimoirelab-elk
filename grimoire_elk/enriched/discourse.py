@@ -41,7 +41,6 @@ class DiscourseEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         # All identities are in the post stream
         # The first post is the question. Next replies
@@ -50,8 +49,7 @@ class DiscourseEnrich(Enrich):
 
         for post in posts:
             user = self.get_sh_identity(post)
-            identities.append(user)
-        return identities
+            yield user
 
     def get_sh_identity(self, post, identity_field=None):
         identity = {}
