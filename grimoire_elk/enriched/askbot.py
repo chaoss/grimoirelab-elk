@@ -64,11 +64,10 @@ class AskbotEnrich(Enrich):
 
     def get_identities(self, item):
         """ Return the identities from an item """
-        identities = []
 
         # question
         user = self.get_sh_identity(item, self.get_field_author())
-        identities.append(user)
+        yield user
 
         # answers
         if 'answers' in item['data']:
@@ -76,11 +75,11 @@ class AskbotEnrich(Enrich):
                 # avoid "answered_by" : "This post is a wiki" corner case
                 if type(answer['answered_by']) is dict:
                     user = self.get_sh_identity(answer['answered_by'])
-                    identities.append(user)
+                    yield user
                 if 'comments' in answer:
                     for comment in answer['comments']:
-                        identities.append(self.get_sh_identity(comment))
-        return identities
+                        commenter = self.get_sh_identity(comment)
+                        yield commenter
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {key: None for key in ['username', 'name', 'email']}
