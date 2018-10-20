@@ -69,18 +69,18 @@ class ReMoEnrich(Enrich):
         return self.author
 
     def get_identities(self, item):
-        ''' Return the identities from an item '''
+        """Return the identities from an item"""
 
-        identities = []
         item = item['data']
         if 'owner' in item:
-            identities.append(self.get_sh_identity(item['owner']))
+            owner = self.get_sh_identity(item['owner'])
+            yield owner
         if 'user' in item:
-            identities.append(self.get_sh_identity(item['user']))
+            user = self.get_sh_identity(item['user'])
+            yield user
         if 'mentor' in item:
-            identities.append(self.get_sh_identity(item['mentor']))
-
-        return identities
+            mentor = self.get_sh_identity(item['mentor'])
+            yield mentor
 
     def get_sh_identity(self, item, identity_field=None):
         # "owner": {
