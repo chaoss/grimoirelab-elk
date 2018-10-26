@@ -30,6 +30,9 @@ from .utils import unixtime_to_datetime
 from ..elastic_mapping import Mapping as BaseMapping
 
 
+MAX_SIZE_BULK_ENRICHED_ITEMS = 200
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -102,7 +105,7 @@ class MeetupEnrich(Enrich):
         if 'data' in item and type(item) == dict:
             user = item['data'][identity_field]
 
-        identity['username'] = user["id"]
+        identity['username'] = str(user["id"])
         identity['email'] = None
         identity['name'] = user["name"]
 
@@ -268,7 +271,7 @@ class MeetupEnrich(Enrich):
             ecomment = copy.deepcopy(eitem)
             created = unixtime_to_datetime(comment['created'] / 1000).isoformat()
             ecomment['url'] = comment['link']
-            ecomment['id'] = comment['id']
+            ecomment['id'] = ecomment['id'] + '_comment_' + str(comment['id'])
             ecomment['comment'] = comment['comment']
             ecomment['like_count'] = comment['like_count']
             ecomment['type'] = 'comment'
@@ -291,9 +294,6 @@ class MeetupEnrich(Enrich):
 
             yield ecomment
 
-    def get_field_unique_id_comment(self):
-        return "id"
-
     def get_rich_item_rsvps(self, rsvps, eitem):
         for rsvp in rsvps:
             ersvp = copy.deepcopy(eitem)
@@ -312,7 +312,7 @@ class MeetupEnrich(Enrich):
             ersvp['member_name'] = member['name']
             ersvp['member_url'] = "https://www.meetup.com/members/" + str(member['id'])
 
-            ersvp['id'] = ersvp['id'] + "_" + str(member['id'])
+            ersvp['id'] = ersvp['id'] + '_rsvp_' + str(rsvp['event']['id']) + "_" + str(member['id'])
             ersvp['url'] = "https://www.meetup.com/members/" + str(member['id'])
 
             ersvp['rsvps_guests'] = rsvp['guests']
@@ -324,49 +324,48 @@ class MeetupEnrich(Enrich):
 
             yield ersvp
 
-    def get_field_unique_id_rsvps(self):
+    def has_identities(self):
+        """ Return whether the enriched items contains identities """
+
+        return False
+
+    def get_field_unique_id(self):
         return "id"
 
     def enrich_items(self, ocean_backend):
-        items = ocean_backend.fetch()
+        items_to_enrich = []
+        num_items = 0
+        ins_items = 0
 
-        super(MeetupEnrich, self).enrich_items(ocean_backend)
-
-        # And now for each item we want also the rsvps and comments items
-        items = ocean_backend.fetch()
-        ncomments = 0
-        icomments = 0
-        nrsvps = 0
-        irsvps = 0
-        nitems = 0
-
-        for item in items:
-            nitems += 1
-
+        for item in ocean_backend.fetch():
             eitem = self.get_rich_item(item)
-            if not eitem or 'id' not in eitem:
+            items_to_enrich.append(eitem)
+
+            if 'comments' in item['data'] and 'id' in eitem:
+                comments = item['data']['comments']
+                rich_item_comments = self.get_rich_item_comments(comments, eitem)
+                items_to_enrich.extend(rich_item_comments)
+
+            if 'rsvps' in item['data'] and 'id' in eitem:
+                rsvps = item['data']['rsvps']
+                rich_item_rsvps = self.get_rich_item_rsvps(rsvps, eitem)
+                items_to_enrich.extend(rich_item_rsvps)
+
+            if len(items_to_enrich) < MAX_SIZE_BULK_ENRICHED_ITEMS:
                 continue
 
-            if 'comments' in item['data']:
-                comments = item['data']['comments']
-                ncomments += len(comments)
-                rich_item_comments = self.get_rich_item_comments(comments, eitem)
-                icomments += self.elastic.bulk_upload(rich_item_comments,
-                                                      self.get_field_unique_id_comment())
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+            items_to_enrich = []
 
-            if 'rsvps' in item['data']:
-                rsvps = item['data']['rsvps']
-                nrsvps += len(rsvps)
-                rich_item_rsvps = self.get_rich_item_rsvps(rsvps, eitem)
-                irsvps += self.elastic.bulk_upload(rich_item_rsvps,
-                                                   self.get_field_unique_id_rsvps())
+        if len(items_to_enrich) > 0:
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
 
-        if ncomments != icomments:
-            missing = ncomments - icomments
-            logger.error("%s/%s missing comments for Meetup", str(missing), str(ncomments))
+        if num_items != ins_items:
+            missing = num_items - ins_items
+            logger.error("%s/%s missing items for Meetup", str(missing), str(num_items))
+        else:
+            logger.info("%s items inserted for Meetup", str(num_items))
 
-        if nrsvps != irsvps:
-            missing = nrsvps - irsvps
-            logger.error("%s/%s missing rsvps for Meetup", str(missing), str(nrsvps))
-
-        return nitems
+        return num_items
