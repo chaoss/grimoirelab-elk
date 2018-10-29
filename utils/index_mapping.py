@@ -44,7 +44,7 @@ def get_params():
     parser.add_argument("-i", "--in-index", required=True,
                         help="ElasticSearch index from which to import items")
     parser.add_argument("-o", "--out-index", required=True,
-                        help="ElasticSearch index in which to export the " +
+                        help="ElasticSearch index in which to export the "
                              "items using a GrimoireLab mapping")
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
     parser.add_argument('-l', '--limit', dest='limit', default=DEFAULT_LIMIT, type=int,

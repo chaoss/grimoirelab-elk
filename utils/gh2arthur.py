@@ -54,8 +54,7 @@ def get_params_parser():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-e", "--elastic_url", default="http://127.0.0.1:9200",
-                        help="Host with elastic search" +
-                        "(default: http://127.0.0.1:9200)")
+                        help="Host with elastic search (default: http://127.0.0.1:9200)")
     parser.add_argument('-g', '--debug', dest='debug', action='store_true')
     parser.add_argument('-t', '--token', dest='token', help="GitHub token")
     parser.add_argument('-o', '--org', dest='org', nargs='*', help='GitHub Organization/s to be analyzed')
