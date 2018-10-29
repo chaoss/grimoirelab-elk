@@ -273,8 +273,8 @@ class ESMapping(Schema):
                         if 'type' in nested_value:
                             ptype = nested_value['type']
                         else:
-                            logging.warning('Not adding to es_mapping checking ' +
-                                            'the nested value: %s', nested_value)
+                            logging.warning('Not adding to es_mapping checking the nested value: %s',
+                                            nested_value)
                             continue
                         es_mapping.add_property(pname=prop_name,
                                                 ptype=ptype,

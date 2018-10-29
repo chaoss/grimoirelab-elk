@@ -102,14 +102,14 @@ class CeresBase:
                 logger.info("No new items to be written this time.")
 
             logger.info(
-                "Items read/to be written/total read/total processed/total written: " +
+                "Items read/to be written/total read/total processed/total written: "
                 "{0}/{1}/{2}/{3}/{4}".format(str(len(item_block)),
                                              str(len(process_results.out_items)),
                                              str(cont),
                                              str(total_processed),
                                              str(total_written)))
 
-        logger.info("SUMMARY: Items total read/total processed/total written: " +
+        logger.info("SUMMARY: Items total read/total processed/total written: "
                     "{0}/{1}/{2}".format(str(cont),
                                          str(total_processed),
                                          str(total_written)))

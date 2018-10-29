@@ -57,8 +57,8 @@ def kafka_kip(enrich):
                 continue
             elif "to -1" in line or "is -1" in line or "= -1" in line or "-1 or" in line:
                 continue
-            elif (line.startswith("+1") or " +1 " in line or line.endswith("+1") or
-                  " +1." in line or " +1," in line):
+            elif line.startswith("+1") or " +1 " in line or line.endswith("+1") \
+                    or " +1." in line or " +1," in line:
                 vote = 1
                 binding = 1  # by default the votes are binding for +1
                 if 'non-binding' in line.lower():
@@ -66,8 +66,8 @@ def kafka_kip(enrich):
                 elif 'binding' in line.lower():
                     binding = 1
                 break
-            elif (line.startswith("-1") or line.endswith(" -1") or " -1 " in line or
-                  " -1." in line or " -1," in line):
+            elif line.startswith("-1") or line.endswith(" -1") or " -1 " in line \
+                    or " -1." in line or " -1," in line:
                 vote = -1
                 if 'non-binding' in line.lower():
                     binding = 0

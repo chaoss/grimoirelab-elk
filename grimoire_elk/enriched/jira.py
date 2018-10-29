@@ -190,8 +190,8 @@ class JiraEnrich(Enrich):
         if 'labels' in issue['fields']:
             eitem['labels'] = issue['fields']['labels']
 
-        if ('priority' in issue['fields'] and issue['fields']['priority'] and
-            'name' in issue['fields']['priority']):
+        if 'priority' in issue['fields'] and issue['fields']['priority'] \
+                and 'name' in issue['fields']['priority']:
             eitem['priority'] = issue['fields']['priority']['name']
 
         # data.fields.progress.percent not exists in Puppet JIRA

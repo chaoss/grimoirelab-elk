@@ -52,7 +52,7 @@ class TestJenkins(TestBaseBackend):
 
         enrich_backend = self.connectors[self.connector][2]()
 
-        enrich_backend.node_regex = '(.*?)(-\d*)?$'
+        enrich_backend.node_regex = r'(.*?)(-\d*)?$'
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)

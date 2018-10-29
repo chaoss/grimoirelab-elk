@@ -118,10 +118,10 @@ class TestGit(TestBaseBackend):
             if study.__name__ == "enrich_demography":
                 study(ocean_backend, enrich_backend, date_field="utc_commit")
 
-            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[Demography] Starting study ' +
-                             self.es_con + '/test_git_enrich')
-            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:[Demography] End ' +
-                             self.es_con + '/test_git_enrich')
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[Demography] '
+                                           'Starting study %s/test_git_enrich' % self.es_con)
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:[Demography] '
+                                            'End %s/test_git_enrich' % self.es_con)
 
         time.sleep(1)  # HACK: Wait until git enrich index has been written
         for item in enrich_backend.fetch():

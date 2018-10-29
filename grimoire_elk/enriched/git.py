@@ -502,7 +502,7 @@ class GitEnrich(Enrich):
                 m = self.AUTHOR_P2P_REGEX.match(item['data']['Author'])
                 n = self.AUTHOR_P2P_NEW_REGEX.match(item['data']['Author'])
                 if m or n:
-                    logger.debug("Multiauthor detected. Creating one commit " +
+                    logger.debug("Multiauthor detected. Creating one commit "
                                  "per author: %s", item['data']['Author'])
                     item['data']['authors'] = self.__get_authors(item['data']['Author'])
                     item['data']['Author'] = item['data']['authors'][0]
