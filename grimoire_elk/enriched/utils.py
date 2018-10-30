@@ -174,6 +174,9 @@ def get_last_enrich(backend_cmd, enrich_backend):
                 last_enrich = offset
             else:
                 last_enrich = enrich_backend.get_last_offset_from_es([filter_])
+
+        else:
+            last_enrich = enrich_backend.get_last_update_from_es([filter_])
     else:
         last_enrich = enrich_backend.get_last_update_from_es()
 

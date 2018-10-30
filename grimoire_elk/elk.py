@@ -455,7 +455,10 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
         elif 'offset' in signature.parameters:
             ocean_backend = connector[1](backend, offset=last_enrich)
         else:
-            ocean_backend = connector[1](backend)
+            if last_enrich:
+                ocean_backend = connector[1](backend, from_date=last_enrich)
+            else:
+                ocean_backend = connector[1](backend)
     else:
         # We can have params for non perceval backends also
         params = enrich_backend.backend_params
