@@ -136,8 +136,9 @@ class PuppetForgeEnrich(Enrich):
         """
         Get the enriched events related to a module
         """
-        events = []
         module = item['data']
+        if not item['data']['releases']:
+            return []
 
         for release in item['data']['releases']:
             event = self.get_rich_item(item)
@@ -172,9 +173,7 @@ class PuppetForgeEnrich(Enrich):
 
             event.update(self.get_grimoire_fields(release["created_at"], "release"))
 
-            events.append(event)
-
-        return events
+            yield event
 
     def enrich_items(self, ocean_backend):
         total = super(PuppetForgeEnrich, self).enrich_items(ocean_backend)
