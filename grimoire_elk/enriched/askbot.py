@@ -30,6 +30,9 @@ from .utils import get_time_diff_days, unixtime_to_datetime
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 
+MAX_SIZE_BULK_ENRICHED_ITEMS = 200
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -143,6 +146,10 @@ class AskbotEnrich(Enrich):
             else:
                 eitem[map_fields[fn]] = None
 
+        # Cast id of question to string
+        eitem['id'] = str(eitem['id'])
+        eitem['score'] = int(eitem['score']) if eitem['score'] else 0
+
         # First answer time
         added_at = unixtime_to_datetime(float(question["added_at"]))
         eitem['time_to_reply'] = None
@@ -157,7 +164,7 @@ class AskbotEnrich(Enrich):
 
         if question['author'] and type(question['author']) is dict:
             eitem['author_askbot_user_name'] = question['author']['username']
-            eitem['author_askbot_id'] = question['author']['id']
+            eitem['author_askbot_id'] = str(question['author']['id'])
             eitem['author_badges'] = question['author']['badges']
             eitem['author_reputation'] = int(question['author']['reputation'])
             eitem['author_url'] = eitem['origin'] + '/users/'
@@ -185,10 +192,7 @@ class AskbotEnrich(Enrich):
 
         return eitem
 
-    def get_field_unique_id_comment(self):
-        return "id"
-
-    def get_field_unique_id_answer(self):
+    def get_field_unique_id(self):
         return "id"
 
     def get_users_data(self, askbot_item):
@@ -200,22 +204,22 @@ class AskbotEnrich(Enrich):
 
     def get_rich_comment(self, item, answer, comment):
         ecomment = self.get_rich_item(item)  # reuse all fields from item
-        ecomment['id'] = comment['id']
+        ecomment['id'] = str(ecomment['id']) + '_' + str(answer['id']) + '_' + str(comment['id'])
         ecomment['url'] = item['data']['url'] + "/?answer="
         ecomment['url'] += answer['id'] + '#post-id-' + answer['id']
         if 'author' in comment:
             # Not sure if this format is present in some version of askbot
             ecomment['author_askbot_user_name'] = comment['author']['username']
-            ecomment['author_askbot_id'] = comment['author']['id']
+            ecomment['author_askbot_id'] = str(comment['author']['id'])
             ecomment['author_url'] = ecomment['origin'] + '/users/'
             ecomment['author_url'] += comment['author']['id'] + '/' + comment['author']['username']
 
         elif 'user_display_name' in comment:
             ecomment['author_askbot_user_name'] = comment['user_display_name']
-            ecomment['author_askbot_id'] = comment['user_id']
+            ecomment['author_askbot_id'] = str(comment['user_id'])
         if 'summary' in comment:
             ecomment['summary'] = comment['summary']
-        ecomment['score'] = comment['score']
+        ecomment['score'] = int(comment['score']) if comment['score'] else 0
 
         dfield = 'added_at'
         if 'comment_added_at' in comment:
@@ -250,12 +254,12 @@ class AskbotEnrich(Enrich):
 
     def get_rich_answer(self, item, answer):
         eanswer = self.get_rich_item(item)  # reuse all fields from item
-        eanswer['id'] = answer['id']
+        eanswer['id'] = str(eanswer['id']) + '_' + str(answer['id'])
         eanswer['url'] = item['data']['url'] + "/?answer="
         eanswer['url'] += answer['id'] + '#post-id-' + answer['id']
         if type(answer['answered_by']) is dict:
             eanswer['author_askbot_user_name'] = answer['answered_by']['username']
-            eanswer['author_askbot_id'] = answer['answered_by']['id']
+            eanswer['author_askbot_id'] = str(answer['answered_by']['id'])
             eanswer['author_badges'] = answer['answered_by']['badges']
             eanswer['author_reputation'] = int(answer['answered_by']['reputation'])
             eanswer['author_url'] = eanswer['origin'] + '/users/'
@@ -265,7 +269,7 @@ class AskbotEnrich(Enrich):
         eanswer['summary'] = answer['summary']
         eanswer['is_accepted_answer'] = 1 if answer['accepted'] else 0
         eanswer['answer_status'] = "accepted" if answer['accepted'] else "not_accepted"
-        eanswer['score'] = answer['score']
+        eanswer['score'] = int(answer['score']) if answer['score'] else 0
         if 'is_correct' in answer:
             eanswer['is_correct'] = 1
 
@@ -291,7 +295,7 @@ class AskbotEnrich(Enrich):
         comments_enrich = []
 
         if 'answers' not in item['data']:
-            return (answers_enrich, comments_enrich)
+            return answers_enrich, comments_enrich
 
         for answer in item['data']['answers']:
             eanswer = self.get_rich_answer(item, answer)
@@ -305,42 +309,36 @@ class AskbotEnrich(Enrich):
                     ecomment = self.get_rich_comment(item, answer, comment)
                     comments_enrich.append(ecomment)
 
-        return (answers_enrich, comments_enrich)
+        return answers_enrich, comments_enrich
 
     def enrich_items(self, ocean_backend):
-        nitems = super(AskbotEnrich, self).enrich_items(ocean_backend)
-        logger.info("Total questions enriched: %i", nitems)
+        items_to_enrich = []
+        num_items = 0
+        ins_items = 0
 
-        # And now for each item we want also the answers (tops)
-        items = ocean_backend.fetch()
-        nanswers = 0
-        ncomments = 0
-        rich_item_answers = []
-        rich_item_comments = []
-        nitems = 0
+        for item in ocean_backend.fetch():
+            eitem = self.get_rich_item(item)
+            items_to_enrich.append(eitem)
 
-        for item in items:
-            nitems += 1
             (answers, comments) = self.get_rich_item_answers_comments(item)
-            rich_item_answers += answers
-            rich_item_comments += comments
+            items_to_enrich.extend(answers)
+            items_to_enrich.extend(comments)
 
-        if rich_item_answers:
-            nanswers = self.elastic.bulk_upload(rich_item_answers,
-                                                self.get_field_unique_id_answer())
+            if len(items_to_enrich) < MAX_SIZE_BULK_ENRICHED_ITEMS:
+                continue
 
-            if nanswers != len(rich_item_answers):
-                missing = len(rich_item_answers) - nanswers
-                logger.error("%s/%s missing answers for Askbot",
-                             str(missing), str(len(rich_item_answers)))
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+            items_to_enrich = []
 
-        if rich_item_comments:
-            ncomments += self.elastic.bulk_upload(rich_item_comments,
-                                                  self.get_field_unique_id_comment())
+        if len(items_to_enrich) > 0:
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
 
-            if ncomments != len(rich_item_comments):
-                missing = len(rich_item_comments) - nanswers
-                logger.error("%s/%s missing comments for Askbot",
-                             str(missing), str(len(rich_item_comments)))
+        if num_items != ins_items:
+            missing = num_items - ins_items
+            logger.error("%s/%s missing items for Askbot", str(missing), str(num_items))
+        else:
+            logger.info("%s items inserted for Askbot", str(num_items))
 
-        return nitems + nanswers + ncomments
+        return num_items
