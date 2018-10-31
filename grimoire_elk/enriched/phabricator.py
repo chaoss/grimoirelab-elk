@@ -139,8 +139,6 @@ class PhabricatorEnrich(Enrich):
 
         * Fields that change: the value of teh field changes with events
         """
-        events = []
-
         # To get values from the task
         eitem = self.get_rich_item(item)
 
@@ -157,6 +155,10 @@ class PhabricatorEnrich(Enrich):
 
         # Events are in transactions field (changes in fields)
         transactions = item['data']['transactions']
+
+        if not transactions:
+            return []
+
         for t in transactions:
             event = {}
             # Needed for incremental updates from the item
@@ -223,9 +225,7 @@ class PhabricatorEnrich(Enrich):
             for f in task_change:
                 event[f] = task_change[f]
 
-            events.append(event)
-
-        return events
+            yield event
 
     def __fill_phab_ids(self, item):
         """ Get mappings between phab ids and names """
