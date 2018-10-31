@@ -27,6 +27,9 @@ from .utils import get_time_diff_days, grimoire_con
 
 from .enrich import Enrich, metadata
 
+MAX_SIZE_BULK_ENRICHED_ITEMS = 200
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -80,7 +83,7 @@ class DiscourseEnrich(Enrich):
 
         for answer in item['data']['post_stream']['posts']:
             eanswer = self.get_rich_item(item)  # reuse all fields from item
-            eanswer['id'] = answer['id']
+            eanswer['id'] = str(eanswer['id']) + '_' + str(answer['id'])
             eanswer['url'] = eanswer['origin'] + "/t/" + answer['topic_slug']
             eanswer['url'] += "/" + str(answer['topic_id']) + "/" + str(answer['post_number'])
             eanswer['type'] = 'answer'
@@ -185,7 +188,7 @@ class DiscourseEnrich(Enrich):
         copy_fields = ["id"]
         for f in copy_fields:
             if f in topic:
-                eitem[f] = topic[f]
+                eitem[f] = str(topic[f])
             else:
                 eitem[f] = None
         # Fields which names are translated
@@ -251,32 +254,36 @@ class DiscourseEnrich(Enrich):
 
         return eitem
 
-    def get_field_unique_id_answer(self):
+    def get_field_unique_id(self):
         return "id"
 
     def enrich_items(self, ocean_backend):
-        items = ocean_backend.fetch()
+        items_to_enrich = []
+        num_items = 0
+        ins_items = 0
 
-        nitems = super(DiscourseEnrich, self).enrich_items(ocean_backend)
-        logger.info("Total questions enriched: %i", nitems)
+        for item in ocean_backend.fetch():
+            eitem = self.get_rich_item(item)
+            items_to_enrich.append(eitem)
 
-        # And now for each item we want also the answers (tops)
-        items = ocean_backend.fetch()
-        nanswers = 0
-        nitems = 0
-        rich_item_answers = []
+            rich_item_comments = self.get_rich_item_answers(item)
+            items_to_enrich.extend(rich_item_comments)
 
-        for item in items:
-            nitems += 1
-            rich_item_answers += self.get_rich_item_answers(item)
+            if len(items_to_enrich) < MAX_SIZE_BULK_ENRICHED_ITEMS:
+                continue
 
-        if rich_item_answers:
-            nanswers += self.elastic.bulk_upload(rich_item_answers,
-                                                 self.get_field_unique_id_answer())
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+            items_to_enrich = []
 
-            if nanswers != len(rich_item_answers):
-                missing = len(rich_item_answers) - nanswers
-                logger.error("%s/%s missing answers for Discourse",
-                             str(missing), str(len(rich_item_answers)))
+        if len(items_to_enrich) > 0:
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
 
-        return nitems
+        if num_items != ins_items:
+            missing = num_items - ins_items
+            logger.error("%s/%s missing items for Discourse", str(missing), str(num_items))
+        else:
+            logger.info("%s items inserted for Discourse", str(num_items))
+
+        return num_items
