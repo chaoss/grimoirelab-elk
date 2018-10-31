@@ -108,10 +108,8 @@ class CratesEnrich(Enrich):
 
         * Fields that change: the value of the field changes with events
         """
-        events = []
-
         if "version_downloads_data" not in item['data']:
-            return events
+            return []
 
         # To get values from the task
         eitem = self.get_rich_item(item)
@@ -125,9 +123,7 @@ class CratesEnrich(Enrich):
             event['sample_downloads'] = sample['downloads']
             event.update(self.get_grimoire_fields(sample_date.isoformat(), "downloads_event"))
 
-            events.append(event)
-
-        return events
+            yield event
 
     @metadata
     def get_rich_item(self, item):
