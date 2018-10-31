@@ -147,6 +147,10 @@ if __name__ == '__main__':
             items.append(item)
             # Get identities from new items to be added to SortingHat
             identities = ocean_backend.get_identities(item)
+
+            if not identities:
+                identities = []
+
             for identity in identities:
                 if identity not in new_identities:
                     new_identities.append(identity)
