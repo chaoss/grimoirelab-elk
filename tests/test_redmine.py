@@ -50,6 +50,14 @@ class TestRedmine(TestBaseBackend):
         self.assertEqual(result['raw'], 3)
         self.assertEqual(result['enrich'], 3)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        for i in self.items:
+            ei = enrich_backend.get_rich_item(i)
+            self.assertIn('metadata__gelk_version', ei)
+            self.assertIn('metadata__gelk_backend_name', ei)
+            self.assertIn('metadata__enriched_on', ei)
+
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
@@ -63,6 +71,14 @@ class TestRedmine(TestBaseBackend):
         result = self._test_raw_to_enrich(projects=True)
         self.assertEqual(result['raw'], 3)
         self.assertEqual(result['enrich'], 3)
+
+        enrich_backend = self.connectors[self.connector][2](json_projects_map="data/projects-release.json",
+                                                            db_user=self.db_user,
+                                                            db_password=self.db_password)
+        for i in self.items:
+            ei = enrich_backend.get_rich_item(i)
+            self.assertIn('project', ei)
+            self.assertIn('project_1', ei)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
