@@ -24,7 +24,7 @@
 import json
 import logging
 
-from grimoire_elk.enriched.enrich import Enrich
+from grimoire_elk.enriched.enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 
 
@@ -96,6 +96,7 @@ class MozillaClubEnrich(Enrich):
 
         return identity
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 
