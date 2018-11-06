@@ -92,6 +92,10 @@ class ElasticItems():
 
         scroll_id = None
         page = self.get_elastic_items(scroll_id, _filter=_filter)
+
+        if not page:
+            return []
+
         scroll_id = page["_scroll_id"]
         scroll_size = page['hits']['total']
 
