@@ -324,11 +324,6 @@ class MeetupEnrich(Enrich):
 
             yield ersvp
 
-    def has_identities(self):
-        """ Return whether the enriched items contains identities """
-
-        return False
-
     def get_field_unique_id(self):
         return "id"
 
@@ -339,6 +334,10 @@ class MeetupEnrich(Enrich):
 
         for item in ocean_backend.fetch():
             eitem = self.get_rich_item(item)
+
+            if 'uuid' not in eitem:
+                continue
+
             items_to_enrich.append(eitem)
 
             if 'comments' in item['data'] and 'id' in eitem:
