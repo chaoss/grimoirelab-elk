@@ -153,7 +153,7 @@ class MediaWikiEnrich(Enrich):
                 erevision.update(self.get_review_sh(rev, item))
 
             if self.prjs_map:
-                eitem.update(self.get_item_project(erevision))
+                erevision.update(self.get_item_project(erevision))
 
             # And now some calculated fields
             if self.prjs_map and "mediawiki" in self.prjs_map:
@@ -181,6 +181,10 @@ class MediaWikiEnrich(Enrich):
             else:
                 erevision["isrevision"] = 1
             erevision["page_last_edited_date"] = eitem['last_edited_date']
+
+            erevision['metadata__gelk_version'] = eitem['metadata__gelk_version']
+            erevision['metadata__gelk_backend_name'] = eitem['metadata__gelk_backend_name']
+            erevision['metadata__enriched_on'] = eitem['metadata__enriched_on']
 
             yield erevision
 
@@ -230,6 +234,9 @@ class MediaWikiEnrich(Enrich):
     def enrich_items(self, items):
         # Enrich always events for MediaWiki items
         return self.enrich_events(items)
+
+    def has_identities(self):
+        False
 
     def enrich_events(self, ocean_backend):
         max_items = self.elastic.max_items_bulk

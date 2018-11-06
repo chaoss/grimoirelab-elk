@@ -25,7 +25,7 @@ import logging
 
 from datetime import datetime
 
-from .enrich import Enrich
+from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 
 from .utils import get_time_diff_days
@@ -96,6 +96,7 @@ class RedmineEnrich(Enrich):
 
         return identity
 
+    @metadata
     def get_rich_item(self, item):
         eitem = {}
 

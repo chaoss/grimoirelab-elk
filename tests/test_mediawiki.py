@@ -57,6 +57,9 @@ class TestMediawiki(TestBaseBackend):
 
         for ei in eitems:
             self.assertEqual(ei['url'], 'https://wiki.mozilla.org/Main_Page/QA/NoMore404s')
+            self.assertIn('metadata__gelk_version', ei)
+            self.assertIn('metadata__gelk_backend_name', ei)
+            self.assertIn('metadata__enriched_on', ei)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
@@ -80,6 +83,8 @@ class TestMediawiki(TestBaseBackend):
 
         for ei in eitems:
             self.assertEqual(ei['url'], 'https://wiki.mozilla.org/view/Main_Page/QA/NoMore404s')
+            self.assertIn('project', ei)
+            self.assertIn('project_1', ei)
 
         # Test when only one URL is given in projects JSON file
         enrich_backend = self.connectors[self.connector][2](json_projects_map="data/projects-release-mediawiki-uc2.json",
@@ -90,6 +95,8 @@ class TestMediawiki(TestBaseBackend):
 
         for ei in eitems:
             self.assertEqual(ei['url'], 'https://wiki.mozilla.org/Main_Page/QA/NoMore404s')
+            self.assertIn('project', ei)
+            self.assertIn('project_1', ei)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
