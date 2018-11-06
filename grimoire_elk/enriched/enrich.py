@@ -853,6 +853,10 @@ class Enrich(ElasticItems):
             if field in identity:
                 iden[field] = identity[field]
 
+        if not iden['name'] and not iden['email'] and not iden['username']:
+            logger.warning("Name, email and username are none in %s", backend_name)
+            return sh_ids
+
         try:
             # Find the uuid for a given id.
             id = utils.uuid(backend_name, email=iden['email'],
