@@ -374,6 +374,10 @@ def load_identities(ocean_backend, enrich_backend):
         items_count += 1
         # Get identities from new items to be added to SortingHat
         identities = enrich_backend.get_identities(item)
+
+        if not identities:
+            continue
+
         for identity in identities:
             if identity not in new_identities:
                 new_identities.append(identity)
