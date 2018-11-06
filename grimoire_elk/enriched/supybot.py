@@ -66,7 +66,10 @@ class SupybotEnrich(Enrich):
         """ Return the identities from an item """
 
         user = self.get_sh_identity(item['data']['nick'])
-        yield user
+        if user:
+            yield user
+        else:
+            return []
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
