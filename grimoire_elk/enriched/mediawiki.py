@@ -235,9 +235,6 @@ class MediaWikiEnrich(Enrich):
         # Enrich always events for MediaWiki items
         return self.enrich_events(items)
 
-    def has_identities(self):
-        False
-
     def enrich_events(self, ocean_backend):
         max_items = self.elastic.max_items_bulk
         current = 0
