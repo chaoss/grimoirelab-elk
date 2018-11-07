@@ -29,7 +29,7 @@
                 },
                 "question_id": 38611467,
                 "score": -2,
-                "tags": [],
+                "tags": ["grimoirelab"],
                 "title": "Python: get every possible combination of weights for a portfolio",
                 "up_vote_count": 0
             },
@@ -206,9 +206,7 @@
         "question_id": 38611900,
         "reopen_vote_count": 0,
         "score": -1,
-        "tags": [
-            "python"
-        ],
+        "tags": [],
         "title": "I need to figure out how to make my program repeat. (Python coding class)",
         "up_vote_count": 0,
         "view_count": 9
