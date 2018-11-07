@@ -36,6 +36,12 @@ class TestRedmine(TestBaseBackend):
     ocean_index = "test_" + connector
     enrich_index = "test_" + connector + "_enrich"
 
+    def test_has_identites(self):
+        """Test value of has_identities method"""
+
+        enrich_backend = self.connectors[self.connector][2]()
+        self.assertTrue(enrich_backend.has_identities())
+
     def test_items_to_raw(self):
         """Test whether JSON items are properly inserted into ES"""
 
