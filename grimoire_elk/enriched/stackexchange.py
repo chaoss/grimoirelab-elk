@@ -21,7 +21,6 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
 
 from .enrich import Enrich, metadata
@@ -60,7 +59,7 @@ class StackExchangeEnrich(Enrich):
     mapping = Mapping
 
     def get_field_unique_id(self):
-        return "question_id"
+        return "item_id"
 
     def get_field_author(self):
         return "owner"
@@ -117,6 +116,7 @@ class StackExchangeEnrich(Enrich):
             # The real data
             question = item['data']
 
+            eitem["item_id"] = question['question_id']
             eitem["type"] = 'question'
             eitem["author"] = None
             if 'owner' in question and question['owner']['user_type'] == "does_not_exist":
@@ -138,8 +138,7 @@ class StackExchangeEnrich(Enrich):
                 else:
                     eitem[f] = None
 
-            eitem["question_tags"] = ",".join(question['tags'])
-            eitem["question_tags_analyzed"] = question['tags']
+            eitem["question_tags"] = question['tags']
             # eitem["question_tags_custom_analyzed"] = question['tags']
 
             # Fields which names are translated
@@ -175,6 +174,7 @@ class StackExchangeEnrich(Enrich):
             eitem["type"] = 'answer'
             eitem["author"] = answer['owner']['display_name']
             eitem["author_link"] = None
+            eitem["item_id"] = answer['answer_id']
             if 'link' in answer['owner']:
                 eitem["author_link"] = answer['owner']['link']
             if 'reputation' in answer['owner']:
@@ -192,10 +192,8 @@ class StackExchangeEnrich(Enrich):
             eitem['answer_status'] = "accepted" if answer['is_accepted'] else "not_accepted"
 
             eitem["question_tags"] = question_tags
-            eitem["question_tags_analyzed"] = question_tags
             if 'tags' in answer:
-                eitem["answer_tags"] = ",".join(answer['tags'])
-                eitem["answer_tags_analyzed"] = answer['tags']
+                eitem["answer_tags"] = answer['tags']
 
             # Fields which names are translated
             map_fields = {"title": "question_title"
@@ -219,44 +217,48 @@ class StackExchangeEnrich(Enrich):
         return eitem
 
     def enrich_items(self, ocean_backend):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        total = 0
-        bulk_json = ""
-
-        url = self.elastic.index_url + '/items/_bulk'
-
-        logger.debug("Adding items to %s (in %i packs)", url, max_items)
+        items_to_enrich = []
+        num_items = 0
+        ins_items = 0
 
         items = ocean_backend.fetch()
         for item in items:
-            if current >= max_items:
-                total += self.elastic.safe_put_bulk(url, bulk_json)
-                bulk_json = ""
-                current = 0
 
-            rich_item = self.get_rich_item(item)
-            data_json = json.dumps(rich_item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (rich_item[self.get_field_unique_id()])
-            bulk_json += data_json + "\n"  # Bulk document
-            current += 1
-            # Time to enrich also de answers
+            answers_tags = []
+
             if 'answers' in item['data']:
                 for answer in item['data']['answers']:
                     # Copy mandatory raw fields
                     answer['origin'] = item['origin']
                     answer['tag'] = item['tag']
 
-                    rich_answer = self.get_rich_item(answer, kind='answer', question_tags=rich_item['question_tags'])
-                    data_json = json.dumps(rich_answer)
-                    bulk_json += '{"index" : {"_id" : "%i_%i" } }\n' % \
-                        (rich_answer[self.get_field_unique_id()],
-                         rich_answer['answer_id'])
-                    bulk_json += data_json + "\n"  # Bulk document
-                    current += 1
+                    rich_answer = self.get_rich_item(answer,
+                                                     kind='answer',
+                                                     question_tags=item['data']['tags'])
+                    if rich_answer['answer_tags']:
+                        answers_tags.extend(rich_answer['answer_tags'])
+                    items_to_enrich.append(rich_answer)
 
-        if current > 0:
-            total += self.elastic.safe_put_bulk(url, bulk_json)
+            rich_question = self.get_rich_item(item)
+            rich_question['answers_tags'] = list(set(answers_tags))
+            rich_question['thread_tags'] = rich_question['answers_tags'] + rich_question['question_tags']
+            items_to_enrich.append(rich_question)
 
-        return total
+            if len(items_to_enrich) < self.elastic.max_items_bulk:
+                continue
+
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+            items_to_enrich = []
+
+        if len(items_to_enrich) > 0:
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+
+        if num_items != ins_items:
+            missing = num_items - ins_items
+            logger.error("%s/%s missing items for Stackexchange", str(missing), str(num_items))
+        else:
+            logger.info("%s items inserted for Stackexchange", str(num_items))
+
+        return num_items

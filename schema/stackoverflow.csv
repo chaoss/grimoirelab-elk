@@ -3,6 +3,7 @@ answer_status,keyword
 answer_count,long
 answer_id,long
 answer_tags,keyword
+answers_tags, keyword
 author_bot,boolean
 author_id,keyword
 author,keyword
@@ -22,6 +23,7 @@ is_accepted,boolean
 is_accepted_answer,long
 is_stackexchange_answer,long
 is_stackexchange_question,long
+item_id,long
 last_activity_date,long
 link,keyword
 metadata__enriched_on,date
@@ -40,12 +42,12 @@ owner_uuid,keyword
 question_accepted_answer_id,long
 question_has_accepted_answer,boolean
 question_id,long
-question_tags_analyzed,keyword
 question_tags,keyword
 question_title,keyword
 score,long
 tag,keyword
 tags,keyword
+thread_tags, keyword
 title_analyzed,text
 title,keyword
 type,keyword
