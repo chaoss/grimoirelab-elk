@@ -22,6 +22,8 @@
 #   Valerio Cosentino <valcos@bitergia.com>
 #
 
+from perceval.backends.core.gitlab import GitLabCommand
+
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 
@@ -74,12 +76,16 @@ class GitLabOcean(ElasticOcean):
         """ Get the arthur params given a URL for the data source """
         params = {}
 
-        owner = url.split('/')[-2]
-        repository = url.split('/')[-1]
-        # params.append('--owner')
-        params['owner'] = owner
-        # params.append('--repository')
-        params['repository'] = repository
+        args = cls.get_perceval_params_from_url(url)
+        parser = GitLabCommand.setup_cmd_parser()
+
+        parsed_args = parser.parse(*args)
+
+        params['owner'] = parsed_args.owner
+        params['repository'] = parsed_args.repository
+        # include only blacklist ids information
+        params['blacklist_ids'] = parsed_args.blacklist_ids
+
         return params
 
     @classmethod
@@ -87,7 +93,16 @@ class GitLabOcean(ElasticOcean):
         """ Get the perceval params given a URL for the data source """
         params = []
 
-        dparam = cls.get_arthur_params_from_url(url)
-        params.append(dparam['owner'])
-        params.append(dparam['repository'])
+        tokens = url.split(' ')
+        repo = tokens[0]
+
+        owner = repo.split('/')[-2]
+        repository = repo.split('/')[-1]
+
+        params.append(owner)
+        params.append(repository)
+
+        if len(tokens) > 1:
+            params.extend(tokens[1:])
+
         return params
