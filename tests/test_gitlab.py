@@ -20,7 +20,6 @@
 # Authors:
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-import json
 import logging
 import unittest
 
@@ -113,10 +112,17 @@ class TestGitLab(TestBaseBackend):
     def test_arthur_params(self):
         """Test the extraction of arthur params from an URL"""
 
-        with open("data/projects-release.json") as projects_filename:
-            url = json.load(projects_filename)['grimoire']['gitlab'][0]
-            arthur_params = {'owner': 'inkscape', 'repository': 'inkscape-web'}
-            self.assertDictEqual(arthur_params, GitLabOcean.get_arthur_params_from_url(url))
+        url = "https://gitlab.com/gitlab-org/gitlab-ee --blacklist-ids 1 10 100 --max-retries 100"
+        arthur_params = {'owner': 'gitlab-org',
+                         'repository': 'gitlab-ee',
+                         'blacklist_ids': [1, 10, 100]}
+
+        self.assertDictEqual(arthur_params, GitLabOcean.get_arthur_params_from_url(url))
+
+        url = "https://gitlab.com/gitlab-org/gitlab-ee --blacklist-ids 1 10 100 --max-retries 100"
+        perceval_params = ['gitlab-org', 'gitlab-ee', '--blacklist-ids', '1', '10', '100', '--max-retries', '100']
+
+        self.assertListEqual(perceval_params, GitLabOcean.get_perceval_params_from_url(url))
 
 
 if __name__ == "__main__":
