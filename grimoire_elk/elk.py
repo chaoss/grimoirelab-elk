@@ -100,7 +100,8 @@ def feed_backend_arthur(backend_name, backend_params):
 
 
 def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
-                 es_index=None, es_index_enrich=None, project=None, arthur=False):
+                 es_index=None, es_index_enrich=None, project=None, arthur=False,
+                 es_aliases=None, es_enrich_aliases=None):
     """ Feed Ocean with backend data """
 
     backend = None
@@ -144,7 +145,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         backend = backend_cmd.backend
 
         ocean_backend = connector[1](backend, fetch_archive=fetch_archive, project=project)
-        elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
+        elastic_ocean = get_elastic(url, es_index, clean, ocean_backend, es_aliases)
         ocean_backend.set_elastic(elastic_ocean)
 
         if fetch_archive:
@@ -216,75 +217,6 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             traceback.print_exc()
 
     logger.info("Done %s " % (backend_name))
-
-
-def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
-    """ Get all items that include uuid """
-
-    # logger.debug("Getting items for merged uuid %s "  % (uuid))
-
-    uuid_fields = enrich_backend.get_fields_uuid()
-
-    terms = ""  # all terms with uuids in the enriched item
-
-    for field in uuid_fields:
-        terms += """
-         {"term": {
-           "%s": {
-              "value": "%s"
-           }
-         }}
-         """ % (field, uuid)
-        terms += ","
-
-    terms = terms[:-1]  # remove last , for last item
-
-    query = """
-    {"query": { "bool": { "should": [%s] }}}
-    """ % (terms)
-
-    url_search = enrich_backend.elastic.index_url + "/_search"
-    url_search += "?size=1000"  # TODO get all items
-
-    r = requests_ses.post(url_search, data=query)
-
-    eitems = r.json()['hits']['hits']
-
-    if len(eitems) == 0:
-        # logger.warning("No enriched items found for uuid: %s " % (uuid))
-        return []
-
-    items_ids = []
-
-    for eitem in eitems:
-        item_id = enrich_backend.get_item_id(eitem)
-        # For one item several eitems could be generated
-        if item_id not in items_ids:
-            items_ids.append(item_id)
-
-    # Time to get the items
-    logger.debug("Items to be renriched for merged uuids: %s" % (",".join(items_ids)))
-
-    url_mget = ocean_backend.elastic.index_url + "/_mget"
-
-    items_ids_query = ""
-
-    for item_id in items_ids:
-        items_ids_query += '{"_id" : "%s"}' % (item_id)
-        items_ids_query += ","
-    items_ids_query = items_ids_query[:-1]  # remove last , for last item
-
-    query = '{"docs" : [%s]}' % (items_ids_query)
-    r = requests_ses.post(url_mget, data=query)
-
-    res_items = r.json()['docs']
-
-    items = []
-    for res_item in res_items:
-        if res_item['found']:
-            items.append(res_item["_source"])
-
-    return items
 
 
 def refresh_projects(enrich_backend):
@@ -364,12 +296,7 @@ def load_identities(ocean_backend, enrich_backend):
     identities_count = 0
     new_identities = []
 
-    # Support that ocean_backend is a list of items (old API)
-    if isinstance(ocean_backend, list):
-        items = ocean_backend
-    else:
-        items = ocean_backend.fetch()
-
+    items = ocean_backend.fetch()
     for item in items:
         items_count += 1
         # Get identities from new items to be added to SortingHat
@@ -423,7 +350,7 @@ def enrich_items(ocean_backend, enrich_backend, events=False):
 
 def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
                       filter_raw=None, filter_raw_should=None):
-    """ Get the ocean backend configured to start from the last enriched date """
+    """Get the ocean backend configured to start from the last enriched date"""
 
     if no_incremental:
         last_enrich = None
@@ -503,7 +430,7 @@ def enrich_backend(url, clean, backend_name, backend_params,
                    filters_raw_prefix=None, jenkins_rename_file=None,
                    unaffiliated_group=None, pair_programming=False,
                    node_regex=False,
-                   studies_args=None):
+                   studies_args=None, es_aliases=None, es_enriched_aliases=None):
     """ Enrich Ocean index """
 
     backend = None
@@ -541,9 +468,9 @@ def enrich_backend(url, clean, backend_name, backend_params,
                                       db_user, db_password, db_host)
         enrich_backend.set_params(backend_params)
         if url_enrich:
-            elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend)
+            elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend, es_enriched_aliases)
         else:
-            elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
+            elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend, es_enriched_aliases)
         enrich_backend.set_elastic(elastic_enrich)
         if github_token and backend_name == "git":
             enrich_backend.set_github_token(github_token)
