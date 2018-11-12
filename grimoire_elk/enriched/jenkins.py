@@ -44,15 +44,14 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = """
-        {
+        mapping = {
             "properties": {
                 "fullDisplayName_analyzed": {
                     "type": "text",
-                    "index": true
+                    "index": True
                 }
-           }
-        } """
+            }
+        }
 
         return {"items": mapping}
 
