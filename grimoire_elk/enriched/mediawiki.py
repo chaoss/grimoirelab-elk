@@ -21,7 +21,6 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
 
 from dateutil import parser
@@ -43,14 +42,13 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = """
-        {
+        mapping = {
             "properties": {
                 "title_analyzed": {
                     "type": "text"
                 }
-           }
-        } """
+            }
+        }
 
         return {"items": mapping}
 
@@ -237,8 +235,7 @@ class MediaWikiEnrich(Enrich):
 
     def enrich_events(self, ocean_backend):
         max_items = self.elastic.max_items_bulk
-        current = 0
-        bulk_json = ""
+        to_insert = []
         total = 0
 
         url = self.elastic.index_url + '/items/_bulk'
@@ -249,17 +246,14 @@ class MediaWikiEnrich(Enrich):
         for item in items:
             rich_item_reviews = self.get_rich_item_reviews(item)
             for enrich_review in rich_item_reviews:
-                if current >= max_items:
-                    total += self.elastic.safe_put_bulk(url, bulk_json)
-                    bulk_json = ""
-                    current = 0
-                data_json = json.dumps(enrich_review)
-                bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                    (enrich_review[self.get_field_unique_id()])
-                bulk_json += data_json + "\n"  # Bulk document
-                current += 1
+                es_item = self.elastic.es_data_format(enrich_review, self.get_field_unique_id())
+                to_insert.append(es_item)
 
-        if current > 0:
-            total += self.elastic.safe_put_bulk(url, bulk_json)
+                if len(to_insert) > max_items:
+                    total += self.elastic.bulk(to_insert)
+                    to_insert = []
+
+        if len(to_insert) > 0:
+            total += self.elastic.bulk(to_insert)
 
         return total
