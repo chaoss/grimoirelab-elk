@@ -111,6 +111,10 @@ class ElasticItems():
                 yield eitem
 
             page = self.get_elastic_items(scroll_id, _filter=_filter)
+
+            if not page:
+                break
+
             scroll_size = len(page['hits']['hits'])
 
         logger.debug("Fetching from %s: done receiving", self.elastic.index_url)
