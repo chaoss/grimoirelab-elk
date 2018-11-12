@@ -40,15 +40,14 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = """
-        {
+        mapping = {
             "properties": {
                 "text_analyzed": {
-                  "type": "text",
-                  "fielddata": true
-                  }
-           }
-        } """
+                    "type": "text",
+                    "fielddata": True
+                }
+            }
+        }
 
         return {"items": mapping}
 
