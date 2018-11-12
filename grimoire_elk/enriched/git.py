@@ -21,10 +21,8 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
 import re
-import sys
 import time
 
 import pkg_resources
@@ -42,9 +40,6 @@ try:
 except ImportError:
     SORTINGHAT_LIBS = False
 
-# Mandatory in Elasticsearch 6, optional in earlier versions
-HEADER_JSON = {"Content-Type": "application/json"}
-
 GITHUB = 'https://github.com/'
 SH_GIT_COMMIT = 'github-commit'
 DEMOGRAPHY_COMMIT_MIN_DATE = '1980-01-01'
@@ -61,15 +56,14 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = """
-        {
+        mapping = {
             "properties": {
-               "message_analyzed": {
+                "message_analyzed": {
                     "type": "text",
-                    "index": true
-               }
-           }
-        }"""
+                    "index": True
+                }
+            }
+        }
 
         return {"items": mapping}
 
@@ -476,22 +470,16 @@ class GitEnrich(Enrich):
         return eitem
 
     def enrich_items(self, ocean_backend, events=False):
-        """ Implementation supporting signed-off and multiauthor/committer commits.
-        """
-
-        headers = {"Content-Type": "application/json"}
+        """ Implementation supporting signed-off and multiauthor/committer commits."""
 
         max_items = self.elastic.max_items_bulk
-        current = 0
+        to_insert = []
         total = 0
-        bulk_json = ""
 
         total_signed_off = 0
         total_multi_author = 0
 
-        url = self.elastic.index_url + '/items/_bulk'
-
-        logger.debug("Adding items to %s (in %i packs)", url, max_items)
+        logger.debug("Adding items to %s (in %i packs)", self.elastic.index_url, max_items)
 
         items = ocean_backend.fetch()
 
@@ -517,26 +505,14 @@ class GitEnrich(Enrich):
                     authors_all = item['data']['Signed-off-by'] + [item['data']['Author']]
                     item['data']['authors_signed_off'] = list(set(authors_all))
 
-            if current >= max_items:
-                try:
-                    total += self.elastic.safe_put_bulk(url, bulk_json)
-                    json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
-                    logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
-                except UnicodeEncodeError:
-                    # Why is requests encoding the POST data as ascii?
-                    logger.error("Unicode error in enriched items")
-                    logger.debug(bulk_json)
-                    safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
-                    total += self.elastic.safe_put_bulk(url, safe_json)
-                bulk_json = ""
-                current = 0
+            if len(to_insert) >= max_items:
+                total += self.elastic.bulk_upload(to_insert)
+                to_insert = []
 
             rich_item = self.get_rich_item(item)
-            data_json = json.dumps(rich_item)
             unique_field = self.get_field_unique_id()
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (rich_item[unique_field])
-            bulk_json += data_json + "\n"  # Bulk document
-            current += 1
+            es_item = self.elastic.es_data_format(rich_item, unique_field)
+            to_insert.append(es_item)
 
             if self.pair_programming:
                 # Multi author support
@@ -544,17 +520,16 @@ class GitEnrich(Enrich):
                     # First author already added in the above commit
                     authors = item['data']['authors']
                     for i in range(1, len(authors)):
-                        # logger.debug('Adding a new commit for %s', authors[i])
                         item['data']['Author'] = authors[i]
                         item['data']['is_git_commit_multi_author'] = 1
-                        rich_item = self.get_rich_item(item)
                         item['data']['is_git_commit_multi_author'] = 1
-                        data_json = json.dumps(rich_item)
+
+                        rich_item = self.get_rich_item(item)
                         commit_id = item["uuid"] + "_" + str(i - 1)
                         rich_item['git_uuid'] = commit_id
-                        bulk_json += '{"index" : {"_id" : "%s" } }\n' % rich_item['git_uuid']
-                        bulk_json += data_json + "\n"  # Bulk document
-                        current += 1
+
+                        es_item = self.elastic.es_data_format(rich_item, 'git_uuid')
+                        to_insert.append(es_item)
                         total_multi_author += 1
 
                 if rich_item['Signed-off-by_number'] > 0:
@@ -564,23 +539,22 @@ class GitEnrich(Enrich):
                     if item['data']['Author'] in authors:
                         authors.remove(item['data']['Author'])
                     for author in authors:
-                        # logger.debug('Adding a new commit for %s', author)
                         # Change the Author in the original commit and generate
                         # a new enriched item with it
                         item['data']['Author'] = author
                         item['data']['is_git_commit_signed_off'] = 1
-                        rich_item = self.get_rich_item(item)
                         commit_id = item["uuid"] + "_" + str(nsg)
+
+                        rich_item = self.get_rich_item(item)
                         rich_item['git_uuid'] = commit_id
-                        data_json = json.dumps(rich_item)
-                        bulk_json += '{"index" : {"_id" : "%s" } }\n' % rich_item['git_uuid']
-                        bulk_json += data_json + "\n"  # Bulk document
-                        current += 1
+
+                        es_item = self.elastic.es_data_format(rich_item, 'git_uuid')
+                        to_insert.append(es_item)
                         total_signed_off += 1
                         nsg += 1
 
-        if current > 0:
-            total += self.elastic.safe_put_bulk(url, bulk_json)
+        if len(to_insert) > 0:
+            total += self.elastic.bulk(to_insert)
 
         if total == 0:
             # No items enriched, nothing to upload to ES
