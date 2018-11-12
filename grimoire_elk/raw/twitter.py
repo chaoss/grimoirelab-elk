@@ -34,16 +34,15 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '''
-         {
-            "dynamic":true,
+        mapping = {
+            "dynamic": True,
             "properties": {
                 "data": {
                     "properties": {
                         "user": {
                             "properties": {
                                 "entities": {
-                                    "dynamic":false,
+                                    "dynamic": False,
                                     "properties": {}
                                 }
                             }
@@ -51,56 +50,55 @@ class Mapping(BaseMapping):
                         "hashtags": {
                             "properties": {
                                 "indices": {
-                                    "dynamic":false,
+                                    "dynamic": False,
                                     "properties": {}
                                 }
                             }
                         },
                         "metadata": {
-                            "dynamic":false,
+                            "dynamic": False,
                             "properties": {}
                         },
                         "entities": {
                             "properties": {
                                 "media": {
-                                    "dynamic":false,
+                                    "dynamic": False,
                                     "properties": {}
                                 },
                                 "symbols": {
-                                    "dynamic":false,
+                                    "dynamic": False,
                                     "properties": {}
                                 },
                                 "urls": {
-                                    "dynamic":false,
+                                    "dynamic": False,
                                     "properties": {}
                                 },
                                 "user_mentions": {
-                                    "dynamic":false,
+                                    "dynamic": False,
                                     "properties": {}
                                 }
                             }
                         },
                         "extended_entities": {
-                            "dynamic":false,
+                            "dynamic": False,
                             "properties": {}
                         },
                         "extended_tweet": {
-                            "dynamic":false,
+                            "dynamic": False,
                             "properties": {}
                         },
                         "quoted_status": {
-                            "dynamic":false,
+                            "dynamic": False,
                             "properties": {}
                         },
                         "retweeted_status": {
-                            "dynamic":false,
+                            "dynamic": False,
                             "properties": {}
                         }
                     }
                 }
             }
         }
-        '''
 
         return {"items": mapping}
 
