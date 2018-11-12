@@ -38,34 +38,41 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '''
-         {
-            "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "long_desc": {
-                                "dynamic": false,
-                                "properties": {}
-                            },
-                            "short_desc": {
-                                "dynamic": false,
-                                "properties": {
-                                    "__text__": {
-                                        "type": "text",
-                                        "index": true
-                                    }
+        mapping = {
+            "dynamic": True,
+            "properties": {
+                "data": {
+                    "properties": {
+                        "long_desc": {
+                            "dynamic": True,
+                            "properties": {
+                                "__text__": {
+                                    "type": "text",
+                                    "index": True
+                                },
+                                "thetext": {
+                                    "dynamic": False,
+                                    "properties": {}
                                 }
-                            },
-                            "activity": {
-                                "dynamic": false,
-                                "properties": {}
                             }
+                        },
+                        "short_desc": {
+                            "dynamic": True,
+                            "properties": {
+                                "__text__": {
+                                    "type": "text",
+                                    "index": True
+                                }
+                            }
+                        },
+                        "activity": {
+                            "dynamic": True,
+                            "properties": {}
                         }
                     }
                 }
+            }
         }
-        '''
 
         return {"items": mapping}
 
