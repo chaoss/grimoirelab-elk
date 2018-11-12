@@ -36,24 +36,22 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '''
-         {
-            "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "comments": {
-                                "properties": {
-                                    "comment": {
-                                        "type": "text",
-                                        "index": true
-                                    },
-                                    "member": {
-                                        "properties": {
-                                            "bio": {
-                                                "type": "text",
-                                                "index": true
-                                            }
+        mapping = {
+            "dynamic": True,
+            "properties": {
+                "data": {
+                    "properties": {
+                        "comments": {
+                            "properties": {
+                                "comment": {
+                                    "type": "text",
+                                    "index": True
+                                },
+                                "member": {
+                                    "properties": {
+                                        "bio": {
+                                            "type": "text",
+                                            "index": True
                                         }
                                     }
                                 }
@@ -61,8 +59,8 @@ class Mapping(BaseMapping):
                         }
                     }
                 }
+            }
         }
-        '''
 
         return {"items": mapping}
 
