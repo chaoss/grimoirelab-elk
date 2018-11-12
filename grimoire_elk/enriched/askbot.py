@@ -46,17 +46,16 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = """
-        {
+        mapping = {
             "properties": {
                 "author_badges": {
-                  "type": "text"
+                    "type": "text"
                 },
                 "summary": {
-                  "type": "text"
+                    "type": "text"
                 }
-           }
-        } """
+            }
+        }
 
         return {"items": mapping}
 
