@@ -21,11 +21,14 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
+
+import datetime
+import dateutil
 import json
 import logging
-import requests
 import time
 import unittest
+import unittest.mock
 
 from base import TestBaseBackend
 from grimoire_elk.raw.git import GitOcean
@@ -134,33 +137,38 @@ class TestGit(TestBaseBackend):
             self.assertTrue('demography_min_date' in item.keys())
             self.assertTrue('demography_max_date' in item.keys())
 
-        r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
-                                                headers=HEADER_JSON, verify=False)
-        self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
+        aliases = enrich_backend.elastic.get_aliases()
+        self.assertIn(DEMOGRAPHICS_ALIAS, aliases)
 
-    def test_onion_study(self):
+    @unittest.mock.patch('grimoire_elk.enriched.enrich.datetime_utcnow')
+    def test_onion_study(self, mock_utcnow):
         """ Test that the onion study works correctly """
+
+        mock_utcnow.return_value = datetime.datetime(1970, 1, 1,
+                                                     tzinfo=dateutil.tz.tzutc())
 
         study, ocean_backend, enrich_backend = self._test_study('enrich_onion')
         study(ocean_backend, enrich_backend, in_index='test_git_enrich')
 
-        url = self.es_con + "/_aliases"
-        response = requests.get(url, verify=False).json()
-        self.assertTrue('git_onion-enriched' in response)
+        aliases = enrich_backend.elastic.es.indices.get_alias("*")
+        self.assertIn('git_onion-enriched', aliases)
 
-        time.sleep(1)
+        query = {
+            "query": {
+                "match_all": {}
+            }
+        }
 
-        url = self.es_con + "/git_onion-enriched/_count"
-        response = requests.get(url, verify=False).json()
-
-        self.assertGreater(response['count'], 0)
+        items = enrich_backend.elastic.es.count(index='git_onion-enriched', body=query)
+        self.assertGreater(items['count'], 0)
 
     def test_arthur_params(self):
         """Test the extraction of arthur params from an URL"""
 
         with open("data/projects-release.json") as projects_filename:
             url = json.load(projects_filename)['grimoire']['git'][0]
-            arthur_params = {'uri': 'https://github.com/grimoirelab/perceval', 'url': 'https://github.com/grimoirelab/perceval'}
+            arthur_params = {'uri': 'https://github.com/grimoirelab/perceval',
+                             'url': 'https://github.com/grimoirelab/perceval'}
             self.assertDictEqual(arthur_params, GitOcean.get_arthur_params_from_url(url))
 
 

@@ -123,3 +123,10 @@ class TestLoadIdentities(unittest.TestCase):
     def test_load_identities(self):
 
         self._test_load_identities()
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("requests").setLevel(logging.WARNING)
+    unittest.main(warnings='ignore')

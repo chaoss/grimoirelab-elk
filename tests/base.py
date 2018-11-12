@@ -27,7 +27,6 @@ import os
 import requests
 import sys
 import unittest
-from datetime import datetime
 
 from elasticsearch import Elasticsearch
 
@@ -51,45 +50,6 @@ def load_mapping(enrich_index, csv_name):
     cvs_mapping = ESMapping.from_csv(enrich_index, cvs_path)
 
     return cvs_mapping
-
-
-def data2es(items, ocean):
-    def ocean_item(item):
-        # Hack until we decide the final id to use
-        if 'uuid' in item:
-            item['ocean-unique-id'] = item['uuid']
-        else:
-            # twitter comes from logstash and uses id
-            item['uuid'] = item['id']
-            item['ocean-unique-id'] = item['id']
-
-        # Hack until we decide when to drop this field
-        if 'updated_on' in item:
-            updated = datetime.fromtimestamp(item['updated_on'])
-            item['metadata__updated_on'] = updated.isoformat()
-        if 'timestamp' in item:
-            ts = datetime.fromtimestamp(item['timestamp'])
-            item['metadata__timestamp'] = ts.isoformat()
-
-        # the _fix_item does not apply to the test data for Twitter
-        try:
-            ocean._fix_item(item)
-        except KeyError:
-            pass
-
-        return item
-
-    items_pack = []  # to feed item in packs
-
-    for item in items:
-        item = ocean_item(item)
-        if len(items_pack) >= ocean.elastic.max_items_bulk:
-            ocean._items_to_es(items_pack)
-            items_pack = []
-        items_pack.append(item)
-    inserted = ocean._items_to_es(items_pack)
-
-    return inserted
 
 
 def refresh_identities(enrich_backend):
@@ -159,8 +119,7 @@ class TestBaseBackend(unittest.TestCase):
         elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
 
-        raw_items = data2es(self.items, ocean_backend)
-
+        raw_items = ocean_backend.feed_items(self.items)
         return {'items': len(self.items), 'raw': raw_items}
 
     def _test_raw_to_enrich(self, sortinghat=False, projects=False):
@@ -172,7 +131,7 @@ class TestBaseBackend(unittest.TestCase):
         ocean_backend = self.connectors[self.connector][1](perceval_backend)
         elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
-        data2es(self.items, ocean_backend)
+        ocean_backend.feed_items(self.items)
 
         # populate enriched index
         if not sortinghat and not projects:
@@ -225,7 +184,7 @@ class TestBaseBackend(unittest.TestCase):
         ocean_backend = self.connectors[self.connector][1](perceval_backend)
         elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
-        data2es(self.items, ocean_backend)
+        ocean_backend.feed_items(self.items)
 
         # populate enriched index
         enrich_backend = self.connectors[self.connector][2]()
@@ -249,7 +208,7 @@ class TestBaseBackend(unittest.TestCase):
         ocean_backend = self.connectors[self.connector][1](perceval_backend)
         elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
-        data2es(self.items, ocean_backend)
+        ocean_backend.feed_items(self.items)
 
         # populate enriched index
         enrich_backend = self.connectors[self.connector][2](db_projects_map=DB_PROJECTS,
@@ -272,7 +231,7 @@ class TestBaseBackend(unittest.TestCase):
         ocean_backend = self.connectors[self.connector][1](perceval_backend)
         elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, ocean_backend)
         ocean_backend.set_elastic(elastic_ocean)
-        data2es(self.items, ocean_backend)
+        ocean_backend.feed_items(self.items)
 
         # populate enriched index
         enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
@@ -283,8 +242,10 @@ class TestBaseBackend(unittest.TestCase):
         enrich_backend.set_elastic(elastic_enrich)
         enrich_backend.enrich_items(ocean_backend)
 
+        found = None
         for study in enrich_backend.studies:
             if test_study == study.__name__:
                 found = (study, ocean_backend, enrich_backend)
+                break
 
         return found

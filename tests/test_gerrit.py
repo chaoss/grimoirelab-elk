@@ -84,9 +84,8 @@ class TestGerrit(TestBaseBackend):
             self.assertTrue('demography_min_date' in item.keys())
             self.assertTrue('demography_max_date' in item.keys())
 
-        r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
-                                                headers=HEADER_JSON, verify=False)
-        self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
+        aliases = enrich_backend.elastic.get_aliases()
+        self.assertIn(DEMOGRAPHICS_ALIAS, aliases)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""

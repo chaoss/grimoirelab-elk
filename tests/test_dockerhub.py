@@ -54,7 +54,7 @@ class TestDockerhub(TestBaseBackend):
 
         result = self._test_raw_to_enrich()
         self.assertEqual(result['raw'], 1)
-        self.assertEqual(result['enrich'], 3)
+        self.assertEqual(result['enrich'], 2)
 
     def test_has_identities(self):
         """Test whether has_identities works"""
@@ -67,14 +67,14 @@ class TestDockerhub(TestBaseBackend):
 
         result = self._test_raw_to_enrich(sortinghat=True)
         self.assertEqual(result['raw'], 1)
-        self.assertEqual(result['enrich'], 3)
+        self.assertEqual(result['enrich'], 2)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
         self.assertEqual(result['raw'], 1)
-        self.assertEqual(result['enrich'], 3)
+        self.assertEqual(result['enrich'], 2)
 
     def test_refresh_identities(self):
         """Test refresh identities"""

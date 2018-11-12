@@ -21,39 +21,36 @@
 #     Jesus M. Gonzalez-Barahona <jgb@bitergia.com>
 #
 
-import json
+import configparser
 import logging
-import os.path
 import sys
 import unittest
 
 if '..' not in sys.path:
     sys.path.insert(0, '..')
 
-from grimoire_elk.enriched.jira import JiraEnrich
+from grimoire_elk.elastic import ElasticSearch
+
+CONFIG_FILE = 'tests.conf'
+INDEX = 'index'
 
 
-class TestEnrichJira(unittest.TestCase):
-    """Functional unit tests for GrimoireELK Enrichment for Jira"""
+class TestElasticSearch(unittest.TestCase):
+    """Functional unit tests for ElasticSearch class"""
 
-    def setUp(self):
-        self.ritems = []
-        self.eitems = []
-        with open(os.path.join("data", "jira_raw_fields.json")) as f:
-            for line in f:
-                self.ritems.append(json.loads(line))
-        with open(os.path.join("data", "jira_enriched_fields.json")) as f:
-            for line in f:
-                self.eitems.append(json.loads(line))
+    @classmethod
+    def setUpClass(cls):
+        cls.config = configparser.ConfigParser()
+        cls.config.read(CONFIG_FILE)
+        cls.es_con = dict(cls.config.items('ElasticSearch'))['url']
 
-    def test_enrich_fields(self):
-        """Test enrich_fields function"""
+    def test_major_version(self):
+        """Test _check_instance function"""
 
-        for ritem, eitem in zip(self.ritems, self.eitems):
-            enriched = {}
-            if 'fields' in ritem['_source']['data']:
-                JiraEnrich.enrich_fields(ritem['_source']['data']['fields'], enriched)
-            self.assertDictEqual(enriched, eitem)
+        elasticsearch = ElasticSearch(url=self.es_con, index=INDEX, insecure=True)
+
+        major = elasticsearch.major_version_es()
+        self.assertEqual(major, '6')
 
 
 if __name__ == "__main__":
