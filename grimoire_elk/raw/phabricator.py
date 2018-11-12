@@ -39,34 +39,32 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '''
-        {
-            "dynamic":true,
+        mapping = {
+            "dynamic": True,
             "properties": {
                 "data": {
                     "properties": {
                         "transactions": {
-                            "dynamic":false,
+                            "dynamic": False,
                             "properties": {}
                         },
                         "fields": {
                             "properties": {
-                                "priority" : {
+                                "priority": {
                                     "properties": {
-                                        "subpriority" : {"type": "float"}
-                                     }
-                                 },
-                                 "description": {
-                                    "dynamic":false,
+                                        "subpriority": {"type": "float"}
+                                    }
+                                },
+                                "description": {
+                                    "dynamic": False,
                                     "properties": {}
-                                 }
-                             }
-                         }
-                     }
-                 }
-             }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
-        '''
 
         return {"items": mapping}
 
