@@ -36,50 +36,48 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '''
-         {
-            "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "details": {
-                                "properties": {
-                                    "suggested_topics": {
-                                        "dynamic": false,
-                                        "properties": {
-                                            "slug": {
-                                                "type": "text",
-                                                "index": true
-                                            },
-                                            "title": {
-                                                "type": "text",
-                                                "index": true
-                                            }
+        mapping = {
+            "dynamic": True,
+            "properties": {
+                "data": {
+                    "properties": {
+                        "details": {
+                            "properties": {
+                                "suggested_topics": {
+                                    "dynamic": False,
+                                    "properties": {
+                                        "slug": {
+                                            "type": "text",
+                                            "index": True
+                                        },
+                                        "title": {
+                                            "type": "text",
+                                            "index": True
                                         }
                                     }
                                 }
-                            },
-                            "fancy_title": {
-                                "type": "text",
-                                "index": true
-                            },
-                            "slug": {
-                                "type": "text",
-                                "index": true
-                            },
-                            "title": {
-                                "type": "text",
-                                "index": true
-                            },
-                            "post_stream": {
-                                "dynamic": false,
-                                "properties": {
-                                    "posts": {
-                                        "properties": {
-                                            "cooked": {
-                                                "type": "text",
-                                                "index": true
-                                            }
+                            }
+                        },
+                        "fancy_title": {
+                            "type": "text",
+                            "index": True
+                        },
+                        "slug": {
+                            "type": "text",
+                            "index": True
+                        },
+                        "title": {
+                            "type": "text",
+                            "index": True
+                        },
+                        "post_stream": {
+                            "dynamic": False,
+                            "properties": {
+                                "posts": {
+                                    "properties": {
+                                        "cooked": {
+                                            "type": "text",
+                                            "index": True
                                         }
                                     }
                                 }
@@ -87,8 +85,8 @@ class Mapping(BaseMapping):
                         }
                     }
                 }
+            }
         }
-        '''
 
         return {"items": mapping}
 
