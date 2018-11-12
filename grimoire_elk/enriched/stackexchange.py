@@ -42,14 +42,13 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = """
-        {
+        mapping = {
             "properties": {
                 "title_analyzed": {
-                  "type": "text"
+                    "type": "text"
                 }
-           }
-        } """
+            }
+        }
 
         return {"items": mapping}
 
@@ -237,23 +236,25 @@ class StackExchangeEnrich(Enrich):
                                                      question_tags=item['data']['tags'])
                     if rich_answer['answer_tags']:
                         answers_tags.extend(rich_answer['answer_tags'])
-                    items_to_enrich.append(rich_answer)
+                    es_item = self.elastic.es_data_format(rich_answer, self.get_field_unique_id())
+                    items_to_enrich.append(es_item)
 
             rich_question = self.get_rich_item(item)
             rich_question['answers_tags'] = list(set(answers_tags))
             rich_question['thread_tags'] = rich_question['answers_tags'] + rich_question['question_tags']
-            items_to_enrich.append(rich_question)
+            es_item = self.elastic.es_data_format(rich_question, self.get_field_unique_id())
+            items_to_enrich.append(es_item)
 
             if len(items_to_enrich) < self.elastic.max_items_bulk:
                 continue
 
             num_items += len(items_to_enrich)
-            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+            ins_items += self.elastic.bulk(items_to_enrich)
             items_to_enrich = []
 
         if len(items_to_enrich) > 0:
             num_items += len(items_to_enrich)
-            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+            ins_items += self.elastic.bulk(items_to_enrich)
 
         if num_items != ins_items:
             missing = num_items - ins_items
