@@ -42,19 +42,18 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = """
-        {
+        mapping = {
             "properties": {
                 "summary_analyzed": {
                     "type": "text",
-                    "index": true
+                    "index": True
                 },
                 "summary": {
                     "type": "text",
-                    "index": true
+                    "index": True
                 }
-           }
-        } """
+            }
+        }
 
         return {"items": mapping}
 
