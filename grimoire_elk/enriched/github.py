@@ -570,7 +570,7 @@ class GitHubEnrich(Enrich):
 
         rich_pr['id'] = pull_request['id']
         rich_pr['id_in_repo'] = pull_request['html_url'].split("/")[-1]
-        rich_pr['repository'] = pull_request['html_url'].rsplit("/", 2)[0]
+        rich_pr['repository'] = self.get_project_repository(rich_pr)
         rich_pr['title'] = pull_request['title']
         rich_pr['title_analyzed'] = pull_request['title']
         rich_pr['state'] = pull_request['state']
@@ -678,7 +678,7 @@ class GitHubEnrich(Enrich):
 
         rich_issue['id'] = issue['id']
         rich_issue['id_in_repo'] = issue['html_url'].split("/")[-1]
-        rich_issue['repository'] = issue['html_url'].rsplit("/", 2)[0]
+        rich_issue['repository'] = self.get_project_repository(rich_issue)
         rich_issue['title'] = issue['title']
         rich_issue['title_analyzed'] = issue['title']
         rich_issue['state'] = issue['state']
