@@ -55,24 +55,22 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = """
-        {
+        mapping = {
             "properties": {
-               "merge_author_geolocation": {
-                   "type": "geo_point"
-               },
-               "assignee_geolocation": {
-                   "type": "geo_point"
-               },
-               "user_geolocation": {
-                   "type": "geo_point"
-               },
-               "title_analyzed": {
-                 "type": "text"
-               }
+                "merge_author_geolocation": {
+                    "type": "geo_point"
+                },
+                "assignee_geolocation": {
+                    "type": "geo_point"
+                },
+                "user_geolocation": {
+                    "type": "geo_point"
+                },
+                "title_analyzed": {
+                    "type": "text"
+                }
             }
         }
-        """
 
         return {"items": mapping}
 
