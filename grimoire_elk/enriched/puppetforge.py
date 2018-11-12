@@ -30,15 +30,14 @@ class PuppetForgeEnrich(Enrich):
 
     def get_elastic_mappings(self):
 
-        mapping = """
-        {
+        mapping = {
             "properties": {
                 "summary_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
-                  }
-           }
-        } """
+                    "type": "string",
+                    "index": "analyzed"
+                }
+            }
+        }
 
         return {"items": mapping}
 
