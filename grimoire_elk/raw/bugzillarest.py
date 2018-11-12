@@ -38,46 +38,44 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '''
-         {
-            "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "comments": {
-                                "dynamic":false,
-                                "properties": {
-                                    "raw_text": {
-                                        "type": "text",
-                                        "index": true
-                                    },
-                                    "text": {
-                                        "type": "text",
-                                        "index": true
-                                    }
+        mapping = {
+            "dynamic": True,
+            "properties": {
+                "data": {
+                    "properties": {
+                        "comments": {
+                            "dynamic": False,
+                            "properties": {
+                                "raw_text": {
+                                    "type": "text",
+                                    "index": True
+                                },
+                                "text": {
+                                    "type": "text",
+                                    "index": True
                                 }
-                            },
-                            "attachments": {
-                                "properties": {
-                                    "description" : {
-                                        "type": "text",
-                                        "index": true
-                                    },
-                                    "summary" : {
-                                        "type": "text",
-                                        "index": true
-                                    }
-                                }
-                            },
-                            "summary": {
-                                "type": "text",
-                                "index": true
                             }
+                        },
+                        "attachments": {
+                            "properties": {
+                                "description": {
+                                    "type": "text",
+                                    "index": True
+                                },
+                                "summary": {
+                                    "type": "text",
+                                    "index": True
+                                }
+                            }
+                        },
+                        "summary": {
+                            "type": "text",
+                            "index": True
                         }
                     }
                 }
+            }
         }
-        '''
 
         return {"items": mapping}
 
