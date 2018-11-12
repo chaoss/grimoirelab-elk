@@ -29,7 +29,7 @@ import sys
 import requests
 from dateutil import parser
 
-from grimoire_elk.elastic import ElasticConnectException
+from grimoire_elk.errors import ElasticException
 from grimoire_elk.elastic import ElasticSearch
 # Connectors for Perceval
 from grimoire_elk.raw.hyperkitty import HyperKittyOcean
@@ -235,7 +235,7 @@ def get_connectors():
             }  # Will come from Registry
 
 
-def get_elastic(url, es_index, clean=None, backend=None):
+def get_elastic(url, es_index, clean=None, backend=None, es_aliases=None):
 
     mapping = None
 
@@ -248,10 +248,10 @@ def get_elastic(url, es_index, clean=None, backend=None):
         insecure = True
         elastic = ElasticSearch(url=url, index=es_index, mappings=mapping,
                                 clean=clean, insecure=insecure,
-                                analyzers=analyzers)
+                                analyzers=analyzers, aliases=es_aliases)
 
-    except ElasticConnectException:
-        logger.error("Can't connect to Elastic Search. Is it running?")
+    except ElasticException:
+        logger.error("Can't connect to ElasticSearch. Is it running?")
         sys.exit(1)
 
     return elastic
