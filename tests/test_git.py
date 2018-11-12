@@ -159,6 +159,7 @@ class TestGit(TestBaseBackend):
             }
         }
 
+        enrich_backend.elastic.es.indices.refresh(index='git_onion-enriched')
         items = enrich_backend.elastic.es.count(index='git_onion-enriched', body=query)
         self.assertGreater(items['count'], 0)
 
