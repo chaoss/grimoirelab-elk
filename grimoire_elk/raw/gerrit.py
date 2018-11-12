@@ -38,9 +38,8 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '''
-         {
-            "dynamic":true,
+        mapping = {
+            "dynamic": True,
             "properties": {
                 "data": {
                     "properties": {
@@ -51,13 +50,13 @@ class Mapping(BaseMapping):
                             "properties": {
                                 "message": {
                                     "type": "text",
-                                    "index": true
+                                    "index": True
                                 }
                             }
                         },
                         "subject": {
                             "type": "text",
-                            "index": true
+                            "index": True
                         },
                         "patchSets": {
                             "properties": {
@@ -65,7 +64,7 @@ class Mapping(BaseMapping):
                                     "properties": {
                                         "description": {
                                             "type": "text",
-                                            "index": true
+                                            "index": True
                                         }
                                     }
                                 }
@@ -75,7 +74,6 @@ class Mapping(BaseMapping):
                 }
             }
         }
-        '''
 
         return {"items": mapping}
 
