@@ -23,291 +23,347 @@
 #
 
 from dateutil import parser
-import json
 import logging
-import sys
+import json
 from time import time
 
-import requests
+from elasticsearch import Elasticsearch, helpers, compat, exceptions
+from elasticsearch.exceptions import NotFoundError
+from elasticsearch.serializer import JSONSerializer
+from elasticsearch.helpers import BulkIndexError
 
-from grimoire_elk.errors import ELKError
-from grimoire_elk.enriched.utils import unixtime_to_datetime, grimoire_con
+import warnings
+warnings.filterwarnings("ignore")
+
+from grimoire_elk.errors import ElasticException
+from grimoire_elk.enriched.utils import unixtime_to_datetime
+
+
+ES_TIMEOUT = 7200
+ES_MAX_RETRIES = 50
+ES_RETRY_ON_TIMEOUT = True
+ES_VERIFY_CERTS = False
+
+ES_SCROLL_SIZE = 100
 
 
 logger = logging.getLogger(__name__)
 
 
-class ElasticConnectException(Exception):
-    message = "Can't connect to ElasticSearch"
+DEFAULT_ITEMS_TYPE = 'items'
 
 
-class ElasticWriteException(Exception):
-    message = "Can't write to ElasticSearch"
+class JSONSerializerASCII(JSONSerializer):
+    """Override elasticsearch library serializer to ensure it encodes utf characters during json dump.
+    See original at: https://github.com/elastic/elasticsearch-py/blob/master/elasticsearch/serializer.py#L42
+    A description of how ensure_ascii encodes unicode characters to ensure they can be sent across the wire
+    as ascii can be found here: https://docs.python.org/3/library/json.html#basic-usage
+    """
+    def dumps(self, data):
+        # don't serialize strings
+        if isinstance(data, compat.string_types):
+            return data
+        try:
+            return json.dumps(data, default=self.default, ensure_ascii=True)
+        except (ValueError, TypeError) as e:
+            raise exceptions.SerializationError(data, e)
 
 
-class ElasticSearch(object):
+class ElasticSearch:
+    """ElasticSearch client to perform operations over the data, such as
+    creating and deleting indexes, adding aliases, uploading and scrolling the data
+
+    :param url: URL of ElasticSearch
+    :param index: target index
+    :param mappings: mappings to upload
+    :param clean: if enabled, delete the index
+    :param insecure: if enable, it ignores to verify certs
+    :param analyzers: analyzers to be included in the mapping
+    :param aliases: aliases to be added to index
+    """
 
     max_items_bulk = 1000
     max_items_clause = 1000  # max items in search clause (refresh identities)
 
-    @classmethod
-    def safe_index(cls, unique_id):
-        """ Return a valid elastic index generated from unique_id """
-        index = unique_id
-        if unique_id:
-            index = unique_id.replace("/", "_").lower()
-        return index
-
-    @staticmethod
-    def _check_instance(url, insecure):
-        """Checks if there is an instance of Elasticsearch in url.
-
-        Actually, it checks if GET on the url returns a JSON document
-        with a field tagline "You know, for search",
-        and a field version.number.
-
-        :value      url: url of the instance to check
-        :value insecure: don't verify ssl connection (boolean)
-        :returns:        major version of Ellasticsearch, as string.
-        """
-
-        res = grimoire_con(insecure).get(url)
-        if res.status_code != 200:
-            logger.error("Didn't get 200 OK from url %s", url)
-            raise ElasticConnectException
-        else:
-            try:
-                version_str = res.json()['version']['number']
-                version_major = version_str.split('.')[0]
-                return version_major
-            except Exception:
-                logger.error("Could not read proper welcome message from url %s",
-                             url)
-                logger.error("Message read: %s", res.text)
-                raise ElasticConnectException
-
     def __init__(self, url, index, mappings=None, clean=False,
-                 insecure=True, analyzers=None):
-        ''' clean: remove already existing index
-            insecure: support https with invalid certificates
-        '''
-
-        # Get major version of Elasticsearch instance
-        self.major = self._check_instance(url, insecure)
-        logger.debug("Found version of ES instance at %s: %s.",
-                     url, self.major)
+                 insecure=True, analyzers=None, aliases=None):
 
         self.url = url
+        self.es_verify_certs = not insecure
+        self.es = Elasticsearch([url], timeout=ES_TIMEOUT, max_retries=ES_MAX_RETRIES,
+                                retry_on_timeout=ES_RETRY_ON_TIMEOUT,
+                                verify_certs=self.es_verify_certs,
+                                serializer=JSONSerializerASCII())
+
+        # Get major version of Elasticsearch instance
+        self.major = self.major_version_es()
+        logger.debug("Found version of ES instance at %s: %s.", self.url, self.major)
 
         # Valid index for elastic
         self.index = self.safe_index(index)
+        self.aliases = aliases
         self.index_url = self.url + "/" + self.index
-        self.wait_bulk_seconds = 2  # time to wait to complete a bulk operation
 
-        self.requests = grimoire_con(insecure)
+        self.create_index(mappings, clean, analyzers)
 
-        res = self.requests.get(self.index_url)
+        if aliases:
+            [self.add_alias(alias) for alias in aliases]
 
-        headers = {"Content-Type": "application/json"}
-        if res.status_code != 200:
-            # Index does no exists
-            r = self.requests.put(self.index_url, data=analyzers,
-                                  headers=headers)
-            if r.status_code != 200:
-                logger.error("Can't create index %s (%s)",
-                             self.index_url, r.status_code)
-                raise ElasticWriteException()
-            else:
-                logger.info("Created index " + self.index_url)
-        else:
-            if clean:
-                res = self.requests.delete(self.index_url)
-                res.raise_for_status()
-                res = self.requests.put(self.index_url, data=analyzers,
-                                        headers=headers)
-                res.raise_for_status()
-                logger.info("Deleted and created index " + self.index_url)
+    def safe_index(self, unique_id):
+        """Return a valid elastic index generated from unique_id"""
+
+        if not unique_id:
+            msg = "Index cannot be none, %s" % self.url
+            logger.error(cause=msg)
+            raise ElasticException(cause=msg)
+
+        index = unique_id.replace("/", "_").lower()
+
+        if index != unique_id:
+            logger.warning("Index %s not valid, changed to %s", unique_id, index)
+
+        return index
+
+    def major_version_es(self):
+        """Get the info of an Elasticsearch DB.
+
+        :returns: major version of Elasticsearch, as string.
+        """
+        try:
+            result = self.es.info()
+            version_number = result['version']['number']
+            version_major = version_number.split('.')[0]
+        except Exception as e:
+            logger.error("Could not read ElasticSearch DB info %s", self.url, str(e))
+            raise ElasticException(cause="Can't connect to ElasticSearch")
+
+        return version_major
+
+    @staticmethod
+    def add_templates(index_mappings):
+
+        templates = [
+            {
+                "notanalyzed": {
+                    "match": "*",
+                    "match_mapping_type": "string",
+                    "mapping": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            {
+                "formatdate": {
+                    "match": "*",
+                    "match_mapping_type": "date",
+                    "mapping": {
+                        "type": "date",
+                        "format": "strict_date_optional_time||epoch_millis"
+                    }
+                }
+            }]
+
+        index_mappings['mappings']['items']['dynamic_templates'] = templates
+
+    def create_index(self, mappings, clean, analyzers):
+        if clean and self.exist_index():
+            self.delete_index()
+
+        index_mappings = {
+            "mappings": {
+                "items": {}
+            }
+        }
+
         if mappings:
-            map_dict = mappings.get_elastic_mappings(es_major=self.major)
-            self.create_mappings(map_dict)
+            user_mappings = mappings.get_elastic_mappings(es_major=self.major)
+            index_mappings['mappings']['items'] = user_mappings['items']
+            self.add_templates(index_mappings)
 
-    def safe_put_bulk(self, url, bulk_json):
-        """ Bulk PUT controlling unicode issues """
+        if analyzers:
+            index_mappings['settings'] = {}
+            index_mappings['settings']['analysis'] = analyzers['analysis']
 
-        headers = {"Content-Type": "application/x-ndjson"}
+        if not self.exist_index():
+            result = self.es.indices.create(index=self.index, body=index_mappings)
+            logger.info("Creating index %s: %s!" % (self.index_url, str(result)))
+
+    def delete_index(self):
+        result = self.es.indices.delete(index=self.index)
+        logger.info("Deleting index %s: %s!" % (self.index_url, result))
+
+    def exist_index(self):
+        return self.es.indices.exists(index=self.index)
+
+    def refresh_index(self):
+        self.es.indices.refresh(index=self.index)
+
+    def add_alias(self, alias):
+
+        # check alias doesn't exist
+        aliases = self.get_aliases()
+
+        if alias in aliases:
+            logger.warning("Alias %s already exists on %s.", alias, self.index_url)
+            return
+
+        if 'filter' in alias and 'alias' in alias:
+            add = {
+                "add": {
+                    "index": self.index,
+                    "alias": alias['alias'],
+                    "filter": alias['filter']
+                }
+            }
+        else:
+            add = {
+                "add": {
+                    "index": self.index,
+                    "alias": alias
+                }
+            }
+
+        result = self.es.indices.update_aliases({
+            "actions": [add]
+        })
+
+        logger.info("Alias %s created on %s.", alias, self.index_url)
+
+    def count_docs(self, query=None):
+        if not query:
+            query = {
+                "query": {
+                    "match_all": {}
+                }
+            }
+
+        result = self.es.count(index=self.index, body=query)
+        return result['count']
+
+    def get_aliases(self):
+        aliases = []
 
         try:
-            res = self.requests.put(url + '?refresh=true', data=bulk_json, headers=headers)
-            res.raise_for_status()
-        except UnicodeEncodeError:
-            # Related to body.encode('iso-8859-1'). mbox data
-            logger.error("Encondig error ... converting bulk to iso-8859-1")
-            bulk_json = bulk_json.encode('iso-8859-1', 'ignore')
-            res = self.requests.put(url, data=bulk_json, headers=headers)
-            res.raise_for_status()
+            result = self.es.indices.get_alias(self.index)
+            for alias in result[self.index]['aliases']:
+                aliases.append(alias)
+        except NotFoundError as e:
+            logger.error('Error on retrieving aliases on %s, %s', self.index_url, str(e))
+            raise e
 
-        result = res.json()
-        failed_items = []
-        if result['errors']:
-            # Due to multiple errors that may be thrown when inserting bulk data, only the first error is returned
-            failed_items = [item['index'] for item in result['items'] if 'error' in item['index']]
-            error = str(failed_items[0]['error'])
+        return aliases
 
-            logger.error("Failed to insert data to ES: %s, %s", error, url)
+    def es_data_format(self, item, field_id, event_id=None, items_type=DEFAULT_ITEMS_TYPE):
+        id = item[field_id] + '_' + item[event_id] if event_id else item[field_id]
 
-        inserted_items = len(result['items']) - len(failed_items)
+        return {"_index": self.index,
+                "_id": id,
+                "_source": item,
+                "_type": items_type}
 
-        # The exception is currently not thrown to avoid stopping ocean uploading processes
-        try:
-            if failed_items:
-                raise ELKError(cause=error)
-        except ELKError:
-            pass
+    def generate_es_data(self, items, field_id, event_id, items_type):
+        for item in items:
+            yield self.es_data_format(item, field_id, event_id, items_type)
 
-        logger.info("%i items uploaded to ES (%s)", inserted_items, url)
-        return inserted_items
+    def bulk_upload(self, items, field_id, event_id=None, items_type=DEFAULT_ITEMS_TYPE):
+        """Format items and upload them to ES"""
 
-    def bulk_upload(self, items, field_id):
-        """Upload in controlled packs items to ES using bulk API"""
+        es_data = self.generate_es_data(items, field_id, event_id, items_type)
+        items_inserted = self.bulk(es_data)
+        return items_inserted
 
-        current = 0
-        new_items = 0  # total items added with bulk
-        bulk_json = ""
+    def bulk(self, items):
+        """Bulk data to ES"""
+
+        items_inserted = 0  # total items added with bulk
 
         if not items:
-            return new_items
+            return items_inserted
 
-        url = self.index_url + '/items/_bulk'
+        logger.debug("Start adding items to %s (in %i packs)" % (self.index_url, self.max_items_bulk))
+        start_time = time()
+        try:
+            result = helpers.bulk(self.es, items, chunk_size=self.max_items_bulk)
+        except BulkIndexError as e:
+            logger.error(str(e))
+            raise e
 
-        logger.debug("Adding items to %s (in %i packs)" % (url, self.max_items_bulk))
-        task_init = time()
+        self.refresh_index()
+        end_time = time()
 
-        for item in items:
-            if current >= self.max_items_bulk:
-                task_init = time()
-                new_items += self.safe_put_bulk(url, bulk_json)
-                current = 0
-                json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
-                logger.debug("bulk packet sent (%.2f sec, %i total, %.2f MB)"
-                             % (time() - task_init, new_items, json_size))
-                bulk_json = ""
-            data_json = json.dumps(item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (item[field_id])
-            bulk_json += data_json + "\n"  # Bulk document
-            current += 1
+        items_inserted = result[0]
+        info = result[1]
 
-        if current > 0:
-            new_items += self.safe_put_bulk(url, bulk_json)
-            json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
-            logger.debug("bulk packet sent (%.2f sec prev, %i total, %.2f MB)"
-                         % (time() - task_init, new_items, json_size))
+        logger.debug("End adding items to %s, it took %s sec" % (self.index_url, end_time - start_time))
 
-        return new_items
+        if info:
+            logger.error("Bulk to %s info %s" % (self.index_url, str(info)))
 
-    def create_mappings(self, mappings):
+        return items_inserted
 
-        headers = {"Content-Type": "application/json"}
+    def aggregations(self, query, scroll="10m", size=ES_SCROLL_SIZE):
+        logger.debug("Query aggregation %s on %s", str(query), self.index_url)
+        page = self.es.search(
+            index=self.index,
+            scroll=scroll,
+            size=size,
+            body=query
+        )
 
-        for _type in mappings:
+        return page
 
-            url_map = self.index_url + "/" + _type + "/_mapping"
+    def search(self, scroll="10m", size=ES_SCROLL_SIZE, query=None):
+        """Search data in ES"""
 
-            # First create the manual mappings
-            if mappings[_type] != '{}':
-                res = self.requests.put(url_map, data=mappings[_type],
-                                        headers=headers)
-                if res.status_code != 200:
-                    logger.error("Error creating ES mappings %s", res.text)
-                    logger.error("Mapping: " + str(mappings[_type]))
-                    res.raise_for_status()
+        total = 0
 
-            # By default all strings are not analyzed in ES < 6
-            if self.major == '2' or self.major == '5':
-                # Before version 6, strings were strings
-                not_analyze_strings = """
-                {
-                  "dynamic_templates": [
-                    { "notanalyzed": {
-                          "match": "*",
-                          "match_mapping_type": "string",
-                          "mapping": {
-                              "type":        "string",
-                              "index":       "not_analyzed"
-                          }
-                       }
-                    },
-                    { "formatdate": {
-                          "match": "*",
-                          "match_mapping_type": "date",
-                          "mapping": {
-                              "type": "date",
-                              "format" : "strict_date_optional_time||epoch_millis"
-                          }
-                       }
-                    }
-                  ]
-                } """
-            else:
-                # After version 6, strings are keywords (not analyzed)
-                not_analyze_strings = """
-                {
-                  "dynamic_templates": [
-                    { "notanalyzed": {
-                          "match": "*",
-                          "match_mapping_type": "string",
-                          "mapping": {
-                              "type":        "keyword"
-                          }
-                       }
-                    },
-                    { "formatdate": {
-                          "match": "*",
-                          "match_mapping_type": "date",
-                          "mapping": {
-                              "type": "date",
-                              "format" : "strict_date_optional_time||epoch_millis"
-                          }
-                       }
-                    }
-                  ]
-                } """
-            res = self.requests.put(url_map, data=not_analyze_strings, headers=headers)
-            try:
-                res.raise_for_status()
-            except requests.exceptions.HTTPError:
-                logger.warning("Can't add mapping %s: %s", url_map, not_analyze_strings)
+        if not query:
+            query = {"query": {"match_all": {}}}
+
+        page = self.es.search(
+            index=self.index,
+            scroll=scroll,
+            size=size,
+            body=query
+        )
+
+        sid = page['_scroll_id']
+        scroll_size = page['hits']['total']
+
+        if scroll_size == 0:
+            logger.warning("No data found!")
+            return
+
+        while scroll_size > 0:
+
+            logger.debug("Searching on %s: %d items received", self.index_url, len(page['hits']['hits']))
+            total += len(page['hits']['hits'])
+            for item in page['hits']['hits']:
+                eitem = item['_source']
+                yield eitem
+
+            page = self.es.scroll(scroll_id=sid, scroll='1m')
+            sid = page['_scroll_id']
+            scroll_size = len(page['hits']['hits'])
+
+        logger.debug("Searching from %s: done, total items received %s", self.index_url, total)
+
+    def update_by_query(self, query):
+        result = self.es.update_by_query(body=query, doc_type=DEFAULT_ITEMS_TYPE, index=self.index)
+
+        if result['failures']:
+            logger.error("Errors when updating %s, %s", self.index_url, str(result['failures']))
+
+        logger.info("Items updated %s/%s on %s", result['updated'], result['total'], self.index_url)
 
     def get_last_date(self, field, filters_=[]):
-        '''
-            :field: field with the data
-            :filters_: additional filters to find the date
-        '''
+        """Get date of last item inserted
 
-        last_date = self.get_last_item_field(field, filters_=filters_)
-
-        return last_date
-
-    def get_last_offset(self, field, filters_=[]):
-        '''
-            :field: field with the data
-            :filters_: additional filters to find the date
-        '''
-
-        offset = self.get_last_item_field(field, filters_=filters_, offset=True)
-
-        return offset
-
-    def get_last_item_field(self, field, filters_=[], offset=False):
-        '''
-            :field: field with the data
-            :filters_: additional filters to find the date
-            :offset: Return offset field insted of date field
-        '''
+        :param field: field with the data
+        :param filters_: additional filters to find the date
+        """
 
         last_value = None
-
-        url = self.index_url
-        url += "/_search"
 
         data_query = ''
         if filters_ is None:
@@ -315,50 +371,40 @@ class ElasticSearch(object):
         for filter_ in filters_:
             if not filter_:
                 continue
-            data_query += '''
-                "query" : {
-                    "term" : { "%s" : "%s"  }
-                 },
-            ''' % (filter_['name'], filter_['value'])
+            data_query += """
+                        "query" : {
+                            "term" : { "%s" : "%s"  }
+                         },
+                    """ % (filter_['name'], filter_['value'])
 
-        data_agg = '''
-            "aggs": {
-                "1": {
-                  "max": {
-                    "field": "%s"
-                  }
-                }
-            }
-        ''' % (field)
+        data_agg = """
+                    "aggs": {
+                        "1": {
+                          "max": {
+                            "field": "%s"
+                          }
+                        }
+                    }
+                """ % (field)
 
-        data_json = '''
-        { "size": 0, %s  %s
-        } ''' % (data_query, data_agg)
+        data_json = """
+                { %s  %s
+                } """ % (data_query, data_agg)
 
-        logger.debug("%s %s", url, data_json)
+        logger.debug("Get last item date on %s, %s", self.index_url, data_json)
+        result = self.search(query=data_json, size=0)
 
-        headers = {"Content-Type": "application/json"}
-
-        res = self.requests.post(url, data=data_json, headers=headers)
-        res.raise_for_status()
-        res_json = res.json()
-
-        if 'aggregations' in res_json:
-            last_value = res_json["aggregations"]["1"]["value"]
-
-            if offset:
-                if last_value is not None:
-                    last_value = int(last_value)
+        if 'aggregations' in result:
+            if "value_as_string" in result["aggregations"]["1"]:
+                last_value = result["aggregations"]["1"]["value_as_string"]
+                last_value = parser.parse(last_value)
             else:
-                if "value_as_string" in res_json["aggregations"]["1"]:
-                    last_value = res_json["aggregations"]["1"]["value_as_string"]
-                    last_value = parser.parse(last_value)
-                else:
-                    last_value = res_json["aggregations"]["1"]["value"]
-                    if last_value:
-                        try:
-                            last_value = unixtime_to_datetime(last_value)
-                        except ValueError:
-                            # last_value is in microsecs
-                            last_value = unixtime_to_datetime(last_value / 1000)
+                last_value = result["aggregations"]["1"]["value"]
+                if last_value:
+                    try:
+                        last_value = unixtime_to_datetime(last_value)
+                    except ValueError:
+                        # last_value is in microsecs
+                        last_value = unixtime_to_datetime(last_value / 1000)
+
         return last_value
