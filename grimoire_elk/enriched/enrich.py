@@ -25,10 +25,8 @@
 import json
 import functools
 import logging
-import requests
-import sys
 
-from datetime import datetime as dt, timedelta
+from datetime import timedelta
 
 import pkg_resources
 from dateutil import parser
@@ -37,12 +35,11 @@ from functools import lru_cache
 from elasticsearch import Elasticsearch
 
 from perceval.backend import find_signature_parameters
-from grimoirelab_toolkit import datetime as gl_dt
+from grimoirelab_toolkit.datetime import datetime_utcnow
 
 from ..elastic_items import ElasticItems
 from .study_ceres_onion import ESOnionConnector, onion_study
 
-from .utils import grimoire_con
 from .. import __version__
 
 logger = logging.getLogger(__name__)
@@ -90,7 +87,7 @@ def metadata(func):
         metadata = {
             'metadata__gelk_version': self.gelk_version,
             'metadata__gelk_backend_name': self.__class__.__name__,
-            'metadata__enriched_on': dt.utcnow().isoformat()
+            'metadata__enriched_on': datetime_utcnow().isoformat()
         }
         eitem.update(metadata)
         return eitem
@@ -147,7 +144,6 @@ class Enrich(ElasticItems):
 
         self.studies = []
 
-        self.requests = grimoire_con()
         self.elastic = None
         self.type_name = "items"  # type inside the index to store items enriched
 
@@ -327,8 +323,7 @@ class Enrich(ElasticItems):
         return self.enrich_items(items, events=True)
 
     def enrich_items(self, ocean_backend, events=False):
-        """
-        Enrich the items fetched from ocean_backend generator
+        """Enrich the items fetched from ocean_backend generator
         generating enriched items/events which are uploaded to the Elasticsearch index for
         this Enricher (self).
 
@@ -336,55 +331,42 @@ class Enrich(ElasticItems):
         :param events: enrich items or enrich events
         :return: total number of enriched items/events uploaded to Elasticsearch
         """
-
         max_items = self.elastic.max_items_bulk
-        current = 0
         total = 0
-        bulk_json = ""
 
         items = ocean_backend.fetch()
-
-        url = self.elastic.index_url + '/items/_bulk'
-
-        logger.debug("Adding items to %s (in %i packs)", url, max_items)
+        logger.debug("Adding items to %s (in %i packs)", self.elastic.index_url, max_items)
 
         if events:
             logger.debug("Adding events items")
 
+        to_insert = []
         for item in items:
-            if current >= max_items:
-                try:
-                    total += self.elastic.safe_put_bulk(url, bulk_json)
-                    json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
-                    logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
-                except UnicodeEncodeError:
-                    # Why is requests encoding the POST data as ascii?
-                    logger.error("Unicode error in enriched items")
-                    logger.debug(bulk_json)
-                    safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
-                    total += self.elastic.safe_put_bulk(url, safe_json)
-                bulk_json = ""
-                current = 0
 
-            if not events:
-                rich_item = self.get_rich_item(item)
-                data_json = json.dumps(rich_item)
-                bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                    (item[self.get_field_unique_id()])
-                bulk_json += data_json + "\n"  # Bulk document
-                current += 1
-            else:
+            if events:
                 rich_events = self.get_rich_events(item)
-                for rich_event in rich_events:
-                    data_json = json.dumps(rich_event)
-                    bulk_json += '{"index" : {"_id" : "%s_%s" } }\n' % \
-                        (item[self.get_field_unique_id()],
-                         rich_event[self.get_field_event_unique_id()])
-                    bulk_json += data_json + "\n"  # Bulk document
-                    current += 1
+                to_insert.extend(rich_events)
+            else:
+                rich_item = self.get_rich_item(item)
+                to_insert.append(rich_item)
 
-        if current > 0:
-            total += self.elastic.safe_put_bulk(url, bulk_json)
+            if len(to_insert) < max_items:
+                continue
+
+            if events:
+                self.elastic.bulk_upload(to_insert, self.get_field_unique_id(), self.get_field_event_unique_id())
+            else:
+                self.elastic.bulk_upload(to_insert, self.get_field_unique_id())
+
+            total += len(to_insert)
+            to_insert = []
+
+        if len(to_insert) > 0:
+            if events:
+                self.elastic.bulk_upload(to_insert, self.get_field_unique_id(), self.get_field_event_unique_id())
+            else:
+                self.elastic.bulk_upload(to_insert, self.get_field_unique_id())
+            total += len(to_insert)
 
         return total
 
@@ -453,27 +435,26 @@ class Enrich(ElasticItems):
 #        mapping = '{}'
 #        return {"items": mapping}
 
-    def get_elastic_analyzers(self):
+    @staticmethod
+    def get_elastic_analyzers():
         """ Custom analyzers for our indexes  """
 
-        analyzers = '''
-        {
-                "analysis" : {
-                    "tokenizer" : {
-                        "comma" : {
-                            "type" : "pattern",
-                            "pattern" : ","
-                        }
-                    },
-                    "analyzer" : {
-                        "comma" : {
-                            "type" : "custom",
-                            "tokenizer" : "comma"
-                        }
+        analyzers = {
+            "analysis": {
+                "tokenizer": {
+                    "comma": {
+                        "type": "pattern",
+                        "pattern": ","
+                    }
+                },
+                "analyzer": {
+                    "comma": {
+                        "type": "custom",
+                        "tokenizer": "comma"
                     }
                 }
+            }
         }
-        '''
 
         return analyzers
 
@@ -888,7 +869,8 @@ class Enrich(ElasticItems):
         logger.info("[Onion] Starting study")
 
         # Creating connections
-        es = Elasticsearch([enrich_backend.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
+        es = Elasticsearch([enrich_backend.elastic.url], timeout=100,
+                           verify_certs=enrich_backend.elastic.es_verify_certs)
 
         in_conn = ESOnionConnector(es_conn=es, es_index=in_index,
                                    contribs_field=contribs_field,
@@ -911,10 +893,9 @@ class Enrich(ElasticItems):
 
         if latest_date:
             logger.info("[Onion] Latest enrichment date: " + latest_date.isoformat())
-            now = gl_dt.datetime_utcnow()
             update_after = latest_date + timedelta(seconds=seconds)
             logger.info("[Onion] Update after date: " + update_after.isoformat())
-            if update_after >= now:
+            if update_after >= datetime_utcnow():
                 logger.info("[Onion] Too soon to update. Next update will be at " + update_after.isoformat())
                 return
 
@@ -957,17 +938,9 @@ class Enrich(ElasticItems):
         authors_min_max_data = {}
 
         es_query = Enrich.authors_min_max_dates(date_field, author_field=author_field)
-        r = self.requests.post(self.elastic.index_url + "/_search",
-                               data=es_query, headers=HEADER_JSON,
-                               verify=False)
-        try:
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as ex:
-            logger.error("Error getting authors mix and max date. Demography aborted.")
-            logger.error(ex)
-            return
+        result = self.elastic.aggregations(query=es_query)
 
-        for author in r.json()['aggregations']['author']['buckets']:
+        for author in result['aggregations']['author']['buckets']:
             authors_min_max_data[author['key']] = author
 
         # Then we update the min max dates of all authors
@@ -978,18 +951,9 @@ class Enrich(ElasticItems):
             es_update = Enrich.update_author_min_max_date(author_min_date, author_max_date,
                                                           author_key, author_field=author_field)
 
-            r = self.requests.post(self.elastic.index_url + "/_update_by_query",
-                                   data=es_update, headers=HEADER_JSON,
-                                   verify=False)
-            try:
-                r.raise_for_status()
-            except requests.exceptions.HTTPError as ex:
-                logger.error("Error updating mix and max date for author %s. Demography aborted.", author_key)
-                logger.error(ex)
-                return
+            self.elastic.update_by_query(query=es_update)
 
-        self.add_alias(DEMOGRAPHICS_ALIAS)
-
+        self.elastic.add_alias(DEMOGRAPHICS_ALIAS)
         logger.info("[Demography] End %s", self.elastic.index_url)
 
     def add_alias(self, alias_name):
@@ -1001,43 +965,14 @@ class Enrich(ElasticItems):
         :returns: None
         """
         # check alias doesn't exist
-        r = self.requests.get(self.elastic.index_url + "/_alias", headers=HEADER_JSON, verify=False)
-        try:
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as ex:
-            logger.warning("Something went wrong when retrieving aliases on %s. Alias not set.",
-                           self.elastic.index_url)
-            logger.warning(ex)
-            return
+        aliases = self.elastic.get_aliases()
 
-        aliases = r.json()[self.elastic.index]['aliases']
         if alias_name in aliases:
             logger.warning("Alias %s already exists on %s.", alias_name, self.elastic.index_url)
             return
 
         # add alias
-        alias_data = """
-        {
-            "actions": [
-                {
-                    "add": {
-                        "index": "%s",
-                        "alias": "%s"
-                    }
-                }
-            ]
-        }
-        """ % (self.elastic.index, alias_name)
-
-        r = self.requests.post(self.elastic.url + "/_aliases", headers=HEADER_JSON, verify=False, data=alias_data)
-        try:
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as ex:
-            logger.warning("Something went wrong when adding an alias on %s. Alias not set.",
-                           self.elastic.index_url)
-            logger.warning(ex)
-            return
-
+        self.elastic.add_alias(alias_name)
         logger.info("Alias %s created on %s.", alias_name, self.elastic.index_url)
 
     @staticmethod
@@ -1054,31 +989,29 @@ class Enrich(ElasticItems):
         # Limit aggregations: https://github.com/elastic/elasticsearch/issues/18838
         # 30000 seems to be a sensible number of the number of people in git
 
-        es_query = """
-        {
-          "size": 0,
-          "aggs": {
-            "author": {
-              "terms": {
-                "field": "%s",
-                "size": 30000
-              },
-              "aggs": {
-                "min": {
-                  "min": {
-                    "field": "%s"
-                  }
-                },
-                "max": {
-                  "max": {
-                    "field": "%s"
-                  }
+        es_query = {
+            "size": 0,
+            "aggs": {
+                "author": {
+                    "terms": {
+                        "field": author_field,
+                        "size": 30000
+                    },
+                    "aggs": {
+                        "min": {
+                            "min": {
+                                "field": date_field
+                            }
+                        },
+                        "max": {
+                            "max": {
+                                "field": date_field
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-        """ % (author_field, date_field, date_field)
 
         return es_query
 
@@ -1095,23 +1028,21 @@ class Enrich(ElasticItems):
         :return: the query to be executed to update demography data of an author
         """
 
-        es_query = '''
-        {
-          "script": {
-            "source":
-            "ctx._source.demography_min_date = params.min_date;ctx._source.demography_max_date = params.max_date;",
-            "lang": "painless",
-            "params": {
-                "min_date": "%s",
-                "max_date": "%s"
+        es_query = {
+            "script": {
+                "source":
+                "ctx._source.demography_min_date = params.min_date;ctx._source.demography_max_date = params.max_date;",
+                "lang": "painless",
+                "params": {
+                    "min_date": min_date,
+                    "max_date": max_date
+                }
+            },
+            "query": {
+                "term": {
+                    author_field: target_author
+                }
             }
-          },
-          "query": {
-            "term": {
-              "%s": "%s"
-            }
-          }
         }
-        ''' % (min_date, max_date, author_field, target_author)
 
         return es_query
