@@ -25,6 +25,7 @@
 
 
 import logging
+import json
 
 from .enriched.utils import get_repository_filter, grimoire_con
 from .elastic_mapping import Mapping
@@ -89,134 +90,102 @@ class ElasticItems():
 
         logger.debug("Creating a elastic items generator.")
 
-        items = self.elastic.search(query=_filter)
+        filter = None
+        if _filter:
+            filter = self.create_filter(_filter)
+
+        items = self.elastic.search(query=filter)
         for item in items:
             yield item
 
         logger.debug("Fetching from %s: done receiving", self.elastic.index_url)
 
-    # def get_elastic_items(self, elastic_scroll_id=None, _filter=None):
-    #     """ Get the items from the index related to the backend applying and
-    #     optional _filter if provided"""
-    #
-    #     headers = {"Content-Type": "application/json"}
-    #
-    #     if not self.elastic:
-    #         return None
-    #     url = self.elastic.index_url
-    #     # 1 minute to process the results of size items
-    #     # In gerrit enrich with 500 items per page we need >1 min
-    #     # In Mozilla ES in Amazon we need 10m
-    #     max_process_items_pack_time = "10m"  # 10 minutes
-    #     url += "/_search?scroll=%s&size=%i" % (max_process_items_pack_time,
-    #                                            self.scroll_size)
-    #
-    #     if elastic_scroll_id:
-    #         """ Just continue with the scrolling """
-    #         url = self.elastic.url
-    #         url += "/_search/scroll"
-    #         scroll_data = {
-    #             "scroll": max_process_items_pack_time,
-    #             "scroll_id": elastic_scroll_id
-    #         }
-    #         query_data = json.dumps(scroll_data)
-    #     else:
-    #         # If using a perceval backends always filter by repository
-    #         # to support multi repository indexes
-    #         # We need the filter dict as a string to join with the rest
-    #         filters_dict = self.get_repository_filter_raw(term=True)
-    #         if filters_dict:
-    #             filters = json.dumps(filters_dict)
-    #         else:
-    #             filters = ''
-    #
-    #         if self.filter_raw:
-    #             filters += '''
-    #                 , {"term":
-    #                     { "%s":"%s"  }
-    #                 }
-    #             ''' % (self.filter_raw['name'], self.filter_raw['value'])
-    #
-    #         if _filter:
-    #             filter_str = '''
-    #                 , {"terms":
-    #                     { "%s": %s }
-    #                 }
-    #             ''' % (_filter['name'], _filter['value'])
-    #             # List to string conversion uses ' that are not allowed in JSON
-    #             filter_str = filter_str.replace("'", "\"")
-    #             filters += filter_str
-    #
-    #         if self.from_date:
-    #             date_field = self.get_incremental_date()
-    #             from_date = self.from_date.isoformat()
-    #
-    #             filters += '''
-    #                 , {"range":
-    #                     {"%s": {"gte": "%s"}}
-    #                 }
-    #             ''' % (date_field, from_date)
-    #         elif self.offset:
-    #             filters += '''
-    #                 , {"range":
-    #                     {"offset": {"gte": %i}}
-    #                 }
-    #             ''' % (self.offset)
-    #
-    #         # Order the raw items from the old ones to the new so if the
-    #         # enrich process fails, it could be resume incrementally
-    #         order_query = ''
-    #         order_field = None
-    #         if self.perceval_backend:
-    #             order_field = self.get_incremental_date()
-    #         if order_field is not None:
-    #             order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
-    #
-    #         filters_should = ''
-    #         if self.filter_raw_should:
-    #             filters_should = json.dumps(self.filter_raw_should)[1:-1]
-    #             # We need to add a bool should query to the outer must query
-    #             query_should = '{"bool": {%s}}' % filters_should
-    #             filters += ", " + query_should
-    #
-    #         # Fix the filters string if it starts with "," (empty first filter)
-    #         if filters.lstrip().startswith(','):
-    #             filters = filters.lstrip()[1:]
-    #
-    #         filters_dict = json.loads("[" + filters + "]")
-    #         if len(filters_dict) == 0:
-    #             # Avoid empty list of filters, ES 6.x doesn't like it
-    #             # In this case, ensure that order_query does not start with ,
-    #             if order_query.startswith(','):
-    #                 order_query = order_query[1:]
-    #             query = """
-    #             {
-    #               %s
-    #             }
-    #             """ % (order_query)
-    #         else:
-    #             query = """
-    #             {
-    #                 "query": {
-    #                     "bool": {
-    #                         "must": [%s]
-    #                     }
-    #                 } %s
-    #             }
-    #             """ % (filters, order_query)
-    #
-    #         logger.debug("Raw query to %s\n%s", url, json.dumps(json.loads(query), indent=4))
-    #         query_data = query
-    #
-    #     items = []
-    #     rjson = None
-    #     try:
-    #         res = self.requests.post(url, data=query_data, headers=headers)
-    #         res.raise_for_status()
-    #         rjson = res.json()
-    #     except Exception:
-    #         # The index could not exists yet or it could be empty
-    #         logger.warning("No JSON found in %s" % (res.text))
-    #         logger.warning("No results found from %s" % (url))
-    #
-    #     return rjson
+    def create_filter(self, _filter=None):
+        """ Get the items from the index related to the backend applying and
+        optional _filter if provided"""
+
+        # If using a perceval backends always filter by repository
+        # to support multi repository indexes
+        # We need the filter dict as a string to join with the rest
+        filters_dict = self.get_repository_filter_raw(term=True)
+        if filters_dict:
+            filters = json.dumps(filters_dict)
+        else:
+            filters = ''
+
+        if self.filter_raw:
+            filters += '''
+                , {"term":
+                    { "%s":"%s"  }
+                }
+            ''' % (self.filter_raw['name'], self.filter_raw['value'])
+
+        if _filter:
+            filter_str = '''
+                , {"terms":
+                    { "%s": %s }
+                }
+            ''' % (_filter['name'], _filter['value'])
+            # List to string conversion uses ' that are not allowed in JSON
+            filter_str = filter_str.replace("'", "\"")
+            filters += filter_str
+
+        if self.from_date:
+            date_field = self.get_incremental_date()
+            from_date = self.from_date.isoformat()
+
+            filters += '''
+                , {"range":
+                    {"%s": {"gte": "%s"}}
+                }
+            ''' % (date_field, from_date)
+        elif self.offset:
+            filters += '''
+                , {"range":
+                    {"offset": {"gte": %i}}
+                }
+            ''' % (self.offset)
+
+        # Order the raw items from the old ones to the new so if the
+        # enrich process fails, it could be resume incrementally
+        order_query = ''
+        order_field = None
+        if self.perceval_backend:
+            order_field = self.get_incremental_date()
+        if order_field is not None:
+            order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
+
+        filters_should = ''
+        if self.filter_raw_should:
+            filters_should = json.dumps(self.filter_raw_should)[1:-1]
+            # We need to add a bool should query to the outer must query
+            query_should = '{"bool": {%s}}' % filters_should
+            filters += ", " + query_should
+
+        # Fix the filters string if it starts with "," (empty first filter)
+        if filters.lstrip().startswith(','):
+            filters = filters.lstrip()[1:]
+
+        filters_dict = json.loads("[" + filters + "]")
+        if len(filters_dict) == 0:
+            # Avoid empty list of filters, ES 6.x doesn't like it
+            # In this case, ensure that order_query does not start with ,
+            if order_query.startswith(','):
+                order_query = order_query[1:]
+            query = """
+            {
+              %s
+            }
+            """ % (order_query)
+        else:
+            query = """
+            {
+                "query": {
+                    "bool": {
+                        "must": [%s]
+                    }
+                } %s
+            }
+            """ % (filters, order_query)
+
+        return json.loads(query)
