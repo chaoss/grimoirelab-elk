@@ -72,14 +72,7 @@ class ElasticOcean(ElasticItems):
         return "metadata__updated_on"
 
     def get_field_unique_id(self):
-        field = "uuid"
-        return field
-
-#    def get_elastic_mappings(self):
-#        """ specific mappings implemented in each data source """
-#        mapping = '{}'
-#
-#        return {"items": mapping}
+        return "uuid"
 
     def get_elastic_analyzers(self):
         """ Custom analyzers for our indexes  """
@@ -120,8 +113,10 @@ class ElasticOcean(ElasticItems):
         """ Some buggy data sources need fixing (like mbox and message-id) """
         pass
 
-    def add_update_date(self, item):
-        """ All item['updated_on'] from perceval is epoch """
+    @staticmethod
+    def add_update_date(item):
+        """All item['updated_on'] from perceval is epoch"""
+
         updated = unixtime_to_datetime(item['updated_on'])
         timestamp = unixtime_to_datetime(item['timestamp'])
         item['metadata__updated_on'] = updated.isoformat()
@@ -209,21 +204,24 @@ class ElasticOcean(ElasticItems):
         added = 0
 
         for item in items:
-            # print("%s %s" % (item['url'], item['lastUpdated_date']))
-            # Add date field for incremental analysis if needed
             self.add_update_date(item)
             self._fix_item(item)
             if self.project:
                 item['project'] = self.project
-            if len(items_pack) >= self.elastic.max_items_bulk:
-                self._items_to_es(items_pack)
-                items_pack = []
+
             if not self.drop_item(item):
                 items_pack.append(item)
                 added += 1
             else:
                 drop += 1
-        self._items_to_es(items_pack)
+
+            if len(items_pack) >= self.elastic.max_items_bulk:
+                self._items_to_es(items_pack)
+                items_pack = []
+
+            else:
+                drop += 1
+        inserted = self._items_to_es(items_pack)
 
         total_time_min = (datetime.now() - task_init).total_seconds() / 60
 
@@ -231,7 +229,7 @@ class ElasticOcean(ElasticItems):
         logger.debug("Dropped %i items using drop_item filter" % (drop))
         logger.info("Finished in %.2f min" % (total_time_min))
 
-        return self
+        return inserted
 
     def _items_to_es(self, json_items):
         """ Append items JSON to ES (data source state) """
@@ -243,7 +241,6 @@ class ElasticOcean(ElasticItems):
                     (self, len(json_items)))
 
         field_id = self.get_field_unique_id()
-
         inserted = self.elastic.bulk_upload(json_items, field_id)
 
         if len(json_items) != inserted:
