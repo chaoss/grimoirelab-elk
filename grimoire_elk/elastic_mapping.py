@@ -46,6 +46,6 @@ class Mapping:
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = '{}'
+        mapping = {}
 
         return {"items": mapping}
