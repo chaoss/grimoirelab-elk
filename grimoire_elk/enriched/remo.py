@@ -40,17 +40,16 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = """
-        {
+        mapping = {
             "properties": {
                 "description_analyzed": {
-                  "type": "text"
+                    "type": "text"
                 },
                 "geolocation": {
                     "type": "geo_point"
                 }
-           }
-        } """
+            }
+        }
 
         return {"items": mapping}
 
