@@ -21,9 +21,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-import json
 import logging
-import sys
 
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
@@ -42,24 +40,22 @@ class Mapping(BaseMapping):
         :returns:        dictionary with a key, 'items', with the mapping
         """
 
-        mapping = """
-        {
+        mapping = {
             "properties": {
                 "description": {
                     "type": "text",
-                    "index": true
+                    "index": True
                 },
                 "description_analyzed": {
                     "type": "text",
-                    "index": true
+                    "index": True
                 },
                 "full_description_analyzed": {
                     "type": "text",
-                    "index": true
+                    "index": True
                 }
-           }
+            }
         }
-        """
 
         return {"items": mapping}
 
@@ -125,12 +121,11 @@ class DockerHubEnrich(Enrich):
     def enrich_items(self, ocean_backend, events=False):
         """ A custom enrich items is needed because apart from the enriched
         events from raw items, a image item with the last data for an image
-        must be created """
-
+        must be created.
+        """
         max_items = self.elastic.max_items_bulk
-        current = 0
         total = 0
-        bulk_json = ""
+        to_insert = []
 
         items = ocean_backend.fetch()
         images_items = {}
@@ -140,19 +135,7 @@ class DockerHubEnrich(Enrich):
         logger.debug("Adding items to %s (in %i packs)", url, max_items)
 
         for item in items:
-            if current >= max_items:
-                total += self.elastic.safe_put_bulk(url, bulk_json)
-                json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
-                logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
-                bulk_json = ""
-                current = 0
-
             rich_item = self.get_rich_item(item)
-            data_json = json.dumps(rich_item)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (item[self.get_field_unique_id()])
-            bulk_json += data_json + "\n"  # Bulk document
-            current += 1
 
             if rich_item['id'] not in images_items:
                 # Let's transform the rich_event in a rich_image
@@ -166,9 +149,17 @@ class DockerHubEnrich(Enrich):
                     rich_item['is_docker_image'] = 1
                     rich_item['is_event'] = 0
                     images_items[rich_item['id']] = rich_item
+            es_item = self.elastic.es_data_format(rich_item, self.get_field_unique_id())
+            to_insert.append(es_item)
 
-        if current > 0:
-            total += self.elastic.safe_put_bulk(url, bulk_json)
+            if len(to_insert) < max_items:
+                continue
+
+            total += self.elastic.bulk(to_insert)
+            to_insert = []
+
+        if len(to_insert) > 0:
+            total += self.elastic.bulk(to_insert)
 
         if total == 0:
             # No items enriched, nothing to upload to ES
@@ -177,12 +168,12 @@ class DockerHubEnrich(Enrich):
         # Time to upload the images enriched items. The id is uuid+"_image"
         # Normally we are enriching events for a unique image so all images
         # data can be upload in one query
+        to_insert = []
         for image in images_items:
             data = images_items[image]
-            data_json = json.dumps(data)
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (data['id'] + "_image")
-            bulk_json += data_json + "\n"  # Bulk document
+            es_item = self.elastic.es_data_format(data, 'id')
+            es_item['_id'] = es_item['_id'] + "_image"
+            to_insert.append(es_item)
 
-        total += self.elastic.safe_put_bulk(url, bulk_json)
+        total += self.elastic.bulk(to_insert)
         return total
