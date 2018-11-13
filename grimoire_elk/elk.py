@@ -100,7 +100,8 @@ def feed_backend_arthur(backend_name, backend_params):
 
 
 def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
-                 es_index=None, es_index_enrich=None, project=None, arthur=False):
+                 es_index=None, es_index_enrich=None, project=None, arthur=False,
+                 es_aliases=None):
     """ Feed Ocean with backend data """
 
     backend = None
@@ -144,7 +145,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         backend = backend_cmd.backend
 
         ocean_backend = connector[1](backend, fetch_archive=fetch_archive, project=project)
-        elastic_ocean = get_elastic(url, es_index, clean, ocean_backend)
+        elastic_ocean = get_elastic(url, es_index, clean, ocean_backend, es_aliases)
         ocean_backend.set_elastic(elastic_ocean)
 
         if fetch_archive:
@@ -510,8 +511,7 @@ def enrich_backend(url, clean, backend_name, backend_params,
                    author_id=None, author_uuid=None, filter_raw=None,
                    filters_raw_prefix=None, jenkins_rename_file=None,
                    unaffiliated_group=None, pair_programming=False,
-                   node_regex=False,
-                   studies_args=None):
+                   node_regex=False, studies_args=None, es_enrich_aliases=None):
     """ Enrich Ocean index """
 
     backend = None
@@ -549,9 +549,9 @@ def enrich_backend(url, clean, backend_name, backend_params,
                                       db_user, db_password, db_host)
         enrich_backend.set_params(backend_params)
         if url_enrich:
-            elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend)
+            elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend, es_enrich_aliases)
         else:
-            elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend)
+            elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend, es_enrich_aliases)
         enrich_backend.set_elastic(elastic_enrich)
         if github_token and backend_name == "git":
             enrich_backend.set_github_token(github_token)
