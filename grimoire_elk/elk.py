@@ -301,7 +301,7 @@ def refresh_projects(enrich_backend):
     logger.info("Total eitems refreshed for project field %i", total)
 
 
-def refresh_identities(enrich_backend, filter_author=None):
+def refresh_identities(enrich_backend, author_field=None, author_values=None):
     """Refresh identities in enriched index.
 
     Retrieve items from the enriched index corresponding to enrich_backend,
@@ -312,13 +312,13 @@ def refresh_identities(enrich_backend, filter_author=None):
     filter are fitered, if that parameters is not None.
 
     :param enrich_backend: enriched backend to update
-    :param  filter_author: filter to use to match items
+    :param  author_field: field to match items authored by a user
+    :param  author_values: values of the authored field to match items
     """
 
     def update_items(new_filter_author):
 
         for eitem in enrich_backend.fetch(new_filter_author):
-            # logger.info(eitem)
             roles = None
             try:
                 roles = enrich_backend.roles
@@ -333,28 +333,36 @@ def refresh_identities(enrich_backend, filter_author=None):
     total = 0
 
     max_ids = enrich_backend.elastic.max_items_clause
+    logger.debug('Refreshing identities')
 
-    if filter_author is None:
+    if author_field is None:
         # No filter, update all items
         for item in update_items(None):
             yield item
             total += 1
     else:
-        nidentities = len(filter_author['value'])
-        logger.debug('Identities to refresh: %i', nidentities)
-        if nidentities > max_ids:
-            logger.warning('Refreshing identities in groups of %i', max_ids)
-            while filter_author['value']:
-                new_filter_author = {"name": filter_author['name'],
-                                     "value": filter_author['value'][0:max_ids]}
-                filter_author['value'] = filter_author['value'][max_ids:]
-                for item in update_items(new_filter_author):
+        to_refresh = []
+        for author_value in author_values:
+            to_refresh.append(author_value)
+
+            if len(to_refresh) > max_ids:
+                filter_author = {"name": author_field,
+                                 "value": to_refresh}
+
+                for item in update_items(filter_author):
                     yield item
                     total += 1
-        else:
+
+                to_refresh = []
+
+        if len(to_refresh) > 0:
+            filter_author = {"name": author_field,
+                             "value": to_refresh}
+
             for item in update_items(filter_author):
                 yield item
                 total += 1
+
     logger.info("Total eitems refreshed for identities fields %i", total)
 
 
@@ -589,18 +597,19 @@ def enrich_backend(url, clean, backend_name, backend_params,
             enrich_backend.elastic.bulk_upload(eitems, field_id)
         elif do_refresh_identities:
 
-            filter_author = None
+            author_attr = None
+            author_values = None
             if author_id:
-                filter_author = {'name': 'author_id',
-                                 'value': author_id}
+                author_attr = 'author_id'
+                author_values = [author_id]
             elif author_uuid:
-                filter_author = {'name': 'author_uuid',
-                                 'value': author_uuid}
+                author_attr = 'author_uuid'
+                author_values = [author_uuid]
 
             logger.info("Refreshing identities fields in %s", enrich_backend.elastic.index_url)
 
             field_id = enrich_backend.get_field_unique_id()
-            eitems = refresh_identities(enrich_backend, filter_author)
+            eitems = refresh_identities(enrich_backend, author_attr, author_values)
             enrich_backend.elastic.bulk_upload(eitems, field_id)
         else:
             clean = False  # Don't remove ocean index when enrich
