@@ -56,6 +56,10 @@ class Mapping(BaseMapping):
                             "description": {
                                 "type": "text",
                                 "index": true
+                            },
+                            "versions_data": {
+                                "dynamic":false,
+                                "properties": {}
                             }
                         }
                     }
