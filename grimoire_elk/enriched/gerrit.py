@@ -47,6 +47,9 @@ class Mapping(BaseMapping):
         mapping = """
         {
             "properties": {
+               "status": {
+                  "type": "keyword"
+               },
                "summary_analyzed": {
                   "type": "text"
                },
