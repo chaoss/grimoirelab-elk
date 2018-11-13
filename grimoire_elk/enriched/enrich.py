@@ -73,6 +73,7 @@ CUSTOM_META_PREFIX = 'cm'
 
 SH_UNKNOWN_VALUE = 'Unknown'
 DEMOGRAPHICS_ALIAS = 'demographics'
+ONION_ALIAS = 'all_onion'
 
 HEADER_JSON = {"Content-Type": "application/json"}
 
@@ -928,9 +929,9 @@ class Enrich(ElasticItems):
 
         # Create alias if output index exists (index is always created from scratch, so
         # alias need to be created each time)
-        if out_conn.exists() and not out_conn.exists_alias(out_index, "all_onion"):
-            logger.info("[Onion] Creating alias: all_onion")
-            out_conn.create_alias('all_onion')
+        if out_conn.exists() and not out_conn.exists_alias(out_index, ONION_ALIAS):
+            logger.info("[Onion] Creating alias: %s", ONION_ALIAS)
+            out_conn.create_alias(ONION_ALIAS)
 
         logger.info("[Onion] This is the end.")
 
@@ -988,57 +989,9 @@ class Enrich(ElasticItems):
                 logger.error(ex)
                 return
 
-        self.add_alias(DEMOGRAPHICS_ALIAS)
+        self.elastic.add_alias(DEMOGRAPHICS_ALIAS)
 
         logger.info("[Demography] End %s", self.elastic.index_url)
-
-    def add_alias(self, alias_name):
-        """
-        Add an alias to the index set in the elastic obj
-
-        :param alias_name: name of the alias
-
-        :returns: None
-        """
-        # check alias doesn't exist
-        r = self.requests.get(self.elastic.index_url + "/_alias", headers=HEADER_JSON, verify=False)
-        try:
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as ex:
-            logger.warning("Something went wrong when retrieving aliases on %s. Alias not set.",
-                           self.elastic.index_url)
-            logger.warning(ex)
-            return
-
-        aliases = r.json()[self.elastic.index]['aliases']
-        if alias_name in aliases:
-            logger.warning("Alias %s already exists on %s.", alias_name, self.elastic.index_url)
-            return
-
-        # add alias
-        alias_data = """
-        {
-            "actions": [
-                {
-                    "add": {
-                        "index": "%s",
-                        "alias": "%s"
-                    }
-                }
-            ]
-        }
-        """ % (self.elastic.index, alias_name)
-
-        r = self.requests.post(self.elastic.url + "/_aliases", headers=HEADER_JSON, verify=False, data=alias_data)
-        try:
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as ex:
-            logger.warning("Something went wrong when adding an alias on %s. Alias not set.",
-                           self.elastic.index_url)
-            logger.warning(ex)
-            return
-
-        logger.info("Alias %s created on %s.", alias_name, self.elastic.index_url)
 
     @staticmethod
     def authors_min_max_dates(date_field, author_field="author_uuid"):
