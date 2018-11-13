@@ -235,7 +235,7 @@ def get_connectors():
             }  # Will come from Registry
 
 
-def get_elastic(url, es_index, clean=None, backend=None):
+def get_elastic(url, es_index, clean=None, backend=None, es_aliases=None):
 
     mapping = None
 
@@ -248,7 +248,7 @@ def get_elastic(url, es_index, clean=None, backend=None):
         insecure = True
         elastic = ElasticSearch(url=url, index=es_index, mappings=mapping,
                                 clean=clean, insecure=insecure,
-                                analyzers=analyzers)
+                                analyzers=analyzers, aliases=es_aliases)
 
     except ElasticConnectException:
         logger.error("Can't connect to Elastic Search. Is it running?")
