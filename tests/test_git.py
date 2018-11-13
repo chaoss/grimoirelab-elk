@@ -41,7 +41,9 @@ class TestGit(TestBaseBackend):
 
     connector = "git"
     ocean_index = "test_" + connector
+    ocean_aliases = ["a", "b", "git-raw"]
     enrich_index = "test_" + connector + "_enrich"
+    enrich_aliases = ["c", "d", "git"]
 
     def test_has_identites(self):
         """Test value of has_identities method"""
@@ -55,6 +57,9 @@ class TestGit(TestBaseBackend):
         result = self._test_items_to_raw()
         self.assertEqual(result['items'], 9)
         self.assertEqual(result['raw'], 9)
+
+        aliases = self.ocean_backend.elastic.list_aliases()
+        self.assertListEqual(self.ocean_aliases, list(aliases.keys()))
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
@@ -73,6 +78,9 @@ class TestGit(TestBaseBackend):
             eitem = enrich_backend.get_rich_item(item)
             self.assertNotEqual(eitem['committer_name'], 'Unknown')
             self.assertNotEqual(eitem['author_name'], 'Unknown')
+
+        aliases = self.enrich_backend.elastic.list_aliases()
+        self.assertListEqual(self.enrich_aliases, list(aliases.keys()))
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""

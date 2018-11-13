@@ -143,6 +143,11 @@ class TestBaseBackend(unittest.TestCase):
         with open(os.path.join("data", self.connector + ".json")) as f:
             self.items = json.load(f)
 
+        self.ocean_backend = None
+        self.enrich_backend = None
+        self.ocean_aliases = []
+        self.enrich_aliases = []
+
     def tearDown(self):
         delete_raw = self.es_con + "/" + self.ocean_index
         requests.delete(delete_raw, verify=False)
@@ -155,11 +160,11 @@ class TestBaseBackend(unittest.TestCase):
 
         clean = True
         perceval_backend = None
-        ocean_backend = self.connectors[self.connector][1](perceval_backend)
-        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, ocean_backend)
-        ocean_backend.set_elastic(elastic_ocean)
+        self.ocean_backend = self.connectors[self.connector][1](perceval_backend)
+        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, self.ocean_backend, self.ocean_aliases)
+        self.ocean_backend.set_elastic(elastic_ocean)
 
-        raw_items = data2es(self.items, ocean_backend)
+        raw_items = data2es(self.items, self.ocean_backend)
 
         return {'items': len(self.items), 'raw': raw_items}
 
@@ -169,32 +174,32 @@ class TestBaseBackend(unittest.TestCase):
         # populate raw index
         perceval_backend = None
         clean = True
-        ocean_backend = self.connectors[self.connector][1](perceval_backend)
-        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, ocean_backend)
-        ocean_backend.set_elastic(elastic_ocean)
-        data2es(self.items, ocean_backend)
+        self.ocean_backend = self.connectors[self.connector][1](perceval_backend)
+        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, self.ocean_backend)
+        self.ocean_backend.set_elastic(elastic_ocean)
+        data2es(self.items, self.ocean_backend)
 
         # populate enriched index
         if not sortinghat and not projects:
-            enrich_backend = self.connectors[self.connector][2]()
+            self.enrich_backend = self.connectors[self.connector][2]()
         elif sortinghat and not projects:
-            enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
-                                                                db_user=self.db_user,
-                                                                db_password=self.db_password)
+            self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
+                                                                     db_user=self.db_user,
+                                                                     db_password=self.db_password)
         elif not sortinghat and projects:
-            enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
-                                                                db_user=self.db_user,
-                                                                db_password=self.db_password)
+            self.enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
+                                                                     db_user=self.db_user,
+                                                                     db_password=self.db_password)
 
-        elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, enrich_backend)
-        enrich_backend.set_elastic(elastic_enrich)
+        elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend, self.enrich_aliases)
+        self.enrich_backend.set_elastic(elastic_enrich)
 
         # Load SH identities
         if sortinghat:
-            load_identities(ocean_backend, enrich_backend)
+            load_identities(self.ocean_backend, self.enrich_backend)
 
-        raw_count = len([item for item in ocean_backend.fetch()])
-        enrich_count = enrich_backend.enrich_items(ocean_backend)
+        raw_count = len([item for item in self.ocean_backend.fetch()])
+        enrich_count = self.enrich_backend.enrich_items(self.ocean_backend)
         # self._test_csv_mappings(sortinghat)
 
         return {'raw': raw_count, 'enrich': enrich_count}
@@ -222,22 +227,22 @@ class TestBaseBackend(unittest.TestCase):
         # populate raw index
         perceval_backend = None
         clean = True
-        ocean_backend = self.connectors[self.connector][1](perceval_backend)
-        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, ocean_backend)
-        ocean_backend.set_elastic(elastic_ocean)
-        data2es(self.items, ocean_backend)
+        self.ocean_backend = self.connectors[self.connector][1](perceval_backend)
+        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, self.ocean_backend)
+        self.ocean_backend.set_elastic(elastic_ocean)
+        data2es(self.items, self.ocean_backend)
 
         # populate enriched index
-        enrich_backend = self.connectors[self.connector][2]()
-        load_identities(ocean_backend, enrich_backend)
-        enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
-                                                            db_user=self.db_user,
-                                                            db_password=self.db_password)
-        elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, enrich_backend)
-        enrich_backend.set_elastic(elastic_enrich)
-        enrich_backend.enrich_items(ocean_backend)
+        self.enrich_backend = self.connectors[self.connector][2]()
+        load_identities(self.ocean_backend, self.enrich_backend)
+        self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
+                                                                 db_user=self.db_user,
+                                                                 db_password=self.db_password)
+        elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
+        self.enrich_backend.set_elastic(elastic_enrich)
+        self.enrich_backend.enrich_items(self.ocean_backend)
 
-        total = refresh_identities(enrich_backend)
+        total = refresh_identities(self.enrich_backend)
         return total
 
     def _test_refresh_project(self):
@@ -246,21 +251,21 @@ class TestBaseBackend(unittest.TestCase):
         # populate raw index
         perceval_backend = None
         clean = True
-        ocean_backend = self.connectors[self.connector][1](perceval_backend)
-        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, ocean_backend)
-        ocean_backend.set_elastic(elastic_ocean)
-        data2es(self.items, ocean_backend)
+        self.ocean_backend = self.connectors[self.connector][1](perceval_backend)
+        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, self.ocean_backend)
+        self.ocean_backend.set_elastic(elastic_ocean)
+        data2es(self.items, self.ocean_backend)
 
         # populate enriched index
-        enrich_backend = self.connectors[self.connector][2](db_projects_map=DB_PROJECTS,
-                                                            db_user=self.db_user,
-                                                            db_password=self.db_password)
+        self.enrich_backend = self.connectors[self.connector][2](db_projects_map=DB_PROJECTS,
+                                                                 db_user=self.db_user,
+                                                                 db_password=self.db_password)
 
-        elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, enrich_backend)
-        enrich_backend.set_elastic(elastic_enrich)
-        enrich_backend.enrich_items(ocean_backend)
+        elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
+        self.enrich_backend.set_elastic(elastic_enrich)
+        self.enrich_backend.enrich_items(self.ocean_backend)
 
-        total = refresh_projects(enrich_backend)
+        total = refresh_projects(self.enrich_backend)
         return total
 
     def _test_study(self, test_study):
@@ -269,22 +274,22 @@ class TestBaseBackend(unittest.TestCase):
         # populate raw index
         perceval_backend = None
         clean = True
-        ocean_backend = self.connectors[self.connector][1](perceval_backend)
-        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, ocean_backend)
-        ocean_backend.set_elastic(elastic_ocean)
-        data2es(self.items, ocean_backend)
+        self.ocean_backend = self.connectors[self.connector][1](perceval_backend)
+        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, self.ocean_backend)
+        self.ocean_backend.set_elastic(elastic_ocean)
+        data2es(self.items, self.ocean_backend)
 
         # populate enriched index
-        enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
-                                                            db_user=self.db_user,
-                                                            db_password=self.db_password)
+        self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
+                                                                 db_user=self.db_user,
+                                                                 db_password=self.db_password)
 
-        elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, enrich_backend)
-        enrich_backend.set_elastic(elastic_enrich)
-        enrich_backend.enrich_items(ocean_backend)
+        elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
+        self.enrich_backend.set_elastic(elastic_enrich)
+        self.enrich_backend.enrich_items(self.ocean_backend)
 
-        for study in enrich_backend.studies:
+        for study in self.enrich_backend.studies:
             if test_study == study.__name__:
-                found = (study, ocean_backend, enrich_backend)
+                found = (study, self.ocean_backend, self.enrich_backend)
 
         return found
