@@ -36,6 +36,8 @@ from grimoire_elk.enriched.utils import unixtime_to_datetime, grimoire_con
 
 logger = logging.getLogger(__name__)
 
+HEADER_JSON = {"Content-Type": "application/json"}
+
 
 class ElasticConnectException(Exception):
     message = "Can't connect to ElasticSearch"
@@ -87,7 +89,7 @@ class ElasticSearch(object):
                 raise ElasticConnectException
 
     def __init__(self, url, index, mappings=None, clean=False,
-                 insecure=True, analyzers=None):
+                 insecure=True, analyzers=None, aliases=None):
         ''' clean: remove already existing index
             insecure: support https with invalid certificates
         '''
@@ -101,6 +103,8 @@ class ElasticSearch(object):
 
         # Valid index for elastic
         self.index = self.safe_index(index)
+        self.aliases = aliases
+
         self.index_url = self.url + "/" + self.index
         self.wait_bulk_seconds = 2  # time to wait to complete a bulk operation
 
@@ -130,6 +134,10 @@ class ElasticSearch(object):
         if mappings:
             map_dict = mappings.get_elastic_mappings(es_major=self.major)
             self.create_mappings(map_dict)
+
+        if aliases:
+            for alias in aliases:
+                self.add_alias(alias)
 
     def safe_put_bulk(self, url, bulk_json):
         """ Bulk PUT controlling unicode issues """
@@ -166,6 +174,60 @@ class ElasticSearch(object):
 
         logger.info("%i items uploaded to ES (%s)", inserted_items, url)
         return inserted_items
+
+    def list_aliases(self):
+        """List aliases linked to the index"""
+
+        # check alias doesn't exist
+        r = self.requests.get(self.index_url + "/_alias", headers=HEADER_JSON, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logger.warning("Something went wrong when retrieving aliases on %s.",
+                           self.index_url)
+            logger.warning(ex)
+            return
+
+        aliases = r.json()[self.index]['aliases']
+        return aliases
+
+    def add_alias(self, alias):
+        """
+        Add an alias to the index set in the elastic obj
+
+        :param alias: alias to add
+
+        :returns: None
+        """
+        aliases = self.list_aliases()
+        if alias in aliases:
+            logger.warning("Alias %s already exists on %s.", alias, self.index_url)
+            return
+
+        # add alias
+        alias_data = """
+        {
+            "actions": [
+                {
+                    "add": {
+                        "index": "%s",
+                        "alias": "%s"
+                    }
+                }
+            ]
+        }
+        """ % (self.index, alias)
+
+        r = self.requests.post(self.url + "/_aliases", headers=HEADER_JSON, verify=False, data=alias_data)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logger.warning("Something went wrong when adding an alias on %s. Alias not set.",
+                           self.index_url)
+            logger.warning(ex)
+            return
+
+        logger.info("Alias %s created on %s.", alias, self.index_url)
 
     def bulk_upload(self, items, field_id):
         """Upload in controlled packs items to ES using bulk API"""
