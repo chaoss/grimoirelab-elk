@@ -48,6 +48,7 @@ HEADER_JSON = {"Content-Type": "application/json"}
 GITHUB = 'https://github.com/'
 SH_GIT_COMMIT = 'github-commit'
 DEMOGRAPHY_COMMIT_MIN_DATE = '1980-01-01'
+AREAS_OF_CODE_ALIAS = 'git_areas_of_code'
 logger = logging.getLogger(__name__)
 
 
@@ -621,11 +622,11 @@ class GitEnrich(Enrich):
 
         # Create alias if output index exists and alias does not
         if out_conn.exists():
-            if not out_conn.exists_alias('git_areas_of_code'):
-                logger.info("[Areas of Code] Creating alias: git_areas_of_code")
-                out_conn.create_alias('git_areas_of_code')
+            if not out_conn.exists_alias(AREAS_OF_CODE_ALIAS):
+                logger.info("[Areas of Code] Creating alias: %s", AREAS_OF_CODE_ALIAS)
+                out_conn.create_alias(AREAS_OF_CODE_ALIAS)
             else:
-                logger.info("[Areas of Code] Alias already exists: git_areas_of_code.")
+                logger.info("[Areas of Code] Alias already exists: %s.", AREAS_OF_CODE_ALIAS)
 
         logger.info("[Areas of Code] End")
 
