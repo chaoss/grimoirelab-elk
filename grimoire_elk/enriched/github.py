@@ -64,6 +64,9 @@ class Mapping(BaseMapping):
                "assignee_geolocation": {
                    "type": "geo_point"
                },
+               "state": {
+                   "type": "keyword"
+               },
                "user_geolocation": {
                    "type": "geo_point"
                },
