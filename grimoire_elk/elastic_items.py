@@ -100,12 +100,13 @@ class ElasticItems():
         scroll_size = page['hits']['total']
 
         if scroll_size == 0:
-            logger.warning("No results found from %s", self.elastic.index_url)
+            logger.warning("No results found from %s", self.elastic.anonymize_url(self.elastic.index_url))
             return
 
         while scroll_size > 0:
 
-            logger.debug("Fetching from %s: %d received", self.elastic.index_url, len(page['hits']['hits']))
+            logger.debug("Fetching from %s: %d received", self.elastic.anonymize_url(self.elastic.index_url),
+                         len(page['hits']['hits']))
             for item in page['hits']['hits']:
                 eitem = item['_source']
                 yield eitem
@@ -117,7 +118,7 @@ class ElasticItems():
 
             scroll_size = len(page['hits']['hits'])
 
-        logger.debug("Fetching from %s: done receiving", self.elastic.index_url)
+        logger.debug("Fetching from %s: done receiving", self.elastic.anonymize_url(self.elastic.index_url))
 
     def get_elastic_items(self, elastic_scroll_id=None, _filter=None):
         """ Get the items from the index related to the backend applying and
@@ -229,10 +230,10 @@ class ElasticItems():
                 }
                 """ % (filters, order_query)
 
-            logger.debug("Raw query to %s\n%s", url, json.dumps(json.loads(query), indent=4))
+            logger.debug("Raw query to %s\n%s", self.elastic.anonymize_url(url),
+                         json.dumps(json.loads(query), indent=4))
             query_data = query
 
-        items = []
         rjson = None
         try:
             res = self.requests.post(url, data=query_data, headers=headers)
@@ -240,7 +241,6 @@ class ElasticItems():
             rjson = res.json()
         except Exception:
             # The index could not exists yet or it could be empty
-            logger.warning("No JSON found in %s" % (res.text))
-            logger.warning("No results found from %s" % (url))
+            logger.warning("No results found from %s", self.elastic.anonymize_url(url))
 
         return rjson
