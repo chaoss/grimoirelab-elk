@@ -99,11 +99,11 @@ class BugzillaEnrich(Enrich):
     @metadata
     def get_rich_item(self, item):
 
+        eitem = {}
+
         if 'bug_id' not in item['data']:
             logger.warning("Dropped bug without bug_id %s", item)
-            return None
-
-        eitem = {}
+            return eitem
 
         for f in self.RAW_FIELDS_COPY:
             if f in item:
@@ -179,3 +179,36 @@ class BugzillaEnrich(Enrich):
         eitem.update(self.get_grimoire_fields(eitem['creation_date'], "bug"))
 
         return eitem
+
+    def enrich_items(self, ocean_backend):
+
+        items_to_enrich = []
+        num_items = 0
+        ins_items = 0
+
+        for item in ocean_backend.fetch():
+            eitem = self.get_rich_item(item)
+
+            if 'uuid' not in eitem:
+                continue
+
+            items_to_enrich.append(eitem)
+
+            if len(items_to_enrich) < self.elastic.max_items_bulk:
+                continue
+
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+            items_to_enrich = []
+
+        if len(items_to_enrich) > 0:
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+
+        if num_items != ins_items:
+            missing = num_items - ins_items
+            logger.error("%s/%s missing items for Meetup", str(missing), str(num_items))
+        else:
+            logger.info("%s items inserted for Meetup", str(num_items))
+
+        return num_items

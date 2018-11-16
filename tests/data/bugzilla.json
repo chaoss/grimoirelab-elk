@@ -525,6 +525,11 @@
         "status_whiteboard": [
             {}
         ],
+        "summary": [
+            {
+                "__text__": "Crass application when showing notes"
+            }
+        ],
         "target_milestone": [
             {
                 "__text__": "---"
@@ -538,6 +543,16 @@
         "version": [
             {
                 "__text__": "unspecified"
+            }
+        ],
+        "votes": [
+            {
+                "__text__": "1000"
+            }
+        ],
+        "watchers": [
+            {
+                "__text__": "1000"
             }
         ]
     },
@@ -1810,4 +1825,323 @@
     "timestamp": 1518164764.342119,
     "updated_on": 1439404330.0,
     "uuid": "b4009442d38f4241a4e22e3e61b7cd8ef5ced35c"
+},{
+    "backend_name": "Bugzilla",
+    "backend_version": "0.8.0",
+    "category": "bug",
+    "data": {
+        "__text__": "\n          ",
+        "activity": [
+            {
+                "Added": "1",
+                "Removed": "0",
+                "What": "Attachment #172 Attachment is obsolete",
+                "When": "2013-06-25 11:57:23 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "high",
+                "Removed": "medium",
+                "What": "Priority",
+                "When": "2013-06-25 11:59:07 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "RESOLVED",
+                "Removed": "UNCONFIRMED",
+                "What": "Status",
+                "When": "2013-06-25 11:59:07 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "",
+                "Removed": "kesitesting@example.com",
+                "What": "CC",
+                "When": "2013-06-25 11:59:07 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "Macintosh",
+                "Removed": "All",
+                "What": "Hardware",
+                "When": "2013-06-25 11:59:07 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "",
+                "Removed": "354",
+                "What": "Blocks",
+                "When": "2013-06-25 11:59:07 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "",
+                "Removed": "350",
+                "What": "Depends on",
+                "When": "2013-06-25 11:59:07 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "dizquierdo@example.com",
+                "Removed": "sduenas@example.org",
+                "What": "Assignee",
+                "When": "2013-06-25 11:59:07 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "FIXED",
+                "Removed": "---",
+                "What": "Resolution",
+                "When": "2013-06-25 11:59:07 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "dizquierdo@example.com",
+                "Removed": "lcanas@example.com",
+                "What": "QA Contact",
+                "When": "2013-06-25 11:59:07 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "trivial",
+                "Removed": "normal",
+                "What": "Severity",
+                "When": "2013-06-25 11:59:07 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "Mac OS",
+                "Removed": "All",
+                "What": "OS",
+                "When": "2013-06-25 11:59:07 CEST",
+                "Who": "sduenas@example.org"
+            },
+            {
+                "Added": "354 , 349",
+                "Removed": "",
+                "What": "Blocks",
+                "When": "2013-06-25 12:04:11 CEST",
+                "Who": "dizquierdo@example.com"
+            },
+            {
+                "Added": "350",
+                "Removed": "",
+                "What": "Depends on",
+                "When": "2013-06-25 12:04:11 CEST",
+                "Who": "dizquierdo@example.com"
+            }
+        ],
+        "assigned_to": [
+            {
+                "__text__": "sduenasc@example.com",
+                "name": "Santiago Due\u00f1as"
+            }
+        ],
+        "blocked": [
+            {
+                "__text__": "349"
+            },
+            {
+                "__text__": "354"
+            }
+        ],
+        "bug_file_loc": [
+            {}
+        ],
+        "bug_severity": [
+            {
+                "__text__": "trivial"
+            }
+        ],
+        "bug_status": [
+            {
+                "__text__": "UNCONFIRMED"
+            }
+        ],
+        "cc": [
+            {
+                "__text__": "sduenas@example.org"
+            },
+            {
+                "__text__": "dizquierdo@example.com"
+            },
+            {
+                "__text__": "lcanas@example.com"
+            }
+        ],
+        "cclist_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "classification": [
+            {
+                "__text__": "Data Analysis Tools"
+            }
+        ],
+        "classification_id": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "component": [
+            {
+                "__text__": "general"
+            }
+        ],
+        "creation_ts": [
+            {
+                "__text__": "2015-05-23 06:06:06 +0200"
+            }
+        ],
+        "delta_ts": [
+            {
+                "__text__": "2015-08-12 18:32:10 +0200"
+            }
+        ],
+        "dependson": [
+            {
+                "__text__": "348"
+            },
+            {
+                "__text__": "350"
+            }
+        ],
+        "everconfirmed": [
+            {
+                "__text__": "0"
+            }
+        ],
+        "keywords": [
+            {}
+        ],
+        "long_desc": [
+            {
+                "__text__": "\n            ",
+                "bug_when": [
+                    {
+                        "__text__": "2013-06-25 11:49:36 +0200"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "1085"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "sduenas@example.org",
+                        "name": "Santiago Due\u00f1as"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attachid": [
+                    {
+                        "__text__": "172"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2013-06-25 11:55:46 +0200"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "1086"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "A mock patch for this bug"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "sduenas@example.org",
+                        "name": "Santiago Due\u00f1as"
+                    }
+                ]
+            }
+        ],
+        "op_sys": [
+            {
+                "__text__": "Mac OS"
+            }
+        ],
+        "priority": [
+            {
+                "__text__": "high"
+            }
+        ],
+        "product": [
+            {
+                "__text__": "CVSAnalY"
+            }
+        ],
+        "qa_contact": [
+            {
+                "__text__": "lcanas@example.com",
+                "name": "Luis Ca\u00f1as"
+            }
+        ],
+        "rep_platform": [
+            {
+                "__text__": "Macintosh"
+            }
+        ],
+        "reporter": [
+            {
+                "__text__": "carlosgc@example.com",
+                "name": "Carlos Garcia Campos"
+            }
+        ],
+        "reporter_accessible": [
+            {
+                "__text__": "1"
+            }
+        ],
+        "resolution": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "short_desc": [
+            {
+                "__text__": "Error parsing a log from git"
+            }
+        ],
+        "status_whiteboard": [
+            {}
+        ],
+        "target_milestone": [
+            {
+                "__text__": "---"
+            }
+        ],
+        "token": [
+            {
+                "__text__": "1372154665-271ef21ec6e2cc69f01b00d49d140277"
+            }
+        ],
+        "version": [
+            {
+                "__text__": "unspecified"
+            }
+        ]
+    },
+    "origin": "http://example.com",
+    "perceval_version": "0.9.10",
+    "tag": "http://example.com",
+    "timestamp": 1518164764.342119,
+    "updated_on": 1439404330.0,
+    "uuid": "b4009442d38f4241a4e22e3e61b7cd8ef5ced35x"
 }]

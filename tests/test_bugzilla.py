@@ -42,33 +42,37 @@ class TestBugzilla(TestBaseBackend):
         enrich_backend = self.connectors[self.connector][2]()
         self.assertTrue(enrich_backend.has_identities())
 
+    def test_get_fields_uuid(self):
+        enrich_backend = self.connectors[self.connector][2]()
+        self.assertListEqual(enrich_backend.get_fields_uuid(), ["assigned_to_uuid", "reporter_uuid"])
+
     def test_items_to_raw(self):
         """Test whether JSON items are properly inserted into ES"""
 
         result = self._test_items_to_raw()
 
-        self.assertEqual(result['items'], 7)
-        self.assertEqual(result['raw'], 7)
+        self.assertEqual(result['items'], 8)
+        self.assertEqual(result['raw'], 8)
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
-        self.assertEqual(result['raw'], 7)
+        self.assertEqual(result['raw'], 8)
         self.assertEqual(result['enrich'], 7)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
-        self.assertEqual(result['raw'], 7)
+        self.assertEqual(result['raw'], 8)
         self.assertEqual(result['enrich'], 7)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
-        self.assertEqual(result['raw'], 7)
+        self.assertEqual(result['raw'], 8)
         self.assertEqual(result['enrich'], 7)
 
     def test_refresh_identities(self):
