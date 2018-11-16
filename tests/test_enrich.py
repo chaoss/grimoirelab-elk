@@ -597,7 +597,8 @@ class TestEnrich(unittest.TestCase):
             self._enrich.elastic.add_alias(DEMOGRAPHICS_ALIAS)
 
         self.assertEqual(cm.output[0],
-                         'INFO:grimoire_elk.elastic:Alias %s created on %s.' % (DEMOGRAPHICS_ALIAS, tmp_index_url))
+                         'INFO:grimoire_elk.elastic:Alias %s created on %s.'
+                         % (DEMOGRAPHICS_ALIAS, self._enrich.elastic.anonymize_url(tmp_index_url)))
 
         r = self._enrich.requests.get(self._enrich.elastic.index_url + "/_alias", headers=HEADER_JSON, verify=False)
         self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[self._enrich.elastic.index]['aliases'])
@@ -607,8 +608,8 @@ class TestEnrich(unittest.TestCase):
             self._enrich.elastic.add_alias(DEMOGRAPHICS_ALIAS)
 
         self.assertEqual(cm.output[0],
-                         'WARNING:grimoire_elk.elastic:Alias %s '
-                         'already exists on %s.' % (DEMOGRAPHICS_ALIAS, tmp_index_url))
+                         'WARNING:grimoire_elk.elastic:Alias %s already exists on %s.'
+                         % (DEMOGRAPHICS_ALIAS, self._enrich.elastic.anonymize_url(tmp_index_url)))
 
         requests.delete(tmp_index_url, verify=False)
 
