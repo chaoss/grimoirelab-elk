@@ -15,7 +15,7 @@ display_username,keyword
 first_answer,long
 first_reply_time,float
 grimoire_creation_date,date
-id,long
+id,keyword
 is_accepted_answer,long
 is_discourse_answer,long
 is_discourse_question,long
