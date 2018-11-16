@@ -28,16 +28,15 @@ import logging
 import requests
 import sys
 
-from datetime import datetime as dt, timedelta
+from datetime import timedelta
 
 import pkg_resources
-from dateutil import parser
 from functools import lru_cache
 
 from elasticsearch import Elasticsearch
 
 from perceval.backend import find_signature_parameters
-from grimoirelab_toolkit import datetime as gl_dt
+from grimoirelab_toolkit.datetime import (datetime_utcnow, str_to_datetime)
 
 from ..elastic_items import ElasticItems
 from .study_ceres_onion import ESOnionConnector, onion_study
@@ -91,7 +90,7 @@ def metadata(func):
         metadata = {
             'metadata__gelk_version': self.gelk_version,
             'metadata__gelk_backend_name': self.__class__.__name__,
-            'metadata__enriched_on': dt.utcnow().isoformat()
+            'metadata__enriched_on': datetime_utcnow().isoformat()
         }
         eitem.update(metadata)
         return eitem
@@ -483,7 +482,7 @@ class Enrich(ElasticItems):
 
         grimoire_date = None
         try:
-            grimoire_date = parser.parse(creation_date).isoformat()
+            grimoire_date = str_to_datetime(creation_date).isoformat()
         except Exception as ex:
             pass
 
@@ -731,7 +730,7 @@ class Enrich(ElasticItems):
         if not roles:
             roles = [author_field]
 
-        date = parser.parse(eitem[self.get_field_date()])
+        date = str_to_datetime(eitem[self.get_field_date()])
 
         for rol in roles:
             if rol + "_id" not in eitem:
@@ -780,9 +779,9 @@ class Enrich(ElasticItems):
             roles = [author_field]
 
         if not date_field:
-            item_date = parser.parse(item[self.get_field_date()])
+            item_date = str_to_datetime(item[self.get_field_date()])
         else:
-            item_date = parser.parse(item[date_field])
+            item_date = str_to_datetime(item[date_field])
 
         users_data = self.get_users_data(item)
 
@@ -918,10 +917,9 @@ class Enrich(ElasticItems):
 
         if latest_date:
             logger.info("[Onion] Latest enrichment date: " + latest_date.isoformat())
-            now = gl_dt.datetime_utcnow()
             update_after = latest_date + timedelta(seconds=seconds)
             logger.info("[Onion] Update after date: " + update_after.isoformat())
-            if update_after >= now:
+            if update_after >= datetime_utcnow():
                 logger.info("[Onion] Too soon to update. Next update will be at " + update_after.isoformat())
                 return
 
