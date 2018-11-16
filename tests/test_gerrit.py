@@ -73,11 +73,11 @@ class TestGerrit(TestBaseBackend):
                 study(ocean_backend, enrich_backend, date_field="grimoire_creation_date")
 
             self.assertEqual(cm.output[0],
-                             'INFO:grimoire_elk.enriched.enrich:[Demography] Starting study '
-                             '%s/test_gerrit_enrich' % self.es_con)
+                             'INFO:grimoire_elk.enriched.enrich:[Demography] Starting study %s/test_gerrit_enrich'
+                             % enrich_backend.elastic.anonymize_url(self.es_con))
             self.assertEqual(cm.output[-1],
-                             'INFO:grimoire_elk.enriched.enrich:[Demography] '
-                             'End %s/test_gerrit_enrich' % self.es_con)
+                             'INFO:grimoire_elk.enriched.enrich:[Demography] End %s/test_gerrit_enrich'
+                             % enrich_backend.elastic.anonymize_url(self.es_con))
 
         time.sleep(1)  # HACK: Wait until git enrich index has been written
         for item in enrich_backend.fetch():
