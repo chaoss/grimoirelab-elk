@@ -15,7 +15,7 @@ author_uuid,keyword
 comment_count,long
 first_answer,long
 grimoire_creation_date,date
-id,long
+id,keyword
 is_accepted_answer,long
 is_askbot_answer,long
 is_askbot_comment,long
