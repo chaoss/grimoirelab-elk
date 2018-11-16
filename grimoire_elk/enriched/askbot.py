@@ -54,6 +54,9 @@ class Mapping(BaseMapping):
                 },
                 "summary": {
                   "type": "text"
+                },
+                "id": {
+                  "type": "keyword"
                 }
            }
         } """
