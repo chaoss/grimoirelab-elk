@@ -602,7 +602,10 @@ class GitEnrich(Enrich):
                              in_index="git-raw",
                              out_index=GIT_AOC_ENRICHED,
                              sort_on_field='metadata__timestamp'):
-        logger.info("[Areas of Code] Starting study")
+
+        log_prefix = "[git] study areas_of_code"
+
+        logger.info(log_prefix + " Starting study - Input: " + in_index + " Output: " + out_index)
 
         # Creating connections
         es_in = Elasticsearch([ocean_backend.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
@@ -613,7 +616,7 @@ class GitEnrich(Enrich):
 
         exists_index = out_conn.exists()
         if no_incremental or not exists_index:
-            logger.info("[Areas of Code] Creating out ES index")
+            logger.info(log_prefix + " Creating out ES index")
             # Initialize out index
             filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/git_aoc.json')
             out_conn.create_index(filename, delete=exists_index)
@@ -623,12 +626,12 @@ class GitEnrich(Enrich):
         # Create alias if output index exists and alias does not
         if out_conn.exists():
             if not out_conn.exists_alias(AREAS_OF_CODE_ALIAS):
-                logger.info("[Areas of Code] Creating alias: %s", AREAS_OF_CODE_ALIAS)
+                logger.info(log_prefix + " Creating alias: %s", AREAS_OF_CODE_ALIAS)
                 out_conn.create_alias(AREAS_OF_CODE_ALIAS)
             else:
-                logger.info("[Areas of Code] Alias already exists: %s.", AREAS_OF_CODE_ALIAS)
+                logger.info(log_prefix + " Alias already exists: %s.", AREAS_OF_CODE_ALIAS)
 
-        logger.info("[Areas of Code] End")
+        logger.info(log_prefix + " End")
 
     def enrich_onion(self, ocean_backend, enrich_backend,
                      no_incremental=False,
