@@ -25,6 +25,7 @@
 from dateutil import parser
 import json
 import logging
+import re
 import sys
 from time import time
 
@@ -84,9 +85,15 @@ class ElasticSearch(object):
                 return version_major
             except Exception:
                 logger.error("Could not read proper welcome message from url %s",
-                             url)
+                             ElasticSearch.anonymize_url(url))
                 logger.error("Message read: %s", res.text)
                 raise ElasticConnectException
+
+    @staticmethod
+    def anonymize_url(url):
+        anonymized = re.sub('^http.*@', 'http://', url)
+
+        return anonymized
 
     def __init__(self, url, index, mappings=None, clean=False,
                  insecure=True, analyzers=None, aliases=None):
@@ -97,7 +104,7 @@ class ElasticSearch(object):
         # Get major version of Elasticsearch instance
         self.major = self._check_instance(url, insecure)
         logger.debug("Found version of ES instance at %s: %s.",
-                     url, self.major)
+                     self.anonymize_url(url), self.major)
 
         self.url = url
 
@@ -119,10 +126,10 @@ class ElasticSearch(object):
                                   headers=headers)
             if r.status_code != 200:
                 logger.error("Can't create index %s (%s)",
-                             self.index_url, r.status_code)
+                             self.anonymize_url(self.index_url), r.status_code)
                 raise ElasticWriteException()
             else:
-                logger.info("Created index " + self.index_url)
+                logger.info("Created index " + self.anonymize_url(self.index_url))
         else:
             if clean:
                 res = self.requests.delete(self.index_url)
@@ -130,7 +137,7 @@ class ElasticSearch(object):
                 res = self.requests.put(self.index_url, data=analyzers,
                                         headers=headers)
                 res.raise_for_status()
-                logger.info("Deleted and created index " + self.index_url)
+                logger.info("Deleted and created index " + self.anonymize_url(self.index_url))
         if mappings:
             map_dict = mappings.get_elastic_mappings(es_major=self.major)
             self.create_mappings(map_dict)
@@ -161,7 +168,7 @@ class ElasticSearch(object):
             failed_items = [item['index'] for item in result['items'] if 'error' in item['index']]
             error = str(failed_items[0]['error'])
 
-            logger.error("Failed to insert data to ES: %s, %s", error, url)
+            logger.error("Failed to insert data to ES: %s, %s", error, self.anonymize_url(url))
 
         inserted_items = len(result['items']) - len(failed_items)
 
@@ -172,7 +179,7 @@ class ElasticSearch(object):
         except ELKError:
             pass
 
-        logger.info("%i items uploaded to ES (%s)", inserted_items, url)
+        logger.info("%i items uploaded to ES (%s)", inserted_items, self.anonymize_url(url))
         return inserted_items
 
     def list_aliases(self):
@@ -184,7 +191,7 @@ class ElasticSearch(object):
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
             logger.warning("Something went wrong when retrieving aliases on %s.",
-                           self.index_url)
+                           self.anonymize_url(self.index_url))
             logger.warning(ex)
             return
 
@@ -201,7 +208,7 @@ class ElasticSearch(object):
         """
         aliases = self.list_aliases()
         if alias in aliases:
-            logger.warning("Alias %s already exists on %s.", alias, self.index_url)
+            logger.warning("Alias %s already exists on %s.", alias, self.anonymize_url(self.index_url))
             return
 
         # add alias
@@ -223,11 +230,11 @@ class ElasticSearch(object):
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
             logger.warning("Something went wrong when adding an alias on %s. Alias not set.",
-                           self.index_url)
+                           self.anonymize_url(self.index_url))
             logger.warning(ex)
             return
 
-        logger.info("Alias %s created on %s.", alias, self.index_url)
+        logger.info("Alias %s created on %s.", alias, self.anonymize_url(self.index_url))
 
     def bulk_upload(self, items, field_id):
         """Upload in controlled packs items to ES using bulk API"""
@@ -241,7 +248,7 @@ class ElasticSearch(object):
 
         url = self.index_url + '/items/_bulk'
 
-        logger.debug("Adding items to %s (in %i packs)" % (url, self.max_items_bulk))
+        logger.debug("Adding items to %s (in %i packs)", self.anonymize_url(url), self.max_items_bulk)
         task_init = time()
 
         for item in items:
@@ -337,7 +344,7 @@ class ElasticSearch(object):
             try:
                 res.raise_for_status()
             except requests.exceptions.HTTPError:
-                logger.warning("Can't add mapping %s: %s", url_map, not_analyze_strings)
+                logger.warning("Can't add mapping %s: %s", self.anonymize_url(url_map), not_analyze_strings)
 
     def get_last_date(self, field, filters_=[]):
         '''
@@ -397,7 +404,7 @@ class ElasticSearch(object):
         { "size": 0, %s  %s
         } ''' % (data_query, data_agg)
 
-        logger.debug("%s %s", url, data_json)
+        logger.debug("%s %s", self.anonymize_url(url), data_json)
 
         headers = {"Content-Type": "application/json"}
 
