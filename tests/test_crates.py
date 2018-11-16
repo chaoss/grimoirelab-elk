@@ -42,6 +42,12 @@ class TestCrates(TestBaseBackend):
         enrich_backend = self.connectors[self.connector][2]()
         self.assertTrue(enrich_backend.has_identities())
 
+    def test_get_field_event_unique_id(self):
+        """Test value of field event unique id"""
+
+        enrich_backend = self.connectors[self.connector][2]()
+        self.assertEqual(enrich_backend.get_field_event_unique_id(), "download_sample_id")
+
     def test_items_to_raw(self):
         """Test whether JSON items are properly inserted into ES"""
 
