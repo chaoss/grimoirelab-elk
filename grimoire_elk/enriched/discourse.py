@@ -266,8 +266,8 @@ class DiscourseEnrich(Enrich):
             eitem = self.get_rich_item(item)
             items_to_enrich.append(eitem)
 
-            rich_item_comments = self.get_rich_item_answers(item)
-            items_to_enrich.extend(rich_item_comments)
+            rich_item_answers = self.get_rich_item_answers(item)
+            items_to_enrich.extend(rich_item_answers)
 
             if len(items_to_enrich) < MAX_SIZE_BULK_ENRICHED_ITEMS:
                 continue
