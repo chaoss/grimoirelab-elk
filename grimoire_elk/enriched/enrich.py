@@ -862,6 +862,12 @@ class Enrich(ElasticItems):
             # Find the uuid for a given id.
             id = utils.uuid(backend_name, email=iden['email'],
                             name=iden['name'], username=iden['username'])
+
+            if not id:
+                logger.warning("Id not found in SortingHat for name: %s, email: %s and username: %s in %s",
+                               str(iden['name']), str(iden['email']), str(iden['username']), backend_name)
+                return sh_ids
+
             with self.sh_db.connect() as session:
                 identity_found = api.find_identity(session, id)
                 sh_ids['id'] = identity_found.id
