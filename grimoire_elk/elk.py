@@ -289,7 +289,8 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
 
 
 def refresh_projects(enrich_backend):
-    logger.debug("Refreshing project field in %s", enrich_backend.elastic.index_url)
+    logger.debug("Refreshing project field in %s",
+                 enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
     total = 0
 
     eitems = enrich_backend.fetch()
@@ -329,7 +330,8 @@ def refresh_identities(enrich_backend, author_field=None, author_values=None):
             eitem.update(new_identities)
             yield eitem
 
-    logger.debug("Refreshing identities fields from %s", enrich_backend.elastic.index_url)
+    logger.debug("Refreshing identities fields from %s",
+                 enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
 
     total = 0
 
@@ -591,7 +593,8 @@ def enrich_backend(url, clean, backend_name, backend_params,
             logger.info("Running only studies (no SH and no enrichment)")
             do_studies(ocean_backend, enrich_backend, studies_args)
         elif do_refresh_projects:
-            logger.info("Refreshing project field in %s", enrich_backend.elastic.index_url)
+            logger.info("Refreshing project field in %s",
+                        enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_projects(enrich_backend)
             enrich_backend.elastic.bulk_upload(eitems, field_id)
@@ -606,7 +609,8 @@ def enrich_backend(url, clean, backend_name, backend_params,
                 author_attr = 'author_uuid'
                 author_values = [author_uuid]
 
-            logger.info("Refreshing identities fields in %s", enrich_backend.elastic.index_url)
+            logger.info("Refreshing identities fields in %s",
+                        enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
 
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_identities(enrich_backend, author_attr, author_values)
@@ -616,7 +620,8 @@ def enrich_backend(url, clean, backend_name, backend_params,
             elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
             ocean_backend.set_elastic(elastic_ocean)
 
-            logger.info("Adding enrichment data to %s", enrich_backend.elastic.index_url)
+            logger.info("Adding enrichment data to %s",
+                        enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
 
             if db_sortinghat and enrich_backend.has_identities():
                 # FIXME: This step won't be done from enrich in the future
