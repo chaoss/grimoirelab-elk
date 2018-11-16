@@ -891,7 +891,9 @@ class Enrich(ElasticItems):
                      contribs_field, timeframe_field, sort_on_field,
                      seconds=ONION_INTERVAL, no_incremental=False):
 
-        logger.info("[Onion] Starting study")
+        log_prefix = "[" + data_source + "] study onion"
+
+        logger.info(log_prefix + "  Starting study - Input: " + in_index + " Output: " + out_index)
 
         # Creating connections
         es = Elasticsearch([enrich_backend.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
@@ -907,7 +909,7 @@ class Enrich(ElasticItems):
                                     read_only=False)
 
         if not in_conn.exists():
-            logger.info("[Onion] Missing index %s", in_index)
+            logger.info(log_prefix + " Missing index %s", in_index)
             return
 
         # Check last execution date
@@ -916,15 +918,15 @@ class Enrich(ElasticItems):
             latest_date = out_conn.latest_enrichment_date()
 
         if latest_date:
-            logger.info("[Onion] Latest enrichment date: " + latest_date.isoformat())
+            logger.info(log_prefix + " Latest enrichment date: " + latest_date.isoformat())
             update_after = latest_date + timedelta(seconds=seconds)
-            logger.info("[Onion] Update after date: " + update_after.isoformat())
+            logger.info(log_prefix + " Update after date: " + update_after.isoformat())
             if update_after >= datetime_utcnow():
-                logger.info("[Onion] Too soon to update. Next update will be at " + update_after.isoformat())
+                logger.info(log_prefix + " Too soon to update. Next update will be at " + update_after.isoformat())
                 return
 
         # Onion currently does not support incremental option
-        logger.info("[Onion] Creating out ES index")
+        logger.info(log_prefix + " Creating out ES index")
         # Initialize out index
         filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/onion.json')
         out_conn.create_index(filename, delete=out_conn.exists())
@@ -934,10 +936,10 @@ class Enrich(ElasticItems):
         # Create alias if output index exists (index is always created from scratch, so
         # alias need to be created each time)
         if out_conn.exists() and not out_conn.exists_alias(out_index, ONION_ALIAS):
-            logger.info("[Onion] Creating alias: %s", ONION_ALIAS)
+            logger.info(log_prefix + " Creating alias: %s", ONION_ALIAS)
             out_conn.create_alias(ONION_ALIAS)
 
-        logger.info("[Onion] This is the end.")
+        logger.info(log_prefix + " This is the end.")
 
     def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
                           author_field="author_uuid"):

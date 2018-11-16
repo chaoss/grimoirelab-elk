@@ -152,6 +152,7 @@ class ESConnector(Connector):
         self._es_index = es_index
         self._sort_on_field = sort_on_field
         self._read_only = read_only
+        self.__log_prefix = "[" + es_index + "] study "
 
     def read_item(self, from_date=None):
         """Read items and return them one by one.
@@ -217,7 +218,7 @@ class ESConnector(Connector):
             docs.append(doc)
         # TODO exception and error handling
         helpers.bulk(self._es_conn, docs)
-        logger.info("Written: " + str(len(docs)))
+        logger.info(self.__log_prefix + " Written: " + str(len(docs)))
 
     def create_index(self, mappings_file, delete=True):
         """Create a new index.
@@ -230,7 +231,7 @@ class ESConnector(Connector):
             raise IOError("Cannot write, Connector created as Read Only")
 
         if delete:
-            logger.info("Deleting index " + self._es_index)
+            logger.info(self.__log_prefix + " Deleting index " + self._es_index)
             self._es_conn.indices.delete(self._es_index, ignore=[400, 404])
 
         # Read Mapping
@@ -259,7 +260,8 @@ class ESConnector(Connector):
 
             aggs = response.to_dict()['aggregations']
             if aggs['max_date']['value'] is None:
-                logger.debug("No data for " + self._sort_on_field + " field found in " + self._es_index + " index")
+                logger.debug(self.__log_prefix + " No data for " + self._sort_on_field
+                             + " field found in " + self._es_index + " index")
 
             else:
                 # Incremental case: retrieve items from last item in ES write index

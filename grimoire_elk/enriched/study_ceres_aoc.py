@@ -42,6 +42,11 @@ class ESPandasConnector(ESConnector):
     Writing is also ready to work directly with Pandas dataframes.
     """
 
+    def __init__(self, es_conn, es_index, sort_on_field='metadata__timestamp', read_only=True):
+
+        super().__init__(es_conn, es_index, sort_on_field, read_only)
+        self.__log_prefix = "[" + es_index + "] study areas_of_code"
+
     @staticmethod
     def make_hashcode(uuid, filepath, file_event):
         """Generate a SHA1 based on the given arguments.
@@ -126,7 +131,7 @@ class ESPandasConnector(ESConnector):
             docs.append(doc)
         # TODO exception and error handling
         helpers.bulk(self._es_conn, docs)
-        logger.info("Written: " + str(len(docs)))
+        logger.info(self.__log_prefix + " Written: " + str(len(docs)))
 
 
 class AreasOfCode(CeresBase):
@@ -148,6 +153,7 @@ class AreasOfCode(CeresBase):
         super().__init__(in_connector, out_connector, block_size)
 
         self._git_enrich = git_enrich
+        self.__log_prefix = "[git] study areas_of_code"
 
     def process(self, items_block):
         """Process items to add file related information.
@@ -159,41 +165,41 @@ class AreasOfCode(CeresBase):
         :param items_block: items to be processed. Expects to find ElasticSearch hits _source part only.
         """
 
-        logger.info("New commits: " + str(len(items_block)))
+        logger.info(self.__log_prefix + " New commits: " + str(len(items_block)))
 
         # Create events from commits
         git_events = Git(items_block, self._git_enrich)
         events_df = git_events.eventize(2)
 
-        logger.info("New events: " + str(len(events_df)))
+        logger.info(self.__log_prefix + " New events: " + str(len(events_df)))
 
         if len(events_df) > 0:
             # Filter information
             data_filtered = FilterRows(events_df)
             events_df = data_filtered.filter_(["filepath"], "-")
 
-            logger.info("New events filtered: " + str(len(events_df)))
+            logger.info(self.__log_prefix + " New events filtered: " + str(len(events_df)))
 
             events_df['message'] = events_df['message'].str.slice(stop=AreasOfCode.MESSAGE_MAX_SIZE)
-            logger.info("Remove message content")
+            logger.info(self.__log_prefix + " Remove message content")
 
             # Add filetype info
             enriched_filetype = FileType(events_df)
             events_df = enriched_filetype.enrich('filepath')
 
-            logger.info("New Filetype events: " + str(len(events_df)))
+            logger.info(self.__log_prefix + " New Filetype events: " + str(len(events_df)))
 
             # Split filepath info
             enriched_filepath = FilePath(events_df)
             events_df = enriched_filepath.enrich('filepath')
 
-            logger.info("New Filepath events: " + str(len(events_df)))
+            logger.info(self.__log_prefix + " New Filepath events: " + str(len(events_df)))
 
             # Deal with surrogates
             convert = ToUTF8(events_df)
             events_df = convert.enrich(["owner"])
 
-        logger.info("Final new events: " + str(len(events_df)))
+        logger.info(self.__log_prefix + " Final new events: " + str(len(events_df)))
 
         return self.ProcessResults(processed=len(events_df), out_items=events_df)
 
