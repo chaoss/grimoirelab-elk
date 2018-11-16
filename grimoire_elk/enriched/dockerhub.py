@@ -137,13 +137,13 @@ class DockerHubEnrich(Enrich):
 
         url = self.elastic.index_url + '/items/_bulk'
 
-        logger.debug("Adding items to %s (in %i packs)", url, max_items)
+        logger.debug("Adding items to %s (in %i packs)", self.elastic.anonymize_url(url), max_items)
 
         for item in items:
             if current >= max_items:
                 total += self.elastic.safe_put_bulk(url, bulk_json)
                 json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
-                logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
+                logger.debug("Added %i items to %s (%0.2f MB)", total, self.elastic.anonymize_url(url), json_size)
                 bulk_json = ""
                 current = 0
 
