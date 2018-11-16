@@ -347,7 +347,7 @@ class Enrich(ElasticItems):
 
         url = self.elastic.index_url + '/items/_bulk'
 
-        logger.debug("Adding items to %s (in %i packs)", url, max_items)
+        logger.debug("Adding items to %s (in %i packs)", self.elastic.anonymize_url(url), max_items)
 
         if events:
             logger.debug("Adding events items")
@@ -357,7 +357,7 @@ class Enrich(ElasticItems):
                 try:
                     total += self.elastic.safe_put_bulk(url, bulk_json)
                     json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
-                    logger.debug("Added %i items to %s (%0.2f MB)", total, url, json_size)
+                    logger.debug("Added %i items to %s (%0.2f MB)", total, self.elastic.anonymize_url(url), json_size)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
                     logger.error("Unicode error in enriched items")
@@ -952,7 +952,7 @@ class Enrich(ElasticItems):
 
         :return: None
         """
-        logger.info("[Demography] Starting study %s" % self.elastic.index_url)
+        logger.info("[Demography] Starting study %s", self.elastic.anonymize_url(self.elastic.index_url))
 
         # The first step is to find the current min and max date for all the authors
         authors_min_max_data = {}
@@ -991,7 +991,7 @@ class Enrich(ElasticItems):
 
         self.elastic.add_alias(DEMOGRAPHICS_ALIAS)
 
-        logger.info("[Demography] End %s", self.elastic.index_url)
+        logger.info("[Demography] End %s", self.elastic.anonymize_url(self.elastic.index_url))
 
     @staticmethod
     def authors_min_max_dates(date_field, author_field="author_uuid"):

@@ -231,7 +231,7 @@ class GitHubEnrich(Enrich):
 
         url = self.elastic.url + GEOLOCATION_INDEX + "geolocations/_bulk"
 
-        logger.debug("Adding geoloc to %s (in %i packs)" % (url, max_items))
+        logger.debug("Adding geoloc to %s (in %i packs)", self.elastic.anonymize_url(url), max_items)
 
         for loc in self.geolocations:
             if current >= max_items:
@@ -385,7 +385,8 @@ class GitHubEnrich(Enrich):
         # pull_requests index search url in which the data is to be updated
         enrich_index_search_url = self.elastic.index_url + "/_search"
 
-        logger.info("Doing enrich_pull_request study for index {}".format(self.elastic.index_url))
+        logger.info("Doing enrich_pull_request study for index {}"
+                    .format(self.elastic.anonymize_url(self.elastic.index_url)))
         time.sleep(1)  # HACK: Wait until git enrich index has been written
 
         def make_request(url, error_msg, data=None, req_type="GET"):

@@ -434,7 +434,7 @@ def kafka_kip(enrich):
 
         logger.info("Total eitems with kafka kip fields %i", total)
 
-    logger.debug("Doing kafka_kip study from %s", enrich.elastic.index_url)
+    logger.debug("Doing kafka_kip study from %s", enrich.elastic.anonymize_url(enrich.elastic.index_url))
 
     # First iteration with the basic fields
     eitems = add_kip_fields(enrich)
