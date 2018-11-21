@@ -53,48 +53,6 @@ class ElasticSearch(object):
     max_items_bulk = 1000
     max_items_clause = 1000  # max items in search clause (refresh identities)
 
-    @classmethod
-    def safe_index(cls, unique_id):
-        """ Return a valid elastic index generated from unique_id """
-        index = unique_id
-        if unique_id:
-            index = unique_id.replace("/", "_").lower()
-        return index
-
-    @staticmethod
-    def _check_instance(url, insecure):
-        """Checks if there is an instance of Elasticsearch in url.
-
-        Actually, it checks if GET on the url returns a JSON document
-        with a field tagline "You know, for search",
-        and a field version.number.
-
-        :value      url: url of the instance to check
-        :value insecure: don't verify ssl connection (boolean)
-        :returns:        major version of Ellasticsearch, as string.
-        """
-
-        res = grimoire_con(insecure).get(url)
-        if res.status_code != 200:
-            logger.error("Didn't get 200 OK from url %s", url)
-            raise ElasticConnectException
-        else:
-            try:
-                version_str = res.json()['version']['number']
-                version_major = version_str.split('.')[0]
-                return version_major
-            except Exception:
-                logger.error("Could not read proper welcome message from url %s",
-                             ElasticSearch.anonymize_url(url))
-                logger.error("Message read: %s", res.text)
-                raise ElasticConnectException
-
-    @staticmethod
-    def anonymize_url(url):
-        anonymized = re.sub('^http.*@', 'http://', url)
-
-        return anonymized
-
     def __init__(self, url, index, mappings=None, clean=False,
                  insecure=True, analyzers=None, aliases=None):
         ''' clean: remove already existing index
@@ -144,7 +102,54 @@ class ElasticSearch(object):
 
         if aliases:
             for alias in aliases:
+                if self.alias_in_use(alias):
+                    logger.warning("Alias %s won't be set on %s, it already exists on %s",
+                                   alias, self.anonymize_url(self.index_url), self.anonymize_url(self.url))
+                    continue
+
                 self.add_alias(alias)
+
+    @classmethod
+    def safe_index(cls, unique_id):
+        """ Return a valid elastic index generated from unique_id """
+        index = unique_id
+        if unique_id:
+            index = unique_id.replace("/", "_").lower()
+        return index
+
+    @staticmethod
+    def _check_instance(url, insecure):
+        """Checks if there is an instance of Elasticsearch in url.
+
+        Actually, it checks if GET on the url returns a JSON document
+        with a field tagline "You know, for search",
+        and a field version.number.
+
+        :value      url: url of the instance to check
+        :value insecure: don't verify ssl connection (boolean)
+        :returns:        major version of Ellasticsearch, as string.
+        """
+
+        res = grimoire_con(insecure).get(url)
+        if res.status_code != 200:
+            logger.error("Didn't get 200 OK from url %s", url)
+            raise ElasticConnectException
+        else:
+            try:
+                version_str = res.json()['version']['number']
+                version_major = version_str.split('.')[0]
+                return version_major
+            except Exception:
+                logger.error("Could not read proper welcome message from url %s",
+                             ElasticSearch.anonymize_url(url))
+                logger.error("Message read: %s", res.text)
+                raise ElasticConnectException
+
+    @staticmethod
+    def anonymize_url(url):
+        anonymized = re.sub('^http.*@', 'http://', url)
+
+        return anonymized
 
     def safe_put_bulk(self, url, bulk_json):
         """ Bulk PUT controlling unicode issues """
@@ -182,6 +187,25 @@ class ElasticSearch(object):
         logger.info("%i items uploaded to ES (%s)", inserted_items, self.anonymize_url(url))
         return inserted_items
 
+    def all_es_aliases(self):
+        """List all aliases used in ES"""
+
+        r = self.requests.get(self.url + "/_aliases", headers=HEADER_JSON, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logger.warning("Something went wrong when retrieving aliases on %s.",
+                           self.anonymize_url(self.index_url))
+            logger.warning(ex)
+            return
+
+        aliases = []
+        for index in r.json().keys():
+            aliases.extend(list(r.json()[index]['aliases'].keys()))
+
+        aliases = list(set(aliases))
+        return aliases
+
     def list_aliases(self):
         """List aliases linked to the index"""
 
@@ -198,9 +222,17 @@ class ElasticSearch(object):
         aliases = r.json()[self.index]['aliases']
         return aliases
 
-    def add_alias(self, alias):
+    def alias_in_use(self, alias):
+        """Check that an alias is already used in the ElasticSearch database
+
+        :param alias: target alias
+        :return: bool
         """
-        Add an alias to the index set in the elastic obj
+        aliases = self.all_es_aliases()
+        return alias in aliases
+
+    def add_alias(self, alias):
+        """Add an alias to the index set in the elastic obj
 
         :param alias: alias to add
 
