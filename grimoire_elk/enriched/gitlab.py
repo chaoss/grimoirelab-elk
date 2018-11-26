@@ -321,7 +321,7 @@ class GitLabEnrich(Enrich):
         rich_mr['created_at'] = merge_request['created_at']
         rich_mr['updated_at'] = merge_request['updated_at']
         rich_mr['url'] = merge_request['web_url']
-        rich_mr['merged'] = True if rich_mr['state'] else False
+        rich_mr['merged'] = rich_mr['state'] == 'merged'
         rich_mr['num_notes'] = len(merge_request['notes_data'])
 
         rich_mr['labels'] = merge_request['labels']
