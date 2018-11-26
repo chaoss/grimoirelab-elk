@@ -264,10 +264,12 @@ class GitLabEnrich(Enrich):
         # The real data
         merge_request = item['data']
 
-        rich_mr['time_to_close_days'] = \
-            get_time_diff_days(merge_request['created_at'], merge_request['closed_at'])
+        time_to_close_days = get_time_diff_days(merge_request['created_at'], merge_request['closed_at'])
+        time_to_merge_days = get_time_diff_days(merge_request['created_at'], merge_request['merged_at'])
 
-        if merge_request['state'] != 'closed':
+        rich_mr['time_to_close_days'] = time_to_merge_days if time_to_merge_days else time_to_close_days
+
+        if merge_request['state'] not in ['merged', 'closed']:
             rich_mr['time_open_days'] = \
                 get_time_diff_days(merge_request['created_at'], datetime.utcnow())
         else:
