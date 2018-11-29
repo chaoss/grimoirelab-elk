@@ -264,10 +264,15 @@ class GitLabEnrich(Enrich):
         # The real data
         merge_request = item['data']
 
-        rich_mr['time_to_close_days'] = \
-            get_time_diff_days(merge_request['created_at'], merge_request['closed_at'])
+        # merge requests can end up in two states, merged and closed. The former concerns merge requests
+        # that were finally merged to the code base, while the latter represents rejected merge requests.
+        # `time_to_close_days` and `time_to_merge_days` are aligned to the aforementioned states.
+        time_to_close_days = get_time_diff_days(merge_request['created_at'], merge_request['closed_at'])
+        time_to_merge_days = get_time_diff_days(merge_request['created_at'], merge_request['merged_at'])
 
-        if merge_request['state'] != 'closed':
+        rich_mr['time_to_close_days'] = time_to_merge_days if time_to_merge_days else time_to_close_days
+
+        if merge_request['state'] not in ['merged', 'closed']:
             rich_mr['time_open_days'] = \
                 get_time_diff_days(merge_request['created_at'], datetime.utcnow())
         else:
@@ -319,7 +324,7 @@ class GitLabEnrich(Enrich):
         rich_mr['created_at'] = merge_request['created_at']
         rich_mr['updated_at'] = merge_request['updated_at']
         rich_mr['url'] = merge_request['web_url']
-        rich_mr['merged'] = True if rich_mr['state'] else False
+        rich_mr['merged'] = rich_mr['state'] == 'merged'
         rich_mr['num_notes'] = len(merge_request['notes_data'])
 
         rich_mr['labels'] = merge_request['labels']
