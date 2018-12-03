@@ -1,50 +1,50 @@
-name,type
-author_bot,boolean
-author_domain,keyword
-author_gender,keyword
-author_gender_acc,keyword
-author_id,keyword
-author_name,keyword
-author_org_name,keyword
-author_user_name,keyword
-author_username,keyword
-author_uuid,keyword
-code_merge_duration,float
-created_at,date
-gitlab_repo,keyword
-grimoire_creation_date,date
-id,long
-id_in_repo,keyword
-is_gitlab_merge_request,long
-item_type,keyword
-labels,keyword
-merge_author_login,keyword
-merge_author_domain,keyword
-merge_author_location,keyword
-merge_author_name,keyword
-merge_author_org,keyword
-merge_request,boolean
-merged,boolean
-metadata__enriched_on,date
-metadata__gelk_backend_name,keyword
-metadata__gelk_version,keyword
-metadata__timestamp,date
-metadata__updated_on,date
-milestone,keyword
-num_notes,long
-num_versions,long
-origin,keyword
-project,keyword
-project_1,keyword
-repository,keyword
-state,keyword
-tag,keyword
-time_open_days,float
-time_to_close_days,float
-time_to_first_attention,float
-title,keyword
-title_analyzed,text
-updated_at,date
-url,keyword
-url_id,keyword
-uuid,keyword
+name,type,aggregatable,description
+author_bot,boolean,true,"True if the given author is identified as a bot."
+author_domain,keyword,true,"Domain associated to the author in sortinghat profile."
+author_gender,keyword,true,"Author gender, based on her name (disabled by default)."
+author_gender_acc,keyword,true,"Author gender accuracy (disabled by default)."
+author_id,keyword,true,"Author Id from sortinghat."
+author_name,keyword,true,"Author name."
+author_org_name,keyword,true,"Organization name."
+author_user_name,keyword,true,"Author user name from SortingHat."
+author_username,keyword,true,"Author user name from GitLab."
+author_uuid,keyword,true,"Author UUID from sortinghat."
+code_merge_duration,float,true,"Code merge duration."
+created_at,date,true,"Merge Request creation date."
+gitlab_repo,keyword,true,"GitLab repository name."
+grimoire_creation_date,date,true,"Merge Request creation date."
+id,long,true,"Merge Request Id in GiLab."
+id_in_repo,keyword,true,"Merge Request Id in the repository it belongs to."
+is_gitlab_merge_request,long,true,"1 indicating this is a Merge Request, used for counting in case other kind of items could be stored in the same index or alias."
+item_type,keyword,true,"Item type, in this case 'merge_request request'"
+labels,keyword,true,"Merge Request assigned labels."
+merge_author_login,keyword,true,"Merge Request author login."
+merge_author_domain,keyword,true,"Merge Request author domain."
+merge_author_location,keyword,true,"Merge Request author location."
+merge_author_name,keyword,true,"Merge Request author name."
+merge_author_org,keyword,true,"Merge Request author organization."
+merge_request,boolean,true,"True if it is a Merge Reuqest (useful to identify Merge Requests if used through aliases including several sources)."
+merged,boolean,true,"True if the Merge Request was already merged."
+metadata__enriched_on,date,true,"Date when the item was enriched."
+metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich information."
+metadata__gelk_version,keyword,true,"Version of the backend used to enrich information."
+metadata__timestamp,date,true,"Date when the item was stored in RAW index."
+metadata__updated_on,date,true,"Date when the item was updated on its original data source."
+milestone,keyword,true,"Assigned milestone."
+num_notes,long,true,"Number of notes."
+num_versions,long,true,"Number of versions"
+origin,keyword,true,"Original URL where the repository was retrieved from."
+project,keyword,true,"Project."
+project_1,keyword,true,"Project (if more than one level is allowed in project hierarchy)."
+repository,keyword,true,"Repository name."
+state,keyword,true,"'merged', 'opened' or 'closed'."
+tag,keyword,true,"Perceval tag."
+time_open_days,float,true,"Time open in days."
+time_to_close_days,float,true,"Time to close Merge Request in days."
+time_to_first_attention,float,true,"Time from creation to first comment or reaction (whatever occurs first) added by an author different from the one who created this Merge Request."
+title,keyword,true,"Merge Request title."
+title_analyzed,text,false,"Merge Request title split by terms to allow searching."
+updated_at,date,true,"Date when the Merge Request was updated."
+url,keyword,true,"Merge Request URL"
+url_id,keyword,true,"Consists of project path and Merge Request id in that project."
+uuid,keyword,true,"Perceval UUID."
