@@ -1,64 +1,64 @@
-name,type
-assignee_data_bot,boolean
-assignee_data_domain,keyword
-assignee_data_id,keyword
-assignee_data_name,keyword
-assignee_data_org_name,keyword
-assignee_data_user_name,keyword
-assignee_data_uuid,keyword
-assignee_domain,keyword
-assignee_geolocation,geo_point
-assignee_location,keyword
-assignee_login,keyword
-assignee_name,keyword
-assignee_org,keyword
-author_bot,boolean
-author_domain,keyword
-author_id,keyword
-author_name,keyword
-author_org_name,keyword
-author_user_name,keyword
-author_uuid,keyword
-closed_at,date
-created_at,date
-github_repo,keyword
-grimoire_creation_date,date
-id_in_repo,keyword
-id,long
-is_github_issue,long
-item_type,keyword
-labels,keyword
-metadata__enriched_on,date
-metadata__gelk_backend_name,keyword
-metadata__gelk_version,keyword
-metadata__timestamp,date
-metadata__updated_on,date
-ocean-unique-id,keyword
-origin,keyword
-project_1,keyword
-project,keyword
-pull_request,boolean
-repository,keyword
-state,keyword
-tag,keyword
-time_open_days,float
-time_to_close_days,float
-title_analyzed,text
-title,keyword
-updated_at,date
-url_id,keyword
-url,keyword
-user_data_bot,boolean
-user_data_domain,keyword
-user_data_id,keyword
-user_data_name,keyword
-user_data_org_name,keyword
-user_data_user_name,keyword
-user_data_uuid,keyword
-user_domain,keyword
-user_geolocation,geo_point
-user_location,keyword
-user_login,keyword
-user_name,keyword
-user_org,keyword
-uuid,keyword
+name,type, description
+assignee_data_bot,boolean,"True/False if the assignee is a bot or not."
+assignee_data_domain,keyword,"Assignee's domain name from SortingHat profile."
+assignee_data_id,keyword,"Assignee's id from SortingHat profile."
+assignee_data_name,keyword,"Assignee's name."
+assignee_data_org_name,keyword,"Assignee's organization name from SortingHat profile."
+assignee_data_user_name,keyword,"Assignee's username from SortingHat profile."
+assignee_data_uuid,keyword,"Assignee's UUID from SortingHat profile."
+assignee_domain,keyword,"Assignee's domain name from GitHub."
+assignee_geolocation,geo_point,"Assignee's global location using coordinates."
+assignee_location,keyword,"Assignee's geographical location."
+assignee_login,keyword,"Assignee's login name from GitHub."
+assignee_name,keyword,"Assignee's name from GitHub."
+assignee_org,keyword,"Assignee's organization name from GitHub."
+author_bot,boolean,"True/False if the autho is a bot or not."
+author_domain,keyword,"Author's domain name from SortingHat profile."
+author_id,keyword,"Author's ID from SortingHat profile."
+author_name,keyword,"Author's name."
+author_org_name,keyword,"Author's organization name from SortingHat profile."
+author_user_name,keyword,"Author's username from SortingHat profile."
+author_uuid,keyword,"Author's UUID from SortingHat profile."
+closed_at,date,"Date when an issue was closed."
+created_at,date,"Date when an issue was opened."
+github_repo,keyword,"The name of the GitHub repository."
+grimoire_creation_date,date,"Issue creation date."
+id_in_repo,keyword,"The issue's ID in the repository it was created."
+id,long,"Issue's ID in GitHub."
+is_github_issue,long,"Used to seperate issues from other items such as pull requests."
+item_type,keyword,"The type of the item (issue/pull request)."
+labels,keyword,"The labels assigned to an issue."
+metadata__enriched_on,date,"Date when the data were enriched."
+metadata__gelk_backend_name,keyword,"Name of the backend used to enrich the data."
+metadata__gelk_version,keyword,"Version of the backed used to enrich the data."
+metadata__timestamp,date,"Date when the item was stored in the ElasticSearch db as a raw index."
+metadata__updated_on,date,"Date when the item was updated on its original data source."
+ocean-unique-id,keyword,"Unique ID for all the datasets contained in the information pool."
+origin,keyword,"The original URL from which the repository was retrieved from."
+project_1,keyword,"Used if more than one project levels are allowed in the project hierarchy."
+project,keyword,"The project name."
+pull_request,boolean,"True/False if the item is a pull request or not."
+repository,keyword,"The repository's name."
+state,keyword,"State of the item (open/closed)."
+tag,keyword,"Perceval tag."
+time_open_days,float,"Time the item is open counted in days."
+time_to_close_days,float,"Time to close an issue counted in days."
+title_analyzed,text,"Issue title split by terms to allow searching."
+title,keyword,"The title of the issue."
+updated_at,date,"Date when the issue was last updated."
+url_id,keyword,"Consists of the project path and the issue's id."
+url,keyword,"Full URL of the issue."
+user_data_bot,boolean,"True/False if the user is a bot or not."
+user_data_domain,keyword,"User's domain name from SortingHat profile."
+user_data_id,keyword,"User's ID from SortingHat profile."
+user_data_name,keyword,"User's name from SortingHat profile."
+user_data_org_name,keyword,"User's organization name from SortingHat profile."
+user_data_user_name,keyword,"User's username from SortingHat profile."
+user_data_uuid,keyword,"User's UUID from SortingHat profile."
+user_domain,keyword,"User's domain name from GitHub."
+user_geolocation,geo_point,"User's global location using coordinates."
+user_location,keyword,"User's geographical location."
+user_login,keyword,"User's login name from GitHub."
+user_name,keyword,"User's name."
+user_org,keyword,"User's organization name."
+uuid,keyword,"Perceval UUID."
