@@ -525,8 +525,8 @@ class Enrich(ElasticItems):
         :param eitem: enriched item for which to find the project
         :return: the project entry (a dictionary)
         """
-
-        ds_name = self.get_connector_name()  # data source name in projects map
+        # get the data source name relying on the cfg section name, if null use the connector name
+        ds_name = self.cfg_section_name if self.cfg_section_name else self.get_connector_name()
         repository = self.get_project_repository(eitem)
         try:
             project = (self.prjs_map[ds_name][repository])
