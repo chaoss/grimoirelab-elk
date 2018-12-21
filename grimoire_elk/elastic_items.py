@@ -53,6 +53,7 @@ class ElasticItems():
         self.requests = grimoire_con(insecure)
         self.elastic = None
         self.elastic_url = None
+        self.cfg_section_name = None
 
     def get_repository_filter_raw(self, term=False):
         """ Returns the filter to be used in queries in a repository items """
@@ -82,6 +83,9 @@ class ElasticItems():
         """ Find the name for the current connector """
         from .utils import get_connector_name
         return get_connector_name(type(self))
+
+    def set_cfg_section_name(self, cfg_section_name):
+        self.cfg_section_name = cfg_section_name
 
     # Items generator
     def fetch(self, _filter=None):
