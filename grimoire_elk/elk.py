@@ -503,7 +503,7 @@ def do_studies(ocean_backend, enrich_backend, studies_args):
                 raise e
 
 
-def enrich_backend(url, clean, backend_name, backend_params,
+def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                    ocean_index=None,
                    ocean_index_enrich=None,
                    db_projects_map=None, json_projects_map=None,
@@ -553,6 +553,8 @@ def enrich_backend(url, clean, backend_name, backend_params,
         enrich_backend = connector[2](db_sortinghat, db_projects_map, json_projects_map,
                                       db_user, db_password, db_host)
         enrich_backend.set_params(backend_params)
+        # store the cfg section name in the enrich backend to recover the corresponding project name in projects.json
+        enrich_backend.set_cfg_section_name(cfg_section_name)
         if url_enrich:
             elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend, es_enrich_aliases)
         else:
