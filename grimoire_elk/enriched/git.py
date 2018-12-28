@@ -625,7 +625,8 @@ class GitEnrich(Enrich):
 
         # Create alias if output index exists and alias does not
         if out_conn.exists():
-            if not out_conn.exists_alias(AREAS_OF_CODE_ALIAS):
+            if not out_conn.exists_alias(AREAS_OF_CODE_ALIAS) \
+                    and not enrich_backend.elastic.alias_in_use(AREAS_OF_CODE_ALIAS):
                 logger.info(log_prefix + " Creating alias: %s", AREAS_OF_CODE_ALIAS)
                 out_conn.create_alias(AREAS_OF_CODE_ALIAS)
             else:
