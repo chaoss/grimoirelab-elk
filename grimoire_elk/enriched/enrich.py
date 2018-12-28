@@ -935,7 +935,8 @@ class Enrich(ElasticItems):
 
         # Create alias if output index exists (index is always created from scratch, so
         # alias need to be created each time)
-        if out_conn.exists() and not out_conn.exists_alias(out_index, ONION_ALIAS):
+        if out_conn.exists() and not out_conn.exists_alias(out_index, ONION_ALIAS) \
+                and not self.elastic.alias_in_use(ONION_ALIAS):
             logger.info(log_prefix + " Creating alias: %s", ONION_ALIAS)
             out_conn.create_alias(ONION_ALIAS)
 
@@ -995,7 +996,9 @@ class Enrich(ElasticItems):
                 logger.error(ex)
                 return
 
-        self.elastic.add_alias(DEMOGRAPHICS_ALIAS)
+        if not self.elastic.alias_in_use(DEMOGRAPHICS_ALIAS):
+            logger.info("Creating alias: %s", DEMOGRAPHICS_ALIAS)
+            self.elastic.add_alias(DEMOGRAPHICS_ALIAS)
 
         logger.info("[Demography] End %s", self.elastic.anonymize_url(self.elastic.index_url))
 
