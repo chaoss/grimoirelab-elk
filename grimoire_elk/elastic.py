@@ -240,7 +240,7 @@ class ElasticSearch(object):
         """
         aliases = self.list_aliases()
         if alias in aliases:
-            logger.warning("Alias %s already exists on %s.", alias, self.anonymize_url(self.index_url))
+            logger.debug("Alias %s already exists on %s.", alias, self.anonymize_url(self.index_url))
             return
 
         # add alias
