@@ -604,11 +604,11 @@ class TestEnrich(unittest.TestCase):
         self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[self._enrich.elastic.index]['aliases'])
 
         # add alias again
-        with self.assertLogs(logger, level='INFO') as cm:
+        with self.assertLogs(logger, level='DEBUG') as cm:
             self._enrich.elastic.add_alias(DEMOGRAPHICS_ALIAS)
 
         self.assertEqual(cm.output[0],
-                         'WARNING:grimoire_elk.elastic:Alias %s already exists on %s.'
+                         'DEBUG:grimoire_elk.elastic:Alias %s already exists on %s.'
                          % (DEMOGRAPHICS_ALIAS, self._enrich.elastic.anonymize_url(tmp_index_url)))
 
         requests.delete(tmp_index_url, verify=False)
