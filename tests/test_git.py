@@ -165,6 +165,9 @@ class TestGit(TestBaseBackend):
 
         self.assertGreater(response['count'], 0)
 
+        delete_onion = self.es_con + "/git_onion-enriched"
+        requests.delete(delete_onion, verify=False)
+
     def test_arthur_params(self):
         """Test the extraction of arthur params from an URL"""
 
