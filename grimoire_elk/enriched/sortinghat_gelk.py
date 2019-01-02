@@ -24,7 +24,6 @@
 
 from datetime import datetime
 import logging
-import traceback
 
 from sortinghat import api
 from sortinghat.db.model import Identity
@@ -91,8 +90,7 @@ class SortingHat(object):
         except Exception as ex:
             logger.warning("Unknown exception adding identity. Ignoring it. %s %s %s",
                            identity['email'], identity['name'],
-                           identity['username'])
-            traceback.print_exc()
+                           identity['username'], exc_info=True)
 
         if 'company' in identity and identity['company'] is not None:
             try:
