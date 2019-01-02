@@ -184,7 +184,7 @@ class ElasticSearch(object):
         except ELKError:
             pass
 
-        logger.info("%i items uploaded to ES (%s)", inserted_items, self.anonymize_url(url))
+        logger.debug("%i items uploaded to ES (%s)", inserted_items, self.anonymize_url(url))
         return inserted_items
 
     def all_es_aliases(self):
