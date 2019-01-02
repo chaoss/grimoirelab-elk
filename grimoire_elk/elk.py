@@ -25,7 +25,6 @@
 import inspect
 import logging
 import pickle
-import traceback
 
 import redis
 
@@ -209,14 +208,11 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
 
     except Exception as ex:
         if backend:
-            logger.error("Error feeding ocean from %s (%s): %s", backend_name, backend.origin, ex)
-            # this print makes blackbird fails
-            traceback.print_exc()
+            logger.error("Error feeding ocean from %s (%s): %s", backend_name, backend.origin, ex, exc_info=True)
         else:
-            logger.error("Error feeding ocean %s" % ex)
-            traceback.print_exc()
+            logger.error("Error feeding ocean %s", ex, exc_info=True)
 
-    logger.info("Done %s " % (backend_name))
+    logger.info("Done %s ", backend_name)
 
 
 def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
@@ -650,12 +646,11 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                     do_studies(ocean_backend, enrich_backend, studies_args)
 
     except Exception as ex:
-        logger.error("%s", traceback.format_exc())
         if backend:
             logger.error("Error enriching ocean from %s (%s): %s",
-                         backend_name, backend.origin, ex)
+                         backend_name, backend.origin, ex, exc_info=True)
         else:
-            logger.error("Error enriching ocean %s", ex)
+            logger.error("Error enriching ocean %s", ex, exc_info=True)
 
     logger.info("Done %s ", backend_name)
 
