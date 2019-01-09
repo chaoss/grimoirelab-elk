@@ -1,7 +1,7 @@
 name,type,aggregatable,description
 author_name,keyword,true,"Author name."
 author_org_name,keyword,true,"Organization name."
-author_uuid,keyword,true,"Author UUID from sortinghat."
+author_uuid,keyword,true,"Author UUID from SortingHat."
 contributions,long,true,"Number of contributions in this quarter made by this author as member of `author_org_name` and included within `project`."
 cum_net_sum,long,true,"Sum of commits used to compute onion."
 data_source,keyword,true,"Data source name for which Onion is computed."
