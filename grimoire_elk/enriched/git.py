@@ -32,18 +32,17 @@ import requests
 from elasticsearch import Elasticsearch
 
 from grimoirelab_toolkit.datetime import datetime_to_utc, str_to_datetime
+from perceval.backends.core.git import GitRepository
 from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
 from ..elastic_mapping import Mapping as BaseMapping
+from ..elastic_items import HEADER_JSON, MAX_BULK_UPDATE_SIZE
 
 try:
     from .sortinghat_gelk import SortingHat
     SORTINGHAT_LIBS = True
 except ImportError:
     SORTINGHAT_LIBS = False
-
-# Mandatory in Elasticsearch 6, optional in earlier versions
-HEADER_JSON = {"Content-Type": "application/json"}
 
 GITHUB = 'https://github.com/'
 SH_GIT_COMMIT = 'github-commit'
@@ -653,3 +652,84 @@ class GitEnrich(Enrich):
                              sort_on_field=sort_on_field,
                              no_incremental=no_incremental,
                              seconds=seconds)
+
+    def update_items(self, ocean_backend, enrich_backend):
+        """Retrieve the commits not present in the original repository and delete
+        the corresponding documents from the raw and enriched indexes"""
+
+        fltr = {
+            'name': 'origin',
+            'value': [self.perceval_backend.origin]
+        }
+
+        git_repo = GitRepository(self.perceval_backend.uri, self.perceval_backend.gitpath)
+        current_hashes = set([commit for commit in git_repo.rev_list()])
+
+        raw_hashes = set([item['data']['commit']
+                          for item in ocean_backend.fetch(ignore_incremental=True, _filter=fltr)])
+
+        hashes_to_delete = list(raw_hashes.difference(current_hashes))
+
+        to_process = []
+        for _hash in hashes_to_delete:
+            to_process.append(_hash)
+
+            if len(to_process) != MAX_BULK_UPDATE_SIZE:
+                continue
+
+            # delete documents from the raw index
+            self.remove_commits(to_process, ocean_backend.elastic.index_url,
+                                'data.commit', self.perceval_backend.origin)
+            # delete documents from the enriched index
+            self.remove_commits(to_process, enrich_backend.elastic.index_url,
+                                'hash', self.perceval_backend.origin)
+
+            to_process = []
+
+        if to_process:
+            # delete documents from the raw index
+            self.remove_commits(to_process, ocean_backend.elastic.index_url,
+                                'data.commit', self.perceval_backend.origin)
+            # delete documents from the enriched index
+            self.remove_commits(to_process, enrich_backend.elastic.index_url,
+                                'hash', self.perceval_backend.origin)
+
+        logger.debug("[update-items] %s commits deleted from %s.",
+                     len(hashes_to_delete), ocean_backend.elastic.anonymize_url(self.elastic.index_url))
+        logger.debug("[update-items] %s commits deleted from %s.",
+                     len(hashes_to_delete), enrich_backend.elastic.anonymize_url(self.elastic.index_url))
+
+    def remove_commits(self, items, index, attribute, origin):
+        """Delete documents that correspond to commits deleted in the Git repository
+
+        :param items: target items to be deleted
+        :param index: target index
+        :param attribute: name of the term attribute to search items
+        :param origin: name of the origin from where the items must be deleted
+        """
+        es_query = '''
+            {
+              "query": {
+                "bool": {
+                    "must": {
+                        "term": {
+                            "origin": "%s"
+                        }
+                    },
+                    "filter": {
+                        "terms": {
+                            "%s": [%s]
+                        }
+                    }
+                }
+              }
+            }
+            ''' % (origin, attribute, ",".join(['"%s"' % i for i in items]))
+
+        r = self.requests.post(index + "/_delete_by_query", data=es_query, headers=HEADER_JSON, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logger.error("Error updating deleted commits for %s.", self.elastic.anonymize_url(index))
+            logger.error(ex)
+            return
