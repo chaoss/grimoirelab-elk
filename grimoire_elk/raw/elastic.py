@@ -200,6 +200,13 @@ class ElasticOcean(ElasticItems):
                 items = self.perceval_backend.fetch()
 
         self.feed_items(items)
+        self.update_items()
+
+    def update_items(self):
+        """Perform update operations over a raw index, just after the collection.
+        It must be redefined in the raw connectors."""
+
+        return
 
     def feed_items(self, items):
         task_init = datetime.now()
