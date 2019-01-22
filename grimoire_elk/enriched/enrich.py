@@ -38,7 +38,8 @@ from elasticsearch import Elasticsearch
 from perceval.backend import find_signature_parameters
 from grimoirelab_toolkit.datetime import (datetime_utcnow, str_to_datetime)
 
-from ..elastic_items import ElasticItems
+from ..elastic_items import (ElasticItems,
+                             HEADER_JSON)
 from .study_ceres_onion import ESOnionConnector, onion_study
 
 from .utils import grimoire_con
@@ -73,8 +74,6 @@ CUSTOM_META_PREFIX = 'cm'
 SH_UNKNOWN_VALUE = 'Unknown'
 DEMOGRAPHICS_ALIAS = 'demographics'
 ONION_ALIAS = 'all_onion'
-
-HEADER_JSON = {"Content-Type": "application/json"}
 
 
 def metadata(func):
@@ -190,6 +189,12 @@ class Enrich(ElasticItems):
                                               parsed_args)
         backend_cmd.backend = backend_cmd.BACKEND(**init_args)
         self.perceval_backend = backend_cmd.backend
+
+    def update_items(self, ocean_backend, enrich_backend):
+        """Perform update operations over an enriched index, just after the enrichment
+        It must be redefined in the enriched connectors"""
+
+        return
 
     def __convert_json_to_projects_map(self, json):
         """ Convert JSON format to the projects map format
