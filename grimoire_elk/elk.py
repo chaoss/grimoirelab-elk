@@ -423,6 +423,7 @@ def enrich_items(ocean_backend, enrich_backend, events=False):
 
     if not events:
         total = enrich_backend.enrich_items(ocean_backend)
+        enrich_backend.update_items(ocean_backend, enrich_backend)
     else:
         total = enrich_backend.enrich_events(ocean_backend)
     return total
