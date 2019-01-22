@@ -30,6 +30,9 @@ import logging
 from .enriched.utils import get_repository_filter, grimoire_con
 from .elastic_mapping import Mapping
 
+HEADER_JSON = {"Content-Type": "application/json"}
+MAX_BULK_UPDATE_SIZE = 1000
+
 logger = logging.getLogger(__name__)
 
 
@@ -88,14 +91,14 @@ class ElasticItems():
         self.cfg_section_name = cfg_section_name
 
     # Items generator
-    def fetch(self, _filter=None):
+    def fetch(self, _filter=None, ignore_incremental=False):
         """ Fetch the items from raw or enriched index. An optional _filter
         could be provided to filter the data collected """
 
         logger.debug("Creating a elastic items generator.")
 
         scroll_id = None
-        page = self.get_elastic_items(scroll_id, _filter=_filter)
+        page = self.get_elastic_items(scroll_id, _filter=_filter, ignore_incremental=ignore_incremental)
 
         if not page:
             return []
@@ -115,7 +118,7 @@ class ElasticItems():
                 eitem = item['_source']
                 yield eitem
 
-            page = self.get_elastic_items(scroll_id, _filter=_filter)
+            page = self.get_elastic_items(scroll_id, _filter=_filter, ignore_incremental=ignore_incremental)
 
             if not page:
                 break
@@ -124,7 +127,7 @@ class ElasticItems():
 
         logger.debug("Fetching from %s: done receiving", self.elastic.anonymize_url(self.elastic.index_url))
 
-    def get_elastic_items(self, elastic_scroll_id=None, _filter=None):
+    def get_elastic_items(self, elastic_scroll_id=None, _filter=None, ignore_incremental=False):
         """ Get the items from the index related to the backend applying and
         optional _filter if provided"""
 
@@ -176,7 +179,7 @@ class ElasticItems():
                 filter_str = filter_str.replace("'", "\"")
                 filters += filter_str
 
-            if self.from_date:
+            if self.from_date and not ignore_incremental:
                 date_field = self.get_incremental_date()
                 from_date = self.from_date.isoformat()
 
@@ -185,12 +188,12 @@ class ElasticItems():
                         {"%s": {"gte": "%s"}}
                     }
                 ''' % (date_field, from_date)
-            elif self.offset:
+            elif self.offset and not ignore_incremental:
                 filters += '''
                     , {"range":
                         {"offset": {"gte": %i}}
                     }
-                ''' % (self.offset)
+                ''' % self.offset
 
             # Order the raw items from the old ones to the new so if the
             # enrich process fails, it could be resume incrementally
