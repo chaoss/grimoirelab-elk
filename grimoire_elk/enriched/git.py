@@ -662,6 +662,8 @@ class GitEnrich(Enrich):
             'value': [self.perceval_backend.origin]
         }
 
+        logger.debug("[update-items] Checking commits for %s.", self.perceval_backend.origin)
+
         git_repo = GitRepository(self.perceval_backend.uri, self.perceval_backend.gitpath)
         current_hashes = set([commit for commit in git_repo.rev_list()])
 
@@ -694,10 +696,12 @@ class GitEnrich(Enrich):
             self.remove_commits(to_process, enrich_backend.elastic.index_url,
                                 'hash', self.perceval_backend.origin)
 
-        logger.debug("[update-items] %s commits deleted from %s.",
-                     len(hashes_to_delete), ocean_backend.elastic.anonymize_url(self.elastic.index_url))
-        logger.debug("[update-items] %s commits deleted from %s.",
-                     len(hashes_to_delete), enrich_backend.elastic.anonymize_url(self.elastic.index_url))
+        logger.debug("[update-items] %s commits deleted from %s with origin %s.",
+                     len(hashes_to_delete), ocean_backend.elastic.anonymize_url(ocean_backend.elastic.index_url),
+                     self.perceval_backend.origin)
+        logger.debug("[update-items] %s commits deleted from %s with origin %s.",
+                     len(hashes_to_delete), enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url),
+                     self.perceval_backend.origin)
 
     def remove_commits(self, items, index, attribute, origin):
         """Delete documents that correspond to commits deleted in the Git repository
