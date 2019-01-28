@@ -533,12 +533,22 @@ class Enrich(ElasticItems):
         # get the data source name relying on the cfg section name, if null use the connector name
         ds_name = self.cfg_section_name if self.cfg_section_name else self.get_connector_name()
         repository = self.get_project_repository(eitem)
+
         try:
             project = (self.prjs_map[ds_name][repository])
             # logger.debug("Project FOUND for repository %s %s", repository, project)
         except KeyError:
             # logger.warning("Project not found for repository %s (data source: %s)", repository, ds_name)
             project = None
+
+            if self.filter_raw:
+                fltr = eitem['origin'] + ' --filter-raw=' + self.filter_raw
+                if ds_name in self.prjs_map and fltr in self.prjs_map[ds_name]:
+                    project = self.prjs_map[ds_name][fltr]
+
+            if project:
+                return project
+
             # Try to use always the origin in any case
             if 'origin' in eitem:
                 if ds_name in self.prjs_map and eitem['origin'] in self.prjs_map[ds_name]:
