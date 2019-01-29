@@ -571,6 +571,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         # filter_raw must be converted from the string param to a dict
         filter_raw_dict = {}
         if filter_raw:
+            enrich_backend.set_filter_raw(filter_raw)
             filter_raw_dict['name'] = filter_raw.split(":")[0].replace('"', '')
             filter_raw_dict['value'] = filter_raw.split(":")[1].replace('"', '')
         # filters_raw_prefix must be converted from the list param to
