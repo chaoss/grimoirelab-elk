@@ -103,8 +103,8 @@ class ElasticSearch(object):
         if aliases:
             for alias in aliases:
                 if self.alias_in_use(alias):
-                    logger.warning("Alias %s won't be set on %s, it already exists on %s",
-                                   alias, self.anonymize_url(self.index_url), self.anonymize_url(self.url))
+                    logger.debug("Alias %s won't be set on %s, it already exists on %s",
+                                 alias, self.anonymize_url(self.index_url), self.anonymize_url(self.url))
                     continue
 
                 self.add_alias(alias)
