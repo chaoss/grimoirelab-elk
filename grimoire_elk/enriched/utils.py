@@ -163,20 +163,28 @@ def get_last_enrich(backend_cmd, enrich_backend):
             except AttributeError:
                 offset = backend_cmd.parsed_args.offset
 
+        filter_raw_dict = None
+        if enrich_backend.filter_raw:
+            filter_raw = enrich_backend.filter_raw
+            filter_raw_dict = {
+                'name': filter_raw.split(":")[0].replace('"', ''),
+                'value': filter_raw.split(":")[1].replace('"', '')
+            }
+
         if from_date:
             if from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
                 last_enrich = from_date
             else:
-                last_enrich = enrich_backend.get_last_update_from_es([filter_])
+                last_enrich = enrich_backend.get_last_update_from_es([filter_, filter_raw_dict])
 
         elif offset is not None:
             if offset != 0:
                 last_enrich = offset
             else:
-                last_enrich = enrich_backend.get_last_offset_from_es([filter_])
+                last_enrich = enrich_backend.get_last_offset_from_es([filter_, filter_raw_dict])
 
         else:
-            last_enrich = enrich_backend.get_last_update_from_es([filter_])
+            last_enrich = enrich_backend.get_last_update_from_es([filter_, filter_raw_dict])
     else:
         last_enrich = enrich_backend.get_last_update_from_es()
 

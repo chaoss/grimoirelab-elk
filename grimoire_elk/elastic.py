@@ -420,10 +420,7 @@ class ElasticSearch(object):
             term = '''{"term" : { "%s" : "%s"}}''' % (filter_['name'], filter_['value'])
             terms.append(term)
 
-        if len(filters_) == 1:
-            data_query = '"query": %s,"' % filters_[0]
-        else:
-            data_query = '''"query": {"bool": {"filter": [%s]}},''' % (','.join(t for t in terms))
+        data_query = '''"query": {"bool": {"filter": [%s]}},''' % (','.join(terms))
 
         data_agg = '''
             "aggs": {
@@ -433,7 +430,7 @@ class ElasticSearch(object):
                   }
                 }
             }
-        ''' % (field)
+        ''' % field
 
         data_json = '''
         { "size": 0, %s  %s
