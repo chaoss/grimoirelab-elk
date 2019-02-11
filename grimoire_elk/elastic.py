@@ -410,17 +410,20 @@ class ElasticSearch(object):
         url = self.index_url
         url += "/_search"
 
-        data_query = ''
         if filters_ is None:
             filters_ = []
+
+        terms = []
         for filter_ in filters_:
             if not filter_:
                 continue
-            data_query += '''
-                "query" : {
-                    "term" : { "%s" : "%s"  }
-                 },
-            ''' % (filter_['name'], filter_['value'])
+            term = '''{"term" : { "%s" : "%s"}}''' % (filter_['name'], filter_['value'])
+            terms.append(term)
+
+        if len(filters_) == 1:
+            data_query = '"query": %s,"' % filters_[0]
+        else:
+            data_query = '''"query": {"bool": {"filter": [%s]}},''' % (','.join(t for t in terms))
 
         data_agg = '''
             "aggs": {
