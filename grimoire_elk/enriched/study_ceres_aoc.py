@@ -42,10 +42,11 @@ class ESPandasConnector(ESConnector):
     Writing is also ready to work directly with Pandas dataframes.
     """
 
-    def __init__(self, es_conn, es_index, sort_on_field='metadata__timestamp', read_only=True):
+    def __init__(self, es_conn, es_index, sort_on_field='metadata__timestamp', repo=None, read_only=True):
 
-        super().__init__(es_conn, es_index, sort_on_field, read_only)
-        self.__log_prefix = "[" + es_index + "] study areas_of_code"
+        super().__init__(es_conn=es_conn, es_index=es_index, sort_on_field=sort_on_field, repo=repo,
+                         read_only=read_only)
+        self.__log_prefix = "[" + es_index + "] study areas_of_code "
 
     @staticmethod
     def make_hashcode(uuid, filepath, file_event):
@@ -88,6 +89,7 @@ class ESPandasConnector(ESConnector):
         """
 
         search_query = self._build_search_query(from_date)
+        logger.debug(self.__log_prefix + str(search_query))
         hits_block = []
         for hit in helpers.scan(self._es_conn,
                                 search_query,
@@ -131,7 +133,7 @@ class ESPandasConnector(ESConnector):
             docs.append(doc)
         # TODO exception and error handling
         helpers.bulk(self._es_conn, docs)
-        logger.info(self.__log_prefix + " Written: " + str(len(docs)))
+        logger.info(self.__log_prefix + "Written: " + str(len(docs)))
 
 
 class AreasOfCode(CeresBase):
