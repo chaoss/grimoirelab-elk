@@ -61,7 +61,7 @@ class ESOnionConnector(ESConnector):
                  timeframe_field='grimoire_creation_date',
                  sort_on_field='metadata__timestamp', read_only=True):
 
-        super().__init__(es_conn, es_index, sort_on_field, read_only)
+        super().__init__(es_conn=es_conn, es_index=es_index, sort_on_field=sort_on_field, read_only=read_only)
 
         self.contribs_field = contribs_field
         self._timeframe_field = timeframe_field

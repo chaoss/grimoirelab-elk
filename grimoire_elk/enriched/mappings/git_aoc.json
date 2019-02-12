@@ -92,6 +92,9 @@
         "metadata__updated_on": {
           "type": "date"
         },
+        "origin": {
+          "type": "keyword"
+        },
         "owner": {
           "type": "keyword"
         },

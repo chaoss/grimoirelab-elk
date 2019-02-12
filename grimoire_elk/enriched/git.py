@@ -610,8 +610,7 @@ class GitEnrich(Enrich):
         es_in = Elasticsearch([ocean_backend.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
         es_out = Elasticsearch([enrich_backend.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
         in_conn = ESPandasConnector(es_conn=es_in, es_index=in_index, sort_on_field=sort_on_field)
-        out_conn = ESPandasConnector(es_conn=es_out, es_index=out_index, sort_on_field=sort_on_field,
-                                     read_only=False)
+        out_conn = ESPandasConnector(es_conn=es_out, es_index=out_index, sort_on_field=sort_on_field, read_only=False)
 
         exists_index = out_conn.exists()
         if no_incremental or not exists_index:
@@ -620,7 +619,17 @@ class GitEnrich(Enrich):
             filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/git_aoc.json')
             out_conn.create_index(filename, delete=exists_index)
 
-        areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
+        repos = []
+        for source in self.json_projects.values():
+            items = source.get('git')
+            if items:
+                repos.extend(items)
+
+        for repo in repos:
+            logger.info(log_prefix + " Processing repo: " + repo)
+            in_conn.update_repo(repo)
+            out_conn.update_repo(repo)
+            areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
 
         # Create alias if output index exists and alias does not
         if out_conn.exists():

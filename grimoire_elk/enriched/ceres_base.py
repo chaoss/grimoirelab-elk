@@ -146,13 +146,17 @@ class ESConnector(Connector):
     :param self._read_only: True to avoid unwanted writes.
     """
 
-    def __init__(self, es_conn, es_index, sort_on_field='metadata__timestamp', read_only=True):
+    def __init__(self, es_conn, es_index, sort_on_field='metadata__timestamp', repo=None, read_only=True):
 
         self._es_conn = es_conn
         self._es_index = es_index
         self._sort_on_field = sort_on_field
+        self._repo = repo
         self._read_only = read_only
         self.__log_prefix = "[" + es_index + "] study "
+
+    def update_repo(self, repo):
+        self._repo = repo
 
     def read_item(self, from_date=None):
         """Read items and return them one by one.
@@ -253,6 +257,10 @@ class ESConnector(Connector):
         search = Search(using=self._es_conn, index=self._es_index)
         # from:to parameters (=> from: 0, size: 0)
         search = search[0:0]
+
+        if self._repo:
+            search = search.filter('term', origin=self._repo)
+
         search = search.aggs.metric('max_date', 'max', field=self._sort_on_field)
 
         try:
@@ -297,18 +305,22 @@ class ESConnector(Connector):
         """Build an ElasticSearch search query to retrieve items for read methods.
 
         :param from_date: date to start retrieving items from.
-        :return:
-
-        :raises ValueError: `metadata__timestamp` field not found in index
-        :raises NotFoundError: index not found in ElasticSearch
+        :return: JSON query in dict format
         """
 
+        sort = [{self._sort_on_field: {"order": "asc"}}]
+
+        filters = []
+        if self._repo:
+            filters.append({"term": {"origin": self._repo}})
+
         if from_date:
-            query = {"range": {self._sort_on_field: {"gte": from_date}}}
+            filters.append({"range": {self._sort_on_field: {"gte": from_date}}})
+
+        if filters:
+            query = {"bool": {"filter": filters}}
         else:
             query = {"match_all": {}}
-
-        sort = [{self._sort_on_field: {"order": "asc"}}]
 
         search_query = {
             "query": query,
