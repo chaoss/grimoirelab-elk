@@ -231,7 +231,7 @@ class ElasticItems():
                 {
                     "query": {
                         "bool": {
-                            "must": [%s]
+                            "filter": [%s]
                         }
                     } %s
                 }
