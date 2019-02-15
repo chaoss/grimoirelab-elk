@@ -56,22 +56,60 @@ class TestMbox(TestBaseBackend):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
-        self.assertEqual(result['raw'], 8)
-        self.assertEqual(result['enrich'], 8)
+        self.assertEqual(result['raw'], 9)
+        self.assertEqual(result['enrich'], 9)
+
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'domain.com')
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'domain.com')
+
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'hotmail.com')
+
+        item = self.items[3]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'gnome.org')
+
+        item = self.items[4]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'wellsfargo.com')
+
+        item = self.items[5]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'example.com')
+
+        item = self.items[6]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'example.com')
+
+        item = self.items[7]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'domain.com')
+
+        item = self.items[8]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'example.org')
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
-        self.assertEqual(result['raw'], 8)
-        self.assertEqual(result['enrich'], 8)
+        self.assertEqual(result['raw'], 9)
+        self.assertEqual(result['enrich'], 9)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
-        self.assertEqual(result['raw'], 8)
-        self.assertEqual(result['enrich'], 8)
+        self.assertEqual(result['raw'], 9)
+        self.assertEqual(result['enrich'], 9)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
