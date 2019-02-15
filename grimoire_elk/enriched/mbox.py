@@ -179,6 +179,9 @@ class MBoxEnrich(Enrich):
         except Exception:
             eitem["tz"] = None
 
+        identity = self.get_sh_identity(message['from'])
+        eitem["mbox_author_domain"] = self.get_identity_domain(identity)
+
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
 
