@@ -1,0 +1,56 @@
+[
+    {
+        "backend_name": "GitHub",
+        "backend_version": "0.19.0",
+        "category": "repository",
+        "data": {
+            "forks": 16699,
+            "id": "2ecf2b4131e3a239132a5c6f44412ed01f56a43b",
+            "stars": 48218,
+            "updated_at": "2018-02-15T08:58:08Z",
+            "watchers": 2901
+        },
+        "origin": "https://github.com/kubernetes/kubernetes",
+        "perceval_version": "0.12.5",
+        "tag": "https://github.com/kubernetes/kubernetes",
+        "timestamp": 1550221871.014851,
+        "updated_on": 1518685088.0,
+        "uuid": "909d743739e22f9e6b84d73a69b0c9e243915699"
+    },
+    {
+        "backend_name": "GitHub",
+        "backend_version": "0.19.0",
+        "category": "repository",
+        "data": {
+            "forks": 16699,
+            "id": "96899408f318d170efdcb13805f0694234686198",
+            "stars": 47118,
+            "updated_at": "2018-03-15T08:58:08Z",
+            "watchers": 4301
+        },
+        "origin": "https://github.com/kubernetes/kubernetes",
+        "perceval_version": "0.12.5",
+        "tag": "https://github.com/kubernetes/kubernetes",
+        "timestamp": 1550222062.699868,
+        "updated_on": 1521104288.0,
+        "uuid": "d34efc4786e63e74541b37f6f78950c963ca87ab"
+    },
+    {
+        "backend_name": "GitHub",
+        "backend_version": "0.19.0",
+        "category": "repository",
+        "data": {
+            "forks": 1,
+            "id": "1f70c18454765686ce91c4ac9aed67a27d94cfe1",
+            "stars": 1,
+            "updated_at": "2018-10-15T08:58:08Z",
+            "watchers": 1
+        },
+        "origin": "https://github.com/kubernetes/kubernetes",
+        "perceval_version": "0.12.5",
+        "tag": "https://github.com/kubernetes/kubernetes",
+        "timestamp": 1550222122.896528,
+        "updated_on": 1539593888.0,
+        "uuid": "e40118e25d317f1b312ca7161dee8e5063e90c84"
+    }
+]
