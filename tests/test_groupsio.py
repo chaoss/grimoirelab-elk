@@ -56,6 +56,12 @@ class TestGrousio(TestBaseBackend):
         self.assertEqual(result['raw'], 50)
         self.assertEqual(result['enrich'], 50)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'groups.io')
+
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 

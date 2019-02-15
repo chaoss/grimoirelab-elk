@@ -56,6 +56,16 @@ class TestPipermail(TestBaseBackend):
         self.assertEqual(result['raw'], 17)
         self.assertEqual(result['enrich'], 17)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'acm.org')
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'redhat.com')
+
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
