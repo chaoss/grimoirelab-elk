@@ -11,6 +11,7 @@ Date,keyword
 email_date,date
 From_bot,boolean
 From_domain,keyword
+mbox_author_domain,keyword
 From_id,keyword
 From_name,keyword
 From_org_name,keyword
