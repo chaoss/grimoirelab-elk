@@ -57,6 +57,20 @@ class TestHyperkitty(TestBaseBackend):
         self.assertEqual(result['raw'], 3)
         self.assertEqual(result['enrich'], 3)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'example.com')
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'example.com')
+
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['mbox_author_domain'], 'example.com')
+
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
