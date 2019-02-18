@@ -119,9 +119,12 @@ class GitHubEnrich(Enrich):
         category = item['category']
         item = item['data']
 
-        identity_types = ['user', 'assignee']
-        if category == "pull_request":
+        if category == "issue":
+            identity_types = ['user', 'assignee']
+        elif category == "pull_request":
             identity_types = ['user', 'merged_by']
+        else:
+            identity_types = []
 
         for identity in identity_types:
             if item[identity]:
@@ -306,6 +309,8 @@ class GitHubEnrich(Enrich):
             rich_item = self.__get_rich_issue(item)
         elif item['category'] == 'pull_request':
             rich_item = self.__get_rich_pull(item)
+        elif item['category'] == 'repository':
+            rich_item = self.__get_rich_repo(item)
         else:
             logger.error("rich item not defined for GitHub category %s", item['category'])
 
@@ -721,6 +726,29 @@ class GitHubEnrich(Enrich):
             rich_issue.update(self.get_item_sh(item, self.issue_roles))
 
         return rich_issue
+
+    def __get_rich_repo(self, item):
+        rich_repo = {}
+
+        for f in self.RAW_FIELDS_COPY:
+            if f in item:
+                rich_repo[f] = item[f]
+            else:
+                rich_repo[f] = None
+
+        repo = item['data']
+
+        rich_repo['forks_count'] = repo['forks_count']
+        rich_repo['subscribers_count'] = repo['subscribers_count']
+        rich_repo['stargazers_count'] = repo['stargazers_count']
+        rich_repo['fetched_on'] = repo['fetched_on']
+
+        if self.prjs_map:
+            rich_repo.update(self.get_item_project(rich_repo))
+
+        rich_repo.update(self.get_grimoire_fields(item['metadata__updated_on'], "repository"))
+
+        return rich_repo
 
 
 class GitHubUser(object):
