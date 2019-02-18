@@ -673,7 +673,12 @@ class GitEnrich(Enrich):
         logger.debug("[update-items] Checking commits for %s.", self.perceval_backend.origin)
 
         git_repo = GitRepository(self.perceval_backend.uri, self.perceval_backend.gitpath)
-        current_hashes = set([commit for commit in git_repo.rev_list()])
+
+        try:
+            current_hashes = set([commit for commit in git_repo.rev_list()])
+        except Exception as e:
+            logger.error("Something went wrong with %s, %s", git_repo.uri, e, exc_info=True)
+            return
 
         raw_hashes = set([item['data']['commit']
                           for item in ocean_backend.fetch(ignore_incremental=True, _filter=fltr)])
