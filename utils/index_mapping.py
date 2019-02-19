@@ -347,6 +347,7 @@ def export_items(elastic_url, in_index, out_index, elastic_url_out=None,
 
 
 if __name__ == '__main__':
+    """Tool to ensure correct mappings in GrimoireLab indexes"""
 
     ARGS = get_params()
 
