@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Tool to ensure correct mappings in GrimoireLab indexes
-#
-# Copyright (C) 2017 Bitergia
+# Copyright (C) 2015-2019 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
