@@ -284,6 +284,7 @@ def get_oauth():
 
 
 if __name__ == '__main__':
+    """GitHub to Kibana"""
 
     task_init = datetime.now()
 
