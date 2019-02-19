@@ -53,6 +53,7 @@ def get_connector_from_name(name, connectors):
 
 
 if __name__ == '__main__':
+    """Gelk: perceval2ocean and ocean2kibana"""
 
     connectors = [[Bugzilla, BugzillaOcean, BugzillaEnrich],
                   [GitHub, GitHubOcean, GitHubEnrich],
