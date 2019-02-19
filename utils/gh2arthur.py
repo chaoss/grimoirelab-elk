@@ -223,6 +223,7 @@ def insert_projects_mapping(db_projects_map, project, repositories):
 
 
 if __name__ == '__main__':
+    """GitHub to Kibana"""
 
     task_init = datetime.now()
 
