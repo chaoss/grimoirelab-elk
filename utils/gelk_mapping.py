@@ -128,6 +128,7 @@ def find_ds_mapping(data_source, es_major_version):
 
 
 if __name__ == '__main__':
+    """Tool to show the mapping used in a GrimoireELK data source"""
 
     ARGS = get_params()
 
