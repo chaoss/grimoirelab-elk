@@ -55,6 +55,7 @@ def get_params():
 
 
 if __name__ == '__main__':
+    """Enriched to Kibana Publisher"""
 
     args = get_params()
 
