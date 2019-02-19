@@ -31,6 +31,7 @@ from grimoire_elk.utils import get_params, config_logging
 
 
 if __name__ == '__main__':
+    """Perceval2Ocean tool"""
 
     app_init = datetime.now()
 
