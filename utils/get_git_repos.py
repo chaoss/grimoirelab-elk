@@ -134,6 +134,8 @@ def get_repositories(owner, token, nrepos):
 
 
 if __name__ == '__main__':
+    """GitHub repository listing for an org"""
+
     args = get_params()
     config_logging(args.debug)
     repos = get_repositories(args.owner, args.token, args.nrepos)
