@@ -318,7 +318,7 @@ class GitEnrich(Enrich):
         self.__fix_field_date(commit, 'CommitDate')
 
         # data fields to copy
-        copy_fields = ["message", "refs"]
+        copy_fields = ["message"]
         for f in copy_fields:
             if f in commit:
                 eitem[f] = commit[f]
@@ -710,136 +710,6 @@ class GitEnrich(Enrich):
         logger.debug("[update-items] %s commits deleted from %s with origin %s.",
                      len(hashes_to_delete), enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url),
                      self.perceval_backend.origin)
-
-        # update ref info
-        self.update_commit_references(ocean_backend, enrich_backend, git_repo, fltr)
-
-    def update_commit_references(self, ocean_backend, enrich_backend, git_repo, fltr):
-        """Update commit references (both tags and branches). For each commit fetched from the raw index, its
-        references are obtained (using the Git command for-each-ref) and used to build the map `pos2commits`.
-        The references are inserted in a list of lists, their position is used as a key in `pos2commits`,
-        which relates groups of references to commits. The idea behind the map is to organize
-        the data to insert aiming at minimizing the number of `_update_by_query` calls. Once the number of
-        fetched commits is equal to `MAX_BULK_UPDATE_SIZE`, the map is processed and the corresponding
-        commits updated in both raw and enriched indexes.
-
-        :param ocean_backend: the ocean backend
-        :param enrich_backend: the enrich backend
-        :param git_repo: Git repository
-        :param fltr: filter used to select only the commits of a given origin
-        """
-        # commit counter, when it reaches MAX_BULK_UPDATE_SIZE, the commits collected are processed in bulks
-        commit_count = 0
-        # list of references group
-        group_refs = []
-        # map that relates the position of a references group to their common commits
-        pos2commits = {}
-
-        for item in ocean_backend.fetch(ignore_incremental=True, _filter=fltr):
-            commit_hash = item['data']['commit']
-
-            try:
-                # obtain the references of the commit
-                references = [r.split('\t')[-1].strip() for r in git_repo.for_each_ref(commit_hash)]
-            except Exception as e:
-                logger.error("Something went wrong when executing for-each-ref on %s", git_repo.uri, e, exc_info=True)
-                continue
-
-            # if a references group doesn't exist, add it to `group_refs`
-            if references not in group_refs:
-                group_refs.append(references)
-                pos = len(group_refs) - 1
-            else:
-                pos = group_refs.index(references)
-
-            # if the key representing a references group exists, add the commit to the corresponding list
-            if pos in pos2commits:
-                commit_hashes = pos2commits[pos]
-                commit_hashes.append(commit_hash)
-                pos2commits.update({pos: commit_hashes})
-            # otherwise init the list with the commit found
-            else:
-                pos2commits.update({pos: [commit_hash]})
-
-            commit_count += 1
-
-            # once `commit_count` is equal to `MAX_BULK_UPDATE_SIZE`, process the map
-            if commit_count == MAX_BULK_UPDATE_SIZE:
-                self.process_map(pos2commits, group_refs, ocean_backend.elastic.index_url, "data.refs", "data.commit")
-                self.process_map(pos2commits, group_refs, enrich_backend.elastic.index_url, "refs", "hash")
-
-                # clear the map, empty the list, reset the counter
-                pos2commits.clear()
-                group_refs.clear()
-                commit_count = 0
-
-        # check if there are some commits left to process
-        if pos2commits:
-            self.process_map(pos2commits, group_refs, ocean_backend.elastic.index_url, "data.refs", "data.commit")
-            self.process_map(pos2commits, group_refs, enrich_backend.elastic.index_url, "refs", "hash")
-
-    def process_map(self, pos2commits, group_refs, index_url, update_attr, filter_attr):
-        """Process the map containing groups of references and their commits.
-
-        :param pos2commits: the map
-        :param group_refs: list of references group
-        :param index_url: target index
-        :param update_attr: attribute to update (`data.refs` for raw data, `refs` for enriched data)
-        :param filter_attr: attribute to filter (`data.commit` for raw data or `hash` for enriched one)
-        """
-        for pos in pos2commits:
-            refs = group_refs[pos]
-
-            self.update_refs(index_url, update_attr, refs, filter_attr, pos2commits[pos])
-
-        logger.debug("Updated refs on index %s", self.elastic.anonymize_url(index_url))
-
-    def update_refs(self, index, update_attr, references, filter_attr, commits):
-        """Update documents that correspond to commits to include the current references
-        information (tags and branches).
-
-        :param index: target index
-        :param update_attr: attribute to update (`data.refs` for raw data, `refs` for enriched data)
-        :param references: list of references to include in the document
-        :param filter_attr: attribute to filter (`data.commit` for raw data or `hash` for enriched one)
-        :param commits: list of commits used to filter on the index
-        """
-        es_query = """
-                {
-                  "script": {
-                    "source": "ctx._source.%s = [%s]",
-                    "lang": "painless"
-                  },
-                  "query": {
-                    "bool": {
-                        "filter": [
-                            {
-                                "terms": {
-                                    "%s": [%s]
-                                }
-                            },
-                            {
-                                "term": {
-                                    "origin": "%s"
-                                }
-                            }
-                        ]
-                    }
-                  }
-                }
-                """ % (update_attr,
-                       ",".join(["'%s'" % r for r in references]),
-                       filter_attr,
-                       ",".join(['"%s"' % c for c in commits]),
-                       self.perceval_backend.origin)
-
-        r = self.requests.post(index + "/_update_by_query", data=es_query, headers=HEADER_JSON, verify=False)
-        try:
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as ex:
-            logger.error("Error updating refs for %s.", self.elastic.anonymize_url(index))
-            logger.error(ex)
-            return
 
     def remove_commits(self, items, index, attribute, origin):
         """Delete documents that correspond to commits deleted in the Git repository
