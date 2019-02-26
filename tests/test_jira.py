@@ -25,7 +25,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.raw.jenkins import JenkinsOcean
+from grimoire_elk.raw.jira import JiraOcean
 
 
 class TestJira(TestBaseBackend):
@@ -97,12 +97,20 @@ class TestJira(TestBaseBackend):
         # ... ?
 
     def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
+        """Test the extraction of arthur params from the projects.json entry"""
 
         with open("data/projects-release.json") as projects_filename:
-            url = json.load(projects_filename)['grimoire']['jenkins'][0]
-            arthur_params = {'uri': 'https://build.opnfv.org/ci', 'url': 'https://build.opnfv.org/ci'}
-            self.assertDictEqual(arthur_params, JenkinsOcean.get_arthur_params_from_url(url))
+            url = json.load(projects_filename)['grimoire']['jira'][0]
+            arthur_params = {'url': 'https://jira.opnfv.org'}
+            self.assertDictEqual(arthur_params, JiraOcean.get_arthur_params_from_url(url))
+
+    def test_get_p2o_params_from_url(self):
+        """Test the extraction of p2o params from the projects.json entry"""
+
+        with open("data/projects-release.json") as projects_filename:
+            url = json.load(projects_filename)['grimoire']['jira'][0]
+            p2o_params = {'url': 'https://jira.opnfv.org', 'filter-raw': 'data.fields.project.key:PROJECT-KEY'}
+            self.assertDictEqual(p2o_params, JiraOcean.get_p2o_params_from_url(url))
 
 
 if __name__ == "__main__":
