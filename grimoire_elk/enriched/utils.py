@@ -21,18 +21,21 @@
 #
 
 import datetime
+from dateutil import parser, tz
 import inspect
 import json
 import logging
 
 import requests
-
-from requests.packages.urllib3.util.retry import Retry
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
-from dateutil import parser, tz
+import urllib3
 
 
+BACKOFF_FACTOR = 0.2
+MAX_RETRIES = 21
+MAX_RETRIES_ON_REDIRECT = 5
+MAX_RETRIES_ON_READ = 8
+MAX_RETRIES_ON_CONNECT = 21
+STATUS_FORCE_LIST = [408, 409]
 logger = logging.getLogger(__name__)
 
 
@@ -114,20 +117,21 @@ def unixtime_to_datetime(ut):
     return dt
 
 
-def grimoire_con(insecure=True, conn_retries=21, total=21):
+def grimoire_con(insecure=True, conn_retries=MAX_RETRIES_ON_CONNECT, total=MAX_RETRIES):
     conn = requests.Session()
     # {backoff factor} * (2 ^ ({number of total retries} - 1))
     # conn_retries = 21  # 209715.2 = 2.4d
     # total covers issues like 'ProtocolError('Connection aborted.')
     # Retry when there are errors in HTTP connections
-    retries = Retry(total=total, connect=conn_retries, read=8, redirect=5, backoff_factor=0.2,
-                    method_whitelist=False)
+    retries = urllib3.util.Retry(total=total, connect=conn_retries, read=MAX_RETRIES_ON_READ,
+                                 redirect=MAX_RETRIES_ON_REDIRECT, backoff_factor=BACKOFF_FACTOR,
+                                 method_whitelist=False, status_forcelist=STATUS_FORCE_LIST)
     adapter = requests.adapters.HTTPAdapter(max_retries=retries)
     conn.mount('http://', adapter)
     conn.mount('https://', adapter)
 
     if insecure:
-        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         conn.verify = False
 
     return conn
