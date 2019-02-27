@@ -30,7 +30,8 @@ import pkg_resources
 import requests
 from elasticsearch import Elasticsearch
 
-from grimoirelab_toolkit.datetime import datetime_to_utc, str_to_datetime
+from grimoirelab_toolkit.datetime import (datetime_to_utc,
+                                          str_to_datetime)
 from perceval.backends.core.git import GitRepository
 from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
@@ -347,6 +348,7 @@ class GitEnrich(Enrich):
         eitem["utc_commit"] = datetime_to_utc(commit_date).replace(tzinfo=None).isoformat()
 
         eitem["tz"] = int(author_date.strftime("%z")[0:3])
+        eitem["branches"] = []
 
         # Compute time to commit
         time_to_commit_delta = datetime_to_utc(author_date) - datetime_to_utc(commit_date)
@@ -475,8 +477,7 @@ class GitEnrich(Enrich):
         return eitem
 
     def enrich_items(self, ocean_backend, events=False):
-        """ Implementation supporting signed-off and multiauthor/committer commits.
-        """
+        """ Implementation supporting signed-off and multiauthor/committer commits."""
 
         headers = {"Content-Type": "application/json"}
 
@@ -716,6 +717,92 @@ class GitEnrich(Enrich):
                      len(hashes_to_delete), enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url),
                      self.perceval_backend.origin)
 
+        # update branch info
+        self.delete_commit_branches(enrich_backend)
+        self.add_commit_branches(git_repo, enrich_backend)
+
+    def delete_commit_branches(self, enrich_backend):
+        """Delete the information about branches from the documents representing
+        commits in the enriched index.
+
+        :param enrich_backend: the enrich backend
+        """
+        fltr = """
+            "filter": [
+                {
+                    "term": {
+                        "origin": "%s"
+                    }
+                }
+            ]
+        """ % self.perceval_backend.origin
+
+        # reset references in enrich index
+        painless_cmd = 'ctx._source.branches = new HashSet();'
+        self.update_index(enrich_backend.elastic.index_url, painless_cmd, fltr)
+
+    def add_commit_branches(self, git_repo, enrich_backend):
+        """Add the information about branches to the documents representing commits in
+        the enriched index. Branches are obtained using the command `git ls-remote`,
+        then for each branch, the list of commits is retrieved via the command `git rev-list branch-name` and
+        used to update the corresponding items in the enriched index.
+
+        :param git_repo: GitRepository object
+        :param enrich_backend: the enrich backend
+        """
+        to_process = []
+        for hash, refname in git_repo._discover_refs(remote=True):
+
+            if not refname.startswith('refs/heads/'):
+                continue
+
+            commit_count = 0
+            branch_name = refname.replace('refs/heads/', '')
+
+            for commit in git_repo.rev_list([branch_name]):
+                to_process.append(commit)
+                commit_count += 1
+
+                if commit_count == MAX_BULK_UPDATE_SIZE:
+                    self.__process_commits_in_branch(enrich_backend, branch_name, to_process)
+
+                    # reset the counter
+                    to_process = []
+                    commit_count = 0
+
+            if commit_count:
+                self.__process_commits_in_branch(enrich_backend, branch_name, to_process)
+
+    def update_index(self, index, painless_cmd, fltr):
+        """Update documents in the index according to the painless command and filter passed in input.
+
+        :param index: target index
+        :param painless_cmd: the painless command
+        :param fltr: a string representation of the filter
+        """
+        es_query = """
+            {
+              "script": {
+                "source": "%s",
+                "lang": "painless"
+              },
+              "query": {
+                "bool": {
+                    %s
+                }
+              }
+            }
+            """ % (painless_cmd,
+                   fltr)
+
+        r = self.requests.post(index + "/_update_by_query", data=es_query, headers=HEADER_JSON, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logger.error("Error updating items for %s with command %s", self.elastic.anonymize_url(index), painless_cmd)
+            logger.error(ex)
+            return
+
     def remove_commits(self, items, index, attribute, origin):
         """Delete documents that correspond to commits deleted in the Git repository
 
@@ -750,3 +837,39 @@ class GitEnrich(Enrich):
             logger.error("Error updating deleted commits for %s.", self.elastic.anonymize_url(index))
             logger.error(ex)
             return
+
+    def __process_commits_in_branch(self, enrich_backend, branch_name, commits):
+        commits_str = ",".join(['"%s"' % c for c in commits])
+
+        # process branch names which include quotes or single quote
+        digested_branch_name = branch_name
+        if "'" in branch_name:
+            digested_branch_name = branch_name.replace("'", "---")
+            logger.warning("Change branch name from %s to %s", branch_name, digested_branch_name)
+        if '"' in branch_name:
+            digested_branch_name = branch_name.replace('"', "---")
+            logger.warning("Change branch name from %s to %s", branch_name, digested_branch_name)
+
+        # update enrich index
+        painless_cmd_enrich = "if(!ctx._source.branches.contains('%s')){ctx._source.branches.add('%s');}" \
+                              % (digested_branch_name, digested_branch_name)
+        fltr_enrich = self.__prepare_filter("hash", commits_str)
+        self.update_index(enrich_backend.elastic.index_url, painless_cmd_enrich, fltr_enrich)
+
+    def __prepare_filter(self, terms_attr, terms_value):
+        fltr = """
+            "filter": [
+                {
+                    "terms": {
+                        "%s": [%s]
+                    }
+                },
+                {
+                    "term": {
+                        "origin": "%s"
+                    }
+                }
+            ]
+        """ % (terms_attr, terms_value, self.perceval_backend.origin)
+
+        return fltr
