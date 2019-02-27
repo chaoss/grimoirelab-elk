@@ -31,6 +31,7 @@ ocean-unique-id,keyword,true,"Unique identifier for all of the datasets in the i
 origin,keyword,true,"Original URL where the repository was retrieved from."
 project_1,keyword,true,"Project (if more than one level is allowed in project hierarchy)"
 project,keyword,true,"Project."
+branches,keyword,true,"List of branches where the commit appears."
 repo_name,keyword,true,"Repository name."
 tag,keyword,true,"Perceval tag."
 title,keyword,true,"Commit title."
