@@ -77,18 +77,3 @@ class BugzillaOcean(ElasticOcean):
         # Could be used for filtering
         product = item['data']['product'][0]['__text__']
         item['product'] = product
-
-    @classmethod
-    def get_p2o_params_from_url(cls, url):
-        # Bugzilla could include in the URL a filter-raw T1720
-        # https://bugzilla.redhat.com/ filter-raw=product:OpenShift Origin
-        params = {}
-
-        tokens = url.split(' ', 1)  # Just split the URL not the filter
-        params['url'] = tokens[0]
-
-        if len(tokens) > 1:
-            f = tokens[1].split("=")[1]
-            params['filter-raw'] = f
-
-        return params
