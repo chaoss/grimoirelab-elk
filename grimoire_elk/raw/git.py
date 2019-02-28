@@ -61,23 +61,6 @@ class GitOcean(ElasticOcean):
     mapping = Mapping
 
     @classmethod
-    def get_p2o_params_from_url(cls, url):
-        # Git could include in the URL a  filters-raw-prefix T1722
-        # https://github.com/VizGrimoire/GrimoireLib --filters-raw-prefix \
-        #  data.files.file:grimoirelib_alch data.files.file:README.md
-        params = {}
-
-        tokens = url.split(' ', 1)  # Just split the URL not the filter
-        params['url'] = tokens[0]
-
-        if len(tokens) > 1:
-            f = tokens[1].split(" ", 1)[1]
-            # Create a filters array
-            params['filters-raw-prefix'] = f.split(" ")
-
-        return params
-
-    @classmethod
     def get_perceval_params_from_url(cls, url):
         params = []
         tokens = url.split(' ', 1)  # Just split the URL not the filter
