@@ -30,8 +30,13 @@ from datetime import datetime
 from ..enriched.utils import unixtime_to_datetime, get_repository_filter
 from ..elastic_items import ElasticItems
 from ..elastic_mapping import Mapping
+from ..errors import ELKError
 
 logger = logging.getLogger(__name__)
+
+
+PRJ_JSON_FILTER_SEPARATOR = "--filter-"
+PRJ_JSON_FILTER_OP_ASSIGNMENT = "="
 
 
 class ElasticOcean(ElasticItems):
@@ -73,12 +78,6 @@ class ElasticOcean(ElasticItems):
         field = "uuid"
         return field
 
-#    def get_elastic_mappings(self):
-#        """ specific mappings implemented in each data source """
-#        mapping = '{}'
-#
-#        return {"items": mapping}
-
     def get_elastic_analyzers(self):
         """ Custom analyzers for our indexes  """
 
@@ -98,7 +97,34 @@ class ElasticOcean(ElasticItems):
     @classmethod
     def get_p2o_params_from_url(cls, url):
         """ Get the p2o params given a URL for the data source """
-        return {"url": url}
+
+        # if the url doesn't contain a filter separator, return it
+        if PRJ_JSON_FILTER_SEPARATOR not in url:
+            return {"url": url}
+
+        # otherwise, add the url to the params
+        params = {'url': url.split(' ', 1)[0]}
+        # tokenize the filter and add them to the param dict
+        tokens = url.split(PRJ_JSON_FILTER_SEPARATOR)[1:]
+
+        if len(tokens) > 1:
+            cause = "Too many filters defined for %s, only the first one is considered" % url
+            logger.warning(cause)
+
+        token = tokens[0]
+        filter_tokens = token.split(PRJ_JSON_FILTER_OP_ASSIGNMENT)
+
+        if len(filter_tokens) != 2:
+            cause = "Too many tokens after splitting for %s in %s" % (token, url)
+            logger.error(cause)
+            raise ELKError(cause=cause)
+
+        fltr_name = filter_tokens[0].strip()
+        fltr_value = filter_tokens[1].strip()
+
+        params['filter-' + fltr_name] = fltr_value
+
+        return params
 
     @classmethod
     def get_perceval_params_from_url(cls, url):
