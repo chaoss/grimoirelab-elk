@@ -234,6 +234,10 @@ class JiraEnrich(Enrich):
         eitem['time_to_last_update_days'] = None
         eitem['url'] = None
 
+        eitem['updated'] = None
+        if 'updated' in issue['fields']:
+            eitem['updated'] = issue['fields']['updated']
+
         if 'long_desc' in issue:
             eitem['number_of_comments'] = len(issue['long_desc'])
         eitem['url'] = item['origin'] + "/browse/" + issue['key']
