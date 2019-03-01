@@ -71,6 +71,7 @@ time_spent_hours,float
 time_spent,long
 time_to_close_days,float
 time_to_last_update_days,float
+updated,date
 url,keyword
 uuid,keyword
 watchers,long
