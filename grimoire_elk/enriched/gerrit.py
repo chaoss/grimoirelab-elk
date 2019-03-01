@@ -211,17 +211,23 @@ class GerritEnrich(Enrich):
                 comment['message'] = comment['message'][:self.KEYWORD_MAX_SIZE]
 
         # Time to add the time diffs
-        createdOn_date = parser.parse(review['createdOn'])
+        created_on = review['createdOn']
         if len(review["patchSets"]) > 0:
-            createdOn_date = parser.parse(review["patchSets"][0]['createdOn'])
-        lastUpdated_date = parser.parse(review['lastUpdated'])
+            created_on = review["patchSets"][0]['createdOn']
+
+        created_on_date = parser.parse(created_on)
+        eitem["created_on"] = created_on
+
+        eitem["last_updated"] = review['lastUpdated']
+        last_updated_date = parser.parse(review['lastUpdated'])
+
         seconds_day = float(60 * 60 * 24)
         if eitem['status'] in ['MERGED', 'ABANDONED']:
             timeopen = \
-                (lastUpdated_date - createdOn_date).total_seconds() / seconds_day
+                (last_updated_date - created_on_date).total_seconds() / seconds_day
         else:
             timeopen = \
-                (datetime.utcnow() - createdOn_date).total_seconds() / seconds_day
+                (datetime.utcnow() - created_on_date).total_seconds() / seconds_day
         eitem["timeopen"] = '%.2f' % timeopen
 
         if self.sortinghat:
