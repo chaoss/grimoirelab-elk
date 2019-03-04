@@ -566,29 +566,14 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         if node_regex:
             enrich_backend.node_regex = node_regex
 
-        # filter_raw must be converted from the string param to a dict
-        filter_raw_dict = {}
         if filter_raw:
             enrich_backend.set_filter_raw(filter_raw)
-            filter_raw_dict['name'] = filter_raw.split(":")[0].replace('"', '')
-            filter_raw_dict['value'] = filter_raw.split(":")[1].replace('"', '')
-        # filters_raw_prefix must be converted from the list param to
-        # DSL query format for a should filter inside a boolean filter
-        filter_raw_should = None
-        if filters_raw_prefix:
-            filter_raw_should = {"should": []}
-            for filter_prefix in filters_raw_prefix:
-                fname = filter_prefix.split(":")[0].replace('"', '')
-                fvalue = filter_prefix.split(":")[1].replace('"', '')
-                filter_raw_should["should"].append(
-                    {
-                        "prefix": {fname: fvalue}
-                    }
-                )
+        elif filters_raw_prefix:
+            enrich_backend.set_filter_raw_should(filters_raw_prefix)
 
         ocean_backend = get_ocean_backend(backend_cmd, enrich_backend,
-                                          no_incremental, filter_raw_dict,
-                                          filter_raw_should)
+                                          no_incremental, filter_raw,
+                                          filters_raw_prefix)
 
         if only_studies:
             logger.info("Running only studies (no SH and no enrichment)")
