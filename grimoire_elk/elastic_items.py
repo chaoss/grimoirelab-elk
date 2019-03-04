@@ -50,7 +50,9 @@ class ElasticItems():
         self.from_date = from_date  # fetch from_date
         self.offset = offset  # fetch from offset
         self.filter_raw = None  # to filter raw items from Ocean
+        self.filter_raw_dict = []
         self.filter_raw_should = None  # to filter raw items from Ocean
+        self.filter_raw_should_dict = []
 
         self.requests = grimoire_con(insecure)
         self.elastic = None
@@ -73,13 +75,38 @@ class ElasticItems():
         """
         return "metadata__timestamp"
 
+    @staticmethod
+    def __process_filter(fltr_raw):
+        fltr_params = fltr_raw.split(":", 1)
+        fltr_name = fltr_params[0].strip().replace('"', '')
+        fltr_value = fltr_params[1].strip().replace('"', '')
+
+        fltr = {
+            'name': fltr_name,
+            'value': fltr_value
+        }
+
+        return fltr
+
     def set_filter_raw(self, filter_raw):
         """ Filter to be used when getting items from Ocean index """
         self.filter_raw = filter_raw
 
+        self.filter_raw_dict = []
+        for fltr_raw in filter_raw.split(","):
+            fltr = self.__process_filter(fltr_raw)
+
+            self.filter_raw_dict.append(fltr)
+
     def set_filter_raw_should(self, filter_raw_should):
         """ Bool filter should to be used when getting items from Ocean index """
         self.filter_raw_should = filter_raw_should
+
+        self.filter_raw_should_dict = []
+        for fltr_raw in filter_raw_should.split(","):
+            fltr = self.__process_filter(fltr_raw)
+
+            self.filter_raw_should_dict.append(fltr)
 
     def get_connector_name(self):
         """ Find the name for the current connector """
@@ -162,11 +189,12 @@ class ElasticItems():
                 filters = ''
 
             if self.filter_raw:
-                filters += '''
-                    , {"term":
-                        { "%s":"%s"  }
-                    }
-                ''' % (self.filter_raw['name'], self.filter_raw['value'])
+                for fltr in self.filter_raw_dict:
+                    filters += '''
+                        , {"term":
+                            { "%s":"%s"  }
+                        }
+                    ''' % (fltr['name'], fltr['value'])
 
             if _filter:
                 filter_str = '''
@@ -202,6 +230,16 @@ class ElasticItems():
                 order_field = self.get_incremental_date()
             if order_field is not None:
                 order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
+
+            # filter_raw_should = {"should": []}
+            # for filter_prefix in filters_raw_prefix:
+            #     fname = filter_prefix.split(":")[0].replace('"', '')
+            #     fvalue = filter_prefix.split(":")[1].replace('"', '')
+            #     filter_raw_should["should"].append(
+            #         {
+            #             "prefix": {fname: fvalue}
+            #         }
+            #     )
 
             filters_should = ''
             if self.filter_raw_should:
