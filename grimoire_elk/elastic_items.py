@@ -181,7 +181,6 @@ class ElasticItems():
         else:
             # If using a perceval backends always filter by repository
             # to support multi repository indexes
-            # We need the filter dict as a string to join with the rest
             filters_dict = self.get_repository_filter_raw(term=True)
             if filters_dict:
                 filters = json.dumps(filters_dict)
@@ -231,48 +230,31 @@ class ElasticItems():
             if order_field is not None:
                 order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
 
-            # filter_raw_should = {"should": []}
-            # for filter_prefix in filters_raw_prefix:
-            #     fname = filter_prefix.split(":")[0].replace('"', '')
-            #     fvalue = filter_prefix.split(":")[1].replace('"', '')
-            #     filter_raw_should["should"].append(
-            #         {
-            #             "prefix": {fname: fvalue}
-            #         }
-            #     )
-
             filters_should = ''
             if self.filter_raw_should:
-                filters_should = json.dumps(self.filter_raw_should)[1:-1]
-                # We need to add a bool should query to the outer must query
-                query_should = '{"bool": {%s}}' % filters_should
+                for fltr in self.filter_raw_should_dict:
+                    filters_should += '''
+                        {"prefix":
+                            { "%s":"%s"  }
+                        },''' % (fltr['name'], fltr['value'])
+
+                filters_should = filters_should.rstrip(',')
+                query_should = '{"bool": {"should": [%s]}}' % filters_should
                 filters += ", " + query_should
 
             # Fix the filters string if it starts with "," (empty first filter)
             if filters.lstrip().startswith(','):
                 filters = filters.lstrip()[1:]
 
-            filters_dict = json.loads("[" + filters + "]")
-            if len(filters_dict) == 0:
-                # Avoid empty list of filters, ES 6.x doesn't like it
-                # In this case, ensure that order_query does not start with ,
-                if order_query.startswith(','):
-                    order_query = order_query[1:]
-                query = """
-                {
-                  %s
-                }
-                """ % (order_query)
-            else:
-                query = """
-                {
-                    "query": {
-                        "bool": {
-                            "filter": [%s]
-                        }
-                    } %s
-                }
-                """ % (filters, order_query)
+            query = """
+            {
+                "query": {
+                    "bool": {
+                        "filter": [%s]
+                    }
+                } %s
+            }
+            """ % (filters, order_query)
 
             logger.debug("Raw query to %s\n%s", self.elastic.anonymize_url(url),
                          json.dumps(json.loads(query), indent=4))
