@@ -90,19 +90,6 @@ class JiraOcean(ElasticOcean):
 
         return {"url": tokens[0]}
 
-    @classmethod
-    def get_p2o_params_from_url(cls, url):
-        params = {}
-
-        tokens = url.split(' ', 1)
-        params['url'] = tokens[0]
-
-        if len(tokens) > 1:
-            f = tokens[1].split("=")[1]
-            params['filter-raw'] = f
-
-        return params
-
     def _fix_item(self, item):
         # Remove all custom fields to avoid the 1000 fields limit in ES
 
