@@ -32,6 +32,9 @@ from ..elastic_mapping import Mapping as BaseMapping
 logger = logging.getLogger(__name__)
 
 
+HIDDEN_EDITOR = '--hidden--'
+
+
 class Mapping(BaseMapping):
 
     @staticmethod
@@ -219,7 +222,7 @@ class MediaWikiEnrich(Enrich):
         if "revisions" in page:
             eitem["nrevisions"] = len(page["revisions"])
             if len(page["revisions"]) > 0:
-                eitem["first_editor"] = page["revisions"][0]["user"]
+                eitem["first_editor"] = page["revisions"][0].get('user', HIDDEN_EDITOR)
                 eitem["last_edited_date"] = page["revisions"][-1]["timestamp"]
 
         if self.sortinghat:
