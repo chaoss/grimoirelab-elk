@@ -236,6 +236,7 @@ def get_connectors():
 def get_elastic(url, es_index, clean=None, backend=None, es_aliases=None):
 
     mapping = None
+    analyzers = None
 
     if backend:
         backend.set_elastic_url(url)
