@@ -20,6 +20,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import datetime
 from dateutil import parser
 import json
 import logging
@@ -31,7 +32,7 @@ import requests
 
 from grimoire_elk.errors import ELKError
 from grimoire_elk.enriched.utils import unixtime_to_datetime, grimoire_con
-
+from grimoirelab_toolkit.datetime import datetime_utcnow
 
 logger = logging.getLogger(__name__)
 
@@ -461,3 +462,45 @@ class ElasticSearch(object):
                             # last_value is in microsecs
                             last_value = unixtime_to_datetime(last_value / 1000)
         return last_value
+
+    def delete_items(self, hours_to_retain, time_field="metadata__updated_on"):
+        """Delete documents updated before a given date
+
+        :param hours_to_retain: maximum number of hours wrt the current date to retain the data
+        :param time_field: time field to delete the data
+        """
+        if hours_to_retain is None:
+            logger.debug("Data retention policy disabled, no items will be deleted.")
+            return
+
+        if hours_to_retain <= 0:
+            logger.debug("Hours to retain must be greater than 0.")
+            return
+
+        before_date = datetime_utcnow() - datetime.timedelta(hours=hours_to_retain)
+        before_date = before_date.replace(minute=0, second=0, microsecond=0)
+        before_date_str = before_date.isoformat()
+
+        es_query = '''
+                    {
+                      "query": {
+                        "range": {
+                            "%s": {
+                                "lte": "%s"
+                            }
+                        }
+                      }
+                    }
+                    ''' % (time_field, before_date_str)
+
+        r = self.requests.post(self.index_url + "/_delete_by_query?refresh",
+                               data=es_query, headers=HEADER_JSON, verify=False)
+        try:
+            r.raise_for_status()
+            r_json = r.json()
+            logger.debug("%s items deleted from %s before %s.",
+                         r_json['deleted'], self.anonymize_url(self.index_url), before_date)
+        except requests.exceptions.HTTPError as ex:
+            logger.error("Error deleted items from %s.", self.anonymize_url(self.index_url))
+            logger.error(ex)
+            return
