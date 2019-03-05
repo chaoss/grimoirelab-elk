@@ -47,6 +47,14 @@ class Mapping(BaseMapping):
                                 "dynamic":false,
                                 "properties": {}
                             },
+                            "ancestors": {
+                                "properties": {
+                                    "extensions": {
+                                        "dynamic":false,
+                                        "properties": {}
+                                    }
+                                }
+                            },
                             "body": {
                                 "dynamic":false,
                                 "properties": {}
