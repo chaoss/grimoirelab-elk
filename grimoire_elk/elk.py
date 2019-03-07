@@ -566,11 +566,6 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         if node_regex:
             enrich_backend.node_regex = node_regex
 
-        if filter_raw:
-            enrich_backend.set_filter_raw(filter_raw)
-        elif filters_raw_prefix:
-            enrich_backend.set_filter_raw_should(filters_raw_prefix)
-
         ocean_backend = get_ocean_backend(backend_cmd, enrich_backend,
                                           no_incremental, filter_raw,
                                           filters_raw_prefix)
