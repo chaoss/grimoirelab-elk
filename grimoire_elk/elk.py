@@ -478,13 +478,14 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
     return ocean_backend
 
 
-def do_studies(ocean_backend, enrich_backend, studies_args):
-    """
+def do_studies(ocean_backend, enrich_backend, studies_args, retention_hours=None):
+    """Execute studies related to a given enrich backend. If `retention_hours` is not None, the
+    study data is deleted based on the number of `retention_hours`.
 
     :param ocean_backend: backend to access raw items
     :param enrich_backend: backend to access enriched items
+    :param retention_hours: maximum number of hours wrt the current date to retain the data
     :param studies_args: list of studies to be executed
-    :return: None
     """
     for study in enrich_backend.studies:
         selected_studies = [(s['name'], s['params']) for s in studies_args if s['type'] == study.__name__]
@@ -496,6 +497,19 @@ def do_studies(ocean_backend, enrich_backend, studies_args):
             except Exception as e:
                 logger.error("Problem executing study %s, %s", name, str(e))
                 raise e
+
+            # identify studies which creates other indexes. If the study is onion,
+            # it can be ignored since the index is recreated every week
+            if name.startswith('enrich_onion'):
+                continue
+
+            index_params = [p for p in params if 'out_index' in p]
+
+            for ip in index_params:
+                index_name = params[ip]
+                elastic = get_elastic(enrich_backend.elastic_url, index_name)
+
+                elastic.delete_items(retention_hours)
 
 
 def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
