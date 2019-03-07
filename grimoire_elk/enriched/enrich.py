@@ -998,7 +998,7 @@ class Enrich(ElasticItems):
             es_update = Enrich.update_author_min_max_date(author_min_date, author_max_date,
                                                           author_key, author_field=author_field)
 
-            r = self.requests.post(self.elastic.index_url + "/_update_by_query",
+            r = self.requests.post(self.elastic.index_url + "/_update_by_query?refresh",
                                    data=es_update, headers=HEADER_JSON,
                                    verify=False)
             try:

@@ -795,7 +795,7 @@ class GitEnrich(Enrich):
             """ % (painless_cmd,
                    fltr)
 
-        r = self.requests.post(index + "/_update_by_query", data=es_query, headers=HEADER_JSON, verify=False)
+        r = self.requests.post(index + "/_update_by_query?refresh", data=es_query, headers=HEADER_JSON, verify=False)
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
@@ -830,7 +830,7 @@ class GitEnrich(Enrich):
             }
             ''' % (origin, attribute, ",".join(['"%s"' % i for i in items]))
 
-        r = self.requests.post(index + "/_delete_by_query", data=es_query, headers=HEADER_JSON, verify=False)
+        r = self.requests.post(index + "/_delete_by_query?refresh", data=es_query, headers=HEADER_JSON, verify=False)
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
