@@ -72,6 +72,7 @@ class GerritEnrich(Enrich):
 
         self.studies = []
         self.studies.append(self.enrich_demography)
+        self.studies.append(self.enrich_onion)
 
     def get_field_author(self):
         return "owner"
@@ -244,3 +245,23 @@ class GerritEnrich(Enrich):
                           author_field="author_uuid"):
 
         super().enrich_demography(ocean_backend, enrich_backend, date_field, author_field=author_field)
+
+    def enrich_onion(self, ocean_backend, enrich_backend,
+                     no_incremental=False,
+                     in_index='gerrit_onion-src',
+                     out_index='gerrit_onion-enriched',
+                     data_source='gerrit',
+                     contribs_field='uuid',
+                     timeframe_field='grimoire_creation_date',
+                     sort_on_field='metadata__timestamp',
+                     seconds=Enrich.ONION_INTERVAL):
+
+        super().enrich_onion(enrich_backend=enrich_backend,
+                             in_index=in_index,
+                             out_index=out_index,
+                             data_source=data_source,
+                             contribs_field=contribs_field,
+                             timeframe_field=timeframe_field,
+                             sort_on_field=sort_on_field,
+                             no_incremental=no_incremental,
+                             seconds=seconds)
