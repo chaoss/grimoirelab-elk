@@ -135,6 +135,20 @@ class ConfluenceEnrich(Enrich):
             eitem['space'] = page['_expandable']['space']
             eitem['space'] = eitem['space'].replace('/rest/api/space/', '')
 
+        # Ancestors enrichment
+        ancestors_titles = []
+        ancestors_links = []
+
+        if 'ancestors' in page:
+            ancestors = page['ancestors']
+            if isinstance(ancestors, list):
+                for ancestor in ancestors:
+                    ancestors_titles.append(ancestor['title'])
+                    ancestors_links.append(ancestor['_links']['webui'])
+
+        eitem['ancestors_titles'] = ancestors_titles
+        eitem['ancestors_links'] = ancestors_links
+
         # Specific enrichment
         if page['type'] == 'page':
             if page['version']['number'] == 1:

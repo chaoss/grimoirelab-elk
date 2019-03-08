@@ -49,6 +49,33 @@ class TestConfluence(TestBaseBackend):
         self.assertEqual(result['items'], 4)
         self.assertEqual(result['raw'], 4)
 
+        # Check enriched data
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertListEqual(eitem['ancestors_titles'],
+                             ['Title 1', 'Title 2', 'Title 3'])
+        self.assertListEqual(eitem['ancestors_links'],
+                             ['/spaces/TEST/title1', '/spaces/TEST/title2', '/spaces/TEST/title3'])
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertListEqual(eitem['ancestors_titles'], ['Title 1'])
+        self.assertListEqual(eitem['ancestors_links'], ['/spaces/TEST/title1'])
+
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertListEqual(eitem['ancestors_titles'], ['Title 3'])
+        self.assertListEqual(eitem['ancestors_links'], ['/spaces/TEST/title3'])
+
+        item = self.items[3]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertListEqual(eitem['ancestors_titles'],
+                             ['Title 1', 'Title 2', 'Title 3'])
+        self.assertListEqual(eitem['ancestors_links'],
+                             ['/spaces/TEST/title1', '/spaces/TEST/title2', '/spaces/TEST/title3'])
+
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
