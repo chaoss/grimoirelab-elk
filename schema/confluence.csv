@@ -1,4 +1,6 @@
 name,type
+ancestors_links,keyword
+ancestors_titles,keyword
 author_bot,boolean
 author_id,keyword
 author_name,keyword
