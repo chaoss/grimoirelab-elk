@@ -25,7 +25,7 @@ import logging
 from datetime import datetime
 from dateutil import parser
 
-from .enrich import Enrich, metadata, DEFAULT_PROJECT
+from .enrich import Enrich, metadata
 from .utils import get_time_diff_days
 
 
@@ -41,6 +41,9 @@ class BugzillaRESTEnrich(Enrich):
 
     def get_fields_uuid(self):
         return ["assigned_to_uuid", "creator_uuid"]
+
+    def get_project_repository(self, eitem):
+        return eitem['origin']
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -60,38 +63,6 @@ class BugzillaRESTEnrich(Enrich):
         identity['email'] = user['email']
         identity['name'] = user['real_name']
         return identity
-
-    def get_item_project(self, eitem):
-        """ Get project mapping enrichment field.
-
-        Bugzillarest mapping is pretty special so it needs a special
-        implementacion.
-        """
-
-        project = None
-        ds_name = self.get_connector_name()  # data source name in projects map
-
-        url = eitem['origin']
-        component = eitem['component'].replace(" ", "+")
-        product = eitem['product'].replace(" ", "+")
-
-        repo_comp = url + "/buglist.cgi?product=" + product + "&component=" + component
-        repo_comp_prod = url + "/buglist.cgi?component=" + component + "&product=" + product
-        repo_product = url + "/buglist.cgi?product=" + product
-
-        for repo in [repo_comp, repo_comp_prod, repo_product, url]:
-            if repo in self.prjs_map[ds_name]:
-                project = self.prjs_map[ds_name][repo]
-                break
-
-        if project is None:
-            project = DEFAULT_PROJECT
-
-        eitem_project = {"project": project}
-
-        eitem_project.update(self.add_project_levels(project))
-
-        return eitem_project
 
     @metadata
     def get_rich_item(self, item):

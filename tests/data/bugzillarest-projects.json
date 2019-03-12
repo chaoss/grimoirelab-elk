@@ -1,7 +1,7 @@
 {
     "Localization": {
         "bugzillarest": [
-            "https://bugzilla.mozilla.org/buglist.cgi?product=Mozilla+Localizations&component=bg+/+Bulgarian"
+            "https://bugzilla.mozilla.org --filter-raw=data.product:Mozilla Localizations,data.component=bg / Bulgarian"
         ]
     }
 }

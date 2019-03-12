@@ -60,17 +60,17 @@ CREATE TABLE `project_repositories` (
 LOCK TABLES `project_repositories` WRITE;
 /*!40000 ALTER TABLE `project_repositories` DISABLE KEYS */;
 INSERT INTO `project_repositories` VALUES 
-	(1,'its','https://bugzilla.redhat.com//buglist.cgi?product=Red Hat OpenStack'),
-	(2,'its','https://bugzilla.redhat.com//buglist.cgi?product=ovirt-engine'),
-	(1,'its','https://bugzilla.redhat.com//buglist.cgi?product=Fedora'),
-	(2,'its','https://bugzilla.redhat.com//buglist.cgi?product=OpenShift Container Platform'),
-	(1,'its','https://bugzilla.redhat.com//buglist.cgi?product=Red Hat Enterprise Linux 7'),
-	(1,'its','https://bugzilla.redhat.com//buglist.cgi?product=ovirt-hosted-engine-setup'),
-	(2,'its','https://bugzilla.redhat.com//buglist.cgi?product=Red Hat Gluster Storage');
+	(1,'its','https://bugzilla.redhat.com --filter-raw=product:Red Hat OpenStack'),
+	(2,'its','https://bugzilla.redhat.com --filter-raw=product:ovirt-engine'),
+	(1,'its','https://bugzilla.redhat.com --filter-raw=product:Fedora'),
+	(2,'its','https://bugzilla.redhat.com --filter-raw=product:OpenShift Container Platform'),
+	(1,'its','https://bugzilla.redhat.com --filter-raw=product:Red Hat Enterprise Linux 7'),
+	(1,'its','https://bugzilla.redhat.com --filter-raw=product:ovirt-hosted-engine-setup'),
+	(2,'its','https://bugzilla.redhat.com --filter-raw=product:Red Hat Gluster Storage');
 INSERT INTO `project_repositories` VALUES 
-	(1,'bugzillarest','https://bugzilla.mozilla.org//buglist.cgi?product=Core'),
-	(2,'bugzillarest','https://bugzilla.mozilla.org//buglist.cgi?product=Firefox for Android'),
-	(1,'bugzillarest','https://bugzilla.mozilla.org//buglist.cgi?product=Firefox');
+	(1,'bugzillarest','https://bugzilla.mozilla.org --filter-raw=product:Core'),
+	(2,'bugzillarest','https://bugzilla.mozilla.org --filter-raw=product:Firefox for Android'),
+	(1,'bugzillarest','https://bugzilla.mozilla.org --filter-raw=product:Firefox');
 INSERT INTO `project_repositories` VALUES 
 	(1,'scr','review.openstack.org_openstack/neutron-specs'),
 	(2,'scr','review.openstack.org_openstack/neutron'),
