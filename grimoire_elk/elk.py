@@ -580,6 +580,13 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         if node_regex:
             enrich_backend.node_regex = node_regex
 
+        # The filter raw is needed to be able to assign the project value to an enriched item
+        # see line 544, grimoire_elk/enriched/enrich.py (fltr = eitem['origin'] + ' --filter-raw=' + self.filter_raw)
+        if filter_raw:
+            enrich_backend.set_filter_raw(filter_raw)
+        elif filters_raw_prefix:
+            enrich_backend.set_filter_raw_should(filters_raw_prefix)
+
         ocean_backend = get_ocean_backend(backend_cmd, enrich_backend,
                                           no_incremental, filter_raw,
                                           filters_raw_prefix)
