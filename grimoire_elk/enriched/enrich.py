@@ -65,6 +65,7 @@ except ImportError:
     SORTINGHAT_LIBS = False
 
 
+UNKNOWN_PROJECT = 'unknown'
 DEFAULT_PROJECT = 'Main'
 DEFAULT_DB_USER = 'root'
 CUSTOM_META_PREFIX = 'cm'
@@ -544,6 +545,8 @@ class Enrich(ElasticItems):
                 if ds_name in self.prjs_map and fltr in self.prjs_map[ds_name]:
                     project = self.prjs_map[ds_name][fltr]
 
+            if project == UNKNOWN_PROJECT:
+                return None
             if project:
                 return project
 
@@ -558,6 +561,9 @@ class Enrich(ElasticItems):
                         if eitem['origin'] in ds_repo:
                             project = self.prjs_map[ds_name][ds_repo]
                             break
+
+        if project == UNKNOWN_PROJECT:
+            project = None
 
         return project
 

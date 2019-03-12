@@ -70,10 +70,7 @@ class BugzillaEnrich(Enrich):
         return identity
 
     def get_project_repository(self, eitem):
-        repo = eitem['origin']
-        product = eitem['product']
-        repo += "buglist.cgi?product=" + product
-        return repo
+        return eitem['origin']
 
     def get_identities(self, item):
         """Return the identities from an item"""
