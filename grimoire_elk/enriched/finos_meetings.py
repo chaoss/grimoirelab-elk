@@ -1,0 +1,103 @@
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2015-2019 Bitergia
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# Authors:
+#   Valerio Cosentino <valcos@bitergia.com>
+#
+
+import logging
+
+from .enrich import Enrich, metadata
+from .sortinghat_gelk import SortingHat
+
+
+logger = logging.getLogger(__name__)
+
+GITHUB_BACKEND = "github"
+
+
+class FinosMeetingsEnrich(Enrich):
+
+    def get_sh_identity(self, item, identity_field=None):
+        identity = {}
+        for field in ['name', 'email', 'username']:
+            identity[field] = None
+
+        user = item
+
+        if 'name' in user and user['name']:
+            identity['name'] = user['name']
+        if 'email' in user and user['email']:
+            identity['email'] = user['email']
+        if 'githubid' in user and user['githubid']:
+            identity['username'] = user['githubid']
+
+        return identity
+
+    def get_field_author(self):
+        return 'email'
+
+    def add_sh_github_identity(self, github_login):
+        identity = {
+            'username': github_login,
+            'email': None,
+            'name': None
+        }
+
+        SortingHat.add_identity(self.sh_db, identity, GITHUB_BACKEND)
+
+    def get_identities(self, item):
+        """ Return the identities from an item """
+
+        data = item['data']
+        identity = self.get_sh_identity(data)
+
+        if identity['username']:
+            self.add_sh_github_identity(identity['username'])
+
+        yield identity
+
+    def has_identities(self):
+        """ Return whether the enriched items contains identities """
+
+        return True
+
+    @metadata
+    def get_rich_item(self, item):
+        eitem = {}
+
+        for f in self.RAW_FIELDS_COPY:
+            if f in item:
+                eitem[f] = item[f]
+            else:
+                eitem[f] = None
+
+        entry = item['data']
+
+        for e in entry.keys():
+            if e == '_id_columns':
+                continue
+
+            eitem[e] = entry[e]
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
+
+        eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "entry"))
+
+        return eitem
