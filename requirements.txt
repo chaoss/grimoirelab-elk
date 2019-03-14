@@ -10,3 +10,4 @@ requests>=2.7.0
 -e git+https://github.com/chaoss/grimoirelab-perceval-mozilla/#egg=grimoirelab-perceval-mozilla
 -e git+https://github.com/chaoss/grimoirelab-perceval-opnfv/#egg=grimoirelab-perceval-opnfv
 -e git+https://github.com/chaoss/grimoirelab-perceval-puppet/#egg=grimoirelab-perceval-puppet
+-e git+https://github.com/Bitergia/grimoirelab-perceval-finos/#egg=grimoirelab-perceval-finos
