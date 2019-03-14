@@ -75,7 +75,7 @@ from .enriched.confluence import ConfluenceEnrich
 from .enriched.crates import CratesEnrich
 from .enriched.discourse import DiscourseEnrich
 from .enriched.dockerhub import DockerHubEnrich
-from .enriched.finos_meetings import FinosMeetingsEnrich
+from .enriched.finosmeetings import FinosMeetingsEnrich
 from .enriched.functest import FunctestEnrich
 from .enriched.gerrit import GerritEnrich
 from .enriched.git import GitEnrich
@@ -113,7 +113,7 @@ from .raw.crates import CratesOcean
 from .raw.discourse import DiscourseOcean
 from .raw.dockerhub import DockerHubOcean
 from .raw.elastic import ElasticOcean
-from .raw.finos_meetings import FinosMeetingsOcean
+from .raw.finosmeetings import FinosMeetingsOcean
 from .raw.functest import FunctestOcean
 from .raw.gerrit import GerritOcean
 from .raw.git import GitOcean
@@ -204,7 +204,7 @@ def get_connectors():
             "crates": [Crates, CratesOcean, CratesEnrich, CratesCommand],
             "discourse": [Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
             "dockerhub": [DockerHub, DockerHubOcean, DockerHubEnrich, DockerHubCommand],
-            "finos_meetings": [FinosMeetings, FinosMeetingsOcean, FinosMeetingsEnrich, FinosMeetingsCommand],
+            "finosmeetings": [FinosMeetings, FinosMeetingsOcean, FinosMeetingsEnrich, FinosMeetingsCommand],
             "functest": [Functest, FunctestOcean, FunctestEnrich, FunctestCommand],
             "gerrit": [Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git": [Git, GitOcean, GitEnrich, GitCommand],

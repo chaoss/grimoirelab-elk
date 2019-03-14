@@ -29,7 +29,7 @@ from base import TestBaseBackend
 class TestFinosMeetings(TestBaseBackend):
     """Test FinosMeetings backend"""
 
-    connector = "finos_meetings"
+    connector = "finosmeetings"
     ocean_index = "test_" + connector
     enrich_index = "test_" + connector + "_enrich"
 
