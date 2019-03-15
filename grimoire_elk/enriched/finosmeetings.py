@@ -23,6 +23,7 @@
 import logging
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 from .sortinghat_gelk import SortingHat
 
 
@@ -31,7 +32,33 @@ logger = logging.getLogger(__name__)
 GITHUB_BACKEND = "github"
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = '''
+         {
+            "dynamic":true,
+            "properties": {
+                "date": {
+                    "type": "keyword"
+                }
+            }
+        }
+        '''
+
+        return {"items": mapping}
+
+
 class FinosMeetingsEnrich(Enrich):
+
+    mapping = Mapping
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
