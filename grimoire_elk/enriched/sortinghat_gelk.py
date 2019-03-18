@@ -20,10 +20,12 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from datetime import datetime
+import datetime
 import logging
 
+from grimoirelab_toolkit.datetime import datetime_utcnow
 from sortinghat import api
+from sortinghat.db.database import Database
 from sortinghat.db.model import Identity
 from sortinghat.exceptions import AlreadyExistsError, InvalidValueError
 
@@ -94,8 +96,8 @@ class SortingHat(object):
             try:
                 api.add_organization(db, identity['company'])
                 api.add_enrollment(db, uuid, identity['company'],
-                                   datetime(1900, 1, 1),
-                                   datetime(2100, 1, 1))
+                                   datetime.datetime(1900, 1, 1),
+                                   datetime.datetime(2100, 1, 1))
             except AlreadyExistsError:
                 pass
 
@@ -118,3 +120,42 @@ class SortingHat(object):
                 continue
 
         logger.info("Total identities added to SH: %i", total)
+
+    @classmethod
+    def remove_uidentities(cls, hours_to_retain, sh_user, sh_pwd, sh_db, sh_host):
+        """Delete unique identities from Sorting Hat before a given date.
+
+        :param hours_to_retain: maximum number of hours wrt the current date to retain unique identities
+        :param sh_user: SortingHat user
+        :param sh_pwd: SortingHat password
+        :param sh_db: SortingHat database
+        param sh_host: SortingHat host
+        """
+        if hours_to_retain is None:
+            logger.debug("Data retention policy disabled, no uidentities will be deleted.")
+            return
+
+        if hours_to_retain <= 0:
+            logger.debug("Hours to retain must be greater than 0.")
+            return
+
+        deleted_uidentities = 0
+        before_date = datetime_utcnow() - datetime.timedelta(hours=hours_to_retain)
+        before_date = before_date.replace(minute=0, second=0, microsecond=0, tzinfo=None)
+
+        sh_db = Database(sh_user, sh_pwd, sh_db, sh_host)
+        uidentities = api.unique_identities(sh_db)
+
+        for uidentity in uidentities:
+            if uidentity.last_modified <= before_date:
+
+                try:
+                    api.delete_unique_identity(sh_db, uidentity.uuid)
+                    logger.debug("Unique identity %s deleted since last modified before %s.",
+                                 uidentity.uuid, before_date.isoformat())
+                    deleted_uidentities += 1
+                except Exception as e:
+                    logger.debug("Impossible to delete unique identity %s: %s", uidentity.uuid, str(e))
+
+        logger.debug("%s unique identities deleted since last modified before %s.",
+                     deleted_uidentities, before_date.isoformat())
