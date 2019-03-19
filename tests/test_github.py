@@ -77,6 +77,7 @@ class TestGit(TestBaseBackend):
         self.assertEqual(eitem['forks_count'], 16687)
         self.assertEqual(eitem['subscribers_count'], 2904)
         self.assertEqual(eitem['stargazers_count'], 48188)
+        self.assertEqual(eitem['url'], "https://github.com/kubernetes/kubernetes")
 
         item = self.items[3]
         eitem = enrich_backend.get_rich_item(item)
@@ -84,6 +85,7 @@ class TestGit(TestBaseBackend):
         self.assertEqual(eitem['forks_count'], 16687)
         self.assertEqual(eitem['subscribers_count'], 4301)
         self.assertEqual(eitem['stargazers_count'], 47118)
+        self.assertEqual(eitem['url'], "https://github.com/kubernetes/kubernetes")
 
         item = self.items[4]
         eitem = enrich_backend.get_rich_item(item)
@@ -91,6 +93,7 @@ class TestGit(TestBaseBackend):
         self.assertEqual(eitem['forks_count'], 1)
         self.assertEqual(eitem['subscribers_count'], 1)
         self.assertEqual(eitem['stargazers_count'], 1)
+        self.assertEqual(eitem['url'], "https://github.com/kubernetes/kubernetes")
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""

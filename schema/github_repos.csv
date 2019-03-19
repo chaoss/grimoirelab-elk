@@ -12,4 +12,5 @@ origin,keyword,true,"The original URL from which the repository was retrieved fr
 stargazers_count,long,true,"Number of stars of the repository."
 subscribers_count,long,true,"Number of watchers of the repository."
 tag,keyword,true,"Perceval tag."
+url,keyword,true,"Full URL of the repository"
 uuid,keyword,true,"Perceval UUID."

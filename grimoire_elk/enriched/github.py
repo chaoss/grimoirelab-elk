@@ -742,6 +742,7 @@ class GitHubEnrich(Enrich):
         rich_repo['subscribers_count'] = repo['subscribers_count']
         rich_repo['stargazers_count'] = repo['stargazers_count']
         rich_repo['fetched_on'] = repo['fetched_on']
+        rich_repo['url'] = repo['html_url']
 
         if self.prjs_map:
             rich_repo.update(self.get_item_project(rich_repo))
