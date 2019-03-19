@@ -525,7 +525,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                    author_id=None, author_uuid=None, filter_raw=None,
                    filters_raw_prefix=None, jenkins_rename_file=None,
                    unaffiliated_group=None, pair_programming=False,
-                   node_regex=False, studies_args=None, es_enrich_aliases=None):
+                   node_regex=False, studies_args=None, es_enrich_aliases=None,
+                   last_enrich_date=None):
     """ Enrich Ocean index """
 
     backend = None
@@ -564,6 +565,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         enrich_backend.set_params(backend_params)
         # store the cfg section name in the enrich backend to recover the corresponding project name in projects.json
         enrich_backend.set_cfg_section_name(cfg_section_name)
+        enrich_backend.set_from_date(last_enrich_date)
         if url_enrich:
             elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend, es_enrich_aliases)
         else:
