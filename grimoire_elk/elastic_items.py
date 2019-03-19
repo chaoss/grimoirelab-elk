@@ -116,6 +116,9 @@ class ElasticItems():
     def set_cfg_section_name(self, cfg_section_name):
         self.cfg_section_name = cfg_section_name
 
+    def set_from_date(self, last_enrich_date):
+        self.from_date = last_enrich_date
+
     # Items generator
     def fetch(self, _filter=None, ignore_incremental=False):
         """ Fetch the items from raw or enriched index. An optional _filter
@@ -205,6 +208,11 @@ class ElasticItems():
                 filter_str = filter_str.replace("'", "\"")
                 filters += filter_str
 
+            # The code below performs the incremental enrichment based on the last value of `metadata__timestamp`
+            # in the enriched index, which is calculated in the TaskEnrich before enriching the single repos that
+            # belong to a given data source. The old implementation of the incremental enrichment, which consisted in
+            # collecting the last value of `metadata__timestamp` in the enriched index for each repo, didn't work
+            # for global data source (which are collected globally and only partially enriched).
             if self.from_date and not ignore_incremental:
                 date_field = self.get_incremental_date()
                 from_date = self.from_date.isoformat()
