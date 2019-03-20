@@ -5,13 +5,13 @@
     "category": "finos-meeting-entry",
     "data": {
         "_id_columns": "email,name,date",
-        "activity": "Data Tech PMC",
+        "cm_title": "Data Tech PMC",
         "date": "2018-09-28",
         "email": "rob.underwood@finos.org",
         "githubid": "brooklynrob",
         "name": "Rob Underwood",
         "org": "FINOS",
-        "program": "Data Tech",
+        "cm_program": "Data Tech",
         "timestamp": 1538092800.0
     },
     "origin": "file:///home/slimbook/Escritorio/sources/grimoirelab-perceval-finos/tests/data/finosmeetings/finosmeetings_entries.csv",
@@ -27,13 +27,13 @@
     "category": "finos-meeting-entry",
     "data": {
         "_id_columns": "email,name,date",
-        "activity": "Security Reference Data",
+        "cm_title": "Security Reference Data",
         "date": "2018-12-11",
         "email": "tosha.ellison@finos.org",
         "githubid": "",
         "name": "Tosha Ellison",
         "org": "FINOS",
-        "program": "Data Tech",
+        "cm_program": "Data Tech",
         "timestamp": 1544486400.0
     },
     "origin": "file:///home/slimbook/Escritorio/sources/grimoirelab-perceval-finos/tests/data/finosmeetings/finosmeetings_entries.csv",
@@ -49,13 +49,13 @@
     "category": "finos-meeting-entry",
     "data": {
         "_id_columns": "email,name,date",
-        "activity": "FDC3 PMC",
+        "cm_title": "FDC3 PMC",
         "date": "2018-10-19",
         "email": "maoo@finos.org",
         "githubid": "maoo",
         "name": "Maurizio Pillitu",
         "org": "FINOS",
-        "program": "FDC3",
+        "cm_program": "FDC3",
         "timestamp": 1539907200.0
     },
     "origin": "file:///home/slimbook/Escritorio/sources/grimoirelab-perceval-finos/tests/data/finosmeetings/finosmeetings_entries.csv",
