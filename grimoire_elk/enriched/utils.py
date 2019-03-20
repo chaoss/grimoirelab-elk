@@ -168,10 +168,14 @@ def get_last_enrich(backend_cmd, enrich_backend):
         if from_date:
             if from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
                 last_enrich = from_date
-            elif enrich_backend.from_date:
-                last_enrich = enrich_backend.from_date
+            # if the index is empty, set the last enrich to None
+            elif not enrich_backend.from_date:
+                last_enrich = None
             else:
-                last_enrich = enrich_backend.get_last_update_from_es([filter_])
+                # if the index is not empty, the last enrich is the minimum between
+                # the last filtered item and the last item in the enriched index
+                last_enrich_filtered = enrich_backend.get_last_update_from_es([filter_])
+                last_enrich = get_min_last_enrich(enrich_backend.from_date, last_enrich_filtered)
 
         elif offset is not None:
             if offset != 0:
@@ -180,11 +184,20 @@ def get_last_enrich(backend_cmd, enrich_backend):
                 last_enrich = enrich_backend.get_last_offset_from_es([filter_])
 
         else:
-            if enrich_backend.from_date:
-                last_enrich = enrich_backend.from_date
+            if not enrich_backend.from_date:
+                last_enrich = None
             else:
-                last_enrich = enrich_backend.get_last_update_from_es([filter_])
+                last_enrich_filtered = enrich_backend.get_last_update_from_es([filter_])
+                last_enrich = get_min_last_enrich(enrich_backend.from_date, last_enrich_filtered)
     else:
         last_enrich = enrich_backend.get_last_update_from_es()
 
     return last_enrich
+
+
+def get_min_last_enrich(last_enrich, last_enrich_filtered):
+    min_enrich = last_enrich
+    if last_enrich_filtered:
+        min_enrich = min(last_enrich, last_enrich_filtered.replace(tzinfo=None))
+
+    return min_enrich
