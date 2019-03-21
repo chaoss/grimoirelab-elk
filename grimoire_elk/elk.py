@@ -25,18 +25,23 @@ import logging
 import pickle
 
 import redis
+from elasticsearch import Elasticsearch
 
 from datetime import datetime
 from dateutil import parser
 
 from arthur.common import Q_STORAGE_ITEMS
 from perceval.backend import find_signature_parameters, Archive
+from grimoirelab_toolkit.datetime import datetime_utcnow
 
+from .elastic_mapping import Mapping as BaseMapping
+from .elastic_items import ElasticItems
+from .enriched.sortinghat_gelk import SortingHat
+from .enriched.utils import get_last_enrich, grimoire_con, get_current_date_minus_hours
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
-from .enriched.sortinghat_gelk import SortingHat
-from .enriched.utils import get_last_enrich, grimoire_con
 
+IDENTITIES_INDEX = "grimoirelab-identities-cache"
 
 logger = logging.getLogger(__name__)
 
@@ -672,3 +677,71 @@ def init_backend(backend_cmd):
         backend_cmd.backend = backend_cmd.BACKEND(**init_args)
 
     return backend_cmd
+
+
+def populate_identities_index(es_enrichment_url, enrich_index):
+    """Save the identities currently in use in the index .identities.
+
+    :param es_enrichment_url: url of the ElasticSearch with enriched data
+    :param enrich_index: name of the enriched index
+    """
+    class Mapping(BaseMapping):
+
+        @staticmethod
+        def get_elastic_mappings(es_major):
+            """Get Elasticsearch mapping.
+
+            :param es_major: major version of Elasticsearch, as string
+            :returns:        dictionary with a key, 'items', with the mapping
+            """
+
+            mapping = """
+            {
+                "properties": {
+                   "sh_uuid": {
+                       "type": "keyword"
+                   },
+                   "last_seen": {
+                       "type": "date"
+                   }
+                }
+            }
+            """
+
+            return {"items": mapping}
+
+    # identities index
+    mapping_identities_index = Mapping()
+    elastic_identities = get_elastic(es_enrichment_url, IDENTITIES_INDEX, mapping=mapping_identities_index)
+
+    # enriched index
+    elastic_enrich = get_elastic(es_enrichment_url, enrich_index)
+    # collect mapping attributes in enriched index
+    attributes = elastic_enrich.all_properties()
+    # select attributes coming from SortingHat (*_uuid except git_uuid)
+    sh_uuid_attributes = [attr for attr in attributes if attr.endswith('_uuid') and not attr.startswith('git_')]
+
+    enriched_items = ElasticItems(None)
+    enriched_items.elastic = elastic_enrich
+
+    logger.debug("Add identities to %s", IDENTITIES_INDEX)
+
+    identities = []
+    for eitem in enriched_items.fetch(ignore_incremental=True):
+        for sh_uuid_attr in sh_uuid_attributes:
+
+            identity = {
+                'sh_uuid': eitem[sh_uuid_attr],
+                'last_seen': datetime_utcnow().isoformat()
+            }
+
+            identities.append(identity)
+
+            if len(identities) == elastic_enrich.max_items_bulk:
+                elastic_identities.bulk_upload(identities, 'sh_uuid')
+                identities = []
+
+    if len(identities) > 0:
+        elastic_identities.bulk_upload(identities, 'sh_uuid')
+
+    logger.debug("Add identities to %s", IDENTITIES_INDEX)
