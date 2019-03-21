@@ -665,6 +665,57 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
     logger.info("Done %s ", backend_name)
 
 
+def retain_identities(hours_to_retain, es_enrichment_url, sortinghat_db):
+    """Select the unique identities not seen before `hours_to_retain` and
+    delete them from SortingHat.
+
+    :param hours_to_retain: maximum number of hours wrt the current date to retain the identities
+    :param es_enrichment_url: URL of the ElasticSearch where the enriched data is stored
+    :param sortinghat_db: instance of the SortingHat database
+    """
+    before_date = get_current_date_minus_hours(hours_to_retain)
+    before_date_str = before_date.isoformat()
+
+    es = Elasticsearch([es_enrichment_url], timeout=120, max_retries=20, retry_on_timeout=True, verify_certs=False)
+
+    page = es.search(
+        index=IDENTITIES_INDEX,
+        scroll="360m",
+        size=1000,
+        body={
+            "query": {
+                "range": {
+                    "last_seen": {
+                        "lte": before_date_str
+                    }
+                }
+            }
+        }
+    )
+
+    sid = page['_scroll_id']
+    scroll_size = page['hits']['total']
+
+    if scroll_size == 0:
+        logging.warning("[identities retention] No identities found in %s after %s!", IDENTITIES_INDEX, before_date_str)
+        return
+
+    count = 0
+
+    while scroll_size > 0:
+        for item in page['hits']['hits']:
+            to_delete = item['_source']['sh_uuid']
+            success = SortingHat.remove_unique_identity(sortinghat_db, to_delete)
+            # increment the number of deleted identities only if the corresponding command was successful
+            count = count + 1 if success else count
+
+        page = es.scroll(scroll_id=sid, scroll='60m')
+        sid = page['_scroll_id']
+        scroll_size = len(page['hits']['hits'])
+
+    logger.debug("[identities retention] Total identities deleted from SH: %i", count)
+
+
 def init_backend(backend_cmd):
     """Init backend within the backend_cmd"""
 
