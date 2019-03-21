@@ -504,3 +504,21 @@ class ElasticSearch(object):
             logger.error("Error deleted items from %s.", self.anonymize_url(self.index_url))
             logger.error(ex)
             return
+
+    def all_properties(self):
+        """Get all properties of a given index"""
+
+        properties = {}
+        r = self.requests.get(self.index_url + "/_mapping", headers=HEADER_JSON, verify=False)
+        try:
+            r.raise_for_status()
+            r_json = r.json()
+
+            if 'items' in r_json[self.index]['mappings']:
+                properties = r_json[self.index]['mappings']['items']['properties']
+        except requests.exceptions.HTTPError as ex:
+            logger.error("Error all attributes for %s.", self.anonymize_url(self.index_url))
+            logger.error(ex)
+            return
+
+        return properties
