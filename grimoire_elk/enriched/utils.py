@@ -30,6 +30,9 @@ import requests
 import urllib3
 
 
+from grimoirelab_toolkit.datetime import datetime_utcnow
+
+
 BACKOFF_FACTOR = 0.2
 MAX_RETRIES = 21
 MAX_RETRIES_ON_REDIRECT = 5
@@ -201,3 +204,9 @@ def get_min_last_enrich(last_enrich, last_enrich_filtered):
         min_enrich = min(last_enrich, last_enrich_filtered.replace(tzinfo=None))
 
     return min_enrich
+
+
+def get_diff_current_date(days=0, hours=0, minutes=0):
+    before_date = datetime_utcnow() - datetime.timedelta(days=days, hours=hours, minutes=minutes)
+
+    return before_date

@@ -32,7 +32,7 @@ import requests
 from grimoire_elk.errors import ELKError
 from grimoire_elk.enriched.utils import (unixtime_to_datetime,
                                          grimoire_con,
-                                         get_current_date_minus_hours)
+                                         get_diff_current_date)
 
 logger = logging.getLogger(__name__)
 
@@ -463,21 +463,21 @@ class ElasticSearch(object):
                             last_value = unixtime_to_datetime(last_value / 1000)
         return last_value
 
-    def delete_items(self, hours_to_retain, time_field="metadata__updated_on"):
+    def delete_items(self, retention_time, time_field="metadata__updated_on"):
         """Delete documents updated before a given date
 
-        :param hours_to_retain: maximum number of hours wrt the current date to retain the data
+        :param retention_time: maximum number of minutes wrt the current date to retain the data
         :param time_field: time field to delete the data
         """
-        if hours_to_retain is None:
+        if retention_time is None:
             logger.debug("[items retention] Retention policy disabled, no items will be deleted.")
             return
 
-        if hours_to_retain <= 0:
-            logger.debug("[items retention] Hours to retain must be greater than 0.")
+        if retention_time <= 0:
+            logger.debug("[items retention] Minutes to retain must be greater than 0.")
             return
 
-        before_date = get_current_date_minus_hours(hours_to_retain)
+        before_date = get_diff_current_date(minutes=retention_time)
         before_date_str = before_date.isoformat()
 
         es_query = '''

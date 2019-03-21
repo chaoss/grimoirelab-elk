@@ -37,7 +37,7 @@ from grimoirelab_toolkit.datetime import datetime_utcnow
 from .elastic_mapping import Mapping as BaseMapping
 from .elastic_items import ElasticItems
 from .enriched.sortinghat_gelk import SortingHat
-from .enriched.utils import get_last_enrich, grimoire_con, get_current_date_minus_hours
+from .enriched.utils import get_last_enrich, grimoire_con, get_diff_current_date
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
 
@@ -485,13 +485,13 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
     return ocean_backend
 
 
-def do_studies(ocean_backend, enrich_backend, studies_args, retention_hours=None):
+def do_studies(ocean_backend, enrich_backend, studies_args, retention_time=None):
     """Execute studies related to a given enrich backend. If `retention_hours` is not None, the
     study data is deleted based on the number of `retention_hours`.
 
     :param ocean_backend: backend to access raw items
     :param enrich_backend: backend to access enriched items
-    :param retention_hours: maximum number of hours wrt the current date to retain the data
+    :param retention_time: maximum number of hours wrt the current date to retain the data
     :param studies_args: list of studies to be executed
     """
     for study in enrich_backend.studies:
@@ -516,7 +516,7 @@ def do_studies(ocean_backend, enrich_backend, studies_args, retention_hours=None
                 index_name = params[ip]
                 elastic = get_elastic(enrich_backend.elastic_url, index_name)
 
-                elastic.delete_items(retention_hours)
+                elastic.delete_items(retention_time)
 
 
 def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
@@ -665,15 +665,15 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
     logger.info("Done %s ", backend_name)
 
 
-def retain_identities(hours_to_retain, es_enrichment_url, sortinghat_db):
-    """Select the unique identities not seen before `hours_to_retain` and
+def retain_identities(retention_time, es_enrichment_url, sortinghat_db):
+    """Select the unique identities not seen before `minutes_to_retain` and
     delete them from SortingHat.
 
-    :param hours_to_retain: maximum number of hours wrt the current date to retain the identities
+    :param retention_time: maximum number of minutes wrt the current date to retain the identities
     :param es_enrichment_url: URL of the ElasticSearch where the enriched data is stored
     :param sortinghat_db: instance of the SortingHat database
     """
-    before_date = get_current_date_minus_hours(hours_to_retain)
+    before_date = get_diff_current_date(minutes=retention_time)
     before_date_str = before_date.isoformat()
 
     es = Elasticsearch([es_enrichment_url], timeout=120, max_retries=20, retry_on_timeout=True, verify_certs=False)
@@ -697,7 +697,8 @@ def retain_identities(hours_to_retain, es_enrichment_url, sortinghat_db):
     scroll_size = page['hits']['total']
 
     if scroll_size == 0:
-        logging.warning("[identities retention] No identities found in %s after %s!", IDENTITIES_INDEX, before_date_str)
+        logging.warning("[identities retention] No inactive identities found in %s after %s!",
+                        IDENTITIES_INDEX, before_date_str)
         return
 
     count = 0
@@ -731,7 +732,7 @@ def init_backend(backend_cmd):
 
 
 def populate_identities_index(es_enrichment_url, enrich_index):
-    """Save the identities currently in use in the index .identities.
+    """Save the identities currently in use in the index IDENTITIES_INDEX.
 
     :param es_enrichment_url: url of the ElasticSearch with enriched data
     :param enrich_index: name of the enriched index
