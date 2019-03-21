@@ -237,9 +237,8 @@ def get_connectors():
             }  # Will come from Registry
 
 
-def get_elastic(url, es_index, clean=None, backend=None, es_aliases=None):
+def get_elastic(url, es_index, clean=None, backend=None, es_aliases=None, mapping=None):
 
-    mapping = None
     analyzers = None
 
     if backend:
