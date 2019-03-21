@@ -486,12 +486,12 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
 
 
 def do_studies(ocean_backend, enrich_backend, studies_args, retention_time=None):
-    """Execute studies related to a given enrich backend. If `retention_hours` is not None, the
-    study data is deleted based on the number of `retention_hours`.
+    """Execute studies related to a given enrich backend. If `retention_time` is not None, the
+    study data is deleted based on the number of minutes declared in `retention_time`.
 
     :param ocean_backend: backend to access raw items
     :param enrich_backend: backend to access enriched items
-    :param retention_time: maximum number of hours wrt the current date to retain the data
+    :param retention_time: maximum number of minutes wrt the current date to retain the data
     :param studies_args: list of studies to be executed
     """
     for study in enrich_backend.studies:
