@@ -118,3 +118,20 @@ class SortingHat(object):
                 continue
 
         logger.info("Total identities added to SH: %i", total)
+
+    @classmethod
+    def remove_unique_identity(cls, sh_db, uuid):
+        """Delete a unique identity from SortingHat.
+
+        :param sh_db: SortingHat database
+        :param uuid: Unique identity identifier
+        """
+        success = False
+        try:
+            api.delete_unique_identity(sh_db, uuid)
+            logger.debug("Unique identity %s deleted", uuid)
+            success = True
+        except Exception as e:
+            logger.debug("Unique identity not deleted due to %s", str(e))
+
+        return success
