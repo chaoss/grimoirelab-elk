@@ -234,7 +234,7 @@ class StackExchangeEnrich(Enrich):
                     rich_answer = self.get_rich_item(answer,
                                                      kind='answer',
                                                      question_tags=item['data']['tags'])
-                    if rich_answer['answer_tags']:
+                    if 'answer_tags' in rich_answer:
                         answers_tags.extend(rich_answer['answer_tags'])
                     items_to_enrich.append(rich_answer)
 
