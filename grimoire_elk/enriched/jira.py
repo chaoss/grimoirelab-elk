@@ -194,12 +194,12 @@ class JiraEnrich(Enrich):
 
         eitem['changes'] = issue['changelog']['total']
 
-        if issue["fields"]["assignee"]:
+        if "assignee" in issue["fields"] and issue["fields"]["assignee"]:
             eitem['assignee'] = issue["fields"]["assignee"]["displayName"]
             if "timeZone" in issue["fields"]["assignee"]:
                 eitem['assignee_tz'] = issue["fields"]["assignee"]["timeZone"]
 
-        if issue["fields"]["creator"] and "creator" in issue["fields"]:
+        if "creator" in issue["fields"] and issue["fields"]["creator"]:
             eitem['author_name'] = issue["fields"]["creator"]["displayName"]
             eitem['author_login'] = issue["fields"]["creator"]["name"]
             if "timeZone" in issue["fields"]["creator"]:
@@ -233,7 +233,7 @@ class JiraEnrich(Enrich):
             if "timeZone" in issue["fields"]["reporter"]:
                 eitem['reporter_tz'] = issue["fields"]["reporter"]["timeZone"]
 
-        if issue['fields']['resolution']:
+        if "resolution" in issue['fields'] and issue['fields']['resolution']:
             eitem['resolution_id'] = issue['fields']['resolution']['id']
             eitem['resolution_name'] = issue['fields']['resolution']['name']
             eitem['resolution_description'] = issue['fields']['resolution']['description']
