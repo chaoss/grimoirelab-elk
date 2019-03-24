@@ -25,6 +25,7 @@ import logging
 from datetime import datetime
 
 from .enrich import Enrich, metadata
+from ..elastic_mapping import Mapping as BaseMapping
 
 from .utils import get_time_diff_days
 
@@ -32,7 +33,34 @@ from .utils import get_time_diff_days
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        geopoints type is not created in dynamic mapping
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns: dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = """
+        {
+            "properties": {
+               "releases": {
+                 "type": "keyword"
+               }
+            }
+        }
+        """
+
+        return {"items": mapping}
+
+
 class JiraEnrich(Enrich):
+
+    mapping = Mapping
 
     roles = ["assignee", "reporter", "creator"]
 
