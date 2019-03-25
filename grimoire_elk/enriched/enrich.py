@@ -915,7 +915,8 @@ class Enrich(ElasticItems):
         logger.info(log_prefix + "  Starting study - Input: " + in_index + " Output: " + out_index)
 
         # Creating connections
-        es = Elasticsearch([enrich_backend.elastic.url], timeout=100, verify_certs=self.elastic.requests.verify)
+        es = Elasticsearch([enrich_backend.elastic.url], retry_on_timeout=True, timeout=100,
+                           verify_certs=self.elastic.requests.verify)
 
         in_conn = ESOnionConnector(es_conn=es, es_index=in_index,
                                    contribs_field=contribs_field,
