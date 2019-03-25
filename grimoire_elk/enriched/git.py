@@ -738,8 +738,31 @@ class GitEnrich(Enrich):
         """ % self.perceval_backend.origin
 
         # reset references in enrich index
-        painless_cmd = 'ctx._source.branches = new HashSet();'
-        self.update_index(enrich_backend.elastic.index_url, painless_cmd, fltr)
+        es_query = """
+            {
+              "script": {
+                "source": "ctx._source.branches = new HashSet();",
+                "lang": "painless"
+              },
+              "query": {
+                "bool": {
+                    %s
+                }
+              }
+            }
+            """ % fltr
+
+        index = enrich_backend.elastic.index_url
+        r = self.requests.post(index + "/_update_by_query?refresh", data=es_query, headers=HEADER_JSON, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logger.error("Error while deleting branches on %s",
+                         self.elastic.anonymize_url(index))
+            logger.error(r.text)
+            return
+
+        logger.debug("Delete branches %s, index %s", r.text, self.elastic.anonymize_url(index))
 
     def add_commit_branches(self, git_repo, enrich_backend):
         """Add the information about branches to the documents representing commits in
@@ -773,36 +796,6 @@ class GitEnrich(Enrich):
             if commit_count:
                 self.__process_commits_in_branch(enrich_backend, branch_name, to_process)
 
-    def update_index(self, index, painless_cmd, fltr):
-        """Update documents in the index according to the painless command and filter passed in input.
-
-        :param index: target index
-        :param painless_cmd: the painless command
-        :param fltr: a string representation of the filter
-        """
-        es_query = """
-            {
-              "script": {
-                "source": "%s",
-                "lang": "painless"
-              },
-              "query": {
-                "bool": {
-                    %s
-                }
-              }
-            }
-            """ % (painless_cmd,
-                   fltr)
-
-        r = self.requests.post(index + "/_update_by_query?refresh", data=es_query, headers=HEADER_JSON, verify=False)
-        try:
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as ex:
-            logger.error("Error updating items for %s with command %s", self.elastic.anonymize_url(index), painless_cmd)
-            logger.error(ex)
-            return
-
     def remove_commits(self, items, index, attribute, origin):
         """Delete documents that correspond to commits deleted in the Git repository
 
@@ -835,7 +828,7 @@ class GitEnrich(Enrich):
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
             logger.error("Error updating deleted commits for %s.", self.elastic.anonymize_url(index))
-            logger.error(ex)
+            logger.error(r.text)
             return
 
     def __process_commits_in_branch(self, enrich_backend, branch_name, commits):
@@ -851,10 +844,35 @@ class GitEnrich(Enrich):
             logger.warning("Change branch name from %s to %s", branch_name, digested_branch_name)
 
         # update enrich index
-        painless_cmd_enrich = "if(!ctx._source.branches.contains('%s')){ctx._source.branches.add('%s');}" \
-                              % (digested_branch_name, digested_branch_name)
-        fltr_enrich = self.__prepare_filter("hash", commits_str)
-        self.update_index(enrich_backend.elastic.index_url, painless_cmd_enrich, fltr_enrich)
+        fltr = self.__prepare_filter("hash", commits_str)
+
+        es_query = """
+            {
+              "script": {
+                "source": "if(!ctx._source.branches.contains(params.branch)){ctx._source.branches.add(params.branch);}",
+                "lang": "painless",
+                "params": {
+                    "branch": "'%s'"
+                }
+              },
+              "query": {
+                "bool": {
+                    %s
+                }
+              }
+            }
+            """ % (digested_branch_name, fltr)
+
+        index = enrich_backend.elastic.index_url
+        r = self.requests.post(index + "/_update_by_query?refresh", data=es_query, headers=HEADER_JSON, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logger.error("Error adding branch info for %s", self.elastic.anonymize_url(index))
+            logger.error(r.text)
+            return
+
+        logger.debug("Add branches %s, index %s", r.text, self.elastic.anonymize_url(index))
 
     def __prepare_filter(self, terms_attr, terms_value):
         fltr = """
