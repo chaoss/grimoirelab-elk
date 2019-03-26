@@ -125,6 +125,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         from_date = None
         category = None
         latest_items = None
+        filter_classified = None
 
         backend_cmd = klass(*backend_params)
 
@@ -172,6 +173,12 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
                 except AttributeError:
                     pass
 
+        if 'filter_classified' in signature.parameters:
+            try:
+                filter_classified = backend_cmd.parsed_args.filter_classified
+            except AttributeError:
+                pass
+
         if 'latest_items' in signature.parameters:
             try:
                 latest_items = backend_cmd.latest_items
@@ -184,25 +191,20 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             # to collect the items and upload to Elasticsearch
             aitems = feed_backend_arthur(backend_name, backend_params)
             ocean_backend.feed(arthur_items=aitems)
-        elif latest_items:
-            if category:
-                ocean_backend.feed(latest_items=latest_items, category=category)
-            else:
-                ocean_backend.feed(latest_items=latest_items)
-        elif offset:
-            if category:
-                ocean_backend.feed(from_offset=offset, category=category)
-            else:
-                ocean_backend.feed(from_offset=offset)
-        elif from_date and from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
-            if category:
-                ocean_backend.feed(from_date, category=category)
-            else:
-                ocean_backend.feed(from_date)
-        elif category:
-            ocean_backend.feed(category=category)
         else:
-            ocean_backend.feed()
+            params = {}
+            if latest_items:
+                params['latest_items'] = latest_items
+            if category:
+                params['category'] = category
+            if filter_classified:
+                params['filter_classified'] = filter_classified
+            if from_date and (from_date.replace(tzinfo=None) != parser.parse("1970-01-01")):
+                params['from_date'] = from_date
+            if offset:
+                params['from_offset'] = offset
+
+            ocean_backend.feed(**params)
 
     except Exception as ex:
         if backend:
