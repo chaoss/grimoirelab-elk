@@ -53,12 +53,65 @@ class TestFinosMeetings(TestBaseBackend):
         self.assertEqual(result['raw'], 3)
         self.assertEqual(result['enrich'], 3)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('csv_org', eitem)
+        self.assertNotIn('org', eitem)
+        self.assertNotIn('project', eitem)
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('csv_org', eitem)
+        self.assertNotIn('org', eitem)
+        self.assertNotIn('project', eitem)
+
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('csv_org', eitem)
+        self.assertNotIn('org', eitem)
+        self.assertNotIn('project', eitem)
+
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
         self.assertEqual(result['raw'], 3)
         self.assertEqual(result['enrich'], 3)
+
+        enrich_backend = self.connectors[self.connector][2]()
+        enrich_backend.sortinghat = True
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('author_id', eitem)
+        self.assertIn('author_uuid', eitem)
+        self.assertIn('author_name', eitem)
+        self.assertIn('author_user_name', eitem)
+        self.assertIn('email_uuid', eitem)
+        self.assertIn('email_name', eitem)
+        self.assertIn('email_user_name', eitem)
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('author_id', eitem)
+        self.assertIn('author_uuid', eitem)
+        self.assertIn('author_name', eitem)
+        self.assertIn('author_user_name', eitem)
+        self.assertIn('email_uuid', eitem)
+        self.assertIn('email_name', eitem)
+        self.assertIn('email_user_name', eitem)
+
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('author_id', eitem)
+        self.assertIn('author_uuid', eitem)
+        self.assertIn('author_name', eitem)
+        self.assertIn('author_user_name', eitem)
+        self.assertIn('email_uuid', eitem)
+        self.assertIn('email_name', eitem)
+        self.assertIn('email_user_name', eitem)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
