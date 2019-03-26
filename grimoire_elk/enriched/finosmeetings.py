@@ -65,7 +65,7 @@ class FinosMeetingsEnrich(Enrich):
         for field in ['name', 'email', 'username']:
             identity[field] = None
 
-        user = item
+        user = item['data'] if 'data' in item else item
 
         if 'name' in user and user['name']:
             identity['name'] = user['name']
@@ -119,8 +119,13 @@ class FinosMeetingsEnrich(Enrich):
         for e in entry.keys():
             if e == '_id_columns':
                 continue
+            elif e == 'org':
+                eitem['csv_org'] = entry[e]
+            else:
+                eitem[e] = entry[e]
 
-            eitem[e] = entry[e]
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(item))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
