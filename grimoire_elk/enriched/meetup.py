@@ -223,10 +223,14 @@ class MeetupEnrich(Enrich):
                 "lat": group['lat'],
                 "lon": group['lon'],
             }
-            group_topics = [topic['name'] for topic in group['topics']]
-            group_topics_keys = [topic['urlkey'] for topic in group['topics']]
-            eitem['group_topics'] = group_topics
-            eitem['group_topics_keys'] = group_topics_keys
+
+            eitem['group_topics'] = []
+            eitem['group_topics_keys'] = []
+            if 'topics' in group:
+                group_topics = [topic['name'] for topic in group['topics']]
+                group_topics_keys = [topic['urlkey'] for topic in group['topics']]
+                eitem['group_topics'] = group_topics
+                eitem['group_topics_keys'] = group_topics_keys
 
         if len(event['rsvps']) > 0:
             eitem['group_members'] = event['rsvps'][0]['group']['members']
