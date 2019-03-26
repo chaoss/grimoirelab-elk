@@ -152,7 +152,8 @@ class ElasticOcean(ElasticItems):
         # Also add timestamp used in incremental enrichment
         item['metadata__timestamp'] = timestamp.isoformat()
 
-    def feed(self, from_date=None, from_offset=None, category=None, latest_items=None, arthur_items=None):
+    def feed(self, from_date=None, from_offset=None, category=None,
+             latest_items=None, arthur_items=None, filter_classified=None):
         """ Feed data in Elastic from Perceval or Arthur """
 
         if self.fetch_archive:
@@ -197,31 +198,29 @@ class ElasticOcean(ElasticItems):
             else:
                 logger.info("Not incremental")
 
+        params = {}
+        # category and filter_classified params are shared
+        # by all Perceval backends
+        if category is not None:
+            params['category'] = category
+        if filter_classified is not None:
+            params['filter_classified'] = filter_classified
+
+        # latest items, from_date and offset cannot be used together,
+        # thus, the params dictionary is filled with the param available
+        # and Perceval is executed
         if latest_items:
-            if category:
-                items = self.perceval_backend.fetch(latest_items=latest_items,
-                                                    category=category)
-            else:
-                items = self.perceval_backend.fetch(latest_items=latest_items)
+            params['latest_items'] = latest_items
+            items = self.perceval_backend.fetch(**params)
         elif last_update:
-            # if offset used for incremental do not use date
-            # Perceval backend from_date must not include timezone
-            # It always uses the server datetime
             last_update = last_update.replace(tzinfo=None)
-            if category:
-                items = self.perceval_backend.fetch(from_date=last_update, category=category)
-            else:
-                items = self.perceval_backend.fetch(from_date=last_update)
+            params['from_date'] = last_update
+            items = self.perceval_backend.fetch(**params)
         elif offset is not None:
-            if category:
-                items = self.perceval_backend.fetch(offset=offset, category=category)
-            else:
-                items = self.perceval_backend.fetch(offset=offset)
+            params['offset'] = offset
+            items = self.perceval_backend.fetch(**params)
         else:
-            if category:
-                items = self.perceval_backend.fetch(category=category)
-            else:
-                items = self.perceval_backend.fetch()
+            items = self.perceval_backend.fetch(**params)
 
         self.feed_items(items)
         self.update_items()
