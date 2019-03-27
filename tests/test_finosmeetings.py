@@ -126,20 +126,20 @@ class TestFinosMeetings(TestBaseBackend):
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
         self.assertIn('project', eitem)
-        self.assertEqual(eitem['project'], eitem['cm_program'])
-        self.assertEqual(eitem['project_1'], eitem['cm_program'])
+        self.assertEqual(eitem['project'], eitem['cm_title'])
+        self.assertEqual(eitem['project_1'], eitem['cm_title'])
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
         self.assertIn('project', eitem)
-        self.assertEqual(eitem['project'], eitem['cm_program'])
-        self.assertEqual(eitem['project_1'], eitem['cm_program'])
+        self.assertEqual(eitem['project'], eitem['cm_title'])
+        self.assertEqual(eitem['project_1'], eitem['cm_title'])
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
         self.assertIn('project', eitem)
-        self.assertEqual(eitem['project'], eitem['cm_program'])
-        self.assertEqual(eitem['project_1'], eitem['cm_program'])
+        self.assertEqual(eitem['project'], eitem['cm_title'])
+        self.assertEqual(eitem['project_1'], eitem['cm_title'])
 
     def test_refresh_identities(self):
         """Test refresh identities"""

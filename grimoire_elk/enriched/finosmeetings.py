@@ -137,8 +137,8 @@ class FinosMeetingsEnrich(Enrich):
     def get_item_project(self, eitem):
 
         project_info = {
-            "project": eitem['cm_program'],
-            "project_1": eitem['cm_program']
+            "project": eitem['cm_title'],
+            "project_1": eitem['cm_title']
         }
 
         return project_info
