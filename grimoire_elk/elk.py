@@ -41,7 +41,8 @@ from .enriched.utils import get_last_enrich, grimoire_con, get_diff_current_date
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
 
-IDENTITIES_INDEX = "grimoirelab-identities-cache"
+IDENTITIES_INDEX = "grimoirelab_identities_cache"
+SIZE_SCROLL_IDENTITIES_INDEX = 1000
 
 logger = logging.getLogger(__name__)
 
@@ -665,28 +666,159 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
     logger.info("Done %s ", backend_name)
 
 
-def retain_identities(retention_time, es_enrichment_url, sortinghat_db):
-    """Select the unique identities not seen before `minutes_to_retain` and
+def delete_orphan_unique_identities(es, sortinghat_db, current_data_source, active_data_sources):
+    """Delete all unique identities which appear in SortingHat, but not in the IDENTITIES_INDEX.
+
+    :param es: ElasticSearchDSL object
+    :param sortinghat_db: instance of the SortingHat database
+    :param current_data_source: current data source
+    :param active_data_sources: list of active data sources
+    """
+    def get_uuids_in_index(target_uuids):
+        """Find a set of uuids in IDENTITIES_INDEX and return them if exist.
+
+        :param target_uuids: target uuids
+        """
+        page = es.search(
+            index=IDENTITIES_INDEX,
+            scroll="360m",
+            size=SIZE_SCROLL_IDENTITIES_INDEX,
+            body={
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {
+                                "terms": {
+                                    "sh_uuid": target_uuids
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        )
+
+        hits = []
+        if page['hits']['total'] != 0:
+            hits = page['hits']['hits']
+
+        return hits
+
+    def delete_unique_identities(target_uuids):
+        """Delete a list of uuids from SortingHat.
+
+        :param target_uuids: uuids to be deleted
+        """
+        count = 0
+
+        for uuid in target_uuids:
+            success = SortingHat.remove_unique_identity(sortinghat_db, uuid)
+            count = count + 1 if success else count
+
+        return count
+
+    def delete_identities(unique_ident, data_sources):
+        """Remove the identities in non active data sources.
+
+        :param unique_ident: unique identity object
+        :param data_sources: target data sources
+        """
+        count = 0
+        for ident in unique_ident.identities:
+            if ident.source not in data_sources:
+                success = SortingHat.remove_identity(sortinghat_db, ident.id)
+                count = count + 1 if success else count
+
+        return count
+
+    def has_identities_in_data_sources(unique_ident, data_sources):
+        """Check if a unique identity has identities in a set of data sources.
+
+        :param unique_ident: unique identity object
+        :param data_sources: target data sources
+        """
+        in_active = False
+        for ident in unique_ident.identities:
+            if ident.source in data_sources:
+                in_active = True
+                break
+
+        return in_active
+
+    deleted_unique_identities = 0
+    deleted_identities = 0
+    uuids_to_process = []
+
+    # Collect all unique identities
+    for unique_identity in SortingHat.unique_identities(sortinghat_db):
+
+        # Remove a unique identity if all its identities are in non active data source
+        if not has_identities_in_data_sources(unique_identity, active_data_sources):
+            deleted_unique_identities += delete_unique_identities([unique_identity.uuid])
+            continue
+
+        # Remove the identities of non active data source for a given unique identity
+        deleted_identities += delete_identities(unique_identity, active_data_sources)
+
+        # Process only the unique identities that include the current data source, since
+        # it may be that unique identities in other data source have not been
+        # added yet to IDENTITIES_INDEX
+        if not has_identities_in_data_sources(unique_identity, [current_data_source]):
+            continue
+
+        # Add the uuid to the list to check its existence in the IDENTITIES_INDEX
+        uuids_to_process.append(unique_identity.uuid)
+
+        # Process the uuids in block of SIZE_SCROLL_IDENTITIES_INDEX
+        if len(uuids_to_process) != SIZE_SCROLL_IDENTITIES_INDEX:
+            continue
+
+        # Find which uuids to be processed exist in IDENTITIES_INDEX
+        results = get_uuids_in_index(uuids_to_process)
+        uuids_found = [item['_source']['sh_uuid'] for item in results]
+
+        # Find the uuids which exist in SortingHat but not in IDENTITIES_INDEX
+        orphan_uuids = set(uuids_to_process) - set(uuids_found)
+        # Delete the orphan uuids from SortingHat
+        deleted_unique_identities += delete_unique_identities(orphan_uuids)
+        # Reset the list
+        uuids_to_process = []
+
+    # Check that no uuids have been left to process
+    if uuids_to_process:
+        # Find which uuids to be processed exist in IDENTITIES_INDEX
+        results = get_uuids_in_index(uuids_to_process)
+        uuids_found = [item['_source']['sh_uuid'] for item in results]
+
+        # Find the uuids which exist in SortingHat but not in IDENTITIES_INDEX
+        orphan_uuids = set(uuids_to_process) - set(uuids_found)
+
+        # Delete the orphan uuids from SortingHat
+        deleted_unique_identities += delete_unique_identities(orphan_uuids)
+
+    logger.debug("[identities retention] Total orphan unique identities deleted from SH: %i",
+                 deleted_unique_identities)
+    logger.debug("[identities retention] Total identities in non-active data sources deleted from SH: %i",
+                 deleted_identities)
+
+
+def delete_inactive_unique_identities(es, sortinghat_db, before_date):
+    """Select the unique identities not seen before `before_date` and
     delete them from SortingHat.
 
-    :param retention_time: maximum number of minutes wrt the current date to retain the identities
-    :param es_enrichment_url: URL of the ElasticSearch where the enriched data is stored
+    :param es: ElasticSearchDSL object
     :param sortinghat_db: instance of the SortingHat database
+    :param before_date: datetime str to filter the identities
     """
-    before_date = get_diff_current_date(minutes=retention_time)
-    before_date_str = before_date.isoformat()
-
-    es = Elasticsearch([es_enrichment_url], timeout=120, max_retries=20, retry_on_timeout=True, verify_certs=False)
-
     page = es.search(
         index=IDENTITIES_INDEX,
         scroll="360m",
-        size=1000,
+        size=SIZE_SCROLL_IDENTITIES_INDEX,
         body={
             "query": {
                 "range": {
                     "last_seen": {
-                        "lte": before_date_str
+                        "lte": before_date
                     }
                 }
             }
@@ -698,7 +830,7 @@ def retain_identities(retention_time, es_enrichment_url, sortinghat_db):
 
     if scroll_size == 0:
         logging.warning("[identities retention] No inactive identities found in %s after %s!",
-                        IDENTITIES_INDEX, before_date_str)
+                        IDENTITIES_INDEX, before_date)
         return
 
     count = 0
@@ -714,7 +846,29 @@ def retain_identities(retention_time, es_enrichment_url, sortinghat_db):
         sid = page['_scroll_id']
         scroll_size = len(page['hits']['hits'])
 
-    logger.debug("[identities retention] Total identities deleted from SH: %i", count)
+    logger.debug("[identities retention] Total inactive identities deleted from SH: %i", count)
+
+
+def retain_identities(retention_time, es_enrichment_url, sortinghat_db, data_source, active_data_sources):
+    """Select the unique identities not seen before `retention_time` and
+    delete them from SortingHat. Furthermore, it deletes also the orphan unique identities,
+    those ones stored in SortingHat but not in IDENTITIES_INDEX.
+
+    :param retention_time: maximum number of minutes wrt the current date to retain the identities
+    :param es_enrichment_url: URL of the ElasticSearch where the enriched data is stored
+    :param sortinghat_db: instance of the SortingHat database
+    :param data_source: target data source (e.g., git, github, slack)
+    :param active_data_sources: list of active data sources
+    """
+    before_date = get_diff_current_date(minutes=retention_time)
+    before_date_str = before_date.isoformat()
+
+    es = Elasticsearch([es_enrichment_url], timeout=120, max_retries=20, retry_on_timeout=True, verify_certs=False)
+
+    # delete the unique identities which have not been seen after `before_date`
+    delete_inactive_unique_identities(es, sortinghat_db, before_date_str)
+    # delete the unique identities for a given data source which are not in the IDENTITIES_INDEX
+    delete_orphan_unique_identities(es, sortinghat_db, data_source, active_data_sources)
 
 
 def init_backend(backend_cmd):
@@ -776,7 +930,7 @@ def populate_identities_index(es_enrichment_url, enrich_index):
     enriched_items = ElasticItems(None)
     enriched_items.elastic = elastic_enrich
 
-    logger.debug("Add identities to %s", IDENTITIES_INDEX)
+    logger.debug("[identities-index] Start adding identities to %s", IDENTITIES_INDEX)
 
     identities = []
     for eitem in enriched_items.fetch(ignore_incremental=True):
@@ -796,4 +950,4 @@ def populate_identities_index(es_enrichment_url, enrich_index):
     if len(identities) > 0:
         elastic_identities.bulk_upload(identities, 'sh_uuid')
 
-    logger.debug("Add identities to %s", IDENTITIES_INDEX)
+    logger.debug("[identities-index] End adding identities to %s", IDENTITIES_INDEX)
