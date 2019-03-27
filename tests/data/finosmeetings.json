@@ -1,68 +1,75 @@
-[
-  {
+[{
     "backend_name": "FinosMeetings",
-    "backend_version": "0.1.0",
+    "backend_version": "0.3.0",
     "category": "finos-meeting-entry",
+    "classified_fields_filtered": null,
     "data": {
-        "_id_columns": "email,name,date",
+        "_id_columns": "email,name,date,cm_program,cm_title,cm_type",
+        "cm_program": "Data Tech",
         "cm_title": "Data Tech PMC",
-        "date": "2018-09-28",
+        "cm_type": "PMC",
+        "date": "2019-01-25",
+        "date_iso_format": "2019-01-25T00:00:00+00:00",
+        "email": "Sailesh.Pandey@nomura.com",
+        "githubid": "",
+        "name": "Sailesh Pandey",
+        "org": "Nomura",
+        "timestamp": 1548374400.0
+    },
+    "origin": "file:///home/slimbook/Escritorio/finos-meetings.csv",
+    "perceval_version": "0.12.8",
+    "tag": "file:///home/slimbook/Escritorio/finos-meetings.csv",
+    "timestamp": 1553703981.584781,
+    "updated_on": 1548374400.0,
+    "uuid": "1e743b80d5411bc176c6903266d50dd51aab7ddc"
+},
+{
+    "backend_name": "FinosMeetings",
+    "backend_version": "0.3.0",
+    "category": "finos-meeting-entry",
+    "classified_fields_filtered": null,
+    "data": {
+        "_id_columns": "email,name,date,cm_program,cm_title,cm_type",
+        "cm_program": "Data Tech",
+        "cm_title": "Data Tech PMC",
+        "cm_type": "PMC",
+        "date": "2019-01-25",
+        "date_iso_format": "2019-01-25T00:00:00+00:00",
+        "email": "Alvin.Shih@morganstanley.com",
+        "githubid": "alvin-c-shih",
+        "name": "Alvin Shih",
+        "org": "Morgan Stanley",
+        "timestamp": 1548374400.0
+    },
+    "origin": "file:///home/slimbook/Escritorio/finos-meetings.csv",
+    "perceval_version": "0.12.8",
+    "tag": "file:///home/slimbook/Escritorio/finos-meetings.csv",
+    "timestamp": 1553703981.585065,
+    "updated_on": 1548374400.0,
+    "uuid": "1342d2a8e6790abb0ef7b5c935e9481eb371f3e8"
+},
+{
+    "backend_name": "FinosMeetings",
+    "backend_version": "0.3.0",
+    "category": "finos-meeting-entry",
+    "classified_fields_filtered": null,
+    "data": {
+        "_id_columns": "email,name,date,cm_program,cm_title,cm_type",
+        "cm_program": "Data Tech",
+        "cm_title": "Data Tech PMC",
+        "cm_type": "PMC",
+        "date": "2019-01-25",
+        "date_iso_format": "2019-01-25T00:00:00+00:00",
         "email": "rob.underwood@finos.org",
         "githubid": "brooklynrob",
         "name": "Rob Underwood",
         "org": "FINOS",
-        "cm_program": "Data Tech",
-        "timestamp": 1538092800.0
+        "timestamp": 1548374400.0
     },
-    "origin": "file:///home/slimbook/Escritorio/sources/grimoirelab-perceval-finos/tests/data/finosmeetings/finosmeetings_entries.csv",
-    "perceval_version": "0.12.7",
-    "tag": "file:///home/slimbook/Escritorio/sources/grimoirelab-perceval-finos/tests/data/finosmeetings/finosmeetings_entries.csv",
-    "timestamp": 1552572843.496362,
-    "updated_on": 1538092800.0,
-    "uuid": "31df0ad6cbfbf0263bfdf1ae8cc0e4e5f691ac94"
-},
-{
-    "backend_name": "FinosMeetings",
-    "backend_version": "0.1.0",
-    "category": "finos-meeting-entry",
-    "data": {
-        "_id_columns": "email,name,date",
-        "cm_title": "Security Reference Data",
-        "date": "2018-12-11",
-        "email": "tosha.ellison@finos.org",
-        "githubid": "",
-        "name": "Tosha Ellison",
-        "org": "FINOS",
-        "cm_program": "Data Tech",
-        "timestamp": 1544486400.0
-    },
-    "origin": "file:///home/slimbook/Escritorio/sources/grimoirelab-perceval-finos/tests/data/finosmeetings/finosmeetings_entries.csv",
-    "perceval_version": "0.12.7",
-    "tag": "file:///home/slimbook/Escritorio/sources/grimoirelab-perceval-finos/tests/data/finosmeetings/finosmeetings_entries.csv",
-    "timestamp": 1552572843.496581,
-    "updated_on": 1544486400.0,
-    "uuid": "c842fa83080b4517cf2ab56218ff261338dfcdfc"
-},
-{
-    "backend_name": "FinosMeetings",
-    "backend_version": "0.1.0",
-    "category": "finos-meeting-entry",
-    "data": {
-        "_id_columns": "email,name,date",
-        "cm_title": "FDC3 PMC",
-        "date": "2018-10-19",
-        "email": "maoo@finos.org",
-        "githubid": "maoo",
-        "name": "Maurizio Pillitu",
-        "org": "FINOS",
-        "cm_program": "FDC3",
-        "timestamp": 1539907200.0
-    },
-    "origin": "file:///home/slimbook/Escritorio/sources/grimoirelab-perceval-finos/tests/data/finosmeetings/finosmeetings_entries.csv",
-    "perceval_version": "0.12.7",
-    "tag": "file:///home/slimbook/Escritorio/sources/grimoirelab-perceval-finos/tests/data/finosmeetings/finosmeetings_entries.csv",
-    "timestamp": 1552572843.496736,
-    "updated_on": 1539907200.0,
-    "uuid": "f239821a53d5554125ae7775a2df54b83362fc7d"
-}
-]
+    "origin": "file:///home/slimbook/Escritorio/finos-meetings.csv",
+    "perceval_version": "0.12.8",
+    "tag": "file:///home/slimbook/Escritorio/finos-meetings.csv",
+    "timestamp": 1553703981.585237,
+    "updated_on": 1548374400.0,
+    "uuid": "2035796c94e22a21933b7274b146437185a7ba5a"
+}]
