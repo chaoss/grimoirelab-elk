@@ -152,3 +152,15 @@ class SortingHat(object):
             logger.debug("Unique identity not deleted due to %s", str(e))
 
         return success
+
+    @classmethod
+    def unique_identities(cls, sh_db):
+        """List the unique identities available in SortingHat.
+
+        :param sh_db: SortingHat database
+        """
+        try:
+            for unique_identity in api.unique_identities(sh_db):
+                yield unique_identity
+        except Exception as e:
+            logger.debug("Unique identities not returned from SortingHat due to %s", str(e))
