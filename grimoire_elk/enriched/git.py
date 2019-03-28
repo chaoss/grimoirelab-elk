@@ -25,10 +25,12 @@ import logging
 import re
 import sys
 import time
-
+from .countryinfo import countrylist
 import pkg_resources
 import requests
 from elasticsearch import Elasticsearch
+from datetime import datetime, timedelta
+import pytz
 
 from grimoirelab_toolkit.datetime import (datetime_to_utc,
                                           str_to_datetime)
@@ -350,6 +352,31 @@ class GitEnrich(Enrich):
         eitem["tz"] = int(author_date.strftime("%z")[0:3])
         eitem["branches"] = []
 
+         # probable countries derived from timezone of AuthorDate
+        if 'AuthorDate' in commit:
+            a_date=datetime.strptime(commit["AuthorDate"], "%a %b %d %H:%M:%S %Y %z")
+            autc_offset = a_date.utcoffset()
+            names={tz.zone for tz in map(pytz.timezone, pytz.all_timezones_set) if a_date.astimezone(tz).utcoffset() == autc_offset}
+            #using function from file countryinfo
+            eitem['country_using_author_date']=countrylist(names)
+            
+
+        # list of directories and files touched by commit
+        file_list=set()
+        dir_list=set()
+        for cfile in commit["files"]:
+            if 'action' not in cfile:
+                # merges are not counted
+                continue
+            file_name=cfile["file"].split('/')[-1]
+            dir_name=cfile['file'].replace('/'+file_name,'')
+            file_list.add(file_name)
+            dir_list.add(dir_name)
+        eitem['file_list']=list(file_list)
+        eitem['dir_list']=list(dir_list)
+        
+        
+        
         # Compute time to commit
         time_to_commit_delta = datetime_to_utc(author_date) - datetime_to_utc(commit_date)
         eitem["time_to_commit_hours"] = round(time_to_commit_delta.seconds / 3600, 2)
