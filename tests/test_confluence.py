@@ -26,6 +26,7 @@ import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.raw.confluence import ConfluenceOcean
+from grimoire_elk.enriched.confluence import NO_ANCESTOR_TITLE
 
 
 class TestConfluence(TestBaseBackend):
@@ -61,7 +62,7 @@ class TestConfluence(TestBaseBackend):
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
-        self.assertListEqual(eitem['ancestors_titles'], ['Title 1'])
+        self.assertListEqual(eitem['ancestors_titles'], [NO_ANCESTOR_TITLE])
         self.assertListEqual(eitem['ancestors_links'], ['/spaces/TEST/title1'])
 
         item = self.items[2]

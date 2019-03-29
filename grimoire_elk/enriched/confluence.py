@@ -29,6 +29,9 @@ from ..elastic_mapping import Mapping as BaseMapping
 logger = logging.getLogger(__name__)
 
 
+NO_ANCESTOR_TITLE = "NO_TITLE"
+
+
 class Mapping(BaseMapping):
 
     @staticmethod
@@ -143,7 +146,11 @@ class ConfluenceEnrich(Enrich):
             ancestors = page['ancestors']
             if isinstance(ancestors, list):
                 for ancestor in ancestors:
-                    ancestors_titles.append(ancestor['title'])
+                    if 'title' in ancestor:
+                        ancestors_titles.append(ancestor['title'])
+                    else:
+                        ancestors_titles.append(NO_ANCESTOR_TITLE)
+
                     ancestors_links.append(ancestor['_links']['webui'])
 
         eitem['ancestors_titles'] = ancestors_titles
