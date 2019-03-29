@@ -149,7 +149,6 @@
                 "id": "128548867",
                 "type": "page",
                 "status": "current",
-                "title": "Title 1",
                 "_links" : {
                     "webui" : "/spaces/TEST/title1"
                 }
