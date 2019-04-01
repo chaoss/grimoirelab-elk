@@ -86,9 +86,12 @@ class MeetupEnrich(Enrich):
             yield user
 
         # rsvps
-        for rsvp in item['rsvps']:
+        rsvps = item.get('rsvps', [])
+
+        for rsvp in rsvps:
             user = self.get_sh_identity(rsvp['member'])
             yield user
+
         # Comments
         for comment in item['comments']:
             user = self.get_sh_identity(comment['member'])
@@ -175,7 +178,9 @@ class MeetupEnrich(Enrich):
             else:
                 eitem[f] = None
 
-        eitem['num_rsvps'] = len(event['rsvps'])
+        rsvps = event.get('rsvps', [])
+
+        eitem['num_rsvps'] = len(rsvps)
         eitem['num_comments'] = len(event['comments'])
 
         try:
@@ -232,8 +237,8 @@ class MeetupEnrich(Enrich):
                 eitem['group_topics'] = group_topics
                 eitem['group_topics_keys'] = group_topics_keys
 
-        if len(event['rsvps']) > 0:
-            eitem['group_members'] = event['rsvps'][0]['group']['members']
+        if len(rsvps) > 0:
+            eitem['group_members'] = rsvps[0]['group']['members']
 
         created = unixtime_to_datetime(event['created'] / 1000).isoformat()
         eitem['type'] = "meetup"
