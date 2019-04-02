@@ -680,7 +680,7 @@ class GitEnrich(Enrich):
         try:
             current_hashes = set([commit for commit in git_repo.rev_list()])
         except Exception as e:
-            logger.error("Something went wrong with %s, %s", git_repo.uri, e, exc_info=True)
+            logger.error("Skip updating branch info for repo %s, git rev-list command failed: %s", git_repo.uri, e)
             return
 
         raw_hashes = set([item['data']['commit']
@@ -784,7 +784,13 @@ class GitEnrich(Enrich):
             commit_count = 0
             branch_name = refname.replace('refs/heads/', '')
 
-            for commit in git_repo.rev_list([branch_name]):
+            try:
+                commits = git_repo.rev_list([branch_name])
+            except Exception as e:
+                logger.error("Skip adding branch info for repo %s, git rev-list command failed: %s", git_repo.uri, e)
+                return
+
+            for commit in commits:
                 to_process.append(commit)
                 commit_count += 1
 
