@@ -25,12 +25,16 @@
 
 import json
 import logging
+import re
 
 from .enriched.utils import get_repository_filter, grimoire_con
 from .elastic_mapping import Mapping
 
 HEADER_JSON = {"Content-Type": "application/json"}
 MAX_BULK_UPDATE_SIZE = 1000
+
+FILTER_DATA_ATTR = 'data.'
+FILTER_SEPARATOR = r",\s*%s" % FILTER_DATA_ATTR
 
 logger = logging.getLogger(__name__)
 
@@ -77,33 +81,42 @@ class ElasticItems():
 
     @staticmethod
     def __process_filter(fltr_raw):
-        fltr_params = fltr_raw.split(":", 1)
+        fltr = fltr_raw
+
+        if not fltr_raw.startswith(FILTER_DATA_ATTR):
+            fltr = FILTER_DATA_ATTR + fltr_raw
+
+        fltr_params = fltr.split(":", 1)
         fltr_name = fltr_params[0].strip().replace('"', '')
         fltr_value = fltr_params[1].strip().replace('"', '')
 
-        fltr = {
+        fltr_dict = {
             'name': fltr_name,
             'value': fltr_value
         }
 
-        return fltr
+        return fltr_dict
 
     def set_filter_raw(self, filter_raw):
-        """ Filter to be used when getting items from Ocean index """
+        """Filter to be used when getting items from Ocean index"""
+
         self.filter_raw = filter_raw
 
         self.filter_raw_dict = []
-        for fltr_raw in filter_raw.split(","):
+        splitted = re.compile(FILTER_SEPARATOR).split(filter_raw)
+        for fltr_raw in splitted:
             fltr = self.__process_filter(fltr_raw)
 
             self.filter_raw_dict.append(fltr)
 
     def set_filter_raw_should(self, filter_raw_should):
-        """ Bool filter should to be used when getting items from Ocean index """
+        """Bool filter should to be used when getting items from Ocean index"""
+
         self.filter_raw_should = filter_raw_should
 
         self.filter_raw_should_dict = []
-        for fltr_raw in filter_raw_should.split(","):
+        splitted = re.compile(FILTER_SEPARATOR).split(filter_raw_should)
+        for fltr_raw in splitted:
             fltr = self.__process_filter(fltr_raw)
 
             self.filter_raw_should_dict.append(fltr)
