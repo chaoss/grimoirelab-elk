@@ -786,23 +786,24 @@ class GitEnrich(Enrich):
 
             try:
                 commits = git_repo.rev_list([branch_name])
-            except Exception as e:
-                logger.error("Skip adding branch info for repo %s, git rev-list command failed: %s", git_repo.uri, e)
-                return
 
-            for commit in commits:
-                to_process.append(commit)
-                commit_count += 1
+                for commit in commits:
+                    to_process.append(commit)
+                    commit_count += 1
 
-                if commit_count == MAX_BULK_UPDATE_SIZE:
+                    if commit_count == MAX_BULK_UPDATE_SIZE:
+                        self.__process_commits_in_branch(enrich_backend, branch_name, to_process)
+
+                        # reset the counter
+                        to_process = []
+                        commit_count = 0
+
+                if commit_count:
                     self.__process_commits_in_branch(enrich_backend, branch_name, to_process)
 
-                    # reset the counter
-                    to_process = []
-                    commit_count = 0
-
-            if commit_count:
-                self.__process_commits_in_branch(enrich_backend, branch_name, to_process)
+            except Exception as e:
+                logger.error("Skip adding branch info for repo %s due to %s", git_repo.uri, e)
+                return
 
     def remove_commits(self, items, index, attribute, origin):
         """Delete documents that correspond to commits deleted in the Git repository
