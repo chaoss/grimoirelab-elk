@@ -939,6 +939,9 @@ def populate_identities_index(es_enrichment_url, enrich_index):
             if sh_uuid_attr not in eitem:
                 continue
 
+            if not eitem[sh_uuid_attr]:
+                continue
+
             identity = {
                 'sh_uuid': eitem[sh_uuid_attr],
                 'last_seen': datetime_utcnow().isoformat()
