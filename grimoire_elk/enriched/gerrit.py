@@ -20,14 +20,14 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from datetime import datetime
-from dateutil import parser
 import logging
-import time
 
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 
+from grimoirelab_toolkit.datetime import (str_to_datetime,
+                                          datetime_utcnow,
+                                          unixtime_to_datetime)
 
 logger = logging.getLogger(__name__)
 
@@ -143,29 +143,27 @@ class GerritEnrich(Enrich):
         return eitem["_source"]["review_id"]
 
     def _fix_review_dates(self, item):
-        ''' Convert dates so ES detect them '''
+        """Convert dates so ES detect them"""
 
         for date_field in ['timestamp', 'createdOn', 'lastUpdated']:
             if date_field in item.keys():
                 date_ts = item[date_field]
-                item[date_field] = time.strftime('%Y-%m-%dT%H:%M:%S',
-                                                 time.localtime(date_ts))
+                item[date_field] = unixtime_to_datetime(date_ts).isoformat()
+
         if 'patchSets' in item.keys():
             for patch in item['patchSets']:
                 pdate_ts = patch['createdOn']
-                patch['createdOn'] = time.strftime('%Y-%m-%dT%H:%M:%S',
-                                                   time.localtime(pdate_ts))
+                patch['createdOn'] = unixtime_to_datetime(pdate_ts).isoformat()
+
                 if 'approvals' in patch:
                     for approval in patch['approvals']:
                         adate_ts = approval['grantedOn']
-                        approval['grantedOn'] = \
-                            time.strftime('%Y-%m-%dT%H:%M:%S',
-                                          time.localtime(adate_ts))
+                        approval['grantedOn'] = unixtime_to_datetime(adate_ts).isoformat()
+
         if 'comments' in item.keys():
             for comment in item['comments']:
                 cdate_ts = comment['timestamp']
-                comment['timestamp'] = time.strftime('%Y-%m-%dT%H:%M:%S',
-                                                     time.localtime(cdate_ts))
+                comment['timestamp'] = unixtime_to_datetime(cdate_ts).isoformat()
 
     @metadata
     def get_rich_item(self, item):
@@ -216,11 +214,11 @@ class GerritEnrich(Enrich):
         if len(review["patchSets"]) > 0:
             created_on = review["patchSets"][0]['createdOn']
 
-        created_on_date = parser.parse(created_on)
+        created_on_date = str_to_datetime(created_on)
         eitem["created_on"] = created_on
 
         eitem["last_updated"] = review['lastUpdated']
-        last_updated_date = parser.parse(review['lastUpdated'])
+        last_updated_date = str_to_datetime(review['lastUpdated'])
 
         seconds_day = float(60 * 60 * 24)
         if eitem['status'] in ['MERGED', 'ABANDONED']:
@@ -228,7 +226,7 @@ class GerritEnrich(Enrich):
                 (last_updated_date - created_on_date).total_seconds() / seconds_day
         else:
             timeopen = \
-                (datetime.utcnow() - created_on_date).total_seconds() / seconds_day
+                (datetime_utcnow() - created_on_date).total_seconds() / seconds_day
         eitem["timeopen"] = '%.2f' % timeopen
 
         if self.sortinghat:
