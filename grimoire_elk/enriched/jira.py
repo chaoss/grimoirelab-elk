@@ -22,12 +22,18 @@
 
 import logging
 
-from datetime import datetime
+from grimoirelab_toolkit.datetime import (datetime_utcnow,
+                                          str_to_datetime)
 
-from .enrich import Enrich, metadata
+from .enrich import Enrich, metadata, SH_UNKNOWN_VALUE
 from ..elastic_mapping import Mapping as BaseMapping
 
 from .utils import get_time_diff_days
+
+
+MAX_SIZE_BULK_ENRICHED_ITEMS = 200
+ISSUE_TYPE = 'issue'
+COMMENT_TYPE = 'comment'
 
 
 logger = logging.getLogger(__name__)
@@ -50,6 +56,9 @@ class Mapping(BaseMapping):
             "properties": {
                "releases": {
                  "type": "keyword"
+               },
+               "body": {
+                 "type": "text"
                }
             }
         }
@@ -62,10 +71,10 @@ class JiraEnrich(Enrich):
 
     mapping = Mapping
 
-    roles = ["assignee", "reporter", "creator"]
+    roles = ["assignee", "reporter", "creator", "author", "updateAuthor"]
 
     def get_fields_uuid(self):
-        return ["assignee_uuid", "reporter_uuid"]
+        return ["assignee_uuid", "reporter_uuid", "creator_uuid", "author_uuid", "updateAuthor_uuid"]
 
     def get_field_author(self):
         return "reporter"
@@ -78,6 +87,8 @@ class JiraEnrich(Enrich):
         user = item
         if 'data' in item and type(item) == dict:
             user = item['data']['fields'][identity_field]
+        elif identity_field:
+            user = item[identity_field]
 
         if not user:
             return identity
@@ -95,6 +106,41 @@ class JiraEnrich(Enrich):
 
         return identity
 
+    def get_item_sh(self, item, roles=None, date_field=None):
+        """Add sorting hat enrichment fields"""
+
+        eitem_sh = {}
+        created = str_to_datetime(date_field)
+
+        for rol in roles:
+            identity = self.get_sh_identity(item, rol)
+            eitem_sh.update(self.get_item_sh_fields(identity, created, rol=rol))
+
+            if not eitem_sh[rol + '_org_name']:
+                eitem_sh[rol + '_org_name'] = SH_UNKNOWN_VALUE
+
+            if not eitem_sh[rol + '_name']:
+                eitem_sh[rol + '_name'] = SH_UNKNOWN_VALUE
+
+            if not eitem_sh[rol + '_user_name']:
+                eitem_sh[rol + '_user_name'] = SH_UNKNOWN_VALUE
+
+            # Add the author field common in all data sources
+            if rol == self.get_field_author():
+                identity = self.get_sh_identity(item, rol)
+                eitem_sh.update(self.get_item_sh_fields(identity, created, rol="author"))
+
+                if not eitem_sh['author_org_name']:
+                    eitem_sh['author_org_name'] = SH_UNKNOWN_VALUE
+
+                if not eitem_sh['author_name']:
+                    eitem_sh['author_name'] = SH_UNKNOWN_VALUE
+
+                if not eitem_sh['author_user_name']:
+                    eitem_sh['author_user_name'] = SH_UNKNOWN_VALUE
+
+        return eitem_sh
+
     def get_project_repository(self, eitem):
         repo = eitem['origin']
         if eitem['origin'][-1] != "/":
@@ -107,7 +153,6 @@ class JiraEnrich(Enrich):
         if 'data' in item:
             users_data = item['data']['fields']
         else:
-            # the item is directly the data (kitsune answer)
             users_data = item
         return users_data
 
@@ -121,6 +166,15 @@ class JiraEnrich(Enrich):
                 continue
             if item["fields"][field]:
                 user = self.get_sh_identity(item["fields"][field])
+                yield user
+
+        comments = item.get('comments_data', [])
+        for comment in comments:
+            if 'author' in comment and comment['author']:
+                user = self.get_sh_identity(comment['author'])
+                yield user
+            if 'updateAuthor' in comment and comment['updateAuthor']:
+                user = self.get_sh_identity(comment['updateAuthor'])
                 yield user
 
     @staticmethod
@@ -262,17 +316,21 @@ class JiraEnrich(Enrich):
         eitem['time_to_last_update_days'] = None
         eitem['url'] = None
 
+        # Add id info to allow to cohesistance of comments and issues in the same index
+        eitem['id'] = issue['id']
+
+        if 'comments_data' in issue:
+            eitem['number_of_comments'] = len(issue['comments_data'])
+
         eitem['updated'] = None
         if 'updated' in issue['fields']:
             eitem['updated'] = issue['fields']['updated']
 
-        if 'long_desc' in issue:
-            eitem['number_of_comments'] = len(issue['long_desc'])
         eitem['url'] = item['origin'] + "/browse/" + issue['key']
         eitem['time_to_close_days'] = \
             get_time_diff_days(issue['fields']['created'], issue['fields']['updated'])
         eitem['time_to_last_update_days'] = \
-            get_time_diff_days(issue['fields']['created'], datetime.utcnow())
+            get_time_diff_days(issue['fields']['created'], datetime_utcnow().replace(tzinfo=None))
 
         if 'fixVersions' in issue['fields']:
             eitem['releases'] = []
@@ -282,11 +340,102 @@ class JiraEnrich(Enrich):
         self.enrich_fields(issue['fields'], eitem)
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, self.roles))
+            eitem.update(self.get_item_sh(item, ["assignee", "reporter", "creator"], issue['fields']['created']))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
 
-        eitem.update(self.get_grimoire_fields(issue['fields']['created'], "issue"))
-
+        eitem.update(self.get_grimoire_fields(issue['fields']['created'], ISSUE_TYPE))
+        eitem["type"] = ISSUE_TYPE
         return eitem
+
+    def get_rich_item_comments(self, comments, eitem):
+        ecomments = []
+
+        for comment in comments:
+            ecomment = {}
+
+            for f in self.RAW_FIELDS_COPY:
+                ecomment[f] = eitem[f]
+
+            # Copy data from the enriched issue
+            ecomment['project_id'] = eitem['project_id']
+            ecomment['project_key'] = eitem['project_key']
+            ecomment['project_name'] = eitem['project_name']
+            ecomment['issue_key'] = eitem['key']
+            ecomment['issue_url'] = eitem['url']
+            ecomment['issue_type'] = eitem['issue_type']
+            ecomment['issue_type'] = eitem['issue_description']
+
+            # Add author and updateAuthor info
+            ecomment['author'] = None
+            ecomment['updateAuthor'] = None
+
+            if "author" in comment and comment["author"]:
+                ecomment['author'] = comment['author']['displayName']
+                if "timeZone" in comment["author"]:
+                    eitem['author_tz'] = comment["author"]["timeZone"]
+
+            if "updateAuthor" in comment and comment["updateAuthor"]:
+                ecomment['updateAuthor'] = comment['updateAuthor']['displayName']
+                if "timeZone" in comment["updateAuthor"]:
+                    eitem['updateAuthor_tz'] = comment["updateAuthor"]["timeZone"]
+
+            # Add comment-specific data
+            ecomment['created'] = str_to_datetime(comment['created']).isoformat()
+            ecomment['updated'] = str_to_datetime(comment['updated']).isoformat()
+            ecomment['body'] = comment['body']
+            ecomment['comment_id'] = comment['id']
+
+            # Add id info to allow to cohesistance of comments and issues in the same index
+            ecomment['id'] = ecomment['issue_key'] + '_comment_' + comment['id']
+            ecomment['type'] = COMMENT_TYPE
+
+            if self.sortinghat:
+                ecomment.update(self.get_item_sh(comment, ['author', 'updateAuthor'], comment['created']))
+
+            if self.prjs_map:
+                ecomment.update(self.get_item_project(ecomment))
+
+            ecomment.update(self.get_grimoire_fields(comment['created'], COMMENT_TYPE))
+
+            ecomments.append(ecomment)
+
+        return ecomments
+
+    def get_field_unique_id(self):
+        return "id"
+
+    def enrich_items(self, ocean_backend):
+        items_to_enrich = []
+        num_items = 0
+        ins_items = 0
+
+        for item in ocean_backend.fetch():
+            eitem = self.get_rich_item(item)
+
+            items_to_enrich.append(eitem)
+
+            comments = item['data'].get('comments_data', [])
+            if comments:
+                rich_item_comments = self.get_rich_item_comments(comments, eitem)
+                items_to_enrich.extend(rich_item_comments)
+
+            if len(items_to_enrich) < MAX_SIZE_BULK_ENRICHED_ITEMS:
+                continue
+
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+            items_to_enrich = []
+
+        if len(items_to_enrich) > 0:
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+
+        if num_items != ins_items:
+            missing = num_items - ins_items
+            logger.error("%s/%s missing items for Jira", str(missing), str(num_items))
+        else:
+            logger.info("%s items inserted for Jira", str(num_items))
+
+        return num_items

@@ -53,23 +53,45 @@ class TestJira(TestBaseBackend):
 
         result = self._test_raw_to_enrich()
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 5)
+        self.assertEqual(result['enrich'], 7)
+
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['number_of_comments'], 0)
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['number_of_comments'], 0)
+
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['number_of_comments'], 0)
+
+        item = self.items[3]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['number_of_comments'], 0)
+
+        item = self.items[4]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['number_of_comments'], 2)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 5)
+        self.assertEqual(result['enrich'], 7)
 
         enrich_backend = self.connectors[self.connector][2]()
         enrich_backend.sortinghat = True
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
-        self.assertEqual(eitem['assignee_name'], 'Unknown')
+        self.assertEqual(eitem['assignee_name'], 'Peter Monks')
         self.assertEqual(eitem['assignee_org_name'], 'Unknown')
-        self.assertEqual(eitem['assignee_user_name'], 'Unknown')
+        self.assertEqual(eitem['assignee_user_name'], 'peter')
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
@@ -82,7 +104,7 @@ class TestJira(TestBaseBackend):
 
         result = self._test_raw_to_enrich(projects=True)
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 5)
+        self.assertEqual(result['enrich'], 7)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
