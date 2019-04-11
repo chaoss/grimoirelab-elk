@@ -513,8 +513,13 @@ class ElasticSearch(object):
             r.raise_for_status()
             r_json = r.json()
 
-            if 'items' in r_json[self.index]['mappings']:
-                properties = r_json[self.index]['mappings']['items']['properties']
+            if 'items' not in r_json[self.index]['mappings']:
+                return properties
+
+            if 'properties' not in r_json[self.index]['mappings']['items']:
+                return properties
+
+            properties = r_json[self.index]['mappings']['items']['properties']
         except requests.exceptions.HTTPError as ex:
             logger.error("Error all attributes for %s.", self.anonymize_url(self.index_url))
             logger.error(ex)
