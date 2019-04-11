@@ -39,7 +39,7 @@ FILTER_SEPARATOR = r",\s*%s" % FILTER_DATA_ATTR
 logger = logging.getLogger(__name__)
 
 
-class ElasticItems():
+class ElasticItems:
 
     mapping = Mapping
 
@@ -57,6 +57,7 @@ class ElasticItems():
         self.filter_raw_dict = []
         self.filter_raw_should = None  # to filter raw items from Ocean
         self.filter_raw_should_dict = []
+        self.projects_json_repo = None
 
         self.requests = grimoire_con(insecure)
         self.elastic = None
@@ -78,6 +79,9 @@ class ElasticItems():
         Field with the date used for incremental analysis.
         """
         return "metadata__timestamp"
+
+    def set_projects_json_repo(self, repo):
+        self.projects_json_repo = repo
 
     @staticmethod
     def __process_filter(fltr_raw):
