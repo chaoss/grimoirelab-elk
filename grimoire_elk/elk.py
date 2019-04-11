@@ -104,7 +104,7 @@ def feed_backend_arthur(backend_name, backend_params):
 
 def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None, arthur=False,
-                 es_aliases=None):
+                 es_aliases=None, projects_json_repo=None):
     """ Feed Ocean with backend data """
 
     backend = None
@@ -151,6 +151,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         ocean_backend = connector[1](backend, fetch_archive=fetch_archive, project=project)
         elastic_ocean = get_elastic(url, es_index, clean, ocean_backend, es_aliases)
         ocean_backend.set_elastic(elastic_ocean)
+        ocean_backend.set_projects_json_repo(projects_json_repo)
 
         if fetch_archive:
             signature = inspect.signature(backend.fetch_from_archive)
