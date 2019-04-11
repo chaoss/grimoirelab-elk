@@ -531,11 +531,22 @@ class Enrich(ElasticItems):
         """
         # get the data source name relying on the cfg section name, if null use the connector name
         ds_name = self.cfg_section_name if self.cfg_section_name else self.get_connector_name()
-        repository = self.get_project_repository(eitem)
 
         try:
-            project = (self.prjs_map[ds_name][repository])
-            # logger.debug("Project FOUND for repository %s %s", repository, project)
+            # retrieve the project which includes the repo url in the projects.json,
+            # the variable `projects_json_repo` is passed from mordred to ELK when
+            # iterating over the repos in the projects.json, (see: param
+            # `projects_json_repo` in the functions elk.feed_backend and
+            # elk.enrich_backend)
+            if self.projects_json_repo:
+                project = self.prjs_map[ds_name][self.projects_json_repo]
+            # if `projects_json_repo`, which shouldn't never happen, use the
+            # method `get_project_repository` (defined in each enricher)
+            else:
+                repository = self.get_project_repository(eitem)
+                project = self.prjs_map[ds_name][repository]
+        # With the introduction of `projects_json_repo` the code in the
+        # except should be unreachable, and could be removed
         except KeyError:
             # logger.warning("Project not found for repository %s (data source: %s)", repository, ds_name)
             project = None
