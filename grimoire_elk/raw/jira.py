@@ -67,6 +67,14 @@ class Mapping(BaseMapping):
                                     "properties": {}
                                 }
                             }
+                        },
+                        "comments_data": {
+                            "properties": {
+                                "body": {
+                                    "type": "text",
+                                    "index": true
+                                }
+                            }
                         }
                     }
                 }
