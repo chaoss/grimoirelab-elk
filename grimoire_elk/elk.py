@@ -535,7 +535,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                    filters_raw_prefix=None, jenkins_rename_file=None,
                    unaffiliated_group=None, pair_programming=False,
                    node_regex=False, studies_args=None, es_enrich_aliases=None,
-                   last_enrich_date=None):
+                   last_enrich_date=None, projects_json_repo=None):
     """ Enrich Ocean index """
 
     backend = None
@@ -598,6 +598,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         elif filters_raw_prefix:
             enrich_backend.set_filter_raw_should(filters_raw_prefix)
 
+        enrich_backend.set_projects_json_repo(projects_json_repo)
         ocean_backend = get_ocean_backend(backend_cmd, enrich_backend,
                                           no_incremental, filter_raw,
                                           filters_raw_prefix)
