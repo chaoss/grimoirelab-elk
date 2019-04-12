@@ -347,6 +347,8 @@ class JiraEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(issue['fields']['created'], ISSUE_TYPE))
         eitem["type"] = ISSUE_TYPE
+
+        self.add_metadata_filter_raw(eitem)
         return eitem
 
     def get_rich_item_comments(self, comments, eitem):
@@ -399,6 +401,7 @@ class JiraEnrich(Enrich):
 
             ecomment.update(self.get_grimoire_fields(comment['created'], COMMENT_TYPE))
 
+            self.add_metadata_filter_raw(ecomment)
             ecomments.append(ecomment)
 
         return ecomments

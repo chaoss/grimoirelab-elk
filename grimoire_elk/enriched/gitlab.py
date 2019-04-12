@@ -153,6 +153,7 @@ class GitLabEnrich(Enrich):
         else:
             logger.error("rich item not defined for GitLab category %s", item['category'])
 
+        self.add_metadata_filter_raw(rich_item)
         return rich_item
 
     def __get_rich_issue(self, item):

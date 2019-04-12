@@ -137,4 +137,5 @@ class BugzillaRESTEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(issue['creation_time'], "bugrest"))
 
+        self.add_metadata_filter_raw(eitem)
         return eitem

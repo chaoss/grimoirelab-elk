@@ -213,6 +213,7 @@ class MattermostEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "message"))
 
+        self.add_metadata_filter_raw(eitem)
         return eitem
 
     def __convert_booleans(self, eitem):

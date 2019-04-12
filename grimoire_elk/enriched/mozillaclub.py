@@ -142,6 +142,7 @@ class MozillaClubEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(event["Timestamp"], "event"))
 
+        self.add_metadata_filter_raw(eitem)
         return eitem
 
     def enrich_items(self, ocean_backend):

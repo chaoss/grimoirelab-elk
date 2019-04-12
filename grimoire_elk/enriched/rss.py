@@ -125,4 +125,5 @@ class RSSEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(eitem["publish_date"], "entry"))
 
+        self.add_metadata_filter_raw(eitem)
         return eitem

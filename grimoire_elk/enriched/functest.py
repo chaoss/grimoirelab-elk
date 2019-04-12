@@ -112,4 +112,5 @@ class FunctestEnrich(Enrich):
         if eitem['project'] and eitem['project'].lower() in self.BOOST_PROJECTS:
             eitem['boost_list'] += ['boosted']
 
+        self.add_metadata_filter_raw(eitem)
         return eitem
