@@ -443,7 +443,7 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
     if no_incremental:
         last_enrich = None
     else:
-        last_enrich = get_last_enrich(backend_cmd, enrich_backend)
+        last_enrich = get_last_enrich(backend_cmd, enrich_backend, filter_raw=filter_raw)
 
     logger.debug("Last enrichment: %s", last_enrich)
 
