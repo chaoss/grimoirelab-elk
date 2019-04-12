@@ -192,6 +192,7 @@ class AskbotEnrich(Enrich):
         eitem["type"] = "question"
         eitem.update(self.get_grimoire_fields(added_at.isoformat(), eitem["type"]))
 
+        self.add_metadata_filter_raw(eitem)
         return eitem
 
     def get_field_unique_id(self):

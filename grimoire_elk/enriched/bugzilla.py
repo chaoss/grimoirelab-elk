@@ -173,4 +173,5 @@ class BugzillaEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(eitem['creation_date'], "bug"))
 
+        self.add_metadata_filter_raw(eitem)
         return eitem

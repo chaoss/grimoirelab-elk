@@ -237,6 +237,7 @@ class GerritEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(review['createdOn'], "review"))
 
+        self.add_metadata_filter_raw(eitem)
         return eitem
 
     def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",

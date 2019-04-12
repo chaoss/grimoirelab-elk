@@ -61,4 +61,5 @@ class GoogleHitsEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "hits"))
 
+        self.add_metadata_filter_raw(eitem)
         return eitem

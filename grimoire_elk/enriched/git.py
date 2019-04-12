@@ -419,6 +419,7 @@ class GitEnrich(Enrich):
         if self.pair_programming:
             eitem = self.__add_pair_programming_metrics(commit, eitem)
 
+        self.add_metadata_filter_raw(eitem)
         return eitem
 
     def __fix_field_date(self, item, attribute):

@@ -129,6 +129,7 @@ class PuppetForgeEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(entry["created_at"], "module"))
 
+        self.add_metadata_filter_raw(eitem)
         return eitem
 
     def get_rich_events(self, item):
