@@ -40,7 +40,7 @@ from ..elastic_items import (ElasticItems,
                              HEADER_JSON)
 from .study_ceres_onion import ESOnionConnector, onion_study
 
-from .utils import grimoire_con
+from .utils import grimoire_con, METADATA_FILTER_RAW
 from .. import __version__
 
 logger = logging.getLogger(__name__)
@@ -391,6 +391,11 @@ class Enrich(ElasticItems):
             total += self.elastic.safe_put_bulk(url, bulk_json)
 
         return total
+
+    def add_metadata_filter_raw(self, eitem):
+        """Add filter raw information to the enriched item"""
+
+        eitem[METADATA_FILTER_RAW] = self.filter_raw
 
     def get_connector_name(self):
         """ Find the name for the current connector """
