@@ -176,7 +176,10 @@ def get_last_enrich(backend_cmd, enrich_backend):
                 last_enrich = None
             else:
                 # if the index is not empty, the last enrich is the minimum between
-                # the last filtered item and the last item in the enriched index
+                # the last filtered item (the last item for a given origin) and the
+                # last item in the enriched index. If `last_enrich_filtered` is empty,
+                # it means that no items for that origin are in the index, thus the
+                # `last_enrich` is set to None
                 last_enrich_filtered = enrich_backend.get_last_update_from_es([filter_])
                 last_enrich = get_min_last_enrich(enrich_backend.from_date, last_enrich_filtered)
 
@@ -199,9 +202,10 @@ def get_last_enrich(backend_cmd, enrich_backend):
 
 
 def get_min_last_enrich(last_enrich, last_enrich_filtered):
-    min_enrich = last_enrich
     if last_enrich_filtered:
-        min_enrich = min(last_enrich, last_enrich_filtered.replace(tzinfo=None))
+        min_enrich = min(last_enrich, last_enrich_filtered.replace(second=0, microsecond=0, tzinfo=None))
+    else:
+        min_enrich = None
 
     return min_enrich
 
