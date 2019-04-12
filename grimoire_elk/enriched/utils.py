@@ -39,6 +39,8 @@ MAX_RETRIES_ON_REDIRECT = 5
 MAX_RETRIES_ON_READ = 8
 MAX_RETRIES_ON_CONNECT = 21
 STATUS_FORCE_LIST = [408, 409, 502, 503, 504]
+METADATA_FILTER_RAW = 'metadata__filter_raw'
+
 logger = logging.getLogger(__name__)
 
 
@@ -140,7 +142,7 @@ def grimoire_con(insecure=True, conn_retries=MAX_RETRIES_ON_CONNECT, total=MAX_R
     return conn
 
 
-def get_last_enrich(backend_cmd, enrich_backend):
+def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
     last_enrich = None
 
     if backend_cmd:
@@ -148,7 +150,19 @@ def get_last_enrich(backend_cmd, enrich_backend):
         # Only supported in data retrieved from a perceval backend
         # Always filter by repository to support multi repository indexes
         backend_name = enrich_backend.get_connector_name()
+
         filter_ = get_repository_filter(backend, backend_name)
+        filters_ = [filter_]
+
+        # include the filter_raw text (taken from the projects.json) to the
+        # list of filters used to retrieve the last enrich date.
+        if filter_raw:
+            filter_raw_ = {
+                "name": METADATA_FILTER_RAW,
+                "value": filter_raw
+            }
+
+            filters_.append(filter_raw_)
 
         # Check if backend supports from_date
         signature = inspect.signature(backend.fetch)
@@ -180,20 +194,20 @@ def get_last_enrich(backend_cmd, enrich_backend):
                 # last item in the enriched index. If `last_enrich_filtered` is empty,
                 # it means that no items for that origin are in the index, thus the
                 # `last_enrich` is set to None
-                last_enrich_filtered = enrich_backend.get_last_update_from_es([filter_])
+                last_enrich_filtered = enrich_backend.get_last_update_from_es(filters_)
                 last_enrich = get_min_last_enrich(enrich_backend.from_date, last_enrich_filtered)
 
         elif offset is not None:
             if offset != 0:
                 last_enrich = offset
             else:
-                last_enrich = enrich_backend.get_last_offset_from_es([filter_])
+                last_enrich = enrich_backend.get_last_offset_from_es(filters_)
 
         else:
             if not enrich_backend.from_date:
                 last_enrich = None
             else:
-                last_enrich_filtered = enrich_backend.get_last_update_from_es([filter_])
+                last_enrich_filtered = enrich_backend.get_last_update_from_es(filters_)
                 last_enrich = get_min_last_enrich(enrich_backend.from_date, last_enrich_filtered)
     else:
         last_enrich = enrich_backend.get_last_update_from_es()
