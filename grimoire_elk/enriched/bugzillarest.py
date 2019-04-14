@@ -22,11 +22,12 @@
 
 import logging
 
-from datetime import datetime
 from dateutil import parser
 
 from .enrich import Enrich, metadata
 from .utils import get_time_diff_days
+
+from grimoirelab_toolkit.datetime import datetime_utcnow
 
 
 logger = logging.getLogger(__name__)
@@ -118,8 +119,10 @@ class BugzillaRESTEnrich(Enrich):
         eitem['url'] = item['origin'] + "/show_bug.cgi?id=" + str(issue['id'])
         eitem['time_to_last_update_days'] = \
             get_time_diff_days(eitem['creation_ts'], eitem['delta_ts'])
-        eitem['timeopen_days'] = \
-            get_time_diff_days(eitem['creation_ts'], datetime.utcnow())
+
+        eitem['timeopen_days'] = get_time_diff_days(eitem['creation_ts'], datetime_utcnow().replace(tzinfo=None))
+        if 'is_open' in issue and not issue['is_open']:
+            eitem['timeopen_days'] = eitem['time_to_last_update_days']
 
         eitem['changes'] = 0
         for history in issue['history']:
