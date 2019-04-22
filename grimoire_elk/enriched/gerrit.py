@@ -276,8 +276,8 @@ class GerritEnrich(Enrich):
 
             # Add comment-specific data
             created = str_to_datetime(comment['timestamp'])
-            ecomment['created_on'] = created.isoformat()
-            ecomment['message'] = comment['message'][:self.KEYWORD_MAX_SIZE]
+            ecomment['comment_created_on'] = created.isoformat()
+            ecomment['comment_message'] = comment['message'][:self.KEYWORD_MAX_SIZE]
 
             # Add id info to allow to coexistence of items of different types in the same index
             ecomment['id'] = '{}_comment_{}'.format(ecomment['review_number'], created.timestamp())
@@ -342,17 +342,17 @@ class GerritEnrich(Enrich):
 
             # Add patchset-specific data
             created = str_to_datetime(patchset['createdOn'])
-            epatchset['created_on'] = created.isoformat()
-            epatchset['number'] = patchset['number']
-            epatchset['isDraft'] = patchset.get('isDraft', None)
-            epatchset['kind'] = patchset.get('kind', None)
-            epatchset['ref'] = patchset.get('ref', None)
-            epatchset['revision'] = patchset.get('revision', None)
-            epatchset['sizeDeletions'] = patchset.get('sizeDeletions', None)
-            epatchset['sizeInsertions'] = patchset.get('sizeInsertions', None)
+            epatchset['patchset_created_on'] = created.isoformat()
+            epatchset['patchset_number'] = patchset['number']
+            epatchset['patchset_isDraft'] = patchset.get('isDraft', None)
+            epatchset['patchset_kind'] = patchset.get('kind', None)
+            epatchset['patchset_ref'] = patchset.get('ref', None)
+            epatchset['patchset_revision'] = patchset.get('revision', None)
+            epatchset['patchset_sizeDeletions'] = patchset.get('sizeDeletions', None)
+            epatchset['patchset_sizeInsertions'] = patchset.get('sizeInsertions', None)
 
             # Add id info to allow to coexistence of items of different types in the same index
-            epatchset['id'] = '{}_patchset_{}'.format(epatchset['review_number'], epatchset['number'])
+            epatchset['id'] = '{}_patchset_{}'.format(epatchset['review_number'], epatchset['patchset_number'])
             epatchset['type'] = PATCHSET_TYPE
 
             if self.sortinghat:
@@ -390,9 +390,9 @@ class GerritEnrich(Enrich):
             eapproval['repository'] = epatchset['repository']
             eapproval['branch'] = epatchset['branch']
             eapproval['review_number'] = epatchset['review_number']
-            eapproval['patchset_number'] = epatchset['number']
-            eapproval['patchset_revision'] = epatchset['revision']
-            eapproval['patchset_ref'] = epatchset['ref']
+            eapproval['patchset_number'] = epatchset['patchset_number']
+            eapproval['patchset_revision'] = epatchset['patchset_revision']
+            eapproval['patchset_ref'] = epatchset['patchset_ref']
 
             # Add author info
             eapproval["approval_author_name"] = None
@@ -405,13 +405,13 @@ class GerritEnrich(Enrich):
 
             # Add approval-specific data
             created = str_to_datetime(approval['grantedOn'])
-            eapproval['granted_on'] = created.isoformat()
-            eapproval['value'] = approval.get('value', None)
-            eapproval['type'] = approval.get('type', None)
-            eapproval['description'] = approval.get('description', None)
+            eapproval['approval_granted_on'] = created.isoformat()
+            eapproval['approval_value'] = approval.get('value', None)
+            eapproval['approval_type'] = approval.get('type', None)
+            eapproval['approval_description'] = approval.get('description', None)
 
-            if eapproval['description']:
-                eapproval['description'] = eapproval['description'][:self.KEYWORD_MAX_SIZE]
+            if eapproval['approval_description']:
+                eapproval['approval_description'] = eapproval['approval_description'][:self.KEYWORD_MAX_SIZE]
 
             # Add id info to allow to coexistence of items of different types in the same index
             eapproval['id'] = '{}_approval_{}'.format(epatchset['id'], created.timestamp())
