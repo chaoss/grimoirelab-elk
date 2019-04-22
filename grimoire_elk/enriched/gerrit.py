@@ -29,6 +29,11 @@ from grimoirelab_toolkit.datetime import (str_to_datetime,
                                           datetime_utcnow,
                                           unixtime_to_datetime)
 
+
+MAX_SIZE_BULK_ENRICHED_ITEMS = 200
+REVIEW_TYPE = 'review'
+COMMENT_TYPE = 'comment'
+
 logger = logging.getLogger(__name__)
 
 
@@ -82,12 +87,16 @@ class GerritEnrich(Enrich):
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
-        for field in ['name', 'email', 'username']:
-            identity[field] = None
 
         user = item  # by default a specific user dict is expected
         if 'data' in item and type(item) == dict:
             user = item['data'][identity_field]
+        elif identity_field:
+            user = item[identity_field]
+
+        identity['name'] = None
+        identity['username'] = None
+        identity['email'] = None
 
         if 'name' in user:
             identity['name'] = user['name']
@@ -192,6 +201,9 @@ class GerritEnrich(Enrich):
                       }
         for fn in map_fields:
             eitem[map_fields[fn]] = review[fn]
+
+        # Add id info to allow to coexistence of items of different types in the same index
+        eitem['id'] = eitem['number']
         eitem["summary_analyzed"] = eitem["summary"]
         eitem["summary"] = eitem["summary"][:self.KEYWORD_MAX_SIZE]
         eitem["name"] = None
@@ -203,11 +215,6 @@ class GerritEnrich(Enrich):
                     eitem["domain"] = review['owner']['email'].split("@")[1]
         # New fields generated for enrichment
         eitem["patchsets"] = len(review["patchSets"])
-
-        # Limit the size of comment messages
-        if 'comments' in review:
-            for comment in review['comments']:
-                comment['message'] = comment['message'][:self.KEYWORD_MAX_SIZE]
 
         # Time to add the time diffs
         created_on = review['createdOn']
@@ -239,6 +246,100 @@ class GerritEnrich(Enrich):
 
         self.add_metadata_filter_raw(eitem)
         return eitem
+
+    def get_rich_item_comments(self, comments, eitem):
+        ecomments = []
+
+        for comment in comments:
+            ecomment = {}
+
+            for f in self.RAW_FIELDS_COPY:
+                ecomment[f] = eitem[f]
+
+            # Copy data from the enriched review
+            ecomment['url'] = eitem['url']
+            ecomment['summary'] = eitem['summary']
+            ecomment['repository'] = eitem['repository']
+            ecomment['branch'] = eitem['branch']
+            ecomment['review_number'] = eitem['number']
+
+            # Add reviewer info
+            ecomment["reviewer_name"] = None
+            ecomment["reviewer_domain"] = None
+            if 'reviewer' in comment and 'name' in comment['reviewer']:
+                ecomment["reviewer_name"] = comment['reviewer']['name']
+                if 'email' in comment['reviewer']:
+                    if '@' in comment['reviewer']['email']:
+                        ecomment["reviewer_domain"] = comment['reviewer']['email'].split("@")[1]
+
+            # Add comment-specific data
+            created = str_to_datetime(comment['timestamp'])
+            ecomment['created'] = created.isoformat()
+            ecomment['message'] = comment['message'][:self.KEYWORD_MAX_SIZE]
+
+            # Add id info to allow to coexistence of items of different types in the same index
+            ecomment['id'] = '{}_comment_{}'.format(ecomment['review_number'], created.timestamp())
+            ecomment['type'] = COMMENT_TYPE
+
+            if self.sortinghat:
+                ecomment.update(self.get_item_sh(comment, ['reviewer'], 'timestamp'))
+
+                ecomment['author_id'] = ecomment['reviewer_id']
+                ecomment['author_uuid'] = ecomment['reviewer_uuid']
+                ecomment['author_name'] = ecomment['reviewer_name']
+                ecomment['author_user_name'] = ecomment['reviewer_user_name']
+                ecomment['author_domain'] = ecomment['reviewer_domain']
+                ecomment['author_gender'] = ecomment['reviewer_gender']
+                ecomment['author_gender_acc'] = ecomment['reviewer_gender_acc']
+                ecomment['author_org_name'] = ecomment['reviewer_org_name']
+                ecomment['author_bot'] = ecomment['reviewer_bot']
+
+            if self.prjs_map:
+                ecomment.update(self.get_item_project(ecomment))
+
+            ecomment.update(self.get_grimoire_fields(comment['timestamp'], COMMENT_TYPE))
+
+            self.add_metadata_filter_raw(ecomment)
+            ecomments.append(ecomment)
+
+        return ecomments
+
+    def get_field_unique_id(self):
+        return "id"
+
+    def enrich_items(self, ocean_backend):
+        items_to_enrich = []
+        num_items = 0
+        ins_items = 0
+
+        for item in ocean_backend.fetch():
+            eitem = self.get_rich_item(item)
+
+            items_to_enrich.append(eitem)
+
+            comments = item['data'].get('comments', [])
+            if comments:
+                rich_item_comments = self.get_rich_item_comments(comments, eitem)
+                items_to_enrich.extend(rich_item_comments)
+
+            if len(items_to_enrich) < MAX_SIZE_BULK_ENRICHED_ITEMS:
+                continue
+
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+            items_to_enrich = []
+
+        if len(items_to_enrich) > 0:
+            num_items += len(items_to_enrich)
+            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+
+        if num_items != ins_items:
+            missing = num_items - ins_items
+            logger.error("%s/%s missing items for Gerrit", str(missing), str(num_items))
+        else:
+            logger.info("%s items inserted for Gerrit", str(num_items))
+
+        return num_items
 
     def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
                           author_field="author_uuid"):
