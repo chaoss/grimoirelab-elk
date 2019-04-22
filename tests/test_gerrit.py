@@ -59,7 +59,26 @@ class TestGerrit(TestBaseBackend):
 
         result = self._test_raw_to_enrich()
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 5)
+        self.assertEqual(result['enrich'], 190)
+
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+
+        comments = item['data']['comments']
+        ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
+        self.assertEqual(len(ecomments), 46)
+
+        patchsets = item['data']['patchSets']
+        eitems = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
+        self.assertEqual(len(eitems), 18)
+
+        epatchsets = [ei for ei in eitems if 'is_gerrit_patchset' in ei]
+        eapprovals = [ei for ei in eitems if 'is_gerrit_approval' in ei]
+
+        self.assertEqual(len(epatchsets), 5)
+        self.assertEqual(len(eapprovals), 13)
 
     def test_demography_study(self):
         """ Test that the demography study works correctly """
@@ -92,14 +111,14 @@ class TestGerrit(TestBaseBackend):
 
         result = self._test_raw_to_enrich(sortinghat=True)
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 5)
+        self.assertEqual(result['enrich'], 190)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 5)
+        self.assertEqual(result['enrich'], 190)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
