@@ -33,6 +33,7 @@ from grimoirelab_toolkit.datetime import (str_to_datetime,
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
 REVIEW_TYPE = 'review'
 COMMENT_TYPE = 'comment'
+PATCHSET_TYPE = 'patchset'
 
 logger = logging.getLogger(__name__)
 
@@ -304,6 +305,68 @@ class GerritEnrich(Enrich):
 
         return ecomments
 
+    def get_rich_item_patchsets(self, patchsets, eitem):
+        epatchesets = []
+
+        for patchset in patchsets:
+            epatcheset = {}
+
+            for f in self.RAW_FIELDS_COPY:
+                epatcheset[f] = eitem[f]
+
+            # Copy data from the enriched review
+            epatcheset['url'] = eitem['url']
+            epatcheset['summary'] = eitem['summary']
+            epatcheset['repository'] = eitem['repository']
+            epatcheset['branch'] = eitem['branch']
+            epatcheset['review_number'] = eitem['number']
+
+            # Add author info
+            epatcheset["patchset_author_name"] = None
+            epatcheset["patchset_author_domain"] = None
+            if 'author' in patchset and 'name' in patchset['author']:
+                epatcheset["patchset_author_name"] = patchset['author']['name']
+                if 'email' in patchset['author']:
+                    if '@' in patchset['author']['email']:
+                        epatcheset["patchset_author_domain"] = patchset['author']['email'].split("@")[1]
+
+            # Add uploader info
+            epatcheset["patchset_uploader_name"] = None
+            epatcheset["patchset_uploader_domain"] = None
+            if 'uploader' in patchset and 'name' in patchset['uploader']:
+                epatcheset["patchset_uploader_name"] = patchset['uploader']['name']
+                if 'email' in patchset['uploader']:
+                    if '@' in patchset['uploader']['email']:
+                        epatcheset["patchset_uploader_domain"] = patchset['uploader']['email'].split("@")[1]
+
+            # Add patchset-specific data
+            created = str_to_datetime(patchset['createdOn'])
+            epatcheset['created'] = created.isoformat()
+            epatcheset['isDraft'] = patchset['isDraft']
+            epatcheset['number'] = patchset['number']
+            epatcheset['kind'] = patchset['kind']
+            epatcheset['ref'] = patchset['ref']
+            epatcheset['revision'] = patchset['revision']
+            epatcheset['sizeDeletions'] = patchset['sizeDeletions']
+            epatcheset['sizeInsertions'] = patchset['sizeInsertions']
+
+            # Add id info to allow to coexistence of items of different types in the same index
+            epatcheset['id'] = '{}_patchset_{}'.format(epatcheset['review_number'], epatcheset['number'])
+            epatcheset['type'] = PATCHSET_TYPE
+
+            if self.sortinghat:
+                epatcheset.update(self.get_item_sh(patchset, ['author', 'uploader'], 'createdOn'))
+
+            if self.prjs_map:
+                epatcheset.update(self.get_item_project(epatcheset))
+
+            epatcheset.update(self.get_grimoire_fields(patchset['createdOn'], PATCHSET_TYPE))
+
+            self.add_metadata_filter_raw(epatcheset)
+            epatchesets.append(epatcheset)
+
+        return epatchesets
+
     def get_field_unique_id(self):
         return "id"
 
@@ -321,6 +384,11 @@ class GerritEnrich(Enrich):
             if comments:
                 rich_item_comments = self.get_rich_item_comments(comments, eitem)
                 items_to_enrich.extend(rich_item_comments)
+
+            patchsets = item['data'].get('patchSets', [])
+            if patchsets:
+                rich_item_patchsets = self.get_rich_item_patchsets(patchsets, eitem)
+                items_to_enrich.extend(rich_item_patchsets)
 
             if len(items_to_enrich) < MAX_SIZE_BULK_ENRICHED_ITEMS:
                 continue
