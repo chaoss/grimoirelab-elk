@@ -34,6 +34,7 @@ MAX_SIZE_BULK_ENRICHED_ITEMS = 200
 REVIEW_TYPE = 'review'
 COMMENT_TYPE = 'comment'
 PATCHSET_TYPE = 'patchset'
+APPROVAL_TYPE = 'approval'
 
 logger = logging.getLogger(__name__)
 
@@ -275,7 +276,7 @@ class GerritEnrich(Enrich):
 
             # Add comment-specific data
             created = str_to_datetime(comment['timestamp'])
-            ecomment['created'] = created.isoformat()
+            ecomment['created_on'] = created.isoformat()
             ecomment['message'] = comment['message'][:self.KEYWORD_MAX_SIZE]
 
             # Add id info to allow to coexistence of items of different types in the same index
@@ -306,66 +307,139 @@ class GerritEnrich(Enrich):
         return ecomments
 
     def get_rich_item_patchsets(self, patchsets, eitem):
-        epatchesets = []
+        eitems = []
 
         for patchset in patchsets:
-            epatcheset = {}
+            epatchset = {}
 
             for f in self.RAW_FIELDS_COPY:
-                epatcheset[f] = eitem[f]
+                epatchset[f] = eitem[f]
 
             # Copy data from the enriched review
-            epatcheset['url'] = eitem['url']
-            epatcheset['summary'] = eitem['summary']
-            epatcheset['repository'] = eitem['repository']
-            epatcheset['branch'] = eitem['branch']
-            epatcheset['review_number'] = eitem['number']
+            epatchset['url'] = eitem['url']
+            epatchset['summary'] = eitem['summary']
+            epatchset['repository'] = eitem['repository']
+            epatchset['branch'] = eitem['branch']
+            epatchset['review_number'] = eitem['number']
 
             # Add author info
-            epatcheset["patchset_author_name"] = None
-            epatcheset["patchset_author_domain"] = None
+            epatchset["patchset_author_name"] = None
+            epatchset["patchset_author_domain"] = None
             if 'author' in patchset and 'name' in patchset['author']:
-                epatcheset["patchset_author_name"] = patchset['author']['name']
+                epatchset["patchset_author_name"] = patchset['author']['name']
                 if 'email' in patchset['author']:
                     if '@' in patchset['author']['email']:
-                        epatcheset["patchset_author_domain"] = patchset['author']['email'].split("@")[1]
+                        epatchset["patchset_author_domain"] = patchset['author']['email'].split("@")[1]
 
             # Add uploader info
-            epatcheset["patchset_uploader_name"] = None
-            epatcheset["patchset_uploader_domain"] = None
+            epatchset["patchset_uploader_name"] = None
+            epatchset["patchset_uploader_domain"] = None
             if 'uploader' in patchset and 'name' in patchset['uploader']:
-                epatcheset["patchset_uploader_name"] = patchset['uploader']['name']
+                epatchset["patchset_uploader_name"] = patchset['uploader']['name']
                 if 'email' in patchset['uploader']:
                     if '@' in patchset['uploader']['email']:
-                        epatcheset["patchset_uploader_domain"] = patchset['uploader']['email'].split("@")[1]
+                        epatchset["patchset_uploader_domain"] = patchset['uploader']['email'].split("@")[1]
 
             # Add patchset-specific data
             created = str_to_datetime(patchset['createdOn'])
-            epatcheset['created'] = created.isoformat()
-            epatcheset['isDraft'] = patchset['isDraft']
-            epatcheset['number'] = patchset['number']
-            epatcheset['kind'] = patchset['kind']
-            epatcheset['ref'] = patchset['ref']
-            epatcheset['revision'] = patchset['revision']
-            epatcheset['sizeDeletions'] = patchset['sizeDeletions']
-            epatcheset['sizeInsertions'] = patchset['sizeInsertions']
+            epatchset['created_on'] = created.isoformat()
+            epatchset['number'] = patchset['number']
+            epatchset['isDraft'] = patchset.get('isDraft', None)
+            epatchset['kind'] = patchset.get('kind', None)
+            epatchset['ref'] = patchset.get('ref', None)
+            epatchset['revision'] = patchset.get('revision', None)
+            epatchset['sizeDeletions'] = patchset.get('sizeDeletions', None)
+            epatchset['sizeInsertions'] = patchset.get('sizeInsertions', None)
 
             # Add id info to allow to coexistence of items of different types in the same index
-            epatcheset['id'] = '{}_patchset_{}'.format(epatcheset['review_number'], epatcheset['number'])
-            epatcheset['type'] = PATCHSET_TYPE
+            epatchset['id'] = '{}_patchset_{}'.format(epatchset['review_number'], epatchset['number'])
+            epatchset['type'] = PATCHSET_TYPE
 
             if self.sortinghat:
-                epatcheset.update(self.get_item_sh(patchset, ['author', 'uploader'], 'createdOn'))
+                epatchset.update(self.get_item_sh(patchset, ['author', 'uploader'], 'createdOn'))
 
             if self.prjs_map:
-                epatcheset.update(self.get_item_project(epatcheset))
+                epatchset.update(self.get_item_project(epatchset))
 
-            epatcheset.update(self.get_grimoire_fields(patchset['createdOn'], PATCHSET_TYPE))
+            epatchset.update(self.get_grimoire_fields(patchset['createdOn'], PATCHSET_TYPE))
 
-            self.add_metadata_filter_raw(epatcheset)
-            epatchesets.append(epatcheset)
+            self.add_metadata_filter_raw(epatchset)
 
-        return epatchesets
+            eitems.append(epatchset)
+
+            # Add approvals as enriched items
+            approvals = patchset.get('approvals', [])
+            if approvals:
+                epatcheset_approvals = self.get_rich_item_patchset_approvals(approvals, epatchset)
+                eitems.extend(epatcheset_approvals)
+
+        return eitems
+
+    def get_rich_item_patchset_approvals(self, approvals, epatchset):
+        eapprovals = []
+
+        for approval in approvals:
+            eapproval = {}
+
+            for f in self.RAW_FIELDS_COPY:
+                eapproval[f] = epatchset[f]
+
+            # Copy data from the enriched patchset
+            eapproval['url'] = epatchset['url']
+            eapproval['summary'] = epatchset['summary']
+            eapproval['repository'] = epatchset['repository']
+            eapproval['branch'] = epatchset['branch']
+            eapproval['review_number'] = epatchset['review_number']
+            eapproval['patchset_number'] = epatchset['number']
+            eapproval['patchset_revision'] = epatchset['revision']
+            eapproval['patchset_ref'] = epatchset['ref']
+
+            # Add author info
+            eapproval["approval_author_name"] = None
+            eapproval["approval_author_domain"] = None
+            if 'by' in approval and 'name' in approval['by']:
+                eapproval["approval_author_name"] = approval['by']['name']
+                if 'email' in approval['by']:
+                    if '@' in approval['by']['email']:
+                        eapproval["approval_author_domain"] = approval['by']['email'].split("@")[1]
+
+            # Add approval-specific data
+            created = str_to_datetime(approval['grantedOn'])
+            eapproval['granted_on'] = created.isoformat()
+            eapproval['value'] = approval.get('value', None)
+            eapproval['type'] = approval.get('type', None)
+            eapproval['description'] = approval.get('description', None)
+
+            if eapproval['description']:
+                eapproval['description'] = eapproval['description'][:self.KEYWORD_MAX_SIZE]
+
+            # Add id info to allow to coexistence of items of different types in the same index
+            eapproval['id'] = '{}_approval_{}'.format(epatchset['id'], created.timestamp())
+            eapproval['type'] = APPROVAL_TYPE
+
+            if self.sortinghat:
+                eapproval.update(self.get_item_sh(approval, ['by'], 'grantedOn'))
+
+                eapproval['author_id'] = eapproval['by_id']
+                eapproval['author_uuid'] = eapproval['by_uuid']
+                eapproval['author_name'] = eapproval['by_name']
+                eapproval['author_user_name'] = eapproval['by_name']
+                eapproval['author_domain'] = eapproval['by_domain']
+                eapproval['author_gender'] = eapproval['by_gender']
+                eapproval['author_gender_acc'] = eapproval['by_gender_acc']
+                eapproval['author_org_name'] = eapproval['by_org_name']
+                eapproval['author_bot'] = eapproval['by_bot']
+
+            if self.prjs_map:
+                eapproval.update(self.get_item_project(eapproval))
+
+            eapproval.update(self.get_grimoire_fields(approval['grantedOn'], APPROVAL_TYPE))
+
+            self.add_metadata_filter_raw(eapproval)
+
+            eapprovals.append(eapproval)
+
+        return eapprovals
 
     def get_field_unique_id(self):
         return "id"
