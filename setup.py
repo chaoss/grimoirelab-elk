@@ -86,8 +86,8 @@ setup(name="grimoire-elk",
           'cereslib>=0.1.0',
           'grimoirelab-toolkit>=0.1.4',
           'sortinghat>=0.6.2',
-          'elasticsearch>=6.1.1',
-          'elasticsearch-dsl>=6.1.0',
+          'elasticsearch==6.3.1',
+          'elasticsearch-dsl==6.3.1',
           'requests>=2.7.0'],
       zip_safe=False
       )
