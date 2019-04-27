@@ -89,13 +89,13 @@ class ESPandasConnector(ESConnector):
         :raises ValueError: `metadata__timestamp` field not found in index
         :raises NotFoundError: index not found in ElasticSearch
         """
-
         search_query = self._build_search_query(from_date)
         logger.debug(self.__log_prefix + str(search_query))
         hits_block = []
         for hit in helpers.scan(self._es_conn,
                                 search_query,
                                 scroll='300m',
+                                size=500,
                                 index=self._es_index,
                                 preserve_order=True):
 
