@@ -21,6 +21,7 @@
 #
 
 import logging
+import re
 
 from .enrich import Enrich, metadata
 
@@ -46,6 +47,28 @@ class FunctestEnrich(Enrich):
     def get_field_author(self):
         # In Functest there is no identities support
         return None
+
+    def __process_duration(self, duration):
+        processed_duration = None
+        try:
+            processed_duration = float(duration)
+        except Exception:
+            match = re.fullmatch(r'(\d+)m(\d+)s', duration)
+            if match:
+                minutes = float(match.group(1))
+                seconds = float(match.group(2))
+                total_secs = (60.0 * minutes) + seconds
+                processed_duration = total_secs
+                return processed_duration
+
+            match = re.fullmatch(r'\d+:\d+:\d+(\.\d+)?', duration)
+            if match:
+                total_secs = sum(
+                    [a * b for a, b in zip([3600.0, 60.0, 1.0], map(float, duration.split(':')))])
+                processed_duration = total_secs
+                return processed_duration
+
+        return processed_duration
 
     @metadata
     def get_rich_item(self, item):
@@ -93,6 +116,11 @@ class FunctestEnrich(Enrich):
 
             if 'duration' in func_test['details']:
                 eitem['duration'] = func_test['details']['duration']
+                eitem['duration'] = self.__process_duration(eitem['duration'])
+
+                if eitem['duration'] is None:
+                    logger.warning("Duration %s not processed for enriched item %s",
+                                   func_test['details']['duration'], eitem)
 
         if 'duration' not in eitem:
             eitem['duration'] = None
