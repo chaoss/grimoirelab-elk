@@ -55,6 +55,19 @@ class TestFunctest(TestBaseBackend):
         self.assertEqual(result['raw'], 27)
         self.assertEqual(result['enrich'], 27)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        expected_durations = [None, None, None, 38.0, 263.0,
+                              None, None, None, None, None,
+                              46.0, 32.7, None, None, None,
+                              None, None, None, None, None,
+                              None, None, 81.7, 84.2, None,
+                              None, None]
+
+        for pos, item in enumerate(self.items):
+            eitem = enrich_backend.get_rich_item(item)
+            self.assertEqual(eitem['duration'], expected_durations[pos])
+
     def test_has_identities(self):
         """Test whether has_identities works"""
 

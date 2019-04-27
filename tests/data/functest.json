@@ -197,7 +197,7 @@
         "case_name": "vping_ssh",
         "criteria": "PASS",
         "details": {
-            "duration": 40.7,
+            "duration": "0:04:23",
             "status": "PASS",
             "timestart": 1496314187.73099
         },
@@ -362,7 +362,7 @@
         "case_name": "vping_userdata",
         "criteria": "PASS",
         "details": {
-            "duration": 41.6,
+            "duration": "0m46s",
             "status": "PASS",
             "timestart": 1496313545.74844
         },
