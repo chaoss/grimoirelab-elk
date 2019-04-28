@@ -94,7 +94,7 @@ class DiscourseEnrich(Enrich):
             eanswer['author_trust_level'] = answer['trust_level']
             eanswer['author_url'] = eanswer['origin'] + "/users/" + str(eanswer['author_id'])
             eanswer['reads'] = answer['reads']
-            eanswer['score'] = answer['score']
+            eanswer['score'] = float(answer['score'])
             eanswer['reply_count'] = answer['reply_count']
             eanswer['time_from_question'] = None
             post_time = answer['created_at']
@@ -225,7 +225,7 @@ class DiscourseEnrich(Enrich):
         eitem['author_trust_level'] = first_post['trust_level']
         eitem['author_url'] = eitem['origin'] + "/users/" + str(eitem['author_id'])
         eitem['reads'] = first_post['reads']
-        eitem['score'] = first_post['score']
+        eitem['score'] = float(first_post['score'])
         eitem['reply_count'] = first_post['reply_count']
 
         eitem['question_has_accepted_answer'] = 0
