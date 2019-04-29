@@ -57,15 +57,23 @@ class TestFunctest(TestBaseBackend):
 
         enrich_backend = self.connectors[self.connector][2]()
 
-        expected_durations = [None, None, None, 38.0, 263.0,
-                              None, None, None, None, None,
-                              46.0, 32.7, None, None, None,
-                              None, None, None, None, None,
-                              None, None, 81.7, 84.2, None,
+        expected_durations_from_api = [None, None, None, 38.0, 41.0,
+                                       None, None, None, None, None,
+                                       42.0, 32.7, None, None, None,
+                                       None, None, None, None, None,
+                                       None, None, 81.7, 84.2, None,
+                                       None, None]
+
+        expected_durations = [None, 750, 1323, 38, 41,
+                              None, None, None, 864, 902,
+                              42, 33, None, None, None,
+                              768, 193, 2, None, 103,
+                              2, 1380, 82, 85, None,
                               None, None]
 
         for pos, item in enumerate(self.items):
             eitem = enrich_backend.get_rich_item(item)
+            self.assertEqual(eitem['duration_from_api'], expected_durations_from_api[pos])
             self.assertEqual(eitem['duration'], expected_durations[pos])
 
     def test_has_identities(self):

@@ -197,7 +197,7 @@
         "case_name": "vping_ssh",
         "criteria": "PASS",
         "details": {
-            "duration": "0:04:23",
+            "duration": "0:00:41",
             "status": "PASS",
             "timestart": 1496314187.73099
         },
@@ -362,7 +362,7 @@
         "case_name": "vping_userdata",
         "criteria": "PASS",
         "details": {
-            "duration": "0m46s",
+            "duration": "0m42s",
             "status": "PASS",
             "timestart": 1496313545.74844
         },
@@ -882,7 +882,7 @@
         "project_name": "functest",
         "scenario": "os-nosdn-kvm_ovs_dpdk_bar-ha",
         "start_date": "2017-06-01 10:01:57",
-        "stop_date": "2017-06-01 10:01:58",
+        "stop_date": "",
         "trust_indicator": null,
         "version": "danube"
     },
