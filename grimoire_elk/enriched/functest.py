@@ -23,6 +23,8 @@
 import logging
 import re
 
+from grimoirelab_toolkit.datetime import str_to_datetime, unixtime_to_datetime
+
 from .enrich import Enrich, metadata
 
 
@@ -48,7 +50,16 @@ class FunctestEnrich(Enrich):
         # In Functest there is no identities support
         return None
 
-    def __process_duration(self, duration):
+    def __process_duration(self, start_date, stop_date):
+        difference_in_seconds = None
+
+        if not start_date or not stop_date:
+            return difference_in_seconds
+
+        difference_in_seconds = abs((stop_date - start_date).seconds)
+        return difference_in_seconds
+
+    def __process_duration_from_api(self, duration):
         processed_duration = None
         try:
             processed_duration = float(duration)
@@ -115,13 +126,23 @@ class FunctestEnrich(Enrich):
                     eitem['failures'] = func_test['details']['failures']
 
             if 'duration' in func_test['details']:
-                eitem['duration'] = func_test['details']['duration']
-                eitem['duration'] = self.__process_duration(eitem['duration'])
+                eitem['duration_from_api'] = self.__process_duration_from_api(func_test['details']['duration'])
+
+                if eitem['duration_from_api'] is None:
+                    logger.debug("Duration from api %s not processed for enriched item %s",
+                                 func_test['details']['duration'], eitem)
+
+            if 'start_date' in func_test and 'stop_date' in func_test and func_test['stop_date']:
+                start_date = self.__convert_str_to_datetime(func_test['start_date'])
+                stop_date = self.__convert_str_to_datetime(func_test['stop_date'])
+                eitem['duration'] = self.__process_duration(start_date, stop_date)
 
                 if eitem['duration'] is None:
-                    logger.warning("Duration %s not processed for enriched item %s",
-                                   func_test['details']['duration'], eitem)
+                    logger.debug("Duration not calculated for enriched item %s with start_date, stop_date: %s, %s",
+                                 eitem, start_date, stop_date)
 
+        if 'duration_from_api' not in eitem:
+            eitem['duration_from_api'] = None
         if 'duration' not in eitem:
             eitem['duration'] = None
         if 'failures' not in eitem:
@@ -142,3 +163,15 @@ class FunctestEnrich(Enrich):
 
         self.add_metadata_filter_raw(eitem)
         return eitem
+
+    @staticmethod
+    def __convert_str_to_datetime(text):
+        try:
+            str_date = str_to_datetime(text)
+        except Exception:
+            try:
+                str_date = unixtime_to_datetime(text)
+            except Exception:
+                str_date = None
+
+        return str_date
