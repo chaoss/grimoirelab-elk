@@ -25,7 +25,7 @@ import logging
 import time
 import unittest
 
-from base import TestBaseBackend
+from base import TestBaseBackend, DB_SORTINGHAT
 from grimoire_elk.raw.gerrit import GerritOcean
 from grimoire_elk.enriched.enrich import (logger,
                                           DEMOGRAPHICS_ALIAS)
@@ -112,6 +112,51 @@ class TestGerrit(TestBaseBackend):
         result = self._test_raw_to_enrich(sortinghat=True)
         self.assertEqual(result['raw'], 5)
         self.assertEqual(result['enrich'], 190)
+
+        enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
+                                                            db_user=self.db_user,
+                                                            db_password=self.db_password)
+
+        for item in self.items:
+            eitem = enrich_backend.get_rich_item(item)
+
+            self.assertIn('changeset_author_id', eitem)
+            self.assertIn('changeset_author_uuid', eitem)
+            self.assertIn('changeset_author_name', eitem)
+            self.assertIn('changeset_author_user_name', eitem)
+            self.assertIn('changeset_author_domain', eitem)
+            self.assertIn('changeset_author_gender', eitem)
+            self.assertIn('changeset_author_gender_acc', eitem)
+            self.assertIn('changeset_author_org_name', eitem)
+            self.assertIn('changeset_author_bot', eitem)
+
+            comments = item['data']['comments']
+            ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
+
+            for ecomment in ecomments:
+                self.assertIn('changeset_author_id', ecomment)
+                self.assertIn('changeset_author_uuid', ecomment)
+                self.assertIn('changeset_author_name', ecomment)
+                self.assertIn('changeset_author_user_name', ecomment)
+                self.assertIn('changeset_author_domain', ecomment)
+                self.assertIn('changeset_author_gender', ecomment)
+                self.assertIn('changeset_author_gender_acc', ecomment)
+                self.assertIn('changeset_author_org_name', ecomment)
+                self.assertIn('changeset_author_bot', ecomment)
+
+            patchsets = item['data']['patchSets']
+            epatchsets = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
+
+            for epatchset in epatchsets:
+                self.assertIn('changeset_author_id', epatchset)
+                self.assertIn('changeset_author_uuid', epatchset)
+                self.assertIn('changeset_author_name', epatchset)
+                self.assertIn('changeset_author_user_name', epatchset)
+                self.assertIn('changeset_author_domain', epatchset)
+                self.assertIn('changeset_author_gender', epatchset)
+                self.assertIn('changeset_author_gender_acc', epatchset)
+                self.assertIn('changeset_author_org_name', epatchset)
+                self.assertIn('changeset_author_bot', epatchset)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""

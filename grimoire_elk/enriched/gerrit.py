@@ -242,6 +242,9 @@ class GerritEnrich(Enrich):
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
 
+            # add changeset author
+            self.add_changeset_author(eitem, eitem, rol='owner')
+
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
 
@@ -299,6 +302,9 @@ class GerritEnrich(Enrich):
                 ecomment['author_gender_acc'] = ecomment['reviewer_gender_acc']
                 ecomment['author_org_name'] = ecomment['reviewer_org_name']
                 ecomment['author_bot'] = ecomment['reviewer_bot']
+
+                # add changeset author
+                self.add_changeset_author(eitem, ecomment)
 
             if self.prjs_map:
                 ecomment.update(self.get_item_project(ecomment))
@@ -364,6 +370,9 @@ class GerritEnrich(Enrich):
 
             if self.sortinghat:
                 epatchset.update(self.get_item_sh(patchset, ['author', 'uploader'], 'createdOn'))
+
+                # add changeset author
+                self.add_changeset_author(eitem, epatchset)
 
             if self.prjs_map:
                 epatchset.update(self.get_item_project(epatchset))
@@ -440,6 +449,9 @@ class GerritEnrich(Enrich):
                 eapproval['author_org_name'] = eapproval['by_org_name']
                 eapproval['author_bot'] = eapproval['by_bot']
 
+                # add changeset author
+                self.add_changeset_author(epatchset, eapproval)
+
             if self.prjs_map:
                 eapproval.update(self.get_item_project(eapproval))
 
@@ -453,6 +465,19 @@ class GerritEnrich(Enrich):
             eapprovals.append(eapproval)
 
         return eapprovals
+
+    def add_changeset_author(self, source_eitem, target_eitem, rol='changeset_author'):
+        """Copy SH changeset author info in `source_eitem` to `target_eitem`"""
+
+        target_eitem['changeset_author_id'] = source_eitem[rol + '_id']
+        target_eitem['changeset_author_uuid'] = source_eitem[rol + '_uuid']
+        target_eitem['changeset_author_name'] = source_eitem[rol + '_name']
+        target_eitem['changeset_author_user_name'] = source_eitem[rol + '_user_name']
+        target_eitem['changeset_author_domain'] = source_eitem[rol + '_domain']
+        target_eitem['changeset_author_gender'] = source_eitem[rol + '_gender']
+        target_eitem['changeset_author_gender_acc'] = source_eitem[rol + '_gender_acc']
+        target_eitem['changeset_author_org_name'] = source_eitem[rol + '_org_name']
+        target_eitem['changeset_author_bot'] = source_eitem[rol + '_bot']
 
     def get_field_unique_id(self):
         return "id"
