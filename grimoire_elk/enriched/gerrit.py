@@ -32,6 +32,7 @@ from grimoirelab_toolkit.datetime import (str_to_datetime,
 
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
 REVIEW_TYPE = 'review'
+CHANGESET_TYPE = 'changeset'
 COMMENT_TYPE = 'comment'
 PATCHSET_TYPE = 'patchset'
 APPROVAL_TYPE = 'approval'
@@ -244,7 +245,10 @@ class GerritEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
 
-        eitem.update(self.get_grimoire_fields(review['createdOn'], "review"))
+        # common field to count all items related to a review
+        eitem.update(self.get_grimoire_fields(review['createdOn'], REVIEW_TYPE))
+        # specific field to count changeset review
+        eitem.update(self.get_grimoire_fields(review['createdOn'], CHANGESET_TYPE))
 
         self.add_metadata_filter_raw(eitem)
         return eitem
@@ -299,6 +303,9 @@ class GerritEnrich(Enrich):
             if self.prjs_map:
                 ecomment.update(self.get_item_project(ecomment))
 
+            # common field to count all items related to a review
+            ecomment.update(self.get_grimoire_fields(comment['timestamp'], REVIEW_TYPE))
+            # specific field to count comment review
             ecomment.update(self.get_grimoire_fields(comment['timestamp'], COMMENT_TYPE))
 
             self.add_metadata_filter_raw(ecomment)
@@ -361,6 +368,9 @@ class GerritEnrich(Enrich):
             if self.prjs_map:
                 epatchset.update(self.get_item_project(epatchset))
 
+            # common field to count all items related to a review
+            epatchset.update(self.get_grimoire_fields(patchset['createdOn'], REVIEW_TYPE))
+            # specific field to count patchset review
             epatchset.update(self.get_grimoire_fields(patchset['createdOn'], PATCHSET_TYPE))
 
             self.add_metadata_filter_raw(epatchset)
@@ -433,6 +443,9 @@ class GerritEnrich(Enrich):
             if self.prjs_map:
                 eapproval.update(self.get_item_project(eapproval))
 
+            # common field to count all items related to a review
+            eapproval.update(self.get_grimoire_fields(approval['grantedOn'], REVIEW_TYPE))
+            # specific field to count approval review
             eapproval.update(self.get_grimoire_fields(approval['grantedOn'], APPROVAL_TYPE))
 
             self.add_metadata_filter_raw(eapproval)
