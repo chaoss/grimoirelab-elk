@@ -4,6 +4,7 @@ build_tag,keyword
 case_name,keyword
 criteria,keyword
 duration,float
+duration_from_api,float
 failures,long
 grimoire_creation_date,date
 installer,keyword
