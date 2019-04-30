@@ -32,7 +32,7 @@ from elasticsearch import Elasticsearch
 
 from grimoirelab_toolkit.datetime import (datetime_to_utc,
                                           str_to_datetime)
-from perceval.backends.core.git import GitRepository
+from perceval.backends.core.git import GitCommand, GitRepository
 from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
 from ..elastic_mapping import Mapping as BaseMapping
@@ -96,6 +96,7 @@ class GitEnrich(Enrich):
         self.studies.append(self.enrich_demography)
         self.studies.append(self.enrich_areas_of_code)
         self.studies.append(self.enrich_onion)
+        self.studies.append(self.enrich_git_branches)
 
         # GitHub API management
         self.github_token = None
@@ -720,14 +721,66 @@ class GitEnrich(Enrich):
                      len(hashes_to_delete), enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url),
                      self.perceval_backend.origin)
 
-        # update branch info
-        self.delete_commit_branches(enrich_backend)
-        self.add_commit_branches(git_repo, enrich_backend)
+    def remove_commits(self, items, index, attribute, origin):
+        """Delete documents that correspond to commits deleted in the Git repository
 
-    def delete_commit_branches(self, enrich_backend):
+        :param items: target items to be deleted
+        :param index: target index
+        :param attribute: name of the term attribute to search items
+        :param origin: name of the origin from where the items must be deleted
+        """
+        es_query = '''
+            {
+              "query": {
+                "bool": {
+                    "must": {
+                        "term": {
+                            "origin": "%s"
+                        }
+                    },
+                    "filter": {
+                        "terms": {
+                            "%s": [%s]
+                        }
+                    }
+                }
+              }
+            }
+            ''' % (origin, attribute, ",".join(['"%s"' % i for i in items]))
+
+        r = self.requests.post(index + "/_delete_by_query?refresh", data=es_query, headers=HEADER_JSON, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logger.error("Error updating deleted commits for %s.", self.elastic.anonymize_url(index))
+            logger.error(r.text)
+            return
+
+    def enrich_git_branches(self, ocean_backend, enrich_backend):
+        """Update the information about branches within the documents representing
+        commits in the enriched index.
+
+        :param ocean_backend: the ocean backend
+        :param enrich_backend: the enrich backend
+        """
+        for ds in self.prjs_map:
+            if ds != "git":
+                continue
+
+            urls = self.prjs_map[ds]
+
+            for url in urls:
+                cmd = GitCommand(*[url])
+
+                git_repo = GitRepository(cmd.parsed_args.uri, cmd.parsed_args.gitpath)
+                self.delete_commit_branches(git_repo, enrich_backend)
+                self.add_commit_branches(git_repo, enrich_backend)
+
+    def delete_commit_branches(self, git_repo, enrich_backend):
         """Delete the information about branches from the documents representing
         commits in the enriched index.
 
+        :param git_repo: GitRepository object
         :param enrich_backend: the enrich backend
         """
         fltr = """
@@ -738,7 +791,7 @@ class GitEnrich(Enrich):
                     }
                 }
             ]
-        """ % self.perceval_backend.origin
+        """ % git_repo.uri
 
         # reset references in enrich index
         es_query = """
@@ -793,55 +846,20 @@ class GitEnrich(Enrich):
                     commit_count += 1
 
                     if commit_count == MAX_BULK_UPDATE_SIZE:
-                        self.__process_commits_in_branch(enrich_backend, branch_name, to_process)
+                        self.__process_commits_in_branch(enrich_backend, git_repo.uri, branch_name, to_process)
 
                         # reset the counter
                         to_process = []
                         commit_count = 0
 
                 if commit_count:
-                    self.__process_commits_in_branch(enrich_backend, branch_name, to_process)
+                    self.__process_commits_in_branch(enrich_backend, git_repo.uri, branch_name, to_process)
 
             except Exception as e:
                 logger.error("Skip adding branch info for repo %s due to %s", git_repo.uri, e)
                 return
 
-    def remove_commits(self, items, index, attribute, origin):
-        """Delete documents that correspond to commits deleted in the Git repository
-
-        :param items: target items to be deleted
-        :param index: target index
-        :param attribute: name of the term attribute to search items
-        :param origin: name of the origin from where the items must be deleted
-        """
-        es_query = '''
-            {
-              "query": {
-                "bool": {
-                    "must": {
-                        "term": {
-                            "origin": "%s"
-                        }
-                    },
-                    "filter": {
-                        "terms": {
-                            "%s": [%s]
-                        }
-                    }
-                }
-              }
-            }
-            ''' % (origin, attribute, ",".join(['"%s"' % i for i in items]))
-
-        r = self.requests.post(index + "/_delete_by_query?refresh", data=es_query, headers=HEADER_JSON, verify=False)
-        try:
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as ex:
-            logger.error("Error updating deleted commits for %s.", self.elastic.anonymize_url(index))
-            logger.error(r.text)
-            return
-
-    def __process_commits_in_branch(self, enrich_backend, branch_name, commits):
+    def __process_commits_in_branch(self, enrich_backend, repo_origin, branch_name, commits):
         commits_str = ",".join(['"%s"' % c for c in commits])
 
         # process branch names which include quotes or single quote
@@ -854,7 +872,7 @@ class GitEnrich(Enrich):
             logger.warning("Change branch name from %s to %s", branch_name, digested_branch_name)
 
         # update enrich index
-        fltr = self.__prepare_filter("hash", commits_str)
+        fltr = self.__prepare_filter("hash", commits_str, repo_origin)
 
         es_query = """
             {
@@ -884,7 +902,7 @@ class GitEnrich(Enrich):
 
         logger.debug("Add branches %s, index %s", r.text, self.elastic.anonymize_url(index))
 
-    def __prepare_filter(self, terms_attr, terms_value):
+    def __prepare_filter(self, terms_attr, terms_value, repo_origin):
         fltr = """
             "filter": [
                 {
@@ -898,6 +916,6 @@ class GitEnrich(Enrich):
                     }
                 }
             ]
-        """ % (terms_attr, terms_value, self.perceval_backend.origin)
+        """ % (terms_attr, terms_value, repo_origin)
 
         return fltr
