@@ -200,13 +200,13 @@ class GerritEnrich(Enrich):
                       "id": "githash",
                       "createdOn": "opened",
                       "project": "repository",
-                      "number": "number"
+                      "number": "changeset_number"
                       }
         for fn in map_fields:
             eitem[map_fields[fn]] = review[fn]
 
         # Add id info to allow to coexistence of items of different types in the same index
-        eitem['id'] = eitem['number']
+        eitem['id'] = eitem['changeset_number']
         eitem["summary_analyzed"] = eitem["summary"]
         eitem["summary"] = eitem["summary"][:self.KEYWORD_MAX_SIZE]
         eitem["name"] = None
@@ -270,7 +270,7 @@ class GerritEnrich(Enrich):
             ecomment['summary'] = eitem['summary']
             ecomment['repository'] = eitem['repository']
             ecomment['branch'] = eitem['branch']
-            ecomment['review_number'] = eitem['number']
+            ecomment['changeset_number'] = eitem['changeset_number']
 
             # Add reviewer info
             ecomment["reviewer_name"] = None
@@ -287,8 +287,8 @@ class GerritEnrich(Enrich):
             ecomment['comment_message'] = comment['message'][:self.KEYWORD_MAX_SIZE]
 
             # Add id info to allow to coexistence of items of different types in the same index
-            ecomment['id'] = '{}_comment_{}'.format(ecomment['review_number'], created.timestamp())
             ecomment['type'] = COMMENT_TYPE
+            ecomment['id'] = '{}_comment_{}'.format(ecomment['changeset_number'], created.timestamp())
 
             if self.sortinghat:
                 ecomment.update(self.get_item_sh(comment, ['reviewer'], 'timestamp'))
@@ -333,7 +333,7 @@ class GerritEnrich(Enrich):
             epatchset['summary'] = eitem['summary']
             epatchset['repository'] = eitem['repository']
             epatchset['branch'] = eitem['branch']
-            epatchset['review_number'] = eitem['number']
+            epatchset['changeset_number'] = eitem['changeset_number']
 
             # Add author info
             epatchset["patchset_author_name"] = None
@@ -365,8 +365,8 @@ class GerritEnrich(Enrich):
             epatchset['patchset_sizeInsertions'] = patchset.get('sizeInsertions', None)
 
             # Add id info to allow to coexistence of items of different types in the same index
-            epatchset['id'] = '{}_patchset_{}'.format(epatchset['review_number'], epatchset['patchset_number'])
             epatchset['type'] = PATCHSET_TYPE
+            epatchset['id'] = '{}_patchset_{}'.format(epatchset['changeset_number'], epatchset['patchset_number'])
 
             if self.sortinghat:
                 epatchset.update(self.get_item_sh(patchset, ['author', 'uploader'], 'createdOn'))
@@ -408,7 +408,7 @@ class GerritEnrich(Enrich):
             eapproval['summary'] = epatchset['summary']
             eapproval['repository'] = epatchset['repository']
             eapproval['branch'] = epatchset['branch']
-            eapproval['review_number'] = epatchset['review_number']
+            eapproval['changeset_number'] = epatchset['changeset_number']
             eapproval['patchset_number'] = epatchset['patchset_number']
             eapproval['patchset_revision'] = epatchset['patchset_revision']
             eapproval['patchset_ref'] = epatchset['patchset_ref']
