@@ -248,6 +248,7 @@ class GerritEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
 
+        eitem['type'] = CHANGESET_TYPE
         # common field to count all items related to a review
         eitem.update(self.get_grimoire_fields(review['createdOn'], REVIEW_TYPE))
         # specific field to count changeset review
