@@ -32,6 +32,7 @@ from ..elastic_mapping import Mapping as BaseMapping
 logger = logging.getLogger(__name__)
 
 
+REVISION_TYPE = 'revision'
 HIDDEN_EDITOR = '--hidden--'
 
 
@@ -187,6 +188,7 @@ class MediaWikiEnrich(Enrich):
             erevision['metadata__gelk_version'] = eitem['metadata__gelk_version']
             erevision['metadata__gelk_backend_name'] = eitem['metadata__gelk_backend_name']
             erevision['metadata__enriched_on'] = eitem['metadata__enriched_on']
+            erevision.update(self.get_grimoire_fields(erevision['metadata__updated_on'], REVISION_TYPE))
 
             yield erevision
 
