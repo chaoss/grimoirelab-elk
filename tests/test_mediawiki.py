@@ -65,6 +65,7 @@ class TestMediawiki(TestBaseBackend):
             self.assertIn('metadata__gelk_version', ei)
             self.assertIn('metadata__gelk_backend_name', ei)
             self.assertIn('metadata__enriched_on', ei)
+            self.assertIn('grimoire_creation_date', ei)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
