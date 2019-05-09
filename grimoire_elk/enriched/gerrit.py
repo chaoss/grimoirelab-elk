@@ -206,7 +206,7 @@ class GerritEnrich(Enrich):
             eitem[map_fields[fn]] = review[fn]
 
         # Add id info to allow to coexistence of items of different types in the same index
-        eitem['id'] = eitem['changeset_number']
+        eitem['id'] = '{}_changeset_{}'.format(eitem['uuid'], eitem['changeset_number'])
         eitem["summary_analyzed"] = eitem["summary"]
         eitem["summary"] = eitem["summary"][:self.KEYWORD_MAX_SIZE]
         eitem["name"] = None
@@ -289,7 +289,7 @@ class GerritEnrich(Enrich):
 
             # Add id info to allow to coexistence of items of different types in the same index
             ecomment['type'] = COMMENT_TYPE
-            ecomment['id'] = '{}_comment_{}'.format(ecomment['changeset_number'], created.timestamp())
+            ecomment['id'] = '{}_comment_{}'.format(eitem['id'], created.timestamp())
 
             if self.sortinghat:
                 ecomment.update(self.get_item_sh(comment, ['reviewer'], 'timestamp'))
@@ -367,7 +367,7 @@ class GerritEnrich(Enrich):
 
             # Add id info to allow to coexistence of items of different types in the same index
             epatchset['type'] = PATCHSET_TYPE
-            epatchset['id'] = '{}_patchset_{}'.format(epatchset['changeset_number'], epatchset['patchset_number'])
+            epatchset['id'] = '{}_patchset_{}'.format(eitem['id'], epatchset['patchset_number'])
 
             if self.sortinghat:
                 epatchset.update(self.get_item_sh(patchset, ['author', 'uploader'], 'createdOn'))
