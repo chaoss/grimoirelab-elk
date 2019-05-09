@@ -763,6 +763,7 @@ class GitEnrich(Enrich):
         :param ocean_backend: the ocean backend
         :param enrich_backend: the enrich backend
         """
+        logger.debug("[git-branches] Start study")
         for ds in self.prjs_map:
             if ds != "git":
                 continue
@@ -773,8 +774,19 @@ class GitEnrich(Enrich):
                 cmd = GitCommand(*[url])
 
                 git_repo = GitRepository(cmd.parsed_args.uri, cmd.parsed_args.gitpath)
+
+                logger.debug("[git-branches] Delete branch info for repo %s in index %s",
+                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url))
                 self.delete_commit_branches(git_repo, enrich_backend)
+
+                logger.debug("[git-branches] Add branch info for repo %s in index %s",
+                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url))
                 self.add_commit_branches(git_repo, enrich_backend)
+
+                logger.debug("[git-branches] Repo %s in index %s processed",
+                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url))
+
+        logger.debug("[git-branches] End study")
 
     def delete_commit_branches(self, git_repo, enrich_backend):
         """Delete the information about branches from the documents representing
