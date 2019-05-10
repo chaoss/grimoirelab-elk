@@ -230,8 +230,7 @@ class GitLabEnrich(Enrich):
         rich_issue['gitlab_repo'] = re.sub('.git$', '', rich_issue['gitlab_repo'])
         rich_issue["url_id"] = issue['web_url'].replace(GITLAB, '')
 
-        rich_issue['milestone'] = issue['milestone']['title'] \
-            if 'milestone' in issue and issue['milestone'] else NO_MILESTONE_TAG
+        self.__add_milestone_info(issue, rich_issue)
 
         if self.prjs_map:
             rich_issue.update(self.get_item_project(rich_issue))
@@ -348,8 +347,7 @@ class GitLabEnrich(Enrich):
             rich_mr['time_to_first_attention'] = \
                 get_time_diff_days(merge_request['created_at'], self.get_time_to_first_attention(merge_request))
 
-        rich_mr['milestone'] = merge_request['milestone']['title'] \
-            if 'milestone' in merge_request and merge_request['milestone'] else NO_MILESTONE_TAG
+        self.__add_milestone_info(merge_request, rich_mr)
 
         if self.prjs_map:
             rich_mr.update(self.get_item_project(rich_mr))
@@ -364,6 +362,27 @@ class GitLabEnrich(Enrich):
             rich_mr.update(self.get_item_sh(item, self.merge_roles))
 
         return rich_mr
+
+    def __add_milestone_info(self, item_data, eitem):
+        """Add milestone tag, start date and due date to the enriched item"""
+
+        eitem['milestone'] = NO_MILESTONE_TAG
+        eitem['milestone_start_date'] = None
+        eitem['milestone_due_date'] = None
+
+        if 'milestone' in item_data and item_data['milestone']:
+            eitem['milestone'] = item_data['milestone']['title']
+
+            milestone = item_data['milestone']
+
+            start_date_str = milestone.get('start_date', None)
+            due_date_str = milestone.get('due_date', None)
+
+            if start_date_str:
+                eitem['milestone_start_date'] = str_to_datetime(start_date_str).replace(tzinfo=None).isoformat()
+
+            if due_date_str:
+                eitem['milestone_due_date'] = str_to_datetime(due_date_str).replace(tzinfo=None).isoformat()
 
     def enrich_onion(self, ocean_backend, enrich_backend,
                      in_index, out_index, data_source=None, no_incremental=False,
