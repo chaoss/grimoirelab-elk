@@ -33,6 +33,8 @@ metadata__gelk_version,keyword,true,"Version of the backend used to enrich infor
 metadata__timestamp,date,true,"Date when the item was stored in RAW index."
 metadata__updated_on,date,true,"Date when the item was updated on its original data source."
 milestone,keyword,true,"Assigned milestone."
+milestone_start_date,date,true,"Date when a milestone was started."
+milestone_due_date,date,true,"Date when a milestone was due."
 origin,keyword,true,"Original URL where the repository was retrieved from."
 project,keyword,true,"Project."
 project_1,keyword,true,"Project (if more than one level is allowed in project hierarchy)."
