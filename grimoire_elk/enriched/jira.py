@@ -316,8 +316,8 @@ class JiraEnrich(Enrich):
         eitem['time_to_last_update_days'] = None
         eitem['url'] = None
 
-        # Add id info to allow to cohesistance of comments and issues in the same index
-        eitem['id'] = issue['id']
+        # Add id info to allow to coexistence of comments and issues in the same index
+        eitem['id'] = '{}_issue_{}'.format(eitem['uuid'], issue['id'])
 
         if 'comments_data' in issue:
             eitem['number_of_comments'] = len(issue['comments_data'])
@@ -389,8 +389,8 @@ class JiraEnrich(Enrich):
             ecomment['body'] = comment['body']
             ecomment['comment_id'] = comment['id']
 
-            # Add id info to allow to cohesistance of comments and issues in the same index
-            ecomment['id'] = ecomment['issue_key'] + '_comment_' + comment['id']
+            # Add id info to allow to coexistence of comments and issues in the same index
+            ecomment['id'] = '{}_comment_{}'.format(eitem['id'], comment['id'])
             ecomment['type'] = COMMENT_TYPE
 
             if self.sortinghat:
