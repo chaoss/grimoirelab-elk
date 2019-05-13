@@ -59,22 +59,32 @@ class TestJira(TestBaseBackend):
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(item['data']['id'], "10010")
+        self.assertEqual(eitem['id'], "fcf4a8418030d95844f0825fb5b1c3bdc0a1d942_issue_10010")
         self.assertEqual(eitem['number_of_comments'], 0)
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(item['data']['id'], "10010")
+        self.assertEqual(eitem['id'], "7bbd3aaee3adba6b1a1d293c78a385a874419b12_issue_10010")
         self.assertEqual(eitem['number_of_comments'], 0)
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(item['data']['id'], "10008")
+        self.assertEqual(eitem['id'], "d6b4168fd458f910fb9af1df0e9edcfaa188cc67_issue_10008")
         self.assertEqual(eitem['number_of_comments'], 0)
 
         item = self.items[3]
         eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(item['data']['id'], "10017")
+        self.assertEqual(eitem['id'], "305dbd15b1f250cb6941d8b9270af3d3a4405084_issue_10017")
         self.assertEqual(eitem['number_of_comments'], 0)
 
         item = self.items[4]
         eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(item['data']['id'], "10018")
+        self.assertEqual(eitem['id'], "929182e386ddb7d290c0dbd2eb34140993c8f567_issue_10018")
         self.assertEqual(eitem['number_of_comments'], 2)
 
     def test_raw_to_enrich_sorting_hat(self):

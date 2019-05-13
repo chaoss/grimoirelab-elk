@@ -964,7 +964,7 @@
             },
             "workratio": -1
         },
-        "id": "10009",
+        "id": "10010",
         "key": "CONTRIB-4",
         "operations": {
             "linkGroups": [
@@ -1139,7 +1139,7 @@
         "self": "https://finosfoundation.atlassian.net/rest/api/2/issue/10009",
         "transitions": []
     },
-    "origin": "http://finosfoundation.atlassian.net",
+    "origin": "https://issues.apache.org/jira",
     "perceval_version": "0.12.9",
     "tag": "http://finosfoundation.atlassian.net",
     "timestamp": 1554907659.471441,
