@@ -80,3 +80,7 @@ class SlackOcean(ElasticOcean):
         params = {"channel": url}
 
         return params
+
+    def _fix_item(self, item):
+        if 'channel_info' in item['data']:
+            item['data']['channel_info'].pop('previous_names', None)
