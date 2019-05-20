@@ -82,6 +82,8 @@ class GerritEnrich(Enrich):
         self.studies.append(self.enrich_demography)
         self.studies.append(self.enrich_onion)
 
+    roles = ["author", "by", "changeset_author", "reviewer", "uploader"]
+
     def get_field_author(self):
         return "owner"
 
