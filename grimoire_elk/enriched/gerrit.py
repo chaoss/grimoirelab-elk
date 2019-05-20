@@ -316,6 +316,8 @@ class GerritEnrich(Enrich):
             ecomment.update(self.get_grimoire_fields(comment['timestamp'], COMMENT_TYPE))
 
             self.add_metadata_filter_raw(ecomment)
+            self.add_gelk_metadata(ecomment)
+
             ecomments.append(ecomment)
 
         return ecomments
@@ -384,6 +386,7 @@ class GerritEnrich(Enrich):
             epatchset.update(self.get_grimoire_fields(patchset['createdOn'], PATCHSET_TYPE))
 
             self.add_metadata_filter_raw(epatchset)
+            self.add_gelk_metadata(epatchset)
 
             eitems.append(epatchset)
 
@@ -462,6 +465,7 @@ class GerritEnrich(Enrich):
             eapproval.update(self.get_grimoire_fields(approval['grantedOn'], APPROVAL_TYPE))
 
             self.add_metadata_filter_raw(eapproval)
+            self.add_gelk_metadata(eapproval)
 
             eapprovals.append(eapproval)
 
@@ -546,3 +550,8 @@ class GerritEnrich(Enrich):
                              sort_on_field=sort_on_field,
                              no_incremental=no_incremental,
                              seconds=seconds)
+
+    def add_gelk_metadata(self, eitem):
+        eitem['metadata__gelk_version'] = self.gelk_version
+        eitem['metadata__gelk_backend_name'] = self.__class__.__name__
+        eitem['metadata__enriched_on'] = datetime_utcnow().isoformat()

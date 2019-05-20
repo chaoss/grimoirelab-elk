@@ -66,19 +66,42 @@ class TestGerrit(TestBaseBackend):
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
 
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__gelk_version', eitem)
+
         comments = item['data']['comments']
         ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
         self.assertEqual(len(ecomments), 46)
+
+        for ecomment in ecomments:
+            self.assertIn('metadata__enriched_on', ecomment)
+            self.assertIn('metadata__gelk_backend_name', ecomment)
+            self.assertIn('metadata__gelk_version', ecomment)
 
         patchsets = item['data']['patchSets']
         eitems = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
         self.assertEqual(len(eitems), 18)
 
+        for eitem in eitems:
+            self.assertIn('metadata__enriched_on', eitem)
+            self.assertIn('metadata__gelk_backend_name', eitem)
+            self.assertIn('metadata__gelk_version', eitem)
+
         epatchsets = [ei for ei in eitems if 'is_gerrit_patchset' in ei]
         eapprovals = [ei for ei in eitems if 'is_gerrit_approval' in ei]
 
         self.assertEqual(len(epatchsets), 5)
+        for epatchset in epatchsets:
+            self.assertIn('metadata__enriched_on', epatchset)
+            self.assertIn('metadata__gelk_backend_name', epatchset)
+            self.assertIn('metadata__gelk_version', epatchset)
+
         self.assertEqual(len(eapprovals), 13)
+        for eapproval in eapprovals:
+            self.assertIn('metadata__enriched_on', eapproval)
+            self.assertIn('metadata__gelk_backend_name', eapproval)
+            self.assertIn('metadata__gelk_version', eapproval)
 
     def test_demography_study(self):
         """ Test that the demography study works correctly """
