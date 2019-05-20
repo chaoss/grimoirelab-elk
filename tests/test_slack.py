@@ -49,6 +49,11 @@ class TestSlack(TestBaseBackend):
         self.assertEqual(result['items'], 9)
         self.assertEqual(result['raw'], 9)
 
+        for item in self.items:
+            self.ocean_backend._fix_item(item)
+
+            self.assertNotIn('previous_names', item['data']['channel_info'])
+
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
