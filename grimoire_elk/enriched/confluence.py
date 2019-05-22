@@ -91,6 +91,8 @@ class ConfluenceEnrich(Enrich):
         identity['name'] = None
         if 'username' in user:
             identity['username'] = user['username']
+        if 'email' in user:
+            identity['email'] = user['email']
         if 'displayName' in user:
             identity['name'] = user['displayName']
 
