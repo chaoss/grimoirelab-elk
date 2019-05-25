@@ -70,6 +70,7 @@ class TestGit(TestBaseBackend):
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['labels'], ['bug', 'feature'])
         self.assertEqual(item['category'], 'pull_request')
+        self.assertEqual(eitem['time_to_merge_request_response'], 335.81)
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
