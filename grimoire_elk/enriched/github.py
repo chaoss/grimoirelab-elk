@@ -281,10 +281,21 @@ class GitHubEnrich(Enrich):
         """Get the first date at which a review was made on the PR by someone
         other than the user who created the PR
         """
-        review_dates = [str_to_datetime(review['created_at']) for review in item['review_comments_data']
-                        if item['user']['login'] != review['user']['login']]
+        review_dates = []
+        for comment in item['review_comments_data']:
+            # skip comments of ghost users
+            if not comment['user']:
+                continue
+
+            # skip comments of the pull request creator
+            if item['user']['login'] == comment['user']['login']:
+                continue
+
+            review_dates.append(str_to_datetime(comment['created_at']))
+
         if review_dates:
             return min(review_dates)
+
         return None
 
     def get_latest_comment_date(self, item):
