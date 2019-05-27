@@ -35,6 +35,7 @@ MAX_BULK_UPDATE_SIZE = 1000
 
 FILTER_DATA_ATTR = 'data.'
 FILTER_SEPARATOR = r",\s*%s" % FILTER_DATA_ATTR
+PROJECTS_JSON_LABELS_PATTERN = r".*(--labels=\[(.*)\]).*"
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,7 @@ class ElasticItems:
         self.filter_raw_should = None  # to filter raw items from Ocean
         self.filter_raw_should_dict = []
         self.projects_json_repo = None
+        self.repo_labels = None
 
         self.requests = grimoire_con(insecure)
         self.elastic = None
@@ -82,6 +84,30 @@ class ElasticItems:
 
     def set_projects_json_repo(self, repo):
         self.projects_json_repo = repo
+
+    def set_repo_labels(self, labels):
+        self.repo_labels = labels
+
+    @staticmethod
+    def extract_repo_labels(repo):
+        """Extract the labels declared in the repositories within the projects.json, and
+        remove them to avoid breaking already existing functionalities.
+
+        :param repo: repo url in projects.json
+        """
+        processed_repo = repo
+        labels_lst = []
+
+        pattern = re.compile(PROJECTS_JSON_LABELS_PATTERN)
+        matchObj = pattern.match(repo)
+
+        if matchObj:
+            labels_info = matchObj.group(1)
+            labels = matchObj.group(2)
+            labels_lst = [l.strip() for l in labels.split(',')]
+            processed_repo = processed_repo.replace(labels_info, '')
+
+        return processed_repo, labels_lst
 
     @staticmethod
     def __process_filter(fltr_raw):
