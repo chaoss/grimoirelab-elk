@@ -104,7 +104,7 @@ def feed_backend_arthur(backend_name, backend_params):
 
 def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None, arthur=False,
-                 es_aliases=None, projects_json_repo=None):
+                 es_aliases=None, projects_json_repo=None, repo_labels=None):
     """ Feed Ocean with backend data """
 
     backend = None
@@ -151,6 +151,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         ocean_backend = connector[1](backend, fetch_archive=fetch_archive, project=project)
         elastic_ocean = get_elastic(url, es_index, clean, ocean_backend, es_aliases)
         ocean_backend.set_elastic(elastic_ocean)
+        ocean_backend.set_repo_labels(repo_labels)
         ocean_backend.set_projects_json_repo(projects_json_repo)
 
         if fetch_archive:
@@ -535,7 +536,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                    filters_raw_prefix=None, jenkins_rename_file=None,
                    unaffiliated_group=None, pair_programming=False,
                    node_regex=False, studies_args=None, es_enrich_aliases=None,
-                   last_enrich_date=None, projects_json_repo=None):
+                   last_enrich_date=None, projects_json_repo=None, repo_labels=None):
     """ Enrich Ocean index """
 
     backend = None
@@ -599,6 +600,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
             enrich_backend.set_filter_raw_should(filters_raw_prefix)
 
         enrich_backend.set_projects_json_repo(projects_json_repo)
+        enrich_backend.set_repo_labels(repo_labels)
         ocean_backend = get_ocean_backend(backend_cmd, enrich_backend,
                                           no_incremental, filter_raw,
                                           filters_raw_prefix)
