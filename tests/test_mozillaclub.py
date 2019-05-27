@@ -26,6 +26,7 @@ import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.raw.mozillaclub import MozillaClubOcean
+from grimoire_elk.enriched.utils import REPO_LABELS
 
 
 class TestMozillaClub(TestBaseBackend):
@@ -62,6 +63,16 @@ class TestMozillaClub(TestBaseBackend):
             self.assertIn('metadata__gelk_version', ei)
             self.assertIn('metadata__gelk_backend_name', ei)
             self.assertIn('metadata__enriched_on', ei)
+
+    def test_enrich_repo_labels(self):
+        """Test whether the field REPO_LABELS is present in the enriched items"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        for item in self.items:
+            eitem = enrich_backend.get_rich_item(item)
+            self.assertIn(REPO_LABELS, eitem)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""

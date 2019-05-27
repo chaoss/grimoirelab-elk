@@ -256,6 +256,7 @@ class GerritEnrich(Enrich):
         # specific field to count changeset review
         eitem.update(self.get_grimoire_fields(review['createdOn'], CHANGESET_TYPE))
 
+        self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem
 
@@ -317,6 +318,7 @@ class GerritEnrich(Enrich):
             # specific field to count comment review
             ecomment.update(self.get_grimoire_fields(comment['timestamp'], COMMENT_TYPE))
 
+            self.add_repository_labels(ecomment)
             self.add_metadata_filter_raw(ecomment)
             self.add_gelk_metadata(ecomment)
 
@@ -387,6 +389,7 @@ class GerritEnrich(Enrich):
             # specific field to count patchset review
             epatchset.update(self.get_grimoire_fields(patchset['createdOn'], PATCHSET_TYPE))
 
+            self.add_repository_labels(epatchset)
             self.add_metadata_filter_raw(epatchset)
             self.add_gelk_metadata(epatchset)
 
@@ -466,6 +469,7 @@ class GerritEnrich(Enrich):
             # specific field to count approval review
             eapproval.update(self.get_grimoire_fields(approval['grantedOn'], APPROVAL_TYPE))
 
+            self.add_repository_labels(eapproval)
             self.add_metadata_filter_raw(eapproval)
             self.add_gelk_metadata(eapproval)
 

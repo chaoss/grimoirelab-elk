@@ -29,6 +29,7 @@ from base import TestBaseBackend, DB_SORTINGHAT
 from grimoire_elk.raw.gerrit import GerritOcean
 from grimoire_elk.enriched.enrich import (logger,
                                           DEMOGRAPHICS_ALIAS)
+from grimoire_elk.enriched.utils import REPO_LABELS
 
 
 HEADER_JSON = {"Content-Type": "application/json"}
@@ -69,6 +70,7 @@ class TestGerrit(TestBaseBackend):
         self.assertIn('metadata__enriched_on', eitem)
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn(REPO_LABELS, eitem)
 
         comments = item['data']['comments']
         ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
@@ -78,6 +80,7 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('metadata__enriched_on', ecomment)
             self.assertIn('metadata__gelk_backend_name', ecomment)
             self.assertIn('metadata__gelk_version', ecomment)
+            self.assertIn(REPO_LABELS, ecomment)
 
         patchsets = item['data']['patchSets']
         eitems = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
@@ -87,6 +90,7 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('metadata__enriched_on', eitem)
             self.assertIn('metadata__gelk_backend_name', eitem)
             self.assertIn('metadata__gelk_version', eitem)
+            self.assertIn(REPO_LABELS, eitem)
 
         epatchsets = [ei for ei in eitems if 'is_gerrit_patchset' in ei]
         eapprovals = [ei for ei in eitems if 'is_gerrit_approval' in ei]
@@ -96,12 +100,14 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('metadata__enriched_on', epatchset)
             self.assertIn('metadata__gelk_backend_name', epatchset)
             self.assertIn('metadata__gelk_version', epatchset)
+            self.assertIn(REPO_LABELS, epatchset)
 
         self.assertEqual(len(eapprovals), 13)
         for eapproval in eapprovals:
             self.assertIn('metadata__enriched_on', eapproval)
             self.assertIn('metadata__gelk_backend_name', eapproval)
             self.assertIn('metadata__gelk_version', eapproval)
+            self.assertIn(REPO_LABELS, eapproval)
 
     def test_demography_study(self):
         """ Test that the demography study works correctly """

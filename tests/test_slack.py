@@ -26,6 +26,7 @@ import unittest
 
 import requests
 from base import TestBaseBackend
+from grimoire_elk.enriched.utils import REPO_LABELS
 from grimoire_elk.raw.slack import SlackOcean
 
 
@@ -66,10 +67,21 @@ class TestSlack(TestBaseBackend):
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['channel_member_count'], 3)
+        self.assertIn(REPO_LABELS, eitem)
 
         for item in self.items[1:]:
             eitem = enrich_backend.get_rich_item(item)
             self.assertEqual(eitem['channel_member_count'], 4565)
+
+    def test_enrich_repo_labels(self):
+        """Test whether the field REPO_LABELS is present in the enriched items"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        for item in self.items:
+            eitem = enrich_backend.get_rich_item(item)
+            self.assertIn(REPO_LABELS, eitem)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""

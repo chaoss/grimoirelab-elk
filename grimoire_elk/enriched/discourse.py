@@ -251,6 +251,7 @@ class DiscourseEnrich(Enrich):
         eitem['type'] = 'question'
         eitem.update(self.get_grimoire_fields(topic["created_at"], eitem['type']))
 
+        self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem
 
