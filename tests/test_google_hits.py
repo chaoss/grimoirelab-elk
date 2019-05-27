@@ -25,6 +25,7 @@ import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.raw.google_hits import GoogleHitsOcean
+from grimoire_elk.enriched.utils import REPO_LABELS
 
 
 class TestGoogleHits(TestBaseBackend):
@@ -57,6 +58,16 @@ class TestGoogleHits(TestBaseBackend):
         self.assertGreater(result['raw'], 0)
         self.assertGreater(result['enrich'], 0)
         self.assertEqual(result['raw'], result['enrich'])
+
+    def test_enrich_repo_labels(self):
+        """Test whether the field REPO_LABELS is present in the enriched items"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        for item in self.items:
+            eitem = enrich_backend.get_rich_item(item)
+            self.assertIn(REPO_LABELS, eitem)
 
     def test_has_identities(self):
         """Test whether has_identities works"""

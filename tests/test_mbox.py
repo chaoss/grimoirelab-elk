@@ -29,6 +29,7 @@ from base import TestBaseBackend
 from grimoire_elk.raw.mbox import MBoxOcean
 from grimoire_elk.enriched.mbox import (logger,
                                         MBoxEnrich)
+from grimoire_elk.enriched.utils import REPO_LABELS
 
 
 class TestMbox(TestBaseBackend):
@@ -95,6 +96,16 @@ class TestMbox(TestBaseBackend):
         item = self.items[8]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['mbox_author_domain'], 'example.org')
+
+    def test_enrich_repo_labels(self):
+        """Test whether the field REPO_LABELS is present in the enriched items"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        for item in self.items:
+            eitem = enrich_backend.get_rich_item(item)
+            self.assertIn(REPO_LABELS, eitem)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""

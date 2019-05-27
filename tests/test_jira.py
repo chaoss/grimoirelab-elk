@@ -26,6 +26,7 @@ import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.raw.jira import JiraOcean
+from grimoire_elk.enriched.utils import REPO_LABELS
 
 
 class TestJira(TestBaseBackend):
@@ -86,6 +87,16 @@ class TestJira(TestBaseBackend):
         self.assertEqual(item['data']['id'], "10018")
         self.assertEqual(eitem['id'], "929182e386ddb7d290c0dbd2eb34140993c8f567_issue_10018")
         self.assertEqual(eitem['number_of_comments'], 2)
+
+    def test_enrich_repo_labels(self):
+        """Test whether the field REPO_LABELS is present in the enriched items"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        for item in self.items:
+            eitem = enrich_backend.get_rich_item(item)
+            self.assertIn(REPO_LABELS, eitem)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""

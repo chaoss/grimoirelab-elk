@@ -348,6 +348,7 @@ class JiraEnrich(Enrich):
         eitem.update(self.get_grimoire_fields(issue['fields']['created'], ISSUE_TYPE))
         eitem["type"] = ISSUE_TYPE
 
+        self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem
 
@@ -401,6 +402,7 @@ class JiraEnrich(Enrich):
 
             ecomment.update(self.get_grimoire_fields(comment['created'], COMMENT_TYPE))
 
+            self.add_repository_labels(ecomment)
             self.add_metadata_filter_raw(ecomment)
             ecomments.append(ecomment)
 

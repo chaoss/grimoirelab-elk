@@ -158,6 +158,7 @@ class KitsuneEnrich(Enrich):
             if self.prjs_map:
                 eitem.update(self.get_item_project(eitem))
 
+            self.add_repository_labels(eitem)
             self.add_metadata_filter_raw(eitem)
 
         elif kind == 'answer':

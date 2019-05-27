@@ -40,6 +40,7 @@ MAX_RETRIES_ON_READ = 8
 MAX_RETRIES_ON_CONNECT = 21
 STATUS_FORCE_LIST = [408, 409, 502, 503, 504]
 METADATA_FILTER_RAW = 'metadata__filter_raw'
+REPO_LABELS = 'repository_labels'
 
 logger = logging.getLogger(__name__)
 

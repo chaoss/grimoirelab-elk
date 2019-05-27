@@ -168,5 +168,6 @@ class CratesEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(eitem['created_at'], "crates"))
 
+        self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem

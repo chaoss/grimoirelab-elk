@@ -40,7 +40,7 @@ from ..elastic_items import (ElasticItems,
                              HEADER_JSON)
 from .study_ceres_onion import ESOnionConnector, onion_study
 
-from .utils import grimoire_con, METADATA_FILTER_RAW
+from .utils import grimoire_con, METADATA_FILTER_RAW, REPO_LABELS
 from .. import __version__
 
 logger = logging.getLogger(__name__)
@@ -214,6 +214,7 @@ class Enrich(ElasticItems):
                     if ds not in ds_repo_to_prj:
                         ds_repo_to_prj[ds] = {}
                 for repo in json[project][ds]:
+                    repo, _ = self.extract_repo_labels(repo)
                     if repo in ds_repo_to_prj[ds]:
                         if project == ds_repo_to_prj[ds][repo]:
                             logger.debug("Duplicated repo: %s %s %s", ds, repo, project)
@@ -391,6 +392,11 @@ class Enrich(ElasticItems):
             total += self.elastic.safe_put_bulk(url, bulk_json)
 
         return total
+
+    def add_repository_labels(self, eitem):
+        """Add labels to the enriched item"""
+
+        eitem[REPO_LABELS] = self.repo_labels
 
     def add_metadata_filter_raw(self, eitem):
         """Add filter raw information to the enriched item"""

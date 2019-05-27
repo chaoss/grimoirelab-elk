@@ -372,5 +372,6 @@ class PhabricatorEnrich(Enrich):
                 assigned_to['assigned_to' + of] = eitem[f]
         eitem.update(assigned_to)
 
+        self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem

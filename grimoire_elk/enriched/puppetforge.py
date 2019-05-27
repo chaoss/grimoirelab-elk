@@ -129,6 +129,7 @@ class PuppetForgeEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(entry["created_at"], "module"))
 
+        self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem
 
