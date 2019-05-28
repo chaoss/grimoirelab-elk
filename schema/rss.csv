@@ -18,6 +18,7 @@ ocean-unique-id,keyword
 origin,keyword
 publish_date,date
 published,keyword
+repository_labels,keyword
 summary_analyzed,text
 summary,keyword
 tag,keyword

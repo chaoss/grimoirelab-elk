@@ -48,6 +48,7 @@ project,keyword,true,Project.
 project_1,keyword,true,Project (if more than one level is allowed in project hierarchy).
 pull_request,boolean,true,True indicating this item is a pull request or not (to be used when the index is queried through aliases including other indexes).
 repository,keyword,true,Repository name.
+repository_labels,keyword,true,"Custom repository labels defined by the user."
 state,keyword,true,State of the Pull Request (GitHub has only 2 possible states: open or closed).
 tag,keyword,true,Perceval tag.
 time_open_days,float,true,Time the Pull Request is open counted in days.

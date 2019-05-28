@@ -39,6 +39,7 @@ profile_title,keyword
 reaction_count,long
 reactions,keyword
 reply_count,long
+repository_labels,keyword
 subscribed,long
 subtype,keyword
 tag,keyword

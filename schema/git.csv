@@ -35,6 +35,7 @@ project_1,keyword,true,"Project (if more than one level is allowed in project hi
 project,keyword,true,"Project."
 branches,keyword,true,"List of branches where the commit appears."
 repo_name,keyword,true,"Repository name."
+repository_labels,keyword,true,"Custom repository labels defined by the user."
 tag,keyword,true,"Perceval tag."
 title,keyword,true,"Commit title."
 tz,long,true,"Timezone in which the commit was made by its original author."

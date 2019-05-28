@@ -45,6 +45,7 @@ project,text,true
 project_1,text,true
 recent_downloads,long,true
 repository,text,true
+repository_labels,keyword,true
 tag,text,true
 uuid,text,true
 versions,text,true

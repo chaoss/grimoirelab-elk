@@ -56,6 +56,7 @@ reporter_name,keyword
 reporter_org_name,keyword
 reporter_user_name,keyword
 reporter_uuid,keyword
+repository_labels,keyword
 resolution_days,float
 resolution,keyword
 severity,keyword

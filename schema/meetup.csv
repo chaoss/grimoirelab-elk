@@ -53,6 +53,7 @@ num_comments,long,true
 num_rsvps,long,true
 ocean-unique-id,keyword,true
 origin,keyword,true
+repository_labels,keyword,true
 rsvps_guests,long,true
 rsvps_response,keyword,true
 rsvps_updated,long,true

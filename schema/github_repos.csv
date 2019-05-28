@@ -9,6 +9,7 @@ metadata__gelk_version,keyword,true,"Version of the backend used to enrich the d
 metadata__timestamp,date,true,"Date when the item was stored in ElasticSearch raw index."
 metadata__updated_on,date,true,"Date when the item was updated on its original data source."
 origin,keyword,true,"The original URL from which the repository was retrieved from."
+repository_labels,keyword,true,"Custom repository labels defined by the user."
 stargazers_count,long,true,"Number of stars of the repository."
 subscribers_count,long,true,"Number of watchers of the repository."
 tag,keyword,true,"Perceval tag."

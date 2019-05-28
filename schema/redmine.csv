@@ -32,6 +32,7 @@ priority_name,keyword
 project_id,long
 project_name,keyword
 relations,long
+repository_labels,keyword
 spent_hours,float
 start_date,date
 status_id,long

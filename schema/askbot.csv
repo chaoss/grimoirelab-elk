@@ -37,6 +37,7 @@ question_last_activity_by_username,keyword
 question_tags,keyword
 question_title,keyword
 question_view_count,long
+repository_labels,keyword
 score,long
 summary,text
 tag,keyword

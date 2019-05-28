@@ -17,6 +17,7 @@ metadata__updated_on,date
 origin,keyword
 pod_name,keyword
 project,keyword
+repository_labels,keyword
 scenario,keyword
 start_date,keyword
 stop_date,keyword
