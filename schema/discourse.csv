@@ -41,6 +41,7 @@ question_title,keyword
 question_views,long
 reads,long
 reply_count,long
+repository_labels,keyword
 score,float
 tag,keyword
 type,keyword

@@ -47,6 +47,7 @@ ocean-unique-id,keyword
 origin,keyword
 project_1,keyword
 project,keyword
+repository_labels,keyword,true
 root,boolean
 size,long
 Subject_analyzed,text

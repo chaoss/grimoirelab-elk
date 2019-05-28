@@ -44,6 +44,7 @@ question_has_accepted_answer,boolean
 question_id,long
 question_tags,keyword
 question_title,keyword
+repository_labels,keyword
 score,long
 tag,keyword
 tags,keyword

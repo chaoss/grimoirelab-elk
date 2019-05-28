@@ -39,6 +39,7 @@ project_1,keyword,true,"Used if more than one project levels are allowed in the 
 project,keyword,true,"Project name."
 pull_request,boolean,true,"True/False if the item is a pull request or not."
 repository,keyword,true,"Repository name."
+repository_labels,keyword,true,"Custom repository labels defined by the user."
 state,keyword,true,"State of the item (open/closed)."
 tag,keyword,true,"Perceval tag."
 time_open_days,float,true,"Time the item is open counted in days."

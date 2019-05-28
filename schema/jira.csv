@@ -57,6 +57,7 @@ reporter_org_name,keyword
 reporter_tz,keyword
 reporter_user_name,keyword
 reporter_uuid,keyword
+repository_labels,keyword
 resolution_date,date
 resolution_description,keyword
 resolution_id,keyword

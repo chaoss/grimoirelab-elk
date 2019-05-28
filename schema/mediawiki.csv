@@ -18,6 +18,7 @@ page_metadata__updated_on,date
 page_origin,keyword
 page_pageid,long
 page_title,keyword
+repository_labels,keyword
 revision_comment,keyword
 revision_parentid,long
 revision_revid,long

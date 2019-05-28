@@ -57,6 +57,7 @@ priority,keyword
 priority_value,long
 project_1,keyword
 project,keyword
+repository_labels,keyword
 status,keyword
 tag,keyword
 tags_analyzed,text

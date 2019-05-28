@@ -23,6 +23,7 @@ metadata__updated_on,date
 ocean-unique-id,keyword
 origin,keyword
 pod,keyword
+repository_labels,keyword
 result,keyword
 tag,keyword
 testproject,keyword
