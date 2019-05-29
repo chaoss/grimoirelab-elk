@@ -88,6 +88,8 @@ setup(name="grimoire-elk",
           'sortinghat>=0.6.2',
           'elasticsearch==6.3.1',
           'elasticsearch-dsl==6.3.1',
-          'requests>=2.7.0'],
+          'requests==2.18.2',
+          'urllib3==1.22'
+      ],
       zip_safe=False
       )
