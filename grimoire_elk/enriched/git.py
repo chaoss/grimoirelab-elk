@@ -28,7 +28,7 @@ import time
 
 import pkg_resources
 import requests
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 from grimoirelab_toolkit.datetime import (datetime_to_utc,
                                           str_to_datetime)
@@ -611,9 +611,11 @@ class GitEnrich(Enrich):
 
         # Creating connections
         es_in = Elasticsearch([ocean_backend.elastic.url], retry_on_timeout=True, timeout=100,
-                              verify_certs=self.elastic.requests.verify)
+                              verify_certs=self.elastic.requests.verify,
+                              connection_class=RequestsHttpConnection)
         es_out = Elasticsearch([enrich_backend.elastic.url], retry_on_timeout=True,
-                               timeout=100, verify_certs=self.elastic.requests.verify)
+                               timeout=100, verify_certs=self.elastic.requests.verify,
+                               connection_class=RequestsHttpConnection)
         in_conn = ESPandasConnector(es_conn=es_in, es_index=in_index, sort_on_field=sort_on_field)
         out_conn = ESPandasConnector(es_conn=es_out, es_index=out_index, sort_on_field=sort_on_field, read_only=False)
 
