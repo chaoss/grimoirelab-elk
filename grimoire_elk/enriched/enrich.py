@@ -31,7 +31,7 @@ from datetime import timedelta
 import pkg_resources
 from functools import lru_cache
 
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 from perceval.backend import find_signature_parameters
 from grimoirelab_toolkit.datetime import (datetime_utcnow, str_to_datetime)
@@ -938,7 +938,7 @@ class Enrich(ElasticItems):
 
         # Creating connections
         es = Elasticsearch([enrich_backend.elastic.url], retry_on_timeout=True, timeout=100,
-                           verify_certs=self.elastic.requests.verify)
+                           verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
 
         in_conn = ESOnionConnector(es_conn=es, es_index=in_index,
                                    contribs_field=contribs_field,
