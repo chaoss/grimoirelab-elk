@@ -17,8 +17,8 @@ before_install:
   - pip install redis
   - pip install PyMySQL
   - pip install httpretty==0.8.6
-  - pip install elasticsearch==6.1.1
-  - pip install elasticsearch-dsl==6.1.0
+  - pip install elasticsearch==6.3.1
+  - pip install elasticsearch-dsl==6.3.0
   - pip install -r "requirements.txt"
 
 #install:
