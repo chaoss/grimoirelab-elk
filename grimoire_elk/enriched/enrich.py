@@ -910,21 +910,24 @@ class Enrich(ElasticItems):
 
             with self.sh_db.connect() as session:
                 identity_found = api.find_identity(session, id)
+
+                if not identity_found:
+                    return sh_ids
+
                 sh_ids['id'] = identity_found.id
                 sh_ids['uuid'] = identity_found.uuid
         except InvalidValueError:
-            logger.warning("None Identity found %s", backend_name)
-            logger.warning(identity)
+            msg = "None Identity found {}".format(backend_name)
+            logger.debug(msg)
         except NotFoundError:
-            logger.error("Identity not found in Sorting Hat %s", backend_name)
-            logger.error(identity)
+            msg = "Identity not found in SortingHat {}".format(backend_name)
+            logger.debug(msg)
         except UnicodeEncodeError:
-            logger.error("UnicodeEncodeError %s", backend_name)
-            logger.error(identity)
+            msg = "UnicodeEncodeError {}, identity: {}".format(backend_name, identity)
+            logger.error(msg)
         except Exception as ex:
-            logger.error("Unknown error adding sorting hat identity %s %s", ex, backend_name)
-            logger.error(identity)
-            logger.error(ex)
+            msg = "Unknown error adding identity in SortingHat, {}, {}, {}".format(ex, backend_name, identity)
+            logger.error(msg)
 
         return sh_ids
 
