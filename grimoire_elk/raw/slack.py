@@ -47,6 +47,10 @@ class Mapping(BaseMapping):
                                     "dynamic":false,
                                     "properties": {}
                                 },
+                                "blocks": {
+                                    "dynamic":false,
+                                    "properties": {}
+                                },
                                 "channel_info": {
                                     "properties": {
                                         "latest": {

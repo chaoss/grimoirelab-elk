@@ -529,6 +529,42 @@
     "backend_version": "0.4.0",
     "category": "message",
     "data": {
+        "blocks": [
+                {
+                    "block_id": "Js3+u",
+                    "text": {
+                        "text": "Helpful question stored",
+                        "type": "mrkdwn",
+                        "verbatim": false
+                    },
+                    "type": "section"
+                },
+                {
+                    "block_id": "hhk",
+                    "text": {
+                        "text": "&gt;&gt;&gt;Hi all. I'm looking to replace a tool",
+                        "type": "mrkdwn",
+                        "verbatim": false
+                    },
+                    "type": "section"
+                },
+                {
+                    "block_id": "HBMhj",
+                    "elements": [
+                        {
+                            "text": "Next time you have a question",
+                            "type": "mrkdwn",
+                            "verbatim": false
+                        }
+                    ],
+                    "type": "context"
+                },
+                {
+                    "block_id": "fQk",
+                    "elements": [],
+                    "type": "actions"
+                }
+            ],
         "channel_info": {
             "created": 1480595743,
             "creator": "U0001",
@@ -620,6 +656,41 @@
     "backend_version": "0.4.0",
     "category": "message",
     "data": {
+        "blocks": [
+                {
+                    "block_id": "Js3+u",
+                    "text": {
+                        "text": "Helpful question stored",
+                        "type": "mrkdwn",
+                        "verbatim": false
+                    },
+                    "type": "section"
+                },
+                {
+                    "block_id": "hhk",
+                    "text": {
+                        "text": "&gt;&gt;&gt;Hi all. I'm looking to replace a tool",
+                        "type": "mrkdwn",
+                        "verbatim": false
+                    },
+                    "type": "section"
+                },
+                {
+                    "block_id": "HBMhj",
+                    "elements": [
+                        {
+                            "text": "Next time you have a question",
+                            "type": "mrkdwn",
+                            "verbatim": false
+                        }
+                    ],
+                    "type": "context"
+                },
+                {
+                    "block_id": "fQk",
+                    "type": "actions"
+                }
+            ],
         "channel_info": {
             "created": 1480595743,
             "creator": "U0001",
@@ -708,6 +779,52 @@
     "backend_version": "0.4.0",
     "category": "message",
     "data": {
+        "blocks": [
+                {
+                    "block_id": "Js3+u",
+                    "text": {
+                        "text": "Helpful question stored",
+                        "type": "mrkdwn",
+                        "verbatim": false
+                    },
+                    "type": "section"
+                },
+                {
+                    "block_id": "hhk",
+                    "text": {
+                        "text": "&gt;&gt;&gt;Hi all. I'm looking to replace a tool",
+                        "type": "mrkdwn",
+                        "verbatim": false
+                    },
+                    "type": "section"
+                },
+                {
+                    "block_id": "HBMhj",
+                    "elements": [
+                        {
+                            "text": "Next time you have a question",
+                            "type": "mrkdwn",
+                            "verbatim": false
+                        }
+                    ],
+                    "type": "context"
+                },
+                {
+                    "block_id": "fQk",
+                    "elements": [
+                        {
+                            "action_id": "faqal://messages/see_stored_answer?id=047010376e184425888b8730fbb6c51e&user=U1TS1SGMQ",
+                            "text": {
+                                "emoji": true,
+                                "text": "See the answer",
+                                "type": "plain_text"
+                            },
+                            "type": "button"
+                        }
+                    ],
+                    "type": "actions"
+                }
+            ],
         "channel_info": {
             "created": 1480595743,
             "creator": "U0001",
