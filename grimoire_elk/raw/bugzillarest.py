@@ -67,6 +67,10 @@ class Mapping(BaseMapping):
                                     }
                                 }
                             },
+                            "description": {
+                                "type": "text",
+                                "index": true
+                            },
                             "summary": {
                                 "type": "text",
                                 "index": true
