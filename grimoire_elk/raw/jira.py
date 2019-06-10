@@ -57,6 +57,10 @@ class Mapping(BaseMapping):
                                 "description": {
                                     "type": "text",
                                     "index": true
+                                },
+                                "environment": {
+                                    "type": "text",
+                                    "index": true
                                 }
                             }
                         },
