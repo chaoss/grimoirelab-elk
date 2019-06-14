@@ -1,0 +1,189 @@
+[{
+        "backend_name": "CoLic",
+        "backend_version": "0.5.0",
+        "category": "code_license_scancode_cli",
+        "data": {
+            "Author": "Valerio Cosentino <valcos@bitergia.com>",
+            "AuthorDate": "Sun May 6 13:11:43 2018 +0200",
+            "Commit": "Valerio Cosentino <valcos@bitergia.com>",
+            "CommitDate": "Sun May 6 13:11:43 2018 +0200",
+            "analysis": [{
+                "authors": [],
+                "base_name": "LICENSE",
+                "copyrights": [{
+                    "end_line": 6,
+                    "start_line": 4,
+                    "value": "Copyright (c) 2007 Free Software Foundation, Inc. <http://fsf.org/>"
+                }],
+                "date": "2019-07-08",
+                "dirs_count": 0,
+                "extension": "",
+                "file_path": "LICENSE",
+                "file_type": "ASCII text",
+                "files_count": 0,
+                "holders": [{
+                    "end_line": 6,
+                    "start_line": 4,
+                    "value": "Free Software Foundation, Inc."
+                }],
+                "is_archive": false,
+                "is_binary": false,
+                "is_media": false,
+                "is_script": false,
+                "is_source": false,
+                "is_text": true,
+                "license_expressions": [
+                    "gpl-3.0"
+                ],
+                "licenses": [{
+                    "category": "Copyleft",
+                    "end_line": 674,
+                    "homepage_url": "http://www.gnu.org/licenses/gpl-3.0.html",
+                    "is_exception": false,
+                    "key": "gpl-3.0",
+                    "matched_rule": {
+                        "identifier": "gpl-3.0.LICENSE",
+                        "is_license_notice": false,
+                        "is_license_reference": false,
+                        "is_license_tag": false,
+                        "is_license_text": true,
+                        "license_expression": "gpl-3.0",
+                        "licenses": [
+                            "gpl-3.0"
+                        ],
+                        "match_coverage": 100.0,
+                        "matched_length": 5700,
+                        "matcher": "1-hash",
+                        "rule_length": 5700,
+                        "rule_relevance": 100
+                    },
+                    "matched_text": "GNU GENERAL PUBLIC LICENSE\n                       Version 3, 29 June 2007\n\n Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>\n Everyone is permitted to copy and distribute verbatim copies\n of this license document, but changing it is not allowed.\n\n",
+                    "name": "GNU General Public License 3.0",
+                    "owner": "Free Software Foundation (FSF)",
+                    "reference_url": "https://enterprise.dejacode.com/urn/urn:dje:license:gpl-3.0",
+                    "score": 100.0,
+                    "short_name": "GPL 3.0",
+                    "spdx_license_key": "GPL-3.0-only",
+                    "spdx_url": "https://spdx.org/licenses/GPL-3.0-only",
+                    "start_line": 1,
+                    "text_url": "http://www.gnu.org/licenses/gpl-3.0-standalone.html"
+                }],
+                "md5": "d32239bcb673463ab874e80d47fae504",
+                "mime_type": "text/plain",
+                "name": "LICENSE",
+                "path": "LICENSE",
+                "programming_language": null,
+                "scan_errors": [],
+                "sha1": "8624bcdae55baeef00cd11d5dfcfa60f68710a02",
+                "size": 35147,
+                "size_count": 0,
+                "type": "file"
+            }],
+            "analyzer": "scancode_cli",
+            "commit": "2fb9a49363021922eb0fcc9874baabfc252a827c",
+            "message": "[graal] Initial commit"
+        },
+        "graal_version": "0.2.1",
+        "origin": "https://github.com/chaoss/grimoirelab-graal",
+        "tag": "https://github.com/chaoss/grimoirelab-graal",
+        "timestamp": 1562563540.615095,
+        "updated_on": 1525605103.0,
+        "uuid": "29d7a294d2316825de824f1084a783f8479073e0"
+    },
+    {
+        "backend_name": "CoLic",
+        "backend_version": "0.5.0",
+        "category": "code_license_scancode_cli",
+        "data": {
+            "Author": "Valerio Cosentino <valcos@bitergia.com>",
+            "AuthorDate": "Sun May 6 13:56:51 2018 +0200",
+            "Commit": "Valerio Cosentino <valcos@bitergia.com>",
+            "CommitDate": "Sun May 6 13:56:51 2018 +0200",
+            "analysis": [{
+                "authors": [{
+                    "end_line": 20,
+                    "start_line": 19,
+                    "value": "Valerio Cosentino <valcos@bitergia.com>"
+                }],
+                "base_name": "codecomplexity",
+                "copyrights": [{
+                    "end_line": 3,
+                    "start_line": 3,
+                    "value": "Copyright (c) 2015-2018 Bitergia"
+                }],
+                "date": "2019-07-08",
+                "dirs_count": 0,
+                "extension": ".py",
+                "file_path": "graal/codecomplexity.py",
+                "file_type": "Python script, ASCII text executable",
+                "files_count": 0,
+                "holders": [{
+                    "end_line": 3,
+                    "start_line": 3,
+                    "value": "Bitergia"
+                }],
+                "is_archive": false,
+                "is_binary": false,
+                "is_media": false,
+                "is_script": true,
+                "is_source": true,
+                "is_text": true,
+                "license_expressions": [
+                    "gpl-3.0-plus"
+                ],
+                "licenses": [{
+                    "category": "Copyleft",
+                    "end_line": 17,
+                    "homepage_url": "http://www.gnu.org/licenses/gpl-3.0-standalone.html",
+                    "is_exception": false,
+                    "key": "gpl-3.0-plus",
+                    "matched_rule": {
+                        "identifier": "gpl-3.0-plus_12.RULE",
+                        "is_license_notice": true,
+                        "is_license_reference": false,
+                        "is_license_tag": false,
+                        "is_license_text": false,
+                        "license_expression": "gpl-3.0-plus",
+                        "licenses": [
+                            "gpl-3.0-plus"
+                        ],
+                        "match_coverage": 98.2,
+                        "matched_length": 109,
+                        "matcher": "3-seq",
+                        "rule_length": 111,
+                        "rule_relevance": 100
+                    },
+                    "matched_text": "This program is free software; you can redistribute it and/or modify\n# it under the terms of the GNU General Public License as published by\n# the Free Software Foundation; either version 3 [of] [the] [License], or\n# (at your option) any later version.\n#\n# This program is distributed in the hope that it will be useful,\n# but WITHOUT ANY WARRANTY; without even the implied warranty of\n# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n# GNU General Public License for more details.\n#\n# You should have received a copy of the GNU General Public License\n# along with this program; if not, write to the Free Software\n# Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-",
+                    "name": "GNU General Public License 3.0 or later",
+                    "owner": "Free Software Foundation (FSF)",
+                    "reference_url": "https://enterprise.dejacode.com/urn/urn:dje:license:gpl-3.0-plus",
+                    "score": 98.2,
+                    "short_name": "GPL 3.0 or later",
+                    "spdx_license_key": "GPL-3.0-or-later",
+                    "spdx_url": "https://spdx.org/licenses/GPL-3.0-or-later",
+                    "start_line": 5,
+                    "text_url": "http://www.gnu.org/licenses/gpl-3.0-standalone.html"
+                }],
+                "md5": "aa66e700b06ead2a28c2dc29633ebc00",
+                "mime_type": "text/x-python",
+                "name": "codecomplexity.py",
+                "path": "codecomplexity.py",
+                "programming_language": "Python",
+                "scan_errors": [],
+                "sha1": "124e07ae6c850eb232aaf07f43cdb2b2ad2a1db1",
+                "size": 7817,
+                "size_count": 0,
+                "type": "file"
+            }],
+            "analyzer": "scancode_cli",
+            "commit": "a957488c9bd95e3b72a30611edc61496ee152430",
+            "message": "[codecomplexity] Enable analysis with no file filtering\n\nThis patch allows to handle analysis without file filtering."
+        },
+        "graal_version": "0.2.1",
+        "origin": "https://github.com/chaoss/grimoirelab-graal",
+        "tag": "https://github.com/chaoss/grimoirelab-graal",
+        "timestamp": 1562563562.34835,
+        "updated_on": 1525607811.0,
+        "uuid": "ce7c47568fd87100aff497dd7677b0736d85db1e"
+    }
+]
