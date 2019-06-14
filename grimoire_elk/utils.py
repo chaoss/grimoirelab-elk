@@ -29,6 +29,8 @@ from dateutil import parser
 
 from grimoire_elk.elastic import ElasticConnectException
 from grimoire_elk.elastic import ElasticSearch
+# Connectors for Graal
+from graal.backends.core.cocom import CoCom, CoComCommand
 # Connectors for Perceval
 from grimoire_elk.raw.hyperkitty import HyperKittyOcean
 from perceval.backends.core.askbot import Askbot, AskbotCommand
@@ -68,6 +70,7 @@ from perceval.backends.mozilla.mozillaclub import MozillaClub, MozillaClubComman
 from perceval.backends.mozilla.remo import ReMo, ReMoCommand
 from perceval.backends.opnfv.functest import Functest, FunctestCommand
 # Connectors for EnrichOcean
+from .enriched.cocom import CocomEnrich
 from .enriched.askbot import AskbotEnrich
 from .enriched.bugzilla import BugzillaEnrich
 from .enriched.bugzillarest import BugzillaRESTEnrich
@@ -105,6 +108,7 @@ from .enriched.supybot import SupybotEnrich
 from .enriched.telegram import TelegramEnrich
 from .enriched.twitter import TwitterEnrich
 # Connectors for Ocean
+from .raw.cocom import CocomOcean
 from .raw.askbot import AskbotOcean
 from .raw.bugzilla import BugzillaOcean
 from .raw.bugzillarest import BugzillaRESTOcean
@@ -200,6 +204,7 @@ def get_connectors():
     return {"askbot": [Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
             "bugzilla": [Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
             "bugzillarest": [BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
+            "cocom": [CoCom, CocomOcean, CocomEnrich, CoComCommand],
             "confluence": [Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
             "crates": [Crates, CratesOcean, CratesEnrich, CratesCommand],
             "discourse": [Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
