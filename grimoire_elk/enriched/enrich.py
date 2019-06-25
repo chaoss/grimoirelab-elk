@@ -101,7 +101,7 @@ class Enrich(ElasticItems):
     kibiter_version = None
     RAW_FIELDS_COPY = ["metadata__updated_on", "metadata__timestamp",
                        "offset", "origin", "tag", "uuid"]
-    KEYWORD_MAX_SIZE = 30000  # this control allows to avoid max_bytes_length_exceeded_exception
+    KEYWORD_MAX_SIZE = 1000  # this control allows to avoid max_bytes_length_exceeded_exception
 
     ONION_INTERVAL = seconds = 3600 * 24 * 7
 
