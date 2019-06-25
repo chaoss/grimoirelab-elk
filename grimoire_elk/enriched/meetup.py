@@ -25,7 +25,7 @@ import logging
 
 from .enrich import Enrich, metadata
 
-from .utils import unixtime_to_datetime
+from grimoirelab_toolkit.datetime import unixtime_to_datetime
 from ..elastic_mapping import Mapping as BaseMapping
 
 
@@ -168,13 +168,20 @@ class MeetupEnrich(Enrich):
 
         # data fields to copy with meetup`prefix
         copy_fields = ["description", "plain_text_description",
-                       "created", "name", "status",
-                       "time", "updated", "utc_offset", "visibility",
+                       "name", "status", "utc_offset", "visibility",
                        "waitlist_count", "yes_rsvp_count", "duration",
                        "featured", "rsvpable"]
+        copy_fields_time = ["time", "updated", "created"]
+
         for f in copy_fields:
             if f in event:
                 eitem["meetup_" + f] = event[f]
+            else:
+                eitem[f] = None
+
+        for f in copy_fields_time:
+            if f in event:
+                eitem["meetup_" + f] = unixtime_to_datetime(event[f] / 1000).isoformat()
             else:
                 eitem[f] = None
 
