@@ -22,9 +22,10 @@
 
 import logging
 
-from dateutil import parser
+from grimoirelab_toolkit.datetime import (str_to_datetime,
+                                          unixtime_to_datetime)
 
-from .utils import get_time_diff_days, unixtime_to_datetime
+from .utils import get_time_diff_days
 
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
@@ -242,7 +243,7 @@ class AskbotEnrich(Enrich):
         if dfield == 'added_at':
             comment_at = unixtime_to_datetime(float(comment[dfield]))
         else:
-            comment_at = parser.parse(comment[dfield])
+            comment_at = str_to_datetime(comment[dfield])
 
         added_at = unixtime_to_datetime(float(item['data']["added_at"]))
         ecomment['time_from_question'] = get_time_diff_days(added_at, comment_at)

@@ -29,9 +29,10 @@ from time import time
 
 import requests
 
+from grimoirelab_toolkit.datetime import unixtime_to_datetime
+
 from grimoire_elk.errors import ELKError
-from grimoire_elk.enriched.utils import (unixtime_to_datetime,
-                                         grimoire_con,
+from grimoire_elk.enriched.utils import (grimoire_con,
                                          get_diff_current_date)
 
 logger = logging.getLogger(__name__)

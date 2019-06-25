@@ -26,8 +26,10 @@
 import inspect
 import logging
 
+from grimoirelab_toolkit.datetime import unixtime_to_datetime
+
 from datetime import datetime
-from ..enriched.utils import unixtime_to_datetime, get_repository_filter
+from ..enriched.utils import get_repository_filter
 from ..elastic_items import ElasticItems
 from ..elastic_mapping import Mapping
 from ..errors import ELKError
