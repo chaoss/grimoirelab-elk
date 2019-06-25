@@ -22,12 +22,13 @@
 
 import logging
 
-from datetime import datetime
+from grimoirelab_toolkit.datetime import (datetime_utcnow,
+                                          unixtime_to_datetime)
 
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 
-from .utils import get_time_diff_days, unixtime_to_datetime
+from .utils import get_time_diff_days
 
 
 TASK_OPEN_STATUS = 'Open'
@@ -312,7 +313,8 @@ class PhabricatorEnrich(Enrich):
                 get_time_diff_days(eitem['creation_date'], eitem['update_date'])
         # Time open (time to open -> now): with painless
         # Time open using the enrich date. Field needed for filtering.
-        eitem['time_open_days_enrich'] = get_time_diff_days(eitem['creation_date'], datetime.utcnow())
+        eitem['time_open_days_enrich'] = get_time_diff_days(eitem['creation_date'],
+                                                            datetime_utcnow().replace(tzinfo=None))
         # Time from last update (time last update -> now): with painless
 
         eitem['changes'] = len(phab_item['transactions'])

@@ -22,10 +22,10 @@
 
 import logging
 
+from grimoirelab_toolkit.datetime import unixtime_to_datetime
+
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
-
-from .utils import unixtime_to_datetime
 
 
 logger = logging.getLogger(__name__)

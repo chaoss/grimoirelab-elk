@@ -26,9 +26,9 @@ import re
 import time
 
 import requests
-from datetime import datetime
 
-from grimoirelab_toolkit.datetime import str_to_datetime
+from grimoirelab_toolkit.datetime import (datetime_utcnow,
+                                          str_to_datetime)
 
 from .utils import get_time_diff_days
 
@@ -545,7 +545,7 @@ class GitHubEnrich(Enrich):
 
         if pull_request['state'] != 'closed':
             rich_pr['time_open_days'] = \
-                get_time_diff_days(pull_request['created_at'], datetime.utcnow())
+                get_time_diff_days(pull_request['created_at'], datetime_utcnow().replace(tzinfo=None))
         else:
             rich_pr['time_open_days'] = rich_pr['time_to_close_days']
 
@@ -653,7 +653,7 @@ class GitHubEnrich(Enrich):
 
         if issue['state'] != 'closed':
             rich_issue['time_open_days'] = \
-                get_time_diff_days(issue['created_at'], datetime.utcnow())
+                get_time_diff_days(issue['created_at'], datetime_utcnow().replace(tzinfo=None))
         else:
             rich_issue['time_open_days'] = rich_issue['time_to_close_days']
 

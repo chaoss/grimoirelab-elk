@@ -23,9 +23,9 @@
 import copy
 import logging
 
-from .enrich import Enrich, metadata
-
 from grimoirelab_toolkit.datetime import unixtime_to_datetime
+
+from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 
 
