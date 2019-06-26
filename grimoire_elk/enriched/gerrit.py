@@ -210,7 +210,7 @@ class GerritEnrich(Enrich):
         # Add id info to allow to coexistence of items of different types in the same index
         eitem['id'] = '{}_changeset_{}'.format(eitem['uuid'], eitem['changeset_number'])
         eitem["summary_analyzed"] = eitem["summary"]
-        eitem["summary"] = eitem["summary"][:self.KEYWORD_MAX_SIZE]
+        eitem["summary"] = eitem["summary"][:self.KEYWORD_MAX_LENGTH]
         eitem["name"] = None
         eitem["domain"] = None
         if 'name' in review['owner']:
@@ -288,7 +288,7 @@ class GerritEnrich(Enrich):
             # Add comment-specific data
             created = str_to_datetime(comment['timestamp'])
             ecomment['comment_created_on'] = created.isoformat()
-            ecomment['comment_message'] = comment['message'][:self.KEYWORD_MAX_SIZE]
+            ecomment['comment_message'] = comment['message'][:self.KEYWORD_MAX_LENGTH]
 
             # Add id info to allow to coexistence of items of different types in the same index
             ecomment['type'] = COMMENT_TYPE
@@ -439,7 +439,7 @@ class GerritEnrich(Enrich):
             eapproval['approval_description'] = approval.get('description', None)
 
             if eapproval['approval_description']:
-                eapproval['approval_description'] = eapproval['approval_description'][:self.KEYWORD_MAX_SIZE]
+                eapproval['approval_description'] = eapproval['approval_description'][:self.KEYWORD_MAX_LENGTH]
 
             # Add id info to allow to coexistence of items of different types in the same index
             eapproval['id'] = '{}_approval_{}'.format(epatchset['id'], created.timestamp())

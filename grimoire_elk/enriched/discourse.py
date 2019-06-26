@@ -211,7 +211,7 @@ class DiscourseEnrich(Enrich):
         # The first post is the first published, and it is the question
         first_post = topic['post_stream']['posts'][0]
 
-        eitem['question_title'] = eitem['question_title'][:self.KEYWORD_MAX_SIZE]
+        eitem['question_title'] = eitem['question_title'][:self.KEYWORD_MAX_LENGTH]
         eitem['category_id'] = topic['category_id']
         eitem['categories'] = self.__related_categories(topic['category_id'])
         if topic['category_id'] in self.categories:

@@ -143,10 +143,10 @@ class BugzillaEnrich(Enrich):
         eitem["status"] = issue['bug_status'][0]['__text__']
         if "short_desc" in issue:
             if "__text__" in issue["short_desc"][0]:
-                eitem["main_description"] = issue['short_desc'][0]['__text__'][:self.KEYWORD_MAX_SIZE]
+                eitem["main_description"] = issue['short_desc'][0]['__text__'][:self.KEYWORD_MAX_LENGTH]
         if "summary" in issue:
             if "__text__" in issue["summary"][0]:
-                eitem["summary"] = issue['summary'][0]['__text__'][:self.KEYWORD_MAX_SIZE]
+                eitem["summary"] = issue['summary'][0]['__text__'][:self.KEYWORD_MAX_LENGTH]
 
         # Fix dates
         date_ts = parser.parse(issue['delta_ts'][0]['__text__'])

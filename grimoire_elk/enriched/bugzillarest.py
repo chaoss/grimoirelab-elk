@@ -92,9 +92,9 @@ class BugzillaRESTEnrich(Enrich):
         eitem["id"] = issue['id']
         eitem["status"] = issue['status']
         if "summary" in issue:
-            eitem["summary"] = issue['summary'][:self.KEYWORD_MAX_SIZE]
+            eitem["summary"] = issue['summary'][:self.KEYWORD_MAX_LENGTH]
             # Share the name field with bugzilla and share the panel
-            eitem["main_description"] = eitem["summary"][:self.KEYWORD_MAX_SIZE]
+            eitem["main_description"] = eitem["summary"][:self.KEYWORD_MAX_LENGTH]
         # Component and product
         eitem["component"] = issue['component']
         eitem["product"] = issue['product']

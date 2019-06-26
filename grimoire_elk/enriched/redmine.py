@@ -117,11 +117,11 @@ class RedmineEnrich(Enrich):
                 eitem[f] = ticket[f]
             else:
                 eitem[f] = None
-        eitem['subject'] = eitem['subject'][:self.KEYWORD_MAX_SIZE]
+        eitem['subject'] = eitem['subject'][:self.KEYWORD_MAX_LENGTH]
         eitem['description_analyzed'] = eitem['description']
 
         if eitem['description']:
-            eitem['description'] = eitem['description'][:self.KEYWORD_MAX_SIZE]
+            eitem['description'] = eitem['description'][:self.KEYWORD_MAX_LENGTH]
 
         # Fields which names are translated
         map_fields = {"due_date": "estimated_closing_date",

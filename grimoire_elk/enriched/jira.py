@@ -262,7 +262,7 @@ class JiraEnrich(Enrich):
         eitem['creation_date'] = issue["fields"]['created']
 
         if 'description' in issue["fields"] and issue["fields"]['description']:
-            eitem['main_description'] = issue["fields"]['description'][:self.KEYWORD_MAX_SIZE]
+            eitem['main_description'] = issue["fields"]['description'][:self.KEYWORD_MAX_LENGTH]
 
         eitem['issue_type'] = issue["fields"]['issuetype']['name']
         eitem['issue_description'] = issue["fields"]['issuetype']['description']
