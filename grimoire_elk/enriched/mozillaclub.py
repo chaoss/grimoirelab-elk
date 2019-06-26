@@ -111,16 +111,16 @@ class MozillaClubEnrich(Enrich):
         event = item['data']
 
         if "Event Description" in event and event["Event Description"]:
-            event["Event Description"] = event["Event Description"][:self.KEYWORD_MAX_SIZE]
+            event["Event Description"] = event["Event Description"][:self.KEYWORD_MAX_LENGTH]
 
         if "Event Creations" in event and event["Event Creations"]:
-            event["Event Creations"] = event["Event Creations"][:self.KEYWORD_MAX_SIZE]
+            event["Event Creations"] = event["Event Creations"][:self.KEYWORD_MAX_LENGTH]
 
         if "Feedback from Attendees" in event and event["Feedback from Attendees"]:
-            event["Feedback from Attendees"] = event["Feedback from Attendees"][:self.KEYWORD_MAX_SIZE]
+            event["Feedback from Attendees"] = event["Feedback from Attendees"][:self.KEYWORD_MAX_LENGTH]
 
         if "Your Feedback" in event and event["Your Feedback"]:
-            event["Your Feedback"] = event["Your Feedback"][:self.KEYWORD_MAX_SIZE]
+            event["Your Feedback"] = event["Your Feedback"][:self.KEYWORD_MAX_LENGTH]
 
         # just copy all fields converting in field names spaces to _
         for f in event:

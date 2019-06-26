@@ -155,7 +155,7 @@ class MBoxEnrich(Enrich):
         eitem["list"] = item["origin"]
 
         if 'Subject' in message and message['Subject']:
-            eitem['Subject'] = eitem['Subject'][:self.KEYWORD_MAX_SIZE]
+            eitem['Subject'] = eitem['Subject'][:self.KEYWORD_MAX_LENGTH]
 
         # Root message
         if 'In-Reply-To' in message:

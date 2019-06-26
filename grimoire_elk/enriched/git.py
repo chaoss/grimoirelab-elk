@@ -335,7 +335,7 @@ class GitEnrich(Enrich):
                 eitem[map_fields[fn]] = None
 
         if 'message' in commit:
-            eitem['message'] = commit['message'][:self.KEYWORD_MAX_SIZE]
+            eitem['message'] = commit['message'][:self.KEYWORD_MAX_LENGTH]
 
         eitem['hash_short'] = eitem['hash'][0:6]
         # Enrich dates
