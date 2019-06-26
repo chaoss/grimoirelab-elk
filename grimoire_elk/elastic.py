@@ -240,7 +240,7 @@ class ElasticSearch(object):
         :returns: None
         """
         aliases = self.list_aliases()
-        if alias in aliases:
+        if aliases and alias in aliases:
             logger.debug("Alias %s already exists on %s.", alias, self.anonymize_url(self.index_url))
             return
 
