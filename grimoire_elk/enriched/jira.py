@@ -54,6 +54,9 @@ class Mapping(BaseMapping):
         mapping = """
         {
             "properties": {
+               "main_description_analyzed": {
+                 "type": "text"
+               },
                "releases": {
                  "type": "keyword"
                },
@@ -263,6 +266,7 @@ class JiraEnrich(Enrich):
 
         if 'description' in issue["fields"] and issue["fields"]['description']:
             eitem['main_description'] = issue["fields"]['description'][:self.KEYWORD_MAX_LENGTH]
+            eitem['main_description_analyzed'] = issue["fields"]['description']
 
         eitem['issue_type'] = issue["fields"]['issuetype']['name']
         eitem['issue_description'] = issue["fields"]['issuetype']['description']
