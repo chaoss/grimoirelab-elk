@@ -22,13 +22,12 @@
 
 import logging
 
-from dateutil import parser
-
 from ..elastic_mapping import Mapping as BaseMapping
 from .enrich import Enrich, metadata
 from .utils import get_time_diff_days
 
-from grimoirelab_toolkit.datetime import datetime_utcnow
+from grimoirelab_toolkit.datetime import (datetime_utcnow,
+                                          str_to_datetime)
 
 
 logger = logging.getLogger(__name__)
@@ -133,9 +132,9 @@ class BugzillaRESTEnrich(Enrich):
         eitem["product"] = issue['product']
 
         # Fix dates
-        date_ts = parser.parse(issue['creation_time'])
+        date_ts = str_to_datetime(issue['creation_time'])
         eitem['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
-        date_ts = parser.parse(issue['last_change_time'])
+        date_ts = str_to_datetime(issue['last_change_time'])
         eitem['changeddate_date'] = date_ts.isoformat()
         eitem['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
