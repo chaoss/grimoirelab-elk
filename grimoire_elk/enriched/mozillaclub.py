@@ -46,14 +46,26 @@ class Mapping(BaseMapping):
                 "Event_Description": {
                     "type": "keyword"
                 },
+                "Event_Description_Analyzed": {
+                    "type": "text"
+                },
                 "Event_Creations": {
                     "type": "keyword"
+                },
+                "Event_Creations_Analyzed": {
+                    "type": "text"
                 },
                 "Feedback_from_Attendees": {
                     "type": "keyword"
                 },
+                "Feedback_from_Attendees_Analyzed": {
+                    "type": "text"
+                },
                 "Your_Feedback": {
                     "type": "keyword"
+                },
+                "Your_Feedback_Analyzed": {
+                    "type": "text"
                 },
                 "geolocation": {
                     "type": "geo_point"
@@ -112,15 +124,19 @@ class MozillaClubEnrich(Enrich):
 
         if "Event Description" in event and event["Event Description"]:
             event["Event Description"] = event["Event Description"][:self.KEYWORD_MAX_LENGTH]
+            event["Event Description Analyzed"] = event["Event Description"]
 
         if "Event Creations" in event and event["Event Creations"]:
             event["Event Creations"] = event["Event Creations"][:self.KEYWORD_MAX_LENGTH]
+            event["Event Creations Analyzed"] = event["Event Creations"]
 
         if "Feedback from Attendees" in event and event["Feedback from Attendees"]:
             event["Feedback from Attendees"] = event["Feedback from Attendees"][:self.KEYWORD_MAX_LENGTH]
+            event["Feedback from Attendees Analyzed"] = event["Feedback from Attendees"]
 
         if "Your Feedback" in event and event["Your Feedback"]:
             event["Your Feedback"] = event["Your Feedback"][:self.KEYWORD_MAX_LENGTH]
+            event["Your Feedback Analyzed"] = event["Your Feedback"]
 
         # just copy all fields converting in field names spaces to _
         for f in event:
