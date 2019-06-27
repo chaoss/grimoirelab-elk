@@ -49,6 +49,9 @@ class Mapping(BaseMapping):
         mapping = """
         {
             "properties": {
+                "revision_comment_analyzed": {
+                    "type": "text"
+                },
                 "title_analyzed": {
                     "type": "text"
                 }
@@ -151,6 +154,7 @@ class MediaWikiEnrich(Enrich):
 
             if "comment" in rev:
                 erevision["revision_comment"] = rev["comment"][:self.KEYWORD_MAX_LENGTH]
+                erevision["revision_comment_analyzed"] = rev["comment"]
 
             if self.sortinghat:
                 erevision.update(self.get_review_sh(rev, item))
