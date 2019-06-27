@@ -56,6 +56,13 @@ class TestDiscourse(TestBaseBackend):
         self.assertEqual(result['raw'], 3)
         self.assertEqual(result['enrich'], 35)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('question_title', eitem)
+        self.assertIn('question_title_analyzed', eitem)
+
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
 
