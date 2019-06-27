@@ -67,6 +67,8 @@ class TestMediawiki(TestBaseBackend):
             self.assertIn('metadata__gelk_backend_name', ei)
             self.assertIn('metadata__enriched_on', ei)
             self.assertIn('grimoire_creation_date', ei)
+            self.assertIn('revision_comment', ei)
+            self.assertIn('revision_comment_analyzed', ei)
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
