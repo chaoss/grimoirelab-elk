@@ -47,25 +47,29 @@ class Mapping(BaseMapping):
                     "type": "keyword"
                 },
                 "Event_Description_Analyzed": {
-                    "type": "text"
+                    "type": "text",
+                    "index": true
                 },
                 "Event_Creations": {
                     "type": "keyword"
                 },
                 "Event_Creations_Analyzed": {
-                    "type": "text"
+                    "type": "text",
+                    "index": true
                 },
                 "Feedback_from_Attendees": {
                     "type": "keyword"
                 },
                 "Feedback_from_Attendees_Analyzed": {
-                    "type": "text"
+                    "type": "text",
+                    "index": true
                 },
                 "Your_Feedback": {
                     "type": "keyword"
                 },
                 "Your_Feedback_Analyzed": {
-                    "type": "text"
+                    "type": "text",
+                    "index": true
                 },
                 "geolocation": {
                     "type": "geo_point"

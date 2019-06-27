@@ -47,10 +47,12 @@ class Mapping(BaseMapping):
         {
             "properties": {
                 "description_analyzed": {
-                    "type": "text"
+                    "type": "text",
+                    "index": true
                 },
                 "subject_analyzed": {
-                    "type": "text"
+                    "type": "text",
+                    "index": true
                 }
            }
         } """
