@@ -23,11 +23,10 @@
 import json
 import logging
 
-from dateutil import parser
+from grimoirelab_toolkit.datetime import str_to_datetime
 
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
-
 
 logger = logging.getLogger(__name__)
 
@@ -114,7 +113,7 @@ class MediaWikiEnrich(Enrich):
         """ Add sorting hat enrichment fields for the author of the revision """
 
         identity = self.get_sh_identity(revision)
-        update = parser.parse(item[self.get_field_date()])
+        update = str_to_datetime(item[self.get_field_date()])
         erevision = self.get_item_sh_fields(identity, update)
 
         return erevision
@@ -221,7 +220,7 @@ class MediaWikiEnrich(Enrich):
             eitem[map_fields[fn]] = page[fn]
 
         # Enrich dates
-        eitem["update_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
+        eitem["update_date"] = str_to_datetime(item["metadata__updated_on"]).isoformat()
         # Revisions
         eitem["last_edited_date"] = None
         eitem["nrevisions"] = 0
