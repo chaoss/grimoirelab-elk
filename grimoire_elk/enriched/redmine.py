@@ -48,6 +48,9 @@ class Mapping(BaseMapping):
             "properties": {
                 "description_analyzed": {
                     "type": "text"
+                },
+                "subject_analyzed": {
+                    "type": "text"
                 }
            }
         } """
@@ -118,8 +121,9 @@ class RedmineEnrich(Enrich):
             else:
                 eitem[f] = None
         eitem['subject'] = eitem['subject'][:self.KEYWORD_MAX_LENGTH]
-        eitem['description_analyzed'] = eitem['description']
+        eitem['subject_analyzed'] = eitem['subject']
 
+        eitem['description_analyzed'] = eitem['description']
         if eitem['description']:
             eitem['description'] = eitem['description'][:self.KEYWORD_MAX_LENGTH]
 

@@ -64,6 +64,12 @@ class TestRedmine(TestBaseBackend):
             self.assertIn('metadata__gelk_backend_name', ei)
             self.assertIn('metadata__enriched_on', ei)
 
+            if 'description' in ei:
+                self.assertIn('description_analyzed', ei)
+
+            if 'subject' in ei:
+                self.assertIn('subject_analyzed', ei)
+
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
 
