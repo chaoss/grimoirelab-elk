@@ -49,10 +49,12 @@ class Mapping(BaseMapping):
         {
             "properties": {
                 "revision_comment_analyzed": {
-                    "type": "text"
+                    "type": "text",
+                    "index": true
                 },
                 "title_analyzed": {
-                    "type": "text"
+                    "type": "text",
+                    "index": true
                 }
            }
         } """

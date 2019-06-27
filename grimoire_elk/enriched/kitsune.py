@@ -47,11 +47,13 @@ class Mapping(BaseMapping):
         {
             "properties": {
                 "content_analyzed": {
-                  "type": "text"
-                  },
+                  "type": "text",
+                  "index": true
+                },
                 "tags_analyzed": {
-                  "type": "text"
-                  }
+                  "type": "text",
+                  "index": true
+                }
            }
         } """
 

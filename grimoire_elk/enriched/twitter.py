@@ -46,11 +46,12 @@ class Mapping(BaseMapping):
         {
             "properties": {
                 "text_analyzed": {
-                  "type": "text"
-                  },
-                  "geolocation": {
+                  "type": "text",
+                  "index": true
+                },
+                "geolocation": {
                      "type": "geo_point"
-                  }
+                }
            }
         } """
 

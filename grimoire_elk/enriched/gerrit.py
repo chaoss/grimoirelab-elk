@@ -54,16 +54,19 @@ class Mapping(BaseMapping):
         {
             "properties": {
                "approval_description_analyzed": {
-                  "type": "text"
+                  "type": "text",
+                  "index": true
                },
                "comment_message_analyzed": {
-                  "type": "text"
+                  "type": "text",
+                  "index": true
                },
                "status": {
                   "type": "keyword"
                },
                "summary_analyzed": {
-                  "type": "text"
+                  "type": "text",
+                  "index": true
                },
                "timeopen": {
                   "type": "double"

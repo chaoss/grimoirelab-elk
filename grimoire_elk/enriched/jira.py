@@ -55,13 +55,15 @@ class Mapping(BaseMapping):
         {
             "properties": {
                "main_description_analyzed": {
-                 "type": "text"
+                 "type": "text",
+                 "index": true
                },
                "releases": {
                  "type": "keyword"
                },
                "body": {
-                 "type": "text"
+                 "type": "text",
+                 "index": true
                }
             }
         }

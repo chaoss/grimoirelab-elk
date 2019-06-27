@@ -66,7 +66,8 @@ class Mapping(BaseMapping):
                                     "items": {
                                         "properties": {
                                             "comment": {
-                                                "type": "text"
+                                                "type": "text",
+                                                "index": true
                                             }
                                         }
                                     }

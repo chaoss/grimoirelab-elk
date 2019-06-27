@@ -50,10 +50,12 @@ class Mapping(BaseMapping):
             "properties": {
                  "Subject_analyzed": {
                    "type": "text",
-                   "fielddata": true
+                   "fielddata": true,
+                   "index": true
                  },
                  "body": {
-                   "type": "text"
+                   "type": "text",
+                   "index": true
                  }
            }
         } """

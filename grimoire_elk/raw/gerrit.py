@@ -43,7 +43,8 @@ class Mapping(BaseMapping):
                 "data": {
                     "properties": {
                         "commitMessage": {
-                            "type": "text"
+                            "type": "text",
+                            "index": true
                         },
                         "comments": {
                             "properties": {

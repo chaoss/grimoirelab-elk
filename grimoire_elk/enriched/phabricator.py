@@ -49,16 +49,19 @@ class Mapping(BaseMapping):
         {
             "properties": {
                 "main_description_analyzed": {
-                  "type": "text"
+                  "type": "text",
+                  "index": true
                 },
                 "assigned_to_roles": {
                   "type": "text",
-                  "fielddata": true
-                 },
+                  "fielddata": true,
+                  "index": true
+                },
                 "tags_analyzed": {
                   "type": "text",
-                  "fielddata": true
-                 }
+                  "fielddata": true,
+                  "index": true
+                }
            }
         } """
 
