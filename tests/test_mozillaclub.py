@@ -62,7 +62,18 @@ class TestMozillaClub(TestBaseBackend):
             ei = enrich_backend.get_rich_item(i)
             self.assertIn('metadata__gelk_version', ei)
             self.assertIn('metadata__gelk_backend_name', ei)
-            self.assertIn('metadata__enriched_on', ei)
+
+            if 'Event Description' in ei:
+                self.assertIn('Event Description Analyzed', ei)
+
+            if 'Event Creations' in ei:
+                self.assertIn('Event Creations Analyzed', ei)
+
+            if 'Feedback from Attendees' in ei:
+                self.assertIn('Feedback from Attendees Analyzed', ei)
+
+            if 'Your Feedback' in ei:
+                self.assertIn('Your Feedback Analyzed', ei)
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
