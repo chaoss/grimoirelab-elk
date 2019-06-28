@@ -50,10 +50,12 @@ class Mapping(BaseMapping):
         {
             "properties": {
                 "author_badges": {
-                  "type": "text"
+                  "type": "text",
+                  "index": true
                 },
                 "summary": {
-                  "type": "text"
+                  "type": "text",
+                  "index": true
                 },
                 "id": {
                   "type": "keyword"

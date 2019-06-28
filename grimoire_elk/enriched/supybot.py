@@ -46,8 +46,9 @@ class Mapping(BaseMapping):
             "properties": {
                 "body_analyzed": {
                   "type": "text",
-                  "fielddata": true
-                  }
+                  "fielddata": true,
+                  "index": true
+                }
            }
         } """
 

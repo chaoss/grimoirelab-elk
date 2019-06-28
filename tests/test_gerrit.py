@@ -77,6 +77,8 @@ class TestGerrit(TestBaseBackend):
         self.assertEqual(len(ecomments), 46)
 
         for ecomment in ecomments:
+            self.assertIn('comment_message', ecomment)
+            self.assertIn('comment_message_analyzed', ecomment)
             self.assertIn('metadata__enriched_on', ecomment)
             self.assertIn('metadata__gelk_backend_name', ecomment)
             self.assertIn('metadata__gelk_version', ecomment)
@@ -104,6 +106,8 @@ class TestGerrit(TestBaseBackend):
 
         self.assertEqual(len(eapprovals), 13)
         for eapproval in eapprovals:
+            self.assertIn('approval_description', eapproval)
+            self.assertIn('approval_description_analyzed', eapproval)
             self.assertIn('metadata__enriched_on', eapproval)
             self.assertIn('metadata__gelk_backend_name', eapproval)
             self.assertIn('metadata__gelk_version', eapproval)

@@ -33,9 +33,9 @@ class PuppetForgeEnrich(Enrich):
         {
             "properties": {
                 "summary_analyzed": {
-                  "type": "string",
-                  "index":"analyzed"
-                  }
+                  "type": "text",
+                  "index":"true"
+                }
            }
         } """
 

@@ -20,13 +20,12 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-
 import logging
 
-from datetime import datetime
+from grimoirelab_toolkit.datetime import (datetime_utcnow,
+                                          str_to_datetime)
 
-from dateutil import parser
-
+from ..elastic_mapping import Mapping as BaseMapping
 from .enrich import Enrich, metadata
 from .utils import get_time_diff_days
 
@@ -34,8 +33,36 @@ from .utils import get_time_diff_days
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns: dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = """
+        {
+            "properties": {
+               "main_description_analyzed": {
+                    "type": "text",
+                    "index": true
+               },
+               "summary_analyzed": {
+                    "type": "text",
+                    "index": true
+               }
+           }
+        }"""
+
+        return {"items": mapping}
+
+
 class BugzillaEnrich(Enrich):
 
+    mapping = Mapping
     roles = ['assigned_to', 'reporter', 'qa_contact']
 
     def get_field_author(self):
@@ -136,7 +163,7 @@ class BugzillaEnrich(Enrich):
                 eitem["reporter_name"] = issue["reporter"][0]["name"]
                 eitem["author_name"] = issue["reporter"][0]["name"]
 
-        date_ts = parser.parse(issue['creation_ts'][0]['__text__'])
+        date_ts = str_to_datetime(issue['creation_ts'][0]['__text__'])
         eitem['creation_date'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
         eitem["bug_id"] = issue['bug_id'][0]['__text__']
@@ -144,12 +171,14 @@ class BugzillaEnrich(Enrich):
         if "short_desc" in issue:
             if "__text__" in issue["short_desc"][0]:
                 eitem["main_description"] = issue['short_desc'][0]['__text__'][:self.KEYWORD_MAX_LENGTH]
+                eitem["main_description_analyzed"] = issue['short_desc'][0]['__text__']
         if "summary" in issue:
             if "__text__" in issue["summary"][0]:
                 eitem["summary"] = issue['summary'][0]['__text__'][:self.KEYWORD_MAX_LENGTH]
+                eitem["summary_analyzed"] = issue['summary'][0]['__text__']
 
         # Fix dates
-        date_ts = parser.parse(issue['delta_ts'][0]['__text__'])
+        date_ts = str_to_datetime(issue['delta_ts'][0]['__text__'])
         eitem['changeddate_date'] = date_ts.isoformat()
         eitem['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
@@ -163,7 +192,7 @@ class BugzillaEnrich(Enrich):
         eitem['resolution_days'] = \
             get_time_diff_days(eitem['creation_date'], eitem['delta_ts'])
         eitem['timeopen_days'] = \
-            get_time_diff_days(eitem['creation_date'], datetime.utcnow())
+            get_time_diff_days(eitem['creation_date'], datetime_utcnow().replace(tzinfo=None))
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item, self.roles))

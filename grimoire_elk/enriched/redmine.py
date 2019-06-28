@@ -22,7 +22,7 @@
 
 import logging
 
-from datetime import datetime
+from grimoirelab_toolkit.datetime import datetime_utcnow
 
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
@@ -47,7 +47,12 @@ class Mapping(BaseMapping):
         {
             "properties": {
                 "description_analyzed": {
-                    "type": "text"
+                    "type": "text",
+                    "index": true
+                },
+                "subject_analyzed": {
+                    "type": "text",
+                    "index": true
                 }
            }
         } """
@@ -118,8 +123,9 @@ class RedmineEnrich(Enrich):
             else:
                 eitem[f] = None
         eitem['subject'] = eitem['subject'][:self.KEYWORD_MAX_LENGTH]
-        eitem['description_analyzed'] = eitem['description']
+        eitem['subject_analyzed'] = eitem['subject']
 
+        eitem['description_analyzed'] = eitem['description']
         if eitem['description']:
             eitem['description'] = eitem['description'][:self.KEYWORD_MAX_LENGTH]
 
@@ -156,9 +162,9 @@ class RedmineEnrich(Enrich):
                 get_time_diff_days(eitem['start_date'], eitem['closing_date'])
         else:
             eitem['timeopen_days'] = \
-                get_time_diff_days(eitem['creation_date'], datetime.utcnow())
+                get_time_diff_days(eitem['creation_date'], datetime_utcnow().replace(tzinfo=None))
             eitem['timeworking_days'] = \
-                get_time_diff_days(eitem['start_date'], datetime.utcnow())
+                get_time_diff_days(eitem['start_date'], datetime_utcnow().replace(tzinfo=None))
 
         eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "job"))
 

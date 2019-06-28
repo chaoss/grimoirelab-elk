@@ -22,19 +22,47 @@
 
 import logging
 
-from dateutil import parser
-
+from ..elastic_mapping import Mapping as BaseMapping
 from .enrich import Enrich, metadata
 from .utils import get_time_diff_days
 
-from grimoirelab_toolkit.datetime import datetime_utcnow
+from grimoirelab_toolkit.datetime import (datetime_utcnow,
+                                          str_to_datetime)
 
 
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns: dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = """
+        {
+            "properties": {
+               "main_description_analyzed": {
+                    "type": "text",
+                    "index": true
+               },
+               "summary_analyzed": {
+                    "type": "text",
+                    "index": true
+               }
+           }
+        }"""
+
+        return {"items": mapping}
+
+
 class BugzillaRESTEnrich(Enrich):
 
+    mapping = Mapping
     roles = ['assigned_to_detail', 'qa_contact_detail', 'creator_detail']
 
     def get_field_author(self):
@@ -94,15 +122,19 @@ class BugzillaRESTEnrich(Enrich):
         if "summary" in issue:
             eitem["summary"] = issue['summary'][:self.KEYWORD_MAX_LENGTH]
             # Share the name field with bugzilla and share the panel
-            eitem["main_description"] = eitem["summary"][:self.KEYWORD_MAX_LENGTH]
+            eitem["main_description"] = eitem["summary"]
+
+            eitem["summary_analyzed"] = issue['summary']
+            eitem["main_description_analyzed"] = issue['summary']
+
         # Component and product
         eitem["component"] = issue['component']
         eitem["product"] = issue['product']
 
         # Fix dates
-        date_ts = parser.parse(issue['creation_time'])
+        date_ts = str_to_datetime(issue['creation_time'])
         eitem['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
-        date_ts = parser.parse(issue['last_change_time'])
+        date_ts = str_to_datetime(issue['last_change_time'])
         eitem['changeddate_date'] = date_ts.isoformat()
         eitem['delta_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 

@@ -53,11 +53,20 @@ class Mapping(BaseMapping):
         mapping = """
         {
             "properties": {
+               "approval_description_analyzed": {
+                  "type": "text",
+                  "index": true
+               },
+               "comment_message_analyzed": {
+                  "type": "text",
+                  "index": true
+               },
                "status": {
                   "type": "keyword"
                },
                "summary_analyzed": {
-                  "type": "text"
+                  "type": "text",
+                  "index": true
                },
                "timeopen": {
                   "type": "double"
@@ -289,6 +298,7 @@ class GerritEnrich(Enrich):
             created = str_to_datetime(comment['timestamp'])
             ecomment['comment_created_on'] = created.isoformat()
             ecomment['comment_message'] = comment['message'][:self.KEYWORD_MAX_LENGTH]
+            ecomment['comment_message_analyzed'] = comment['message']
 
             # Add id info to allow to coexistence of items of different types in the same index
             ecomment['type'] = COMMENT_TYPE
@@ -440,6 +450,7 @@ class GerritEnrich(Enrich):
 
             if eapproval['approval_description']:
                 eapproval['approval_description'] = eapproval['approval_description'][:self.KEYWORD_MAX_LENGTH]
+                eapproval['approval_description_analyzed'] = eapproval['approval_description']
 
             # Add id info to allow to coexistence of items of different types in the same index
             eapproval['id'] = '{}_approval_{}'.format(epatchset['id'], created.timestamp())

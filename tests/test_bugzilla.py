@@ -57,6 +57,13 @@ class TestBugzilla(TestBaseBackend):
         self.assertEqual(result['raw'], 7)
         self.assertEqual(result['enrich'], 7)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('main_description', eitem)
+        self.assertIn('main_description_analyzed', eitem)
+
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
 

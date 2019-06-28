@@ -22,6 +22,7 @@
 
 import logging
 
+from ..elastic_mapping import Mapping as BaseMapping
 from .utils import get_time_diff_days, grimoire_con
 
 from .enrich import Enrich, metadata
@@ -32,7 +33,32 @@ MAX_SIZE_BULK_ENRICHED_ITEMS = 200
 logger = logging.getLogger(__name__)
 
 
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns: dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = """
+        {
+            "properties": {
+               "question_title_analyzed": {
+                    "type": "text",
+                    "index": true
+               }
+           }
+        }"""
+
+        return {"items": mapping}
+
+
 class DiscourseEnrich(Enrich):
+
+    mapping = Mapping
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
@@ -212,6 +238,8 @@ class DiscourseEnrich(Enrich):
         first_post = topic['post_stream']['posts'][0]
 
         eitem['question_title'] = eitem['question_title'][:self.KEYWORD_MAX_LENGTH]
+        eitem['question_title_analyzed'] = eitem['question_title']
+
         eitem['category_id'] = topic['category_id']
         eitem['categories'] = self.__related_categories(topic['category_id'])
         if topic['category_id'] in self.categories:

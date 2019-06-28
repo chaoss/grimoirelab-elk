@@ -63,6 +63,8 @@ class TestJira(TestBaseBackend):
         self.assertEqual(item['data']['id'], "10010")
         self.assertEqual(eitem['id'], "fcf4a8418030d95844f0825fb5b1c3bdc0a1d942_issue_10010")
         self.assertEqual(eitem['number_of_comments'], 0)
+        self.assertIn("main_description", eitem)
+        self.assertIn("main_description_analyzed", eitem)
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
