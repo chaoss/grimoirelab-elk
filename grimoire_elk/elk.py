@@ -32,6 +32,7 @@ from dateutil import parser
 
 from arthur.common import Q_STORAGE_ITEMS
 from perceval.backend import find_signature_parameters, Archive
+from perceval.errors import RateLimitError
 from grimoirelab_toolkit.datetime import datetime_utcnow
 
 from .elastic_mapping import Mapping as BaseMapping
@@ -107,6 +108,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
                  es_aliases=None, projects_json_repo=None, repo_labels=None):
     """ Feed Ocean with backend data """
 
+    error_msg = None
     backend = None
     repo = {'backend_name': backend_name, 'backend_params': backend_params}  # repository data to be stored in conf
 
@@ -214,13 +216,19 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
 
             ocean_backend.feed(**params)
 
+    except RateLimitError as ex:
+        logger.error("Error feeding ocean from %s (%s): rate limit exceeded", backend_name, backend.origin)
+        error_msg = "RateLimitError: seconds to reset {}".format(ex.seconds_to_reset)
     except Exception as ex:
         if backend:
-            logger.error("Error feeding ocean from %s (%s): %s", backend_name, backend.origin, ex, exc_info=True)
+            error_msg = "Error feeding ocean from {} ({}): {}".format(backend_name, backend.origin, ex)
+            logger.error(error_msg, exc_info=True)
         else:
-            logger.error("Error feeding ocean %s", ex, exc_info=True)
+            error_msg = "Error feeding ocean from {}".format(ex)
+            logger.error(error_msg, exc_info=True)
 
     logger.info("Done %s ", backend_name)
+    return error_msg
 
 
 def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
