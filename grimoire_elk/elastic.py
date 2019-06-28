@@ -29,7 +29,8 @@ from time import time
 
 import requests
 
-from grimoirelab_toolkit.datetime import unixtime_to_datetime
+from grimoirelab_toolkit.datetime import (unixtime_to_datetime,
+                                          InvalidDateError)
 
 from grimoire_elk.errors import ELKError
 from grimoire_elk.enriched.utils import (grimoire_con,
@@ -459,7 +460,7 @@ class ElasticSearch(object):
                     if last_value:
                         try:
                             last_value = unixtime_to_datetime(last_value)
-                        except ValueError:
+                        except InvalidDateError:
                             # last_value is in microsecs
                             last_value = unixtime_to_datetime(last_value / 1000)
         return last_value
