@@ -154,7 +154,7 @@ class ElasticOcean(ElasticItems):
         # Also add timestamp used in incremental enrichment
         item['metadata__timestamp'] = timestamp.isoformat()
 
-    def feed(self, from_date=None, from_offset=None, category=None,
+    def feed(self, from_date=None, from_offset=None, category=None, branches=None,
              latest_items=None, arthur_items=None, filter_classified=None):
         """ Feed data in Elastic from Perceval or Arthur """
 
@@ -205,6 +205,8 @@ class ElasticOcean(ElasticItems):
         # by all Perceval backends
         if category is not None:
             params['category'] = category
+        if branches is not None:
+            params['branches'] = branches
         if filter_classified is not None:
             params['filter_classified'] = filter_classified
 

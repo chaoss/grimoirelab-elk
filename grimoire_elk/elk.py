@@ -132,6 +132,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         offset = None
         from_date = None
         category = None
+        branches = None
         latest_items = None
         filter_classified = None
 
@@ -183,6 +184,15 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
                 except AttributeError:
                     pass
 
+        if 'branches' in signature.parameters:
+            try:
+                branches = backend_cmd.branches
+            except AttributeError:
+                try:
+                    branches = backend_cmd.parsed_args.branches
+                except AttributeError:
+                    pass
+
         if 'filter_classified' in signature.parameters:
             try:
                 filter_classified = backend_cmd.parsed_args.filter_classified
@@ -207,6 +217,8 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
                 params['latest_items'] = latest_items
             if category:
                 params['category'] = category
+            if branches:
+                params['branches'] = branches
             if filter_classified:
                 params['filter_classified'] = filter_classified
             if from_date and (from_date.replace(tzinfo=None) != parser.parse("1970-01-01")):
