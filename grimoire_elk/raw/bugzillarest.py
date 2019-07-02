@@ -71,6 +71,22 @@ class Mapping(BaseMapping):
                                 "type": "text",
                                 "index": true
                             },
+                            "history": {
+                                "properties": {
+                                    "changes": {
+                                        "properties": {
+                                            "removed": {
+                                                "type": "text",
+                                                "index": true
+                                            },
+                                            "added": {
+                                                "type": "text",
+                                                "index": true
+                                            }
+                                        }
+                                    }
+                                }
+                            },
                             "summary": {
                                 "type": "text",
                                 "index": true
