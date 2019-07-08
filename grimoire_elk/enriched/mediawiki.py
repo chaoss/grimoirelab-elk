@@ -180,20 +180,21 @@ class MediaWikiEnrich(Enrich):
 
             erevision["url"] = erevision["url"].replace(" ", "_")
             erevision["iscreated"] = 0
-            erevision["creation_date"] = None
             erevision["isrevision"] = 0
+            erevision["creation_date"] = rev['timestamp']
 
             if rev['parentid'] == 0:
                 erevision["iscreated"] = 1
-                erevision["creation_date"] = rev['timestamp']
             else:
                 erevision["isrevision"] = 1
+
             erevision["page_last_edited_date"] = eitem['last_edited_date']
 
             erevision['metadata__gelk_version'] = eitem['metadata__gelk_version']
             erevision['metadata__gelk_backend_name'] = eitem['metadata__gelk_backend_name']
             erevision['metadata__enriched_on'] = eitem['metadata__enriched_on']
-            erevision.update(self.get_grimoire_fields(erevision['metadata__updated_on'], REVISION_TYPE))
+
+            erevision.update(self.get_grimoire_fields(erevision['creation_date'], REVISION_TYPE))
 
             yield erevision
 

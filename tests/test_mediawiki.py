@@ -59,16 +59,105 @@ class TestMediawiki(TestBaseBackend):
         enrich_backend = self.connectors[self.connector][2]()
 
         item = self.items[0]
-        eitems = enrich_backend.get_rich_item_reviews(item)
 
-        for ei in eitems:
-            self.assertEqual(ei['url'], 'https://wiki.mozilla.org/Main_Page/QA/NoMore404s')
-            self.assertIn('metadata__gelk_version', ei)
-            self.assertIn('metadata__gelk_backend_name', ei)
-            self.assertIn('metadata__enriched_on', ei)
-            self.assertIn('grimoire_creation_date', ei)
-            self.assertIn('revision_comment', ei)
-            self.assertIn('revision_comment_analyzed', ei)
+        eitems = []
+        for item in self.items:
+            eitems.extend([ei for ei in enrich_backend.get_rich_item_reviews(item)])
+
+        eitem = eitems[0]
+        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org/Main_Page/QA/NoMore404s')
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('grimoire_creation_date', eitem)
+        self.assertIn('revision_comment', eitem)
+        self.assertIn('revision_comment_analyzed', eitem)
+        self.assertEqual(eitem['creation_date'], "2016-07-26T07:57:48Z")
+        self.assertEqual(eitem['iscreated'], 1)
+        self.assertEqual(eitem['isrevision'], 0)
+
+        eitem = eitems[1]
+        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org/Main_Page/QA/NoMore404s')
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('grimoire_creation_date', eitem)
+        self.assertIn('revision_comment', eitem)
+        self.assertIn('revision_comment_analyzed', eitem)
+        self.assertEqual(eitem['creation_date'], "2016-07-27T11:17:55Z")
+        self.assertEqual(eitem['iscreated'], 0)
+        self.assertEqual(eitem['isrevision'], 1)
+
+        eitem = eitems[2]
+        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org/QA/Fennec/48/RC/smoketests-results')
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('grimoire_creation_date', eitem)
+        self.assertIsNone(eitem['revision_comment'])
+        self.assertEqual(eitem['creation_date'], "2016-07-27T10:02:21Z")
+        self.assertEqual(eitem['iscreated'], 1)
+        self.assertEqual(eitem['isrevision'], 0)
+
+        eitem = eitems[3]
+        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org/QA/Fennec/48/RC/smoketests-results')
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('grimoire_creation_date', eitem)
+        self.assertIn('revision_comment', eitem)
+        self.assertIn('revision_comment_analyzed', eitem)
+        self.assertEqual(eitem['creation_date'], "2016-07-27T11:14:17Z")
+        self.assertEqual(eitem['iscreated'], 0)
+        self.assertEqual(eitem['isrevision'], 1)
+
+        eitem = eitems[4]
+        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org//Technical_Collaboration_Guideline/Translation')
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('grimoire_creation_date', eitem)
+        self.assertIn('revision_comment', eitem)
+        self.assertIn('revision_comment_analyzed', eitem)
+        self.assertEqual(eitem['creation_date'], "2016-07-27T10:35:03Z")
+        self.assertEqual(eitem['iscreated'], 1)
+        self.assertEqual(eitem['isrevision'], 0)
+
+        eitem = eitems[5]
+        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org//Technical_Collaboration_Guideline/Translation')
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('grimoire_creation_date', eitem)
+        self.assertIn('revision_comment', eitem)
+        self.assertIn('revision_comment_analyzed', eitem)
+        self.assertEqual(eitem['creation_date'], "2016-07-27T10:43:41Z")
+        self.assertEqual(eitem['iscreated'], 0)
+        self.assertEqual(eitem['isrevision'], 1)
+
+        eitem = eitems[6]
+        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org//Technical_Collaboration_Guideline/Translation')
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('grimoire_creation_date', eitem)
+        self.assertIn('revision_comment', eitem)
+        self.assertIn('revision_comment_analyzed', eitem)
+        self.assertEqual(eitem['creation_date'], '2016-07-27T10:46:57Z')
+        self.assertEqual(eitem['iscreated'], 0)
+        self.assertEqual(eitem['isrevision'], 1)
+
+        eitem = eitems[7]
+        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org//Technical_Collaboration_Guideline/Translation')
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('grimoire_creation_date', eitem)
+        self.assertIn('revision_comment', eitem)
+        self.assertIn('revision_comment_analyzed', eitem)
+        self.assertEqual(eitem['creation_date'], "2016-06-21T17:16:29Z")
+        self.assertEqual(eitem['iscreated'], 1)
+        self.assertEqual(eitem['isrevision'], 0)
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
