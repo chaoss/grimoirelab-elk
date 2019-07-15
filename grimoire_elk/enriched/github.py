@@ -85,6 +85,7 @@ class GitHubEnrich(Enrich):
 
     issue_roles = ['assignee_data', 'user_data']
     pr_roles = ['merged_by_data', 'user_data']
+    roles = ['assignee_data', 'merged_by_data', 'user_data']
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
