@@ -54,41 +54,64 @@ class TestJira(TestBaseBackend):
 
         result = self._test_raw_to_enrich()
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 7)
+        self.assertEqual(result['enrich'], 17)
 
         enrich_backend = self.connectors[self.connector][2]()
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(item['data']['id'], "10010")
-        self.assertEqual(eitem['id'], "fcf4a8418030d95844f0825fb5b1c3bdc0a1d942_issue_10010")
+        self.assertEqual(eitem['id'], "fcf4a8418030d95844f0825fb5b1c3bdc0a1d942_issue_10010_user_creator")
         self.assertEqual(eitem['number_of_comments'], 0)
         self.assertIn("main_description", eitem)
         self.assertIn("main_description_analyzed", eitem)
+        self.assertEqual(eitem['user_type'], 'creator')
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item, target_user='assignee')
+        self.assertEqual(item['data']['id'], "10010")
+        self.assertEqual(eitem['id'], "fcf4a8418030d95844f0825fb5b1c3bdc0a1d942_issue_10010_user_assignee")
+        self.assertEqual(eitem['number_of_comments'], 0)
+        self.assertIn("main_description", eitem)
+        self.assertIn("main_description_analyzed", eitem)
+        self.assertEqual(eitem['user_type'], 'assignee')
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item, target_user='reporter')
+        self.assertEqual(item['data']['id'], "10010")
+        self.assertEqual(eitem['id'], "fcf4a8418030d95844f0825fb5b1c3bdc0a1d942_issue_10010_user_reporter")
+        self.assertEqual(eitem['number_of_comments'], 0)
+        self.assertIn("main_description", eitem)
+        self.assertIn("main_description_analyzed", eitem)
+        self.assertEqual(eitem['user_type'], 'reporter')
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(item['data']['id'], "10010")
-        self.assertEqual(eitem['id'], "7bbd3aaee3adba6b1a1d293c78a385a874419b12_issue_10010")
+        self.assertEqual(eitem['id'], "7bbd3aaee3adba6b1a1d293c78a385a874419b12_issue_10010_user_creator")
         self.assertEqual(eitem['number_of_comments'], 0)
+        self.assertEqual(eitem['user_type'], 'creator')
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(item['data']['id'], "10008")
-        self.assertEqual(eitem['id'], "d6b4168fd458f910fb9af1df0e9edcfaa188cc67_issue_10008")
+        self.assertEqual(eitem['id'], "d6b4168fd458f910fb9af1df0e9edcfaa188cc67_issue_10008_user_creator")
         self.assertEqual(eitem['number_of_comments'], 0)
+        self.assertEqual(eitem['user_type'], 'creator')
 
         item = self.items[3]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(item['data']['id'], "10017")
-        self.assertEqual(eitem['id'], "305dbd15b1f250cb6941d8b9270af3d3a4405084_issue_10017")
+        self.assertEqual(eitem['id'], "305dbd15b1f250cb6941d8b9270af3d3a4405084_issue_10017_user_creator")
         self.assertEqual(eitem['number_of_comments'], 0)
+        self.assertEqual(eitem['user_type'], 'creator')
 
         item = self.items[4]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(item['data']['id'], "10018")
-        self.assertEqual(eitem['id'], "929182e386ddb7d290c0dbd2eb34140993c8f567_issue_10018")
+        self.assertEqual(eitem['id'], "929182e386ddb7d290c0dbd2eb34140993c8f567_issue_10018_user_creator")
         self.assertEqual(eitem['number_of_comments'], 2)
+        self.assertEqual(eitem['user_type'], 'creator')
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
@@ -105,29 +128,45 @@ class TestJira(TestBaseBackend):
 
         result = self._test_raw_to_enrich(sortinghat=True)
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 7)
+        self.assertEqual(result['enrich'], 17)
 
         enrich_backend = self.connectors[self.connector][2]()
         enrich_backend.sortinghat = True
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
-        self.assertEqual(eitem['assignee_name'], 'Peter Monks')
-        self.assertEqual(eitem['assignee_org_name'], 'Unknown')
-        self.assertEqual(eitem['assignee_user_name'], 'peter')
+        self.assertEqual(eitem['author_name'], 'Maurizio Pillitu')
+        self.assertEqual(eitem['author_org_name'], 'Unknown')
+        self.assertEqual(eitem['author_user_name'], 'maoo')
+        self.assertEqual(eitem['user_type'], 'creator')
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item, target_user='assignee')
+        self.assertEqual(eitem['author_name'], 'Peter Monks')
+        self.assertEqual(eitem['author_org_name'], 'Unknown')
+        self.assertEqual(eitem['author_user_name'], 'peter')
+        self.assertEqual(eitem['user_type'], 'assignee')
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item, target_user='reporter')
+        self.assertEqual(eitem['author_name'], 'Maurizio Pillitu')
+        self.assertEqual(eitem['author_org_name'], 'Unknown')
+        self.assertEqual(eitem['author_user_name'], 'maoo')
+        self.assertEqual(eitem['user_type'], 'reporter')
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
-        self.assertNotEqual(eitem['assignee_name'], 'Unknown')
-        self.assertEqual(eitem['assignee_org_name'], 'Unknown')
-        self.assertNotEqual(eitem['assignee_user_name'], 'Unknown')
+        self.assertNotEqual(eitem['author_name'], 'Unknown')
+        self.assertEqual(eitem['author_org_name'], 'Unknown')
+        self.assertNotEqual(eitem['author_user_name'], 'Unknown')
+        self.assertEqual(eitem['user_type'], 'creator')
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 7)
+        self.assertEqual(result['enrich'], 17)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
