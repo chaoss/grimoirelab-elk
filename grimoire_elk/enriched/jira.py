@@ -34,7 +34,6 @@ MAX_SIZE_BULK_ENRICHED_ITEMS = 200
 ISSUE_TYPE = 'issue'
 COMMENT_TYPE = 'comment'
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -118,6 +117,7 @@ class JiraEnrich(Enrich):
 
         for rol in roles:
             identity = self.get_sh_identity(item, rol)
+
             eitem_sh.update(self.get_item_sh_fields(identity, created, rol=rol))
 
             if not eitem_sh[rol + '_org_name']:
@@ -128,20 +128,6 @@ class JiraEnrich(Enrich):
 
             if not eitem_sh[rol + '_user_name']:
                 eitem_sh[rol + '_user_name'] = SH_UNKNOWN_VALUE
-
-            # Add the author field common in all data sources
-            if rol == self.get_field_author():
-                identity = self.get_sh_identity(item, rol)
-                eitem_sh.update(self.get_item_sh_fields(identity, created, rol="author"))
-
-                if not eitem_sh['author_org_name']:
-                    eitem_sh['author_org_name'] = SH_UNKNOWN_VALUE
-
-                if not eitem_sh['author_name']:
-                    eitem_sh['author_name'] = SH_UNKNOWN_VALUE
-
-                if not eitem_sh['author_user_name']:
-                    eitem_sh['author_user_name'] = SH_UNKNOWN_VALUE
 
         return eitem_sh
 
@@ -230,7 +216,7 @@ class JiraEnrich(Enrich):
                                 eitem['sprint_complete'] = cls.fix_value_null(sprint_complete)
 
     @metadata
-    def get_rich_item(self, item):
+    def get_rich_item(self, item, author_type='creator'):
 
         eitem = {}
 
@@ -252,16 +238,27 @@ class JiraEnrich(Enrich):
 
         eitem['changes'] = issue['changelog']['total']
 
+        if "creator" in issue["fields"] and issue["fields"]["creator"]:
+            eitem['creator_name'] = issue["fields"]["creator"]["displayName"]
+            eitem['creator_login'] = issue["fields"]["creator"]["name"]
+            if "timeZone" in issue["fields"]["creator"]:
+                eitem['creator_tz'] = issue["fields"]["creator"]["timeZone"]
+
         if "assignee" in issue["fields"] and issue["fields"]["assignee"]:
             eitem['assignee'] = issue["fields"]["assignee"]["displayName"]
             if "timeZone" in issue["fields"]["assignee"]:
                 eitem['assignee_tz'] = issue["fields"]["assignee"]["timeZone"]
 
-        if "creator" in issue["fields"] and issue["fields"]["creator"]:
-            eitem['author_name'] = issue["fields"]["creator"]["displayName"]
-            eitem['author_login'] = issue["fields"]["creator"]["name"]
-            if "timeZone" in issue["fields"]["creator"]:
-                eitem['author_tz'] = issue["fields"]["creator"]["timeZone"]
+        if 'reporter' in issue['fields'] and issue['fields']['reporter']:
+            eitem['reporter_name'] = issue['fields']['reporter']['displayName']
+            eitem['reporter_login'] = issue['fields']['reporter']['name']
+            if "timeZone" in issue["fields"]["reporter"]:
+                eitem['reporter_tz'] = issue["fields"]["reporter"]["timeZone"]
+
+        eitem['author_type'] = author_type
+        eitem['author_name'] = eitem.get(author_type + '_name', None)
+        eitem['author_login'] = eitem.get(author_type + '_login', None)
+        eitem['author_tz'] = eitem.get(author_type + '_tz', None)
 
         eitem['creation_date'] = issue["fields"]['created']
 
@@ -285,12 +282,6 @@ class JiraEnrich(Enrich):
         eitem['project_id'] = issue['fields']['project']['id']
         eitem['project_key'] = issue['fields']['project']['key']
         eitem['project_name'] = issue['fields']['project']['name']
-
-        if 'reporter' in issue['fields'] and issue['fields']['reporter']:
-            eitem['reporter_name'] = issue['fields']['reporter']['displayName']
-            eitem['reporter_login'] = issue['fields']['reporter']['name']
-            if "timeZone" in issue["fields"]["reporter"]:
-                eitem['reporter_tz'] = issue["fields"]["reporter"]["timeZone"]
 
         if "resolution" in issue['fields'] and issue['fields']['resolution']:
             eitem['resolution_id'] = issue['fields']['resolution']['id']
@@ -322,7 +313,7 @@ class JiraEnrich(Enrich):
         eitem['url'] = None
 
         # Add id info to allow to coexistence of comments and issues in the same index
-        eitem['id'] = '{}_issue_{}'.format(eitem['uuid'], issue['id'])
+        eitem['id'] = '{}_issue_{}_user_{}'.format(eitem['uuid'], issue['id'], author_type)
 
         if 'comments_data' in issue:
             eitem['number_of_comments'] = len(issue['comments_data'])
@@ -346,6 +337,17 @@ class JiraEnrich(Enrich):
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item, ["assignee", "reporter", "creator"], issue['fields']['created']))
+
+            # Set the author info to the one identified by author_type
+            eitem['author_id'] = eitem[author_type + '_id']
+            eitem['author_uuid'] = eitem[author_type + '_uuid']
+            eitem['author_name'] = eitem[author_type + '_name']
+            eitem['author_user_name'] = eitem[author_type + '_user_name']
+            eitem['author_domain'] = eitem[author_type + '_domain']
+            eitem['author_gender'] = eitem[author_type + '_gender']
+            eitem['author_gender_acc'] = eitem[author_type + '_gender_acc']
+            eitem['author_org_name'] = eitem[author_type + '_org_name']
+            eitem['author_bot'] = eitem[author_type + '_bot']
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
@@ -422,13 +424,17 @@ class JiraEnrich(Enrich):
         ins_items = 0
 
         for item in ocean_backend.fetch():
-            eitem = self.get_rich_item(item)
+            eitem_creator = self.get_rich_item(item, author_type='creator')
+            eitem_assignee = self.get_rich_item(item, author_type='assignee')
+            eitem_reporter = self.get_rich_item(item, author_type='reporter')
 
-            items_to_enrich.append(eitem)
+            items_to_enrich.append(eitem_creator)
+            items_to_enrich.append(eitem_assignee)
+            items_to_enrich.append(eitem_reporter)
 
             comments = item['data'].get('comments_data', [])
             if comments:
-                rich_item_comments = self.get_rich_item_comments(comments, eitem)
+                rich_item_comments = self.get_rich_item_comments(comments, eitem_creator)
                 items_to_enrich.extend(rich_item_comments)
 
             if len(items_to_enrich) < MAX_SIZE_BULK_ENRICHED_ITEMS:
