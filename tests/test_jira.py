@@ -185,7 +185,7 @@ class TestJira(TestBaseBackend):
 
         with open("data/projects-release.json") as projects_filename:
             url = json.load(projects_filename)['grimoire']['jira'][0]
-            p2o_params = {'url': 'https://jira.opnfv.org', 'filter-raw': 'data.fields.project.key:PROJECT-KEY'}
+            p2o_params = {'url': 'https://jira.opnfv.org', 'filter-raw': 'search_fields.project_key:PROJECT-KEY'}
             self.assertDictEqual(p2o_params, JiraOcean.get_p2o_params_from_url(url))
 
 

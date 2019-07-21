@@ -57,7 +57,7 @@
             "https://build.opnfv.org/ci"
         ],
         "jira": [
-            "https://jira.opnfv.org --filter-raw=data.fields.project.key:PROJECT-KEY"
+            "https://jira.opnfv.org --filter-raw=search_fields.project_key:PROJECT-KEY"
         ],
         "kitsune": [""],
         "mattermost": [
