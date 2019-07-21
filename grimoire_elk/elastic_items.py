@@ -33,7 +33,7 @@ from .elastic_mapping import Mapping
 HEADER_JSON = {"Content-Type": "application/json"}
 MAX_BULK_UPDATE_SIZE = 1000
 
-FILTER_DATA_ATTR = 'data.'
+FILTER_DATA_ATTR = 'search_fields.'
 FILTER_SEPARATOR = r",\s*%s" % FILTER_DATA_ATTR
 PROJECTS_JSON_LABELS_PATTERN = r".*(--labels=\[(.*)\]).*"
 
