@@ -86,20 +86,20 @@ class JiraEnrich(Enrich):
     def get_sh_identity(self, item, identity_field=None):
         """ Return a Sorting Hat identity using jira user data """
 
-        identity = {}
-
         user = item
         if 'data' in item and type(item) == dict:
-            user = item['data']['fields'][identity_field]
+            user = item['data']['fields'].get(identity_field, None)
         elif identity_field:
             user = item[identity_field]
 
         if not user:
-            return identity
+            return {}
 
-        identity['name'] = None
-        identity['username'] = None
-        identity['email'] = None
+        identity = {
+            'name': None,
+            'username': None,
+            'email': None
+        }
 
         if 'displayName' in user:
             identity['name'] = user['displayName']
