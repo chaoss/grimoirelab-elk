@@ -79,7 +79,10 @@ setup(name="grimoire-elk",
           'elasticsearch==6.3.1',
           'elasticsearch-dsl==6.3.1',
           'requests==2.21.0',
-          'urllib3==1.24.3'
+          'urllib3==1.24.3',
+          'PyMySQL>=0.7.0',
+          'redis>=2.10.0, <=2.10.6',
+          'pandas==0.18.1'
       ],
       zip_safe=False
       )
