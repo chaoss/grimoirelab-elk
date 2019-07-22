@@ -129,7 +129,7 @@ class TestGerrit(TestBaseBackend):
                              'INFO:grimoire_elk.enriched.enrich:[Demography] End %s/test_gerrit_enrich'
                              % enrich_backend.elastic.anonymize_url(self.es_con))
 
-        time.sleep(1)  # HACK: Wait until git enrich index has been written
+        time.sleep(5)  # HACK: Wait until git enrich index has been written
         for item in enrich_backend.fetch():
             self.assertTrue('demography_min_date' in item.keys())
             self.assertTrue('demography_max_date' in item.keys())
