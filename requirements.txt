@@ -10,6 +10,7 @@ pandas==0.18.1
 -e git+https://github.com/chaoss/grimoirelab-cereslib/#egg=grimoirelab-cereslib
 -e git+https://github.com/chaoss/grimoirelab-kingarthur/#egg=grimoirelab-kingarthur
 -e git+https://github.com/chaoss/grimoirelab-perceval/#egg=grimoirelab-perceval
+-e git+https://github.com/chaoss/grimoirelab-graal/#egg=grimoirelab-graal
 -e git+https://github.com/chaoss/grimoirelab-perceval-mozilla/#egg=grimoirelab-perceval-mozilla
 -e git+https://github.com/chaoss/grimoirelab-perceval-opnfv/#egg=grimoirelab-perceval-opnfv
 -e git+https://github.com/chaoss/grimoirelab-perceval-puppet/#egg=grimoirelab-perceval-puppet
