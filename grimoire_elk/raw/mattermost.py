@@ -29,40 +29,20 @@ class Mapping(BaseMapping):
     def get_elastic_mappings(es_major):
         """Get Elasticsearch mapping.
 
-        Non dynamic discovery of type for:
-            * data.attachments.ts
-
         :param es_major: major version of Elasticsearch, as string
-        :returns:        dictionary with a key, 'items', with the mapping
+        :returns: dictionary with a key, 'items', with the mapping
         """
-
         mapping = '''
-             {
-                "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "attachments": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                },
-                                "channel_info": {
-                                    "properties": {
-                                        "latest": {
-                                            "dynamic": false,
-                                            "properties": {}
-                                        }
-                                    }
-                                },
-                                "root": {
-                                   "dynamic":false,
-                                    "properties": {}
-                                }
-                            }
-                        }
-                    }
+         {
+            "dynamic":true,
+            "properties": {
+                "data": {
+                    "dynamic":false,
+                    "properties": {}
+                }
             }
-            '''
+        }
+        '''
 
         return {"items": mapping}
 
