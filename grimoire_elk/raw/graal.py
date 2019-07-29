@@ -56,7 +56,7 @@ class Mapping(BaseMapping):
 
 
 class GraalOcean(ElasticOcean):
-    """CoLic Ocean feeder"""
+    """Graal Ocean feeder"""
 
     mapping = Mapping
 

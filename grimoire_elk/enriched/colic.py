@@ -63,7 +63,7 @@ class ColicEnrich(Enrich):
     def get_field_unique_id(self):
         return "id"
 
-    def get_licensed_files(repository_url, to_date):
+    def get_licensed_files(self, repository_url, to_date):
         """ Retrieve all the licensed files until the to_date, corresponding
         to the given repository.
         """
@@ -108,7 +108,7 @@ class ColicEnrich(Enrich):
 
         return query_licensed_files
 
-    def get_copyrighted_files(repository_url, to_date):
+    def get_copyrighted_files(self, repository_url, to_date):
         """ Retrieve all the copyrighted files until the to_date, corresponding
         to the given repository.
         """
@@ -260,7 +260,7 @@ class ColicEnrich(Enrich):
         return num_items
 
     def enrich_colic_analysis(self, ocean_backend, enrich_backend, no_incremental=False,
-                              out_index="colic_enrich_graal_repo", interval_months=3,
+                              out_index="colic_enrich_graal_repo", interval_months=[3],
                               date_field="grimoire_creation_date"):
 
         logger.info("Doing enrich_colic_analysis study for index {}"
@@ -269,12 +269,14 @@ class ColicEnrich(Enrich):
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
                    verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
         in_index = enrich_backend.elastic.index
+        interval_months = list(map(int, interval_months))
 
         unique_repos = es_in.search(
             index=in_index,
             body=get_unique_repository())
 
         repositories = [repo['key'] for repo in unique_repos['aggregations']['unique_repos'].get('buckets', [])]
+        current_month = datetime_utcnow().replace(day=1, hour=0, minute=0, second=0)
         num_items = 0
         ins_items = 0
 
@@ -282,53 +284,59 @@ class ColicEnrich(Enrich):
             es_out = ElasticSearch(enrich_backend.elastic.url, out_index)
             evolution_items = []
 
-            to_month = get_to_date(es_in, in_index, out_index, repository_url)
-            to_month = to_month.replace(day=1, hour=0, minute=0, second=0)
-            current_month = datetime_utcnow().replace(day=1, hour=0, minute=0, second=0)
+            for interval in interval_months:
 
-            while to_month < current_month:
-                copyrighted_files_at_time = es_in.search(
-                    index=in_index,
-                    body=self.get_copyrighted_files(repository_url, to_month.isoformat()))
+                to_month = get_to_date(es_in, in_index, out_index, repository_url, interval)
+                to_month = to_month.replace(month=int(interval), day=1, hour=0, minute=0, second=0)
 
-                licensed_files_at_time = es_in.search(
-                    index=in_index,
-                    body=self.get_licensed_files(repository_url, to_month.isoformat()))
+                while to_month < current_month:
+                    copyrighted_files_at_time = es_in.search(
+                        index=in_index,
+                        body=self.get_copyrighted_files(repository_url, to_month.isoformat()))
 
-                files_at_time = es_in.search(
-                    index=in_index,
-                    body=get_files_at_time(repository_url, to_month.isoformat()))
+                    licensed_files_at_time = es_in.search(
+                        index=in_index,
+                        body=self.get_licensed_files(repository_url, to_month.isoformat()))
 
-                licensed_files = int(licensed_files_at_time["aggregations"]["1"]["value"])
-                copyrighted_files = int(copyrighted_files_at_time["aggregations"]["1"]["value"])
-                total_files = int(files_at_time["aggregations"]["1"]["value"])
+                    files_at_time = es_in.search(
+                        index=in_index,
+                        body=get_files_at_time(repository_url, to_month.isoformat()))
 
-                repository_name = repository_url.split("/")[-1]
-                evolution_item = {
-                    "id": "{}_{}_{}".format(to_month.isoformat(), repository_name, interval_months),
-                    "origin": repository_url,
-                    "interval_months": interval_months,
-                    "study_creation_date": to_month.isoformat(),
-                    "licensed_files": licensed_files,
-                    "copyrighted_files": copyrighted_files,
-                    "total_files": total_files
-                }
+                    licensed_files = int(licensed_files_at_time["aggregations"]["1"]["value"])
+                    copyrighted_files = int(copyrighted_files_at_time["aggregations"]["1"]["value"])
+                    # TODO: Fix - need more efficient query
+                    total_files = len(files_at_time['aggregations']['file_stats'].get("buckets", []))
 
-                evolution_items.append(evolution_item)
+                    if not total_files:
+                        to_month = to_month + relativedelta(months=+interval)
+                        continue
 
-                if len(evolution_items) >= self.elastic.max_items_bulk:
+                    repository_name = repository_url.split("/")[-1]
+                    evolution_item = {
+                        "id": "{}_{}_{}".format(to_month.isoformat(), repository_name, interval),
+                        "origin": repository_url,
+                        "interval_months": interval,
+                        "study_creation_date": to_month.isoformat(),
+                        "licensed_files": licensed_files,
+                        "copyrighted_files": copyrighted_files,
+                        "total_files": total_files
+                    }
+
+                    evolution_items.append(evolution_item)
+
+                    if len(evolution_items) >= self.elastic.max_items_bulk:
+                        num_items += len(evolution_items)
+                        ins_items += es_out.bulk_upload(evolution_items, self.get_field_unique_id())
+                        evolution_items = []
+
+                    to_month = to_month + relativedelta(months=+interval)
+
+                if len(evolution_items) > 0:
                     num_items += len(evolution_items)
                     ins_items += es_out.bulk_upload(evolution_items, self.get_field_unique_id())
-                    evolution_items = []
 
-                to_month = to_month + relativedelta(months=+interval_months)
-
-            if len(evolution_items) > 0:
-                num_items += len(evolution_items)
-                ins_items += es_out.bulk_upload(evolution_items, self.get_field_unique_id())
-
-            if num_items != ins_items:
-                missing = num_items - ins_items
-                logger.error("%s/%s missing items for Graal CoLic Analysis Study", str(missing), str(num_items))
-            else:
-                logger.info("%s items inserted for Graal CoLic Analysis Study", str(num_items))
+                if num_items != ins_items:
+                    missing = num_items - ins_items
+                    logger.error("%s/%s missing items for Graal CoLic Analysis Study", str(missing), str(num_items))
+                else:
+                    logger.info("%s items inserted for Graal CoLic Analysis Study", str(num_items))

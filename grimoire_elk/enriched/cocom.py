@@ -138,12 +138,14 @@ class CocomEnrich(Enrich):
         """ Add derived metrics fields """
 
         # TODO: Fix Logic: None rather than 1
-        if None not in [eitem["loc"], eitem["comments"], eitem["num_funs"]]:
-            eitem["loc_per_comment_lines"] = eitem["loc"] / max(eitem["comments"], 1)
-            eitem["loc_per_blank_lines"] = eitem["loc"] / max(eitem["blanks"], 1)
-            eitem["loc_per_function"] = eitem["loc"] / max(eitem["num_funs"], 1)
+        if eitem["loc"] is not None and eitem["comments"] is not None and eitem["num_funs"] is not None:
+            eitem["comments_per_loc"] = round(eitem["comments"] / max(eitem["loc"], 1), 2)
+            eitem["blanks_per_loc"] = round(eitem["blanks"] / max(eitem["loc"], 1), 2)
+            eitem["loc_per_function"] = round(eitem["loc"] / max(eitem["num_funs"], 1), 2)
         else:
-            eitem["loc_per_comment_lines"] = eitem["loc_per_blank_lines"] = eitem["loc_per_function"] = None
+            eitem["comments_per_loc"] = None
+            eitem["blanks_per_loc"] = None
+            eitem["loc_per_function"] = None
 
         return eitem
 
@@ -176,7 +178,7 @@ class CocomEnrich(Enrich):
         return num_items
 
     def enrich_repo_analysis(self, ocean_backend, enrich_backend, no_incremental=False,
-                             out_index="cocom_enrich_graal_repo", interval_months=3,
+                             out_index="cocom_enrich_graal_repo", interval_months=[3],
                              date_field="grimoire_creation_date"):
 
         logger.info("Doing enrich_repository_analysis study for index {}"
@@ -185,12 +187,14 @@ class CocomEnrich(Enrich):
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
                    verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
         in_index = enrich_backend.elastic.index
+        interval_months = list(map(int, interval_months))
 
         unique_repos = es_in.search(
             index=in_index,
             body=get_unique_repository())
 
         repositories = [repo['key'] for repo in unique_repos['aggregations']['unique_repos'].get('buckets', [])]
+        current_month = datetime_utcnow().replace(day=1, hour=0, minute=0, second=0)
         num_items = 0
         ins_items = 0
 
@@ -198,58 +202,61 @@ class CocomEnrich(Enrich):
             es_out = ElasticSearch(enrich_backend.elastic.url, out_index)
             evolution_items = []
 
-            to_month = get_to_date(es_in, in_index, out_index, repository_url)
-            to_month = to_month.replace(day=1, hour=0, minute=0, second=0)
-            current_month = datetime_utcnow().replace(day=1, hour=0, minute=0, second=0)
+            for interval in interval_months:
 
-            while to_month < current_month:
-                files_at_time = es_in.search(
-                    index=in_index,
-                    body=get_files_at_time(repository_url, to_month.isoformat())
-                )['aggregations']['file_stats'].get("buckets", [])
+                to_month = get_to_date(es_in, in_index, out_index, repository_url, interval)
+                to_month = to_month.replace(month=int(interval), day=1, hour=0, minute=0, second=0)
 
-                if not len(files_at_time):
-                    to_month = to_month + relativedelta(months=+interval_months)
-                    continue
+                while to_month < current_month:
+                    files_at_time = es_in.search(
+                        index=in_index,
+                        body=get_files_at_time(repository_url, to_month.isoformat())
+                    )['aggregations']['file_stats'].get("buckets", [])
 
-                repository_name = repository_url.split("/")[-1]
-                evolution_item = {
-                    "id": "{}_{}_{}".format(to_month.isoformat(), repository_name, interval_months),
-                    "origin": repository_url,
-                    "interval_months": interval_months,
-                    "study_creation_date": to_month.isoformat(),
-                    "total_files": len(files_at_time)
-                }
+                    if not len(files_at_time):
+                        to_month = to_month + relativedelta(months=+interval)
+                        continue
 
-                for file_ in files_at_time:
-                    file_details = file_["1"]["hits"]["hits"][0]["_source"]
+                    repository_name = repository_url.split("/")[-1]
+                    evolution_item = {
+                        "id": "{}_{}_{}".format(to_month.isoformat(), repository_name, interval),
+                        "origin": repository_url,
+                        "interval_months": interval,
+                        "study_creation_date": to_month.isoformat(),
+                        "total_files": len(files_at_time)
+                    }
 
-                    for metric in self.metrics:
-                        total_metric = "total_" + metric
-                        evolution_item[total_metric] = evolution_item.get(total_metric, 0)
-                        evolution_item[total_metric] += file_details[metric] if file_details[metric] is not None else 0
+                    for file_ in files_at_time:
+                        file_details = file_["1"]["hits"]["hits"][0]["_source"]
 
-                # TODO: Fix Logic: None rather than 1
-                evolution_item["total_loc_per_comment_lines"] = evolution_item["total_loc"] / \
-                    max(evolution_item["total_comments"], 1)
-                evolution_item["total_loc_per_blank_lines"] = evolution_item["total_loc"] / max(evolution_item["total_blanks"], 1)
-                evolution_item["total_loc_per_function"] = evolution_item["total_loc"] / max(evolution_item["total_num_funs"], 1)
+                        for metric in self.metrics:
+                            total_metric = "total_" + metric
+                            evolution_item[total_metric] = evolution_item.get(total_metric, 0)
+                            evolution_item[total_metric] += file_details[metric] if file_details[metric] is not None else 0
 
-                evolution_items.append(evolution_item)
+                    # TODO: Fix Logic: None rather than 1
+                    evolution_item["total_comments_per_loc"] = round(
+                        evolution_item["total_comments"] / max(evolution_item["total_loc"], 1), 2)
+                    evolution_item["total_blanks_per_loc"] = round(
+                        evolution_item["total_blanks"] / max(evolution_item["total_loc"], 1), 2)
+                    evolution_item["total_loc_per_function"] = round(
+                        evolution_item["total_loc"] / max(evolution_item["total_num_funs"], 1), 2)
 
-                if len(evolution_items) >= self.elastic.max_items_bulk:
+                    evolution_items.append(evolution_item)
+
+                    if len(evolution_items) >= self.elastic.max_items_bulk:
+                        num_items += len(evolution_items)
+                        ins_items += es_out.bulk_upload(evolution_items, self.get_field_unique_id())
+                        evolution_items = []
+
+                    to_month = to_month + relativedelta(months=+interval)
+
+                if len(evolution_items) > 0:
                     num_items += len(evolution_items)
                     ins_items += es_out.bulk_upload(evolution_items, self.get_field_unique_id())
-                    evolution_items = []
 
-                to_month = to_month + relativedelta(months=+interval_months)
-
-            if len(evolution_items) > 0:
-                num_items += len(evolution_items)
-                ins_items += es_out.bulk_upload(evolution_items, self.get_field_unique_id())
-
-            if num_items != ins_items:
-                missing = num_items - ins_items
-                logger.error("%s/%s missing items for Graal CoCom Analysis Study", str(missing), str(num_items))
-            else:
-                logger.info("%s items inserted for Graal CoCom Analysis Study", str(num_items))
+                if num_items != ins_items:
+                    missing = num_items - ins_items
+                    logger.error("%s/%s missing items for Graal CoCom Analysis Study", str(missing), str(num_items))
+                else:
+                    logger.info("%s items inserted for Graal CoCom Analysis Study", str(num_items))

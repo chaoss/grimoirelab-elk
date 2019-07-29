@@ -43,7 +43,7 @@ def get_unique_repository():
     return query_unique_repository
 
 
-def get_last_study_date(repository_url):
+def get_last_study_date(repository_url, interval):
     """ Retrieve the last study_creation_date of the item corresponding
     to given repository from the study index.
     """
@@ -64,11 +64,15 @@ def get_last_study_date(repository_url):
                     "term": {
                         "origin.keyword": "%s"
                     }
+                },{
+                    "term":{
+                        "interval_months": "%s"
+                    }
                 }]
             }
         }
     }
-    """ % (repository_url)
+    """ % (repository_url, interval)
 
     return query_last_study_date
 
@@ -116,8 +120,6 @@ def get_files_at_time(repository_url, to_date):
     """ Retrieve all the latest changes wrt files until the to_date,
     corresponding to the given repository.
     """
-
-    # TODO: Fix for interval month matching
 
     query_files_at_time = """
     {
@@ -167,14 +169,14 @@ def get_files_at_time(repository_url, to_date):
     return query_files_at_time
 
 
-def get_to_date(es_in, in_index, out_index, repository_url):
+def get_to_date(es_in, in_index, out_index, repository_url, interval):
     """ Get the appropriate to_date value for incremental insertion. """
     study_data_available = False
 
     if es_in.indices.exists(index=out_index):
         last_study_date = es_in.search(
             index=out_index,
-            body=get_last_study_date(repository_url))["aggregations"]["1"]
+            body=get_last_study_date(repository_url, interval))["aggregations"]["1"]
 
         if last_study_date["value"] is not None:
             study_data_available = True
