@@ -28,6 +28,9 @@ from dateutil import parser
 
 from grimoire_elk.elastic import ElasticConnectException
 from grimoire_elk.elastic import ElasticSearch
+# Connectors for Graal
+from graal.backends.core.cocom import CoCom, CoComCommand
+from graal.backends.core.colic import CoLic, CoLicCommand
 # Connectors for Perceval
 from grimoire_elk.raw.hyperkitty import HyperKittyOcean
 from perceval.backends.core.askbot import Askbot, AskbotCommand
@@ -70,6 +73,8 @@ from perceval.backends.opnfv.functest import Functest, FunctestCommand
 from .enriched.askbot import AskbotEnrich
 from .enriched.bugzilla import BugzillaEnrich
 from .enriched.bugzillarest import BugzillaRESTEnrich
+from .enriched.cocom import CocomEnrich
+from .enriched.colic import ColicEnrich
 from .enriched.confluence import ConfluenceEnrich
 from .enriched.crates import CratesEnrich
 from .enriched.discourse import DiscourseEnrich
@@ -119,6 +124,7 @@ from .raw.git import GitOcean
 from .raw.github import GitHubOcean
 from .raw.gitlab import GitLabOcean
 from .raw.google_hits import GoogleHitsOcean
+from .raw.graal import GraalOcean
 from .raw.groupsio import GroupsioOcean
 from .raw.jenkins import JenkinsOcean
 from .raw.jira import JiraOcean
@@ -199,6 +205,8 @@ def get_connectors():
     return {"askbot": [Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
             "bugzilla": [Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
             "bugzillarest": [BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
+            "cocom": [CoCom, GraalOcean, CocomEnrich, CoComCommand],
+            "colic": [CoLic, GraalOcean, ColicEnrich, CoLicCommand],
             "confluence": [Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
             "crates": [Crates, CratesOcean, CratesEnrich, CratesCommand],
             "discourse": [Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],

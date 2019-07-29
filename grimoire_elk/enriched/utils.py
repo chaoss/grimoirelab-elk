@@ -29,7 +29,8 @@ import requests
 import urllib3
 
 
-from grimoirelab_toolkit.datetime import datetime_utcnow
+from grimoirelab_toolkit.datetime import (datetime_utcnow,
+                                          str_to_datetime)
 
 
 BACKOFF_FACTOR = 0.2
@@ -212,3 +213,16 @@ def get_diff_current_date(days=0, hours=0, minutes=0):
     before_date = datetime_utcnow() - datetime.timedelta(days=days, hours=hours, minutes=minutes)
 
     return before_date
+
+
+def fix_field_date(date_value):
+    """Fix possible errors in the field date"""
+
+    field_date = str_to_datetime(date_value)
+
+    try:
+        _ = int(field_date.strftime("%z")[0:3])
+    except ValueError:
+        field_date = field_date.replace(tzinfo=None)
+
+    return field_date.isoformat()
