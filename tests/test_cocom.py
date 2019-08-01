@@ -23,6 +23,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
+from grimoire_elk.enriched.cocom import logger
 
 
 HEADER_JSON = {"Content-Type": "application/json"}
@@ -120,6 +121,20 @@ class TestCoCom(TestBaseBackend):
         self.assertEqual(eitem["comments_per_loc"], None)
         self.assertEqual(eitem["blanks_per_loc"], None)
         self.assertEqual(eitem["loc_per_function"], None)
+
+    def test_cocom_analysis_study(self):
+        """ Test that the cocom analysis study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_repo_analysis')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_repo_analysis":
+                study(ocean_backend, enrich_backend)
+                self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.cocom:[cocom] Starting '
+                                 'enrich_repository_analysis study')
+                self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.cocom:[cocom] Ending '
+                                 'enrich_repository_analysis study')
 
 
 if __name__ == "__main__":

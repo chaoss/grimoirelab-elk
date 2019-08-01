@@ -23,6 +23,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
+from grimoire_elk.enriched.colic import logger
 
 
 HEADER_JSON = {"Content-Type": "application/json"}
@@ -80,6 +81,20 @@ class TestCoLic(TestBaseBackend):
         self.assertEqual(eitem['has_copyright'], 1)
         self.assertEqual(eitem['modules'], ["graal"])
         self.assertEqual(eitem['file_path'], "graal/codecomplexity.py")
+
+    def test_colic_analysis_study(self):
+        """ Test that the colic analysis study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_colic_analysis')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_colic_analysis":
+                study(ocean_backend, enrich_backend)
+                self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.colic:[colic] Starting '
+                                 'enrich_colic_analysis study')
+                self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.colic:[colic] Ending '
+                                 'enrich_colic_analysis study')
 
 
 if __name__ == "__main__":
