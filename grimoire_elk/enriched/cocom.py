@@ -181,8 +181,7 @@ class CocomEnrich(Enrich):
                              out_index="cocom_enrich_graal_repo", interval_months=[3],
                              date_field="grimoire_creation_date"):
 
-        logger.info("Doing enrich_repository_analysis study for index {}"
-                    .format(self.elastic.anonymize_url(self.elastic.index_url)))
+        logger.info("[cocom] Starting enrich_repository_analysis study")
 
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
                    verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
@@ -260,3 +259,5 @@ class CocomEnrich(Enrich):
                     logger.error("%s/%s missing items for Graal CoCom Analysis Study", str(missing), str(num_items))
                 else:
                     logger.info("%s items inserted for Graal CoCom Analysis Study", str(num_items))
+
+        logger.info("[cocom] Ending enrich_repository_analysis study")
