@@ -13,8 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Authors:
 #   Valerio Cosentino <valcos@bitergia.com>
@@ -32,6 +31,7 @@ from .graal_study_evolution import (get_to_date,
                                     get_unique_repository,
                                     get_files_at_time)
 from .utils import fix_field_date
+from ..elastic_mapping import Mapping as BaseMapping
 
 from grimoirelab_toolkit.datetime import datetime_utcnow
 from grimoire_elk.elastic import ElasticSearch
@@ -39,6 +39,71 @@ from grimoire_elk.elastic import ElasticSearch
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
 
 logger = logging.getLogger(__name__)
+
+
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        Ensure data.message is string, since it can be very large
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = '''
+         {
+            "dynamic":true,
+            "properties": {
+                "id" : {
+                    "type" : "keyword"
+                },
+                "interval_months" : {
+                    "type" : "long"
+                },
+                "origin" : {
+                    "type" : "keyword"
+                },
+                "study_creation_date" : {
+                    "type" : "date"
+                },
+                "total_blanks" : {
+                    "type" : "long"
+                },
+                "total_blanks_per_loc" : {
+                    "type" : "float"
+                },
+                "total_ccn" : {
+                    "type" : "long"
+                },
+                "total_comments" : {
+                    "type" : "long"
+                },
+                "total_comments_per_loc" : {
+                    "type" : "float"
+                },
+                "total_files" : {
+                    "type" : "long"
+                },
+                "total_loc" : {
+                    "type" : "long"
+                },
+                "total_loc_per_function" : {
+                    "type" : "float"
+                },
+                "total_num_funs" : {
+                    "type" : "long"
+                },
+                "total_tokens" : {
+                    "type" : "long"
+                }
+            }
+        }
+        '''
+
+        return {"items": mapping}
 
 
 class CocomEnrich(Enrich):
@@ -198,7 +263,7 @@ class CocomEnrich(Enrich):
         ins_items = 0
 
         for repository_url in repositories:
-            es_out = ElasticSearch(enrich_backend.elastic.url, out_index)
+            es_out = ElasticSearch(enrich_backend.elastic.url, out_index, mappings=Mapping)
             evolution_items = []
 
             for interval in interval_months:
