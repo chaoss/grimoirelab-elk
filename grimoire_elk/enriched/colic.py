@@ -13,8 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Authors:
 #   Nishchith Shetty <inishchith@gmail.com>
@@ -30,6 +29,7 @@ from .graal_study_evolution import (get_to_date,
                                     get_unique_repository,
                                     get_files_at_time)
 from .utils import fix_field_date
+from ..elastic_mapping import Mapping as BaseMapping
 
 from grimoirelab_toolkit.datetime import datetime_utcnow
 from grimoire_elk.elastic import ElasticSearch
@@ -37,6 +37,50 @@ from grimoire_elk.elastic import ElasticSearch
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
 
 logger = logging.getLogger(__name__)
+
+
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        Ensure data.message is string, since it can be very large
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = '''
+         {
+            "dynamic":true,
+            "properties": {
+                "id" : {
+                    "type" : "keyword"
+                },
+                "interval_months" : {
+                    "type" : "long"
+                },
+                "origin" : {
+                    "type" : "keyword"
+                },
+                "study_creation_date" : {
+                    "type" : "date"
+                },
+                "total_files": {
+                    "type": "long"
+                },
+                "licensed_files": {
+                    "type": "long"
+                },
+                "copyrighted_files": {
+                    "type": "long"
+                }
+            }
+        }
+        '''
+
+        return {"items": mapping}
 
 
 class ColicEnrich(Enrich):
@@ -167,8 +211,8 @@ class ColicEnrich(Enrich):
         return modules
 
     @metadata
-    def get_rich_item(self, file_analysis):
-        # TODO: requires adjustments regarding category of backend used
+    def __get_rich_scancode(self, file_analysis):
+        # Scancode and Scancode-CLI Implementation
 
         eitem = {}
         eitem["file_path"] = file_analysis["file_path"]
@@ -192,14 +236,44 @@ class ColicEnrich(Enrich):
 
         return eitem
 
-    def get_rich_items(self, item):
-        # The real data
-        entry = item['data']
+    @metadata
+    def __get_rich_nomossa(self, file_analysis):
+        # NOMOS analyzer implementation
 
+        eitem = {}
+        eitem["file_path"] = file_analysis["file_path"]
+        eitem["modules"] = self.extract_modules(eitem["file_path"])
+        eitem["licenses"] = []
+        eitem["license_name"] = []
+        eitem["has_license"] = 0
+
+        if file_analysis["licenses"] != "No_license_found":
+            eitem["has_license"] = 1
+            for _license in file_analysis["licenses"]:
+                eitem["licenses"].append(_license)
+                eitem["license_name"].append(_license)
+
+        # NOMOS doesn't provide copyright information.
+        eitem["copyrights"] = []
+        eitem["has_copyright"] = 0
+
+        return eitem
+
+    def get_rich_items(self, item):
+        """
+            :category: code_license_scancode_cli(default)
+        """
+
+        if item["category"] == "code_license_nomos":
+            get_rich_item = self.__get_rich_nomossa
+        else:
+            get_rich_item = self.__get_rich_scancode
+
+        entry = item['data']
         enriched_items = []
 
         for file_analysis in entry["analysis"]:
-            eitem = self.get_rich_item(file_analysis)
+            eitem = get_rich_item(file_analysis)
 
             for f in self.RAW_FIELDS_COPY:
                 if f in item:
@@ -208,13 +282,14 @@ class ColicEnrich(Enrich):
                     eitem[f] = None
 
             # common attributes
-            eitem['commit_sha'] = entry['commit']
             eitem['author'] = entry['Author']
-            eitem['committer'] = entry['Commit']
-            eitem['commit'] = entry['commit']
-            eitem['message'] = entry['message']
             eitem['author_date'] = fix_field_date(entry['AuthorDate'])
+            eitem["category"] = item["category"]
+            eitem['commit'] = entry['commit']
+            eitem['committer'] = entry['Commit']
             eitem['commit_date'] = fix_field_date(entry['CommitDate'])
+            eitem['commit_sha'] = entry['commit']
+            eitem['message'] = entry['message']
 
             if self.prjs_map:
                 eitem.update(self.get_item_project(eitem))
@@ -280,7 +355,7 @@ class ColicEnrich(Enrich):
         ins_items = 0
 
         for repository_url in repositories:
-            es_out = ElasticSearch(enrich_backend.elastic.url, out_index)
+            es_out = ElasticSearch(enrich_backend.elastic.url, out_index, mappings=Mapping)
             evolution_items = []
 
             for interval in interval_months:

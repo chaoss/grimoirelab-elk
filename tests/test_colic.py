@@ -13,8 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Authors:
 #     Nishchith Shetty <inishchith@gmail.com>
@@ -81,6 +80,36 @@ class TestCoLic(TestBaseBackend):
         self.assertEqual(eitem['has_copyright'], 1)
         self.assertEqual(eitem['modules'], ["graal"])
         self.assertEqual(eitem['file_path'], "graal/codecomplexity.py")
+
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_items(item)[0]
+        self.assertEqual(eitem['licenses'], ["gpl-3.0-plus"])
+        self.assertEqual(eitem['has_license'], 1)
+        self.assertEqual(eitem['license_name'], ["GNU General Public License 3.0 or later"])
+        self.assertEqual(eitem['copyrights'], ["Copyright (c) 2015-2018 Bitergia"])
+        self.assertEqual(eitem['has_copyright'], 1)
+        self.assertEqual(eitem['modules'], ["graal"])
+        self.assertEqual(eitem['file_path'], "graal/codecomplexity.py")
+
+        item = self.items[3]
+        eitem = enrich_backend.get_rich_items(item)[0]
+        self.assertEqual(eitem['licenses'], [])
+        self.assertEqual(eitem['has_license'], 0)
+        self.assertEqual(eitem['license_name'], [])
+        self.assertEqual(eitem['copyrights'], [])
+        self.assertEqual(eitem['has_copyright'], 0)
+        self.assertEqual(eitem['modules'], [])
+        self.assertEqual(eitem['file_path'], "README.md")
+
+        item = self.items[4]
+        eitem = enrich_backend.get_rich_items(item)[0]
+        self.assertEqual(eitem['licenses'], ["GPL-3.0"])
+        self.assertEqual(eitem['has_license'], 1)
+        self.assertEqual(eitem['license_name'], ["GPL-3.0"])
+        self.assertEqual(eitem['copyrights'], [])
+        self.assertEqual(eitem['has_copyright'], 0)
+        self.assertEqual(eitem['modules'], ["tests"])
+        self.assertEqual(eitem['file_path'], "tests/test_colic.py")
 
     def test_colic_analysis_study(self):
         """ Test that the colic analysis study works correctly """

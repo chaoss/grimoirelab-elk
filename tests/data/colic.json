@@ -185,5 +185,135 @@
         "timestamp": 1562563562.34835,
         "updated_on": 1525607811.0,
         "uuid": "ce7c47568fd87100aff497dd7677b0736d85db1e"
+    },
+    {
+        "backend_name": "CoLic",
+        "backend_version": "0.5.0",
+        "category": "code_license_scancode",
+        "data": {
+            "Author": "Valerio Cosentino <valcos@bitergia.com>",
+            "AuthorDate": "Sun May 6 13:56:51 2018 +0200",
+            "Commit": "Valerio Cosentino <valcos@bitergia.com>",
+            "CommitDate": "Sun May 6 13:56:51 2018 +0200",
+            "analysis": [{
+                "copyrights": [{
+                    "end_line": 3,
+                    "start_line": 3,
+                    "value": "Copyright (c) 2015-2018 Bitergia"
+                }],
+                "file_path": "graal/codecomplexity.py",
+                "licenses": [{
+                    "category": "Copyleft",
+                    "end_line": 17,
+                    "homepage_url": "http://www.gnu.org/licenses/gpl-3.0-standalone.html",
+                    "is_exception": false,
+                    "key": "gpl-3.0-plus",
+                    "matched_rule": {
+                        "identifier": "gpl-3.0-plus_117.RULE",
+                        "is_license_notice": true,
+                        "is_license_reference": false,
+                        "is_license_tag": false,
+                        "is_license_text": false,
+                        "license_expression": "gpl-3.0-plus",
+                        "licenses": [
+                            "gpl-3.0-plus"
+                        ],
+                        "match_coverage": 97.35,
+                        "matched_length": 110,
+                        "matcher": "3-seq",
+                        "rule_length": 113,
+                        "rule_relevance": 100.0
+                    },
+                    "name": "GNU General Public License 3.0 or later",
+                    "owner": "Free Software Foundation (FSF)",
+                    "reference_url": "https://enterprise.dejacode.com/urn/urn:dje:license:gpl-3.0-plus",
+                    "score": 97.35,
+                    "short_name": "GPL 3.0 or later",
+                    "spdx_license_key": "GPL-3.0-or-later",
+                    "spdx_url": "https://spdx.org/licenses/GPL-3.0-or-later",
+                    "start_line": 5,
+                    "text_url": "http://www.gnu.org/licenses/gpl-3.0-standalone.html"
+                }]
+            }],
+            "analyzer": "scancode",
+            "commit": "a957488c9bd95e3b72a30611edc61496ee152430",
+            "message": "[codecomplexity] Enable analysis with no file filtering\n\nThis patch allows to handle analysis without file filtering."
+        },
+        "graal_version": "0.2.1",
+        "origin": "https://github.com/chaoss/grimoirelab-graal",
+        "tag": "https://github.com/chaoss/grimoirelab-graal",
+        "timestamp": 1565108843.015344,
+        "updated_on": 1525607811.0,
+        "uuid": "ce7c47568fd87100aff497dd7677b0736d85db1e"
+    },
+    {
+        "backend_name": "CoLic",
+        "backend_version": "0.5.0",
+        "category": "code_license_scancode",
+        "data": {
+            "Author": "valerio <valcos@bitergia.com>",
+            "AuthorDate": "Sun May 6 14:02:36 2018 +0200",
+            "Commit": "GitHub <noreply@github.com>",
+            "CommitDate": "Sun May 6 14:02:36 2018 +0200",
+            "analysis": [{
+                "copyrights": [],
+                "file_path": "README.md",
+                "licenses": []
+            }],
+            "analyzer": "scancode",
+            "commit": "8aedf09e36008fee19192985c0eb51879c6c61e4",
+            "message": "Create README.md"
+        },
+        "graal_version": "0.2.1",
+        "origin": "https://github.com/chaoss/grimoirelab-graal",
+        "tag": "https://github.com/chaoss/grimoirelab-graal",
+        "timestamp": 1565108866.965087,
+        "updated_on": 1525608156.0,
+        "uuid": "856beb87d6b324b136e718295cc6ad69343a1066"
+    },
+    {
+        "backend_name": "CoLic",
+        "backend_version": "0.5.0",
+        "category": "code_license_nomos",
+        "data": {
+            "Author": "inishchith <inishchith@gmail.com>",
+            "AuthorDate": "Mon Feb 25 21:44:23 2019 +0530",
+            "Commit": "Valerio Cosentino <valcos@bitergia.com>",
+            "CommitDate": "Tue Feb 26 16:24:43 2019 +0100",
+            "analysis": [{
+                    "file_path": "tests/test_colic.py",
+                    "licenses": [
+                        "GPL-3.0"
+                    ]
+                },
+                {
+                    "file_path": "tests/test_nomos.py",
+                    "licenses": [
+                        "GPL-3.0"
+                    ]
+                },
+                {
+                    "file_path": "tests/test_scancode.py",
+                    "licenses": [
+                        "GPL-3.0"
+                    ]
+                },
+                {
+                    "file_path": "tests/utils.py",
+                    "licenses": [
+                        "GPL-3.0"
+                    ]
+                }
+            ],
+            "analyzer": "nomos",
+            "commit": "dda651a12eb05b2d604522b4fbdbf07d3e213eff",
+            "message": "[tests] Move executable path to utils.py\n\nMove executable paths - NOMOS_PATH and SCANCODE_PATH to utils.py"
+        },
+        "graal_version": "0.2.1",
+        "origin": "https://github.com/chaoss/grimoirelab-graal",
+        "tag": "https://github.com/chaoss/grimoirelab-graal",
+        "timestamp": 1565204679.302685,
+        "updated_on": 1551194683.0,
+        "uuid": "79a561015d5d49c3ec6754a05db24735f957814e"
     }
 ]
