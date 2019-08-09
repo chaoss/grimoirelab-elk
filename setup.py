@@ -82,7 +82,7 @@ setup(name="grimoire-elk",
           'urllib3==1.24.3',
           'PyMySQL>=0.7.0',
           'redis>=2.10.0, <=2.10.6',
-          'pandas==0.18.1'
+          'pandas==0.22.0'
       ],
       zip_safe=False
       )
