@@ -235,6 +235,9 @@ class MeetupEnrich(Enrich):
                 "lon": group['lon'],
             }
 
+            if eitem['group_created']:
+                eitem['group_created'] = unixtime_to_datetime(eitem['group_created'] / 1000).isoformat()
+
             eitem['group_topics'] = []
             eitem['group_topics_keys'] = []
             if 'topics' in group:

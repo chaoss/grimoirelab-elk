@@ -9,7 +9,7 @@ comment,keyword,true
 description_analyzed,text,false
 event_url,keyword,true
 grimoire_creation_date,date,true
-group_created,long,true
+group_created,date,true
 group_geolocation,geo_point,true
 group_id,long,true
 group_join_mode,keyword,true
