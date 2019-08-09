@@ -62,6 +62,7 @@ class TestMeetup(TestBaseBackend):
         self.assertEqual(eitem['meetup_created'], '2016-03-22T16:36:44+00:00')
         self.assertEqual(eitem['meetup_time'], '2016-04-07T16:30:00+00:00')
         self.assertEqual(eitem['meetup_updated'], '2016-04-07T21:39:24+00:00')
+        self.assertEqual(eitem['group_created'], '2016-03-20T15:13:47+00:00')
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
