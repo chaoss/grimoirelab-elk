@@ -22,6 +22,7 @@
 import logging
 
 from .enrich import Enrich, metadata
+from .utils import get_time_diff_days
 from ..elastic_mapping import Mapping as BaseMapping
 
 from grimoirelab_toolkit.datetime import (str_to_datetime,
@@ -35,6 +36,8 @@ CHANGESET_TYPE = 'changeset'
 COMMENT_TYPE = 'comment'
 PATCHSET_TYPE = 'patchset'
 APPROVAL_TYPE = 'approval'
+
+CODE_REVIEW_TYPE = 'Code-Review'
 
 logger = logging.getLogger(__name__)
 
@@ -236,6 +239,9 @@ class GerritEnrich(Enrich):
 
         created_on_date = str_to_datetime(created_on)
         eitem["created_on"] = created_on
+
+        time_first_review = self.get_time_first_review(review)
+        eitem['time_to_first_review'] = get_time_diff_days(created_on, time_first_review)
 
         eitem["last_updated"] = review['lastUpdated']
         last_updated_date = str_to_datetime(review['lastUpdated'])
@@ -502,6 +508,42 @@ class GerritEnrich(Enrich):
 
     def get_field_unique_id(self):
         return "id"
+
+    def get_time_first_review(self, review):
+        """Get the first date at which a review was made on the changeset by someone
+        other than the user who created the changeset
+        """
+        changeset_owner_username = review['owner'].get('username', None)
+        changeset_owner_email = review['owner'].get('email', None)
+
+        first_review = None
+
+        patchsets = review.get('patchSets', [])
+        for patchset in patchsets:
+
+            approvals = patchset.get('approvals', [])
+            for approval in approvals:
+
+                if approval['type'] != CODE_REVIEW_TYPE:
+                    continue
+
+                approval_by = approval.get('by', None)
+
+                if not approval_by:
+                    continue
+
+                approval_by_username = approval_by.get('username', None)
+                approval_by_email = approval_by.get('email', None)
+
+                if approval_by_username and changeset_owner_username:
+                    first_review = approval['grantedOn'] if approval_by_username != changeset_owner_username else None
+                elif approval_by_email and changeset_owner_email:
+                    first_review = approval['grantedOn'] if approval_by_email != changeset_owner_email else None
+
+                if first_review:
+                    return first_review
+
+        return first_review
 
     def enrich_items(self, ocean_backend):
         items_to_enrich = []
