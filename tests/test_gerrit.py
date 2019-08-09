@@ -70,6 +70,7 @@ class TestGerrit(TestBaseBackend):
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__gelk_version', eitem)
         self.assertIn(REPO_LABELS, eitem)
+        self.assertEqual(eitem['time_to_first_review'], 0.06)
 
         comments = item['data']['comments']
         ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
