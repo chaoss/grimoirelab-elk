@@ -115,7 +115,7 @@ class CocomEnrich(Enrich):
                          db_user, db_password, db_host)
 
         self.studies = []
-        self.studies.append(self.enrich_repo_analysis)
+        self.studies.append(self.enrich_cocom_analysis)
 
     def get_identities(self, item):
         """ Return the identities from an item """
@@ -242,11 +242,11 @@ class CocomEnrich(Enrich):
 
         return num_items
 
-    def enrich_repo_analysis(self, ocean_backend, enrich_backend, no_incremental=False,
-                             out_index="cocom_enrich_graal_repo", interval_months=[3],
-                             date_field="grimoire_creation_date"):
+    def enrich_cocom_analysis(self, ocean_backend, enrich_backend, no_incremental=False,
+                              out_index="cocom_enrich_graal_repo", interval_months=[3],
+                              date_field="grimoire_creation_date"):
 
-        logger.info("[cocom] Starting enrich_repository_analysis study")
+        logger.info("[enrich-cocom-analysis] Start enrich_cocom_analysis study")
 
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
                    verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
@@ -259,11 +259,16 @@ class CocomEnrich(Enrich):
 
         repositories = [repo['key'] for repo in unique_repos['aggregations']['unique_repos'].get('buckets', [])]
         current_month = datetime_utcnow().replace(day=1, hour=0, minute=0, second=0)
+
+        logger.info("[enrich-cocom-analysis] {} repositories to process".format(len(repositories)))
+        es_out = ElasticSearch(enrich_backend.elastic.url, out_index, mappings=Mapping)
+        es_out.add_alias("cocom_study")
+
         num_items = 0
         ins_items = 0
 
         for repository_url in repositories:
-            es_out = ElasticSearch(enrich_backend.elastic.url, out_index, mappings=Mapping)
+            logger.info("[enrich-cocom-analysis] Start analysis for {}".format(repository_url))
             evolution_items = []
 
             for interval in interval_months:
@@ -306,6 +311,7 @@ class CocomEnrich(Enrich):
                     evolution_item["total_loc_per_function"] = round(
                         evolution_item["total_loc"] / max(evolution_item["total_num_funs"], 1), 2)
 
+                    evolution_item.update(self.get_grimoire_fields(evolution_item["study_creation_date"], "stats"))
                     evolution_items.append(evolution_item)
 
                     if len(evolution_items) >= self.elastic.max_items_bulk:
@@ -321,8 +327,12 @@ class CocomEnrich(Enrich):
 
                 if num_items != ins_items:
                     missing = num_items - ins_items
-                    logger.error("%s/%s missing items for Graal CoCom Analysis Study", str(missing), str(num_items))
+                    logger.error(
+                        "[enrich-cocom-analysis] %s/%s missing items for Graal CoCom Analysis Study", str(missing), str(num_items)
+                    )
                 else:
-                    logger.info("%s items inserted for Graal CoCom Analysis Study", str(num_items))
+                    logger.info("[enrich-cocom-analysis] %s items inserted for Graal CoCom Analysis Study", str(num_items))
 
-        logger.info("[cocom] Ending enrich_repository_analysis study")
+            logger.info("[enrich-cocom-analysis] End analysis for {} with month interval".format(repository_url, interval))
+
+        logger.info("[enrich-cocom-analysis] End enrich_cocom_analysis study")

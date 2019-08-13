@@ -120,9 +120,9 @@ class TestCoLic(TestBaseBackend):
 
             if study.__name__ == "enrich_colic_analysis":
                 study(ocean_backend, enrich_backend)
-                self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.colic:[colic] Starting '
+                self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.colic:[enrich-colic-analysis] Start '
                                  'enrich_colic_analysis study')
-                self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.colic:[colic] Ending '
+                self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.colic:[enrich-colic-analysis] End '
                                  'enrich_colic_analysis study')
 
 
