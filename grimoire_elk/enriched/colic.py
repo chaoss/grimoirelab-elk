@@ -26,8 +26,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
 from .enrich import (Enrich,
                      metadata)
 from .graal_study_evolution import (get_to_date,
-                                    get_unique_repository,
-                                    get_files_at_time)
+                                    get_unique_repository)
 from .utils import fix_field_date
 from ..elastic_mapping import Mapping as BaseMapping
 
@@ -107,7 +106,43 @@ class ColicEnrich(Enrich):
     def get_field_unique_id(self):
         return "id"
 
-    def get_licensed_files(self, repository_url, to_date):
+    def __get_total_files(self, repository_url, to_date):
+        """ Retrieve total number for files until to_date, corresponding
+        to the given repository
+        """
+
+        query_total_files = """
+        {
+            "size": 0,
+            "aggs": {
+                "1": {
+                    "cardinality": {
+                        "field": "file_path"
+                    }
+                }
+            },
+            "query": {
+                "bool": {
+                    "filter": [{
+                        "term": {
+                            "origin": "%s"
+                        }
+                    },
+                    {
+                        "range": {
+                            "metadata__updated_on": {
+                                "lte": "%s"
+                            }
+                        }
+                    }]
+                }
+            }
+        }
+        """ % (repository_url, to_date)
+
+        return query_total_files
+
+    def __get_licensed_files(self, repository_url, to_date):
         """ Retrieve all the licensed files until the to_date, corresponding
         to the given repository.
         """
@@ -124,18 +159,14 @@ class ColicEnrich(Enrich):
             },
             "query": {
                 "bool": {
-                    "must": [{
-                        "match_phrase": {
-                            "has_license": {
-                                "query": 1
-                            }
+                    "filter": [{
+                        "term": {
+                            "has_license": 1
                         }
                     },
                     {
-                        "match_phrase": {
-                            "origin": {
-                                "query": "%s"
-                            }
+                        "term": {
+                            "origin": "%s"
                         }
                     },
                     {
@@ -152,7 +183,7 @@ class ColicEnrich(Enrich):
 
         return query_licensed_files
 
-    def get_copyrighted_files(self, repository_url, to_date):
+    def __get_copyrighted_files(self, repository_url, to_date):
         """ Retrieve all the copyrighted files until the to_date, corresponding
         to the given repository.
         """
@@ -169,18 +200,14 @@ class ColicEnrich(Enrich):
             },
             "query": {
                 "bool": {
-                    "must": [{
-                        "match_phrase": {
-                            "has_copyright": {
-                                "query": 1
-                            }
+                    "filter": [{
+                        "term": {
+                            "has_copyright": 1
                         }
                     },
                     {
-                        "match_phrase": {
-                            "origin": {
-                                "query": "%s"
-                            }
+                        "term": {
+                            "origin": "%s"
                         }
                     },
                     {
@@ -338,7 +365,7 @@ class ColicEnrich(Enrich):
                               out_index="colic_enrich_graal_repo", interval_months=[3],
                               date_field="grimoire_creation_date"):
 
-        logger.info("[colic] Starting enrich_colic_analysis study")
+        logger.info("[enrich-colic-analysis] Start enrich_colic_analysis study")
 
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
                    verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
@@ -350,12 +377,17 @@ class ColicEnrich(Enrich):
             body=get_unique_repository())
 
         repositories = [repo['key'] for repo in unique_repos['aggregations']['unique_repos'].get('buckets', [])]
+
+        logger.info("[enrich-colic-analysis] {} repositories to process".format(len(repositories)))
+        es_out = ElasticSearch(enrich_backend.elastic.url, out_index, mappings=Mapping)
+        es_out.add_alias("colic_study")
+
         current_month = datetime_utcnow().replace(day=1, hour=0, minute=0, second=0)
         num_items = 0
         ins_items = 0
 
         for repository_url in repositories:
-            es_out = ElasticSearch(enrich_backend.elastic.url, out_index, mappings=Mapping)
+            logger.info("[enrich-colic-analysis] Start analysis for {}".format(repository_url))
             evolution_items = []
 
             for interval in interval_months:
@@ -366,20 +398,19 @@ class ColicEnrich(Enrich):
                 while to_month < current_month:
                     copyrighted_files_at_time = es_in.search(
                         index=in_index,
-                        body=self.get_copyrighted_files(repository_url, to_month.isoformat()))
+                        body=self.__get_copyrighted_files(repository_url, to_month.isoformat()))
 
                     licensed_files_at_time = es_in.search(
                         index=in_index,
-                        body=self.get_licensed_files(repository_url, to_month.isoformat()))
+                        body=self.__get_licensed_files(repository_url, to_month.isoformat()))
 
                     files_at_time = es_in.search(
                         index=in_index,
-                        body=get_files_at_time(repository_url, to_month.isoformat()))
+                        body=self.__get_total_files(repository_url, to_month.isoformat()))
 
                     licensed_files = int(licensed_files_at_time["aggregations"]["1"]["value"])
                     copyrighted_files = int(copyrighted_files_at_time["aggregations"]["1"]["value"])
-                    # TODO: Fix - need more efficient query
-                    total_files = len(files_at_time['aggregations']['file_stats'].get("buckets", []))
+                    total_files = int(files_at_time["aggregations"]["1"]["value"])
 
                     if not total_files:
                         to_month = to_month + relativedelta(months=+interval)
@@ -396,6 +427,7 @@ class ColicEnrich(Enrich):
                         "total_files": total_files
                     }
 
+                    evolution_item.update(self.get_grimoire_fields(evolution_item["study_creation_date"], "stats"))
                     evolution_items.append(evolution_item)
 
                     if len(evolution_items) >= self.elastic.max_items_bulk:
@@ -411,8 +443,12 @@ class ColicEnrich(Enrich):
 
                 if num_items != ins_items:
                     missing = num_items - ins_items
-                    logger.error("%s/%s missing items for Graal CoLic Analysis Study", str(missing), str(num_items))
+                    logger.error(
+                        "[enrich-colic-analysis] %s/%s missing items for Graal CoLic Analysis Study", str(missing), str(num_items)
+                    )
                 else:
-                    logger.info("%s items inserted for Graal CoLic Analysis Study", str(num_items))
+                    logger.info("[enrich-colic-analysis] %s items inserted for Graal CoLic Analysis Study", str(num_items))
 
-        logger.info("[colic] Ending enrich_colic_analysis study")
+            logger.info("[enrich-colic-analysis] End analysis for {} with month interval".format(repository_url, interval))
+
+        logger.info("[enrich-colic-analysis] End enrich_colic_analysis study")
