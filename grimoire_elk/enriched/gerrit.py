@@ -230,12 +230,15 @@ class GerritEnrich(Enrich):
                 if '@' in review['owner']['email']:
                     eitem["domain"] = review['owner']['email'].split("@")[1]
         # New fields generated for enrichment
-        eitem["patchsets"] = len(review["patchSets"])
+        patchsets = review['patchSets']
+        eitem["patchsets"] = len(patchsets)
 
         # Time to add the time diffs
         created_on = review['createdOn']
-        if len(review["patchSets"]) > 0:
-            created_on = review["patchSets"][0]['createdOn']
+        if len(patchsets) > 0:
+            created_on = patchsets[0]['createdOn']
+
+        eitem['status_value'] = self.last_changeset_approval_value(patchsets)
 
         created_on_date = str_to_datetime(created_on)
         eitem["created_on"] = created_on
@@ -589,6 +592,39 @@ class GerritEnrich(Enrich):
                     return first_review
 
         return first_review
+
+    def last_changeset_approval_value(self, patchsets):
+        """Get the last approval value for a given changeset by iterating on the
+        corresponding patchsets. Non code-review patchset approvals and approvals
+        reviewed by the author of the patchset are filtered out."""
+
+        approval_status = None
+        # reverse the patchsets list to get the latest ones first
+        for patchset in reversed(patchsets):
+
+            patchset_author_username = patchset['author'].get('username', None)
+            patchset_author_email = patchset['author'].get('email', None)
+
+            approvals = patchset.get('approvals', [])
+            if not approvals:
+                continue
+
+            approvals_filtered = [a for a in reversed(approvals) if a['type'] == CODE_REVIEW_TYPE]
+
+            for approval in approvals_filtered:
+                approval_by = approval.get('by', None)
+                approval_by_username = approval_by.get('username', None)
+                approval_by_email = approval_by.get('email', None)
+
+                if approval_by_username and patchset_author_username:
+                    approval_status = approval['value'] if approval_by_username != patchset_author_username else None
+                elif approval_by_email and patchset_author_email:
+                    approval_status = approval['value'] if approval_by_email != patchset_author_email else None
+
+                if approval_status:
+                    return approval_status
+
+        return approval_status
 
     def enrich_items(self, ocean_backend):
         items_to_enrich = []
