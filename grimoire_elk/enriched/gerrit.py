@@ -386,6 +386,10 @@ class GerritEnrich(Enrich):
             epatchset['patchset_sizeDeletions'] = patchset.get('sizeDeletions', None)
             epatchset['patchset_sizeInsertions'] = patchset.get('sizeInsertions', None)
 
+            time_first_review = self.get_time_first_review_patchset(patchset)
+            epatchset['patchset_time_to_first_review'] = get_time_diff_days(epatchset['patchset_created_on'],
+                                                                            time_first_review)
+
             # Add id info to allow to coexistence of items of different types in the same index
             epatchset['type'] = PATCHSET_TYPE
             epatchset['id'] = '{}_patchset_{}'.format(eitem['id'], epatchset['patchset_number'])
@@ -508,6 +512,39 @@ class GerritEnrich(Enrich):
 
     def get_field_unique_id(self):
         return "id"
+
+    def get_time_first_review_patchset(self, patchset):
+        """Get the first date at which a review was made on the patchset by someone
+        other than the user who created the patchset
+        """
+        patchset_author_username = patchset['author'].get('username', None)
+        patchset_author_email = patchset['author'].get('email', None)
+
+        first_review = None
+
+        approvals = patchset.get('approvals', [])
+        for approval in approvals:
+
+            if approval['type'] != CODE_REVIEW_TYPE:
+                continue
+
+            approval_by = approval.get('by', None)
+
+            if not approval_by:
+                continue
+
+            approval_by_username = approval_by.get('username', None)
+            approval_by_email = approval_by.get('email', None)
+
+            if approval_by_username and patchset_author_username:
+                first_review = approval['grantedOn'] if approval_by_username != patchset_author_username else None
+            elif approval_by_email and patchset_author_email:
+                first_review = approval['grantedOn'] if approval_by_email != patchset_author_email else None
+
+            if first_review:
+                break
+
+        return first_review
 
     def get_time_first_review(self, review):
         """Get the first date at which a review was made on the changeset by someone

@@ -98,11 +98,14 @@ class TestGerrit(TestBaseBackend):
         eapprovals = [ei for ei in eitems if 'is_gerrit_approval' in ei]
 
         self.assertEqual(len(epatchsets), 5)
-        for epatchset in epatchsets:
+
+        expected_patchset_time_to_first_review = [0.06, 5.21, None, 0.37, None]
+        for i, epatchset in enumerate(epatchsets):
             self.assertIn('metadata__enriched_on', epatchset)
             self.assertIn('metadata__gelk_backend_name', epatchset)
             self.assertIn('metadata__gelk_version', epatchset)
             self.assertIn(REPO_LABELS, epatchset)
+            self.assertEqual(epatchset['patchset_time_to_first_review'], expected_patchset_time_to_first_review[i])
 
         self.assertEqual(len(eapprovals), 13)
         for eapproval in eapprovals:
