@@ -59,7 +59,7 @@ class TestGerrit(TestBaseBackend):
 
         result = self._test_raw_to_enrich()
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 190)
+        self.assertEqual(result['enrich'], 191)
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -86,7 +86,7 @@ class TestGerrit(TestBaseBackend):
 
         patchsets = item['data']['patchSets']
         eitems = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
-        self.assertEqual(len(eitems), 18)
+        self.assertEqual(len(eitems), 19)
 
         for eitem in eitems:
             self.assertIn('metadata__enriched_on', eitem)
@@ -107,7 +107,7 @@ class TestGerrit(TestBaseBackend):
             self.assertIn(REPO_LABELS, epatchset)
             self.assertEqual(epatchset['patchset_time_to_first_review'], expected_patchset_time_to_first_review[i])
 
-        self.assertEqual(len(eapprovals), 13)
+        self.assertEqual(len(eapprovals), 14)
         for eapproval in eapprovals:
             self.assertIn('approval_description', eapproval)
             self.assertIn('approval_description_analyzed', eapproval)
@@ -147,7 +147,7 @@ class TestGerrit(TestBaseBackend):
 
         result = self._test_raw_to_enrich(sortinghat=True)
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 190)
+        self.assertEqual(result['enrich'], 191)
 
         enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                             db_user=self.db_user,
@@ -199,7 +199,7 @@ class TestGerrit(TestBaseBackend):
 
         result = self._test_raw_to_enrich(projects=True)
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 190)
+        self.assertEqual(result['enrich'], 191)
 
     def test_refresh_identities(self):
         """Test refresh identities"""

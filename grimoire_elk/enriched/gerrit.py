@@ -519,6 +519,7 @@ class GerritEnrich(Enrich):
         """
         patchset_author_username = patchset['author'].get('username', None)
         patchset_author_email = patchset['author'].get('email', None)
+        patchset_created_on = str_to_datetime(patchset['createdOn']).isoformat()
 
         first_review = None
 
@@ -529,8 +530,11 @@ class GerritEnrich(Enrich):
                 continue
 
             approval_by = approval.get('by', None)
-
             if not approval_by:
+                continue
+
+            approval_granted_on = str_to_datetime(approval['grantedOn']).isoformat()
+            if approval_granted_on < patchset_created_on:
                 continue
 
             approval_by_username = approval_by.get('username', None)
@@ -552,6 +556,7 @@ class GerritEnrich(Enrich):
         """
         changeset_owner_username = review['owner'].get('username', None)
         changeset_owner_email = review['owner'].get('email', None)
+        changeset_created_on = str_to_datetime(review['createdOn']).isoformat()
 
         first_review = None
 
@@ -565,8 +570,11 @@ class GerritEnrich(Enrich):
                     continue
 
                 approval_by = approval.get('by', None)
-
                 if not approval_by:
+                    continue
+
+                approval_granted_on = str_to_datetime(approval['grantedOn']).isoformat()
+                if approval_granted_on < changeset_created_on:
                     continue
 
                 approval_by_username = approval_by.get('username', None)
