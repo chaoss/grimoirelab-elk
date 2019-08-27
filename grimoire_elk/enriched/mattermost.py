@@ -25,6 +25,8 @@ import logging
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 
+from grimoirelab_toolkit.datetime import unixtime_to_datetime
+
 
 logger = logging.getLogger(__name__)
 
@@ -187,11 +189,9 @@ class MattermostEnrich(Enrich):
                     eitem['profile_title'] = message['user_data']['profile']['title']
                 eitem['avatar'] = message['user_data']['profile']['image_32']
 
-        # Channel info: we don't have this information in Mattermost. Just the channel_id
-        channel = message['channel_id']
-        eitem['channel_name'] = None
-        eitem['channel_id'] = message['channel_id']
-        eitem['channel_created'] = None
+        eitem['channel_name'] = message['channel_data']['name']
+        eitem['channel_id'] = message['channel_data']['id']
+        eitem['channel_created'] = unixtime_to_datetime(message['channel_data']['create_at'] / 1000).isoformat()
         eitem['channel_member_count'] = None
         # if 'topic' in channel:
         #     eitem['channel_topic'] = channel['topic']
