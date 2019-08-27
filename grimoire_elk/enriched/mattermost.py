@@ -146,14 +146,6 @@ class MattermostEnrich(Enrich):
             eitem['reaction_count'] = len(message['reactions'])
             eitem['reactions'] = []
             for rdata in message['reactions']:
-                # {
-                #         "count": 2,
-                #         "users": [
-                #            "U38J51N7J",
-                #            "U3Q0VLHU3"
-                #         ],
-                #         "name": "+1"
-                # }
                 for i in range(0, rdata['count']):
                     eitem['reactions'].append(rdata["name"])
 
@@ -193,15 +185,6 @@ class MattermostEnrich(Enrich):
         eitem['channel_id'] = message['channel_data']['id']
         eitem['channel_created'] = unixtime_to_datetime(message['channel_data']['create_at'] / 1000).isoformat()
         eitem['channel_member_count'] = None
-        # if 'topic' in channel:
-        #     eitem['channel_topic'] = channel['topic']
-        # if 'purpose' in channel:
-        #     eitem['channel_purpose'] = channel['purpose']
-        # channel_bool_fields = ['is_archived', 'is_general', 'is_starred']
-        # for field in channel_bool_fields:
-        #     eitem['channel_' + field] = 0
-        #     if field in channel and channel[field]:
-        #         eitem['channel_' + field] = 1
 
         eitem = self.__convert_booleans(eitem)
 
