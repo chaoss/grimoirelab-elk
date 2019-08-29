@@ -440,6 +440,17 @@
                             "username": "armando-migliaccio"
                         },
                         "description": "Code-Review",
+                        "grantedOn": 1468859792,
+                        "type": "Code-Review",
+                        "value": "-1"
+                    },
+                    {
+                        "by": {
+                            "email": "armamig_at_gmail.com",
+                            "name": "Armando Migliaccio",
+                            "username": "armando-migliaccio"
+                        },
+                        "description": "Code-Review",
                         "grantedOn": 1468885064,
                         "type": "Code-Review",
                         "value": "-1"

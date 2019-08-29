@@ -22,6 +22,7 @@
 import logging
 
 from .enrich import Enrich, metadata
+from .utils import get_time_diff_days
 from ..elastic_mapping import Mapping as BaseMapping
 
 from grimoirelab_toolkit.datetime import (str_to_datetime,
@@ -35,6 +36,8 @@ CHANGESET_TYPE = 'changeset'
 COMMENT_TYPE = 'comment'
 PATCHSET_TYPE = 'patchset'
 APPROVAL_TYPE = 'approval'
+
+CODE_REVIEW_TYPE = 'Code-Review'
 
 logger = logging.getLogger(__name__)
 
@@ -237,6 +240,9 @@ class GerritEnrich(Enrich):
         created_on_date = str_to_datetime(created_on)
         eitem["created_on"] = created_on
 
+        time_first_review = self.get_time_first_review(review)
+        eitem['time_to_first_review'] = get_time_diff_days(created_on, time_first_review)
+
         eitem["last_updated"] = review['lastUpdated']
         last_updated_date = str_to_datetime(review['lastUpdated'])
 
@@ -380,6 +386,10 @@ class GerritEnrich(Enrich):
             epatchset['patchset_sizeDeletions'] = patchset.get('sizeDeletions', None)
             epatchset['patchset_sizeInsertions'] = patchset.get('sizeInsertions', None)
 
+            time_first_review = self.get_time_first_review_patchset(patchset)
+            epatchset['patchset_time_to_first_review'] = get_time_diff_days(epatchset['patchset_created_on'],
+                                                                            time_first_review)
+
             # Add id info to allow to coexistence of items of different types in the same index
             epatchset['type'] = PATCHSET_TYPE
             epatchset['id'] = '{}_patchset_{}'.format(eitem['id'], epatchset['patchset_number'])
@@ -502,6 +512,83 @@ class GerritEnrich(Enrich):
 
     def get_field_unique_id(self):
         return "id"
+
+    def get_time_first_review_patchset(self, patchset):
+        """Get the first date at which a review was made on the patchset by someone
+        other than the user who created the patchset
+        """
+        patchset_author_username = patchset['author'].get('username', None)
+        patchset_author_email = patchset['author'].get('email', None)
+        patchset_created_on = str_to_datetime(patchset['createdOn']).isoformat()
+
+        first_review = None
+
+        approvals = patchset.get('approvals', [])
+        for approval in approvals:
+
+            if approval['type'] != CODE_REVIEW_TYPE:
+                continue
+
+            approval_by = approval.get('by', None)
+            if not approval_by:
+                continue
+
+            approval_granted_on = str_to_datetime(approval['grantedOn']).isoformat()
+            if approval_granted_on < patchset_created_on:
+                continue
+
+            approval_by_username = approval_by.get('username', None)
+            approval_by_email = approval_by.get('email', None)
+
+            if approval_by_username and patchset_author_username:
+                first_review = approval['grantedOn'] if approval_by_username != patchset_author_username else None
+            elif approval_by_email and patchset_author_email:
+                first_review = approval['grantedOn'] if approval_by_email != patchset_author_email else None
+
+            if first_review:
+                break
+
+        return first_review
+
+    def get_time_first_review(self, review):
+        """Get the first date at which a review was made on the changeset by someone
+        other than the user who created the changeset
+        """
+        changeset_owner_username = review['owner'].get('username', None)
+        changeset_owner_email = review['owner'].get('email', None)
+        changeset_created_on = str_to_datetime(review['createdOn']).isoformat()
+
+        first_review = None
+
+        patchsets = review.get('patchSets', [])
+        for patchset in patchsets:
+
+            approvals = patchset.get('approvals', [])
+            for approval in approvals:
+
+                if approval['type'] != CODE_REVIEW_TYPE:
+                    continue
+
+                approval_by = approval.get('by', None)
+                if not approval_by:
+                    continue
+
+                approval_granted_on = str_to_datetime(approval['grantedOn']).isoformat()
+                if approval_granted_on < changeset_created_on:
+                    continue
+
+                approval_by_username = approval_by.get('username', None)
+                approval_by_email = approval_by.get('email', None)
+
+                if approval_by_username and changeset_owner_username:
+                    first_review = approval['grantedOn'] if approval_by_username != changeset_owner_username else None
+                elif approval_by_email and changeset_owner_email:
+                    first_review = approval['grantedOn'] if approval_by_email != changeset_owner_email else None
+
+                if first_review:
+                    return first_review
+
+        return first_review
 
     def enrich_items(self, ocean_backend):
         items_to_enrich = []
