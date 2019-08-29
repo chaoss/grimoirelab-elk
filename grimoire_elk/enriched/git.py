@@ -34,6 +34,7 @@ from grimoirelab_toolkit.datetime import (datetime_to_utc,
 from perceval.backends.core.git import GitCommand, GitRepository
 from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
+from ..elastic import ElasticSearch as elastic
 from ..elastic_mapping import Mapping as BaseMapping
 from ..elastic_items import HEADER_JSON, MAX_BULK_UPDATE_SIZE
 
@@ -356,6 +357,10 @@ class GitEnrich(Enrich):
 
         # Other enrichment
         eitem["repo_name"] = item["origin"]
+
+        if eitem["repo_name"].startswith('http'):
+            eitem["repo_name"] = elastic.anonymize_url(eitem["repo_name"])
+
         # Number of files touched
         eitem["files"] = 0
         # Number of lines added and removed

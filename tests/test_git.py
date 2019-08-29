@@ -70,6 +70,7 @@ class TestGit(TestBaseBackend):
         enrich_backend = self.connectors[self.connector][2]()
 
         item = self.items[0]
+        item['origin'] = 'https://admin:admin@gittest'
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['committer_name'], '')
 
