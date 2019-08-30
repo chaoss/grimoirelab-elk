@@ -21,7 +21,6 @@ metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich inf
 metadata__gelk_version,keyword,true,"Version of the backend used to enrich information."
 metadata__timestamp,date,true,"Date when the item was stored in RAW index."
 metadata__updated_on,date,true,"Date when the item was updated in its original data source."
-ocean-unique-id,keyword,true,"Unique identifier for all of the datasets in the information lake."
 origin,keyword,true,"Original URL where the data was retrieved from."
 pod,keyword,true,"Pod name."
 repository_labels,keyword,true,"Custom labels set in projects.json file to ease filtering."
