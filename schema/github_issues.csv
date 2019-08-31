@@ -33,7 +33,6 @@ metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich the
 metadata__gelk_version,keyword,true,"Version of the backend used to enrich the data."
 metadata__timestamp,date,true,"Date when the item was stored in ElasticSearch raw index."
 metadata__updated_on,date,true,"Date when the item was updated on its original data source."
-ocean-unique-id,keyword,true,"Unique ID for all the datasets contained in the information pool."
 origin,keyword,true,"The original URL from which the repository was retrieved from."
 project_1,keyword,true,"Used if more than one project levels are allowed in the project hierarchy."
 project,keyword,true,"Project name."

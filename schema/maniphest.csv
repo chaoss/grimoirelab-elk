@@ -43,7 +43,6 @@ metadata__timestamp,date
 metadata__updated_on,date
 modification_date,date
 num_changes,long
-ocean-unique-id,keyword
 origin,keyword
 ownerData_bot,boolean
 ownerData_domain,keyword
