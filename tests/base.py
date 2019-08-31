@@ -53,14 +53,6 @@ def load_mapping(enrich_index, csv_name):
 
 def data2es(items, ocean):
     def ocean_item(item):
-        # Hack until we decide the final id to use
-        if 'uuid' in item:
-            item['ocean-unique-id'] = item['uuid']
-        else:
-            # twitter comes from logstash and uses id
-            item['uuid'] = item['id']
-            item['ocean-unique-id'] = item['id']
-
         # Hack until we decide when to drop this field
         if 'updated_on' in item:
             updated = datetime.fromtimestamp(item['updated_on'])
