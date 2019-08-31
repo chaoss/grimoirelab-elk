@@ -60,8 +60,6 @@ class Schema(object):
     __excluded_props += ['is_askbot_comment']
     # Cache from confluence could not include this field
     __excluded_props += ['is_attachment', 'is_comment', 'is_new_page']
-    # Old ocean unique identifier
-    __excluded_props += ['ocean-unique-id']
 
     def __init__(self, schema_name):
         self.schema_name = schema_name
