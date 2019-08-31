@@ -67,7 +67,3 @@ class AskbotOcean(ElasticOcean):
     """Askbot Ocean feeder"""
 
     mapping = Mapping
-
-    def _fix_item(self, item):
-        # item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
-        item["ocean-unique-id"] = item["uuid"]
