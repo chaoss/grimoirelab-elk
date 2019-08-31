@@ -22,7 +22,6 @@ nick_name,keyword
 nick_org_name,keyword
 nick_user_name,keyword
 nick_uuid,keyword
-ocean-unique-id,keyword
 origin,keyword
 repository_labels,keyword
 sent_date,date

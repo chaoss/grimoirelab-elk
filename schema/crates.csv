@@ -32,7 +32,6 @@ metadata__enriched_on,date,true
 metadata__gelk_backend_name,text,true
 metadata__gelk_version,text,true
 name,text,true
-ocean-unique-id,text,true
 origin,text,true
 owner_user_data_bot,boolean,true
 owner_user_data_domain,text,true

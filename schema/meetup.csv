@@ -51,7 +51,6 @@ metadata__timestamp,date,true
 metadata__updated_on,date,true
 num_comments,long,true
 num_rsvps,long,true
-ocean-unique-id,keyword,true
 origin,keyword,true
 repository_labels,keyword,true
 rsvps_guests,long,true
