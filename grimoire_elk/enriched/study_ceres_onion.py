@@ -265,6 +265,8 @@ class ESOnionConnector(ESConnector):
         if org_name:
             s = s.filter('term', author_org_name=org_name)
 
+        s = s.filter('term', author_bot='false')
+
         # from:to parameters (=> from: 0, size: 0)
         s = s[0:0]
 
