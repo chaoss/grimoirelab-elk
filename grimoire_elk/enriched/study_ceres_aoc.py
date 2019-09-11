@@ -201,6 +201,8 @@ class AreasOfCode(CeresBase):
 
             logger.info(self.__log_prefix + " New Filepath events: " + str(len(events_df)))
 
+            events_df['origin'] = events_df['repository']
+
             # Deal with surrogates
             convert = ToUTF8(events_df)
             events_df = convert.enrich(["owner"])
