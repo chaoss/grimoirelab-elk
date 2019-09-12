@@ -46,7 +46,7 @@ is_gerrit_approval,long,true,"Field containing '1' only if the item is a patchse
 is_gerrit_changeset,long,true,"Field containing '1' only if the item is a patchset changeset."
 is_gerrit_comment,long,true,"Field containing '1' only if the item is a patchset comment."
 is_gerrit_patchset,long,true,"Field containing '1' only if the item is a patchset."
-is_gerrit_review,long,true,true,"Field containing '1' that allows to sum fields when concatenating with other indexes."
+is_gerrit_review,long,true,"Field containing '1' that allows to sum fields when concatenating with other indexes."
 last_updated,date,true,"Date when the changeset was last updated."
 metadata__enriched_on,date,true,"Date when the item was enriched."
 metadata__gelk_backend_name,keyword,true,"Grimoire-ELK backend name."
