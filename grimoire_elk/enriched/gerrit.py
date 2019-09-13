@@ -150,9 +150,9 @@ class GerritEnrich(Enrich):
                 if 'approvals' in patchset:
                     # Approvals by
                     for approval in patchset['approvals']:
-                        user = approval['by']
-                        identity = self.get_sh_identity(user)
-                        yield identity
+                        if 'by' in approval:
+                            identity = self.get_sh_identity(approval['by'])
+                            yield identity
 
         # Comments reviewers
         if 'comments' in item:
@@ -520,8 +520,9 @@ class GerritEnrich(Enrich):
         """Get the first date at which a review was made on the patchset by someone
         other than the user who created the patchset
         """
-        patchset_author_username = patchset['author'].get('username', None)
-        patchset_author_email = patchset['author'].get('email', None)
+        patchset_author = patchset.get('author', None)
+        patchset_author_username = patchset_author.get('username', None) if patchset_author else None
+        patchset_author_email = patchset_author.get('email', None) if patchset_author else None
         patchset_created_on = str_to_datetime(patchset['createdOn']).isoformat()
 
         first_review = None
@@ -532,21 +533,21 @@ class GerritEnrich(Enrich):
             if approval['type'] != CODE_REVIEW_TYPE:
                 continue
 
-            approval_by = approval.get('by', None)
-            if not approval_by:
-                continue
-
             approval_granted_on = str_to_datetime(approval['grantedOn']).isoformat()
             if approval_granted_on < patchset_created_on:
                 continue
 
-            approval_by_username = approval_by.get('username', None)
-            approval_by_email = approval_by.get('email', None)
+            approval_by = approval.get('by', None)
+            approval_by_username = approval_by.get('username', None) if approval_by else None
+            approval_by_email = approval_by.get('email', None) if approval_by else None
 
             if approval_by_username and patchset_author_username:
                 first_review = approval['grantedOn'] if approval_by_username != patchset_author_username else None
             elif approval_by_email and patchset_author_email:
                 first_review = approval['grantedOn'] if approval_by_email != patchset_author_email else None
+            else:
+                # if patchset_author or approval_by is None
+                first_review = approval['grantedOn']
 
             if first_review:
                 break
@@ -557,8 +558,9 @@ class GerritEnrich(Enrich):
         """Get the first date at which a review was made on the changeset by someone
         other than the user who created the changeset
         """
-        changeset_owner_username = review['owner'].get('username', None)
-        changeset_owner_email = review['owner'].get('email', None)
+        changeset_owner = review['owner']
+        changeset_owner_username = changeset_owner.get('username', None)
+        changeset_owner_email = changeset_owner.get('email', None)
         changeset_created_on = str_to_datetime(review['createdOn']).isoformat()
 
         first_review = None
@@ -572,21 +574,21 @@ class GerritEnrich(Enrich):
                 if approval['type'] != CODE_REVIEW_TYPE:
                     continue
 
-                approval_by = approval.get('by', None)
-                if not approval_by:
-                    continue
-
                 approval_granted_on = str_to_datetime(approval['grantedOn']).isoformat()
                 if approval_granted_on < changeset_created_on:
                     continue
 
-                approval_by_username = approval_by.get('username', None)
-                approval_by_email = approval_by.get('email', None)
+                approval_by = approval.get('by', None)
+                approval_by_username = approval_by.get('username', None) if approval_by else None
+                approval_by_email = approval_by.get('email', None) if approval_by else None
 
                 if approval_by_username and changeset_owner_username:
                     first_review = approval['grantedOn'] if approval_by_username != changeset_owner_username else None
                 elif approval_by_email and changeset_owner_email:
                     first_review = approval['grantedOn'] if approval_by_email != changeset_owner_email else None
+                else:
+                    # if changeset_owner or approval_by is None
+                    first_review = approval['grantedOn']
 
                 if first_review:
                     return first_review
@@ -602,8 +604,9 @@ class GerritEnrich(Enrich):
         # reverse the patchsets list to get the latest ones first
         for patchset in reversed(patchsets):
 
-            patchset_author_username = patchset['author'].get('username', None)
-            patchset_author_email = patchset['author'].get('email', None)
+            patchset_author = patchset.get('author', None)
+            patchset_author_username = patchset_author.get('username', None) if patchset_author else None
+            patchset_author_email = patchset_author.get('email', None) if patchset_author else None
 
             approvals = patchset.get('approvals', [])
             if not approvals:
@@ -613,13 +616,16 @@ class GerritEnrich(Enrich):
 
             for approval in approvals_filtered:
                 approval_by = approval.get('by', None)
-                approval_by_username = approval_by.get('username', None)
-                approval_by_email = approval_by.get('email', None)
+                approval_by_username = approval_by.get('username', None) if approval_by else None
+                approval_by_email = approval_by.get('email', None) if approval_by else None
 
                 if approval_by_username and patchset_author_username:
                     approval_status = approval['value'] if approval_by_username != patchset_author_username else None
                 elif approval_by_email and patchset_author_email:
                     approval_status = approval['value'] if approval_by_email != patchset_author_email else None
+                else:
+                    # if patchset_author or approval_by is None
+                    approval_status = approval['value']
 
                 if approval_status:
                     return approval_status
