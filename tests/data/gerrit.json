@@ -1393,11 +1393,6 @@
                         "value": "-1"
                     }
                 ],
-                "author": {
-                    "email": "xianms_at_cn.ibm.com",
-                    "name": "MingShuang Xian",
-                    "username": "MingShuangXian"
-                },
                 "comments": [
                     {
                         "file": "/COMMIT_MSG",

@@ -117,6 +117,16 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('metadata__gelk_version', eapproval)
             self.assertIn(REPO_LABELS, eapproval)
 
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn(REPO_LABELS, eitem)
+
+        self.assertEqual(eitem['time_to_first_review'], 1.1)
+        self.assertEqual(eitem['status_value'], '-1')
+
     def test_demography_study(self):
         """ Test that the demography study works correctly """
 
