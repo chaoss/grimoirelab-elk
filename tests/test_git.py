@@ -79,6 +79,34 @@ class TestGit(TestBaseBackend):
             self.assertNotEqual(eitem['committer_name'], 'Unknown')
             self.assertNotEqual(eitem['author_name'], 'Unknown')
 
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_date'], '2012-08-14T14:32:15')
+        self.assertEqual(eitem['author_date_weekday'], 2)
+        self.assertEqual(eitem['author_date_hour'], 14)
+        self.assertEqual(eitem['utc_author_date_weekday'], 2)
+        self.assertEqual(eitem['utc_author_date_hour'], 17)
+
+        self.assertEqual(eitem['commit_date'], '2012-08-14T14:32:15')
+        self.assertEqual(eitem['commit_date_weekday'], 2)
+        self.assertEqual(eitem['commit_date_hour'], 14)
+        self.assertEqual(eitem['utc_commit_date_weekday'], 2)
+        self.assertEqual(eitem['utc_commit_date_hour'], 17)
+
+        item = self.items[8]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_date'], '2014-02-11T22:10:39')
+        self.assertEqual(eitem['author_date_weekday'], 2)
+        self.assertEqual(eitem['author_date_hour'], 22)
+        self.assertEqual(eitem['utc_author_date_weekday'], 3)
+        self.assertEqual(eitem['utc_author_date_hour'], 6)
+
+        self.assertEqual(eitem['commit_date'], '2014-02-11T22:10:39')
+        self.assertEqual(eitem['commit_date_weekday'], 2)
+        self.assertEqual(eitem['commit_date_hour'], 22)
+        self.assertEqual(eitem['utc_commit_date_weekday'], 3)
+        self.assertEqual(eitem['utc_commit_date_hour'], 6)
+
         aliases = self.enrich_backend.elastic.list_aliases()
         self.assertListEqual(self.enrich_aliases, list(aliases.keys()))
 
