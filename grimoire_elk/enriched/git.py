@@ -17,6 +17,7 @@
 #
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
+#   Georg Link <georglink@bitergia.com>
 #
 
 import json
@@ -345,8 +346,23 @@ class GitEnrich(Enrich):
         eitem["author_date"] = author_date.replace(tzinfo=None).isoformat()
         eitem["commit_date"] = commit_date.replace(tzinfo=None).isoformat()
 
-        eitem["utc_author"] = datetime_to_utc(author_date).replace(tzinfo=None).isoformat()
-        eitem["utc_commit"] = datetime_to_utc(commit_date).replace(tzinfo=None).isoformat()
+        eitem["author_date_weekday"] = author_date.replace(tzinfo=None).isoweekday()
+        eitem["author_date_hour"] = author_date.replace(tzinfo=None).hour
+
+        eitem["commit_date_weekday"] = commit_date.replace(tzinfo=None).isoweekday()
+        eitem["commit_date_hour"] = commit_date.replace(tzinfo=None).hour
+
+        utc_author_date = datetime_to_utc(author_date)
+        utc_commit_date = datetime_to_utc(commit_date)
+
+        eitem["utc_author"] = utc_author_date.replace(tzinfo=None).isoformat()
+        eitem["utc_commit"] = utc_commit_date.replace(tzinfo=None).isoformat()
+
+        eitem["utc_author_date_weekday"] = utc_author_date.replace(tzinfo=None).isoweekday()
+        eitem["utc_author_date_hour"] = utc_author_date.replace(tzinfo=None).hour
+
+        eitem["utc_commit_date_weekday"] = utc_commit_date.replace(tzinfo=None).isoweekday()
+        eitem["utc_commit_date_hour"] = utc_commit_date.replace(tzinfo=None).hour
 
         eitem["tz"] = int(author_date.strftime("%z")[0:3])
         eitem["branches"] = []
