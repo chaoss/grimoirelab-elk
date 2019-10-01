@@ -65,6 +65,9 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone'], "8.17")
         self.assertEqual(eitem['milestone_start_date'], "2017-01-07T00:00:00")
         self.assertEqual(eitem['milestone_due_date'], "2017-02-21T00:00:00")
+        self.assertEqual(eitem['milestone_url'], "https://gitlab.com/gitlab-org/gitlab-ce/milestones/34")
+        self.assertEqual(eitem['milestone_id'], 134231)
+        self.assertEqual(eitem['milestone_iid'], 34)
         self.assertEqual(eitem['labels'], [])
 
         item = self.items[1]
@@ -72,6 +75,9 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone'], NO_MILESTONE_TAG)
         self.assertEqual(eitem['milestone_start_date'], None)
         self.assertEqual(eitem['milestone_due_date'], None)
+        self.assertEqual(eitem['milestone_url'], None)
+        self.assertEqual(eitem['milestone_id'], None)
+        self.assertEqual(eitem['milestone_iid'], None)
         self.assertEqual(eitem['labels'], [])
 
         item = self.items[2]
@@ -79,6 +85,9 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone'], NO_MILESTONE_TAG)
         self.assertEqual(eitem['milestone_start_date'], None)
         self.assertEqual(eitem['milestone_due_date'], None)
+        self.assertEqual(eitem['milestone_url'], None)
+        self.assertEqual(eitem['milestone_id'], None)
+        self.assertEqual(eitem['milestone_iid'], None)
         self.assertEqual(eitem['labels'], ['CI/CD', 'Deliverable'])
 
         item = self.items[4]
@@ -86,6 +95,9 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone'], "8.17")
         self.assertEqual(eitem['milestone_start_date'], "2017-01-07T00:00:00")
         self.assertEqual(eitem['milestone_due_date'], "2017-02-21T00:00:00")
+        self.assertEqual(eitem['milestone_url'], "https://gitlab.com/gitlab-org/gitlab-ce/milestones/34")
+        self.assertEqual(eitem['milestone_id'], 134231)
+        self.assertEqual(eitem['milestone_iid'], 34)
         self.assertEqual(eitem['labels'], [])
 
         item = self.items[5]
@@ -93,6 +105,9 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone'], NO_MILESTONE_TAG)
         self.assertEqual(eitem['milestone_start_date'], None)
         self.assertEqual(eitem['milestone_due_date'], None)
+        self.assertEqual(eitem['milestone_url'], None)
+        self.assertEqual(eitem['milestone_id'], None)
+        self.assertEqual(eitem['milestone_iid'], None)
         self.assertEqual(eitem['labels'], [])
 
         item = self.items[6]
@@ -100,6 +115,9 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone'], NO_MILESTONE_TAG)
         self.assertEqual(eitem['milestone_start_date'], None)
         self.assertEqual(eitem['milestone_due_date'], None)
+        self.assertEqual(eitem['milestone_url'], None)
+        self.assertEqual(eitem['milestone_id'], None)
+        self.assertEqual(eitem['milestone_iid'], None)
         self.assertEqual(eitem['labels'], ['CI/CD', 'Deliverable'])
 
     def test_enrich_repo_labels(self):

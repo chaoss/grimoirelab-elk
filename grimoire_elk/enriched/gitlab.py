@@ -370,11 +370,17 @@ class GitLabEnrich(Enrich):
         eitem['milestone'] = NO_MILESTONE_TAG
         eitem['milestone_start_date'] = None
         eitem['milestone_due_date'] = None
+        eitem['milestone_url'] = None
+        eitem['milestone_id'] = None
+        eitem['milestone_iid'] = None
 
         if 'milestone' in item_data and item_data['milestone']:
-            eitem['milestone'] = item_data['milestone']['title']
-
             milestone = item_data['milestone']
+
+            eitem['milestone'] = milestone.get('title', None)
+            eitem['milestone_url'] = milestone.get('web_url', None)
+            eitem['milestone_id'] = milestone.get('id', None)
+            eitem['milestone_iid'] = milestone.get('iid', None)
 
             start_date_str = milestone.get('start_date', None)
             due_date_str = milestone.get('due_date', None)
