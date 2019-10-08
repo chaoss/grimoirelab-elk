@@ -1,14 +1,15 @@
 # Welcome to GrimoireELK [![Build Status](https://travis-ci.org/chaoss/grimoirelab-elk.svg?branch=master)](https://travis-ci.org/chaoss/grimoirelab-elk)[![Coverage Status](https://coveralls.io/repos/github/chaoss/grimoirelab-elk/badge.svg?branch=master)](https://coveralls.io/github/chaoss/grimoirelab-elk?branch=master)
 
-GrimoireELK is the component that interacts with the ElasticSearch database. Its goal is two-fold, first it aims at offering a convenient 
+GrimoireELK is the component that interacts with the ElasticSearch database. Its goal is two-fold, first it aims at offering a convenient
 way to store the data coming from Perceval, second it processes and enriches the data in a format that can be consumed by Kibiter.
 
-The Perceval data is stored in ElasticSearch indexes as raw documents (one per item extracted by Perceval). Such a raw data includes all information coming from the original 
-data sources, thus granting the platform to perform multiple analysis without the need of downloading the same data over and over. The raw data is then enriched according to the 
-data source from where it was collected and stored to enriched indexes. The enrichment removes information not needed by Kibiter and includes additional information which is 
-not directly available within the raw data. For instance, pair programming information for Git data, time to solve (i.e., close or merge) issues and pull requests for GitHub 
-data, and identities and organization information coming from [SortingHat](https://github.com/chaoss/grimoirelab-sortinghat) . The enriched data is stored as JSON 
-documents, which embed information linked to the corresponding raw documents to ease debugging and guarantee traceability.
+The Perceval data is stored in ElasticSearch indexes as raw documents (one per item extracted by Perceval). Those raw documents, which will be referred to as "raw data" in
+this documentation, include all information coming from the original data source which grants the platform to perform multiple analysis without the need of downloading the
+same data over and over again. Once raw data is retrieved, a new phase starts where data is enriched according to the data source from where it was collected and stored
+in ElasticSearch indexes. The enrichment removes information not needed by Kibiter and includes additional information which is not directly available within the raw data.
+For instance, pair programming information for Git data, time to solve (i.e., close or merge) issues and pull requests for GitHub data, and identities and organization
+information coming from [SortingHat](https://github.com/chaoss/grimoirelab-sortinghat) . The enriched data is stored as JSON documents, which embed information linked to
+the corresponding raw documents to ease debugging and guarantee traceability.
 
 ## Raw data
 
@@ -76,13 +77,13 @@ Each enriched index includes one or more types of documents, which are summarize
 - **Telegram**: each document corresponds to a tweet.
 
 ### Fields
-Each enriched document contains a set of fields, they can be (i) common to all data sources (e.g., metadata fields, time field), (ii) specific to the data source, (iii) related to contributor’s 
+Each enriched document contains a set of fields, they can be (i) common to all data sources (e.g., metadata fields, time field), (ii) specific to the data source, (iii) related to contributor’s
 profile information (i.e., identity fields) or (iv) to the project listed in the Mordred projects.json (i.e., project fields).
 
 #### Metadata fields
-- **metadata__timestamp** (date): Date when the item was retrieved from the original data source.
+- **metadata__timestamp** (date): Date when the item was retrieved from the original data source and stored in the index with raw documents.
 - **metadata__updated_on** (date): Date when the item was updated in its original data source.
-- **metadata__enriched_on** (date): Date when the item was enriched.
+- **metadata__enriched_on** (date): Date when the item was enriched and stored in the index with enriched documents.
 - **metadata__gelk_backend_name** (string): Name of the backend used to enrich information.
 - **metadata__gelk_version** (string): Version of the backend used to enrich information.
 - **origin** (string): Original URL where the repository was retrieved from.
@@ -93,14 +94,14 @@ profile information (i.e., identity fields) or (iv) to the project listed in the
 - **author_name** (string): Similar to author_uuid, but less useful for unique counts as different profiles could share the same name. Nevertheless is more appropriate to show this field when aggregating data by author as it is usually nicer to see a name than a hash value.
 - **author_bot** (boolean): True if the given author is identified as a bot.
 - **author_domain** (string): Domain associated to the author in SortingHat profile.
-- **author_id** (string): Author Id from SortingHat.
+- **author_id** (string): Author identifier. This id comes from SortingHat and identifies each different identity provided by SortingHat. These identifiers are grouped in a single author_uuid, so this fields is not commonly used unless data needs to be debugged.
 
 #### Project fields
-- **project** (string): Project.
+- **project** (string): Project name as defined in the JSON file where repositories are grouped by project.
 - **project_1** (string): Project (if more than one level is allowed in project hierarchy).
 
 #### Time field:
-- **grimoire_creation_date** (date): Date when the item was created upstream. Used to represent data in time series by default in the dashboards.
+- **grimoire_creation_date** (date): Date when the item was created upstream. Used by default to represent data in time series on the dashboards.
 
 #### Demography fields:
 - **author_max_date** (date): Date of most recent commit made by this author.
@@ -108,4 +109,3 @@ profile information (i.e., identity fields) or (iv) to the project listed in the
 
 #### Data source specific fields
 Details of the fields of each data source is available in the [Schema](https://github.com/chaoss/grimoirelab-elk/tree/master/schema) folder.
-
