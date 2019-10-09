@@ -84,9 +84,9 @@ class DiscourseEnrich(Enrich):
         if identity_field in post:
             post = post[identity_field]
 
-        identity['username'] = post['username']
+        identity['username'] = post.get('username', None)
         identity['email'] = None
-        identity['name'] = post['display_username']
+        identity['name'] = post.get('display_username', None)
         return identity
 
     def get_field_author(self):
@@ -113,8 +113,8 @@ class DiscourseEnrich(Enrich):
             eanswer['type'] = 'answer'
             eanswer.update(self.get_grimoire_fields(answer['created_at'], eanswer['type']))
             eanswer.pop('is_discourse_question')
-            eanswer['display_username'] = answer['display_username']
-            eanswer['username'] = answer['username']
+            eanswer['display_username'] = answer.get('display_username', None)
+            eanswer['username'] = answer.get('username', None)
             eanswer['author_id'] = answer['user_id']
             eanswer['author_trust_level'] = answer['trust_level']
             eanswer['author_url'] = eanswer['origin'] + "/users/" + str(eanswer['author_id'])
@@ -246,8 +246,8 @@ class DiscourseEnrich(Enrich):
             eitem['categories'] += [eitem['category_name']]
         eitem['url'] = eitem['origin'] + "/t/" + first_post['topic_slug']
         eitem['url'] += "/" + str(first_post['topic_id']) + "/" + str(first_post['post_number'])
-        eitem['display_username'] = first_post['display_username']
-        eitem['username'] = first_post['username']
+        eitem['display_username'] = first_post.get('display_username', None)
+        eitem['username'] = first_post.get('username', None)
         eitem['author_id'] = first_post['user_id']
         eitem['author_trust_level'] = first_post['trust_level']
         eitem['author_url'] = eitem['origin'] + "/users/" + str(eitem['author_id'])
