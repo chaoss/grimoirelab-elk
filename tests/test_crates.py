@@ -19,7 +19,6 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-import json
 import logging
 import unittest
 
@@ -93,13 +92,22 @@ class TestCrates(TestBaseBackend):
         result = self._test_refresh_project()
         # ... ?
 
+    def test_perceval_params(self):
+        """Test the extraction of perceval params from an URL"""
+
+        url = ""
+        expected_params = []
+        self.assertListEqual(CratesOcean.get_perceval_params_from_url(url), expected_params)
+
     def test_arthur_params(self):
         """Test the extraction of arthur params from an URL"""
 
-        with open("data/projects-release.json") as projects_filename:
-            url = json.load(projects_filename)['grimoire']['crates'][0]
-            arthur_params = {'uri': '', 'url': ''}
-            self.assertDictEqual(arthur_params, CratesOcean.get_arthur_params_from_url(url))
+        url = ""
+        expected_params = {
+            'url': '',
+            'uri': ''
+        }
+        self.assertDictEqual(CratesOcean.get_arthur_params_from_url(url), expected_params)
 
 
 if __name__ == "__main__":
