@@ -133,11 +133,22 @@ class JenkinsOcean(ElasticOcean):
         # Jenkins could include in the URL a jenkins-rename-file T1746
         params = {}
 
-        tokens = url.split(' ', 1)  # Just split the URL not the filter
+        tokens = url.split(' ')  # Just split the URL not the filter
         params['url'] = tokens[0]
 
-        if len(tokens) > 1:
-            params['jenkins-rename-file'] = tokens[1].split(" ", 1)[1]
+        if len(tokens) == 0:
+            return params
+
+        for token in tokens[1:]:
+            token = token.strip('--')
+            assignment = token.split('=')
+            fltr_name = assignment[0].strip()
+            fltr_value = assignment[1].strip()
+
+            if token.startswith('jenkins'):
+                params['jenkins-rename-file'] = fltr_value
+            elif token.startswith('filter'):
+                params[fltr_name] = fltr_value
 
         return params
 
