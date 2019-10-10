@@ -275,7 +275,7 @@
         "build_tag": "jenkins-functest-fuel-armband-baremetal-daily-danube-166",
         "case_name": "connection_check",
         "criteria": "PASS",
-        "details": {},
+        "details": "",
         "installer": "fuel",
         "pod_name": "arm-pod3",
         "project_name": "functest",
