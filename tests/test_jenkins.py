@@ -19,7 +19,6 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-import json
 import logging
 import unittest
 
@@ -114,10 +113,37 @@ class TestJenkins(TestBaseBackend):
     def test_arthur_params(self):
         """Test the extraction of arthur params from an URL"""
 
-        with open("data/projects-release.json") as projects_filename:
-            url = json.load(projects_filename)['grimoire']['jenkins'][0]
-            arthur_params = {'uri': 'https://build.opnfv.org/ci', 'url': 'https://build.opnfv.org/ci'}
-            self.assertDictEqual(arthur_params, JenkinsOcean.get_arthur_params_from_url(url))
+        url = 'https://build.opnfv.org/ci'
+        expected_params = {
+            'uri': 'https://build.opnfv.org/ci',
+            'url': 'https://build.opnfv.org/ci'
+        }
+        self.assertDictEqual(JenkinsOcean.get_arthur_params_from_url(url), expected_params)
+
+    def test_p2o_params(self):
+        """Test the extraction of p2o params from an URL"""
+
+        url = "http://jenkins.onap.info --filter-no-collection=true --jenkins-rename-file=/tmp/jenkins_nodes.csv"
+        expected_params = {
+            'url': 'http://jenkins.onap.info',
+            'filter-no-collection': 'true',
+            'jenkins-rename-file': '/tmp/jenkins_nodes.csv'
+        }
+        self.assertDictEqual(JenkinsOcean.get_p2o_params_from_url(url), expected_params)
+
+        url = "http://jenkins.onap.info --jenkins-rename-file=/tmp/jenkins_nodes.csv"
+        expected_params = {
+            'url': 'http://jenkins.onap.info',
+            'jenkins-rename-file': '/tmp/jenkins_nodes.csv'
+        }
+        self.assertDictEqual(JenkinsOcean.get_p2o_params_from_url(url), expected_params)
+
+        url = "http://jenkins.onap.info --filter-no-collection=true"
+        expected_params = {
+            'url': 'http://jenkins.onap.info',
+            'filter-no-collection': 'true'
+        }
+        self.assertDictEqual(JenkinsOcean.get_p2o_params_from_url(url), expected_params)
 
 
 if __name__ == "__main__":
