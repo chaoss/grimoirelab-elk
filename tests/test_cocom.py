@@ -22,6 +22,7 @@ import logging
 import unittest
 
 from base import TestBaseBackend
+from grimoire_elk.raw.graal import GraalOcean
 from grimoire_elk.enriched.cocom import logger
 
 
@@ -134,6 +135,21 @@ class TestCoCom(TestBaseBackend):
                                  'enrich_cocom_analysis study')
                 self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.cocom:[enrich-cocom-analysis] End '
                                  'enrich_cocom_analysis study')
+
+    def test_perceval_params(self):
+        """Test the extraction of perceval params from an URL"""
+
+        url = "https://github.com/grimoirelab/perceval"
+        expected_params = [
+            'https://github.com/grimoirelab/perceval'
+        ]
+        self.assertListEqual(GraalOcean.get_perceval_params_from_url(url), expected_params)
+
+        url = "https://github.com/grimoirelab/perceval /tmp/perceval-repo"
+        expected_params = [
+            'https://github.com/grimoirelab/perceval'
+        ]
+        self.assertListEqual(GraalOcean.get_perceval_params_from_url(url), expected_params)
 
 
 if __name__ == "__main__":
