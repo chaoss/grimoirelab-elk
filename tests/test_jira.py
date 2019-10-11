@@ -53,7 +53,7 @@ class TestJira(TestBaseBackend):
 
         result = self._test_raw_to_enrich()
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 17)
+        self.assertEqual(result['enrich'], 14)
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -84,13 +84,6 @@ class TestJira(TestBaseBackend):
         self.assertIn("main_description_analyzed", eitem)
         self.assertEqual(eitem['author_type'], 'reporter')
 
-        item = self.items[1]
-        eitem = enrich_backend.get_rich_item(item)
-        self.assertEqual(item['data']['id'], "10010")
-        self.assertEqual(eitem['id'], "7bbd3aaee3adba6b1a1d293c78a385a874419b12_issue_10010_user_creator")
-        self.assertEqual(eitem['number_of_comments'], 0)
-        self.assertEqual(eitem['author_type'], 'creator')
-
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(item['data']['id'], "10008")
@@ -118,16 +111,28 @@ class TestJira(TestBaseBackend):
         self._test_raw_to_enrich()
         enrich_backend = self.connectors[self.connector][2]()
 
-        for item in self.items:
-            eitem = enrich_backend.get_rich_item(item)
-            self.assertIn(REPO_LABELS, eitem)
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn(REPO_LABELS, eitem)
+
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn(REPO_LABELS, eitem)
+
+        item = self.items[3]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn(REPO_LABELS, eitem)
+
+        item = self.items[4]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn(REPO_LABELS, eitem)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 17)
+        self.assertEqual(result['enrich'], 14)
 
         enrich_backend = self.connectors[self.connector][2]()
         enrich_backend.sortinghat = True
@@ -153,19 +158,12 @@ class TestJira(TestBaseBackend):
         self.assertEqual(eitem['author_user_name'], 'maoo')
         self.assertEqual(eitem['author_type'], 'reporter')
 
-        item = self.items[1]
-        eitem = enrich_backend.get_rich_item(item)
-        self.assertNotEqual(eitem['author_name'], 'Unknown')
-        self.assertEqual(eitem['author_org_name'], 'Unknown')
-        self.assertNotEqual(eitem['author_user_name'], 'Unknown')
-        self.assertEqual(eitem['author_type'], 'creator')
-
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
         self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 17)
+        self.assertEqual(result['enrich'], 14)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
