@@ -136,7 +136,7 @@ class JenkinsOcean(ElasticOcean):
         tokens = url.split(' ')  # Just split the URL not the filter
         params['url'] = tokens[0]
 
-        if len(tokens) == 0:
+        if len(tokens) == 1:
             return params
 
         for token in tokens[1:]:

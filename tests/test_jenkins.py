@@ -110,6 +110,21 @@ class TestJenkins(TestBaseBackend):
         result = self._test_refresh_project()
         # ... ?
 
+    def test_perceval_params(self):
+        """Test the extraction of perceval params from an URL"""
+
+        url = 'https://build.opnfv.org/ci'
+        expected_params = [
+            'https://build.opnfv.org/ci'
+        ]
+        self.assertListEqual(JenkinsOcean.get_perceval_params_from_url(url), expected_params)
+
+        url = "https://build.opnfv.org/ci --filter-no-collection=true --jenkins-rename-file=/tmp/jenkins_nodes.csv"
+        expected_params = [
+            'https://build.opnfv.org/ci'
+        ]
+        self.assertListEqual(JenkinsOcean.get_perceval_params_from_url(url), expected_params)
+
     def test_arthur_params(self):
         """Test the extraction of arthur params from an URL"""
 
@@ -122,6 +137,12 @@ class TestJenkins(TestBaseBackend):
 
     def test_p2o_params(self):
         """Test the extraction of p2o params from an URL"""
+
+        url = "http://jenkins.onap.info"
+        expected_params = {
+            'url': 'http://jenkins.onap.info'
+        }
+        self.assertDictEqual(JenkinsOcean.get_p2o_params_from_url(url), expected_params)
 
         url = "http://jenkins.onap.info --filter-no-collection=true --jenkins-rename-file=/tmp/jenkins_nodes.csv"
         expected_params = {
