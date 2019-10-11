@@ -19,7 +19,6 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-import json
 import logging
 import unittest
 
@@ -152,13 +151,25 @@ class TestMbox(TestBaseBackend):
             self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.mbox:[Kafka KIP] Starting study')
             self.assertEqual(cm.output[1], 'INFO:grimoire_elk.enriched.mbox:[Kafka KIP] End')
 
+    def test_perceval_params(self):
+        """Test the extraction of perceval params from an URL"""
+
+        url = "metrics-grimoire /home/bitergia/.perceval/mbox"
+        expected_params = [
+            'metrics-grimoire',
+            '/home/bitergia/.perceval/mbox'
+        ]
+        self.assertListEqual(MBoxOcean.get_perceval_params_from_url(url), expected_params)
+
     def test_arthur_params(self):
         """Test the extraction of arthur params from an URL"""
 
-        with open("data/projects-release.json") as projects_filename:
-            url = json.load(projects_filename)['grimoire']['mbox'][0]
-            arthur_params = {'dirpath': '/home/bitergia/.perceval/mbox', 'uri': 'metrics-grimoire'}
-            self.assertDictEqual(arthur_params, MBoxOcean.get_arthur_params_from_url(url))
+        url = "metrics-grimoire /home/bitergia/.perceval/mbox"
+        expected_params = {
+            'dirpath': '/home/bitergia/.perceval/mbox',
+            'uri': 'metrics-grimoire'
+        }
+        self.assertDictEqual(MBoxOcean.get_arthur_params_from_url(url), expected_params)
 
 
 if __name__ == "__main__":
