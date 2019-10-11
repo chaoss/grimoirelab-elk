@@ -151,6 +151,9 @@ class JiraEnrich(Enrich):
 
         item = item['data']
 
+        if 'fields' not in item:
+            return {}
+
         for field in ["assignee", "reporter", "creator"]:
             if field not in item["fields"]:
                 continue
@@ -424,6 +427,12 @@ class JiraEnrich(Enrich):
         ins_items = 0
 
         for item in ocean_backend.fetch():
+            # This condition should never happen, since the enriched
+            # data heavily relies on the `fields` attribute
+            if "fields" not in item["data"]:
+                logger.warning("Skipping item with uuid %s, no fields attribute", item['uuid'])
+                continue
+
             eitem_creator = self.get_rich_item(item, author_type='creator')
             eitem_assignee = self.get_rich_item(item, author_type='assignee')
             eitem_reporter = self.get_rich_item(item, author_type='reporter')
