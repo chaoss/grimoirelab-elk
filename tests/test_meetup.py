@@ -19,7 +19,6 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-import json
 import logging
 import unittest
 
@@ -100,13 +99,25 @@ class TestMeetup(TestBaseBackend):
         result = self._test_refresh_project()
         # ... ?
 
+    def test_perceval_params(self):
+        """Test the extraction of perceval params from an URL"""
+
+        url = "South-East-Puppet-User-Group"
+        expected_params = [
+            "--tag",
+            "South-East-Puppet-User-Group",
+            "South-East-Puppet-User-Group"
+        ]
+        self.assertListEqual(MeetupOcean.get_perceval_params_from_url(url), expected_params)
+
     def test_arthur_params(self):
         """Test the extraction of arthur params from an URL"""
 
-        with open("data/projects-release.json") as projects_filename:
-            url = json.load(projects_filename)['grimoire']['meetup'][0]
-            arthur_params = {'group': 'South-East-Puppet-User-Group'}
-            self.assertDictEqual(arthur_params, MeetupOcean.get_arthur_params_from_url(url))
+        url = "South-East-Puppet-User-Group"
+        expected_params = {
+            'group': 'South-East-Puppet-User-Group'
+        }
+        self.assertDictEqual(MeetupOcean.get_arthur_params_from_url(url), expected_params)
 
 
 if __name__ == "__main__":
