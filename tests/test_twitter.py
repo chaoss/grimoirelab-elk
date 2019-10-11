@@ -25,6 +25,7 @@ import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.enriched.utils import REPO_LABELS
+from grimoire_elk.raw.twitter import TwitterOcean
 
 
 class TestTwitter(TestBaseBackend):
@@ -89,6 +90,15 @@ class TestTwitter(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_arthur_params(self):
+        """Test the extraction of arthur params from an URL"""
+
+        url = "bitergia"
+        expected_params = {
+            'query': 'bitergia'
+        }
+        self.assertDictEqual(TwitterOcean.get_arthur_params_from_url(url), expected_params)
 
 
 if __name__ == "__main__":
