@@ -202,7 +202,7 @@ def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
 
 def get_min_last_enrich(last_enrich, last_enrich_filtered):
     if last_enrich_filtered:
-        min_enrich = min(last_enrich, last_enrich_filtered.replace(second=0, microsecond=0, tzinfo=None))
+        min_enrich = min(last_enrich, last_enrich_filtered.replace(tzinfo=None))
     else:
         min_enrich = None
 
