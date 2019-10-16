@@ -29,7 +29,7 @@
             "review.openstack.org"
         ],
         "*git": [
-            "https://github.com/VizGrimoire/GrimoireLib --filters-raw-prefix data.files.file:grimoirelib_alch data.files.file:README.md",
+            "https://github.com/VizGrimoire/GrimoireLib",
             "https://github.com/MetricsGrimoire/CMetrics"
         ],
         "git": [

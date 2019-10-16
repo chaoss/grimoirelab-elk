@@ -21,7 +21,7 @@
 
 import unittest
 
-from grimoire_elk.raw.elastic import ElasticOcean, logger
+from grimoire_elk.raw.elastic import ElasticOcean
 from grimoire_elk.errors import ELKError
 
 
@@ -44,25 +44,6 @@ class TestElasticOcean(unittest.TestCase):
         self.assertEqual(len(params), 2)
         self.assertEqual(params['url'], "https://bugzilla.mozilla.org")
         self.assertEqual(params['filter-raw'], "data.product:Add-on SDK,data.component:General")
-
-    def test_get_p2o_params_from_url_more_filters(self):
-        """Test whether a warning is logged in """
-
-        with self.assertLogs(logger, level='WARNING') as cm:
-            params = ElasticOcean.get_p2o_params_from_url("https://finosfoundation.atlassian.net/wiki/ "
-                                                          "--filter-raw=data.project:openstack/stx-clients "
-                                                          "--filter-raw-prefix=data.project:https://github.com/")
-
-            self.assertEqual(len(params), 2)
-            self.assertEqual(params['url'], "https://finosfoundation.atlassian.net/wiki/")
-            self.assertEqual(params['filter-raw'], "data.project:openstack/stx-clients")
-
-            self.assertEqual(cm.output[0],
-                             'WARNING:grimoire_elk.raw.elastic:Too many filters defined '
-                             'for https://finosfoundation.atlassian.net/wiki/ '
-                             '--filter-raw=data.project:openstack/stx-clients '
-                             '--filter-raw-prefix=data.project:https://github.com/, '
-                             'only the first one is considered')
 
     def test_get_p2o_params_from_url_error(self):
         """Test whether an exception is thrown when the tokens obtained when parsing the filter are not 2"""
