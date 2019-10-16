@@ -120,7 +120,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
     klass = connector[3]  # BackendCmd for the connector
 
     try:
-        logger.info("Feeding Ocean from %s (%s)", backend_name, es_index)
+        logger.debug("Feeding raw from %s (%s)", backend_name, es_index)
 
         if not es_index:
             logger.error("Raw index not defined for %s", backend_name)
@@ -228,17 +228,17 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             ocean_backend.feed(**params)
 
     except RateLimitError as ex:
-        logger.error("Error feeding ocean from %s (%s): rate limit exceeded", backend_name, backend.origin)
+        logger.error("Error feeding raw from %s (%s): rate limit exceeded", backend_name, backend.origin)
         error_msg = "RateLimitError: seconds to reset {}".format(ex.seconds_to_reset)
     except Exception as ex:
         if backend:
-            error_msg = "Error feeding ocean from {} ({}): {}".format(backend_name, backend.origin, ex)
+            error_msg = "Error feeding raw from {} ({}): {}".format(backend_name, backend.origin, ex)
             logger.error(error_msg, exc_info=True)
         else:
-            error_msg = "Error feeding ocean from {}".format(ex)
+            error_msg = "Error feeding raw from {}".format(ex)
             logger.error(error_msg, exc_info=True)
 
-    logger.info("Done %s ", backend_name)
+    logger.info("[%s] Done collection for %s", backend_name, backend.origin)
     return error_msg
 
 
@@ -655,8 +655,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
             elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
             ocean_backend.set_elastic(elastic_ocean)
 
-            logger.info("Adding enrichment data to %s",
-                        enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
+            logger.debug("Adding enrichment data to %s",
+                         enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
 
             if db_sortinghat and enrich_backend.has_identities():
                 # FIXME: This step won't be done from enrich in the future
@@ -686,7 +686,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         else:
             logger.error("Error enriching ocean %s", ex, exc_info=True)
 
-    logger.info("Done %s ", backend_name)
+    logger.info("[%s] Done enrichment for %s", backend_name, backend.origin)
 
 
 def delete_orphan_unique_identities(es, sortinghat_db, current_data_source, active_data_sources):
