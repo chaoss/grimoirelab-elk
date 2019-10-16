@@ -337,8 +337,6 @@ def get_params_parser():
                         help="Only enrich items")
     parser.add_argument("--filter-raw", dest='filter_raw',
                         help="Filter raw items. Format: field:value")
-    parser.add_argument("--filters-raw-prefix", nargs='*',
-                        help="Filter raw items with prefix filter. Format: field:value field:value ...")
     parser.add_argument("--events-enrich", dest='events_enrich', action='store_true',
                         help="Enrich events in items")
     parser.add_argument('--index', help="Ocean index name")
