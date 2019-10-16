@@ -32,7 +32,9 @@ from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 from grimoirelab_toolkit.datetime import (datetime_to_utc,
                                           str_to_datetime)
-from perceval.backends.core.git import GitCommand, GitRepository
+from perceval.backends.core.git import (GitCommand,
+                                        GitRepository,
+                                        EmptyRepositoryError)
 from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
 from ..elastic import ElasticSearch as elastic
@@ -547,8 +549,7 @@ class GitEnrich(Enrich):
                     logger.debug("Added %i items to %s (%0.2f MB)", total, self.elastic.anonymize_url(url), json_size)
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
-                    logger.error("Unicode error in enriched items")
-                    logger.debug(bulk_json)
+                    logger.warning("Unicode error in enriched items, converting to ascii")
                     safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
                     total += self.elastic.safe_put_bulk(url, safe_json)
                 bulk_json = ""
@@ -701,9 +702,11 @@ class GitEnrich(Enrich):
         logger.debug("[update-items] Checking commits for %s.", self.perceval_backend.origin)
 
         git_repo = GitRepository(self.perceval_backend.uri, self.perceval_backend.gitpath)
-
         try:
             current_hashes = set([commit for commit in git_repo.rev_list()])
+        except EmptyRepositoryError as e:
+            logger.warning("Skip updating branch info for repo %s, repo is empty", git_repo.uri)
+            return
         except Exception as e:
             logger.error("Skip updating branch info for repo %s, git rev-list command failed: %s", git_repo.uri, e)
             return
