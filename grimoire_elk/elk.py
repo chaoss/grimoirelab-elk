@@ -456,8 +456,7 @@ def enrich_items(ocean_backend, enrich_backend, events=False):
     return total
 
 
-def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
-                      filter_raw=None, filter_raw_should=None):
+def get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw=None):
     """ Get the ocean backend configured to start from the last enriched date """
 
     if no_incremental:
@@ -501,8 +500,6 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental,
 
     if filter_raw:
         ocean_backend.set_filter_raw(filter_raw)
-    if filter_raw_should:
-        ocean_backend.set_filter_raw_should(filter_raw_should)
 
     return ocean_backend
 
@@ -552,7 +549,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                    db_user=None, db_password=None, db_host=None,
                    do_refresh_projects=False, do_refresh_identities=False,
                    author_id=None, author_uuid=None, filter_raw=None,
-                   filters_raw_prefix=None, jenkins_rename_file=None,
+                   jenkins_rename_file=None,
                    unaffiliated_group=None, pair_programming=False,
                    node_regex=False, studies_args=None, es_enrich_aliases=None,
                    last_enrich_date=None, projects_json_repo=None, repo_labels=None):
@@ -615,14 +612,10 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         # see line 544, grimoire_elk/enriched/enrich.py (fltr = eitem['origin'] + ' --filter-raw=' + self.filter_raw)
         if filter_raw:
             enrich_backend.set_filter_raw(filter_raw)
-        elif filters_raw_prefix:
-            enrich_backend.set_filter_raw_should(filters_raw_prefix)
 
         enrich_backend.set_projects_json_repo(projects_json_repo)
         enrich_backend.set_repo_labels(repo_labels)
-        ocean_backend = get_ocean_backend(backend_cmd, enrich_backend,
-                                          no_incremental, filter_raw,
-                                          filters_raw_prefix)
+        ocean_backend = get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw)
 
         if only_studies:
             logger.info("Running only studies (no SH and no enrichment)")
