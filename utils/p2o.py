@@ -83,7 +83,7 @@ if __name__ == '__main__':
                                args.db_user, args.db_password, args.db_host,
                                args.refresh_projects, args.refresh_identities,
                                args.author_id, args.author_uuid,
-                               args.filter_raw, args.filters_raw_prefix,
+                               args.filter_raw,
                                args.jenkins_rename_file, unaffiliated_group,
                                args.pair_programming, studies_args)
                 logging.info("Enrich backend completed")
