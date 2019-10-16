@@ -185,7 +185,8 @@ class ElasticOcean(ElasticItems):
                 self.last_update = self.get_last_update_from_es(filters_=filters_)
                 last_update = self.last_update
 
-            logger.info("Incremental from: %s", last_update)
+            logger.info("[%s] Incremental from: %s for %s", self.perceval_backend.__class__.__name__,
+                        last_update, self.perceval_backend.origin)
 
         offset = None
         if 'offset' in signature.parameters:
@@ -195,7 +196,8 @@ class ElasticOcean(ElasticItems):
                 offset = self.elastic.get_last_offset("offset", filters_=filters_)
 
             if offset is not None:
-                logger.info("Incremental from: %i offset", offset)
+                logger.info("[%s] Incremental from: %i offset, for %s", self.perceval_backend.__class__.__name__,
+                            offset, self.perceval_backend.origin)
             else:
                 logger.info("Not incremental")
 
@@ -261,8 +263,8 @@ class ElasticOcean(ElasticItems):
         total_time_min = (datetime.now() - task_init).total_seconds() / 60
 
         logger.debug("Added %i items to index %s", added, self.elastic.index)
-        logger.debug("Dropped %i items using drop_item filter" % (drop))
-        logger.info("Finished in %.2f min" % (total_time_min))
+        logger.debug("Dropped %i items using drop_item filter" % drop)
+        logger.debug("Finished in %.2f min" % total_time_min)
 
         return self
 
@@ -272,8 +274,7 @@ class ElasticOcean(ElasticItems):
         if len(json_items) == 0:
             return
 
-        logger.info("Adding items to Ocean for %s (%i items)" %
-                    (self, len(json_items)))
+        logger.debug("Adding items to Ocean for %s (%i items)" % (self, len(json_items)))
 
         field_id = self.get_field_unique_id()
 
