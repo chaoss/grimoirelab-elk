@@ -178,7 +178,7 @@ class ElasticItems:
         scroll_size = page['hits']['total']
 
         if scroll_size == 0:
-            logger.warning("No results found from %s", self.elastic.anonymize_url(self.elastic.index_url))
+            logger.debug("No results found from %s and filter %s", self.elastic.anonymize_url(self.elastic.index_url))
             return
 
         while scroll_size > 0:
@@ -317,6 +317,6 @@ class ElasticItems:
             rjson = res.json()
         except Exception:
             # The index could not exists yet or it could be empty
-            logger.warning("No results found from %s", self.elastic.anonymize_url(url))
+            logger.debug("No results found from %s", self.elastic.anonymize_url(url))
 
         return rjson
