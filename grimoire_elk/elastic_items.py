@@ -55,8 +55,6 @@ class ElasticItems:
         self.offset = offset  # fetch from offset
         self.filter_raw = None  # to filter raw items from Ocean
         self.filter_raw_dict = []
-        self.filter_raw_should = None  # to filter raw items from Ocean
-        self.filter_raw_should_dict = []
         self.projects_json_repo = None
         self.repo_labels = None
 
@@ -137,18 +135,6 @@ class ElasticItems:
             fltr = self.__process_filter(fltr_raw)
 
             self.filter_raw_dict.append(fltr)
-
-    def set_filter_raw_should(self, filter_raw_should):
-        """Bool filter should to be used when getting items from Ocean index"""
-
-        self.filter_raw_should = filter_raw_should
-
-        self.filter_raw_should_dict = []
-        splitted = re.compile(FILTER_SEPARATOR).split(filter_raw_should)
-        for fltr_raw in splitted:
-            fltr = self.__process_filter(fltr_raw)
-
-            self.filter_raw_should_dict.append(fltr)
 
     def get_connector_name(self):
         """ Find the name for the current connector """
@@ -279,18 +265,6 @@ class ElasticItems:
                 order_field = self.get_incremental_date()
             if order_field is not None:
                 order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
-
-            filters_should = ''
-            if self.filter_raw_should:
-                for fltr in self.filter_raw_should_dict:
-                    filters_should += '''
-                        {"prefix":
-                            { "%s":"%s"  }
-                        },''' % (fltr['name'], fltr['value'])
-
-                filters_should = filters_should.rstrip(',')
-                query_should = '{"bool": {"should": [%s]}}' % filters_should
-                filters += ", " + query_should
 
             # Fix the filters string if it starts with "," (empty first filter)
             if filters.lstrip().startswith(','):
