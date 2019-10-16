@@ -140,9 +140,8 @@ class ElasticSearch(object):
                 version_major = version_str.split('.')[0]
                 return version_major
             except Exception:
-                logger.error("Could not read proper welcome message from url %s",
-                             ElasticSearch.anonymize_url(url))
-                logger.error("Message read: %s", res.text)
+                logger.error("Could not read proper welcome message from url %s, %s",
+                             ElasticSearch.anonymize_url(url), res.text)
                 raise ElasticConnectException
 
     @staticmethod
@@ -161,7 +160,7 @@ class ElasticSearch(object):
             res.raise_for_status()
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
-            logger.error("Encondig error ... converting bulk to iso-8859-1")
+            logger.warning("Encondig error ... converting bulk to iso-8859-1")
             bulk_json = bulk_json.encode('iso-8859-1', 'ignore')
             res = self.requests.put(url, data=bulk_json, headers=headers)
             res.raise_for_status()
@@ -194,9 +193,8 @@ class ElasticSearch(object):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
-            logger.warning("Something went wrong when retrieving aliases on %s.",
-                           self.anonymize_url(self.index_url))
-            logger.warning(ex)
+            logger.warning("Something went wrong when retrieving aliases on %s, %s",
+                           self.anonymize_url(self.index_url), ex)
             return
 
         aliases = []
@@ -214,9 +212,8 @@ class ElasticSearch(object):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
-            logger.warning("Something went wrong when retrieving aliases on %s.",
-                           self.anonymize_url(self.index_url))
-            logger.warning(ex)
+            logger.warning("Something went wrong when retrieving aliases on %s, %s",
+                           self.anonymize_url(self.index_url), ex)
             return
 
         aliases = r.json()[self.index]['aliases']
@@ -261,9 +258,8 @@ class ElasticSearch(object):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
-            logger.warning("Something went wrong when adding an alias on %s. Alias not set.",
-                           self.anonymize_url(self.index_url))
-            logger.warning(ex)
+            logger.warning("Something went wrong when adding an alias on %s. Alias not set. %s",
+                           self.anonymize_url(self.index_url), ex)
             return
 
         logger.info("Alias %s created on %s.", alias, self.anonymize_url(self.index_url))
@@ -318,8 +314,7 @@ class ElasticSearch(object):
                 res = self.requests.put(url_map, data=mappings[_type],
                                         headers=headers)
                 if res.status_code != 200:
-                    logger.error("Error creating ES mappings %s", res.text)
-                    logger.error("Mapping: " + str(mappings[_type]))
+                    logger.error("Error creating ES mappings %s. Mapping: %s", res.text, str(mappings[_type]))
                     res.raise_for_status()
 
             # By default all strings are not analyzed in ES < 6
@@ -376,7 +371,7 @@ class ElasticSearch(object):
             try:
                 res.raise_for_status()
             except requests.exceptions.HTTPError:
-                logger.warning("Can't add mapping %s: %s", self.anonymize_url(url_map), not_analyze_strings)
+                logger.error("Can't add mapping %s: %s", self.anonymize_url(url_map), not_analyze_strings)
 
     def get_last_date(self, field, filters_=[]):
         '''
@@ -501,8 +496,8 @@ class ElasticSearch(object):
             logger.debug("[items retention] %s items deleted from %s before %s.",
                          r_json['deleted'], self.anonymize_url(self.index_url), before_date)
         except requests.exceptions.HTTPError as ex:
-            logger.error("[items retention] Error deleted items from %s.", self.anonymize_url(self.index_url))
-            logger.error(ex)
+            logger.error("[items retention] Error deleted items from %s. %s",
+                         self.anonymize_url(self.index_url), ex)
             return
 
     def all_properties(self):
@@ -522,8 +517,7 @@ class ElasticSearch(object):
 
             properties = r_json[self.index]['mappings']['items']['properties']
         except requests.exceptions.HTTPError as ex:
-            logger.error("Error all attributes for %s.", self.anonymize_url(self.index_url))
-            logger.error(ex)
+            logger.error("Error all attributes for %s. %s", self.anonymize_url(self.index_url), ex)
             return
 
         return properties
