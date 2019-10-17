@@ -936,7 +936,7 @@ class Enrich(ElasticItems):
 
         log_prefix = "[" + data_source + "] study onion"
 
-        logger.info(log_prefix + "  Starting study - Input: " + in_index + " Output: " + out_index)
+        logger.info("%s  starting study - Input: %s Output: %s", log_prefix, in_index, out_index)
 
         # Creating connections
         es = Elasticsearch([enrich_backend.elastic.url], retry_on_timeout=True, timeout=100,
@@ -953,7 +953,7 @@ class Enrich(ElasticItems):
                                     read_only=False)
 
         if not in_conn.exists():
-            logger.info(log_prefix + " Missing index %s", in_index)
+            logger.info("%s missing index %s", log_prefix, in_index)
             return
 
         # Check last execution date
@@ -964,13 +964,14 @@ class Enrich(ElasticItems):
         if latest_date:
             logger.info(log_prefix + " Latest enrichment date: " + latest_date.isoformat())
             update_after = latest_date + timedelta(seconds=seconds)
-            logger.info(log_prefix + " Update after date: " + update_after.isoformat())
+            logger.info("%s update after date: %s", log_prefix, update_after.isoformat())
             if update_after >= datetime_utcnow():
-                logger.info(log_prefix + " Too soon to update. Next update will be at " + update_after.isoformat())
+                logger.info("%s too soon to update. Next update will be at %s",
+                            log_prefix, update_after.isoformat())
                 return
 
         # Onion currently does not support incremental option
-        logger.info(log_prefix + " Creating out ES index")
+        logger.info("%s Creating out ES index", log_prefix)
         # Initialize out index
         filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/onion.json')
         out_conn.create_index(filename, delete=out_conn.exists())
@@ -980,10 +981,10 @@ class Enrich(ElasticItems):
         # Create alias if output index exists (index is always created from scratch, so
         # alias need to be created each time)
         if out_conn.exists() and not out_conn.exists_alias(out_index, ONION_ALIAS):
-            logger.info(log_prefix + " Creating alias: %s", ONION_ALIAS)
+            logger.info("%s Creating alias: %s", log_prefix, ONION_ALIAS)
             out_conn.create_alias(ONION_ALIAS)
 
-        logger.info(log_prefix + " This is the end.")
+        logger.info("%s end", log_prefix)
 
     def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
                           author_field="author_uuid"):
@@ -1002,7 +1003,9 @@ class Enrich(ElasticItems):
 
         :return: None
         """
-        logger.info("[Demography] Starting study %s", self.elastic.anonymize_url(self.elastic.index_url))
+        data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
+        log_prefix = "[" + data_source + "] Demography"
+        logger.info("%s starting study %s", log_prefix, self.elastic.anonymize_url(self.elastic.index_url))
 
         # The first step is to find the current min and max date for all the authors
         authors_min_max_data = {}
@@ -1014,7 +1017,7 @@ class Enrich(ElasticItems):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
-            logger.error("Error getting authors mix and max date. Demography aborted.")
+            logger.error("%s error getting authors mix and max date. Aborted.", log_prefix)
             logger.error(ex)
             return
 
@@ -1036,22 +1039,23 @@ class Enrich(ElasticItems):
                     verify=False
                 )
             except requests.exceptions.RetryError:
-                logger.warning("Retry execeeded while executing demography. The following query is skipped %s.",
-                               es_update)
+                logger.warning("%s retry execeeded while executing demography."
+                               " The following query is skipped %s", log_prefix, es_update)
                 continue
 
             try:
                 r.raise_for_status()
             except requests.exceptions.HTTPError as ex:
-                logger.error("Error updating mix and max date for author %s. Demography aborted.", author_key)
+                logger.error("%s error updating mix and max date for author %s. Aborted.",
+                             log_prefix, author_key)
                 logger.error(ex)
                 return
 
         if not self.elastic.alias_in_use(DEMOGRAPHICS_ALIAS):
-            logger.info("Creating alias: %s", DEMOGRAPHICS_ALIAS)
+            logger.info("%s Creating alias: %s", log_prefix, DEMOGRAPHICS_ALIAS)
             self.elastic.add_alias(DEMOGRAPHICS_ALIAS)
 
-        logger.info("[Demography] End %s", self.elastic.anonymize_url(self.elastic.index_url))
+        logger.info("%s end %s", log_prefix, self.elastic.anonymize_url(self.elastic.index_url))
 
     @staticmethod
     def authors_min_max_dates(date_field, author_field="author_uuid"):

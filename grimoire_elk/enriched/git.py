@@ -663,12 +663,12 @@ class GitEnrich(Enrich):
         if out_conn.exists():
             if not out_conn.exists_alias(AREAS_OF_CODE_ALIAS) \
                     and not enrich_backend.elastic.alias_in_use(AREAS_OF_CODE_ALIAS):
-                logger.info(log_prefix + " Creating alias: %s", AREAS_OF_CODE_ALIAS)
+                logger.info("%s creating alias: %s", log_prefix, AREAS_OF_CODE_ALIAS)
                 out_conn.create_alias(AREAS_OF_CODE_ALIAS)
             else:
-                logger.info(log_prefix + " Alias already exists: %s.", AREAS_OF_CODE_ALIAS)
+                logger.warning("%s alias already exists: %s.", log_prefix, AREAS_OF_CODE_ALIAS)
 
-        logger.info(log_prefix + " End")
+        logger.info(log_prefix + " end")
 
     def enrich_onion(self, ocean_backend, enrich_backend,
                      no_incremental=False,
