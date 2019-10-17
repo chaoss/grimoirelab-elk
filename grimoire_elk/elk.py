@@ -517,11 +517,12 @@ def do_studies(ocean_backend, enrich_backend, studies_args, retention_time=None)
         selected_studies = [(s['name'], s['params']) for s in studies_args if s['type'] == study.__name__]
 
         for (name, params) in selected_studies:
-            logger.info("Starting study: %s, params %s", name, str(params))
+            data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
+            logger.info("[%s] Starting study: %s, params %s", data_source, name, params)
             try:
                 study(ocean_backend, enrich_backend, **params)
             except Exception as e:
-                logger.error("Problem executing study %s, %s", name, str(e))
+                logger.error("[%s] Problem executing study %s, %s", data_source, name, e)
                 raise e
 
             # identify studies which creates other indexes. If the study is onion,

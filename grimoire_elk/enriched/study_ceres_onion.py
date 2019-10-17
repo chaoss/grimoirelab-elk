@@ -66,7 +66,8 @@ class ESOnionConnector(ESConnector):
 
         self.contribs_field = contribs_field
         self._timeframe_field = timeframe_field
-        self.__log_prefix = "[" + es_index + "] study onion"
+        data_source = es_index.split("_")[0]
+        self.__log_prefix = "[" + data_source + "] study onion"
 
     def read_block(self, size=None, from_date=None):
         """Read author commits by Quarter, Org and Project.
@@ -81,7 +82,7 @@ class ESOnionConnector(ESConnector):
 
         for quarter in quarters:
 
-            logger.info(self.__log_prefix + " Quarter: " + str(quarter))
+            logger.info("{%s} Quarter: {%s}", self.__log_prefix, quarter)
 
             date_range = {self._timeframe_field: {'gte': quarter.start_time, 'lte': quarter.end_time}}
 
@@ -98,7 +99,7 @@ class ESOnionConnector(ESConnector):
             # Get global data by Org
             for org_name in orgs:
 
-                logger.info(self.__log_prefix + " Quarter: " + str(quarter) + "  Org: " + org_name)
+                logger.debug("{%s} Quarter: {%s}  Org: {%s}", self.__log_prefix, quarter, org_name)
 
                 s = self.__build_search(date_range, org_name=org_name)
                 response = s.execute()
@@ -109,7 +110,8 @@ class ESOnionConnector(ESConnector):
             # Get project specific data
             for project in projects:
 
-                logger.info(self.__log_prefix + " Quarter: " + str(quarter) + "  Project: " + project)
+                logger.debug("{%s} Quarter: {%s}  Project: {%s}",
+                             self.__log_prefix, quarter, project)
 
                 # Global project
                 s = self.__build_search(date_range, project_name=project)
@@ -121,7 +123,8 @@ class ESOnionConnector(ESConnector):
                 # Split by Org
                 for org_name in orgs:
 
-                    logger.info(self.__log_prefix + " Quarter: " + str(quarter) + "  Project: " + project + "  Org: " + org_name)
+                    logger.debug("{%s} Quarter: {%s}  Project: {%s}  Org: {%s}",
+                                 self.__log_prefix, quarter, project, org_name)
 
                     s = self.__build_search(date_range, project_name=project, org_name=org_name)
                     response = s.execute()
@@ -138,7 +141,7 @@ class ESOnionConnector(ESConnector):
             raise IOError("Cannot write, Connector created as Read Only")
 
         if len(items) == 0:
-            logger.info(self.__log_prefix + " Nothing to write")
+            logger.info("{%s} Nothing to write", self.__log_prefix)
             return
 
         # Uploading info to the new ES
@@ -176,7 +179,7 @@ class ESOnionConnector(ESConnector):
 
         # TODO exception and error handling
         helpers.bulk(self._es_conn, docs)
-        logger.info(self.__log_prefix + " Written: " + str(len(docs)))
+        logger.debug("{%s} Written: {%s}", self.__log_prefix, len(docs))
 
     def latest_enrichment_date(self):
         """Get the most recent enrichment date.
@@ -198,7 +201,8 @@ class ESOnionConnector(ESConnector):
 
             aggs = response.to_dict()['aggregations']
             if aggs['max_date']['value'] is None:
-                logger.debug(self.__log_prefix + " No data for metadata__enriched_on field found in " + self._es_index + " index")
+                logger.debug("{%s} No data for metadata__enriched_on field found in {%s} index",
+                             self.__log_prefix, self._es_index)
 
             else:
                 # Incremental case: retrieve items from last item in ES write index
@@ -296,7 +300,7 @@ class ESOnionConnector(ESConnector):
         name_list = []
         contribs_list = []
         latest_ts_list = []
-        logger.debug(self.__log_prefix + " timing: " + timing.key_as_string)
+        logger.debug("{%s} timing: {%s}", self.__log_prefix, timing.key_as_string)
 
         for author in timing[self.AUTHOR_UUID].buckets:
             latest_ts_list.append(timing[self.LATEST_TS].value_as_string)
@@ -350,7 +354,7 @@ class OnionStudy(CeresBase):
         :param items_block: items to be processed. Expects to find a pandas DataFrame.
         """
 
-        logger.info(self.__log_prefix + " Authors to process: " + str(len(items_block)))
+        logger.debug("{%s} Authors to process: {%s}", self.__log_prefix, len(items_block))
 
         onion_enrich = Onion(items_block)
         df_onion = onion_enrich.enrich(member_column=ESOnionConnector.AUTHOR_UUID,
@@ -364,7 +368,7 @@ class OnionStudy(CeresBase):
         df_onion['data_source'] = self.data_source
         df_onion['grimoire_creation_date'] = df_onion[ESOnionConnector.TIMEFRAME]
 
-        logger.info(self.__log_prefix + " Final new events: " + str(len(df_onion)))
+        logger.debug("{%s} Final new events: {%s}", self.__log_prefix, len(df_onion))
 
         return self.ProcessResults(processed=len(df_onion), out_items=df_onion)
 

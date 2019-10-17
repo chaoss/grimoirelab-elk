@@ -78,11 +78,16 @@ class CeresBase:
 
         :return: total number of out_items written.
         """
+        if hasattr(self, '_OnionStudy__log_prefix'):
+            logs_prefix = self._OnionStudy__log_prefix
+        else:
+            logs_prefix = self._AreasOfCode__log_prefix
+
         from_date = self._out.latest_date()
         if from_date:
-            logger.info("Reading items since " + from_date)
+            logger.debug("%s reading items since %s", logs_prefix, from_date)
         else:
-            logger.info("Reading items since the beginning of times")
+            logger.info("%s reading items since the beginning of times", logs_prefix)
 
         cont = 0
         total_processed = 0
@@ -98,22 +103,18 @@ class CeresBase:
                 self._out.write(process_results.out_items)
                 total_written += len(process_results.out_items)
             else:
-                logger.info("No new items to be written this time.")
+                logger.info("%s no new items to be written this time.", logs_prefix)
 
-            logger.info(
-                "Items read/to be written/total read/total processed/total written: "
-                "{0}/{1}/{2}/{3}/{4}".format(str(len(item_block)),
-                                             str(len(process_results.out_items)),
-                                             str(cont),
-                                             str(total_processed),
-                                             str(total_written)))
+            logger.debug("%s items read/to be written/total read/total processed/total written: "
+                         "%s/%s/%s/%s/%s",
+                         logs_prefix, len(item_block), len(process_results.out_items),
+                         cont, total_processed, total_processed)
 
-        logger.info("SUMMARY: Items total read/total processed/total written: "
-                    "{0}/{1}/{2}".format(str(cont),
-                                         str(total_processed),
-                                         str(total_written)))
+        logger.info("%s SUMMARY: Items total read/total processed/total written: "
+                    "%s/%s/%s",
+                    logs_prefix, cont, total_processed, total_written)
 
-        logger.info("This is the end.")
+        logger.debug("%s this is the end.", logs_prefix)
 
         return total_written
 
