@@ -986,28 +986,78 @@ class Enrich(ElasticItems):
 
         logger.info("%s end", log_prefix)
 
-    def enrich_external_data(self, ocean_backend, enrich_backend, json_url, target_index=None):
+    def enrich_extra_data(self, ocean_backend, enrich_backend, json_url, target_index=None):
         """
-        This study enables adding external fields to a target index. For example if a use case requires
-        tagging specific documents in an index with extra fields, like tagging all kernel maintainers with extra
-        attributes like "maintainer = boolean"
+        This study enables setting/removing extra fields on/from a target index. For example if a use case
+        requires tagging specific documents in an index with extra fields, like tagging all kernel
+        maintainers with an extra attribute such as "maintainer = True".
+
+        The extra data to be added/removed is passed via a JSON (`json_url`) and contains:
+         - a list of AND `conditions`, which must be all True to select a document. Each condition
+           is defined by a `field` present in the document and a `value`.
+         - an optional `date_range`, used to apply the conditions on a time span. Date range is defined by
+           a datetime `field`, a `start` and optional an `end` date.
+         - a list of `set_extra_fields`, which will be set (i.e., added or modified) on the target index. An
+           `add_extra_field` is defined by a `field` and its `value`. Field names are automatically prepended
+           with the word `extra`. This is needed to separate the original fields with the extra ones.
+         - a list of `remove_extra_fields`, which will be removed from the target index if
+           exist. A `remove_extra_field` is defined by a `field`, which automatically prepended with the word `extra`.
+           This is needed to avoid deleting original fields.
+           Note that removals are executed after additions.
+
+        An example of JSON is provided below:
+        ```
+        [
+            {
+                "conditions": [
+                    {
+                        "field": "author_name",
+                        "value": "Mister X"
+                    }
+                ],
+                "set_extra_fields": [
+                    {
+                        "field": "maintainer",
+                        "value": "true"
+                    }
+                ]
+            },
+            {
+                "conditions": [
+                    {
+                        "field": "author_name",
+                        "value": "Mister X"
+                    }
+                 ],
+                 "date_range": {
+                    "field": "grimoire_creation_date",
+                    "start": "2018-01-01",
+                    "end": "2019-01-01"
+                },
+                "remove_extra_fields": [
+                    {
+                        "field": "maintainer",
+                        "value": "true"
+                    }
+                ]
+            }
+        ]
+        ```
 
         :param ocean_backend: backend from which to read the raw items
         :param enrich_backend:  backend from which to read the enriched items
         :param json_url: url to json file that containing the target documents and the extra fields to be added
-        :param target_index: an optional target index to be enriched (eg. could be any of the enriched ones created by
-        the tool
-
+        :param target_index: an optional target index to be enriched (e.g., an enriched or study index). If not
+                             declared it will be the index defined in the enrich_backend.
         """
-
         index_url = "{}/{}".format(enrich_backend.elastic_url,
                                    target_index) if target_index else enrich_backend.elastic.index_url
         url = "{}/_update_by_query?wait_for_completion=true&conflicts=proceed".format(index_url)
 
         res = self.requests.get(index_url)
         if res.status_code != 200:
-            logger.error("[external-data] Target index %s doesn't exists, "
-                         "enrich_modify_data finished", self.elastic.anonymize_url(url))
+            logger.error("[enrich-extra-data] Target index %s doesn't exists, "
+                         "study finished", self.elastic.anonymize_url(url))
             return
 
         res = self.requests.get(json_url)
@@ -1015,65 +1065,62 @@ class Enrich(ElasticItems):
         extras = res.json()
 
         for extra in extras:
-            filters = []
-            date_range_fltr = []
+            conds = []
+            fltrs = []
             stmts = []
 
-            # create filter
-            target = extra.get('target', [])
-            for t in target:
-                t_field = t['field']
-                t_value = t['value']
-                fltr = {
+            # create AND conditions
+            conditions = extra.get('conditions', [])
+            for c in conditions:
+                c_field = c['field']
+                c_value = c['value']
+                cond = {
                     "term": {
-                        t_field: t_value
+                        c_field: c_value
                     }
                 }
-                filters.append(fltr)
+                conds.append(cond)
+
+            # create date filter
             date_range = extra.get('date_range', [])
             if date_range:
+                gte = date_range.get("start", None)
+                lte = date_range.get("end", None)
+                # handle empty values
+                lte = "now" if not lte else lte
+
                 date_fltr = {
                     "range": {
-                        "grimoire_creation_date": {}
+                        date_range['field']: {
+                            "gte": gte,
+                            "lte": lte
+                        }
                     }
                 }
-                gte = ''
-                lte = ''
-                for d in date_range:
-                    d_field = d['field']
-                    if d_field == 'grimoire_creation_date':
-                        gte = d['value']
-                    if d_field == 'end_date':
-                        lte = d['value']
-                if gte and not lte:
-                    date_fltr['range']['grimoire_creation_date'] = {"gte": gte, "lte": "now"}
-                if not gte and lte:
-                    date_fltr['range']['grimoire_creation_date'] = {"lte": lte}
-                if gte and lte:
-                    date_fltr['range']['grimoire_creation_date'] = {"gte": gte, "lte": lte}
-                date_range_fltr.append(date_fltr)
-                del gte, lte
-            # populate painless, add/modify statements
-            set_fields = extra.get('set_extra_fields', [])
-            for f in set_fields:
-                e_field = "{}_{}".format(EXTRA_PREFIX, f['field'])
-                e_value = f['value']
 
-                if isinstance(e_value, int) or isinstance(e_value, float):
-                    if isinstance(e_value, bool):
-                        stmt = "ctx._source.{} = {}".format(e_field, str(e_value).lower())
+                fltrs.append(date_fltr)
+
+            # populate painless, add/modify statements
+            add_fields = extra.get('set_extra_fields', [])
+            for a in add_fields:
+                a_field = "{}_{}".format(EXTRA_PREFIX, a['field'])
+                a_value = a['value']
+
+                if isinstance(a_value, int) or isinstance(a_value, float):
+                    if isinstance(a_value, bool):
+                        stmt = "ctx._source.{} = {}".format(a_field, str(a_value).lower())
                     else:
-                        stmt = "ctx._source.{} = {}".format(e_field, e_value)
+                        stmt = "ctx._source.{} = {}".format(a_field, a_value)
                 else:
-                    stmt = "ctx._source.{} = '{}'".format(e_field, e_value)
+                    stmt = "ctx._source.{} = '{}'".format(a_field, a_value)
                 stmts.append(stmt)
 
             # populate painless, remove statements
             remove_fields = extra.get('remove_extra_fields', [])
-            for f in remove_fields:
-                e_field = "{}_{}".format(EXTRA_PREFIX, f['field'])
+            for r in remove_fields:
+                r_field = "{}_{}".format(EXTRA_PREFIX, r['field'])
 
-                stmt = "ctx._source.remove('{}')".format(e_field)
+                stmt = "ctx._source.remove('{}')".format(r_field)
 
                 stmts.append(stmt)
 
@@ -1091,23 +1138,23 @@ class Enrich(ElasticItems):
                         }
                       }
                     }
-                    ''' % (";".join(stmts), json.dumps(filters), json.dumps(date_range_fltr))
+                    ''' % (";".join(stmts), json.dumps(conds), json.dumps(fltrs))
 
             try:
                 r = self.requests.post(url, data=es_query, headers=HEADER_JSON, verify=False)
             except requests.exceptions.RetryError:
-                logger.warning("[external-data] Retry exceeded while executing external_data. "
+                logger.warning("[enrich-extra-data] Retry exceeded while executing study. "
                                "The following query is skipped %s.", es_query)
                 continue
 
             try:
                 r.raise_for_status()
             except requests.exceptions.HTTPError as ex:
-                logger.error("[external-data] Error while executing external_data. Study aborted.")
+                logger.error("[enrich-extra-data] Error while executing study. Study aborted.")
                 logger.error(ex)
                 return
 
-            logger.info("[external-data] Target index %s "
+            logger.info("[enrich-extra-data] Target index %s "
                         "updated with data from %s", self.elastic.anonymize_url(url), json_url)
 
     def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
