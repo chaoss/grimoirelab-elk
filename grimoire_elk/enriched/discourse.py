@@ -178,13 +178,6 @@ class DiscourseEnrich(Enrich):
                 related.append(self.categories[cat])
         return related
 
-    def __show_categories_tree(self):
-        """ Show the category tree: list of categories and its subcategories """
-        for cat in self.categories_tree:
-            print("%s (%i)" % (self.categories[cat], cat))
-            for subcat in self.categories_tree[cat]:
-                print("-> %s (%i)" % (self.categories[subcat], subcat))
-
     @metadata
     def get_rich_item(self, item):
 
