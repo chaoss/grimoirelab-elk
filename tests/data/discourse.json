@@ -689,7 +689,7 @@
         "visible": true,
         "word_count": 190
     },
-    "origin": "https://foro.mozilla-hispano.org/",
+    "origin": "https://forum.mautic.org/",
     "perceval_version": "0.2.0",
     "timestamp": 1469614665.547536,
     "updated_on": 1469009983.89,
@@ -1500,7 +1500,7 @@
         "visible": true,
         "word_count": 12025
     },
-    "origin": "https://foro.mozilla-hispano.org/",
+    "origin": "https://forum.mautic.org/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com",
     "timestamp": 1518164982.60455,
@@ -3538,7 +3538,7 @@
         "visible": true,
         "word_count": 12025
     },
-    "origin": "https://foro.mozilla-hispano.org/",
+    "origin": "https://forum.mautic.org/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com",
     "timestamp": 1518164982.617184,
