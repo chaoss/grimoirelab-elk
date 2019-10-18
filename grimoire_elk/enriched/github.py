@@ -94,7 +94,7 @@ class GitHubEnrich(Enrich):
         self.studies = []
         self.studies.append(self.enrich_onion)
         self.studies.append(self.enrich_pull_requests)
-        self.studies.append(self.enrich_external_data)
+        self.studies.append(self.enrich_extra_data)
 
         self.users = {}  # cache users
         self.location = {}  # cache users location
@@ -338,13 +338,6 @@ class GitHubEnrich(Enrich):
         self.geo_locations_to_es()  # Update geolocations in Elastic
 
         return total
-
-    def enrich_external_data(self, ocean_backend, enrich_backend, json_url,
-                             target_index='github_issues_external_data'):
-        super().enrich_external_data(ocean_backend=ocean_backend,
-                                     enrich_backend=enrich_backend,
-                                     json_url=json_url,
-                                     target_index=target_index)
 
     def enrich_onion(self, ocean_backend, enrich_backend,
                      no_incremental=False,
