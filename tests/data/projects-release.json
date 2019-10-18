@@ -17,7 +17,7 @@
         ],
         "crates": [""],
         "discourse": [
-            "https://foro.mozilla-hispano.org/"
+            "https://forum.mautic.org/"
         ],
         "dockerhub": [
             "bitergia kibiter"

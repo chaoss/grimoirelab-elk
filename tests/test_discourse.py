@@ -103,7 +103,7 @@ class TestDiscourse(TestBaseBackend):
 
         with open("data/projects-release.json") as projects_filename:
             url = json.load(projects_filename)['grimoire']['discourse'][0]
-            arthur_params = {'uri': 'https://foro.mozilla-hispano.org/', 'url': 'https://foro.mozilla-hispano.org/'}
+            arthur_params = {'uri': 'https://forum.mautic.org/', 'url': 'https://forum.mautic.org/'}
             self.assertDictEqual(arthur_params, DiscourseOcean.get_arthur_params_from_url(url))
 
 
