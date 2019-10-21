@@ -95,6 +95,28 @@ class TestGit(TestBaseBackend):
         self.assertEqual(eitem['stargazers_count'], 1)
         self.assertEqual(eitem['url'], "https://github.com/kubernetes/kubernetes")
 
+        item = self.items[5]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(item['category'], 'issue')
+        self.assertIsNone(eitem['user_name'])
+        self.assertIsNone(eitem['user_domain'])
+        self.assertIsNone(eitem['user_org'])
+        self.assertIsNone(eitem['author_name'])
+        self.assertIsNone(eitem['assignee_name'])
+        self.assertIsNone(eitem['assignee_domain'])
+        self.assertIsNone(eitem['assignee_org'])
+
+        item = self.items[6]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(item['category'], 'pull_request')
+        self.assertIsNone(eitem['user_name'])
+        self.assertIsNone(eitem['user_domain'])
+        self.assertIsNone(eitem['user_org'])
+        self.assertIsNone(eitem['author_name'])
+        self.assertIsNone(eitem['merge_author_name'])
+        self.assertIsNone(eitem['merge_author_domain'])
+        self.assertIsNone(eitem['merge_author_org'])
+
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
 
