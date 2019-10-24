@@ -107,5 +107,8 @@ profile information (i.e., identity fields) or (iv) to the project listed in the
 - **author_max_date** (date): Date of most recent commit made by this author.
 - **author_min_date** (date): Date of the first commit made by this author.
 
+#### Extra fields:
+- **extra_** (anything): Extra fields added using the `enrich_extra_data` study.
+
 #### Data source specific fields
 Details of the fields of each data source is available in the [Schema](https://github.com/chaoss/grimoirelab-elk/tree/master/schema) folder.

@@ -185,6 +185,22 @@ class TestGit(TestBaseBackend):
                                                 headers=HEADER_JSON, verify=False)
         self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
 
+    def test_extra_study(self):
+        """ Test that the extra study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_extra_data')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_extra_data":
+                study(ocean_backend, enrich_backend,
+                      json_url="https://gist.githubusercontent.com/valeriocos/893f55c28c4bd8fa7a217c4e201f4698/raw/"
+                               "ba298a6fb09558e68c5e4ec6ae23b1c89fe920ef/test_extra_study.txt")
+
+        time.sleep(5)  # HACK: Wait until git enrich index has been written
+        for item in enrich_backend.fetch():
+            self.assertTrue('extra_secret_repo' in item.keys())
+
     def test_onion_study(self):
         """ Test that the onion study works correctly """
 
