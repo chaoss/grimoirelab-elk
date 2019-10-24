@@ -164,7 +164,8 @@ class ElasticItems:
         scroll_size = page['hits']['total']
 
         if scroll_size == 0:
-            logger.debug("No results found from %s and filter %s", self.elastic.anonymize_url(self.elastic.index_url))
+            logger.debug("No results found from %s and filter %s", self.elastic.anonymize_url(self.elastic.index_url),
+                         str(_filter))
             return
 
         while scroll_size > 0:
