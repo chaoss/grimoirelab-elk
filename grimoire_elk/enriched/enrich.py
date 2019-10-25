@@ -205,7 +205,16 @@ class Enrich(ElasticItems):
         """
         ds_repo_to_prj = {}
 
-        for project in json:
+        # Sent the unknown project to the end of the list.
+        # This change is needed to avoid assigning repositories to
+        # the `Main` project when they exist in the `unknown`
+        # section and in other sections too.
+        project_names = list(json.keys())
+        if UNKNOWN_PROJECT in json:
+            project_names.remove(UNKNOWN_PROJECT)
+            project_names.append(UNKNOWN_PROJECT)
+
+        for project in project_names:
             for ds in json[project]:
                 if ds == "meta":
                     continue  # not a real data source
