@@ -56,12 +56,6 @@
         "jenkins": [
             "https://build.opnfv.org/ci"
         ],
-        "*jira": [
-            "https://tickets.puppetlabs.com"
-        ],
-        "*jira": [
-            "https://jira.iotivity.org/"
-        ],
         "jira": [
             "https://jira.opnfv.org --filter-raw=data.fields.project.key:PROJECT-KEY"
         ],
@@ -118,6 +112,11 @@
         ],
         "twitter": [
             ""
+        ]
+    },
+    "unknown": {
+        "jira": [
+            "https://jira.opnfv.org"
         ]
     }
 }
