@@ -102,7 +102,7 @@ class ElasticItems:
             labels_info = matchObj.group(1)
             labels = matchObj.group(2)
             labels_lst = [l.strip() for l in labels.split(',')]
-            processed_repo = processed_repo.replace(labels_info, '')
+            processed_repo = processed_repo.replace(labels_info, '').strip()
 
         return processed_repo, labels_lst
 
