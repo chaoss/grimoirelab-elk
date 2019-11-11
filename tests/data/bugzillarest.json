@@ -1536,7 +1536,6 @@
         "creation_time": "2016-04-27T07:36:19Z",
         "creator": "shuang",
         "creator_detail": {
-            "email": "shuang",
             "id": 458181,
             "name": "shuang",
             "real_name": "Shawn Huang [:shawnjohnjr]"
@@ -2504,7 +2503,7 @@
         "creation_time": "2016-07-27T09:23:40Z",
         "creator": "cam",
         "creator_detail": {
-            "email": "cam",
+            "email": "cam@example.org",
             "id": 54040,
             "name": "cam",
             "real_name": "Cameron McCormack (:heycam)"

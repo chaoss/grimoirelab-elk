@@ -84,6 +84,17 @@ class TestBugzillaRest(TestBaseBackend):
         self.assertEqual(result['raw'], 7)
         self.assertEqual(result['enrich'], 7)
 
+        enrich_backend = self.connectors[self.connector][2]()
+        enrich_backend.sortinghat = True
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIsNone(eitem['author_domain'])
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_domain'], 'example.org')
+
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
