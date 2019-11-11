@@ -17,6 +17,7 @@ group_members,long,true
 group_name,keyword,true
 group_topics_keys,keyword,true
 group_topics,keyword,true
+group_urlname,keyword,true
 group_who,keyword,true
 id,keyword,true
 is_meetup_comment,long,true

@@ -222,7 +222,7 @@ class MeetupEnrich(Enrich):
 
         if 'group' in event:
             group = event['group']
-            copy_fields = ["id", "created", "join_mode", "name", "url_name",
+            copy_fields = ["id", "created", "join_mode", "name", "urlname",
                            "who"]
             for f in copy_fields:
                 if f in group:
