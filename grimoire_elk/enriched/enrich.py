@@ -357,7 +357,7 @@ class Enrich(ElasticItems):
 
         items = ocean_backend.fetch()
 
-        url = self.elastic.index_url + '/items/_bulk'
+        url = self.elastic.get_bulk_url()
 
         logger.debug("Adding items to %s (in %i packs)", self.elastic.anonymize_url(url), max_items)
 
@@ -480,22 +480,7 @@ class Enrich(ElasticItems):
         """ Custom analyzers for our indexes  """
 
         analyzers = '''
-        {
-                "analysis" : {
-                    "tokenizer" : {
-                        "comma" : {
-                            "type" : "pattern",
-                            "pattern" : ","
-                        }
-                    },
-                    "analyzer" : {
-                        "comma" : {
-                            "type" : "custom",
-                            "tokenizer" : "comma"
-                        }
-                    }
-                }
-        }
+        {}
         '''
 
         return analyzers
