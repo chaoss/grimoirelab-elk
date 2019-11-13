@@ -154,6 +154,8 @@ class ESConnector(Connector):
         self._read_only = read_only
         self.__log_prefix = "[" + es_index + "] study "
 
+        self._es_major = self._es_conn.info()['version']['number'].split('.')[0]
+
     def update_repo(self, repo):
         self._repo = repo
 
