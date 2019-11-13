@@ -264,6 +264,26 @@ class ElasticSearch(object):
 
         logger.info("Alias %s created on %s.", alias, self.anonymize_url(self.index_url))
 
+    def get_bulk_url(self):
+        """Get the bulk URL endpoint"""
+
+        if self.major == '7':
+            bulk_url = self.index_url + '/_bulk'
+        else:
+            bulk_url = self.index_url + '/items/_bulk'
+
+        return bulk_url
+
+    def get_mapping_url(self, _type=None):
+        """Get the mapping URL endpoint"""
+
+        if self.major == '7':
+            mapping_url = self.index_url + "/_mapping"
+        else:
+            mapping_url = self.index_url + "/" + _type + "/_mapping"
+
+        return mapping_url
+
     def bulk_upload(self, items, field_id):
         """Upload in controlled packs items to ES using bulk API"""
 
@@ -274,7 +294,7 @@ class ElasticSearch(object):
         if not items:
             return new_items
 
-        url = self.index_url + '/items/_bulk'
+        url = self.get_bulk_url()
 
         logger.debug("Adding items to %s (in %i packs)", self.anonymize_url(url), self.max_items_bulk)
         task_init = time()
@@ -307,7 +327,7 @@ class ElasticSearch(object):
 
         for _type in mappings:
 
-            url_map = self.index_url + "/" + _type + "/_mapping"
+            url_map = self.get_mapping_url(_type)
 
             # First create the manual mappings
             if mappings[_type] != '{}':
@@ -317,56 +337,29 @@ class ElasticSearch(object):
                     logger.error("Error creating ES mappings %s. Mapping: %s", res.text, str(mappings[_type]))
                     res.raise_for_status()
 
-            # By default all strings are not analyzed in ES < 6
-            if self.major == '2' or self.major == '5':
-                # Before version 6, strings were strings
-                not_analyze_strings = """
-                {
-                  "dynamic_templates": [
-                    { "notanalyzed": {
-                          "match": "*",
-                          "match_mapping_type": "string",
-                          "mapping": {
-                              "type":        "string",
-                              "index":       "not_analyzed"
-                          }
-                       }
-                    },
-                    { "formatdate": {
-                          "match": "*",
-                          "match_mapping_type": "date",
-                          "mapping": {
-                              "type": "date",
-                              "format" : "strict_date_optional_time||epoch_millis"
-                          }
-                       }
-                    }
-                  ]
-                } """
-            else:
-                # After version 6, strings are keywords (not analyzed)
-                not_analyze_strings = """
-                {
-                  "dynamic_templates": [
-                    { "notanalyzed": {
-                          "match": "*",
-                          "match_mapping_type": "string",
-                          "mapping": {
-                              "type":        "keyword"
-                          }
-                       }
-                    },
-                    { "formatdate": {
-                          "match": "*",
-                          "match_mapping_type": "date",
-                          "mapping": {
-                              "type": "date",
-                              "format" : "strict_date_optional_time||epoch_millis"
-                          }
-                       }
-                    }
-                  ]
-                } """
+            # After version 6, strings are keywords (not analyzed)
+            not_analyze_strings = """
+            {
+              "dynamic_templates": [
+                { "notanalyzed": {
+                      "match": "*",
+                      "match_mapping_type": "string",
+                      "mapping": {
+                          "type": "keyword"
+                      }
+                   }
+                },
+                { "formatdate": {
+                      "match": "*",
+                      "match_mapping_type": "date",
+                      "mapping": {
+                          "type": "date",
+                          "format" : "strict_date_optional_time||epoch_millis"
+                      }
+                   }
+                }
+              ]
+            } """
             res = self.requests.put(url_map, data=not_analyze_strings, headers=headers)
             try:
                 res.raise_for_status()
