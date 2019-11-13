@@ -159,6 +159,10 @@ class ESOnionConnector(ESConnector):
                 "_id": item_id,
                 "_source": row
             }
+
+            if self._es_major == '7':
+                doc.pop('_type')
+
             docs.append(doc)
 
         # TODO uncomment following lines for incremental version
