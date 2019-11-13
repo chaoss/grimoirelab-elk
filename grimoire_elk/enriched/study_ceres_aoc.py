@@ -131,6 +131,10 @@ class ESPandasConnector(ESConnector):
                 "_id": item_id,
                 "_source": row
             }
+
+            if self._es_major == '7':
+                doc.pop('_type')
+
             docs.append(doc)
         # TODO exception and error handling
         chunk_size = 2000
