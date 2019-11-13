@@ -1,0 +1,120 @@
+{
+  "mappings": {
+    "properties": {
+      "addedlines": {
+        "type": "long"
+      },
+      "author_bot": {
+        "type": "boolean"
+      },
+      "author_domain": {
+        "type": "keyword"
+      },
+      "author_id": {
+        "type": "keyword"
+      },
+      "author_name": {
+        "type": "keyword"
+      },
+      "author_org_name": {
+        "type": "keyword"
+      },
+      "author_user_name": {
+        "type": "keyword"
+      },
+      "author_uuid": {
+        "type": "keyword"
+      },
+      "committer": {
+        "type": "keyword"
+      },
+      "committer_date": {
+        "type": "date"
+      },
+      "date": {
+        "type": "date"
+      },
+      "eventtype": {
+        "type": "keyword"
+      },
+      "fileaction": {
+        "type": "keyword"
+      },
+      "filepath": {
+        "type": "keyword"
+      },
+      "files": {
+        "type": "long"
+      },
+      "filetype": {
+        "type": "keyword"
+      },
+      "file_name": {
+        "type": "keyword"
+      },
+      "file_ext": {
+        "type": "keyword"
+      },
+      "file_dir_name": {
+        "type": "keyword"
+      },
+      "file_path_list": {
+        "type": "keyword"
+      },
+      "git_author_domain": {
+        "type": "keyword"
+      },
+      "grimoire_creation_date": {
+        "type": "date"
+      },
+      "hash": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "message": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "metadata__enriched_on": {
+        "type": "date"
+      },
+      "metadata__timestamp": {
+        "type": "date"
+      },
+      "metadata__updated_on": {
+        "type": "date"
+      },
+      "origin": {
+        "type": "keyword"
+      },
+      "owner": {
+        "type": "keyword"
+      },
+      "perceval_uuid": {
+        "type": "keyword"
+      },
+      "project": {
+        "type": "keyword"
+      },
+      "project_1": {
+        "type": "keyword"
+      },
+      "removedlines": {
+        "type": "long"
+      },
+      "repository": {
+        "type": "keyword"
+      },
+      "uuid": {
+        "type": "keyword"
+      }
+    }
+  }
+}

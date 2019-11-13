@@ -649,7 +649,11 @@ class GitEnrich(Enrich):
         if no_incremental or not exists_index:
             logger.info("{} Creating out ES index".format(log_prefix))
             # Initialize out index
-            filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/git_aoc.json')
+
+            if self.elastic.major == '7':
+                filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/git_aoc_es7.json')
+            else:
+                filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/git_aoc.json')
             out_conn.create_index(filename, delete=exists_index)
 
         repos = []
