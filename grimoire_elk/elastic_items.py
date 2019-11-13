@@ -161,7 +161,11 @@ class ElasticItems:
             return []
 
         scroll_id = page["_scroll_id"]
-        scroll_size = page['hits']['total']
+        total = page['hits']['total']
+        if isinstance(total, dict):
+            scroll_size = total['value']
+        else:
+            scroll_size = total
 
         if scroll_size == 0:
             logger.debug("No results found from {} and filter {}".format(
