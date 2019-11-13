@@ -970,7 +970,11 @@ class Enrich(ElasticItems):
         # Onion currently does not support incremental option
         logger.info("{} Creating out ES index".format(log_prefix))
         # Initialize out index
-        filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/onion.json')
+        if self.elastic.major == '7':
+            filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/onion_es7.json')
+        else:
+            filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/onion.json')
+
         out_conn.create_index(filename, delete=out_conn.exists())
 
         onion_study(in_conn=in_conn, out_conn=out_conn, data_source=data_source)
