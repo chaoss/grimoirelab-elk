@@ -517,7 +517,7 @@ class GitEnrich(Enrich):
         total_signed_off = 0
         total_multi_author = 0
 
-        url = self.elastic.index_url + '/items/_bulk'
+        url = self.elastic.get_bulk_url()
 
         logger.debug("[git] Adding items to {} (in {} packs)".format(
                      self.elastic.anonymize_url(url), max_items))

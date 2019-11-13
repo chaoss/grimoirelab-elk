@@ -135,7 +135,7 @@ class DockerHubEnrich(Enrich):
         items = ocean_backend.fetch()
         images_items = {}
 
-        url = self.elastic.index_url + '/items/_bulk'
+        url = self.elastic.get_bulk_url()
 
         logger.debug("[dockerhub] Adding items to {} (in {} packs)".format(
                      self.elastic.anonymize_url(url), max_items))

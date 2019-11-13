@@ -214,7 +214,7 @@ class MBoxEnrich(Enrich):
         total = 0
         bulk_json = ""
 
-        url = self.elastic.index_url + '/items/_bulk'
+        url = self.elastic.get_bulk_url()
 
         logger.debug("[mbox] Adding items to {} (in {} packs)".format(self.elastic.anonymize_url(url), max_items))
 

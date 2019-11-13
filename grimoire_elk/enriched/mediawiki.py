@@ -246,7 +246,7 @@ class MediaWikiEnrich(Enrich):
         bulk_json = ""
         total = 0
 
-        url = self.elastic.index_url + '/items/_bulk'
+        url = self.elastic.get_bulk_url()
 
         logger.debug("[mediawiki] Adding items to {} (in {} packs)".format(self.elastic.anonymize_url(url), max_items))
 
