@@ -121,7 +121,7 @@ class BugzillaEnrich(Enrich):
     def get_rich_item(self, item):
 
         if 'bug_id' not in item['data']:
-            logger.warning("Dropped bug without bug_id %s", item)
+            logger.warning("[bugzilla] Dropped bug without bug_id {}".format(item))
             return None
 
         eitem = {}
