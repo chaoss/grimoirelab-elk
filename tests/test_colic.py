@@ -121,10 +121,10 @@ class TestCoLic(TestBaseBackend):
 
             if study.__name__ == "enrich_colic_analysis":
                 study(ocean_backend, enrich_backend)
-                self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.colic:[enrich-colic-analysis] Start '
-                                 'enrich_colic_analysis study')
-                self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.colic:[enrich-colic-analysis] End '
-                                 'enrich_colic_analysis study')
+                self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.colic:[colic] study enrich-colic-analysis '
+                                               'start')
+                self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.colic:[colic] study enrich-colic-analysis '
+                                                'end')
 
     def test_perceval_params(self):
         """Test the extraction of perceval params from an URL"""
