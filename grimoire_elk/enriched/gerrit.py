@@ -665,9 +665,9 @@ class GerritEnrich(Enrich):
 
         if num_items != ins_items:
             missing = num_items - ins_items
-            logger.error("%s/%s missing items for Gerrit", str(missing), str(num_items))
+            logger.error("[gerrit] {}/{} missing items".format(missing, num_items))
         else:
-            logger.info("%s items inserted for Gerrit", str(num_items))
+            logger.info("[gerrit] {} items inserted".format(num_items))
 
         return num_items
 
