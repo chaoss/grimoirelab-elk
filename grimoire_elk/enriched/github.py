@@ -177,12 +177,14 @@ class GitHubEnrich(Enrich):
             r = self.requests.get(url, params=params)
 
             try:
-                logger.debug("Using Maps API to find %s" % (location))
+                logger.debug("[github] Using Maps API to find {}".format(
+                             location))
                 r_json = r.json()
                 geo_code = r_json['results'][0]['geometry']['location']
             except Exception:
                 if location not in self.location_not_found:
-                    logger.debug("Can't find geocode for " + location)
+                    logger.debug("[github] Can't find geocode for ".format(
+                                 location))
                     self.location_not_found.append(location)
 
             if geo_code:
@@ -209,7 +211,8 @@ class GitHubEnrich(Enrich):
         type_items = r.json()
 
         if 'hits' not in type_items:
-            logger.info("No github %s data in ES" % (kind))
+            logger.debug("[github] No github {} data in ES".format(
+                         kind))
 
         else:
             while len(type_items['hits']['hits']) > 0:
@@ -235,7 +238,8 @@ class GitHubEnrich(Enrich):
 
         url = self.elastic.url + GEOLOCATION_INDEX + "geolocations/_bulk"
 
-        logger.debug("Adding geoloc to %s (in %i packs)", self.elastic.anonymize_url(url), max_items)
+        logger.debug("[github] Adding geoloc to {} (in {} packs)".format(
+                     self.elastic.anonymize_url(url), max_items))
 
         for loc in self.geolocations:
             if current >= max_items:
@@ -259,7 +263,7 @@ class GitHubEnrich(Enrich):
         if current > 0:
             total += self.elastic.safe_put_bulk(url, bulk_json)
 
-        logger.debug("Adding geoloc to ES Done")
+        logger.debug("[github] Adding geoloc to ES Done")
 
         return total
 
@@ -326,7 +330,8 @@ class GitHubEnrich(Enrich):
         elif item['category'] == 'repository':
             rich_item = self.__get_rich_repo(item)
         else:
-            logger.error("rich item not defined for GitHub category %s", item['category'])
+            logger.error("[github] rich item not defined for GitHub category {}".format(
+                         item['category']))
 
         self.add_repository_labels(rich_item)
         self.add_metadata_filter_raw(rich_item)
@@ -335,7 +340,7 @@ class GitHubEnrich(Enrich):
     def enrich_items(self, items):
         total = super(GitHubEnrich, self).enrich_items(items)
 
-        logger.debug("Updating GitHub users geolocations in Elastic")
+        logger.debug("[github] Updating GitHub users geolocations in Elastic")
         self.geo_locations_to_es()  # Update geolocations in Elastic
 
         return total
@@ -404,8 +409,8 @@ class GitHubEnrich(Enrich):
         # pull_requests index search url in which the data is to be updated
         enrich_index_search_url = self.elastic.index_url + "/_search"
 
-        logger.info("Doing enrich_pull_request study for index {}"
-                    .format(self.elastic.anonymize_url(self.elastic.index_url)))
+        logger.info("[github] Doing enrich_pull_request study for index {}".format(
+                    self.elastic.anonymize_url(self.elastic.index_url)))
         time.sleep(1)  # HACK: Wait until git enrich index has been written
 
         def make_request(url, error_msg, data=None, req_type="GET"):
@@ -528,7 +533,8 @@ class GitHubEnrich(Enrich):
                 pull_requests = []
 
             num_enriched += 1
-            logger.info("pull_requests processed %i/%i", num_enriched, len(pull_requests_ids))
+            logger.info("[github] pull_requests processed {}/{}".format(
+                        num_enriched, len(pull_requests_ids)))
 
         self.elastic.bulk_upload(pull_requests, "_item_id")
 
