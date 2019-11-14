@@ -355,9 +355,9 @@ class ColicEnrich(Enrich):
 
         if num_items != ins_items:
             missing = num_items - ins_items
-            logger.error("%s/%s missing items for CoLic", str(missing), str(num_items))
+            logger.error("[colic] {}/{} missing items".format(missing, num_items))
         else:
-            logger.info("%s items inserted for CoLic", str(num_items))
+            logger.info("[colic] {} items inserted".format(num_items))
 
         return num_items
 
@@ -365,7 +365,7 @@ class ColicEnrich(Enrich):
                               out_index="colic_enrich_graal_repo", interval_months=[3],
                               date_field="grimoire_creation_date"):
 
-        logger.info("[enrich-colic-analysis] Start enrich_colic_analysis study")
+        logger.info("[colic] study enrich-colic-analysis start")
 
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
                    verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
@@ -378,7 +378,8 @@ class ColicEnrich(Enrich):
 
         repositories = [repo['key'] for repo in unique_repos['aggregations']['unique_repos'].get('buckets', [])]
 
-        logger.info("[enrich-colic-analysis] {} repositories to process".format(len(repositories)))
+        logger.info("[colic] study enrich-colic-analysis {} repositories to process".format(
+                    len(repositories)))
         es_out = ElasticSearch(enrich_backend.elastic.url, out_index, mappings=Mapping)
         es_out.add_alias("colic_study")
 
@@ -387,7 +388,8 @@ class ColicEnrich(Enrich):
         ins_items = 0
 
         for repository_url in repositories:
-            logger.info("[enrich-colic-analysis] Start analysis for {}".format(repository_url))
+            logger.info("[colic] study enrich-colic-analysis start analysis for {}".format(
+                        repository_url))
             evolution_items = []
 
             for interval in interval_months:
@@ -444,11 +446,17 @@ class ColicEnrich(Enrich):
                 if num_items != ins_items:
                     missing = num_items - ins_items
                     logger.error(
-                        "[enrich-colic-analysis] %s/%s missing items for Graal CoLic Analysis Study", str(missing), str(num_items)
+                        "[colic] study enrich-colic-analysis {}/{} missing items for Graal CoLic Analysis "
+                        "Study".format(missing, num_items)
                     )
                 else:
-                    logger.info("[enrich-colic-analysis] %s items inserted for Graal CoLic Analysis Study", str(num_items))
+                    logger.info(
+                        "[colic] study enrich-colic-analysis {} items inserted for Graal CoLic Analysis "
+                        "Study".format(num_items)
+                    )
 
-            logger.info("[enrich-colic-analysis] End analysis for {} with month interval".format(repository_url, interval))
+            logger.info(
+                "[colic] study enrich-colic-analysis end analysis for {} with month interval".format(repository_url)
+            )
 
-        logger.info("[enrich-colic-analysis] End enrich_colic_analysis study")
+        logger.info("[colic] study enrich-colic-analysis end")
