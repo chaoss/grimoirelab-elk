@@ -183,11 +183,13 @@ class DiscourseEnrich(Enrich):
 
         # Get the categories name if not already done
         if not self.categories:
-            logger.info("Getting the categories data from %s", item['origin'])
+            logger.info("[discourse] Getting the categories data from {}".format(
+                        item['origin']))
             self.categories = self.__collect_categories(item['origin'])
         # Get the categories tree if not already done
         if not self.categories_tree:
-            logger.info("Getting the categories tree data from %s", item['origin'])
+            logger.info("[discourse] Getting the categories tree data from {}".format(
+                        item['origin']))
             self.categories_tree = self.__collect_categories_tree(item['origin'])
             # self.__show_categories_tree()
 
@@ -303,8 +305,9 @@ class DiscourseEnrich(Enrich):
 
         if num_items != ins_items:
             missing = num_items - ins_items
-            logger.error("%s/%s missing items for Discourse", str(missing), str(num_items))
+            logger.error("[discourse] {}/{} missing items for Discourse".format(
+                         missing, num_items))
         else:
-            logger.info("%s items inserted for Discourse", str(num_items))
+            logger.info("[discourse] {} items inserted for Discourse".format(num_items))
 
         return num_items
