@@ -236,9 +236,11 @@ class CocomEnrich(Enrich):
 
         if num_items != ins_items:
             missing = num_items - ins_items
-            logger.error("%s/%s missing items for Cocom", str(missing), str(num_items))
+            logger.error("[cocom] {}/{} missing items".format(
+                         missing, num_items))
         else:
-            logger.info("%s items inserted for Cocom", str(num_items))
+            logger.info("[cocom] {} items inserted".format(
+                        num_items))
 
         return num_items
 
@@ -246,7 +248,7 @@ class CocomEnrich(Enrich):
                               out_index="cocom_enrich_graal_repo", interval_months=[3],
                               date_field="grimoire_creation_date"):
 
-        logger.info("[enrich-cocom-analysis] Start enrich_cocom_analysis study")
+        logger.info("[cocom] study enrich-cocom-analysis start")
 
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
                    verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
@@ -260,7 +262,8 @@ class CocomEnrich(Enrich):
         repositories = [repo['key'] for repo in unique_repos['aggregations']['unique_repos'].get('buckets', [])]
         current_month = datetime_utcnow().replace(day=1, hour=0, minute=0, second=0)
 
-        logger.info("[enrich-cocom-analysis] {} repositories to process".format(len(repositories)))
+        logger.info("[cocom] study enrich-cocom-analysis {} repositories to process".format(
+                    len(repositories)))
         es_out = ElasticSearch(enrich_backend.elastic.url, out_index, mappings=Mapping)
         es_out.add_alias("cocom_study")
 
@@ -268,7 +271,8 @@ class CocomEnrich(Enrich):
         ins_items = 0
 
         for repository_url in repositories:
-            logger.info("[enrich-cocom-analysis] Start analysis for {}".format(repository_url))
+            logger.info("[cocom] study enrich-cocom-analysis start analysis for {}".format(
+                        repository_url))
             evolution_items = []
 
             for interval in interval_months:
@@ -328,11 +332,17 @@ class CocomEnrich(Enrich):
                 if num_items != ins_items:
                     missing = num_items - ins_items
                     logger.error(
-                        "[enrich-cocom-analysis] %s/%s missing items for Graal CoCom Analysis Study", str(missing), str(num_items)
+                        "[cocom] study enrich-cocom-analysis {}/{} missing items for Graal CoCom Analysis "
+                        "Study".format(missing, num_items)
                     )
                 else:
-                    logger.info("[enrich-cocom-analysis] %s items inserted for Graal CoCom Analysis Study", str(num_items))
+                    logger.info(
+                        "[cocom] study enrich-cocom-analysis {} items inserted for Graal CoCom Analysis "
+                        "Study".format(num_items)
+                    )
 
-            logger.info("[enrich-cocom-analysis] End analysis for {} with month interval".format(repository_url, interval))
+            logger.info(
+                "[cocom] study enrich-cocom-analysis End analysis for {} with month interval".format(repository_url)
+            )
 
-        logger.info("[enrich-cocom-analysis] End enrich_cocom_analysis study")
+        logger.info("[cocom] study enrich-cocom-analysis End")
