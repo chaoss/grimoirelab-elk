@@ -128,8 +128,8 @@ class FunctestEnrich(Enrich):
                 eitem['duration_from_api'] = self.__process_duration_from_api(func_test['details']['duration'])
 
                 if eitem['duration_from_api'] is None:
-                    logger.debug("Duration from api %s not processed for enriched item %s",
-                                 func_test['details']['duration'], eitem)
+                    logger.debug("[functest] Duration from api {} not processed for enriched item {}".format(
+                                 func_test['details']['duration'], eitem))
 
             if 'start_date' in func_test and 'stop_date' in func_test and func_test['stop_date']:
                 start_date = self.__convert_str_to_datetime(func_test['start_date'])
@@ -137,8 +137,8 @@ class FunctestEnrich(Enrich):
                 eitem['duration'] = self.__process_duration(start_date, stop_date)
 
                 if eitem['duration'] is None:
-                    logger.debug("Duration not calculated for enriched item %s with start_date, stop_date: %s, %s",
-                                 eitem, start_date, stop_date)
+                    logger.debug("[functest] Duration not calculated for enriched item {} with start_date,"
+                                 " stop_date: {}, {}".format(eitem, start_date, stop_date))
 
         if 'duration_from_api' not in eitem:
             eitem['duration_from_api'] = None
