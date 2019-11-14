@@ -131,10 +131,10 @@ class TestCoCom(TestBaseBackend):
 
             if study.__name__ == "enrich_cocom_analysis":
                 study(ocean_backend, enrich_backend)
-                self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.cocom:[enrich-cocom-analysis] Start '
-                                 'enrich_cocom_analysis study')
-                self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.cocom:[enrich-cocom-analysis] End '
-                                 'enrich_cocom_analysis study')
+                self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.cocom:[cocom] study enrich-cocom-analysis '
+                                               'start')
+                self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.cocom:[cocom] study enrich-cocom-analysis '
+                                                'End')
 
     def test_perceval_params(self):
         """Test the extraction of perceval params from an URL"""
