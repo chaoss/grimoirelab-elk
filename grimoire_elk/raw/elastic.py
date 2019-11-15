@@ -17,6 +17,7 @@
 #
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
+#   Quan Zhou <quan@bitergia.com>
 #
 
 """Ocean feeder for Elastic from  Perseval data"""
@@ -109,14 +110,14 @@ class ElasticOcean(ElasticItems):
         tokens = url.split(PRJ_JSON_FILTER_SEPARATOR)[1:]
 
         if len(tokens) > 1:
-            cause = "Too many filters defined for %s, only the first one is considered" % url
+            cause = "Too many filters defined for {}, only the first one is considered".format(url)
             logger.warning(cause)
 
         token = tokens[0]
         filter_tokens = token.split(PRJ_JSON_FILTER_OP_ASSIGNMENT)
 
         if len(filter_tokens) != 2:
-            cause = "Too many tokens after splitting for %s in %s" % (token, url)
+            cause = "Too many tokens after splitting for {} in {}".format(token, url)
             logger.error(cause)
             raise ELKError(cause=cause)
 
@@ -185,8 +186,9 @@ class ElasticOcean(ElasticItems):
                 self.last_update = self.get_last_update_from_es(filters_=filters_)
                 last_update = self.last_update
 
-            logger.info("[%s] Incremental from: %s for %s", self.perceval_backend.__class__.__name__,
-                        last_update, self.perceval_backend.origin)
+            logger.info("[{}] Incremental from: {} for {}".format(
+                        self.perceval_backend.__class__.__name__.lower(),
+                        last_update, self.perceval_backend.origin))
 
         offset = None
         if 'offset' in signature.parameters:
@@ -196,10 +198,12 @@ class ElasticOcean(ElasticItems):
                 offset = self.elastic.get_last_offset("offset", filters_=filters_)
 
             if offset is not None:
-                logger.info("[%s] Incremental from: %i offset, for %s", self.perceval_backend.__class__.__name__,
-                            offset, self.perceval_backend.origin)
+                logger.info("[{}] Incremental from: {} offset, for {}".format(
+                            self.perceval_backend.__class__.__name__.lower(),
+                            offset, self.perceval_backend.origin))
             else:
-                logger.info("Not incremental")
+                logger.info("[{}] Not incremental".format(
+                            self.perceval_backend.__class__.__name__.lower()))
 
         params = {}
         # category and filter_classified params are shared
@@ -262,10 +266,14 @@ class ElasticOcean(ElasticItems):
 
         total_time_min = (datetime.now() - task_init).total_seconds() / 60
 
-        logger.debug("Added %i items to index %s", added, self.elastic.index)
-        logger.debug("Dropped %i items using drop_item filter" % drop)
-        logger.debug("Finished in %.2f min" % total_time_min)
-
+        logger.debug("[{}] Added {} items to index {}".format(
+                     self.perceval_backend.__class__.__name__.lower(),
+                     added, self.elastic.index))
+        logger.debug("[{}] Dropped {} items using drop_item filter".format(
+                     self.perceval_backend.__class__.__name__.lower(), drop))
+        logger.debug("[{}] Finished in {:.2f} min".format(
+                     self.perceval_backend.__class__.__name__.lower(),
+                     total_time_min))
         return self
 
     def _items_to_es(self, json_items):
@@ -274,7 +282,9 @@ class ElasticOcean(ElasticItems):
         if len(json_items) == 0:
             return
 
-        logger.debug("Adding items to Ocean for %s (%i items)" % (self, len(json_items)))
+        logger.debug("[{}] Adding items to Raw for {} ({} items)".format(
+                     self.perceval_backend.__class__.__name__.lower(),
+                     self, len(json_items)))
 
         field_id = self.get_field_unique_id()
 
@@ -288,9 +298,8 @@ class ElasticOcean(ElasticItems):
             version = info['backend_version']
             origin = info['origin']
 
-            logger.warning("%s/%s missing JSON items for backend %s [ver. %s], origin %s",
-                           str(missing),
-                           str(len(json_items)),
-                           name, version, origin)
+            logger.warning("[{}] {}/{} missing JSON items for backend {} [ver. {}], origin {}".format(
+                           self.perceval_backend.__class__.__name__.lower(),
+                           missing, len(json_items), name, version, origin))
 
         return inserted
