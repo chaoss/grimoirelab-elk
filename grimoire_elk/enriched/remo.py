@@ -116,7 +116,7 @@ class ReMoEnrich(Enrich):
         elif 'first_name' in item:
             category = 'users'
         else:
-            logger.error("Can not detect category in item %s", item)
+            logger.error("[remo] Can not detect category in item {}".format(item))
 
         return category
 
