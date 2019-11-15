@@ -113,6 +113,10 @@ class JiraEnrich(Enrich):
         """Add sorting hat enrichment fields"""
 
         eitem_sh = {}
+
+        if not self.sortinghat:
+            return eitem_sh
+
         created = str_to_datetime(date_field)
 
         for rol in roles:
