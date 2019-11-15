@@ -85,9 +85,9 @@ class CeresBase:
 
         from_date = self._out.latest_date()
         if from_date:
-            logger.debug("%s reading items since %s", logs_prefix, from_date)
+            logger.debug("{} reading items since {}".format(logs_prefix, from_date))
         else:
-            logger.info("%s reading items since the beginning of times", logs_prefix)
+            logger.info("{} reading items since the beginning of times".format(logs_prefix))
 
         cont = 0
         total_processed = 0
@@ -103,18 +103,17 @@ class CeresBase:
                 self._out.write(process_results.out_items)
                 total_written += len(process_results.out_items)
             else:
-                logger.info("%s no new items to be written this time.", logs_prefix)
+                logger.info("{} no new items to be written this time.".format(logs_prefix))
 
-            logger.debug("%s items read/to be written/total read/total processed/total written: "
-                         "%s/%s/%s/%s/%s",
-                         logs_prefix, len(item_block), len(process_results.out_items),
-                         cont, total_processed, total_processed)
+            logger.debug("{} items read/to be written/total read/total processed/total written: "
+                         "{}/{}/{}/{}/{}".format(logs_prefix, len(item_block),
+                                                 len(process_results.out_items),
+                                                 cont, total_processed, total_processed))
 
-        logger.info("%s SUMMARY: Items total read/total processed/total written: "
-                    "%s/%s/%s",
-                    logs_prefix, cont, total_processed, total_written)
+        logger.info("{} SUMMARY: Items total read/total processed/total written: "
+                    "{}/{}/{}".format(logs_prefix, cont, total_processed, total_written))
 
-        logger.debug("%s this is the end.", logs_prefix)
+        logger.debug("{} this is the end.".format(logs_prefix))
 
         return total_written
 
@@ -222,7 +221,7 @@ class ESConnector(Connector):
             docs.append(doc)
         # TODO exception and error handling
         helpers.bulk(self._es_conn, docs)
-        logger.info(self.__log_prefix + " Written: " + str(len(docs)))
+        logger.info("{} Written: {}".format(self.__log_prefix, len(docs)))
 
     def create_index(self, mappings_file, delete=True):
         """Create a new index.
@@ -235,7 +234,7 @@ class ESConnector(Connector):
             raise IOError("Cannot write, Connector created as Read Only")
 
         if delete:
-            logger.info(self.__log_prefix + " Deleting index " + self._es_index)
+            logger.info("{} Deleting index {}".format(self.__log_prefix, self._es_index))
             self._es_conn.indices.delete(self._es_index, ignore=[400, 404])
 
         # Read Mapping
@@ -268,8 +267,8 @@ class ESConnector(Connector):
 
             aggs = response.to_dict()['aggregations']
             if aggs['max_date']['value'] is None:
-                logger.debug(self.__log_prefix + " No data for " + self._sort_on_field
-                             + " field found in " + self._es_index + " index")
+                logger.debug("{} No data for {} field found in {} index".format(
+                             self.__log_prefix, self._sort_on_field, self._es_index))
 
             else:
                 # Incremental case: retrieve items from last item in ES write index
