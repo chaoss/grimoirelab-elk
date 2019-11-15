@@ -819,8 +819,10 @@ class Enrich(ElasticItems):
         If there are no roles, just add the author fields.
 
         """
-
         eitem_sh = {}  # Item enriched
+
+        if not self.sortinghat:
+            return eitem_sh
 
         author_field = self.get_field_author()
 

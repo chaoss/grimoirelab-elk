@@ -270,6 +270,9 @@ class MeetupEnrich(Enrich):
 
         sh_fields = {}
 
+        if not self.sortinghat:
+            return sh_fields
+
         # Not shared common get_item_sh because it is pretty specific
         if 'member' in item:
             # comment and rsvp
