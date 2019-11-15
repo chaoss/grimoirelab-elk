@@ -119,7 +119,7 @@ class StackExchangeEnrich(Enrich):
             eitem["type"] = 'question'
             eitem["author"] = None
             if 'owner' in question and question['owner']['user_type'] == "does_not_exist":
-                logger.warning("question without owner: %s", question['question_id'])
+                logger.warning("[stackexchange] question without owner: {}".format(question['question_id']))
             else:
                 eitem["author"] = question['owner']['display_name']
                 eitem["author_link"] = None
@@ -150,7 +150,7 @@ class StackExchangeEnrich(Enrich):
             eitem['question_accepted_answer_id'] = None
 
             if question['answer_count'] >= 1 and 'answers' not in question:
-                logger.warning("Missing answers for question %s", question['question_id'])
+                logger.warning("[stackexchange] Missing answers for question {}".format(question['question_id']))
             elif question['answer_count'] >= 1 and 'answers' in question:
                 answers_id = [p['answer_id'] for p in question['answers']
                               if 'is_accepted' in p and p['is_accepted']]
@@ -259,8 +259,8 @@ class StackExchangeEnrich(Enrich):
 
         if num_items != ins_items:
             missing = num_items - ins_items
-            logger.error("%s/%s missing items for Stackexchange", str(missing), str(num_items))
+            logger.error("[stackexchange] {}/{} missing items".format(missing, num_items))
         else:
-            logger.info("%s items inserted for Stackexchange", str(num_items))
+            logger.info("[stackexchange] {} items inserted".format(num_items))
 
         return num_items
