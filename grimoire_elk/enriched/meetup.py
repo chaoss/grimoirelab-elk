@@ -121,7 +121,7 @@ class MeetupEnrich(Enrich):
         eitem = {}
 
         if 'time' not in item['data']:
-            logger.warning("[meetup] Not processing %s: no time field", item['uuid'])
+            logger.warning("[meetup] Not processing {}: no time field".format(item['uuid']))
             return eitem
 
         for f in self.RAW_FIELDS_COPY:
@@ -193,10 +193,10 @@ class MeetupEnrich(Enrich):
             if 'time' in event:
                 eitem['time_date'] = unixtime_to_datetime(event['time'] / 1000).isoformat()
             else:
-                logger.warning("time field nof found in event")
+                logger.warning("[meetup] Time field nof found in event")
                 return {}
         except ValueError:
-            logger.warning("Wrong datetime for %s: %s", eitem['url'], event['time'])
+            logger.warning("[meetup] Wrong datetime for {}: {}".format(eitem['url'], event['time']))
             # If no datetime for the enriched item, it is useless for Kibana
             return {}
 
@@ -385,8 +385,8 @@ class MeetupEnrich(Enrich):
 
         if num_items != ins_items:
             missing = num_items - ins_items
-            logger.error("%s/%s missing items for Meetup", str(missing), str(num_items))
+            logger.error("[meetup] {}/{} missing items".format(missing, num_items))
         else:
-            logger.info("%s items inserted for Meetup", str(num_items))
+            logger.info("[meetup] {} items inserted".format(num_items))
 
         return num_items
