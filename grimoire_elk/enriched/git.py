@@ -170,15 +170,15 @@ class GitEnrich(Enrich):
                 # Get the usename from GitHub
                 gh_username = self.get_github_login(user_data, rol, commit_hash, github_repo)
                 # Create a new SH identity with name, email from git and username from github
-                logger.debug("Adding new identity %s to SH %s: %s", gh_username, SH_GIT_COMMIT, user)
+                logger.debug("[git] Adding new identity {} to SH {}: {}".format(gh_username, SH_GIT_COMMIT, user))
                 user = self.get_sh_identity(user_data)
                 user['username'] = gh_username
                 SortingHat.add_identity(self.sh_db, user, SH_GIT_COMMIT)
             else:
                 if user_data not in self.github_logins:
                     self.github_logins[user_data] = sh_identity['username']
-                    logger.debug("GitHub-commit exists. username:%s user:%s",
-                                 sh_identity['username'], user_data)
+                    logger.debug("[git] GitHub-commit exists. username:{} user:{}".format(
+                                 sh_identity['username'], user_data))
 
         commit_hash = item['data']['commit']
 
@@ -255,18 +255,19 @@ class GitEnrich(Enrich):
                 r.raise_for_status()
             except requests.exceptions.ConnectionError as ex:
                 # Connection error
-                logger.error("Can't get github login for %s in %s because a connection error ", repo, commit_hash)
+                logger.error("[git] Can't get github login for {} in {} because a connection error ".format(
+                             repo, commit_hash))
                 return login
 
             self.rate_limit = int(r.headers['X-RateLimit-Remaining'])
             self.rate_limit_reset_ts = int(r.headers['X-RateLimit-Reset'])
-            logger.debug("Rate limit pending: %s", self.rate_limit)
+            logger.debug("[git] Rate limit pending: {}".format(self.rate_limit))
             if self.rate_limit <= self.min_rate_to_sleep:
                 seconds_to_reset = self.rate_limit_reset_ts - int(time.time()) + 1
                 if seconds_to_reset < 0:
                     seconds_to_reset = 0
-                cause = "GitHub rate limit exhausted."
-                logger.info("%s Waiting %i secs for rate limit reset.", cause, seconds_to_reset)
+                cause = "[git] GitHub rate limit exhausted."
+                logger.info("{} Waiting {} secs for rate limit reset.".format(cause, seconds_to_reset))
                 time.sleep(seconds_to_reset)
                 # Retry once we have rate limit
                 r = self.requests.get(commit_url, headers=headers)
@@ -275,7 +276,7 @@ class GitEnrich(Enrich):
                 r.raise_for_status()
             except requests.exceptions.HTTPError as ex:
                 # commit not found probably or rate limit exhausted
-                logger.error("Can't find commit %s %s", commit_url, ex)
+                logger.error("[git] Can't find commit {} {}".format(commit_url, ex))
                 return login
 
             commit_json = r.json()
@@ -296,13 +297,13 @@ class GitEnrich(Enrich):
             elif rol == "committer":
                 login = user_login
             else:
-                logger.error("Wrong rol: %s" % (rol))
+                logger.error("[git] Wrong rol: {}".format(rol))
                 raise RuntimeError
 
             self.github_logins[user] = login
-            logger.debug("%s is %s in github (not found %i authors %i committers )", user, login,
-                         self.github_logins_author_not_found,
-                         self.github_logins_committer_not_found)
+            logger.debug("[git] {} is {} in github (not found {} authors {} committers )".format(
+                         user, login, self.github_logins_author_not_found,
+                         self.github_logins_committer_not_found))
 
         return login
 
@@ -455,7 +456,8 @@ class GitEnrich(Enrich):
         try:
             _ = int(field_date.strftime("%z")[0:3])
         except ValueError:
-            logger.warning("%s in commit %s has a wrong format", attribute, item['commit'])
+            logger.warning("[git] {} in commit {} has a wrong format".format(
+                           attribute, item['commit']))
             item[attribute] = field_date.replace(tzinfo=None).isoformat()
 
     def __add_pair_programming_metrics(self, commit, eitem):
@@ -517,7 +519,8 @@ class GitEnrich(Enrich):
 
         url = self.elastic.index_url + '/items/_bulk'
 
-        logger.debug("Adding items to %s (in %i packs)", self.elastic.anonymize_url(url), max_items)
+        logger.debug("[git] Adding items to {} (in {} packs)".format(
+                     self.elastic.anonymize_url(url), max_items))
 
         items = ocean_backend.fetch()
 
@@ -528,14 +531,14 @@ class GitEnrich(Enrich):
                 m = self.AUTHOR_P2P_REGEX.match(item['data']['Author'])
                 n = self.AUTHOR_P2P_NEW_REGEX.match(item['data']['Author'])
                 if m or n:
-                    logger.debug("Multiauthor detected. Creating one commit "
-                                 "per author: %s", item['data']['Author'])
+                    logger.debug("[git] Multiauthor detected. Creating one commit "
+                                 "per author: {}".format(item['data']['Author']))
                     item['data']['authors'] = self.__get_authors(item['data']['Author'])
                     item['data']['Author'] = item['data']['authors'][0]
                 m = self.AUTHOR_P2P_REGEX.match(item['data']['Commit'])
                 n = self.AUTHOR_P2P_NEW_REGEX.match(item['data']['Author'])
                 if m or n:
-                    logger.debug("Multicommitter detected: using just the first committer")
+                    logger.debug("[git] Multicommitter detected: using just the first committer")
                     item['data']['committers'] = self.__get_authors(item['data']['Commit'])
                     item['data']['Commit'] = item['data']['committers'][0]
                 # Add the authors list using the original Author and the Signed-off list
@@ -547,10 +550,11 @@ class GitEnrich(Enrich):
                 try:
                     total += self.elastic.safe_put_bulk(url, bulk_json)
                     json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
-                    logger.debug("Added %i items to %s (%0.2f MB)", total, self.elastic.anonymize_url(url), json_size)
+                    logger.debug("[git] Added {} items to {} ({:.2f} MB)".format(
+                                 total, self.elastic.anonymize_url(url), json_size))
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
-                    logger.warning("Unicode error in enriched items, converting to ascii")
+                    logger.warning("[git] Unicode error in enriched items, converting to ascii")
                     safe_json = str(bulk_json.encode('ascii', 'ignore'), 'ascii')
                     total += self.elastic.safe_put_bulk(url, safe_json)
                 bulk_json = ""
@@ -612,8 +616,8 @@ class GitEnrich(Enrich):
             return total
 
         if self.pair_programming:
-            logger.info("Signed-off commits generated: %i", total_signed_off)
-            logger.info("Multi author commits generated: %i", total_multi_author)
+            logger.info("[git] Signed-off commits generated: {}".format(total_signed_off))
+            logger.info("[git] Multi author commits generated: {}".format(total_multi_author))
 
         return total
 
@@ -629,7 +633,7 @@ class GitEnrich(Enrich):
 
         log_prefix = "[git] study areas_of_code"
 
-        logger.info(log_prefix + " Starting study - Input: " + in_index + " Output: " + out_index)
+        logger.info("{} Starting study - Input: {} Output: {}".format(log_prefix, in_index, out_index))
 
         # Creating connections
         es_in = Elasticsearch([ocean_backend.elastic.url], retry_on_timeout=True, timeout=100,
@@ -643,7 +647,7 @@ class GitEnrich(Enrich):
 
         exists_index = out_conn.exists()
         if no_incremental or not exists_index:
-            logger.info(log_prefix + " Creating out ES index")
+            logger.info("{} Creating out ES index".format(log_prefix))
             # Initialize out index
             filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/git_aoc.json')
             out_conn.create_index(filename, delete=exists_index)
@@ -655,7 +659,7 @@ class GitEnrich(Enrich):
                 repos.extend(items)
 
         for repo in repos:
-            logger.info(log_prefix + " Processing repo: " + repo)
+            logger.info("{} Processing repo: {}".format(log_prefix, repo))
             in_conn.update_repo(repo)
             out_conn.update_repo(repo)
             areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
@@ -664,12 +668,12 @@ class GitEnrich(Enrich):
         if out_conn.exists():
             if not out_conn.exists_alias(AREAS_OF_CODE_ALIAS) \
                     and not enrich_backend.elastic.alias_in_use(AREAS_OF_CODE_ALIAS):
-                logger.info("%s creating alias: %s", log_prefix, AREAS_OF_CODE_ALIAS)
+                logger.info("{} creating alias: {}".format(log_prefix, AREAS_OF_CODE_ALIAS))
                 out_conn.create_alias(AREAS_OF_CODE_ALIAS)
             else:
-                logger.warning("%s alias already exists: %s.", log_prefix, AREAS_OF_CODE_ALIAS)
+                logger.warning("{} alias already exists: {}.".format(log_prefix, AREAS_OF_CODE_ALIAS))
 
-        logger.info(log_prefix + " end")
+        logger.info("{} end".format(log_prefix))
 
     def enrich_onion(self, ocean_backend, enrich_backend,
                      no_incremental=False,
@@ -700,16 +704,17 @@ class GitEnrich(Enrich):
             'value': [self.perceval_backend.origin]
         }
 
-        logger.debug("[update-items] Checking commits for %s.", self.perceval_backend.origin)
+        logger.debug("[git] update-items Checking commits for {}.".format(self.perceval_backend.origin))
 
         git_repo = GitRepository(self.perceval_backend.uri, self.perceval_backend.gitpath)
         try:
             current_hashes = set([commit for commit in git_repo.rev_list()])
         except EmptyRepositoryError as e:
-            logger.warning("Skip updating branch info for repo %s, repo is empty", git_repo.uri)
+            logger.warning("[git] Skip updating branch info for repo {}, repo is empty".format(git_repo.uri))
             return
         except Exception as e:
-            logger.error("Skip updating branch info for repo %s, git rev-list command failed: %s", git_repo.uri, e)
+            logger.error("[git] Skip updating branch info for repo {}, git rev-list command failed: {}".format(
+                         git_repo.uri, e))
             return
 
         raw_hashes = set([item['data']['commit']
@@ -741,12 +746,12 @@ class GitEnrich(Enrich):
             self.remove_commits(to_process, enrich_backend.elastic.index_url,
                                 'hash', self.perceval_backend.origin)
 
-        logger.debug("[update-items] %s commits deleted from %s with origin %s.",
+        logger.debug("[git] update-items {} commits deleted from {} with origin {}.".format(
                      len(hashes_to_delete), ocean_backend.elastic.anonymize_url(ocean_backend.elastic.index_url),
-                     self.perceval_backend.origin)
-        logger.debug("[update-items] %s commits deleted from %s with origin %s.",
+                     self.perceval_backend.origin))
+        logger.debug("[git] update-items {} commits deleted from {} with origin {}.".format(
                      len(hashes_to_delete), enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url),
-                     self.perceval_backend.origin)
+                     self.perceval_backend.origin))
 
     def remove_commits(self, items, index, attribute, origin):
         """Delete documents that correspond to commits deleted in the Git repository
@@ -779,7 +784,7 @@ class GitEnrich(Enrich):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
-            logger.error("Error updating deleted commits for %s.", self.elastic.anonymize_url(index))
+            logger.error("[git] Error updating deleted commits for {}.".format(self.elastic.anonymize_url(index)))
             logger.error(r.text)
             return
 
@@ -790,7 +795,7 @@ class GitEnrich(Enrich):
         :param ocean_backend: the ocean backend
         :param enrich_backend: the enrich backend
         """
-        logger.debug("[git-branches] Start study")
+        logger.debug("[git] study git-branches start")
         for ds in self.prjs_map:
             if ds != "git":
                 continue
@@ -802,18 +807,18 @@ class GitEnrich(Enrich):
 
                 git_repo = GitRepository(cmd.parsed_args.uri, cmd.parsed_args.gitpath)
 
-                logger.debug("[git-branches] Delete branch info for repo %s in index %s",
-                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url))
+                logger.debug("[git] study git-branches delete branch info for repo {} in index {}".format(
+                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url)))
                 self.delete_commit_branches(git_repo, enrich_backend)
 
-                logger.debug("[git-branches] Add branch info for repo %s in index %s",
-                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url))
+                logger.debug("[git] study git-branches add branch info for repo {} in index {}".format(
+                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url)))
                 self.add_commit_branches(git_repo, enrich_backend)
 
-                logger.debug("[git-branches] Repo %s in index %s processed",
-                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url))
+                logger.debug("[git] study git-branches repo {} in index {} processed".format(
+                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url)))
 
-        logger.debug("[git-branches] End study")
+        logger.debug("[git] study git-branches end")
 
     def delete_commit_branches(self, git_repo, enrich_backend):
         """Delete the information about branches from the documents representing
@@ -852,12 +857,13 @@ class GitEnrich(Enrich):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            logger.error("Error while deleting branches on %s",
-                         self.elastic.anonymize_url(index))
+            logger.error("[git] Error while deleting branches on {}".format(
+                         self.elastic.anonymize_url(index)))
             logger.error(r.text)
             return
 
-        logger.debug("Delete branches %s, index %s", r.text, self.elastic.anonymize_url(index))
+        logger.debug("[git] Delete branches {}, index {}".format(
+                     r.text, self.elastic.anonymize_url(index)))
 
     def add_commit_branches(self, git_repo, enrich_backend):
         """Add the information about branches to the documents representing commits in
@@ -895,7 +901,7 @@ class GitEnrich(Enrich):
                     self.__process_commits_in_branch(enrich_backend, git_repo.uri, branch_name, to_process)
 
             except Exception as e:
-                logger.error("Skip adding branch info for repo %s due to %s", git_repo.uri, e)
+                logger.error("[git] Skip adding branch info for repo {} due to {}".format(git_repo.uri, e))
                 return
 
     def __process_commits_in_branch(self, enrich_backend, repo_origin, branch_name, commits):
@@ -905,10 +911,10 @@ class GitEnrich(Enrich):
         digested_branch_name = branch_name
         if "'" in branch_name:
             digested_branch_name = branch_name.replace("'", "---")
-            logger.warning("Change branch name from %s to %s", branch_name, digested_branch_name)
+            logger.warning("[git] Change branch name from {} to {}".format(branch_name, digested_branch_name))
         if '"' in branch_name:
             digested_branch_name = branch_name.replace('"', "---")
-            logger.warning("Change branch name from %s to %s", branch_name, digested_branch_name)
+            logger.warning("[git] Change branch name from {} to {}".format(branch_name, digested_branch_name))
 
         # update enrich index
         fltr = self.__prepare_filter("hash", commits_str, repo_origin)
@@ -935,11 +941,11 @@ class GitEnrich(Enrich):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            logger.error("Error adding branch info for %s", self.elastic.anonymize_url(index))
+            logger.error("[git] Error adding branch info for {}".format(self.elastic.anonymize_url(index)))
             logger.error(r.text)
             return
 
-        logger.debug("Add branches %s, index %s", r.text, self.elastic.anonymize_url(index))
+        logger.debug("[git] Add branches {}, index {}".format(r.text, self.elastic.anonymize_url(index)))
 
     def __prepare_filter(self, terms_attr, terms_value, repo_origin):
         fltr = """
