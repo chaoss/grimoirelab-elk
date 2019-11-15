@@ -238,8 +238,8 @@ class AskbotEnrich(Enrich):
                 comment['added_at_date'] = comment[dfield]
             ecomment.update(self.get_item_sh(comment, date_field="added_at_date"))
             if ecomment['author_user_name'] != ecomment['author_askbot_user_name']:
-                logger.warning('Bad SH identity in askbot comment. Found %s expecting %s',
-                               ecomment['author_user_name'], ecomment['author_askbot_user_name'])
+                logger.warning('[asknot] Bad SH identity in askbot comment. Found {} expecting {}'.format(
+                               ecomment['author_user_name'], ecomment['author_askbot_user_name']))
 
         if dfield == 'added_at':
             comment_at = unixtime_to_datetime(float(comment[dfield]))
@@ -283,8 +283,8 @@ class AskbotEnrich(Enrich):
             answer['added_at_date'] = unixtime_to_datetime(float(answer["added_at"])).isoformat()
             eanswer.update(self.get_item_sh(answer, date_field="added_at_date"))
             if 'author_askbot_user_name' in eanswer and eanswer['author_user_name'] != eanswer['author_askbot_user_name']:
-                logger.warning('Bad SH identity in askbot answer. Found %s expecting %s',
-                               eanswer['author_user_name'], eanswer['author_askbot_user_name'])
+                logger.warning('[askbot] Bad SH identity in askbot answer. Found {} expecting {}'.format(
+                               eanswer['author_user_name'], eanswer['author_askbot_user_name']))
         answer_at = unixtime_to_datetime(float(answer["added_at"]))
         added_at = unixtime_to_datetime(float(item['data']["added_at"]))
         eanswer['time_from_question'] = get_time_diff_days(added_at, answer_at)
@@ -343,8 +343,8 @@ class AskbotEnrich(Enrich):
 
         if num_items != ins_items:
             missing = num_items - ins_items
-            logger.error("%s/%s missing items for Askbot", str(missing), str(num_items))
+            logger.error("[askbot] {}/{} missing items for Askbot".format(missing, num_items))
         else:
-            logger.info("%s items inserted for Askbot", str(num_items))
+            logger.info("[askbot] {} items inserted for Askbot".format(num_items))
 
         return num_items
