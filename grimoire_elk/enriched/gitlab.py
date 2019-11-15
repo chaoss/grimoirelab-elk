@@ -151,7 +151,7 @@ class GitLabEnrich(Enrich):
         elif item['category'] == 'merge_request':
             rich_item = self.__get_rich_merge(item)
         else:
-            logger.error("rich item not defined for GitLab category %s", item['category'])
+            logger.error("[gerrit] rich item not defined for GitLab category {}".format(item['category']))
 
         self.add_repository_labels(rich_item)
         self.add_metadata_filter_raw(rich_item)
@@ -402,7 +402,8 @@ class GitLabEnrich(Enrich):
             raise ELKError(cause="Missing data_source attribute")
 
         if data_source not in [GITLAB_MERGES, GITLAB_ISSUES]:
-            logger.warning("data source value %s should be: %s or %s", data_source, GITLAB_ISSUES, GITLAB_MERGES)
+            logger.warning("[gitlab] data source value {} should be: {} or {}".format(
+                           data_source, GITLAB_ISSUES, GITLAB_MERGES))
 
         super().enrich_onion(enrich_backend=enrich_backend,
                              in_index=in_index,
