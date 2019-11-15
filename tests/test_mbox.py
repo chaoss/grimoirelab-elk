@@ -148,8 +148,8 @@ class TestMbox(TestBaseBackend):
         study, ocean_backend, enrich_backend = self._test_study('kafka_kip')
         with self.assertLogs(logger, level='INFO') as cm:
             study(ocean_backend, enrich_backend)
-            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.mbox:[Kafka KIP] Starting study')
-            self.assertEqual(cm.output[1], 'INFO:grimoire_elk.enriched.mbox:[Kafka KIP] End')
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.mbox:[mbox] study Kafka KIP starting')
+            self.assertEqual(cm.output[1], 'INFO:grimoire_elk.enriched.mbox:[mbox] study Kafka KIP end')
 
     def test_perceval_params(self):
         """Test the extraction of perceval params from an URL"""

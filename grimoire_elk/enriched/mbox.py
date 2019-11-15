@@ -216,7 +216,7 @@ class MBoxEnrich(Enrich):
 
         url = self.elastic.index_url + '/items/_bulk'
 
-        logger.debug("Adding items to %s (in %i packs)", self.elastic.anonymize_url(url), max_items)
+        logger.debug("[mbox] Adding items to {} (in {} packs)".format(self.elastic.anonymize_url(url), max_items))
 
         for item in items:
             if current >= max_items:
@@ -238,7 +238,7 @@ class MBoxEnrich(Enrich):
             total += self.elastic.safe_put_bulk(url, bulk_json)
         except UnicodeEncodeError:
             # Related to body.encode('iso-8859-1'). mbox data
-            logger.error("Encoding error ... converting bulk to iso-8859-1")
+            logger.error("[mbox] Encoding error ... converting bulk to iso-8859-1")
             bulk_json = bulk_json.encode('iso-8859-1', 'ignore')
 
             total += self.elastic.safe_put_bulk(url, bulk_json)
@@ -248,6 +248,6 @@ class MBoxEnrich(Enrich):
     def kafka_kip(self, ocean_backend, enrich_backend, no_incremental=False):
         # KIP study is not incremental
 
-        logger.info("[Kafka KIP] Starting study")
+        logger.info("[mbox] study Kafka KIP starting")
         kafka_kip(self)
-        logger.info("[Kafka KIP] End")
+        logger.info("[mbox] study Kafka KIP end")
