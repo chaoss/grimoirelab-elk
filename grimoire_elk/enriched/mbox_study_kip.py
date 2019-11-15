@@ -232,12 +232,12 @@ def kafka_kip(enrich):
                 eitem.update({"kip_final_status":
                               enrich.kips_final_status[eitem['kip']]})
             else:
-                logger.warning("No final status for kip: %i", eitem['kip'])
+                logger.warning("[mbox] study Kafka KIP no final status: {}".format(eitem['kip']))
                 eitem.update({"kip_final_status": None})
             yield eitem
             total += 1
 
-        logger.info("Total eitems with kafka final status kip field %i", total)
+        logger.info("[mbox] study Kafka KIP total eitems with kafka final status kip field {}".format(total))
 
     def add_kip_time_status_fields(enrich):
         """ Add kip fields with final status and times """
@@ -344,7 +344,7 @@ def kafka_kip(enrich):
             yield eitem
             total += 1
 
-        logger.info("Total eitems with kafka extra kip fields %i", total)
+        logger.info("[mbox] study Kafka KIP total eitems with kafka extra kip fields {}".format(total))
 
     def add_kip_fields(enrich):
         """ Add extra fields needed for kip analysis"""
@@ -413,7 +413,7 @@ def kafka_kip(enrich):
                     kip_fields['kip_vote'] = vote
                     kip_fields['kip_binding'] = binding
                 else:
-                    logger.debug("Message %s without body", eitem['Subject'])
+                    logger.debug("[mbox] study Kafka KIP message {} without body".format(eitem['Subject']))
                 # Update kip discuss dates
                 if "kip_min_vote" not in enrich.kips_dates[kip]:
                     enrich.kips_dates[kip].update({
@@ -430,9 +430,9 @@ def kafka_kip(enrich):
             yield eitem
             total += 1
 
-        logger.info("Total eitems with kafka kip fields %i", total)
+        logger.info("[mbox] study Kafka KIP total eitems with kafka kip fields {}".format(total))
 
-    logger.debug("Doing kafka_kip study from %s", enrich.elastic.anonymize_url(enrich.elastic.index_url))
+    logger.debug("[mbox] study Kafka KIP doing from {}".format(enrich.elastic.anonymize_url(enrich.elastic.index_url)))
 
     # First iteration with the basic fields
     eitems = add_kip_fields(enrich)
