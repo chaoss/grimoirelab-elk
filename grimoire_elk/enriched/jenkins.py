@@ -82,12 +82,12 @@ class JenkinsEnrich(Enrich):
         """
         self.nodes_rename_file = nodes_rename_file
         self.__load_node_renames()
-        logger.info("Jenkis node rename file active: %s", nodes_rename_file)
+        logger.info("[jenkins] Node rename file active: {}".format(nodes_rename_file))
 
     def __load_node_renames(self):
         # In OPNFV nodes could be renamed
         if not self.nodes_rename_file:
-            logger.debug("Jenkis node rename file not defined.")
+            logger.debug("[jenkis] Node rename file not defined.")
             return
         try:
             with open(self.nodes_rename_file, 'r') as csvfile:
@@ -98,10 +98,9 @@ class JenkinsEnrich(Enrich):
                     rename = action.split("merge into ")
                     if len(rename) > 1:
                         self.nodes_rename[name] = rename[1]
-                logger.debug("Total node renames: %i", len(self.nodes_rename.keys()))
+                logger.debug("[jenkins] Total node renames: {}".format(len(self.nodes_rename.keys())))
         except FileNotFoundError:
-            logger.info("Jenkis node rename file not found %s",
-                        self.nodes_rename_file)
+            logger.info("[jenkins] Node rename file not found {}".format(self.nodes_rename_file))
 
     def get_field_author(self):
         # In Jenkins there are no identities support
@@ -167,7 +166,7 @@ class JenkinsEnrich(Enrich):
             extra_fields['branch'] = components[-1]
         except IndexError as ex:
             # Just DEBUG level because it is just for OPNFV
-            logger.debug('Problems parsing job name %s', job_name)
+            logger.debug('[jenkins] Problems parsing job name {}'.format(job_name))
             logger.debug(ex)
 
         return extra_fields
@@ -181,7 +180,7 @@ class JenkinsEnrich(Enrich):
         if match and len(match.groups()) >= 1:
             node_name = match.group(1)
         else:
-            msg = "Node name not extracted, using builtOn as it is: " + regex + ":" + built_on
+            msg = "[jenkins] Node name not extracted, using builtOn as it is: {}:{}".format(regex, built_on)
             logger.warning(msg)
             node_name = built_on
 
