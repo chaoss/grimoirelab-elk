@@ -220,7 +220,7 @@ class KitsuneEnrich(Enrich):
 
         url = self.elastic.index_url + '/items/_bulk'
 
-        logger.debug("Adding items to %s (in %i packs)", self.elastic.anonymize_url(url), max_items)
+        logger.debug("[kitsune] Adding items to {} (in {} packs)".format(self.elastic.anonymize_url(url), max_items))
 
         items = ocean_backend.fetch()
         for item in items:
