@@ -434,7 +434,7 @@ class JiraEnrich(Enrich):
             # This condition should never happen, since the enriched
             # data heavily relies on the `fields` attribute
             if "fields" not in item["data"]:
-                logger.warning("Skipping item with uuid %s, no fields attribute", item['uuid'])
+                logger.warning("[jira] Skipping item with uuid {}, no fields attribute".format(item['uuid']))
                 continue
 
             eitem_creator = self.get_rich_item(item, author_type='creator')
@@ -463,8 +463,8 @@ class JiraEnrich(Enrich):
 
         if num_items != ins_items:
             missing = num_items - ins_items
-            logger.error("%s/%s missing items for Jira", str(missing), str(num_items))
+            logger.error("[jira] {}/{} missing items for Jira".format(missing, num_items))
         else:
-            logger.info("%s items inserted for Jira", str(num_items))
+            logger.info("[jira] {} items inserted for Jira".format(num_items))
 
         return num_items
