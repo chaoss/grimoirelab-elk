@@ -174,7 +174,7 @@ class Enrich(ElasticItems):
         backend_name = self.get_connector_name()
         # We can now create the perceval backend
         if not get_connector_from_name(backend_name):
-            raise RuntimeError("Unknown backend %s" % backend_name)
+            raise RuntimeError("Unknown backend {}".format(backend_name))
         connector = get_connector_from_name(backend_name)
         klass = connector[3]  # BackendCmd for the connector
         if not klass:
@@ -225,11 +225,11 @@ class Enrich(ElasticItems):
                     repo, _ = self.extract_repo_labels(repo)
                     if repo in ds_repo_to_prj[ds]:
                         if project == ds_repo_to_prj[ds][repo]:
-                            logger.debug("Duplicated repo: %s %s %s", ds, repo, project)
+                            logger.debug("Duplicated repo: {} {} {}".format(ds, repo, project))
                         else:
                             if len(project.split(".")) > len(ds_repo_to_prj[ds][repo].split(".")):
-                                logger.debug("Changed repo project because we found a leaf: %s leaf vs %s (%s, %s)",
-                                             project, ds_repo_to_prj[ds][repo], repo, ds)
+                                logger.debug("Changed repo project because we found a leaf: {} leaf vs "
+                                             "{} ({}, {})".format(project, ds_repo_to_prj[ds][repo], repo, ds))
                                 ds_repo_to_prj[ds][repo] = project
                     else:
                         ds_repo_to_prj[ds][repo] = project
@@ -258,21 +258,21 @@ class Enrich(ElasticItems):
                 if project not in db_projects:
                     db_projects.append(project)
                 if project not in json:
-                    logger.error("Project not found in JSON ", project)
-                    raise NotFoundError("Project not found in JSON " + project)
+                    logger.error("Project not found in JSON {}".format(project))
+                    raise NotFoundError("Project not found in JSON {}".format(project))
                 else:
                     if ds == 'mls':
                         repo_mls = repository.split("/")[-1]
                         repo_mls = repo_mls.replace(".mbox", "")
                         repository = 'https://dev.eclipse.org/mailman/listinfo/' + repo_mls
                     if ds_map_db[ds] not in json[project]:
-                        logger.error("db repository not found in json %s", repository)
+                        logger.error("db repository not found in json {}".format(repository))
                     elif repository not in json[project][ds_map_db[ds]]:
-                        logger.error("db repository not found in json %s", repository)
+                        logger.error("db repository not found in json {}".format(repository))
 
         for project in json.keys():
             if project not in db_projects:
-                logger.debug("JSON project %s not found in db" % project)
+                logger.debug("JSON project {} not found in db".format(project))
 
         # Check that all JSON data is in the database
         for project in json:
@@ -288,10 +288,10 @@ class Enrich(ElasticItems):
                         # print("Found ", repo, ds)
                         pass
                     else:
-                        logger.debug("Not found repository in db %s %s", repo, ds)
+                        logger.debug("Not found repository in db {} {}".format(repo, ds))
 
-        logger.debug("Number of db projects: %i", len(db_projects))
-        logger.debug("Number of json projects: %i (>=%i)", len(json.keys()), len(db_projects))
+        logger.debug("Number of db projects: {}".format(db_projects))
+        logger.debug("Number of json projects: {} (>={})".format(json.keys(), db_projects))
 
     def __get_projects_map(self, db_projects_map, db_user=None, db_password=None, db_host=None):
         # Read the repo to project mapping from a database
@@ -316,7 +316,7 @@ class Enrich(ElasticItems):
                     ds_repo_to_prj[ds] = {}
                 ds_repo_to_prj[ds][repo] = name
         else:
-            raise RuntimeError("Can't find projects mapping in %s" % (db_projects_map))
+            raise RuntimeError("Can't find projects mapping in {}".format(db_projects_map))
         return ds_repo_to_prj
 
     def get_field_unique_id(self):
@@ -359,7 +359,7 @@ class Enrich(ElasticItems):
 
         url = self.elastic.index_url + '/items/_bulk'
 
-        logger.debug("Adding items to %s (in %i packs)", self.elastic.anonymize_url(url), max_items)
+        logger.debug("Adding items to {} (in {} packs)".format(self.elastic.anonymize_url(url), max_items))
 
         if events:
             logger.debug("Adding events items")
@@ -369,7 +369,8 @@ class Enrich(ElasticItems):
                 try:
                     total += self.elastic.safe_put_bulk(url, bulk_json)
                     json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
-                    logger.debug("Added %i items to %s (%0.2f MB)", total, self.elastic.anonymize_url(url), json_size)
+                    logger.debug("Added {} items to {} ({:.2f} MB)".format(
+                                 total, self.elastic.anonymize_url(url), json_size))
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
                     logger.error("Unicode error in enriched items")
@@ -743,7 +744,7 @@ class Enrich(ElasticItems):
             eitem_sh[rol + "_gender_acc"] = profile.get('gender_acc', 0)
 
         elif not profile and sh_id:
-            logger.warning("Can't find SH identity profile: %s", sh_id)
+            logger.warning("Can't find SH identity profile: {}".format(sh_id))
 
         # Ensure we always write gender fields
         if not eitem_sh.get(rol + "_gender"):
@@ -784,11 +785,11 @@ class Enrich(ElasticItems):
         for rol in roles:
             if rol + "_id" not in eitem:
                 # For example assignee in github it is usual that it does not appears
-                logger.debug("Enriched index does not include SH ids for %s. Can not refresh it.", rol + "_id")
+                logger.debug("Enriched index does not include SH ids for {}_id. Can not refresh it.".format(rol))
                 continue
             sh_id = eitem[rol + "_id"]
             if not sh_id:
-                logger.debug("%s_id is None", rol)
+                logger.debug("{}_id is None".format(rol))
                 continue
             if rol == author_field:
                 sh_id_author = sh_id
@@ -903,7 +904,7 @@ class Enrich(ElasticItems):
                 iden[field] = identity[field]
 
         if not iden['name'] and not iden['email'] and not iden['username']:
-            logger.warning("Name, email and username are none in %s", backend_name)
+            logger.warning("Name, email and username are none in {}".format(backend_name))
             return sh_ids
 
         try:
@@ -912,8 +913,8 @@ class Enrich(ElasticItems):
                             name=iden['name'], username=iden['username'])
 
             if not id:
-                logger.warning("Id not found in SortingHat for name: %s, email: %s and username: %s in %s",
-                               str(iden['name']), str(iden['email']), str(iden['username']), backend_name)
+                logger.warning("Id not found in SortingHat for name: {}, email: {} and username: {} in {}".format(
+                               iden['name'], iden['email'], iden['username'], backend_name))
                 return sh_ids
 
             with self.sh_db.connect() as session:
@@ -945,7 +946,7 @@ class Enrich(ElasticItems):
 
         log_prefix = "[" + data_source + "] study onion"
 
-        logger.info("%s  starting study - Input: %s Output: %s", log_prefix, in_index, out_index)
+        logger.info("{}  starting study - Input: {} Output: {}".format(log_prefix, in_index, out_index))
 
         # Creating connections
         es = Elasticsearch([enrich_backend.elastic.url], retry_on_timeout=True, timeout=100,
@@ -962,7 +963,7 @@ class Enrich(ElasticItems):
                                     read_only=False)
 
         if not in_conn.exists():
-            logger.info("%s missing index %s", log_prefix, in_index)
+            logger.info("{} missing index {}".format(log_prefix, in_index))
             return
 
         # Check last execution date
@@ -971,16 +972,16 @@ class Enrich(ElasticItems):
             latest_date = out_conn.latest_enrichment_date()
 
         if latest_date:
-            logger.info(log_prefix + " Latest enrichment date: " + latest_date.isoformat())
+            logger.info("{} Latest enrichment date: {}".format(log_prefix, latest_date.isoformat()))
             update_after = latest_date + timedelta(seconds=seconds)
-            logger.info("%s update after date: %s", log_prefix, update_after.isoformat())
+            logger.info("{} update after date: {}".format(log_prefix, update_after.isoformat()))
             if update_after >= datetime_utcnow():
-                logger.info("%s too soon to update. Next update will be at %s",
-                            log_prefix, update_after.isoformat())
+                logger.info("{} too soon to update. Next update will be at {}".format(
+                            log_prefix, update_after.isoformat()))
                 return
 
         # Onion currently does not support incremental option
-        logger.info("%s Creating out ES index", log_prefix)
+        logger.info("{} Creating out ES index".format(log_prefix))
         # Initialize out index
         filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/onion.json')
         out_conn.create_index(filename, delete=out_conn.exists())
@@ -990,10 +991,10 @@ class Enrich(ElasticItems):
         # Create alias if output index exists (index is always created from scratch, so
         # alias need to be created each time)
         if out_conn.exists() and not out_conn.exists_alias(out_index, ONION_ALIAS):
-            logger.info("%s Creating alias: %s", log_prefix, ONION_ALIAS)
+            logger.info("{} Creating alias: {}".format(log_prefix, ONION_ALIAS))
             out_conn.create_alias(ONION_ALIAS)
 
-        logger.info("%s end", log_prefix)
+        logger.info("{} end".format(log_prefix))
 
     def enrich_extra_data(self, ocean_backend, enrich_backend, json_url, target_index=None):
         """
@@ -1065,8 +1066,8 @@ class Enrich(ElasticItems):
 
         res = self.requests.get(index_url)
         if res.status_code != 200:
-            logger.error("[enrich-extra-data] Target index %s doesn't exists, "
-                         "study finished", self.elastic.anonymize_url(url))
+            logger.error("[enrich-extra-data] Target index {} doesn't exists, "
+                         "study finished".format(self.elastic.anonymize_url(url)))
             return
 
         res = self.requests.get(json_url)
@@ -1153,7 +1154,7 @@ class Enrich(ElasticItems):
                 r = self.requests.post(url, data=es_query, headers=HEADER_JSON, verify=False)
             except requests.exceptions.RetryError:
                 logger.warning("[enrich-extra-data] Retry exceeded while executing study. "
-                               "The following query is skipped %s.", es_query)
+                               "The following query is skipped {}.".format(es_query))
                 continue
 
             try:
@@ -1163,8 +1164,8 @@ class Enrich(ElasticItems):
                 logger.error(ex)
                 return
 
-            logger.info("[enrich-extra-data] Target index %s "
-                        "updated with data from %s", self.elastic.anonymize_url(url), json_url)
+            logger.info("[enrich-extra-data] Target index {} updated with data from {}".format(
+                        self.elastic.anonymize_url(url), json_url))
 
     def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
                           author_field="author_uuid"):
@@ -1184,8 +1185,8 @@ class Enrich(ElasticItems):
         :return: None
         """
         data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
-        log_prefix = "[" + data_source + "] Demography"
-        logger.info("%s starting study %s", log_prefix, self.elastic.anonymize_url(self.elastic.index_url))
+        log_prefix = "[{}] Demography".format(data_source)
+        logger.info("{} starting study {}".format(log_prefix, self.elastic.anonymize_url(self.elastic.index_url)))
 
         # The first step is to find the current min and max date for all the authors
         authors_min_max_data = {}
@@ -1197,7 +1198,7 @@ class Enrich(ElasticItems):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
-            logger.error("%s error getting authors mix and max date. Aborted.", log_prefix)
+            logger.error("{} error getting authors mix and max date. Aborted.".format(log_prefix))
             logger.error(ex)
             return
 
@@ -1219,23 +1220,23 @@ class Enrich(ElasticItems):
                     verify=False
                 )
             except requests.exceptions.RetryError:
-                logger.warning("%s retry execeeded while executing demography."
-                               " The following query is skipped %s", log_prefix, es_update)
+                logger.warning("{} retry execeeded while executing demography."
+                               " The following query is skipped {}".format(log_prefix, es_update))
                 continue
 
             try:
                 r.raise_for_status()
             except requests.exceptions.HTTPError as ex:
-                logger.error("%s error updating mix and max date for author %s. Aborted.",
-                             log_prefix, author_key)
+                logger.error("{} error updating mix and max date for author {}. Aborted.".format(
+                             log_prefix, author_key))
                 logger.error(ex)
                 return
 
         if not self.elastic.alias_in_use(DEMOGRAPHICS_ALIAS):
-            logger.info("%s Creating alias: %s", log_prefix, DEMOGRAPHICS_ALIAS)
+            logger.info("{} Creating alias: {}".format(log_prefix, DEMOGRAPHICS_ALIAS))
             self.elastic.add_alias(DEMOGRAPHICS_ALIAS)
 
-        logger.info("%s end %s", log_prefix, self.elastic.anonymize_url(self.elastic.index_url))
+        logger.info("{} end {}".format(log_prefix, self.elastic.anonymize_url(self.elastic.index_url)))
 
     @staticmethod
     def authors_min_max_dates(date_field, author_field="author_uuid"):
