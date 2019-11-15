@@ -59,7 +59,7 @@ def feed_arthur():
     db_url = 'redis://localhost/8'
 
     conn = redis.StrictRedis.from_url(db_url)
-    logger.debug("Redis connection stablished with %s.", db_url)
+    logger.debug("Redis connection stablished with {}.".format(db_url))
 
     # Get and remove queued items in an atomic transaction
     pipe = conn.pipeline()
@@ -74,7 +74,7 @@ def feed_arthur():
         arthur_items[arthur_item['tag']].append(arthur_item)
 
     for tag in arthur_items:
-        logger.debug("Items for %s: %i", tag, len(arthur_items[tag]))
+        logger.debug("Items for {}: {}".format(tag, len(arthur_items[tag])))
 
 
 def feed_backend_arthur(backend_name, backend_params):
@@ -83,21 +83,21 @@ def feed_backend_arthur(backend_name, backend_params):
     # Always get pending items from arthur for all data sources
     feed_arthur()
 
-    logger.debug("Items available for %s", arthur_items.keys())
+    logger.debug("Items available for {}".format(arthur_items.keys()))
 
     # Get only the items for the backend
     if not get_connector_from_name(backend_name):
-        raise RuntimeError("Unknown backend %s" % backend_name)
+        raise RuntimeError("Unknown backend {}".format(backend_name))
     connector = get_connector_from_name(backend_name)
     klass = connector[3]  # BackendCmd for the connector
 
     backend_cmd = init_backend(klass(*backend_params))
 
     tag = backend_cmd.backend.tag
-    logger.debug("Getting items for %s.", tag)
+    logger.debug("Getting items for {}.".format(tag))
 
     if tag in arthur_items:
-        logger.debug("Found items for %s.", tag)
+        logger.debug("Found items for {}.".format(tag))
         for item in arthur_items[tag]:
             yield item
 
@@ -115,15 +115,15 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         clean = False  # don't remove index, it could be shared
 
     if not get_connector_from_name(backend_name):
-        raise RuntimeError("Unknown backend %s" % backend_name)
+        raise RuntimeError("Unknown backend {}".format(backend_name))
     connector = get_connector_from_name(backend_name)
     klass = connector[3]  # BackendCmd for the connector
 
     try:
-        logger.debug("Feeding raw from %s (%s)", backend_name, es_index)
+        logger.debug("Feeding raw from {} ({})".format(backend_name, es_index))
 
         if not es_index:
-            logger.error("Raw index not defined for %s", backend_name)
+            logger.error("Raw index not defined for {}".format(backend_name))
 
         repo['repo_update_start'] = datetime.now().isoformat()
 
@@ -228,7 +228,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             ocean_backend.feed(**params)
 
     except RateLimitError as ex:
-        logger.error("Error feeding raw from %s (%s): rate limit exceeded", backend_name, backend.origin)
+        logger.error("Error feeding raw from {} ({}): rate limit exceeded".format(backend_name, backend.origin))
         error_msg = "RateLimitError: seconds to reset {}".format(ex.seconds_to_reset)
     except Exception as ex:
         if backend:
@@ -238,7 +238,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             error_msg = "Error feeding raw from {}".format(ex)
             logger.error(error_msg, exc_info=True)
 
-    logger.info("[%s] Done collection for %s", backend_name, backend.origin)
+    logger.info("[{}] Done collection for {}".format(backend_name, backend.origin))
     return error_msg
 
 
@@ -287,7 +287,7 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
             items_ids.append(item_id)
 
     # Time to get the items
-    logger.debug("Items to be renriched for merged uuids: %s" % (",".join(items_ids)))
+    logger.debug("Items to be renriched for merged uuids: {}".format(",".join(items_ids)))
 
     url_mget = ocean_backend.elastic.index_url + "/_mget"
 
@@ -312,8 +312,8 @@ def get_items_from_uuid(uuid, enrich_backend, ocean_backend):
 
 
 def refresh_projects(enrich_backend):
-    logger.debug("Refreshing project field in %s",
-                 enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
+    logger.debug("Refreshing project field in {}".format(
+                 enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url)))
     total = 0
 
     eitems = enrich_backend.fetch()
@@ -323,7 +323,7 @@ def refresh_projects(enrich_backend):
         yield eitem
         total += 1
 
-    logger.info("Total eitems refreshed for project field %i", total)
+    logger.debug("Total eitems refreshed for project field {}".format(total))
 
 
 def refresh_identities(enrich_backend, author_field=None, author_values=None):
@@ -353,8 +353,8 @@ def refresh_identities(enrich_backend, author_field=None, author_values=None):
             eitem.update(new_identities)
             yield eitem
 
-    logger.debug("Refreshing identities fields from %s",
-                 enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
+    logger.debug("Refreshing identities fields from {}".format(
+                 enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url)))
 
     total = 0
 
@@ -389,7 +389,7 @@ def refresh_identities(enrich_backend, author_field=None, author_values=None):
                 yield item
                 total += 1
 
-    logger.info("Total eitems refreshed for identities fields %i", total)
+    logger.debug("Total eitems refreshed for identities fields {}".format(total))
 
 
 def load_identities(ocean_backend, enrich_backend):
@@ -439,8 +439,8 @@ def load_bulk_identities(items_count, new_identities, sh_db, connector_name):
 
     SortingHat.add_identities(sh_db, new_identities, connector_name)
 
-    logger.debug("Processed %i items identities (%i identities) from %s",
-                 items_count, len(new_identities), connector_name)
+    logger.debug("Processed {} items identities ({} identities) from {}".format(
+                 items_count, len(new_identities), connector_name))
 
     return identities_count
 
@@ -464,7 +464,7 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw=No
     else:
         last_enrich = get_last_enrich(backend_cmd, enrich_backend, filter_raw=filter_raw)
 
-    logger.debug("Last enrichment: %s", last_enrich)
+    logger.debug("Last enrichment: {}".format(last_enrich))
 
     backend = None
 
@@ -518,11 +518,11 @@ def do_studies(ocean_backend, enrich_backend, studies_args, retention_time=None)
 
         for (name, params) in selected_studies:
             data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
-            logger.info("[%s] Starting study: %s, params %s", data_source, name, params)
+            logger.info("[{}] Starting study: {}, params {}".format(data_source, name, params))
             try:
                 study(ocean_backend, enrich_backend, **params)
             except Exception as e:
-                logger.error("[%s] Problem executing study %s, %s", data_source, name, e)
+                logger.error("[{}] Problem executing study {}, {}".format(data_source, name, e))
                 raise e
 
             # identify studies which creates other indexes. If the study is onion,
@@ -566,7 +566,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         clean = False  # refresh works over the existing enriched items
 
     if not get_connector_from_name(backend_name):
-        raise RuntimeError("Unknown backend %s" % backend_name)
+        raise RuntimeError("Unknown backend {}".format(backend_name))
     connector = get_connector_from_name(backend_name)
     klass = connector[3]  # BackendCmd for the connector
 
@@ -622,8 +622,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
             logger.info("Running only studies (no SH and no enrichment)")
             do_studies(ocean_backend, enrich_backend, studies_args)
         elif do_refresh_projects:
-            logger.info("Refreshing project field in %s",
-                        enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
+            logger.info("Refreshing project field in {}".format(
+                        enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url)))
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_projects(enrich_backend)
             enrich_backend.elastic.bulk_upload(eitems, field_id)
@@ -638,8 +638,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                 author_attr = 'author_uuid'
                 author_values = [author_uuid]
 
-            logger.info("Refreshing identities fields in %s",
-                        enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
+            logger.info("Refreshing identities fields in {}".format(
+                        enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url)))
 
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_identities(enrich_backend, author_attr, author_values)
@@ -649,38 +649,38 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
             elastic_ocean = get_elastic(url, ocean_index, clean, ocean_backend)
             ocean_backend.set_elastic(elastic_ocean)
 
-            logger.debug("Adding enrichment data to %s",
-                         enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url))
+            logger.debug("Adding enrichment data to {}".format(
+                         enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url)))
 
             if db_sortinghat and enrich_backend.has_identities():
                 # FIXME: This step won't be done from enrich in the future
                 total_ids = load_identities(ocean_backend, enrich_backend)
-                logger.info("Total identities loaded %i ", total_ids)
+                logger.debug("Total identities loaded {} ".format(total_ids))
 
             if only_identities:
-                logger.info("Only SH identities added. Enrich not done!")
+                logger.debug("Only SH identities added. Enrich not done!")
 
             else:
                 # Enrichment for the new items once SH update is finished
                 if not events_enrich:
                     enrich_count = enrich_items(ocean_backend, enrich_backend)
                     if enrich_count is not None:
-                        logger.info("Total items enriched %i ", enrich_count)
+                        logger.debug("Total items enriched {} ".format(enrich_count))
                 else:
                     enrich_count = enrich_items(ocean_backend, enrich_backend, events=True)
                     if enrich_count is not None:
-                        logger.info("Total events enriched %i ", enrich_count)
+                        logger.debug("Total events enriched {} ".format(enrich_count))
                 if studies:
                     do_studies(ocean_backend, enrich_backend, studies_args)
 
     except Exception as ex:
         if backend:
-            logger.error("Error enriching ocean from %s (%s): %s",
-                         backend_name, backend.origin, ex, exc_info=True)
+            logger.error("Error enriching raw from {} ({}): {}".format(
+                         backend_name, backend.origin, ex), exc_info=True)
         else:
-            logger.error("Error enriching ocean %s", ex, exc_info=True)
+            logger.error("Error enriching raw {}".format(ex), exc_info=True)
 
-    logger.info("[%s] Done enrichment for %s", backend_name, backend.origin)
+    logger.info("[{}] Done enrichment for {}".format(backend_name, backend.origin))
 
 
 def delete_orphan_unique_identities(es, sortinghat_db, current_data_source, active_data_sources):
@@ -813,10 +813,10 @@ def delete_orphan_unique_identities(es, sortinghat_db, current_data_source, acti
         # Delete the orphan uuids from SortingHat
         deleted_unique_identities += delete_unique_identities(orphan_uuids)
 
-    logger.debug("[identities retention] Total orphan unique identities deleted from SH: %i",
-                 deleted_unique_identities)
-    logger.debug("[identities retention] Total identities in non-active data sources deleted from SH: %i",
-                 deleted_identities)
+    logger.debug("[identities retention] Total orphan unique identities deleted from SH: {}".format(
+                 deleted_unique_identities))
+    logger.debug("[identities retention] Total identities in non-active data sources deleted from SH: {}".format(
+                 deleted_identities))
 
 
 def delete_inactive_unique_identities(es, sortinghat_db, before_date):
@@ -846,8 +846,8 @@ def delete_inactive_unique_identities(es, sortinghat_db, before_date):
     scroll_size = page['hits']['total']
 
     if scroll_size == 0:
-        logging.warning("[identities retention] No inactive identities found in %s after %s!",
-                        IDENTITIES_INDEX, before_date)
+        logging.warning("[identities retention] No inactive identities found in {} after {}!".format(
+                        IDENTITIES_INDEX, before_date))
         return
 
     count = 0
@@ -863,7 +863,7 @@ def delete_inactive_unique_identities(es, sortinghat_db, before_date):
         sid = page['_scroll_id']
         scroll_size = len(page['hits']['hits'])
 
-    logger.debug("[identities retention] Total inactive identities deleted from SH: %i", count)
+    logger.debug("[identities retention] Total inactive identities deleted from SH: {}".format(count))
 
 
 def retain_identities(retention_time, es_enrichment_url, sortinghat_db, data_source, active_data_sources):
@@ -947,7 +947,7 @@ def populate_identities_index(es_enrichment_url, enrich_index):
     enriched_items = ElasticItems(None)
     enriched_items.elastic = elastic_enrich
 
-    logger.debug("[identities-index] Start adding identities to %s", IDENTITIES_INDEX)
+    logger.debug("[identities-index] Start adding identities to {}".format(IDENTITIES_INDEX))
 
     identities = []
     for eitem in enriched_items.fetch(ignore_incremental=True):
@@ -973,4 +973,4 @@ def populate_identities_index(es_enrichment_url, enrich_index):
     if len(identities) > 0:
         elastic_identities.bulk_upload(identities, 'sh_uuid')
 
-    logger.debug("[identities-index] End adding identities to %s", IDENTITIES_INDEX)
+    logger.debug("[identities-index] End adding identities to {}".format(IDENTITIES_INDEX))
