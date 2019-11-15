@@ -137,7 +137,7 @@ class ESPandasConnector(ESConnector):
         chunks = [docs[i:i + chunk_size] for i in range(0, len(docs), chunk_size)]
         for chunk in chunks:
             helpers.bulk(self._es_conn, chunk)
-        logger.debug("%s Written: %s", self.__log_prefix, len(docs))
+        logger.debug("{} Written: {}".format(self.__log_prefix, len(docs)))
 
 
 class AreasOfCode(CeresBase):
@@ -171,35 +171,35 @@ class AreasOfCode(CeresBase):
         :param items_block: items to be processed. Expects to find ElasticSearch hits _source part only.
         """
 
-        logger.debug("%s New commits: %s", self.__log_prefix, len(items_block))
+        logger.debug("{} New commits: {}".format(self.__log_prefix, len(items_block)))
 
         # Create events from commits
         git_events = Git(items_block, self._git_enrich)
         events_df = git_events.eventize(2)
 
-        logger.debug("%s New events: %s", self.__log_prefix, len(events_df))
+        logger.debug("{} New events: {}".format(self.__log_prefix, len(events_df)))
 
         if len(events_df) > 0:
             # Filter information
             data_filtered = FilterRows(events_df)
             events_df = data_filtered.filter_(["filepath"], "-")
 
-            logger.debug("%s New events filtered: %s", self.__log_prefix, len(events_df))
+            logger.debug("{} New events filtered: {}".format(self.__log_prefix, len(events_df)))
 
             events_df['message'] = events_df['message'].str.slice(stop=AreasOfCode.MESSAGE_MAX_SIZE)
-            logger.debug("%s Remove message content", self.__log_prefix)
+            logger.debug("{} Remove message content".format(self.__log_prefix))
 
             # Add filetype info
             enriched_filetype = FileType(events_df)
             events_df = enriched_filetype.enrich('filepath')
 
-            logger.debug("%s New Filetype events: %s", self.__log_prefix, len(events_df))
+            logger.debug("{} New Filetype events: {}".format(self.__log_prefix, len(events_df)))
 
             # Split filepath info
             enriched_filepath = FilePath(events_df)
             events_df = enriched_filepath.enrich('filepath')
 
-            logger.debug("%s New Filepath events: %s", self.__log_prefix, len(events_df))
+            logger.debug("{} New Filepath events: {}".format(self.__log_prefix, len(events_df)))
 
             events_df['origin'] = events_df['repository']
 
@@ -207,7 +207,7 @@ class AreasOfCode(CeresBase):
             convert = ToUTF8(events_df)
             events_df = convert.enrich(["owner"])
 
-        logger.debug("%s Final new events: %s", self.__log_prefix, len(events_df))
+        logger.debug("{} Final new events: {}".format(self.__log_prefix, len(events_df)))
 
         return self.ProcessResults(processed=len(events_df), out_items=events_df)
 
