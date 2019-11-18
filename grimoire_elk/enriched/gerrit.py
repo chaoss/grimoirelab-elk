@@ -140,9 +140,10 @@ class GerritEnrich(Enrich):
         # Patchset uploader and author
         if 'patchSets' in item:
             for patchset in item['patchSets']:
-                user = patchset['uploader']
-                identity = self.get_sh_identity(user)
-                yield identity
+                if 'uploader' in patchset:
+                    user = patchset['uploader']
+                    identity = self.get_sh_identity(user)
+                    yield identity
                 if 'author' in patchset:
                     user = patchset['author']
                     identity = self.get_sh_identity(user)
@@ -157,9 +158,10 @@ class GerritEnrich(Enrich):
         # Comments reviewers
         if 'comments' in item:
             for comment in item['comments']:
-                user = comment['reviewer']
-                identity = self.get_sh_identity(user)
-                yield identity
+                if 'reviewer' in comment:
+                    user = comment['reviewer']
+                    identity = self.get_sh_identity(user)
+                    yield identity
 
     def get_item_id(self, eitem):
         """ Return the item_id linked to this enriched eitem """
@@ -313,17 +315,18 @@ class GerritEnrich(Enrich):
             ecomment['id'] = '{}_comment_{}'.format(eitem['id'], created.timestamp())
 
             if self.sortinghat:
-                ecomment.update(self.get_item_sh(comment, ['reviewer'], 'timestamp'))
+                if 'reviewer' in comment:
+                    ecomment.update(self.get_item_sh(comment, ['reviewer'], 'timestamp'))
 
-                ecomment['author_id'] = ecomment['reviewer_id']
-                ecomment['author_uuid'] = ecomment['reviewer_uuid']
-                ecomment['author_name'] = ecomment['reviewer_name']
-                ecomment['author_user_name'] = ecomment['reviewer_user_name']
-                ecomment['author_domain'] = ecomment['reviewer_domain']
-                ecomment['author_gender'] = ecomment['reviewer_gender']
-                ecomment['author_gender_acc'] = ecomment['reviewer_gender_acc']
-                ecomment['author_org_name'] = ecomment['reviewer_org_name']
-                ecomment['author_bot'] = ecomment['reviewer_bot']
+                    ecomment['author_id'] = ecomment['reviewer_id']
+                    ecomment['author_uuid'] = ecomment['reviewer_uuid']
+                    ecomment['author_name'] = ecomment['reviewer_name']
+                    ecomment['author_user_name'] = ecomment['reviewer_user_name']
+                    ecomment['author_domain'] = ecomment['reviewer_domain']
+                    ecomment['author_gender'] = ecomment['reviewer_gender']
+                    ecomment['author_gender_acc'] = ecomment['reviewer_gender_acc']
+                    ecomment['author_org_name'] = ecomment['reviewer_org_name']
+                    ecomment['author_bot'] = ecomment['reviewer_bot']
 
                 # add changeset author
                 self.add_changeset_author(eitem, ecomment)

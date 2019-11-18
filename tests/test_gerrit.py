@@ -150,7 +150,7 @@ class TestGerrit(TestBaseBackend):
             if item['type'] == 'patchset' and item['patchset_author_name'] is None:
                 self.assertFalse('demography_min_date' in item.keys())
                 self.assertFalse('demography_max_date' in item.keys())
-            else:
+            elif 'reviewer_uuid' in item:
                 self.assertTrue('demography_min_date' in item.keys())
                 self.assertTrue('demography_max_date' in item.keys())
 
