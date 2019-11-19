@@ -84,6 +84,7 @@ from .enriched.functest import FunctestEnrich
 from .enriched.gerrit import GerritEnrich
 from .enriched.git import GitEnrich
 from .enriched.github import GitHubEnrich
+from .enriched.github2 import GitHubEnrich2
 from .enriched.gitlab import GitLabEnrich
 from .enriched.google_hits import GoogleHitsEnrich
 from .enriched.groupsio import GroupsioEnrich
@@ -216,6 +217,7 @@ def get_connectors():
             "gerrit": [Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git": [Git, GitOcean, GitEnrich, GitCommand],
             "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
+            "github2": [GitHub, GitHubOcean, GitHubEnrich2, GitHubCommand],
             "gitlab": [GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
             "google_hits": [GoogleHits, GoogleHitsOcean, GoogleHitsEnrich, GoogleHitsCommand],
             "groupsio": [Groupsio, GroupsioOcean, GroupsioEnrich, GroupsioCommand],
