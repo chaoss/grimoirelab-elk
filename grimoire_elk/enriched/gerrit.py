@@ -110,16 +110,13 @@ class GerritEnrich(Enrich):
         elif identity_field:
             user = item[identity_field]
 
-        identity['name'] = None
-        identity['username'] = None
-        identity['email'] = None
+        if not user:
+            return identity
 
-        if 'name' in user:
-            identity['name'] = user['name']
-        if 'email' in user:
-            identity['email'] = user['email']
-        if 'username' in user:
-            identity['username'] = user['username']
+        identity['name'] = user.get('name', None)
+        identity['username'] = user.get('username', None)
+        identity['email'] = user.get('email', None)
+
         return identity
 
     def get_project_repository(self, eitem):
