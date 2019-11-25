@@ -34,7 +34,8 @@ from grimoirelab_toolkit.datetime import (datetime_to_utc,
                                           str_to_datetime)
 from perceval.backends.core.git import (GitCommand,
                                         GitRepository,
-                                        EmptyRepositoryError)
+                                        EmptyRepositoryError,
+                                        RepositoryError)
 from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
 from ..elastic import ElasticSearch as elastic
@@ -710,15 +711,20 @@ class GitEnrich(Enrich):
 
         logger.debug("[git] update-items Checking commits for {}.".format(self.perceval_backend.origin))
 
-        git_repo = GitRepository(self.perceval_backend.uri, self.perceval_backend.gitpath)
         try:
+            git_repo = GitRepository(self.perceval_backend.uri, self.perceval_backend.gitpath)
             current_hashes = set([commit for commit in git_repo.rev_list()])
-        except EmptyRepositoryError as e:
-            logger.warning("[git] Skip updating branch info for repo {}, repo is empty".format(git_repo.uri))
+        except EmptyRepositoryError:
+            logger.warning("[git] Skip updating branch info for repo {}, "
+                           "repo is empty".format(self.perceval_backend.origin))
+            return
+        except RepositoryError:
+            logger.warning("[git] Skip updating branch info for repo {}, "
+                           "repo doesn't exist locally".format(self.perceval_backend.origin))
             return
         except Exception as e:
-            logger.error("[git] Skip updating branch info for repo {}, git rev-list command failed: {}".format(
-                         git_repo.uri, e))
+            logger.error("[git] Skip updating branch info for repo {}, "
+                         "git rev-list command failed: {}".format(self.perceval_backend.origin, e))
             return
 
         raw_hashes = set([item['data']['commit']
