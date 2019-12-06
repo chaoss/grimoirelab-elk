@@ -578,7 +578,7 @@ class GerritEnrich(Enrich):
         """Get the first date at which a review was made on the changeset by someone
         other than the user who created the changeset
         """
-        if not 'owner' in review:
+        if 'owner' not in review:
             return None
 
         changeset_owner = review['owner']
