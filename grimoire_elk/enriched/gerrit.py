@@ -18,7 +18,6 @@
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
-
 import logging
 
 from .enrich import Enrich, metadata
@@ -133,9 +132,10 @@ class GerritEnrich(Enrich):
         item = item['data']
 
         # Changeset owner
-        user = item['owner']
-        identity = self.get_sh_identity(user)
-        yield identity
+        if 'owner' in item:
+            user = item['owner']
+            identity = self.get_sh_identity(user)
+            yield identity
 
         # Patchset uploader and author
         if 'patchSets' in item:
@@ -226,7 +226,7 @@ class GerritEnrich(Enrich):
         eitem["summary"] = eitem["summary"][:self.KEYWORD_MAX_LENGTH]
         eitem["name"] = None
         eitem["domain"] = None
-        if 'name' in review['owner']:
+        if 'owner' in review and 'name' in review['owner']:
             eitem["name"] = review['owner']['name']
             if 'email' in review['owner']:
                 if '@' in review['owner']['email']:
@@ -474,15 +474,23 @@ class GerritEnrich(Enrich):
             if self.sortinghat:
                 eapproval.update(self.get_item_sh(approval, ['by'], 'grantedOn'))
 
-                eapproval['author_id'] = eapproval['by_id']
-                eapproval['author_uuid'] = eapproval['by_uuid']
-                eapproval['author_name'] = eapproval['by_name']
-                eapproval['author_user_name'] = eapproval['by_name']
-                eapproval['author_domain'] = eapproval['by_domain']
-                eapproval['author_gender'] = eapproval['by_gender']
-                eapproval['author_gender_acc'] = eapproval['by_gender_acc']
-                eapproval['author_org_name'] = eapproval['by_org_name']
-                eapproval['author_bot'] = eapproval['by_bot']
+                if 'by_id' in eapproval:
+                    eapproval['author_id'] = eapproval['by_id']
+                if 'by_uuid' in eapproval:
+                    eapproval['author_uuid'] = eapproval['by_uuid']
+                if 'by_name' in eapproval:
+                    eapproval['author_name'] = eapproval['by_name']
+                    eapproval['author_user_name'] = eapproval['by_name']
+                if 'by_domain' in eapproval:
+                    eapproval['author_domain'] = eapproval['by_domain']
+                if 'by_gender' in eapproval:
+                    eapproval['author_gender'] = eapproval['by_gender']
+                if 'by_gender_acc' in eapproval:
+                    eapproval['author_gender_acc'] = eapproval['by_gender_acc']
+                if 'by_org_name' in eapproval:
+                    eapproval['author_org_name'] = eapproval['by_org_name']
+                if 'by_bot' in eapproval:
+                    eapproval['author_bot'] = eapproval['by_bot']
 
                 # add changeset author
                 self.add_changeset_author(epatchset, eapproval)
@@ -506,15 +514,24 @@ class GerritEnrich(Enrich):
     def add_changeset_author(self, source_eitem, target_eitem, rol='changeset_author'):
         """Copy SH changeset author info in `source_eitem` to `target_eitem`"""
 
-        target_eitem['changeset_author_id'] = source_eitem[rol + '_id']
-        target_eitem['changeset_author_uuid'] = source_eitem[rol + '_uuid']
-        target_eitem['changeset_author_name'] = source_eitem[rol + '_name']
-        target_eitem['changeset_author_user_name'] = source_eitem[rol + '_user_name']
-        target_eitem['changeset_author_domain'] = source_eitem[rol + '_domain']
-        target_eitem['changeset_author_gender'] = source_eitem[rol + '_gender']
-        target_eitem['changeset_author_gender_acc'] = source_eitem[rol + '_gender_acc']
-        target_eitem['changeset_author_org_name'] = source_eitem[rol + '_org_name']
-        target_eitem['changeset_author_bot'] = source_eitem[rol + '_bot']
+        if rol + '_id' in source_eitem:
+            target_eitem['changeset_author_id'] = source_eitem[rol + '_id']
+        if rol + '_uuid' in source_eitem:
+            target_eitem['changeset_author_uuid'] = source_eitem[rol + '_uuid']
+        if rol + '_name' in source_eitem:
+            target_eitem['changeset_author_name'] = source_eitem[rol + '_name']
+        if rol + '_user_name' in source_eitem:
+            target_eitem['changeset_author_user_name'] = source_eitem[rol + '_user_name']
+        if rol + '_domain' in source_eitem:
+            target_eitem['changeset_author_domain'] = source_eitem[rol + '_domain']
+        if rol + '_gender' in source_eitem:
+            target_eitem['changeset_author_gender'] = source_eitem[rol + '_gender']
+        if rol + '_gender_acc' in source_eitem:
+            target_eitem['changeset_author_gender_acc'] = source_eitem[rol + '_gender_acc']
+        if rol + '_org_name' in source_eitem:
+            target_eitem['changeset_author_org_name'] = source_eitem[rol + '_org_name']
+        if rol + '_bot' in source_eitem:
+            target_eitem['changeset_author_bot'] = source_eitem[rol + '_bot']
 
     def get_field_unique_id(self):
         return "id"
@@ -561,6 +578,9 @@ class GerritEnrich(Enrich):
         """Get the first date at which a review was made on the changeset by someone
         other than the user who created the changeset
         """
+        if not 'owner' in review:
+            return None
+
         changeset_owner = review['owner']
         changeset_owner_username = changeset_owner.get('username', None)
         changeset_owner_email = changeset_owner.get('email', None)
