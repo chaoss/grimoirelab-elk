@@ -51,18 +51,19 @@ class TestGerrit(TestBaseBackend):
         """Test whether JSON items are properly inserted into ES"""
 
         result = self._test_items_to_raw()
-        self.assertEqual(result['items'], 5)
-        self.assertEqual(result['raw'], 5)
+        self.assertEqual(result['items'], 6)
+        self.assertEqual(result['raw'], 6)
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
-        self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 191)
+        self.assertEqual(result['raw'], 6)
+        self.assertEqual(result['enrich'], 240)
 
         enrich_backend = self.connectors[self.connector][2]()
 
+        # 1st review
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
         self.assertIn('metadata__enriched_on', eitem)
@@ -86,17 +87,17 @@ class TestGerrit(TestBaseBackend):
             self.assertIn(REPO_LABELS, ecomment)
 
         patchsets = item['data']['patchSets']
-        eitems = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
-        self.assertEqual(len(eitems), 19)
+        epatchsets = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
+        self.assertEqual(len(epatchsets), 19)
 
-        for eitem in eitems:
-            self.assertIn('metadata__enriched_on', eitem)
-            self.assertIn('metadata__gelk_backend_name', eitem)
-            self.assertIn('metadata__gelk_version', eitem)
-            self.assertIn(REPO_LABELS, eitem)
+        for epatchset in epatchsets:
+            self.assertIn('metadata__enriched_on', epatchset)
+            self.assertIn('metadata__gelk_backend_name', epatchset)
+            self.assertIn('metadata__gelk_version', epatchset)
+            self.assertIn(REPO_LABELS, epatchset)
 
-        epatchsets = [ei for ei in eitems if 'is_gerrit_patchset' in ei]
-        eapprovals = [ei for ei in eitems if 'is_gerrit_approval' in ei]
+        eapprovals = [ei for ei in epatchsets if 'is_gerrit_approval' in ei]
+        epatchsets = [ei for ei in epatchsets if 'is_gerrit_patchset' in ei]
 
         self.assertEqual(len(epatchsets), 5)
 
@@ -117,6 +118,7 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('metadata__gelk_version', eapproval)
             self.assertIn(REPO_LABELS, eapproval)
 
+        # 2nd review
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
         self.assertIn('metadata__enriched_on', eitem)
@@ -124,8 +126,77 @@ class TestGerrit(TestBaseBackend):
         self.assertIn('metadata__gelk_version', eitem)
         self.assertIn(REPO_LABELS, eitem)
 
-        self.assertEqual(eitem['time_to_first_review'], 1.1)
-        self.assertEqual(eitem['status_value'], '-1')
+        comments = item['data']['comments']
+        ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
+        self.assertEqual(len(ecomments), 23)
+
+        patchsets = item['data']['patchSets']
+        epatchsets = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
+        self.assertEqual(len(epatchsets), 11)
+
+        # 3rd review
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn(REPO_LABELS, eitem)
+
+        comments = item['data']['comments']
+        ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
+        self.assertEqual(len(ecomments), 24)
+
+        patchsets = item['data']['patchSets']
+        epatchsets = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
+        self.assertEqual(len(epatchsets), 17)
+
+        # 4th review
+        item = self.items[3]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn(REPO_LABELS, eitem)
+
+        comments = item['data']['comments']
+        ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
+        self.assertEqual(len(ecomments), 6)
+
+        patchsets = item['data']['patchSets']
+        epatchsets = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
+        self.assertEqual(len(epatchsets), 3)
+
+        # 5th review
+        item = self.items[4]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn(REPO_LABELS, eitem)
+
+        comments = item['data']['comments']
+        ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
+        self.assertEqual(len(ecomments), 31)
+
+        patchsets = item['data']['patchSets']
+        epatchsets = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
+        self.assertEqual(len(epatchsets), 6)
+
+        # 6th review
+        item = self.items[5]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertIn('metadata__enriched_on', eitem)
+        self.assertIn('metadata__gelk_backend_name', eitem)
+        self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn(REPO_LABELS, eitem)
+
+        comments = item['data']['comments']
+        ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
+        self.assertEqual(len(ecomments), 46)
+
+        patchsets = item['data']['patchSets']
+        epatchsets = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
+        self.assertEqual(len(epatchsets), 2)
 
     def test_demography_study(self):
         """ Test that the demography study works correctly """
@@ -138,7 +209,8 @@ class TestGerrit(TestBaseBackend):
                 study(ocean_backend, enrich_backend, date_field="grimoire_creation_date")
 
             self.assertEqual(cm.output[0],
-                             'INFO:grimoire_elk.enriched.enrich:[gerrit] Demography starting study %s/test_gerrit_enrich'
+                             'INFO:grimoire_elk.enriched.enrich:[gerrit] '
+                             'Demography starting study %s/test_gerrit_enrich'
                              % enrich_backend.elastic.anonymize_url(self.es_con))
             self.assertEqual(cm.output[-1],
                              'INFO:grimoire_elk.enriched.enrich:[gerrit] Demography end %s/test_gerrit_enrich'
@@ -162,8 +234,8 @@ class TestGerrit(TestBaseBackend):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
-        self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 191)
+        self.assertEqual(result['raw'], 6)
+        self.assertEqual(result['enrich'], 240)
 
         enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                             db_user=self.db_user,
@@ -214,8 +286,8 @@ class TestGerrit(TestBaseBackend):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
-        self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 191)
+        self.assertEqual(result['raw'], 6)
+        self.assertEqual(result['enrich'], 240)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
