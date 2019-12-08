@@ -425,10 +425,6 @@ class Enrich(ElasticItems):
         """ Field with the date in the JSON enriched items """
         return "metadata__updated_on"
 
-    def get_fields_uuid(self):
-        """ Fields with unique identities in the JSON enriched items """
-        raise NotImplementedError
-
     def get_identities(self, item):
         """ Return the identities from an item """
         raise NotImplementedError

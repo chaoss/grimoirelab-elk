@@ -112,9 +112,6 @@ class GitHubEnrich(Enrich):
         """ Field with the date in the JSON enriched items """
         return "grimoire_creation_date"
 
-    def get_fields_uuid(self):
-        return ["assignee_uuid", "user_uuid", "merge_author_uuid"]
-
     def get_identities(self, item):
         """Return the identities from an item"""
 

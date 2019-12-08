@@ -67,9 +67,6 @@ class BugzillaEnrich(Enrich):
     def get_field_author(self):
         return "reporter"
 
-    def get_fields_uuid(self):
-        return ["assigned_to_uuid", "reporter_uuid"]
-
     def get_sh_identity(self, item, identity_field=None):
         """ Return a Sorting Hat identity using bugzilla user data """
 

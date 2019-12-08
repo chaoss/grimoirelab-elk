@@ -67,9 +67,6 @@ class BugzillaRESTEnrich(Enrich):
     def get_field_author(self):
         return 'creator_detail'
 
-    def get_fields_uuid(self):
-        return ["assigned_to_uuid", "creator_uuid"]
-
     def get_project_repository(self, eitem):
         return eitem['origin']
 
