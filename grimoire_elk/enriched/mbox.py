@@ -76,9 +76,6 @@ class MBoxEnrich(Enrich):
     def get_field_author(self):
         return "From"
 
-    def get_fields_uuid(self):
-        return ["from_uuid"]
-
     def get_identities(self, item):
         """ Return the identities from an item """
 

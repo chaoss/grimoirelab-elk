@@ -98,9 +98,6 @@ class GerritEnrich(Enrich):
     def get_field_author(self):
         return "owner"
 
-    def get_fields_uuid(self):
-        return ["review_uuid", "patchSet_uuid", "approval_uuid"]
-
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
 

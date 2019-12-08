@@ -76,9 +76,6 @@ class JiraEnrich(Enrich):
 
     roles = ["assignee", "reporter", "creator", "author", "updateAuthor"]
 
-    def get_fields_uuid(self):
-        return ["assignee_uuid", "reporter_uuid", "creator_uuid", "author_uuid", "updateAuthor_uuid"]
-
     def get_field_author(self):
         return "reporter"
 
