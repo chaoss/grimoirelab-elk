@@ -28,7 +28,8 @@ import httpretty
 if '..' not in sys.path:
     sys.path.insert(0, '..')
 
-from grimoire_elk.elastic import ElasticSearch, ElasticConnectException
+from grimoire_elk.elastic import ElasticSearch
+from grimoire_elk.errors import ElasticError
 
 
 class TestElasticSearch(unittest.TestCase):
@@ -93,7 +94,7 @@ class TestElasticSearch(unittest.TestCase):
         major = ElasticSearch._check_instance(self.url_es6, False)
         self.assertEqual(major, '6')
 
-        with self.assertRaises(ElasticConnectException):
+        with self.assertRaises(ElasticError):
             major = ElasticSearch._check_instance(self.url_es6_err, False)
 
 

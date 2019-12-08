@@ -31,21 +31,13 @@ import requests
 from grimoirelab_toolkit.datetime import (unixtime_to_datetime,
                                           InvalidDateError)
 
-from grimoire_elk.errors import ELKError
+from grimoire_elk.errors import ELKError, ElasticError
 from grimoire_elk.enriched.utils import (grimoire_con,
                                          get_diff_current_date)
 
 logger = logging.getLogger(__name__)
 
 HEADER_JSON = {"Content-Type": "application/json"}
-
-
-class ElasticConnectException(Exception):
-    message = "Can't connect to ElasticSearch"
-
-
-class ElasticWriteException(Exception):
-    message = "Can't write to ElasticSearch"
 
 
 class ElasticSearch(object):
@@ -83,9 +75,9 @@ class ElasticSearch(object):
             r = self.requests.put(self.index_url, data=analyzers,
                                   headers=headers)
             if r.status_code != 200:
-                logger.error("Can't create index {} ({})".format(
-                             self.anonymize_url(self.index_url), r.status_code))
-                raise ElasticWriteException()
+                msg = "Can't create index {} ({})".format(self.anonymize_url(self.index_url), r.status_code)
+                logger.error(msg)
+                raise ElasticError(cause=msg)
             else:
                 logger.info("Created index {}".format(self.anonymize_url(self.index_url)))
         else:
@@ -132,17 +124,21 @@ class ElasticSearch(object):
 
         res = grimoire_con(insecure).get(url)
         if res.status_code != 200:
-            logger.error("Didn't get 200 OK from url {}".format(url))
-            raise ElasticConnectException
+            msg = "Got {} from url {}".format(res.status_code, url)
+            logger.error(msg)
+            raise ElasticError(cause=msg)
         else:
             try:
                 version_str = res.json()['version']['number']
                 version_major = version_str.split('.')[0]
                 return version_major
             except Exception:
-                logger.error("Could not read proper welcome message from url {}, {}".format(
-                             ElasticSearch.anonymize_url(url), res.text))
-                raise ElasticConnectException
+                msg = "Could not read proper welcome message from url {}, {}".format(
+                    ElasticSearch.anonymize_url(url),
+                    res.text
+                )
+                logger.error(msg)
+                raise ElasticError(cause=msg)
 
     @staticmethod
     def anonymize_url(url):

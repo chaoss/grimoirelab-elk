@@ -26,7 +26,7 @@ import sys
 import requests
 from dateutil import parser
 
-from grimoire_elk.elastic import ElasticConnectException
+from grimoire_elk.errors import ElasticError
 from grimoire_elk.elastic import ElasticSearch
 # Connectors for Graal
 from graal.backends.core.cocom import CoCom, CoComCommand
@@ -261,8 +261,9 @@ def get_elastic(url, es_index, clean=None, backend=None, es_aliases=None, mappin
                                 clean=clean, insecure=insecure,
                                 analyzers=analyzers, aliases=es_aliases)
 
-    except ElasticConnectException:
-        logger.error("Can't connect to Elastic Search. Is it running?")
+    except ElasticError:
+        msg = "Can't connect to Elastic Search. Is it running?"
+        logger.error(msg)
         sys.exit(1)
 
     return elastic

@@ -29,7 +29,7 @@ from perceval.backends.bugzilla import Bugzilla
 from perceval.backends.gerrit import Gerrit
 from perceval.backends.github import GitHub
 
-from grimoire_elk.elastic import ElasticConnectException
+from grimoire_elk.errors import ElasticError
 from grimoire_elk.elastic import ElasticSearch
 from grimoire_elk.enriched.bugzilla import BugzillaEnrich
 from grimoire_elk.enriched.gerrit import GerritEnrich
@@ -115,7 +115,7 @@ if __name__ == '__main__':
                                 enrich_backend.get_elastic_mappings(),
                                 clean)
 
-    except ElasticConnectException:
+    except ElasticError:
         logging.error("Can't connect to Elastic Search. Is it running?")
         sys.exit(1)
 
