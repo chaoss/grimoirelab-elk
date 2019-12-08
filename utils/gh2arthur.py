@@ -32,7 +32,8 @@ import MySQLdb
 import requests
 from dateutil import parser
 
-from grimoire_elk.elastic import ElasticSearch, ElasticConnectException
+from grimoire_elk.elastic import ElasticSearch
+from grimoire_elk.errors import ElasticError
 from grimoire_elk.utils import config_logging
 
 GITHUB_URL = "https://github.com/"
@@ -240,7 +241,7 @@ if __name__ == '__main__':
     es_enrich = None
     try:
         es_enrich = ElasticSearch(args.elastic_url, index_enrich)
-    except ElasticConnectException:
+    except ElasticError:
         logging.error("Can't connect to Elastic Search. Is it running?")
 
     # The owner could be an org or an user.
