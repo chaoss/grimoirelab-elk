@@ -40,3 +40,9 @@ class ELKError(BaseError):
     """Generic error for elk error"""
 
     message = "%(cause)s"
+
+
+class ElasticError(BaseError):
+    """Generic error for elastic"""
+
+    message = "%(cause)s"

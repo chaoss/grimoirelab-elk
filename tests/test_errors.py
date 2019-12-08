@@ -71,5 +71,14 @@ class TestELKError(unittest.TestCase):
         self.assertEqual('key error on item', str(e))
 
 
+class TestElasticError(unittest.TestCase):
+
+    def test_message(self):
+        """Make sure that prints the correct error"""
+
+        e = errors.ElasticError(cause='ES not reachable')
+        self.assertEqual('ES not reachable', str(e))
+
+
 if __name__ == "__main__":
     unittest.main()
