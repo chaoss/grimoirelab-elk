@@ -67,27 +67,7 @@ class ElasticSearch(object):
 
         self.requests = grimoire_con(insecure)
 
-        res = self.requests.get(self.index_url)
-
-        headers = {"Content-Type": "application/json"}
-        if res.status_code != 200:
-            # Index does no exists
-            r = self.requests.put(self.index_url, data=analyzers,
-                                  headers=headers)
-            if r.status_code != 200:
-                msg = "Can't create index {} ({})".format(self.anonymize_url(self.index_url), r.status_code)
-                logger.error(msg)
-                raise ElasticError(cause=msg)
-            else:
-                logger.info("Created index {}".format(self.anonymize_url(self.index_url)))
-        else:
-            if clean:
-                res = self.requests.delete(self.index_url)
-                res.raise_for_status()
-                res = self.requests.put(self.index_url, data=analyzers,
-                                        headers=headers)
-                res.raise_for_status()
-                logger.info("Deleted and created index {}".format(self.anonymize_url(self.index_url)))
+        self.create_index(analyzers, clean)
         if mappings:
             map_dict = mappings.get_elastic_mappings(es_major=self.major)
             self.create_mappings(map_dict)
@@ -145,6 +125,34 @@ class ElasticSearch(object):
         anonymized = re.sub('^http.*@', 'http://', url)
 
         return anonymized
+
+    def create_index(self, analyzers=None, clean=False):
+        """Create an index. If clean is `True`, the target index will be deleted and recreated.
+
+        :param analyzers: set index analyzers
+        :param clean: if True, the index is deleted and recreated
+        """
+        res = self.requests.get(self.index_url)
+
+        headers = {"Content-Type": "application/json"}
+        if res.status_code != 200:
+            # Index does no exists
+            res = self.requests.put(self.index_url, data=analyzers,
+                                    headers=headers)
+            if res.status_code != 200:
+                msg = "Can't create index {} ({})".format(self.anonymize_url(self.index_url), res.status_code)
+                logger.error(msg)
+                raise ElasticError
+            else:
+                logger.info("Created index {}".format(self.anonymize_url(self.index_url)))
+        else:
+            if clean:
+                res = self.requests.delete(self.index_url)
+                res.raise_for_status()
+                res = self.requests.put(self.index_url, data=analyzers,
+                                        headers=headers)
+                res.raise_for_status()
+                logger.info("Deleted and created index {}".format(self.anonymize_url(self.index_url)))
 
     def safe_put_bulk(self, url, bulk_json):
         """ Bulk PUT controlling unicode issues """
