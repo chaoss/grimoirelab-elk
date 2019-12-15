@@ -47,10 +47,17 @@ class ElasticSearch(object):
 
     def __init__(self, url, index, mappings=None, clean=False,
                  insecure=True, analyzers=None, aliases=None):
-        ''' clean: remove already existing index
-            insecure: support https with invalid certificates
-        '''
+        """Class to handle the operations with the ElasticSearch database, such as
+        creating indexes, mappings, setting up aliases and uploading documents.
 
+        :param url: ES url
+        :param index: index name
+        :param mappings: an instance of the Mapping class
+        :param clean: if True, deletes an existing index and create it again
+        :param insecure: support https with invalid certificates
+        :param analyzers: analyzers for ElasticSearch
+        :param aliases: list of aliases, defined as strings, to be added to the index
+        """
         # Get major version of Elasticsearch instance
         self.major = self.check_instance(url, insecure)
         logger.debug("Found version of ES instance at {}: {}.".format(
@@ -126,6 +133,10 @@ class ElasticSearch(object):
 
     @staticmethod
     def anonymize_url(url):
+        """Remove credentials from the url
+
+        :param url: target url
+        """
         anonymized = re.sub('^http.*@', 'http://', url)
 
         return anonymized
@@ -159,8 +170,12 @@ class ElasticSearch(object):
                 logger.info("Deleted and created index {}".format(self.anonymize_url(self.index_url)))
 
     def safe_put_bulk(self, url, bulk_json):
-        """ Bulk PUT controlling unicode issues """
+        """Bulk items to a target index `url`. In case of UnicodeEncodeError,
+        the bulk is encoded with iso-8859-1.
 
+        :param url: target index where to bulk the items
+        :param bulk_json: str representation of the items to upload
+        """
         headers = {"Content-Type": "application/x-ndjson"}
 
         try:
@@ -283,8 +298,10 @@ class ElasticSearch(object):
         return bulk_url
 
     def get_mapping_url(self, _type=None):
-        """Get the mapping URL endpoint"""
+        """Get the mapping URL endpoint
 
+        :param _type: type of the mapping. In case of ES7, it is None
+        """
         if self.major == '7':
             mapping_url = self.index_url + "/_mapping"
         else:
@@ -293,8 +310,11 @@ class ElasticSearch(object):
         return mapping_url
 
     def bulk_upload(self, items, field_id):
-        """Upload in controlled packs items to ES using bulk API"""
+        """Upload in controlled packs items to ES using bulk API
 
+        :param items: list of items to be uploaded
+        :param field_id: unique ID attribute used to differentiate the items
+        """
         current = 0
         new_items = 0  # total items added with bulk
         bulk_json = ""
@@ -330,7 +350,11 @@ class ElasticSearch(object):
         return new_items
 
     def create_mappings(self, mappings):
+        """Create the mappings for a given index. It includes the index
+        pattern plus dynamic templates.
 
+        :param mappings: elastic_mapping.Mapping object
+        """
         headers = {"Content-Type": "application/json"}
 
         for _type in mappings:
@@ -375,32 +399,32 @@ class ElasticSearch(object):
                 logger.error("Can't add mapping {}: {}".format(self.anonymize_url(url_map), not_analyze_strings))
 
     def get_last_date(self, field, filters_=[]):
-        '''
-            :field: field with the data
-            :filters_: additional filters to find the date
-        '''
+        """Find the date of the last item stored in the index
 
+        :param field: field with the data
+        :param filters_: additional filters to find the date
+        """
         last_date = self.get_last_item_field(field, filters_=filters_)
 
         return last_date
 
     def get_last_offset(self, field, filters_=[]):
-        '''
-            :field: field with the data
-            :filters_: additional filters to find the date
-        '''
+        """Find the offset of the last item stored in the index
 
+        :param field: field with the data
+        :param filters_: additional filters to find the date
+        """
         offset = self.get_last_item_field(field, filters_=filters_, offset=True)
 
         return offset
 
     def get_last_item_field(self, field, filters_=[], offset=False):
-        '''
-            :field: field with the data
-            :filters_: additional filters to find the date
-            :offset: Return offset field insted of date field
-        '''
+        """Find the offset/date of the last item stored in the index.
 
+        :param field: field with the data
+        :param filters_: additional filters to find the date
+        :param offset: if True, returns the offset field instead of date field
+        """
         last_value = None
 
         url = self.index_url
