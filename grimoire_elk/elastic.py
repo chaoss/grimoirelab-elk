@@ -52,7 +52,7 @@ class ElasticSearch(object):
         '''
 
         # Get major version of Elasticsearch instance
-        self.major = self._check_instance(url, insecure)
+        self.major = self.check_instance(url, insecure)
         logger.debug("Found version of ES instance at {}: {}.".format(
                      self.anonymize_url(url), self.major))
 
@@ -83,14 +83,18 @@ class ElasticSearch(object):
 
     @classmethod
     def safe_index(cls, unique_id):
-        """ Return a valid elastic index generated from unique_id """
+        """Return a valid elastic index generated from unique_id
+
+        :param unique_id: index name
+        """
+
         index = unique_id
         if unique_id:
             index = unique_id.replace("/", "_").lower()
         return index
 
     @staticmethod
-    def _check_instance(url, insecure):
+    def check_instance(url, insecure):
         """Checks if there is an instance of Elasticsearch in url.
 
         Actually, it checks if GET on the url returns a JSON document
@@ -99,9 +103,9 @@ class ElasticSearch(object):
 
         :value      url: url of the instance to check
         :value insecure: don't verify ssl connection (boolean)
-        :returns:        major version of Ellasticsearch, as string.
-        """
 
+        :returns:        major version of Elasticsearch, as string.
+        """
         res = grimoire_con(insecure).get(url)
         if res.status_code != 200:
             msg = "Got {} from url {}".format(res.status_code, url)
