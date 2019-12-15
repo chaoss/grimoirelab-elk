@@ -302,7 +302,7 @@
         "refs": []
     },
     "origin": "/tmp/perceval_mc84igfc/gittest",
-    "perceval_version": "0.9.10",
+    "perceval_version": "0.9.11",
     "tag": "/tmp/perceval_mc84igfc/gittest",
     "timestamp": 1518165202.698608,
     "updated_on": 1392185269.0,
@@ -342,7 +342,7 @@
         ]
     },
     "origin": "/tmp/perceval_mc84igfc/gittest",
-    "perceval_version": "0.9.10",
+    "perceval_version": "0.9.11",
     "tag": "/tmp/perceval_mc84igfc/gittest",
     "timestamp": 1518165202.699163,
     "updated_on": 1392185366.0,
