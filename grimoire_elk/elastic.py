@@ -366,9 +366,10 @@ class ElasticSearch(object):
             if mappings[_type] != '{}':
                 res = self.requests.put(url_map, data=mappings[_type],
                                         headers=headers)
-                if res.status_code != 200:
-                    logger.error("Error creating ES mappings {}. Mapping: {}".format(res.text, str(mappings[_type])))
+                try:
                     res.raise_for_status()
+                except requests.exceptions.HTTPError:
+                    logger.error("Error creating ES mappings {}. Mapping: {}".format(res.text, str(mappings[_type])))
 
             # After version 6, strings are keywords (not analyzed)
             not_analyze_strings = """
