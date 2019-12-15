@@ -157,7 +157,7 @@ class ElasticSearch(object):
             if res.status_code != 200:
                 msg = "Can't create index {} ({})".format(self.anonymize_url(self.index_url), res.status_code)
                 logger.error(msg)
-                raise ElasticError
+                raise ElasticError(cause=msg)
             else:
                 logger.info("Created index {}".format(self.anonymize_url(self.index_url)))
         else:
