@@ -190,6 +190,7 @@ class ElasticSearch(object):
 
         result = res.json()
         failed_items = []
+        error = ""
         if result['errors']:
             # Due to multiple errors that may be thrown when inserting bulk data, only the first error is returned
             failed_items = [item['index'] for item in result['items'] if 'error' in item['index']]
