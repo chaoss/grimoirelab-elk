@@ -19,7 +19,6 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from dateutil import parser
 import json
 import logging
 import re
@@ -28,7 +27,8 @@ from time import time
 
 import requests
 
-from grimoirelab_toolkit.datetime import (unixtime_to_datetime,
+from grimoirelab_toolkit.datetime import (str_to_datetime,
+                                          unixtime_to_datetime,
                                           InvalidDateError)
 
 from grimoire_elk.errors import ELKError, ElasticError
@@ -445,7 +445,7 @@ class ElasticSearch(object):
             else:
                 if "value_as_string" in res_json["aggregations"]["1"]:
                     last_value = res_json["aggregations"]["1"]["value_as_string"]
-                    last_value = parser.parse(last_value)
+                    last_value = str_to_datetime(last_value)
                 else:
                     last_value = res_json["aggregations"]["1"]["value"]
                     if last_value:
