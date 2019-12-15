@@ -74,6 +74,7 @@ class TestElastic(unittest.TestCase):
         cls.config = configparser.ConfigParser()
         cls.config.read(CONFIG_FILE)
         cls.es_con = dict(cls.config.items('ElasticSearch'))['url']
+        cls.es_major = requests.get(cls.es_con, verify=False).json()['version']['number'].split('.')[0]
 
     def tearDown(self):
         target_index_url = self.es_con + "/" + self.target_index
@@ -563,14 +564,6 @@ class TestElastic(unittest.TestCase):
 
         self.assertDictEqual(properties, expected_properties)
 
-    def test_all_properties_no_items(self):
-        """Test whether no properties are returned if the items field doesn't exist in the mapping"""
-
-        elastic = ElasticSearch(self.es_con, self.target_index, {})
-        properties = elastic.all_properties()
-
-        self.assertDictEqual(properties, {})
-
     def test_all_properties_no_properties(self):
         """Test whether no properties are returned if they don't exist in the mapping"""
 
@@ -583,7 +576,11 @@ class TestElastic(unittest.TestCase):
     def test_all_properties_error(self):
         """Test whether an error message is logged when the properties aren't retrieved"""
 
-        url = self.es_con + '/' + self.target_index + '/_mapping'
+        if self.es_major == '7':
+            url = self.es_con + '/' + self.target_index + '/_mapping'
+        else:
+            url = self.es_con + '/' + self.target_index + '/items/_mapping'
+
         httpretty.register_uri(httpretty.GET,
                                url,
                                body={},
@@ -592,7 +589,7 @@ class TestElastic(unittest.TestCase):
                                    "Content-Type": "application/json"
                                })
 
-        elastic = MockElasticSearch(self.es_con, self.target_index)
+        elastic = MockElasticSearch(self.es_con, self.target_index, major=self.es_major)
         with self.assertLogs(logger, level='ERROR') as cm:
             elastic.all_properties()
             self.assertRegex(cm.output[0], 'ERROR:grimoire_elk.elastic:Error all attributes*')

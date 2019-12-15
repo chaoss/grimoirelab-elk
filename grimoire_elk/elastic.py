@@ -530,19 +530,20 @@ class ElasticSearch(object):
     def all_properties(self):
         """Get all properties of a given index"""
 
-        properties = {}
-        r = self.requests.get(self.index_url + "/_mapping", headers=HEADER_JSON, verify=False)
+        url = self.get_mapping_url(_type='items')
+        r = self.requests.get(url, headers=HEADER_JSON, verify=False)
         try:
             r.raise_for_status()
             r_json = r.json()
 
-            if 'items' not in r_json[self.index]['mappings']:
-                return properties
+            # ES 7.x
+            properties = r_json[self.index]['mappings'].get('properties', {})
 
-            if 'properties' not in r_json[self.index]['mappings']['items']:
-                return properties
+            # ES 6.x
+            if not properties:
+                items_mapping = r_json[self.index]['mappings'].get('items', {})
+                properties = items_mapping.get('properties', {}) if items_mapping else {}
 
-            properties = r_json[self.index]['mappings']['items']['properties']
         except requests.exceptions.HTTPError as ex:
             logger.error("Error all attributes for {}. {}".format(self.anonymize_url(self.index_url), ex))
             return
