@@ -1,4 +1,5 @@
-[{
+[
+    {
     "backend_name": "GitLab",
         "backend_version": "0.5.0",
         "category": "issue",
@@ -430,6 +431,75 @@
         "timestamp": 1536860519.489991,
         "updated_on": 1489879265.911,
         "uuid": "f165360164293e94ee2c27af82ffc0fa36a6f5fc"
+    },
+    {
+        "backend_name": "GitLab",
+        "backend_version": "0.11.1",
+        "category": "issue",
+        "data": {
+            "assignee": null,
+            "assignees": [],
+            "author": null,
+            "award_emoji_data": [],
+            "closed_at": null,
+            "confidential": false,
+            "created_at": "2019-12-16T03:46:58.457Z",
+            "description": "Involve benefit mind avoid send them herself. Republican peace bank herself key performance picture. Own it speak minute improve offer attorney.Career company year design student possible people. Other authority whom deal stay rule bag.\nMarket grow guy peace table high power. Girl manage star fast heart including they allow.",
+            "discussion_locked": null,
+            "downvotes": 0,
+            "due_date": null,
+            "id": 28731770,
+            "iid": 106422,
+            "labels": [],
+            "milestone": null,
+            "notes_data": [],
+            "project_id": 278964,
+            "state": "opened",
+            "time_stats": {
+                "human_time_estimate": null,
+                "total_time_spent": 0,
+                "human_total_time_spent": null,
+                "time_estimate": 0
+            },
+            "title": "It student kitchen finally although test.\nThan politics life quite part culture world. Risk right view.\nInvolve yes marriage all boy hundred by. Whatever later happen use social.",
+            "updated_at": "2019-12-16T03:46:58.457Z",
+            "upvotes": 0,
+            "user_notes_count": 0,
+            "web_url": "https://gitlab.com/gitlab-org/gitlab/issues/106422",
+            "weight": null,
+            "epic_iid": null,
+            "merge_requests_count": 0,
+            "moved_to_id": null,
+            "_links": {
+                "award_emoji": "https://gitlab.com/api/v4/projects/278964/issues/106422/award_emoji",
+                "self": "https://gitlab.com/api/v4/projects/278964/issues/106422",
+                "project": "https://gitlab.com/api/v4/projects/278964",
+                "notes": "https://gitlab.com/api/v4/projects/278964/issues/106422/notes"
+            },
+            "closed_by": null,
+            "task_completion_status": {
+                "completed_count": 0,
+                "count": 0
+            },
+            "epic": null,
+            "has_tasks": false
+        },
+        "search_fields": {
+            "owner": "gitlab-org",
+            "item_id": "28731770",
+            "iid": 106422,
+            "project": "gitlab",
+            "groups": null
+        },
+        "origin": "https://gitlab.com/gitlab-org/gitlab",
+        "perceval_version": "0.12.25",
+        "tag": "https://gitlab.com/gitlab-org/gitlab",
+        "timestamp": 1576470015.736746,
+        "updated_on": 1576468018.457,
+        "uuid": "f96a7f2ff3af3e6157b25ccbff231b53df6a3a4a",
+        "classified_fields_filtered": null,
+        "metadata__updated_on": "2019-12-16T03:46:58.457000+00:00",
+        "metadata__timestamp": "2019-12-16T04:20:15.736746+00:00"
     },
     {
         "backend_name": "GitLab",
