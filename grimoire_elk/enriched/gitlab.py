@@ -178,10 +178,9 @@ class GitLabEnrich(Enrich):
         else:
             rich_issue['time_open_days'] = rich_issue['time_to_close_days']
 
-        rich_issue['author_username'] = issue['author']['username']
-        author = issue['author']
-
+        author = issue.get('author', None)
         if author:
+            rich_issue['author_username'] = issue['author']['username']
             rich_issue['author_name'] = author['name']
             if 'email' in author and author['email']:
                 rich_issue["author_domain"] = self.get_email_domain(author['email'])
@@ -277,10 +276,9 @@ class GitLabEnrich(Enrich):
         else:
             rich_mr['time_open_days'] = rich_mr['time_to_close_days']
 
-        rich_mr['author_username'] = merge_request['author']['username']
-        author = merge_request['author']
-
+        author = merge_request.get('author', None)
         if author:
+            rich_mr['author_username'] = merge_request['author']['username']
             rich_mr['author_name'] = author['name']
             if 'email' in author and author['email']:
                 rich_mr["author_domain"] = self.get_email_domain(author['email'])
