@@ -48,7 +48,13 @@ class ElasticItems:
     scroll_size = 100
 
     def __init__(self, perceval_backend, from_date=None, insecure=True, offset=None):
+        """Class to perform operations over the items stored in a ES index.
 
+        :param perceval_backend: Perceval backend object
+        :param from_date: Date obj used to extract the items in an ES index after a given date
+        :param insecure: support https with invalid certificates
+        :param offset: Offset number used to extract the items in an ES index after a given offset ID
+        """
         self.perceval_backend = perceval_backend
         self.last_update = None  # Last update in ocean items index for feed
         self.from_date = from_date  # fetch from_date
@@ -64,25 +70,34 @@ class ElasticItems:
         self.cfg_section_name = None
 
     def get_repository_filter_raw(self, term=False):
-        """ Returns the filter to be used in queries in a repository items """
+        """Returns the filter to be used in queries in a repository items"""
+
         perceval_backend_name = self.get_connector_name()
         filter_ = get_repository_filter(self.perceval_backend, perceval_backend_name, term)
         return filter_
 
     def get_field_date(self):
-        """ Field with the update in the JSON items. Now the same in all. """
+        """Field with the update in the JSON items. Now the same in all."""
+
         return "metadata__updated_on"
 
     def get_incremental_date(self):
-        """
-        Field with the date used for incremental analysis.
-        """
+        """Field with the date used for incremental analysis."""
+
         return "metadata__timestamp"
 
     def set_projects_json_repo(self, repo):
+        """Set the repo extracted from the projects.json
+
+        :param repo: target repo
+        """
         self.projects_json_repo = repo
 
     def set_repo_labels(self, labels):
+        """Set the labels of the repo
+
+        :param labels: list of labels (str)
+        """
         self.repo_labels = labels
 
     @staticmethod
@@ -125,8 +140,10 @@ class ElasticItems:
         return fltr_dict
 
     def set_filter_raw(self, filter_raw):
-        """Filter to be used when getting items from Ocean index"""
+        """Filter to be used when getting items from Ocean index
 
+        :param filter_raw: str representation of the filter (e.g., "data.product:Add-on SDK",)
+        """
         self.filter_raw = filter_raw
 
         self.filter_raw_dict = []
@@ -137,20 +154,33 @@ class ElasticItems:
             self.filter_raw_dict.append(fltr)
 
     def get_connector_name(self):
-        """ Find the name for the current connector """
+        """Find the name for the current connector"""
+
         from .utils import get_connector_name
         return get_connector_name(type(self))
 
     def set_cfg_section_name(self, cfg_section_name):
+        """Set the cfg section name
+
+        :param cfg_section_name: name of the cfg section
+        """
         self.cfg_section_name = cfg_section_name
 
     def set_from_date(self, last_enrich_date):
+        """Set the from date
+
+        :param last_enrich_date: date of last enrichment
+        """
         self.from_date = last_enrich_date
 
     # Items generator
     def fetch(self, _filter=None, ignore_incremental=False):
-        """ Fetch the items from raw or enriched index. An optional _filter
-        could be provided to filter the data collected """
+        """Fetch the items from raw or enriched index. An optional _filter can be
+        provided to filter the data collected
+
+        :param _filter: optional filter of data collected
+        :param ignore_incremental: if True, incremental collection is ignored
+        """
 
         logger.debug("Creating a elastic items generator.")
 
@@ -162,10 +192,7 @@ class ElasticItems:
 
         scroll_id = page["_scroll_id"]
         total = page['hits']['total']
-        if isinstance(total, dict):
-            scroll_size = total['value']
-        else:
-            scroll_size = total
+        scroll_size = total['value'] if isinstance(total, dict) else total
 
         if scroll_size == 0:
             logger.debug("No results found from {} and filter {}".format(
@@ -190,9 +217,13 @@ class ElasticItems:
         logger.debug("Fetching from {}: done receiving".format(self.elastic.anonymize_url(self.elastic.index_url)))
 
     def get_elastic_items(self, elastic_scroll_id=None, _filter=None, ignore_incremental=False):
-        """ Get the items from the index related to the backend applying and
-        optional _filter if provided"""
+        """Get the items from the index related to the backend applying and
+        optional _filter if provided
 
+        :param elastic_scroll_id: If not None, it allows to continue scrolling the data
+        :param _filter: if not None, it allows to define a terms filter (e.g., "uuid": ["hash1", "hash2, ...]
+        :param ignore_incremental: if True, incremental collection is ignored
+        """
         headers = {"Content-Type": "application/json"}
 
         if not self.elastic:
@@ -272,8 +303,7 @@ class ElasticItems:
                 order_query = ', "sort": { "%s": { "order": "asc" }} ' % order_field
 
             # Fix the filters string if it starts with "," (empty first filter)
-            if filters.lstrip().startswith(','):
-                filters = filters.lstrip()[1:]
+            filters = filters.lstrip()[1:] if filters.lstrip().startswith(',') else filters
 
             query = """
             {
