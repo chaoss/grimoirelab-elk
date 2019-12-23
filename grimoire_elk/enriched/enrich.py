@@ -1767,3 +1767,224 @@ class Enrich(ElasticItems):
         ''' % (min_date, max_date, author_field, target_author)
 
         return es_query
+
+    def enrich_feelings(self, ocean_backend, enrich_backend, attributes, nlp_rest_url,
+                        no_incremental=False, uuid_field='id', date_field="grimoire_creation_date"):
+        """
+        This study allows to add sentiment and emotion data to a target enriched index. All documents in the enriched
+        index not containing the attributes `has_sentiment` or `has_emotion` are retrieved. Then, each attribute
+        listed in the param `attributes` is searched in the document. If the attribute is found, its text is
+        retrieved and sent to the NLP tool available at `nlp_rest_url`, which returns sentiment and emotion
+        information. Such a data is stored in the attributes `feeling_sentiment` and `feeling_emotion` using
+        the `update_by_query` endpoint.
+
+        :param ocean_backend: backend from which to read the raw items
+        :param enrich_backend:  backend from which to read the enriched items
+        :param attributes: list of attributes in the JSON documents from where the
+            sentiment/emotion data must be extracted.
+        :param nlp_rest_url: URL of the NLP tool
+        :param no_incremental: if `True` the incremental enrichment is ignored.
+        :param uuid_field: field storing the UUID of the documents
+        :param date_field: field used to order the documents
+        """
+        es_query = """
+            {
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "bool": {
+                                    "must_not": {
+                                        "exists": {
+                                            "field": "has_sentiment"
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "bool": {
+                                    "must_not": {
+                                        "exists": {
+                                            "field": "has_emotion"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "sort": [
+                    {
+                      "%s": {
+                        "order": "asc"
+                      }
+                    }
+                  ]
+            }
+            """ % date_field
+
+        logger.info("[enrich-feelings] Start study on {} with data from {}".format(
+            self.elastic.anonymize_url(self.elastic.index_url), nlp_rest_url))
+
+        es = ES([self.elastic_url], timeout=3600, max_retries=50, retry_on_timeout=True, verify_certs=False)
+        search_fields = [attr for attr in attributes]
+        search_fields.extend([uuid_field])
+        page = es.search(index=enrich_backend.elastic.index,
+                         scroll="1m",
+                         _source=search_fields,
+                         size=100,
+                         body=json.loads(es_query))
+
+        scroll_id = page["_scroll_id"]
+        total = page['hits']['total']
+        if isinstance(total, dict):
+            scroll_size = total['value']
+        else:
+            scroll_size = total
+
+        if scroll_size == 0:
+            logging.warning("No data found!")
+            return
+
+        total = 0
+        sentiments_data = {}
+        emotions_data = {}
+        while scroll_size > 0:
+
+            for hit in page['hits']['hits']:
+                source = hit['_source']
+                source_uuid = str(source[uuid_field])
+                total += 1
+
+                for attr in attributes:
+                    found = source.get(attr, None)
+                    if not found:
+                        continue
+                    else:
+                        found = found.encode('utf-8')
+
+                    sentiment_label, emotion_label = self.get_feelings(found, nlp_rest_url)
+                    self.__update_feelings_data(sentiments_data, sentiment_label, source_uuid)
+                    self.__update_feelings_data(emotions_data, emotion_label, source_uuid)
+
+            if sentiments_data:
+                self.__add_feelings_to_index('sentiment', sentiments_data, uuid_field)
+                sentiments_data = {}
+            if emotions_data:
+                self.__add_feelings_to_index('emotion', emotions_data, uuid_field)
+                emotions_data = {}
+
+            page = es.scroll(scroll_id=scroll_id, scroll='1m')
+            scroll_id = page['_scroll_id']
+            scroll_size = len(page['hits']['hits'])
+
+        if sentiments_data:
+            self.__add_feelings_to_index('sentiment', sentiments_data, uuid_field)
+        if emotions_data:
+            self.__add_feelings_to_index('emotion', emotions_data, uuid_field)
+
+        logger.info("[enrich-feelings] End study. Index {} updated with data from {}".format(
+            self.elastic.anonymize_url(self.elastic.index_url), nlp_rest_url))
+
+    def get_feelings(self, text, nlp_rest_url):
+        """This method wraps the calls to the NLP rest service. First the text is converted as plain text,
+        then the code is stripped and finally the resulting text is process to extract sentiment and emotion
+        information.
+
+        :param text: text to analyze
+        :param nlp_rest_url: URL of the NLP rest tool
+        :return: a tuple composed of the sentiment and emotion labels
+        """
+        sentiment = None
+        emotion = None
+
+        headers = {
+            'Content-Type': 'text/plain'
+        }
+        plain_text_url = nlp_rest_url + '/plainTextBugTrackerMarkdown'
+        r = self.requests.post(plain_text_url, data=text, headers=headers)
+        r.raise_for_status()
+        plain_text_json = r.json()
+
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        code_url = nlp_rest_url + '/code'
+        r = self.requests.post(code_url, data=json.dumps(plain_text_json), headers=headers)
+        r.raise_for_status()
+        code_json = r.json()
+
+        texts = [c['text'] for c in code_json if c['label'] != '__label__Code']
+        message = '.'.join(texts)
+        message_dump = json.dumps([message])
+
+        if not message:
+            logger.debug("[enrich-feelings] No feelings detected after processing on {} in index {}".format(
+                text, self.elastic.anonymize_url(self.elastic.index_url)))
+            return sentiment, emotion
+
+        sentiment_url = nlp_rest_url + '/sentiment'
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        r = self.requests.post(sentiment_url, data=message_dump, headers=headers)
+        r.raise_for_status()
+        sentiment_json = r.json()[0]
+        sentiment = sentiment_json['label']
+
+        emotion_url = nlp_rest_url + '/emotion'
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        r = self.requests.post(emotion_url, data=message_dump, headers=headers)
+        r.raise_for_status()
+        emotion_json = r.json()[0]
+
+        emotion = emotion_json['labels'][0] if len(emotion_json.get('labels', [])) > 0 else None
+        return sentiment, emotion
+
+    def __update_feelings_data(self, data, label, source_uuid):
+        if not label:
+            entry = data.get('__label__unknown', None)
+            if not entry:
+                data.update({'__label__unknown': [source_uuid]})
+            else:
+                entry.append(source_uuid)
+        else:
+            entry = data.get(label, None)
+            if not entry:
+                data.update({label: [source_uuid]})
+            else:
+                entry.append(source_uuid)
+
+    def __add_feelings_to_index(self, feeling_type, feeling_data, uuid_field):
+        url = "{}/_update_by_query?wait_for_completion=true".format(self.elastic.index_url)
+        for fd in feeling_data:
+            uuids = json.dumps(feeling_data[fd])
+            es_query = """
+                {
+                  "script": {
+                    "source": "ctx._source.feeling_%s = '%s';ctx._source.has_%s = 1",
+                    "lang": "painless"
+                  },
+                  "query": {
+                    "bool": {
+                      "filter": {
+                        "terms": {
+                            "%s": %s
+                        }
+                      }
+                    }
+                  }
+                }
+                """ % (feeling_type, fd, feeling_type, uuid_field, uuids)
+
+            r = self.requests.post(url, data=es_query, headers=HEADER_JSON, verify=False)
+            try:
+                r.raise_for_status()
+                logger.debug("[enrich-feelings] Adding {} on uuids {} in {}".format(
+                    fd, uuids, self.elastic.anonymize_url(self.elastic.index_url)))
+            except requests.exceptions.HTTPError as ex:
+                logger.error("[enrich-feelings] Error while executing study. Study aborted.")
+                logger.error(ex)
+                return
