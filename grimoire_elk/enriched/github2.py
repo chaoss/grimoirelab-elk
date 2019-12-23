@@ -108,6 +108,7 @@ class GitHubEnrich2(Enrich):
 
         self.studies = []
         self.studies.append(self.enrich_geolocation)
+        self.studies.append(self.enrich_feelings)
         self.studies.append(self.enrich_extra_data)
 
     def set_elastic(self, elastic):
