@@ -21,6 +21,8 @@
 import logging
 import time
 import unittest
+import unittest.mock
+from unittest.mock import MagicMock
 
 from base import TestBaseBackend
 from grimoire_elk.enriched.enrich import logger
@@ -212,6 +214,60 @@ class TestGitHub2(TestBaseBackend):
         self.assertEqual(len(items), 3)
         for item in items:
             self.assertIn('user_geolocation', item)
+
+    def test_feelings_study(self):
+        """ Test that feelings study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_feelings')
+
+        def mocked_feelings(found, nlp_rest_url):
+            return '__label__positive', '__label__love'
+
+        enrich_backend.get_feelings = MagicMock(side_effect=mocked_feelings)
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_feelings":
+                study(ocean_backend, enrich_backend, attributes=["body"], nlp_rest_url='http://localhost:2901')
+
+            self.assertRegex(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:\\[enrich-feelings\\] Start study.*')
+            self.assertRegex(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:\\[enrich-feelings\\] End study.*')
+
+        time.sleep(5)  # HACK: Wait until github enrich index has been written
+        items = [item for item in enrich_backend.fetch() if 'body' in item]
+        self.assertEqual(len(items), 5)
+        for item in items:
+            self.assertEqual(item['has_sentiment'], 1)
+            self.assertEqual(item['has_emotion'], 1)
+            self.assertEqual(item['feeling_emotion'], '__label__love')
+            self.assertEqual(item['feeling_sentiment'], '__label__positive')
+
+    def test_feelings_study_unknown(self):
+        """ Test that feelings study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_feelings')
+
+        def mocked_feelings(found, nlp_rest_url):
+            return '__label__unknown', '__label__unknown'
+
+        enrich_backend.get_feelings = MagicMock(side_effect=mocked_feelings)
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_feelings":
+                study(ocean_backend, enrich_backend, attributes=["body"], nlp_rest_url='http://localhost:2901')
+
+            self.assertRegex(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:\\[enrich-feelings\\] Start study.*')
+            self.assertRegex(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:\\[enrich-feelings\\] End study.*')
+
+        time.sleep(5)  # HACK: Wait until github enrich index has been written
+        items = [item for item in enrich_backend.fetch() if 'body' in item]
+        self.assertEqual(len(items), 5)
+        for item in items:
+            self.assertEqual(item['has_sentiment'], 1)
+            self.assertEqual(item['has_emotion'], 1)
+            self.assertEqual(item['feeling_emotion'], '__label__unknown')
+            self.assertEqual(item['feeling_sentiment'], '__label__unknown')
 
 
 if __name__ == "__main__":
