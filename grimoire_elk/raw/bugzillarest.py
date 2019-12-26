@@ -81,6 +81,14 @@ class Mapping(BaseMapping):
                                             "added": {
                                                 "type": "text",
                                                 "index": true
+                                            },
+                                            "comment": {
+                                                "properties": {
+                                                    "thetext": {
+                                                        "type": "text",
+                                                        "index": true
+                                                    }
+                                                }
                                             }
                                         }
                                     }
