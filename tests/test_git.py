@@ -201,6 +201,54 @@ class TestGit(TestBaseBackend):
         for item in enrich_backend.fetch():
             self.assertTrue('extra_secret_repo' in item.keys())
 
+    def test_enrich_forecast_activity(self):
+        """ Test that the forecast activity study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_forecast_activity')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_forecast_activity":
+                study(ocean_backend, enrich_backend, out_index='git_study_forecast_activity', observations=2)
+
+                self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:'
+                                               '[enrich-forecast-activity] Start study')
+                self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:'
+                                                '[enrich-forecast-activity] End study')
+
+        time.sleep(5)  # HACK: Wait until git enrich index has been written
+        url = self.es_con + "/git_study_forecast_activity/_search"
+        response = enrich_backend.requests.get(url, verify=False).json()
+        for hit in response['hits']['hits']:
+            source = hit['_source']
+            self.assertIn('uuid', source)
+            self.assertIn('origin', source)
+            self.assertIn('repository', source)
+            self.assertIn('interval_months', source)
+            self.assertIn('from_date', source)
+            self.assertIn('to_date', source)
+            self.assertIn('study_creation_date', source)
+            self.assertIn('grimoire_creation_date', source)
+            self.assertIn('is_git_survived', source)
+            self.assertIn('author_uuid', source)
+            self.assertIn('author_name', source)
+            self.assertIn('author_bot', source)
+            self.assertIn('author_user_name', source)
+            self.assertIn('author_org_name', source)
+            self.assertIn('author_domain', source)
+            self.assertIn('prediction_05', source)
+            self.assertIn('prediction_07', source)
+            self.assertIn('prediction_09', source)
+            self.assertIn('next_activity_05', source)
+            self.assertIn('next_activity_07', source)
+            self.assertIn('next_activity_09', source)
+            self.assertIn('metadata__gelk_version', source)
+            self.assertIn('metadata__gelk_backend_name', source)
+            self.assertIn('metadata__enriched_on', source)
+
+        delete_survival = self.es_con + "/git_study_forecast_activity"
+        requests.delete(delete_survival, verify=False)
+
     def test_onion_study(self):
         """ Test that the onion study works correctly """
 

@@ -93,6 +93,7 @@ class GitEnrich(Enrich):
         self.studies.append(self.enrich_areas_of_code)
         self.studies.append(self.enrich_onion)
         self.studies.append(self.enrich_git_branches)
+        self.studies.append(self.enrich_forecast_activity)
         self.studies.append(self.enrich_extra_data)
 
         self.rate_limit = None
