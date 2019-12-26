@@ -26,19 +26,24 @@ import requests
 import sys
 
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 import pkg_resources
 from functools import lru_cache
 
-from elasticsearch import Elasticsearch, RequestsHttpConnection
+from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
 from geopy.geocoders import Nominatim
 
 from perceval.backend import find_signature_parameters
 from grimoirelab_toolkit.datetime import (datetime_utcnow, str_to_datetime)
 
+from ..elastic import ElasticSearch
 from ..elastic_items import (ElasticItems,
                              HEADER_JSON)
 from .study_ceres_onion import ESOnionConnector, onion_study
+from .graal_study_evolution import (get_to_date,
+                                    get_unique_repository)
+from statsmodels.duration.survfunc import SurvfuncRight
 
 from .utils import grimoire_con, METADATA_FILTER_RAW, REPO_LABELS
 from .. import __version__
@@ -933,8 +938,8 @@ class Enrich(ElasticItems):
         logger.info("{}  starting study - Input: {} Output: {}".format(log_prefix, in_index, out_index))
 
         # Creating connections
-        es = Elasticsearch([enrich_backend.elastic.url], retry_on_timeout=True, timeout=100,
-                           verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+        es = ES([enrich_backend.elastic.url], retry_on_timeout=True, timeout=100,
+                verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
 
         in_conn = ESOnionConnector(es_conn=es, es_index=in_index,
                                    contribs_field=contribs_field,
@@ -1277,8 +1282,8 @@ class Enrich(ElasticItems):
         log_prefix = "[{}] Geolocation".format(data_source)
         logger.info("{} starting study {}".format(log_prefix, self.elastic.anonymize_url(self.elastic.index_url)))
 
-        es_in = Elasticsearch([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
-                              verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+        es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
+                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
         in_index = enrich_backend.elastic.index
 
         query_locations_no_geo_points = """
@@ -1350,6 +1355,271 @@ class Enrich(ElasticItems):
                 )
 
         logger.info("{} end {}".format(log_prefix, self.elastic.anonymize_url(self.elastic.index_url)))
+
+    def enrich_forecast_activity(self, ocean_backend, enrich_backend, out_index,
+                                 observations=20, probabilities=[0.5, 0.7, 0.9], interval_months=6,
+                                 date_field="metadata__updated_on"):
+        """
+        The goal of this study is to forecast the contributor activity based on their past contributions. The idea
+        behind this study is that abandonment of active developers poses a significant risk for open source
+        software projects, and this risk can be reduced by forecasting the future activity of contributors
+        involved in such projects and taking necessary countermeasures. The logic of this study is based
+        on the tool: https://github.com/AlexandreDecan/gap
+
+        :param ocean_backend: backend from which to read the raw items
+        :param enrich_backend:  backend from which to read the enriched items
+        :param observations: number of observations to consider
+        :param probabilities: probabilities of the next contributor's activity
+        :param interval_months: number of months to consider a contributor active on the repo
+        :param date_field: field used to find the author's activity
+
+        Example of the setup.cfg
+
+        [git]
+        raw_index = git_gap_raw
+        enriched_index = git_gap_enriched
+        latest-items = true
+        category = commit
+        studies = [enrich_forecast_activity]
+
+        [enrich_forecast_activity]
+        out_index = git_study_forecast_activity
+        observations = 40
+        probability = [0.5, 0.7]
+        date_field = author_date
+        """
+        logger.info("[enrich-forecast-activity] Start study")
+
+        es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
+                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+        in_index = enrich_backend.elastic.index
+
+        unique_repos = es_in.search(
+            index=in_index,
+            body=get_unique_repository())
+
+        repositories = [repo['key'] for repo in unique_repos['aggregations']['unique_repos'].get('buckets', [])]
+        current_month = datetime_utcnow().replace(day=1, hour=0, minute=0, second=0)
+
+        logger.info("[enrich-forecast-activity] {} repositories to process".format(len(repositories)))
+        es_out = ElasticSearch(enrich_backend.elastic.url, out_index)
+        es_out.add_alias("forecast_activity_study")
+
+        num_items = 0
+        ins_items = 0
+
+        survided_authors = []
+        # iterate over the repositories
+        for repository_url in repositories:
+            logger.debug("[enrich-forecast-activity] Start analysis for {}".format(repository_url))
+            from_month = get_to_date(es_in, in_index, out_index, repository_url, interval_months)
+            to_month = from_month.replace(month=int(interval_months), day=1, hour=0, minute=0, second=0)
+
+            # analyse the repository on a given time frame
+            while to_month < current_month:
+
+                from_month_iso = from_month.isoformat()
+                to_month_iso = to_month.isoformat()
+
+                # get authors
+                authors = es_in.search(
+                    index=in_index,
+                    body=self.authors_between_dates(repository_url, from_month_iso, to_month_iso,
+                                                    date_field=date_field)
+                )['aggregations']['authors'].get("buckets", [])
+
+                # get author activity
+                for author in authors:
+                    author_uuid = author['key']
+                    activities = es_in.search(index=in_index,
+                                              body=self.author_activity(repository_url, from_month_iso, to_month_iso,
+                                                                        author_uuid, date_field=date_field)
+                                              )['hits']['hits']
+
+                    dates = [str_to_datetime(a['_source'][date_field]) for a in activities]
+                    durations = self.dates_to_duration(dates, window_size=observations)
+
+                    if len(durations) < observations:
+                        continue
+
+                    repository_name = repository_url.split("/")[-1]
+                    author_name = activities[0]['_source'].get('author_name', None)
+                    author_user_name = activities[0]['_source'].get('author_user_name', None)
+                    author_org_name = activities[0]['_source'].get('author_org_name', None)
+                    author_domain = activities[0]['_source'].get('author_domain', None)
+                    author_bot = activities[0]['_source'].get('author_bot', None)
+                    to_month_iso = to_month.isoformat()
+                    survided_author = {
+                        "uuid": "{}_{}_{}_{}".format(to_month_iso, repository_name, interval_months, author_uuid),
+                        "origin": repository_url,
+                        "repository": repository_name,
+                        "interval_months": interval_months,
+                        "from_date": from_month_iso,
+                        "to_date": to_month_iso,
+                        "study_creation_date": from_month_iso,
+                        "author_uuid": author_uuid,
+                        "author_name": author_name,
+                        "author_bot": author_bot,
+                        "author_user_name": author_user_name,
+                        "author_org_name": author_org_name,
+                        "author_domain": author_domain,
+                        'metadata__gelk_version': self.gelk_version,
+                        'metadata__gelk_backend_name': self.__class__.__name__,
+                        'metadata__enriched_on': datetime_utcnow().isoformat()
+                    }
+
+                    survided_author.update(self.get_grimoire_fields(survided_author["study_creation_date"], "survived"))
+
+                    last_activity = dates[-1]
+                    surv = SurvfuncRight(durations, [1] * len(durations))
+                    for prob in probabilities:
+                        pred = surv.quantile(float(prob))
+                        pred_field = "prediction_{}".format(str(prob).replace('.', ''))
+
+                        survided_author[pred_field] = int(pred)
+                        next_activity_field = "next_activity_{}".format(str(prob).replace('.', ''))
+                        survided_author[next_activity_field] = (last_activity + timedelta(days=int(pred))).isoformat()
+
+                    survided_authors.append(survided_author)
+
+                    if len(survided_authors) >= self.elastic.max_items_bulk:
+                        num_items += len(survided_authors)
+                        ins_items += es_out.bulk_upload(survided_authors, self.get_field_unique_id())
+                        survided_authors = []
+
+                from_month = to_month
+                to_month = to_month + relativedelta(months=+interval_months)
+
+                logger.debug("[enrich-forecast-activity] End analysis for {}".format(repository_url))
+
+        if len(survided_authors) > 0:
+            num_items += len(survided_authors)
+            ins_items += es_out.bulk_upload(survided_authors, self.get_field_unique_id())
+
+        logger.info("[enrich-forecast-activity] End study")
+
+    def dates_to_duration(self, dates, *, window_size=20):
+        """
+        Convert a list of dates into a list of durations
+        (between consecutive dates). The resulting list is composed of
+        'window_size' durations.
+        """
+        dates = sorted(set(dates))
+        kept = dates[-window_size - 1:]  # -1 because intervals vs. bounds
+        durations = []
+        for first, second in zip(kept[:-1], kept[1:]):
+            duration = (second - first).days
+            durations.append(duration)
+
+        return durations
+
+    @staticmethod
+    def authors_between_dates(repository_url, min_date, max_date,
+                              author_field="author_uuid", date_field="metadata__updated_on"):
+        """
+        Get all authors between a min and max date
+
+        :param repository_url: url of the repository
+        :param min_date: min date to retrieve the authors' activities
+        :param max_date: max date to retrieve the authors' activities
+        :param author_field: field of the author
+        :param date_field: field used to find the authors active in a given timeframe
+
+        :return: the query to be executed to get the authors between two dates
+        """
+        es_query = """
+            {
+              "query": {
+                "bool": {
+                    "filter": [
+                        {
+                            "term": {
+                                "origin": "%s"
+                            }
+                        },
+                        {
+                            "range": {
+                                "%s": {
+                                    "gte": "%s",
+                                    "lte": "%s"
+                                }
+                            }
+                        }
+                    ]
+                }
+              },
+              "size": 0,
+              "aggs": {
+                "authors": {
+                    "terms": {
+                        "field": "%s",
+                        "order": {
+                            "_key": "asc"
+                        }
+                    }
+                }
+              }
+            }
+            """ % (repository_url, date_field, min_date, max_date, author_field)
+
+        return es_query
+
+    @staticmethod
+    def author_activity(repository_url, min_date, max_date, author_value,
+                        author_field="author_uuid", date_field="metadata__updated_on"):
+        """
+        Get the author's activity between two dates
+
+        :param repository_url: url of the repository
+        :param min_date: min date to retrieve the authors' activities
+        :param max_date: max date to retrieve the authors' activities
+        :param author_value: target author
+        :param date_field: field used to find the the authors' activities
+        :param author_field: field of the author
+
+        :return: the query to be executed to get the authors' activities for a given repository
+        """
+        es_query = """
+                {
+                  "_source": ["%s", "author_name", "author_org_name", "author_bot",
+                              "author_user_name", "author_domain"],
+                  "size": 5000,
+                  "query": {
+                    "bool": {
+                        "filter": [
+                            {
+                                "term": {
+                                    "origin": "%s"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "%s": {
+                                        "gte": "%s",
+                                        "lte": "%s"
+                                    }
+                                }
+                            },
+                            {
+                                "term": {
+                                    "%s": "%s"
+                                }
+                            }
+                        ]
+                    }
+                  },
+                  "sort": [
+                        {
+                            "%s": {
+                                "order": "asc"
+                            }
+                        }
+                    ]
+                }
+                """ % (date_field, repository_url, date_field, min_date, max_date,
+                       author_field, author_value, date_field)
+
+        return es_query
 
     def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
                           author_field="author_uuid"):
