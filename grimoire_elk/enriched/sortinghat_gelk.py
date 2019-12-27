@@ -53,10 +53,11 @@ class SortingHat(object):
                 filter(Identity.name == identity['name'], Identity.email == identity['email'], Identity.source == source)
             identities = query.all()
             if identities:
-                user = {}
-                user['name'] = identities[0].name
-                user['email'] = identities[0].email
-                user['username'] = identities[0].username
+                user = {
+                    'name': identities[0].name,
+                    'email': identities[0].email,
+                    'username': identities[0].username
+                }
         return user
 
     @classmethod
