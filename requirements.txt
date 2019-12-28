@@ -6,6 +6,7 @@ PyMySQL>=0.7.0
 redis==3.0.0
 geopy>=1.20.0
 pandas>=0.22.0,<=0.25.3
+statsmodels >= 0.9.0
 -e git+https://github.com/chaoss/grimoirelab-sortinghat/#egg=grimoirelab-sortinghat
 -e git+https://github.com/chaoss/grimoirelab-toolkit/#egg=grimoirelab-toolkit
 -e git+https://github.com/chaoss/grimoirelab-cereslib/#egg=grimoirelab-cereslib
