@@ -84,7 +84,8 @@ setup(name="grimoire-elk",
           'PyMySQL>=0.7.0',
           'redis==3.0.0',
           'pandas>=0.22.0,<=0.25.3',
-          'geopy>=1.20.0'
+          'geopy>=1.20.0',
+          'statsmodels >= 0.9.0'
       ],
       zip_safe=False
       )
