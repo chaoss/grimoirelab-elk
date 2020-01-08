@@ -174,6 +174,8 @@ class GitHubEnrich2(Enrich):
         return identity
 
     def get_geo_point(self, location):
+        """Get geo point from location. This method is actually not used"""
+
         geo_point = geo_code = None
 
         if location is None:
@@ -575,7 +577,7 @@ class GitHubEnrich2(Enrich):
                 rich_pr["user_domain"] = self.get_email_domain(user['email'])
             rich_pr['user_org'] = user['company']
             rich_pr['user_location'] = user['location']
-            rich_pr['user_geolocation'] = self.get_geo_point(user['location'])
+            rich_pr['user_geolocation'] = None
         else:
             rich_pr['user_name'] = None
             rich_pr["user_domain"] = None
@@ -592,8 +594,7 @@ class GitHubEnrich2(Enrich):
                 rich_pr["merge_author_domain"] = self.get_email_domain(merged_by['email'])
             rich_pr['merge_author_org'] = merged_by['company']
             rich_pr['merge_author_location'] = merged_by['location']
-            rich_pr['merge_author_geolocation'] = \
-                self.get_geo_point(merged_by['location'])
+            rich_pr['merge_author_geolocation'] = None
         else:
             rich_pr['merge_author_name'] = None
             rich_pr['merge_author_login'] = None
@@ -688,7 +689,7 @@ class GitHubEnrich2(Enrich):
                 rich_issue["user_domain"] = self.get_email_domain(user['email'])
             rich_issue['user_org'] = user['company']
             rich_issue['user_location'] = user['location']
-            rich_issue['user_geolocation'] = self.get_geo_point(user['location'])
+            rich_issue['user_geolocation'] = None
         else:
             rich_issue['user_name'] = None
             rich_issue["user_domain"] = None
@@ -706,8 +707,7 @@ class GitHubEnrich2(Enrich):
                 rich_issue["assignee_domain"] = self.get_email_domain(assignee['email'])
             rich_issue['assignee_org'] = assignee['company']
             rich_issue['assignee_location'] = assignee['location']
-            rich_issue['assignee_geolocation'] = \
-                self.get_geo_point(assignee['location'])
+            rich_issue['assignee_geolocation'] = None
         else:
             rich_issue['assignee_name'] = None
             rich_issue['assignee_login'] = None
