@@ -61,6 +61,15 @@ class Mapping(BaseMapping):
                                    }
                                 }
                             },
+                            "reviews_data": {
+                                "dynamic":false,
+                                "properties": {
+                                    "body": {
+                                        "type": "text",
+                                        "index": true
+                                    }
+                                }
+                            },
                             "body": {
                                 "type": "text",
                                 "index": true
