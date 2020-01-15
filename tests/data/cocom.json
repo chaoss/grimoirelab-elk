@@ -56,8 +56,7 @@
                 "tokens": 4623
             }],
             "analyzer": "lizard_file",
-            "commit": "41f207a9349ae497055ac03157d9915ae81031e0",
-            "message": "[tests] Add test for deriving `git_path` from `uri`\n \n Signed-off-by: inishchith <inishchith@gmail.com>"
+            "commit": "41f207a9349ae497055ac03157d9915ae81031e0"
         },
         "graal_version": "0.2.1",
         "origin": "https://github.com/chaoss/grimoirelab-graal",
