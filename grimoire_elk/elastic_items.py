@@ -175,7 +175,7 @@ class ElasticItems:
 
         scroll_id = None
         page = self.get_elastic_items(scroll_id, _filter=_filter, ignore_incremental=ignore_incremental)
-        if 'too_many_scrolls' in page:
+        if page and 'too_many_scrolls' in page:
             sec = self.scroll_wait
             while sec > 0:
                 logger.debug("Too many scrolls open, waiting up to {} seconds".format(sec))
