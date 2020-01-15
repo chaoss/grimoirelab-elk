@@ -80,8 +80,7 @@
                 "type": "file"
             }],
             "analyzer": "scancode_cli",
-            "commit": "2fb9a49363021922eb0fcc9874baabfc252a827c",
-            "message": "[graal] Initial commit"
+            "commit": "2fb9a49363021922eb0fcc9874baabfc252a827c"
         },
         "graal_version": "0.2.1",
         "origin": "https://github.com/chaoss/grimoirelab-graal",
