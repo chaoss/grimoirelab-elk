@@ -364,6 +364,7 @@ def get_params_parser():
     parser.add_argument('--only-studies', action='store_true', help="Execute only studies.")
     parser.add_argument('--bulk-size', default=1000, type=int,
                         help="Number of items per bulk request to Elasticsearch.")
+    parser.add_argument('--scroll-wait', default=900, type=int, help="Wait for available scroll (default 900s)")
     parser.add_argument('--scroll-size', default=100, type=int,
                         help="Number of items to get from Elasticsearch when scrolling.")
     parser.add_argument('--arthur', action='store_true', help="Read items from arthur redis queue")

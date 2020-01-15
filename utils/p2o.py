@@ -52,6 +52,8 @@ if __name__ == '__main__':
                 ElasticSearch.max_items_bulk = args.bulk_size
             if args.scroll_size:
                 ElasticItems.scroll_size = args.scroll_size
+            if args.scroll_wait:
+                ElasticItems.scroll_wait = args.scroll_wait
             if not args.enrich_only:
                 feed_backend(url, clean, args.fetch_cache,
                              args.backend, args.backend_args,

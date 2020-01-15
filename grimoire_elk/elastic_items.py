@@ -25,6 +25,7 @@
 import json
 import logging
 import re
+import time
 
 from .enriched.utils import get_repository_filter, grimoire_con
 from .elastic_mapping import Mapping
@@ -46,6 +47,7 @@ class ElasticItems:
     # In large projects like Eclipse commits, 100 is too much
     # Change it from p2o command line or mordred config
     scroll_size = 100
+    scroll_wait = 900
 
     def __init__(self, perceval_backend, from_date=None, insecure=True, offset=None):
 
@@ -147,6 +149,23 @@ class ElasticItems:
     def set_from_date(self, last_enrich_date):
         self.from_date = last_enrich_date
 
+    def free_scroll(self, scroll_id=None):
+        """ Free scroll after use"""
+        if not scroll_id:
+            return
+
+        logger.debug("Releasing scroll_id={}".format(scroll_id))
+        url = self.elastic.url + "/_search/scroll"
+        headers = {"Content-Type": "application/json"}
+        scroll_data = {"scroll_id": scroll_id}
+        query_data = json.dumps(scroll_data)
+        try:
+            res = self.requests.delete(url, data=query_data, headers=headers)
+            res.raise_for_status()
+        except Exception:
+            logger.debug("Error releasing scroll: {}/{}".format(self.elastic.anonymize_url(url), scroll_id))
+            logger.debug("Error releasing scroll: {}".format(res.json()))
+
     # Items generator
     def fetch(self, _filter=None, ignore_incremental=False):
         """ Fetch the items from raw or enriched index. An optional _filter
@@ -156,6 +175,16 @@ class ElasticItems:
 
         scroll_id = None
         page = self.get_elastic_items(scroll_id, _filter=_filter, ignore_incremental=ignore_incremental)
+        if 'too_many_scrolls' in page:
+            sec = self.scroll_wait
+            while sec > 0:
+                logger.debug("Too many scrolls open, waiting up to {} seconds".format(sec))
+                time.sleep(1)
+                sec -= 1
+                page = self.get_elastic_items(scroll_id, _filter=_filter, ignore_incremental=ignore_incremental)
+                if not 'too_many_scrolls' in page:
+                    logger.debug("Scroll acquired after {} seconds".format(self.scroll_wait - sec))
+                    break
 
         if not page:
             return []
@@ -170,6 +199,7 @@ class ElasticItems:
         if scroll_size == 0:
             logger.debug("No results found from {} and filter {}".format(
                          self.elastic.anonymize_url(self.elastic.index_url), _filter))
+            self.free_scroll(scroll_id)
             return
 
         while scroll_size > 0:
@@ -187,6 +217,7 @@ class ElasticItems:
 
             scroll_size = len(page['hits']['hits'])
 
+        self.free_scroll(scroll_id)
         logger.debug("Fetching from {}: done receiving".format(self.elastic.anonymize_url(self.elastic.index_url)))
 
     def get_elastic_items(self, elastic_scroll_id=None, _filter=None, ignore_incremental=False):
@@ -292,6 +323,8 @@ class ElasticItems:
         rjson = None
         try:
             res = self.requests.post(url, data=query_data, headers=headers)
+            if self.too_many_scrolls(res):
+                return { 'too_many_scrolls': True }
             res.raise_for_status()
             rjson = res.json()
         except Exception:
@@ -299,3 +332,17 @@ class ElasticItems:
             logger.debug("No results found from {}".format(self.elastic.anonymize_url(url)))
 
         return rjson
+
+    def too_many_scrolls(self, res):
+        """Check if result conatins 'too many scroll contexts' error"""
+        r = res.json()
+        return (
+            r
+            and 'status' in r
+            and 'error' in r
+            and r['status'] == 500
+            and 'root_cause' in r['error']
+            and len(r['error']['root_cause']) > 0
+            and 'reason' in r['error']['root_cause'][0]
+            and 'Trying to create too many scroll contexts' in r['error']['root_cause'][0]['reason']
+            )
