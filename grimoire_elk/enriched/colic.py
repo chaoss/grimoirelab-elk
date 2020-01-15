@@ -316,7 +316,7 @@ class ColicEnrich(Enrich):
             eitem['committer'] = entry['Commit']
             eitem['commit_date'] = fix_field_date(entry['CommitDate'])
             eitem['commit_sha'] = entry['commit']
-            eitem['message'] = entry['message']
+            eitem['message'] = entry.get('message', None)
 
             # Other enrichment
             eitem["repo_url"] = item["origin"]
