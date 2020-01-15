@@ -182,6 +182,9 @@ class ElasticItems:
                 time.sleep(1)
                 sec -= 1
                 page = self.get_elastic_items(scroll_id, _filter=_filter, ignore_incremental=ignore_incremental)
+                if not page:
+                    logger.debug("Waiting for scroll terminated")
+                    break
                 if 'too_many_scrolls' not in page:
                     logger.debug("Scroll acquired after {} seconds".format(self.scroll_wait - sec))
                     break
