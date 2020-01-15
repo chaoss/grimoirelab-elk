@@ -180,7 +180,7 @@ class CocomEnrich(Enrich):
             eitem['commit_sha'] = entry['commit']
             eitem['author'] = entry['Author']
             eitem['committer'] = entry['Commit']
-            eitem['message'] = entry['message']
+            eitem['message'] = entry.get('message', None)
             eitem['author_date'] = fix_field_date(entry['AuthorDate'])
             eitem['commit_date'] = fix_field_date(entry['CommitDate'])
 
