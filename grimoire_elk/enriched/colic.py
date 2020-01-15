@@ -318,6 +318,11 @@ class ColicEnrich(Enrich):
             eitem['commit_sha'] = entry['commit']
             eitem['message'] = entry['message']
 
+            # Other enrichment
+            eitem["repo_url"] = item["origin"]
+            if eitem["repo_url"].startswith('http'):
+                eitem["repo_url"] = ElasticSearch.anonymize_url(eitem["repo_url"])
+
             if self.prjs_map:
                 eitem.update(self.get_item_project(eitem))
 
@@ -388,8 +393,12 @@ class ColicEnrich(Enrich):
         ins_items = 0
 
         for repository_url in repositories:
+            repository_url_anonymized = repository_url
+            if repository_url_anonymized.startswith('http'):
+                repository_url_anonymized = ElasticSearch.anonymize_url(repository_url_anonymized)
+
             logger.info("[colic] study enrich-colic-analysis start analysis for {}".format(
-                        repository_url))
+                        repository_url_anonymized))
             evolution_items = []
 
             for interval in interval_months:
@@ -418,9 +427,9 @@ class ColicEnrich(Enrich):
                         to_month = to_month + relativedelta(months=+interval)
                         continue
 
-                    repository_name = repository_url.split("/")[-1]
                     evolution_item = {
-                        "id": "{}_{}_{}".format(to_month.isoformat(), repository_name, interval),
+                        "id": "{}_{}_{}".format(to_month.isoformat(), hash(repository_url_anonymized), interval),
+                        "repo_url": repository_url_anonymized,
                         "origin": repository_url,
                         "interval_months": interval,
                         "study_creation_date": to_month.isoformat(),
@@ -456,7 +465,8 @@ class ColicEnrich(Enrich):
                     )
 
             logger.info(
-                "[colic] study enrich-colic-analysis end analysis for {} with month interval".format(repository_url)
+                "[colic] study enrich-colic-analysis end analysis for {} with month interval".format(
+                    repository_url_anonymized)
             )
 
         logger.info("[colic] study enrich-colic-analysis end")
