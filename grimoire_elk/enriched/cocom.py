@@ -184,6 +184,11 @@ class CocomEnrich(Enrich):
             eitem['author_date'] = fix_field_date(entry['AuthorDate'])
             eitem['commit_date'] = fix_field_date(entry['CommitDate'])
 
+            # Other enrichment
+            eitem["repo_url"] = item["origin"]
+            if eitem["repo_url"].startswith('http'):
+                eitem["repo_url"] = ElasticSearch.anonymize_url(eitem["repo_url"])
+
             if self.prjs_map:
                 eitem.update(self.get_item_project(eitem))
 
@@ -271,8 +276,12 @@ class CocomEnrich(Enrich):
         ins_items = 0
 
         for repository_url in repositories:
+            repository_url_anonymized = repository_url
+            if repository_url_anonymized.startswith('http'):
+                repository_url_anonymized = ElasticSearch.anonymize_url(repository_url_anonymized)
+
             logger.info("[cocom] study enrich-cocom-analysis start analysis for {}".format(
-                        repository_url))
+                        repository_url_anonymized))
             evolution_items = []
 
             for interval in interval_months:
@@ -292,7 +301,8 @@ class CocomEnrich(Enrich):
 
                     repository_name = repository_url.split("/")[-1]
                     evolution_item = {
-                        "id": "{}_{}_{}".format(to_month.isoformat(), repository_name, interval),
+                        "id": "{}_{}_{}".format(to_month.isoformat(), hash(repository_url_anonymized), interval),
+                        "repo_url": repository_url_anonymized,
                         "origin": repository_url,
                         "interval_months": interval,
                         "study_creation_date": to_month.isoformat(),
@@ -342,7 +352,8 @@ class CocomEnrich(Enrich):
                     )
 
             logger.info(
-                "[cocom] study enrich-cocom-analysis End analysis for {} with month interval".format(repository_url)
+                "[cocom] study enrich-cocom-analysis End analysis for {} with month interval".format(
+                    repository_url_anonymized)
             )
 
         logger.info("[cocom] study enrich-cocom-analysis End")

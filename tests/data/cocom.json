@@ -217,5 +217,59 @@
         "timestamp": 1564575285.20279,
         "updated_on": 1526570774.0,
         "uuid": "0387fc9162b87ae8ad06f626be921d796e32c687"
+    },
+    {
+        "backend_name" : "CoCom",
+        "backend_version" : "0.3.0",
+        "graal_version" : "0.2.5",
+        "timestamp" : 1.579019901097611E9,
+        "origin" : "https://valeriocos:xxxxx0@github.com/chaoss/grimoirelab-toolkit",
+        "uuid" : "54859916bbf7c4f1adea24d79bc42911a310330a",
+        "updated_on" : 1.494584485E9,
+        "classified_fields_filtered" : null,
+        "category" : "code_complexity_lizard_file",
+        "search_fields" : {
+            "item_id" : "bf302f17458b477ab029dd5f8139015df47ce719"
+        },
+        "tag" : "https://valeriocos:xxxxx0@github.com/chaoss/grimoirelab-toolkit",
+        "data" : {
+            "commit" : "bf302f17458b477ab029dd5f8139015df47ce719",
+            "Author" : "Santiago Dueñas <sduenas@bitergia.com>",
+            "AuthorDate" : "Thu May 11 20:10:54 2017 +0200",
+            "Commit" : "Santiago Dueñas <sduenas@bitergia.com>",
+            "CommitDate" : "Fri May 12 12:21:25 2017 +0200",
+            "message" : "[uris] Add module for handling URIs",
+            "analysis" : [
+                {
+                    "ccn" : 1,
+                    "avg_ccn" : 1.0,
+                    "avg_loc" : 2.0,
+                    "avg_tokens" : 30.0,
+                    "num_funs" : 1,
+                    "loc" : 4,
+                    "tokens" : 37,
+                    "ext" : "py",
+                    "blanks" : 9,
+                    "comments" : 29,
+                    "file_path" : "grimoirelab/toolkit/uris.py"
+                },
+                {
+                    "ccn" : 3,
+                    "avg_ccn" : 1.0,
+                    "avg_loc" : 10.333333333333334,
+                    "avg_tokens" : 62.666666666666664,
+                    "num_funs" : 3,
+                    "loc" : 41,
+                    "tokens" : 243,
+                    "ext" : "py",
+                    "blanks" : 23,
+                    "comments" : 24,
+                    "file_path" : "tests/test_uris.py"
+                }
+            ],
+            "analyzer" : "lizard_file"
+        },
+        "metadata__updated_on" : "2017-05-12T10:21:25+00:00",
+        "metadata__timestamp" : "2020-01-14T16:38:21.097611+00:00"
     }
 ]
