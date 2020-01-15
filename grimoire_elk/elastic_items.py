@@ -182,7 +182,7 @@ class ElasticItems:
                 time.sleep(1)
                 sec -= 1
                 page = self.get_elastic_items(scroll_id, _filter=_filter, ignore_incremental=ignore_incremental)
-                if not 'too_many_scrolls' in page:
+                if 'too_many_scrolls' not in page:
                     logger.debug("Scroll acquired after {} seconds".format(self.scroll_wait - sec))
                     break
 
@@ -324,7 +324,7 @@ class ElasticItems:
         try:
             res = self.requests.post(url, data=query_data, headers=headers)
             if self.too_many_scrolls(res):
-                return { 'too_many_scrolls': True }
+                return {'too_many_scrolls': True}
             res.raise_for_status()
             rjson = res.json()
         except Exception:
@@ -345,4 +345,4 @@ class ElasticItems:
             and len(r['error']['root_cause']) > 0
             and 'reason' in r['error']['root_cause'][0]
             and 'Trying to create too many scroll contexts' in r['error']['root_cause'][0]['reason']
-            )
+        )
