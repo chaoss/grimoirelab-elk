@@ -376,6 +376,7 @@ class GitHubEnrich2(Enrich):
             ecomment['issue_id'] = eitem['issue_id']
             ecomment['issue_id_in_repo'] = eitem['issue_id_in_repo']
             ecomment['issue_url'] = eitem['issue_url']
+            ecomment['issue_title'] = eitem['issue_title']
             ecomment['issue_state'] = eitem['issue_state']
             ecomment['issue_created_at'] = eitem['issue_created_at']
             ecomment['issue_updated_at'] = eitem['issue_updated_at']
@@ -402,6 +403,7 @@ class GitHubEnrich2(Enrich):
             # due to backtrack compatibility, `is_github2_*` is replaced with `is_github_*`
             ecomment.pop('is_github2_{}'.format(ISSUE_COMMENT_TYPE))
             ecomment['is_github_{}'.format(ISSUE_COMMENT_TYPE)] = 1
+            ecomment['is_github_comment'] = 1
 
             if self.sortinghat:
                 ecomment.update(self.get_item_sh(comment, self.comment_roles, 'updated_at'))
@@ -443,6 +445,9 @@ class GitHubEnrich2(Enrich):
             ecomment['pull_labels'] = eitem['pull_labels']
             ecomment['pull_id'] = eitem['pull_id']
             ecomment['pull_id_in_repo'] = eitem['pull_id_in_repo']
+            ecomment['issue_id_in_repo'] = eitem['issue_id_in_repo']
+            ecomment['issue_title'] = eitem['issue_title']
+            ecomment['issue_url'] = eitem['issue_url']
             ecomment['pull_url'] = eitem['pull_url']
             ecomment['pull_state'] = eitem['pull_state']
             ecomment['pull_created_at'] = eitem['pull_created_at']
@@ -472,6 +477,7 @@ class GitHubEnrich2(Enrich):
             # due to backtrack compatibility, `is_github2_*` is replaced with `is_github_*`
             ecomment.pop('is_github2_{}'.format(REVIEW_COMMENT_TYPE))
             ecomment['is_github_{}'.format(REVIEW_COMMENT_TYPE)] = 1
+            ecomment['is_github_comment'] = 1
 
             if self.sortinghat:
                 ecomment.update(self.get_item_sh(comment, self.comment_roles, 'updated_at'))
@@ -606,9 +612,10 @@ class GitHubEnrich2(Enrich):
         rich_pr['id'] = pull_request['id']
         rich_pr['pull_id'] = pull_request['id']
         rich_pr['pull_id_in_repo'] = pull_request['html_url'].split("/")[-1]
+        rich_pr['issue_id_in_repo'] = pull_request['html_url'].split("/")[-1]
         rich_pr['repository'] = self.get_project_repository(rich_pr)
-        rich_pr['title'] = pull_request['title']
-        rich_pr['title_analyzed'] = pull_request['title']
+        rich_pr['issue_title'] = pull_request['title']
+        rich_pr['issue_title_analyzed'] = pull_request['title']
         rich_pr['pull_state'] = pull_request['state']
         rich_pr['pull_created_at'] = pull_request['created_at']
         rich_pr['pull_updated_at'] = pull_request['updated_at']
@@ -617,6 +624,7 @@ class GitHubEnrich2(Enrich):
         rich_pr['pull_closed_at'] = pull_request['closed_at']
         rich_pr['url'] = pull_request['html_url']
         rich_pr['pull_url'] = pull_request['html_url']
+        rich_pr['issue_url'] = pull_request['html_url']
 
         # extract reactions and add it to enriched item
         rich_pr.update(self.__get_reactions(pull_request))
@@ -720,8 +728,8 @@ class GitHubEnrich2(Enrich):
         rich_issue['issue_id'] = issue['id']
         rich_issue['issue_id_in_repo'] = issue['html_url'].split("/")[-1]
         rich_issue['repository'] = self.get_project_repository(rich_issue)
-        rich_issue['title'] = issue['title']
-        rich_issue['title_analyzed'] = issue['title']
+        rich_issue['issue_title'] = issue['title']
+        rich_issue['issue_title_analyzed'] = issue['title']
         rich_issue['issue_state'] = issue['state']
         rich_issue['issue_created_at'] = issue['created_at']
         rich_issue['issue_updated_at'] = issue['updated_at']
