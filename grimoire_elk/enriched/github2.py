@@ -19,7 +19,6 @@
 #   Valerio Cosentino <valcos@bitergia.com>
 #
 
-import json
 import logging
 import re
 
@@ -110,14 +109,8 @@ class GitHubEnrich2(Enrich):
         self.studies = []
         self.studies.append(self.enrich_extra_data)
 
-        self.users = {}  # cache users
-        self.location = {}  # cache users location
-        self.location_not_found = []  # location not found in map api
-
     def set_elastic(self, elastic):
         self.elastic = elastic
-        # Recover cache data from Elastic
-        self.geolocations = self.geo_locationsfrom__es()
 
     def get_field_author(self):
         return "user_data"
@@ -172,121 +165,6 @@ class GitHubEnrich2(Enrich):
         identity['email'] = user.get('email', None)
 
         return identity
-
-    def get_geo_point(self, location):
-        """Get geo point from location. This method is actually not used"""
-
-        geo_point = geo_code = None
-
-        if location is None:
-            return geo_point
-
-        if location in self.geolocations:
-            geo_location = self.geolocations[location]
-            geo_point = {
-                "lat": geo_location['lat'],
-                "lon": geo_location['lon']
-            }
-
-        elif location in self.location_not_found:
-            # Don't call the API.
-            pass
-
-        else:
-            url = 'https://maps.googleapis.com/maps/api/geocode/json'
-            params = {'sensor': 'false', 'address': location}
-            r = self.requests.get(url, params=params)
-
-            try:
-                logger.debug("[github] Using Maps API to find {}".format(
-                             location))
-                r_json = r.json()
-                geo_code = r_json['results'][0]['geometry']['location']
-            except Exception:
-                if location not in self.location_not_found:
-                    logger.debug("[github] Can't find geocode for ".format(
-                                 location))
-                    self.location_not_found.append(location)
-
-            if geo_code:
-                geo_point = {
-                    "lat": geo_code['lat'],
-                    "lon": geo_code['lng']
-                }
-                self.geolocations[location] = geo_point
-
-        return geo_point
-
-    def get_github_cache(self, kind, key_):
-        """ Get cache data for items of _type using key_ as the cache dict key """
-
-        cache = {}
-        res_size = 100  # best size?
-        from_ = 0
-
-        index_github = "github/" + kind
-
-        url = self.elastic.url + "/" + index_github
-        url += "/_search" + "?" + "size=%i" % res_size
-        r = self.requests.get(url)
-        type_items = r.json()
-
-        if 'hits' not in type_items:
-            logger.debug("[github] No github {} data in ES".format(
-                         kind))
-
-        else:
-            while len(type_items['hits']['hits']) > 0:
-                for hit in type_items['hits']['hits']:
-                    item = hit['_source']
-                    cache[item[key_]] = item
-                from_ += res_size
-                r = self.requests.get(url + "&from=%i" % from_)
-                type_items = r.json()
-                if 'hits' not in type_items:
-                    break
-
-        return cache
-
-    def geo_locationsfrom__es(self):
-        return self.get_github_cache("geolocations", "location")
-
-    def geo_locations_to_es(self):
-        max_items = self.elastic.max_items_bulk
-        current = 0
-        total = 0
-        bulk_json = ""
-
-        url = self.elastic.url + GEOLOCATION_INDEX + "geolocations/_bulk"
-
-        logger.debug("[github] Adding geoloc to {} (in {} packs)".format(
-                     self.elastic.anonymize_url(url), max_items))
-
-        for loc in self.geolocations:
-            if current >= max_items:
-                total += self.elastic.safe_put_bulk(url, bulk_json)
-                bulk_json = ""
-                current = 0
-
-            geopoint = self.geolocations[loc]
-            location = geopoint.copy()
-            location["location"] = loc
-            # First upload the raw issue data to ES
-            data_json = json.dumps(location)
-            # Don't include in URL non ascii codes
-            safe_loc = str(loc.encode('ascii', 'ignore'), 'ascii')
-            geo_id = str("%s-%s-%s" % (location["lat"], location["lon"],
-                                       safe_loc))
-            bulk_json += '{"index" : {"_id" : "%s" } }\n' % (geo_id)
-            bulk_json += data_json + "\n"  # Bulk document
-            current += 1
-
-        if current > 0:
-            total += self.elastic.safe_put_bulk(url, bulk_json)
-
-        logger.debug("[github] Adding geoloc to ES Done")
-
-        return total
 
     def get_project_repository(self, eitem):
         repo = eitem['origin']
@@ -529,9 +407,6 @@ class GitHubEnrich2(Enrich):
             logger.error("%s/%s missing items for GitHub", str(missing), str(num_items))
         else:
             logger.info("%s items inserted for GitHub", str(num_items))
-
-        logger.debug("[github] Updating GitHub users geolocations in Elastic")
-        self.geo_locations_to_es()  # Update geolocations in Elastic
 
         return num_items
 
