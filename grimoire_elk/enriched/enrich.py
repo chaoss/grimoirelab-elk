@@ -31,6 +31,7 @@ import pkg_resources
 from functools import lru_cache
 
 from elasticsearch import Elasticsearch, RequestsHttpConnection
+from geopy.geocoders import Nominatim
 
 from perceval.backend import find_signature_parameters
 from grimoirelab_toolkit.datetime import (datetime_utcnow, str_to_datetime)
@@ -1153,6 +1154,202 @@ class Enrich(ElasticItems):
 
             logger.info("[enrich-extra-data] Target index {} updated with data from {}".format(
                         self.elastic.anonymize_url(url), json_url))
+
+    def find_geo_point_in_index(self, es_in, in_index, location_field, location_value, geolocation_field):
+        """Look for a geo point in the `in_index` based on the `location_field` and `location_value`
+
+        :param es_in: Elastichsearch obj
+        :param in_index: target index
+        :param location_field: field including location info (e.g., user_location)
+        :param location_value: value of the location field (e.g., Madrid, Spain)
+        :param geolocation_field: field including geolocation info (e.g., user_geo_location)
+        :return: geolocation coordinates
+        """
+        query_location_geo_point = """
+        {
+          "_source": {
+            "includes": ["%s"]
+            },
+          "size": 1,
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "exists": {
+                    "field": "%s"
+                  }
+                }
+              ],
+              "filter": [
+                {"term" : { "%s" : "%s" }}
+              ]
+            }
+          }
+        }
+        """ % (geolocation_field, geolocation_field, location_field, location_value)
+
+        location_geo_point = es_in.search(index=in_index, body=query_location_geo_point)['hits']['hits']
+        geo_point_found = location_geo_point[0]['_source'][geolocation_field] if location_geo_point else None
+
+        return geo_point_found
+
+    def add_geo_point_in_index(self, enrich_backend, geolocation_field, loc_lat, loc_lon, location_field, location):
+        """Add geo point information (`loc_lat` and `loc_lon`) to the `in_index` in `geolocation_field` based
+        on the `location_field` and `location_value`.
+
+        :param enrich_backend: Enrich backend obj
+        :param geolocation_field: field including geolocation info (e.g., user_geo_location)
+        :param loc_lat: latitude value
+        :param loc_lon: longitude value
+        :param location_field: field including location info (e.g., user_location)
+        :param location: value of the location field (e.g., Madrid, Spain)
+        """
+        es_query = """
+            {
+              "script": {
+                "source":
+                "ctx._source.%s = [:];ctx._source.%s.lat = params.geo_lat;ctx._source.%s.lon = params.geo_lon;",
+                "lang": "painless",
+                "params": {
+                    "geo_lat": "%s",
+                    "geo_lon": "%s"
+                }
+              },
+              "query": {
+                "term": {
+                  "%s": "%s"
+                }
+              }
+            }
+        """ % (geolocation_field, geolocation_field, geolocation_field, loc_lat, loc_lon,
+               location_field, location)
+
+        r = self.requests.post(
+            enrich_backend.elastic.index_url + "/_update_by_query?wait_for_completion=true&conflicts=proceed",
+            data=es_query.encode('utf-8'), headers=HEADER_JSON,
+            verify=False
+        )
+
+        r.raise_for_status()
+
+    def enrich_geolocation(self, ocean_backend, enrich_backend, location_field, geolocation_field):
+        """
+        This study includes geo points information (latitude and longitude) based on the value of
+        the `location_field`. The coordinates are retrieved using Nominatim through the geopy package, and
+        saved in the `geolocation_field`.
+
+        All locations included in the `location_field` are retrieved from the enriched index. For each location,
+        the geo points are retrieved. First the geo points already stored in the index are used to resolve the
+        new geo points. If they are not present in the enriched index, Nominatim is employed to obtain the new geo
+        points. The geo points are then saved to the `geolocation_field`. In case the geo points are not found for
+        a given location, they are set to lat:0 lon:0, which point to the Null Island.
+
+        The example below shows how to activate the study by modifying the setup.cfg. The study
+        `enrich_geolocation:user` retrieves location data from `user_location` and stores the geo points
+        to `user_geolocation`. In a similar manner, `enrich_geolocation:assignee` takes the data from
+        `assignee_location` and stores the geo points to `assignee_geolocation`.
+
+        ```
+        [github]
+        raw_index = github_issues_chaoss
+        enriched_index = github_issues_chaoss_enriched
+        api-token = ...
+        ...
+        studies = [enrich_geolocation:user, enrich_geolocation:assignee]
+
+        [enrich_geolocation:user]
+        location_field = user_location
+        geolocation_field = user_geolocation
+
+        [enrich_geolocation:assignee]
+        location_field = assignee_location
+        geolocation_field = assignee_geolocation
+        ```
+
+        :param ocean_backend: backend from which to read the raw items
+        :param enrich_backend:  backend from which to read the enriched items
+        :param location_field: field in the enriched index including location info (e.g., Madrid, Spain)
+        :param geolocation_field: enriched field where latitude and longitude will be stored.
+
+        :return: None
+        """
+        data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
+        log_prefix = "[{}] Geolocation".format(data_source)
+        logger.info("{} starting study {}".format(log_prefix, self.elastic.anonymize_url(self.elastic.index_url)))
+
+        es_in = Elasticsearch([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
+                              verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+        in_index = enrich_backend.elastic.index
+
+        query_locations_no_geo_points = """
+        {
+          "size": 0,
+          "aggs": {
+            "locations": {
+              "terms": {
+                "field": "%s",
+                "size": 5000,
+                "order": {
+                  "_count": "desc"
+                }
+              }
+            }
+          },
+          "query": {
+            "bool": {
+              "must_not": [
+                {
+                  "exists": {
+                    "field": "%s"
+                  }
+                }
+              ]
+            }
+          }
+        }
+        """ % (location_field, geolocation_field)
+
+        locations_no_geo_points = es_in.search(index=in_index, body=query_locations_no_geo_points)
+        locations = [loc['key'] for loc in locations_no_geo_points['aggregations']['locations'].get('buckets', [])]
+        geolocator = Nominatim()
+
+        for location in locations:
+            # Default lat and lon coordinates point to the Null Island https://en.wikipedia.org/wiki/Null_Island
+            loc_lat = 0
+            loc_lon = 0
+
+            # look for the geo point in the current index
+            loc_info = self.find_geo_point_in_index(es_in, in_index, location_field, location, geolocation_field)
+            if loc_info:
+                loc_lat = loc_info['lat']
+                loc_lon = loc_info['lon']
+            else:
+                try:
+                    loc_info = geolocator.geocode(location)
+                except Exception as ex:
+                    logger.debug("{} Location {} not found for {}. {}".format(
+                        log_prefix, location,
+                        self.elastic.anonymize_url(enrich_backend.elastic.index_url),
+                        ex)
+                    )
+                    continue
+
+                # The geolocator may return a None value
+                if loc_info:
+                    loc_lat = loc_info.latitude
+                    loc_lon = loc_info.longitude
+
+            try:
+                self.add_geo_point_in_index(enrich_backend, geolocation_field, loc_lat, loc_lon,
+                                            location_field, location)
+            except requests.exceptions.HTTPError as ex:
+                logger.error("{} error executing study for {}. {}".format(
+                    log_prefix,
+                    self.elastic.anonymize_url(enrich_backend.elastic.index_url),
+                    ex)
+                )
+
+        logger.info("{} end {}".format(log_prefix, self.elastic.anonymize_url(self.elastic.index_url)))
 
     def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
                           author_field="author_uuid"):
