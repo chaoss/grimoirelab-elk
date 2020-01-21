@@ -636,35 +636,3 @@ class GitHubEnrich(Enrich):
         rich_repo.update(self.get_grimoire_fields(item['metadata__updated_on'], "repository"))
 
         return rich_repo
-
-
-class GitHubUser(object):
-    """ Helper class to manage data from a Github user """
-
-    users = {}  # cache with users from github
-
-    def __init__(self, user):
-
-        self.login = user['login']
-        self.email = user['email']
-        if 'company' in user:
-            self.company = user['company']
-        self.orgs = user['orgs']
-        self.org = self._getOrg()
-        self.name = user['name']
-        self.location = user['location']
-
-    def _getOrg(self):
-        company = None
-
-        if self.company:
-            company = self.company
-
-        if company is None:
-            company = ''
-            # Return the list of orgs
-            for org in self.orgs:
-                company += org['login'] + ";;"
-            company = company[:-2]
-
-        return company
