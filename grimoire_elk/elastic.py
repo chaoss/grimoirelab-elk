@@ -232,25 +232,30 @@ class ElasticSearch(object):
         :returns: None
         """
         aliases = self.list_aliases()
-        if aliases and alias in aliases:
-            logger.debug("Alias {} already exists on {}.".format(alias, self.anonymize_url(self.index_url)))
+        alias_dict = alias
+        if isinstance(alias, str):
+            alias_dict = {
+                "alias": alias
+            }
+
+        if aliases and alias_dict['alias'] in aliases:
+            logger.debug("Alias {} already exists on {}.".format(
+                alias_dict['alias'],
+                self.anonymize_url(self.index_url)
+            ))
             return
 
         # add alias
-        alias_data = """
-        {
+        alias_dict['index'] = self.index
+        alias_action = {
             "actions": [
                 {
-                    "add": {
-                        "index": "%s",
-                        "alias": "%s"
-                    }
+                    "add": alias_dict
                 }
             ]
         }
-        """ % (self.index, alias)
 
-        r = self.requests.post(self.url + "/_aliases", headers=HEADER_JSON, verify=False, data=alias_data)
+        r = self.requests.post(self.url + "/_aliases", headers=HEADER_JSON, verify=False, data=json.dumps(alias_action))
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
