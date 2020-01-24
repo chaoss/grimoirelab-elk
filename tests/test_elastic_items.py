@@ -400,7 +400,8 @@ class TestElasticItems(unittest.TestCase):
         with self.assertLogs(logger, level='DEBUG') as cm:
             items = [ei for ei in eitems.fetch()]
             self.assertEqual(len(items), 0)
-            self.assertRegex(cm.output[-1], 'DEBUG:grimoire_elk.elastic_items:No results found.*')
+            self.assertRegex(cm.output[-2], 'DEBUG:grimoire_elk.elastic_items:No results found.*')
+            self.assertRegex(cm.output[-1], 'DEBUG:grimoire_elk.elastic_items:Releasing scroll_id=*')
 
     def test_fetch_empty(self):
         """Test whether the fetch method returns an empty list when the index is empty"""
