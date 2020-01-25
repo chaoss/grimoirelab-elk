@@ -529,8 +529,6 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         else:
             elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend, es_enrich_aliases)
         enrich_backend.set_elastic(elastic_enrich)
-        if github_token and backend_name == "git":
-            enrich_backend.set_github_token(github_token)
         if jenkins_rename_file and backend_name == "jenkins":
             enrich_backend.set_jenkins_rename_file(jenkins_rename_file)
         if unaffiliated_group:
