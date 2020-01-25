@@ -24,7 +24,6 @@ import json
 import logging
 import re
 import sys
-import time
 
 import pkg_resources
 import requests
@@ -42,14 +41,7 @@ from ..elastic import ElasticSearch as elastic
 from ..elastic_mapping import Mapping as BaseMapping
 from ..elastic_items import HEADER_JSON, MAX_BULK_UPDATE_SIZE
 
-try:
-    from .sortinghat_gelk import SortingHat
-    SORTINGHAT_LIBS = True
-except ImportError:
-    SORTINGHAT_LIBS = False
-
 GITHUB = 'https://github.com/'
-SH_GIT_COMMIT = 'github-commit'
 DEMOGRAPHY_COMMIT_MIN_DATE = '1980-01-01'
 AREAS_OF_CODE_ALIAS = 'git_areas_of_code'
 logger = logging.getLogger(__name__)
@@ -103,18 +95,10 @@ class GitEnrich(Enrich):
         self.studies.append(self.enrich_git_branches)
         self.studies.append(self.enrich_extra_data)
 
-        # GitHub API management
-        self.github_token = None
-        self.github_logins = {}
-        self.github_logins_committer_not_found = 0
-        self.github_logins_author_not_found = 0
         self.rate_limit = None
         self.rate_limit_reset_ts = None
         self.min_rate_to_sleep = 100  # if pending rate < 100 sleep
         self.pair_programming = pair_programming
-
-    def set_github_token(self, token):
-        self.github_token = token
 
     def get_field_author(self):
         return "Author"
@@ -149,36 +133,7 @@ class GitEnrich(Enrich):
         return authors
 
     def get_identities(self, item):
-        """ Return the identities from an item.
-            If the repo is in GitHub, get the usernames from GitHub. """
-
-        def add_sh_github_identity(user, user_field, rol):
-            """ Add a new github identity to SH if it does not exists """
-            github_repo = None
-            if GITHUB in item['origin']:
-                github_repo = item['origin'].replace(GITHUB, '')
-                github_repo = re.sub('.git$', '', github_repo)
-            if not github_repo:
-                return
-
-            # Try to get the identity from SH
-            user_data = item['data'][user_field]
-            sh_identity = SortingHat.get_github_commit_username(self.sh_db, user, SH_GIT_COMMIT)
-            if not sh_identity:
-                # Get the usename from GitHub
-                gh_username = self.get_github_login(user_data, rol, commit_hash, github_repo)
-                # Create a new SH identity with name, email from git and username from github
-                logger.debug("[git] Adding new identity {} to SH {}: {}".format(gh_username, SH_GIT_COMMIT, user))
-                user = self.get_sh_identity(user_data)
-                user['username'] = gh_username
-                SortingHat.add_identity(self.sh_db, user, SH_GIT_COMMIT)
-            else:
-                if user_data not in self.github_logins:
-                    self.github_logins[user_data] = sh_identity['username']
-                    logger.debug("[git] GitHub-commit exists. username:{} user:{}".format(
-                                 sh_identity['username'], user_data))
-
-        commit_hash = item['data']['commit']
+        """Return the identities from an item."""
 
         if item['data']['Author']:
             # Check multi authors commits
@@ -192,8 +147,6 @@ class GitEnrich(Enrich):
             else:
                 user = self.get_sh_identity(item['data']["Author"])
                 yield user
-                if self.github_token:
-                    add_sh_github_identity(user, 'Author', 'author')
         if item['data']['Commit']:
             m = self.AUTHOR_P2P_REGEX.match(item['data']["Commit"])
             n = self.AUTHOR_P2P_NEW_REGEX.match(item['data']["Author"])
@@ -205,8 +158,6 @@ class GitEnrich(Enrich):
             else:
                 user = self.get_sh_identity(item['data']['Commit'])
                 yield user
-                if self.github_token:
-                    add_sh_github_identity(user, 'Commit', 'committer')
         if 'Signed-off-by' in item['data'] and self.pair_programming:
             signers = item['data']["Signed-off-by"]
             for signer in signers:
@@ -235,75 +186,6 @@ class GitEnrich(Enrich):
 
     def get_project_repository(self, eitem):
         return eitem['origin']
-
-    def get_github_login(self, user, rol, commit_hash, repo):
-        """ rol: author or committer """
-        login = None
-        try:
-            login = self.github_logins[user]
-        except KeyError:
-            # Get the login from github API
-            GITHUB_API_URL = "https://api.github.com"
-            commit_url = GITHUB_API_URL + "/repos/%s/commits/%s" % (repo, commit_hash)
-            headers = {'Authorization': 'token ' + self.github_token}
-
-            r = self.requests.get(commit_url, headers=headers)
-
-            try:
-                r.raise_for_status()
-            except requests.exceptions.ConnectionError as ex:
-                # Connection error
-                logger.error("[git] Can't get github login for {} in {} because a connection error ".format(
-                             repo, commit_hash))
-                return login
-
-            self.rate_limit = int(r.headers['X-RateLimit-Remaining'])
-            self.rate_limit_reset_ts = int(r.headers['X-RateLimit-Reset'])
-            logger.debug("[git] Rate limit pending: {}".format(self.rate_limit))
-            if self.rate_limit <= self.min_rate_to_sleep:
-                seconds_to_reset = self.rate_limit_reset_ts - int(time.time()) + 1
-                if seconds_to_reset < 0:
-                    seconds_to_reset = 0
-                cause = "[git] GitHub rate limit exhausted."
-                logger.info("{} Waiting {} secs for rate limit reset.".format(cause, seconds_to_reset))
-                time.sleep(seconds_to_reset)
-                # Retry once we have rate limit
-                r = self.requests.get(commit_url, headers=headers)
-
-            try:
-                r.raise_for_status()
-            except requests.exceptions.HTTPError as ex:
-                # commit not found probably or rate limit exhausted
-                logger.error("[git] Can't find commit {} {}".format(commit_url, ex))
-                return login
-
-            commit_json = r.json()
-            author_login = None
-            if 'author' in commit_json and commit_json['author']:
-                author_login = commit_json['author']['login']
-            else:
-                self.github_logins_author_not_found += 1
-
-            user_login = None
-            if 'committer' in commit_json and commit_json['committer']:
-                user_login = commit_json['committer']['login']
-            else:
-                self.github_logins_committer_not_found += 1
-
-            if rol == "author":
-                login = author_login
-            elif rol == "committer":
-                login = user_login
-            else:
-                logger.error("[git] Wrong rol: {}".format(rol))
-                raise RuntimeError
-
-            self.github_logins[user] = login
-            logger.debug("[git] {} is {} in github (not found {} authors {} committers )".format(
-                         user, login, self.github_logins_author_not_found,
-                         self.github_logins_committer_not_found))
-
-        return login
 
     @metadata
     def get_rich_item(self, item):

@@ -45,21 +45,6 @@ class SortingHat(object):
         return uuid
 
     @classmethod
-    def get_github_commit_username(cls, db, identity, source):
-        user = None
-
-        with db.connect() as session:
-            query = session.query(Identity).\
-                filter(Identity.name == identity['name'], Identity.email == identity['email'], Identity.source == source)
-            identities = query.all()
-            if identities:
-                user = {}
-                user['name'] = identities[0].name
-                user['email'] = identities[0].email
-                user['username'] = identities[0].username
-        return user
-
-    @classmethod
     def add_identity(cls, db, identity, backend):
         """ Load and identity list from backend in Sorting Hat """
         uuid = None
