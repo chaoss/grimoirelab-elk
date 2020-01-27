@@ -19,9 +19,11 @@
 #     Valerio Cosentino <valcos@bitergia.com>
 #
 import logging
+import time
 import unittest
 
 from base import TestBaseBackend
+from grimoire_elk.enriched.enrich import logger
 from grimoire_elk.enriched.utils import REPO_LABELS
 from grimoire_elk.raw.github import GitHubOcean
 
@@ -186,6 +188,35 @@ class TestGitHub2(TestBaseBackend):
             'repository': 'grimoirelab-perceval'
         }
         self.assertDictEqual(GitHubOcean.get_arthur_params_from_url(url), expected_params)
+
+    def test_geolocation_study(self):
+        """ Test that the geolocation study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_geolocation')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_geolocation":
+                study(ocean_backend, enrich_backend,
+                      location_field="user_location", geolocation_field="user_geolocation")
+
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[github] Geolocation '
+                                           'starting study %s/test_github2_enrich'
+                             % enrich_backend.elastic.anonymize_url(self.es_con))
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:[github] Geolocation '
+                                            'end %s/test_github2_enrich'
+                             % enrich_backend.elastic.anonymize_url(self.es_con))
+
+        time.sleep(5)  # HACK: Wait until github enrich index has been written
+        items = [item for item in enrich_backend.fetch() if 'user_location' in item]
+        self.assertEqual(len(items), 3)
+        for item in items:
+            if item['user_location']:
+                geolocation = item['user_geolocation']
+                self.assertIn('lon', geolocation)
+                self.assertIn('lat', geolocation)
+            else:
+                self.assertIsNone(item['user_geolocation'])
 
 
 if __name__ == "__main__":
