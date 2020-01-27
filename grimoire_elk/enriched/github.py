@@ -92,6 +92,7 @@ class GitHubEnrich(Enrich):
         self.studies = []
         self.studies.append(self.enrich_onion)
         self.studies.append(self.enrich_pull_requests)
+        self.studies.append(self.enrich_geolocation)
         self.studies.append(self.enrich_extra_data)
 
     def set_elastic(self, elastic):
