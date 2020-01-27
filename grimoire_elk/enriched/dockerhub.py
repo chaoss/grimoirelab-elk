@@ -163,7 +163,7 @@ class DockerHubEnrich(Enrich):
                 images_items[rich_item['id']] = rich_item
             else:
                 image_date = images_items[rich_item['id']]['last_updated']
-                if image_date <= rich_item['last_updated']:
+                if image_date and image_date <= rich_item['last_updated']:
                     # This event is newer for the image
                     rich_item['is_docker_image'] = 1
                     rich_item['is_event'] = 0
