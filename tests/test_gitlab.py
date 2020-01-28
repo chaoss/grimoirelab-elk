@@ -70,6 +70,7 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone_iid'], 34)
         self.assertEqual(eitem['labels'], [])
         self.assertEqual(eitem['author_username'], "redfish64")
+        self.assertEqual(eitem['repository'], "https://gitlab.com/fdroid/fdroiddata")
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
@@ -81,6 +82,7 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone_iid'], None)
         self.assertEqual(eitem['labels'], [])
         self.assertEqual(eitem['author_username'], "redfish64")
+        self.assertEqual(eitem['repository'], "https://gitlab.com/fdroid/fdroiddata")
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
@@ -92,6 +94,7 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone_iid'], None)
         self.assertEqual(eitem['labels'], ['CI/CD', 'Deliverable'])
         self.assertEqual(eitem['author_username'], "YoeriNijs")
+        self.assertEqual(eitem['repository'], "https://gitlab.com/fdroid/fdroiddata")
 
         item = self.items[4]
         eitem = enrich_backend.get_rich_item(item)
@@ -103,6 +106,7 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone_iid'], None)
         self.assertEqual(eitem['labels'], [])
         self.assertEqual(eitem['author_username'], None)
+        self.assertEqual(eitem['repository'], "https://gitlab.com/gitlab-org/gitlab")
 
         item = self.items[5]
         eitem = enrich_backend.get_rich_item(item)
@@ -114,6 +118,7 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone_iid'], 34)
         self.assertEqual(eitem['labels'], [])
         self.assertEqual(eitem['author_username'], "grote")
+        self.assertEqual(eitem['repository'], "https://gitlab.com/fdroid/fdroiddata")
 
         item = self.items[6]
         eitem = enrich_backend.get_rich_item(item)
@@ -125,6 +130,7 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone_iid'], None)
         self.assertEqual(eitem['labels'], [])
         self.assertEqual(eitem['author_username'], "Rudloff")
+        self.assertEqual(eitem['repository'], "https://gitlab.com/fdroid/fdroiddata")
 
         item = self.items[7]
         eitem = enrich_backend.get_rich_item(item)
@@ -136,6 +142,7 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['milestone_iid'], None)
         self.assertEqual(eitem['labels'], ['CI/CD', 'Deliverable'])
         self.assertEqual(eitem['author_username'], "marc.nause")
+        self.assertEqual(eitem['repository'], "https://gitlab.com/fdroid/fdroiddata")
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
