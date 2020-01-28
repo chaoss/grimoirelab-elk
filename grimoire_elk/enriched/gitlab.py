@@ -311,7 +311,7 @@ class GitLabEnrich(Enrich):
 
         rich_mr['id'] = merge_request['id']
         rich_mr['id_in_repo'] = merge_request['iid']
-        rich_mr['repository'] = merge_request['web_url'].rsplit("/", 2)[0]
+        rich_mr['repository'] = merge_request['web_url'].rsplit("/", 2)[0].split("/-")[0]
         rich_mr['title'] = merge_request['title']
         rich_mr['title_analyzed'] = merge_request['title']
         rich_mr['state'] = merge_request['state']
