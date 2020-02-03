@@ -722,8 +722,24 @@ class GitHubEnrich(Enrich):
      def enrich_backlog_analysis(self, ocean_backend, enrich_backend, no_incremental=False,
                               out_index="github_enrich_backlog",
                               date_field="grimoire_creation_date"):
+        """
+        The purpose of this study is to add additional index to compute the
+        chronological evolution of opened issues and average opened time issues.
 
-         logger.info("[enrich-backlog-analysis] Start enrich_backlog_analysis study")
+        For each repository and label, we start the study on repository
+        creation date until today with a day interval (default). For each date
+        we retrieve the number of open issue at this date by difference between
+        number of opened issues and number of closed issues. In addition, we
+        compute the average opened time for all issues open at this date.
+
+        To differenciate by label, we compute evolution for bugs and all others
+        labels (like "enhancement","good first issue" ... ), we call this
+        "reduced labels". We need to use theses reduced labels because the
+        complixity to compute evolution for each combinaison of labels would be
+        too big. In addition, we rename "bug" label to "bugs" in reduced labels.
+        """
+
+        logger.info("[enrich-backlog-analysis] Start enrich_backlog_analysis study")
 
          # connect to ES
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,

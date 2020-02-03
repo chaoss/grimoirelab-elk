@@ -17,6 +17,8 @@
 # Authors:
 #   Florent Kaisser <florent.pro@kaisser.name>
 #
+# In this file, we have the ES requests used by backlog evolution github study
+#
 
 from grimoirelab_toolkit.datetime import str_to_datetime
 
