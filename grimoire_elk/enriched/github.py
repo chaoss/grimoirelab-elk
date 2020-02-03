@@ -672,25 +672,25 @@ class GitHubEnrich(Enrich):
 
     def __create_backlog_item(self, repository_url, repository_name, project, date, label, issues):
 
-         average_opened_time = 0
+        average_opened_time = 0
         if (len(issues) > 0):
-            average_opened_time = sum(issues) / len(issues)
+          average_opened_time = sum(issues) / len(issues)
 
-         evolution_item = {
-            "uuid": "{}_{}_{}".format(date, repository_name, label),
-            "opened": len(issues),
-            "average_opened_time" : average_opened_time,
-            "origin": repository_url,
-            "labels" : label,
-            "project" : project,
-            "study_creation_date":date
+        evolution_item = {
+          "uuid": "{}_{}_{}".format(date, repository_name, label),
+          "opened": len(issues),
+          "average_opened_time" : average_opened_time,
+          "origin": repository_url,
+          "labels" : label,
+          "project" : project,
+          "study_creation_date":date
         }
 
-         evolution_item.update(self.get_grimoire_fields(date, "stats"))
+        evolution_item.update(self.get_grimoire_fields(date, "stats"))
 
-         return evolution_item
+        return evolution_item
 
-     def __get_opened_issues(self, es_in, in_index, repository_url, date, other,label):
+    def __get_opened_issues(self, es_in, in_index, repository_url, date, other,label):
         next_date = (str_to_datetime(date).replace(tzinfo=None) + relativedelta(days=int(BACKLOG_INTERVAL_STUDY))).strftime('%Y-%m-%dT%H:%M:%S.000Z')
         if(other):
             issues = es_in.search(
@@ -698,7 +698,7 @@ class GitHubEnrich(Enrich):
               body=get_issues_not_closed_other_label(repository_url,next_date,REDUCED_LABELS)
             )['hits']['hits']
 
-             issues = issues + es_in.search(
+            issues = issues + es_in.search(
               index=in_index,
               body=get_issues_open_at_other_label(repository_url,next_date,REDUCED_LABELS)
             )['hits']['hits']
@@ -708,18 +708,18 @@ class GitHubEnrich(Enrich):
               body=get_issues_not_closed_by_label(repository_url,next_date,label)
             )['hits']['hits']
 
-             issues = issues + es_in.search(
+            issues = issues + es_in.search(
               index=in_index,
               body=get_issues_open_at_by_label(repository_url,next_date,label)
             )['hits']['hits']
 
-         return list(map(
+        return list(map(
                 lambda i : get_time_diff_days(
                             str_to_datetime(i['_source']['created_at']),
                                             str_to_datetime(next_date)),
                             issues))
 
-     def enrich_backlog_analysis(self, ocean_backend, enrich_backend, no_incremental=False,
+    def enrich_backlog_analysis(self, ocean_backend, enrich_backend, no_incremental=False,
                               out_index="github_enrich_backlog",
                               date_field="grimoire_creation_date"):
         """
@@ -752,7 +752,7 @@ class GitHubEnrich(Enrich):
             body=get_unique_repository_with_project_name())
         repositories = [repo['key'] for repo in unique_repos['aggregations']['unique_repos'].get('buckets', [])]
 
-         logger.info("[enrich-backlog-analysis] {} repositories to process".format(len(repositories)))
+        logger.info("[enrich-backlog-analysis] {} repositories to process".format(len(repositories)))
 
          # create the index
         es_out = ElasticSearch(enrich_backend.elastic.url, out_index, mappings=Mapping)
@@ -766,7 +766,7 @@ class GitHubEnrich(Enrich):
             project = repository["project"]
             repository_name = repository_url.split("/")[-1]
 
-             logger.info("[enrich-backlog-analysis] Start analysis for {}".format(repository_url))
+            logger.info("[enrich-backlog-analysis] Start analysis for {}".format(repository_url))
 
              # get each day since repository creation
             dates = es_in.search(
@@ -810,7 +810,7 @@ class GitHubEnrich(Enrich):
                     num_items += len(evolution_items)
                     ins_items += es_out.bulk_upload(evolution_items, self.get_field_unique_id())
 
-                 if num_items != ins_items:
+                if num_items != ins_items:
                     missing = num_items - ins_items
                     logger.error(
                         "[enrich-backlog-analysis] %s/%s missing items for Graal Backlog Analysis Study", str(missing), str(num_items)
@@ -819,4 +819,4 @@ class GitHubEnrich(Enrich):
                     logger.info("[enrich-backlog-analysis] %s items inserted for Graal Backlog Analysis Study", str(num_items))
 
 
-         logger.info("[enrich-backlog-analysis] End enrich_backlog_analysis study")
+        logger.info("[enrich-backlog-analysis] End enrich_backlog_analysis study")
