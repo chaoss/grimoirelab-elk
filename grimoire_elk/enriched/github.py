@@ -26,7 +26,6 @@ import time
 
 import requests
 
-from functools import reduce
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
@@ -53,10 +52,10 @@ from .github_study_evolution import (
 
 GITHUB = 'https://github.com/'
 
-#use reduced label to compute backlog evolution by label
-#REDUCED_LABELS = ["bug","enhancement"]
+# use reduced label to compute backlog evolution by label
+# REDUCED_LABELS = ["bug","enhancement"]
 REDUCED_LABELS = ["bugs"]
-MAP_LABEL = {"" : "others" , "bug" : "bugs"}
+MAP_LABEL = {"": "others", "bug": "bugs"}
 
 BACKLOG_INTERVAL_STUDY = 1.0
 
@@ -274,7 +273,8 @@ class GitHubEnrich(Enrich):
                              no_incremental=no_incremental,
                              seconds=seconds)
 
-    def enrich_pull_requests(self, ocean_backend, enrich_backend, raw_issues_index="github_issues_raw"):
+    def enrich_pull_requests(self, ocean_backend, enrich_backend,
+                             raw_issues_index="github_issues_raw"):
         """
         The purpose of this Study is to add additional fields to the pull_requests only index.
         Basically to calculate some of the metrics from Code Development under GMD metrics:
@@ -610,10 +610,13 @@ class GitHubEnrich(Enrich):
         [labels.append(label['name']) for label in issue['labels'] if 'labels' in issue]
         rich_issue['labels'] = labels
 
-        #add reduced labels field (default : bugs + others labels)
+        # add reduced labels field (default : bugs + others labels)
         labels = []
-        [labels.append(MAP_LABEL[label['name']] if (label['name'] in MAP_LABEL) and MAP_LABEL[label['name']] in REDUCED_LABELS else MAP_LABEL[''])
-            for label in issue['labels'] if 'labels' in issue]
+        [labels.append(MAP_LABEL[label['name']]
+                       if (label['name'] in MAP_LABEL)
+                       and MAP_LABEL[label['name']] in REDUCED_LABELS
+                       else MAP_LABEL['']
+                       ) for label in issue['labels'] if 'labels' in issue]
         rich_issue['reduced_labels'] = list(set(labels))
 
         rich_issue['pull_request'] = True
@@ -674,54 +677,57 @@ class GitHubEnrich(Enrich):
 
         average_opened_time = 0
         if (len(issues) > 0):
-          average_opened_time = sum(issues) / len(issues)
+            average_opened_time = sum(issues) / len(issues)
 
         evolution_item = {
           "uuid": "{}_{}_{}".format(date, repository_name, label),
           "opened": len(issues),
-          "average_opened_time" : average_opened_time,
+          "average_opened_time": average_opened_time,
           "origin": repository_url,
-          "labels" : label,
-          "project" : project,
-          "study_creation_date":date
+          "labels": label,
+          "project": project,
+          "study_creation_date": date
         }
 
         evolution_item.update(self.get_grimoire_fields(date, "stats"))
 
         return evolution_item
 
-    def __get_opened_issues(self, es_in, in_index, repository_url, date, other,label):
-        next_date = (str_to_datetime(date).replace(tzinfo=None) + relativedelta(days=int(BACKLOG_INTERVAL_STUDY))).strftime('%Y-%m-%dT%H:%M:%S.000Z')
+    def __get_opened_issues(self, es_in, in_index, repository_url, date, other, label):
+        next_date = (str_to_datetime(date).replace(tzinfo=None)
+                     + relativedelta(days=int(BACKLOG_INTERVAL_STUDY))
+                     ).strftime('%Y-%m-%dT%H:%M:%S.000Z')
         if(other):
             issues = es_in.search(
               index=in_index,
-              body=get_issues_not_closed_other_label(repository_url,next_date,REDUCED_LABELS)
+              body=get_issues_not_closed_other_label(repository_url, next_date, REDUCED_LABELS)
             )['hits']['hits']
 
             issues = issues + es_in.search(
               index=in_index,
-              body=get_issues_open_at_other_label(repository_url,next_date,REDUCED_LABELS)
+              body=get_issues_open_at_other_label(repository_url, next_date, REDUCED_LABELS)
             )['hits']['hits']
         else:
             issues = es_in.search(
               index=in_index,
-              body=get_issues_not_closed_by_label(repository_url,next_date,label)
+              body=get_issues_not_closed_by_label(repository_url, next_date, label)
             )['hits']['hits']
 
             issues = issues + es_in.search(
               index=in_index,
-              body=get_issues_open_at_by_label(repository_url,next_date,label)
+              body=get_issues_open_at_by_label(repository_url, next_date, label)
             )['hits']['hits']
 
-        return list(map(
-                lambda i : get_time_diff_days(
+        return list(map(lambda i: get_time_diff_days(
                             str_to_datetime(i['_source']['created_at']),
-                                            str_to_datetime(next_date)),
-                            issues))
+                            str_to_datetime(next_date)
+                            ),
+                        issues)
+                    )
 
     def enrich_backlog_analysis(self, ocean_backend, enrich_backend, no_incremental=False,
-                              out_index="github_enrich_backlog",
-                              date_field="grimoire_creation_date"):
+                                out_index="github_enrich_backlog",
+                                date_field="grimoire_creation_date"):
         """
         The purpose of this study is to add additional index to compute the
         chronological evolution of opened issues and average opened time issues.
@@ -741,12 +747,12 @@ class GitHubEnrich(Enrich):
 
         logger.info("[enrich-backlog-analysis] Start enrich_backlog_analysis study")
 
-         # connect to ES
+        # connect to ES
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
                    verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
         in_index = enrich_backend.elastic.index
 
-         # get all repositories
+        # get all repositories
         unique_repos = es_in.search(
             index=in_index,
             body=get_unique_repository_with_project_name())
@@ -754,11 +760,11 @@ class GitHubEnrich(Enrich):
 
         logger.info("[enrich-backlog-analysis] {} repositories to process".format(len(repositories)))
 
-         # create the index
+        # create the index
         es_out = ElasticSearch(enrich_backend.elastic.url, out_index, mappings=Mapping)
         es_out.add_alias("backlog_study")
 
-         # analysis for each repositories
+        # analysis for each repositories
         num_items = 0
         ins_items = 0
         for repository in repositories:
@@ -768,44 +774,46 @@ class GitHubEnrich(Enrich):
 
             logger.info("[enrich-backlog-analysis] Start analysis for {}".format(repository_url))
 
-             # get each day since repository creation
+            # get each day since repository creation
             dates = es_in.search(
                 index=in_index,
-                body=get_issues_dates(int(BACKLOG_INTERVAL_STUDY),repository_url)
+                body=get_issues_dates(int(BACKLOG_INTERVAL_STUDY), repository_url)
             )['aggregations']['created_per_interval'].get("buckets", [])
 
-             # for each selected label + other labels
-            for label,other in  [(MAP_LABEL[""],True)] + [(l,False) for l in REDUCED_LABELS]:
-                #compute metrics for each day (ES request for each day)
+            # for each selected label + other labels
+            for label, other in [(MAP_LABEL[""], True)] + [(l, False) for l in REDUCED_LABELS]:
+                # compute metrics for each day (ES request for each day)
                 evolution_items = []
-                for date in map( lambda i : i['key_as_string'], dates):
+                for date in map(lambda i: i['key_as_string'], dates):
                     evolution_item = self.__create_backlog_item(
-                        repository_url,repository_name, project, date, label,
-                        self.__get_opened_issues(es_in, in_index,
-                                                repository_url, date, other, label)
+                        repository_url, repository_name, project, date, label,
+                        self.__get_opened_issues(es_in, in_index, repository_url, date, other, label)
                     )
                     evolution_items.append(evolution_item)
 
-                 #complete until today (no ES request needed, just extrapol)
-                today = datetime.now().replace( hour=0, minute=0, second=0,tzinfo=None)
+                # complete until today (no ES request needed, just extrapol)
+                today = datetime.now().replace(hour=0, minute=0, second=0, tzinfo=None)
                 last_item = evolution_item
-                last_date = str_to_datetime(evolution_item['study_creation_date']).replace(tzinfo=None) + relativedelta(days=int(BACKLOG_INTERVAL_STUDY))
-                average_opened_time = evolution_item['average_opened_time'] + BACKLOG_INTERVAL_STUDY
+                last_date = str_to_datetime(
+                    evolution_item['study_creation_date']).replace(tzinfo=None) \
+                    + relativedelta(days=int(BACKLOG_INTERVAL_STUDY))
+                average_opened_time = evolution_item['average_opened_time'] \
+                    + BACKLOG_INTERVAL_STUDY
                 while last_date < today:
-                  date = last_date.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-                  evolution_item = {}
-                  evolution_item.update(last_item)
-                  evolution_item.update({
-                    "average_opened_time" : average_opened_time,
-                    "study_creation_date" : date,
-                    "uuid" : "{}_{}_{}".format(date, repository_name, label),
-                  })
-                  evolution_item.update(self.get_grimoire_fields(date, "stats"))
-                  evolution_items.append(evolution_item)
-                  last_date = last_date + relativedelta(days=int(BACKLOG_INTERVAL_STUDY))
-                  average_opened_time = average_opened_time + BACKLOG_INTERVAL_STUDY
+                    date = last_date.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+                    evolution_item = {}
+                    evolution_item.update(last_item)
+                    evolution_item.update({
+                        "average_opened_time": average_opened_time,
+                        "study_creation_date": date,
+                        "uuid": "{}_{}_{}".format(date, repository_name, label),
+                    })
+                    evolution_item.update(self.get_grimoire_fields(date, "stats"))
+                    evolution_items.append(evolution_item)
+                    last_date = last_date + relativedelta(days=int(BACKLOG_INTERVAL_STUDY))
+                    average_opened_time = average_opened_time + BACKLOG_INTERVAL_STUDY
 
-                 #upload items to ES
+                # upload items to ES
                 if len(evolution_items) > 0:
                     num_items += len(evolution_items)
                     ins_items += es_out.bulk_upload(evolution_items, self.get_field_unique_id())
@@ -813,10 +821,16 @@ class GitHubEnrich(Enrich):
                 if num_items != ins_items:
                     missing = num_items - ins_items
                     logger.error(
-                        "[enrich-backlog-analysis] %s/%s missing items for Graal Backlog Analysis Study", str(missing), str(num_items)
+                        ("[enrich-backlog-analysis] %s/%s missing items",
+                            "for Graal Backlog Analysis Study"),
+                        str(missing),
+                        str(num_items)
                     )
                 else:
-                    logger.info("[enrich-backlog-analysis] %s items inserted for Graal Backlog Analysis Study", str(num_items))
-
+                    logger.info(
+                        ("[enrich-backlog-analysis] %s items inserted",
+                            "for Graal Backlog Analysis Study"),
+                        str(num_items)
+                    )
 
         logger.info("[enrich-backlog-analysis] End enrich_backlog_analysis study")
