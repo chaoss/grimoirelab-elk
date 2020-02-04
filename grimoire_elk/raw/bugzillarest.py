@@ -66,6 +66,10 @@ class Mapping(BaseMapping):
                                     }
                                 }
                             },
+                            "clones": {
+                                "dynamic":false,
+                                "properties": {}
+                            },
                             "description": {
                                 "type": "text",
                                 "index": true
