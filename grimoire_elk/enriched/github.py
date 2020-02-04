@@ -40,14 +40,12 @@ from .utils import get_time_diff_days
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 
-from .github_study_evolution import (
-                                    get_unique_repository_with_project_name,
-                                    get_issues_dates,
-                                    get_issues_not_closed_by_label,
-                                    get_issues_open_at_by_label,
-                                    get_issues_not_closed_other_label,
-                                    get_issues_open_at_other_label
-                                    )
+from .github_study_evolution import (get_unique_repository_with_project_name,
+                                     get_issues_dates,
+                                     get_issues_not_closed_by_label,
+                                     get_issues_open_at_by_label,
+                                     get_issues_not_closed_other_label,
+                                     get_issues_open_at_other_label)
 
 
 GITHUB = 'https://github.com/'
@@ -680,13 +678,13 @@ class GitHubEnrich(Enrich):
             average_opened_time = sum(issues) / len(issues)
 
         evolution_item = {
-          "uuid": "{}_{}_{}".format(date, repository_name, label),
-          "opened": len(issues),
-          "average_opened_time": average_opened_time,
-          "origin": repository_url,
-          "labels": label,
-          "project": project,
-          "study_creation_date": date
+            "uuid": "{}_{}_{}".format(date, repository_name, label),
+            "opened": len(issues),
+            "average_opened_time": average_opened_time,
+            "origin": repository_url,
+            "labels": label,
+            "project": project,
+            "study_creation_date": date
         }
 
         evolution_item.update(self.get_grimoire_fields(date, "stats"))
@@ -699,30 +697,29 @@ class GitHubEnrich(Enrich):
                      ).strftime('%Y-%m-%dT%H:%M:%S.000Z')
         if(other):
             issues = es_in.search(
-              index=in_index,
-              body=get_issues_not_closed_other_label(repository_url, next_date, REDUCED_LABELS)
+                index=in_index,
+                body=get_issues_not_closed_other_label(repository_url, next_date, REDUCED_LABELS)
             )['hits']['hits']
 
             issues = issues + es_in.search(
-              index=in_index,
-              body=get_issues_open_at_other_label(repository_url, next_date, REDUCED_LABELS)
+                index=in_index,
+                body=get_issues_open_at_other_label(repository_url, next_date, REDUCED_LABELS)
             )['hits']['hits']
         else:
             issues = es_in.search(
-              index=in_index,
-              body=get_issues_not_closed_by_label(repository_url, next_date, label)
+                index=in_index,
+                body=get_issues_not_closed_by_label(repository_url, next_date, label)
             )['hits']['hits']
 
             issues = issues + es_in.search(
-              index=in_index,
-              body=get_issues_open_at_by_label(repository_url, next_date, label)
+                index=in_index,
+                body=get_issues_open_at_by_label(repository_url, next_date, label)
             )['hits']['hits']
 
         return list(map(lambda i: get_time_diff_days(
-                            str_to_datetime(i['_source']['created_at']),
-                            str_to_datetime(next_date)
-                            ),
-                        issues)
+                        str_to_datetime(i['_source']['created_at']),
+                        str_to_datetime(next_date)
+                        ), issues)
                     )
 
     def enrich_backlog_analysis(self, ocean_backend, enrich_backend, no_incremental=False,
