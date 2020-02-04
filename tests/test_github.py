@@ -194,12 +194,7 @@ class TestGit(TestBaseBackend):
         items = [item for item in enrich_backend.fetch() if 'user_location' in item]
         self.assertEqual(len(items), 4)
         for item in items:
-            if item['user_location']:
-                geolocation = item['user_geolocation']
-                self.assertIn('lon', geolocation)
-                self.assertIn('lat', geolocation)
-            else:
-                self.assertIsNone(item['user_geolocation'])
+            self.assertIn('user_geolocation', item)
 
 
 if __name__ == "__main__":
