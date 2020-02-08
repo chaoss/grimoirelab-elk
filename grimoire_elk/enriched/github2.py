@@ -455,8 +455,7 @@ class GitHubEnrich2(Enrich):
         if user is not None and user:
             rich_pr['user_name'] = user['name']
             rich_pr['author_name'] = user['name']
-            if user['email']:
-                rich_pr["user_domain"] = self.get_email_domain(user['email'])
+            rich_pr["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
             rich_pr['user_org'] = user['company']
             rich_pr['user_location'] = user['location']
             rich_pr['user_geolocation'] = None
@@ -472,8 +471,7 @@ class GitHubEnrich2(Enrich):
         if merged_by and merged_by is not None:
             rich_pr['merge_author_login'] = merged_by['login']
             rich_pr['merge_author_name'] = merged_by['name']
-            if merged_by['email']:
-                rich_pr["merge_author_domain"] = self.get_email_domain(merged_by['email'])
+            rich_pr["merge_author_domain"] = self.get_email_domain(merged_by['email']) if merged_by['email'] else None
             rich_pr['merge_author_org'] = merged_by['company']
             rich_pr['merge_author_location'] = merged_by['location']
             rich_pr['merge_author_geolocation'] = None
@@ -569,8 +567,7 @@ class GitHubEnrich2(Enrich):
         if user is not None and user:
             rich_issue['user_name'] = user['name']
             rich_issue['author_name'] = user['name']
-            if user['email']:
-                rich_issue["user_domain"] = self.get_email_domain(user['email'])
+            rich_issue["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
             rich_issue['user_org'] = user['company']
             rich_issue['user_location'] = user['location']
             rich_issue['user_geolocation'] = None
@@ -587,8 +584,7 @@ class GitHubEnrich2(Enrich):
             assignee = issue['assignee_data']
             rich_issue['assignee_login'] = assignee['login']
             rich_issue['assignee_name'] = assignee['name']
-            if assignee['email']:
-                rich_issue["assignee_domain"] = self.get_email_domain(assignee['email'])
+            rich_issue["assignee_domain"] = self.get_email_domain(assignee['email']) if assignee['email'] else None
             rich_issue['assignee_org'] = assignee['company']
             rich_issue['assignee_location'] = assignee['location']
             rich_issue['assignee_geolocation'] = None
