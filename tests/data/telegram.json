@@ -115,4 +115,32 @@
     "timestamp": 1518165883.551917,
     "updated_on": 1467370372.0,
     "uuid": "2e61e72b64c9084f3c5a36671c3119641c3ae42f"
+},{
+    "backend_name": "Telegram",
+    "backend_version": "0.7.0",
+    "category": "message",
+    "data": {
+        "message": {
+            "chat": {
+                "first_name": "Santi",
+                "id": 8,
+                "type": "private"
+            },
+            "date": 1467370372,
+            "from": {
+                "first_name": "Santi",
+                "id": 8
+            },
+            "message_id": 34,
+            "text": "Hi Bot!!!"
+        },
+        "update_id": 319280321
+    },
+    "offset": 319280321,
+    "origin": "https://telegram.org/mybot",
+    "perceval_version": "0.9.10",
+    "tag": "https://telegram.org/mybot",
+    "timestamp": 1518165889.551917,
+    "updated_on": 1467370379.0,
+    "uuid": "2e61e72b64c9084f3c5a36671c3115551c3ae42f"
 }]
