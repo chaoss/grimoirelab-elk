@@ -655,7 +655,7 @@ class GitHubEnrich(Enrich):
 
         return rich_repo
 
-    def __create_backlog_item(self, repository_url, repository_name, project, date, label, map_label, issues):
+    def __create_backlog_item(self, repository_url, repository_name, project, date, interval, label, map_label, issues):
 
         average_opened_time = 0
         if (len(issues) > 0):
@@ -668,7 +668,9 @@ class GitHubEnrich(Enrich):
             "origin": repository_url,
             "labels": map_label[label] if (label in map_label) else map_label[""],
             "project": project,
-            "study_creation_date": date
+            "interval_days": interval,
+            "study_creation_date": date,
+            "metadata__enriched_on": date
         }
 
         evolution_item.update(self.get_grimoire_fields(date, "stats"))
@@ -708,7 +710,9 @@ class GitHubEnrich(Enrich):
 
     def enrich_backlog_analysis(self, ocean_backend, enrich_backend, no_incremental=False,
                                 out_index="github_enrich_backlog",
-                                date_field="grimoire_creation_date"):
+                                date_field="grimoire_creation_date",
+                                interval_days=1, reduced_labels=["bug"],
+                                map_label=["others", "bugs"]):
         """
         The purpose of this study is to add additional index to compute the
         chronological evolution of opened issues and average opened time issues.
@@ -723,14 +727,22 @@ class GitHubEnrich(Enrich):
         labels (like "enhancement","good first issue" ... ), we call this
         "reduced labels". We need to use theses reduced labels because the
         complixity to compute evolution for each combinaison of labels would be
-        too big. In addition, we rename "bug" label to "bugs" in reduced labels.
+        too big. In addition, we rename "bug" label to "bugs" with map_label.
+
+        Entry example in setup.cfg :
+
+        [enrich_backlog_analysis]
+        out_index = github_enrich_backlog
+        interval_days = 7
+        reduced_labels = ["bug","enhancement"]
+        map_label = ["others", "bugs", "enhancements"]
+
         """
 
-        reduced_labels = ["bug"]
-        map_label = {"": "others", "bug": "bugs"}
-        interval_days = 1
-
         logger.info("[enrich-backlog-analysis] Start enrich_backlog_analysis study")
+
+        # combine two lists to create the dict to map labels
+        map_label = dict(zip([""] + reduced_labels, map_label))
 
         # connect to ES
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
@@ -771,7 +783,7 @@ class GitHubEnrich(Enrich):
                 evolution_items = []
                 for date in map(lambda i: i['key_as_string'], dates):
                     evolution_item = self.__create_backlog_item(
-                        repository_url, repository_name, project, date, label, map_label,
+                        repository_url, repository_name, project, date, interval_days, label, map_label,
                         self.__get_opened_issues(es_in, in_index, repository_url, date, interval_days,
                                                  other, label, reduced_labels)
                     )
