@@ -50,13 +50,6 @@ from .github_study_evolution import (get_unique_repository_with_project_name,
 
 GITHUB = 'https://github.com/'
 
-# use reduced label to compute backlog evolution by label
-# REDUCED_LABELS = ["bug","enhancement"]
-REDUCED_LABELS = ["bugs"]
-MAP_LABEL = {"": "others", "bug": "bugs"}
-
-BACKLOG_INTERVAL_STUDY = 1.0
-
 logger = logging.getLogger(__name__)
 
 
@@ -608,15 +601,6 @@ class GitHubEnrich(Enrich):
         [labels.append(label['name']) for label in issue['labels'] if 'labels' in issue]
         rich_issue['labels'] = labels
 
-        # add reduced labels field (default : bugs + others labels)
-        labels = []
-        [labels.append(MAP_LABEL[label['name']]
-                       if (label['name'] in MAP_LABEL)
-                       and MAP_LABEL[label['name']] in REDUCED_LABELS
-                       else MAP_LABEL['']
-                       ) for label in issue['labels'] if 'labels' in issue]
-        rich_issue['reduced_labels'] = list(set(labels))
-
         rich_issue['pull_request'] = True
         rich_issue['item_type'] = 'pull request'
         if 'head' not in issue.keys() and 'pull_request' not in issue.keys():
@@ -671,7 +655,7 @@ class GitHubEnrich(Enrich):
 
         return rich_repo
 
-    def __create_backlog_item(self, repository_url, repository_name, project, date, label, issues):
+    def __create_backlog_item(self, repository_url, repository_name, project, date, label, map_label, issues):
 
         average_opened_time = 0
         if (len(issues) > 0):
@@ -682,7 +666,7 @@ class GitHubEnrich(Enrich):
             "opened": len(issues),
             "average_opened_time": average_opened_time,
             "origin": repository_url,
-            "labels": label,
+            "labels": map_label[label] if (label in map_label) else map_label[""],
             "project": project,
             "study_creation_date": date
         }
@@ -691,19 +675,19 @@ class GitHubEnrich(Enrich):
 
         return evolution_item
 
-    def __get_opened_issues(self, es_in, in_index, repository_url, date, other, label):
+    def __get_opened_issues(self, es_in, in_index, repository_url, date, interval, other, label, reduced_labels):
         next_date = (str_to_datetime(date).replace(tzinfo=None)
-                     + relativedelta(days=int(BACKLOG_INTERVAL_STUDY))
+                     + relativedelta(days=interval)
                      ).strftime('%Y-%m-%dT%H:%M:%S.000Z')
         if(other):
             issues = es_in.search(
                 index=in_index,
-                body=get_issues_not_closed_other_label(repository_url, next_date, REDUCED_LABELS)
+                body=get_issues_not_closed_other_label(repository_url, next_date, reduced_labels)
             )['hits']['hits']
 
             issues = issues + es_in.search(
                 index=in_index,
-                body=get_issues_open_at_other_label(repository_url, next_date, REDUCED_LABELS)
+                body=get_issues_open_at_other_label(repository_url, next_date, reduced_labels)
             )['hits']['hits']
         else:
             issues = es_in.search(
@@ -742,6 +726,10 @@ class GitHubEnrich(Enrich):
         too big. In addition, we rename "bug" label to "bugs" in reduced labels.
         """
 
+        reduced_labels = ["bug"]
+        map_label = {"": "others", "bug": "bugs"}
+        interval_days = 1
+
         logger.info("[enrich-backlog-analysis] Start enrich_backlog_analysis study")
 
         # connect to ES
@@ -774,17 +762,18 @@ class GitHubEnrich(Enrich):
             # get each day since repository creation
             dates = es_in.search(
                 index=in_index,
-                body=get_issues_dates(int(BACKLOG_INTERVAL_STUDY), repository_url)
+                body=get_issues_dates(interval_days, repository_url)
             )['aggregations']['created_per_interval'].get("buckets", [])
 
-            # for each selected label + other labels
-            for label, other in [(MAP_LABEL[""], True)] + [(l, False) for l in REDUCED_LABELS]:
+            # for each selected label + others labels
+            for label, other in [("", True)] + [(l, False) for l in reduced_labels]:
                 # compute metrics for each day (ES request for each day)
                 evolution_items = []
                 for date in map(lambda i: i['key_as_string'], dates):
                     evolution_item = self.__create_backlog_item(
-                        repository_url, repository_name, project, date, label,
-                        self.__get_opened_issues(es_in, in_index, repository_url, date, other, label)
+                        repository_url, repository_name, project, date, label, map_label,
+                        self.__get_opened_issues(es_in, in_index, repository_url, date, interval_days,
+                                                 other, label, reduced_labels)
                     )
                     evolution_items.append(evolution_item)
 
@@ -793,9 +782,9 @@ class GitHubEnrich(Enrich):
                 last_item = evolution_item
                 last_date = str_to_datetime(
                     evolution_item['study_creation_date']).replace(tzinfo=None) \
-                    + relativedelta(days=int(BACKLOG_INTERVAL_STUDY))
+                    + relativedelta(days=interval_days)
                 average_opened_time = evolution_item['average_opened_time'] \
-                    + BACKLOG_INTERVAL_STUDY
+                    + float(interval_days)
                 while last_date < today:
                     date = last_date.strftime('%Y-%m-%dT%H:%M:%S.000Z')
                     evolution_item = {}
@@ -807,8 +796,8 @@ class GitHubEnrich(Enrich):
                     })
                     evolution_item.update(self.get_grimoire_fields(date, "stats"))
                     evolution_items.append(evolution_item)
-                    last_date = last_date + relativedelta(days=int(BACKLOG_INTERVAL_STUDY))
-                    average_opened_time = average_opened_time + BACKLOG_INTERVAL_STUDY
+                    last_date = last_date + relativedelta(days=interval_days)
+                    average_opened_time = average_opened_time + float(interval_days)
 
                 # upload items to ES
                 if len(evolution_items) > 0:

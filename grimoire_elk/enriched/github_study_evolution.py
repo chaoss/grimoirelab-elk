@@ -64,7 +64,7 @@ def get_issues_not_closed_by_label(repository_url, to_date, label):
                       "origin": "%s"
                   }},{
                   "term": {
-                      "reduced_labels": "%s"
+                      "labels": "%s"
                   }},{
                   "range" : {
                      "created_at": {"lt" : "%s"}
@@ -90,7 +90,7 @@ def get_issues_open_at_by_label(repository_url, to_date, label):
                       "origin": "%s"
                   }},{
                   "term": {
-                      "reduced_labels": "%s"
+                      "labels": "%s"
                   }},{
                   "range" : {
                      "closed_at": {"gt" : "%s"}
@@ -116,7 +116,7 @@ def get_issues_not_closed_other_label(repository_url, to_date, exclude_labels):
           "bool": {
               "must_not":[{
                 "terms": {
-                  "reduced_labels": %s
+                  "labels": %s
                 }
               },{
                   "exists": {
@@ -148,7 +148,7 @@ def get_issues_open_at_other_label(repository_url, to_date, exclude_labels):
           "bool": {
               "must_not":{
                 "terms": {
-                  "reduced_labels": %s
+                  "labels": %s
                 }
               },
               "filter": [{
