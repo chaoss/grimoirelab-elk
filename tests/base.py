@@ -281,5 +281,6 @@ class TestBaseBackend(unittest.TestCase):
         for study in self.enrich_backend.studies:
             if test_study == study.__name__:
                 found = (study, self.ocean_backend, self.enrich_backend)
+                break
 
         return found
