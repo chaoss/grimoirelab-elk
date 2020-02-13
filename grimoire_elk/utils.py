@@ -29,7 +29,9 @@ from dateutil import parser
 from grimoire_elk.errors import ElasticError
 from grimoire_elk.elastic import ElasticSearch
 # Connectors for Graal
+from graal.backends.core.coqua import CoQua, CoQuaCommand
 from graal.backends.core.cocom import CoCom, CoComCommand
+from graal.backends.core.codep import CoDep, CoDepCommand
 from graal.backends.core.colic import CoLic, CoLicCommand
 # Connectors for Perceval
 from grimoire_elk.raw.hyperkitty import HyperKittyOcean
@@ -75,6 +77,8 @@ from .enriched.bugzilla import BugzillaEnrich
 from .enriched.bugzillarest import BugzillaRESTEnrich
 from .enriched.cocom import CocomEnrich
 from .enriched.colic import ColicEnrich
+from .enriched.dockerdeps import Dockerdeps
+from .enriched.dockersmells import Dockersmells
 from .enriched.confluence import ConfluenceEnrich
 from .enriched.crates import CratesEnrich
 from .enriched.discourse import DiscourseEnrich
@@ -208,6 +212,8 @@ def get_connectors():
             "bugzillarest": [BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
             "cocom": [CoCom, GraalOcean, CocomEnrich, CoComCommand],
             "colic": [CoLic, GraalOcean, ColicEnrich, CoLicCommand],
+            "dockerdeps": [CoDep, GraalOcean, Dockerdeps, CoDepCommand],
+            "dockersmells": [CoQua, GraalOcean, Dockersmells, CoQuaCommand],
             "confluence": [Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
             "crates": [Crates, CratesOcean, CratesEnrich, CratesCommand],
             "discourse": [Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
