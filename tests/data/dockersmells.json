@@ -1,0 +1,181 @@
+[
+  {
+    "backend_name": "CoQua",
+    "backend_version": "0.4.0",
+    "category": "code_quality_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Thu Nov 2 01:51:46 2017 +0100",
+        "CommitDate": "Wed Nov 8 11:33:41 2017 +0100",
+        "analysis": {
+            "tests/Dockerfile": {
+                "smells": [
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 13 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 16 DL3008 Pin versions in apt-get install",
+                    "/tests/Dockerfile 16 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 16 DL3014 Use the -y switch",
+                    "/tests/Dockerfile 16 DL3015 Avoid additional packages by specifying --no-install-recommends",
+                    "/tests/Dockerfile 29 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 31 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 31 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 34 DL3020 Use COPY instead of ADD for files and folders",
+                    "/tests/Dockerfile 35 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 37 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 37 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 37 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 37 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 37 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 37 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 52 DL3000 Use absolute WORKDIR",
+                    "/tests/Dockerfile 54 DL3025 Use arguments JSON notation for CMD and ENTRYPOINT arguments"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "06c84dfc0bb6788ff5d5699201dd7fc4cd657ffa",
+        "message": "[tests] New mordred container\n\nThis patch changes:\n\n* The base container used for the mordred service in docker-compose.\n  Now, it is based on Debian9 (since the script below needs\n  Python3.5), and only minimal packages are installed\n  (including almost no Python modules, which will be installed later).\n\n* The docker-compose file is simplified, using the\n  utils/build_grimoirelab script.\n\n* The utils/build_grimoirelab script was fixed to work well when\n  installing in the system (instead of in a virtual environment).\n\n* tests/README.md is updated to reflect some of these changes.\n\nFor now, it only installs the master/HEAD for all GrimoireLab repos,\nbut it could be easily modified to install any coordinanted\nrelease."
+    },
+    "graal_version": "0.2.5",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "06c84dfc0bb6788ff5d5699201dd7fc4cd657ffa"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1581598282.025115,
+    "updated_on": 1510137221.0,
+    "uuid": "d683dedac96e9cdf934247f7608c5c45695b995d"
+},
+{
+    "backend_name": "CoQua",
+    "backend_version": "0.4.0",
+    "category": "code_quality_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Wed Nov 8 20:32:57 2017 +0100",
+        "CommitDate": "Wed Nov 8 21:47:53 2017 +0100",
+        "analysis": {
+            "tests/Dockerfile": {
+                "smells": [
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 13 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 16 DL3008 Pin versions in apt-get install",
+                    "/tests/Dockerfile 16 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 16 DL3014 Use the -y switch",
+                    "/tests/Dockerfile 16 DL3015 Avoid additional packages by specifying --no-install-recommends",
+                    "/tests/Dockerfile 31 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 33 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 33 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 36 DL3020 Use COPY instead of ADD for files and folders",
+                    "/tests/Dockerfile 37 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 39 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 39 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 39 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 39 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 39 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 39 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 54 DL3000 Use absolute WORKDIR",
+                    "/tests/Dockerfile 56 DL3025 Use arguments JSON notation for CMD and ENTRYPOINT arguments"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "0f5effdb63510335fb2f12150c7c69e91c2efac3",
+        "message": "[tests] Fix docker cointainers configuration info\n\nDependencies could not be installed from wheels because\nthe wheel package was not installed. This patch installs it.\nA new Python dependency is not available in binary wheels, so\nit needs to be compiled. But there was no compiler in the\nbase container. So, this patch installs it.\nThere are some other (hopefully minor) issues fixed too."
+    },
+    "graal_version": "0.2.5",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "0f5effdb63510335fb2f12150c7c69e91c2efac3"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1581598282.220004,
+    "updated_on": 1510174073.0,
+    "uuid": "05453b69f942e2b503cc10359dc6124264522982"
+},
+{
+    "backend_name": "CoQua",
+    "backend_version": "0.4.0",
+    "category": "code_quality_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Wed Nov 8 22:35:17 2017 +0100",
+        "CommitDate": "Wed Nov 8 23:36:39 2017 +0100",
+        "analysis": {
+            "tests/Dockerfile": {
+                "smells": [
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 5 DL4000 MAINTAINER is deprecated",
+                    "/tests/Dockerfile 13 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 16 DL3008 Pin versions in apt-get install",
+                    "/tests/Dockerfile 16 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 16 DL3014 Use the -y switch",
+                    "/tests/Dockerfile 16 DL3015 Avoid additional packages by specifying --no-install-recommends",
+                    "/tests/Dockerfile 32 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 34 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 34 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 37 DL3020 Use COPY instead of ADD for files and folders",
+                    "/tests/Dockerfile 38 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 40 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 40 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 40 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 40 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 40 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 40 DL3009 Delete the apt-get lists after installing something",
+                    "/tests/Dockerfile 55 DL3000 Use absolute WORKDIR",
+                    "/tests/Dockerfile 57 DL3025 Use arguments JSON notation for CMD and ENTRYPOINT arguments"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "301c37ea04bf2dfafb76c51d8bb0b0b079324874",
+        "message": "[tests] Fix minor issues in configuration\n\nDockerfile needs to apt install a dbm package.\nsetup.cfg needs to be updated due to change in sortinghat."
+    },
+    "graal_version": "0.2.5",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "301c37ea04bf2dfafb76c51d8bb0b0b079324874"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1581598282.415212,
+    "updated_on": 1510180599.0,
+    "uuid": "373a29dd18da673ec4bde9d5d0c9766cb89bba4f"
+},
+{
+    "backend_name": "CoQua",
+    "backend_version": "0.4.0",
+    "category": "code_quality_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Mon Nov 13 09:39:24 2017 +0100",
+        "CommitDate": "Mon Nov 13 10:04:20 2017 +0100",
+        "analysis": {
+            "tests/Dockerfile": {
+                "smells": []
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "a8d50b5702a0a61110def54ffb14ffc9e7e158dc",
+        "message": "[docker] Create a docker directory for the docker image\n\nAnd minor change to the docker-compose.yml."
+    },
+    "graal_version": "0.2.5",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "a8d50b5702a0a61110def54ffb14ffc9e7e158dc"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1581598282.424964,
+    "updated_on": 1510563860.0,
+    "uuid": "0db3a5f9b478be4e45fb4c46582276a587ca76d1"
+}]
