@@ -1,0 +1,978 @@
+[{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Thu Nov 2 01:51:46 2017 +0100",
+        "CommitDate": "Wed Nov 8 11:33:41 2017 +0100",
+        "analysis": {
+            "tests/Dockerfile": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "git",
+                    "git-core",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "06c84dfc0bb6788ff5d5699201dd7fc4cd657ffa",
+        "message": "[tests] New mordred container\n\nThis patch changes:\n\n* The base container used for the mordred service in docker-compose.\n  Now, it is based on Debian9 (since the script below needs\n  Python3.5), and only minimal packages are installed\n  (including almost no Python modules, which will be installed later).\n\n* The docker-compose file is simplified, using the\n  utils/build_grimoirelab script.\n\n* The utils/build_grimoirelab script was fixed to work well when\n  installing in the system (instead of in a virtual environment).\n\n* tests/README.md is updated to reflect some of these changes.\n\nFor now, it only installs the master/HEAD for all GrimoireLab repos,\nbut it could be easily modified to install any coordinanted\nrelease."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "06c84dfc0bb6788ff5d5699201dd7fc4cd657ffa"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550255.416345,
+    "updated_on": 1510137221.0,
+    "uuid": "d683dedac96e9cdf934247f7608c5c45695b995d"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Wed Nov 8 20:32:57 2017 +0100",
+        "CommitDate": "Wed Nov 8 21:47:53 2017 +0100",
+        "analysis": {
+            "tests/Dockerfile": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "0f5effdb63510335fb2f12150c7c69e91c2efac3",
+        "message": "[tests] Fix docker cointainers configuration info\n\nDependencies could not be installed from wheels because\nthe wheel package was not installed. This patch installs it.\nA new Python dependency is not available in binary wheels, so\nit needs to be compiled. But there was no compiler in the\nbase container. So, this patch installs it.\nThere are some other (hopefully minor) issues fixed too."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "0f5effdb63510335fb2f12150c7c69e91c2efac3"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550255.559294,
+    "updated_on": 1510174073.0,
+    "uuid": "05453b69f942e2b503cc10359dc6124264522982"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Wed Nov 8 22:35:17 2017 +0100",
+        "CommitDate": "Wed Nov 8 23:36:39 2017 +0100",
+        "analysis": {
+            "tests/Dockerfile": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "301c37ea04bf2dfafb76c51d8bb0b0b079324874",
+        "message": "[tests] Fix minor issues in configuration\n\nDockerfile needs to apt install a dbm package.\nsetup.cfg needs to be updated due to change in sortinghat."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "301c37ea04bf2dfafb76c51d8bb0b0b079324874"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550255.723187,
+    "updated_on": 1510180599.0,
+    "uuid": "373a29dd18da673ec4bde9d5d0c9766cb89bba4f"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Mon Nov 13 09:39:24 2017 +0100",
+        "CommitDate": "Mon Nov 13 10:04:20 2017 +0100",
+        "analysis": {
+            "tests/Dockerfile": {
+                "dependencies": []
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "a8d50b5702a0a61110def54ffb14ffc9e7e158dc",
+        "message": "[docker] Create a docker directory for the docker image\n\nAnd minor change to the docker-compose.yml."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "a8d50b5702a0a61110def54ffb14ffc9e7e158dc"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550255.731703,
+    "updated_on": 1510563860.0,
+    "uuid": "0db3a5f9b478be4e45fb4c46582276a587ca76d1"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Tue Nov 14 01:01:35 2017 +0100",
+        "CommitDate": "Thu Nov 16 07:40:44 2017 +0100",
+        "analysis": {
+            "docker/Dockerfile-factory": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "pandoc",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            },
+            "docker/Dockerfile-installed": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "pandoc",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "bdd1b19e03fbbeb12f7e3b5aedaed2c1046b25a0",
+        "message": "[docker] Add machinery to produce new docker images\n\nRead README.md in this commit for details.\n\nThe Dockerfile-factory produces distributable pypi packages.\nThe packages for elasticgirl.22 were produced using it.\nNow, it does some minimum checking, can be extended to improve\nthat part significantly.\n\nThe Dockerfile-installed produces a container with installed\nGrimoireLab packages. When run, produces a minimum dashboard\nfor some GrimoireLab repos, as a proof of concept. Still needs\nsome work, but it is already useful. I can also be extended\nto do some testing, or some other stuff."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "bdd1b19e03fbbeb12f7e3b5aedaed2c1046b25a0"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550256.037423,
+    "updated_on": 1510814444.0,
+    "uuid": "7885ec8c6af57ba50de8d4b910b6de2c6815f467"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Thu Dec 28 17:50:06 2017 +0100",
+        "CommitDate": "Wed Jan 3 11:02:38 2018 +0100",
+        "analysis": {
+            "docker/Dockerfile-installed": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "pandoc",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "c8628ff8c5d964242dc4da90e9448675bcac81d3",
+        "message": "[docker] Micellaneous modifications\n\nCopied build_grimoirelab from utils (minor changes).\nmenu-grimoirelab.yaml with only options for GrimoireLab.\nUpdate of projects-grimoirelab.json.\nMake menu.yaml a link so that it can be easily substituted when running.\nRelease file now includes a reference to the release id.\nSome other minor changes."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "c8628ff8c5d964242dc4da90e9448675bcac81d3"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550256.359785,
+    "updated_on": 1514973758.0,
+    "uuid": "d496455d497823577802b7d848dd75272a6d73f2"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Sun Dec 31 00:07:24 2017 +0100",
+        "CommitDate": "Thu Jan 4 06:08:45 2018 +0100",
+        "analysis": {
+            "docker/Dockerfile-full": {
+                "dependencies": [
+                    "grimoirelab/installed",
+                    "openjdk-8-jdk-headless",
+                    "mariadb-server",
+                    "net-tools"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "5dd87535e5c8b4007ed7e58c2d4bf3d3622563cd",
+        "message": "[docker] New grimoirelab/full container\n\nNew container, with GrimoreLab installed, and all the services\nneeded to produce a dashboard with it: ElasticSearch, MariaDB,\nand Kibana.\n\nIf run as such, it produces a GrimoireLab dashboard for the\nGrimoireLab project."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "5dd87535e5c8b4007ed7e58c2d4bf3d3622563cd"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550256.57292,
+    "updated_on": 1515042525.0,
+    "uuid": "a9f8c1741abb3d7f7d393acdd358a6dba286327e"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Sat Jan 6 01:55:09 2018 +0100",
+        "CommitDate": "Wed Jan 10 22:49:27 2018 +0100",
+        "analysis": {
+            "docker/Dockerfile-factory": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "pandoc",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            },
+            "docker/Dockerfile-full": {
+                "dependencies": [
+                    "grimoirelab/installed",
+                    "openjdk-8-jdk-headless",
+                    "mariadb-server",
+                    "net-tools"
+                ]
+            },
+            "docker/Dockerfile-installed": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "pandoc",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "819051c0ce1699bf7b1a68612ba846970e35e917",
+        "message": "[docker] Fix some details of the images.\n\nNow images for grimoirelab/factory, grimoirelab/installed,\nand grimoirelab/full are produced from the root dir of the repo.\nThis allows to have access to the utils and releases directories\nwhen needed.\n.dockerignore to avoid uploading to the docker daemon a lot\nof stuff in those directories, which is not needed.\nFix to ensure that grimoirelab/full works, by waiting until\nthe Kibana index in Elasticserarch is ready.\nUpdated docs."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "819051c0ce1699bf7b1a68612ba846970e35e917"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550257.124051,
+    "updated_on": 1515620967.0,
+    "uuid": "05ad11e22dd5f1684fb9084251d21a271076751e"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Fri Jan 19 01:01:41 2018 +0100",
+        "CommitDate": "Wed Jan 24 02:55:14 2018 +0100",
+        "analysis": {
+            "docker/Dockerfile-full": {
+                "dependencies": [
+                    "grimoirelab/installed",
+                    "openjdk-8-jdk-headless",
+                    "net-tools",
+                    "mariadb-server"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "fe7ab96bdf7d0187737285af6dc3c08f5c422f14",
+        "message": "[docker] Support for Elasticsearch 6.x\n\nNow Dockerfile-full installs Elasticsearch 6.1 and Kibiter 6.1.\nAll GrimoireLab tools already support these versions, except\nsome minor issues with panels."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "fe7ab96bdf7d0187737285af6dc3c08f5c422f14"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550257.389622,
+    "updated_on": 1516758914.0,
+    "uuid": "4311bb6d66c3fb28a9caae1e863b45699f760556"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Fri Jan 19 01:01:41 2018 +0100",
+        "CommitDate": "Wed Jan 31 23:14:07 2018 +0100",
+        "analysis": {
+            "docker/Dockerfile-full": {
+                "dependencies": [
+                    "grimoirelab/installed",
+                    "openjdk-8-jdk-headless",
+                    "net-tools",
+                    "mariadb-server"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "d82db982e4b4ffa55690423b6c469c4da3cdb283",
+        "message": "[docker] Improved support for Elasticsearch 6.x\n\nFix some minor issues to better suppport Elasticsearch 6.x\nExpose MariaDB port to be usable from host."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "d82db982e4b4ffa55690423b6c469c4da3cdb283"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550257.552812,
+    "updated_on": 1517436847.0,
+    "uuid": "14c19fb58bb9b7c8c7d5f772efcf2983251d5a3c"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Wed Jan 31 09:40:07 2018 +0100",
+        "CommitDate": "Wed Jan 31 23:14:07 2018 +0100",
+        "analysis": {
+            "docker/Dockerfile-full": {
+                "dependencies": [
+                    "grimoirelab/installed",
+                    "openjdk-8-jdk-headless",
+                    "net-tools",
+                    "mariadb-server"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "acec4c6a2913ed2155d2f28c20f3299b73eda7d1",
+        "message": "[docker] Some missing stuff for the latest Kibiter version"
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "acec4c6a2913ed2155d2f28c20f3299b73eda7d1"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550257.745334,
+    "updated_on": 1517436847.0,
+    "uuid": "44386a94d6e4396675f1724ef8f457f4653d3eec"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Wed Jan 31 19:47:49 2018 +0100",
+        "CommitDate": "Wed Jan 31 23:14:07 2018 +0100",
+        "analysis": {
+            "docker/Dockerfile-installed": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "pandoc",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "39da14b1785c20ff68c3da52f46529187eee4a41",
+        "message": "[docker] Minor fixes\n\nSome fixes to the configuration file (small stuff)."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "39da14b1785c20ff68c3da52f46529187eee4a41"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550257.914111,
+    "updated_on": 1517436847.0,
+    "uuid": "370e56ec0f65f9ceef55307f1cc03fcfbf63b957"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Wed Feb 21 18:14:23 2018 +0100",
+        "CommitDate": "Fri Feb 23 20:12:51 2018 +0100",
+        "analysis": {
+            "docker/Dockerfile-full": {
+                "dependencies": [
+                    "grimoirelab/installed",
+                    "openjdk-8-jdk-headless",
+                    "net-tools",
+                    "mariadb-server"
+                ]
+            },
+            "docker/Dockerfile-installed": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "pandoc",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            },
+            "docker/Dockerfile-secured": {
+                "dependencies": [
+                    "grimoirelab/full"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "639c1bf0499e12be9d0d3b3061e6a52b689da3d1",
+        "message": "[docker] Add configuration for new secured container\n\nThe grimoirelab/secured Docker container image is a secured version\nof grimoirelab/full. It uses the SearchGuard plugin for Elasticsearch\nand Kibana to have authentication and permissions.\n\nThis patch include also some resctruturing of the files used\nby the Dockerfiles, and of the Mordred configuration files,\nwhich are now structured in several pieces.\n\nThe list of repositories, identities, etc. are now for CHAOSS,\ninstead than for GrimoireLab."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "639c1bf0499e12be9d0d3b3061e6a52b689da3d1"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550258.377706,
+    "updated_on": 1519413171.0,
+    "uuid": "352958bf1f1819cc76a1c335515bb63a907fee91"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Mon Mar 19 19:51:47 2018 +0100",
+        "CommitDate": "Mon Mar 19 21:27:26 2018 +0100",
+        "analysis": {
+            "docker/Dockerfile-full": {
+                "dependencies": [
+                    "grimoirelab/installed",
+                    "openjdk-8-jdk-headless",
+                    "net-tools",
+                    "mariadb-server"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "0c2601dd72b2d7cd1c6ec0546840377df7e5a47d",
+        "message": "[docker] Build image using the latest Kibiter"
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "0c2601dd72b2d7cd1c6ec0546840377df7e5a47d"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550258.540417,
+    "updated_on": 1521491246.0,
+    "uuid": "80a32155c98ee98a60267bb8ca894de33af7a805"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Tue Mar 20 22:42:03 2018 +0100",
+        "CommitDate": "Wed Mar 21 18:17:23 2018 +0100",
+        "analysis": {
+            "docker/Dockerfile-secured": {
+                "dependencies": [
+                    "grimoirelab/full"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "c989e865da384c086509e6a6874c7db2566750f6",
+        "message": "[docker] Fix Dockerfile for grimoirelab/secured for the latest Kibiter"
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "c989e865da384c086509e6a6874c7db2566750f6"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550258.668909,
+    "updated_on": 1521652643.0,
+    "uuid": "56ab1043df16da150a05ab6c1ab0c37b32854022"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Tue May 15 14:55:04 2018 +0200",
+        "CommitDate": "Fri May 18 05:56:55 2018 +0200",
+        "analysis": {
+            "docker/Dockerfile-factory": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "pandoc",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            },
+            "docker/Dockerfile-installed": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "pandoc",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            },
+            "docker/Dockerfile-secured": {
+                "dependencies": [
+                    "grimoirelab/full"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "8ad356c0f430c91aac8f36f4c22274e055e0ff93",
+        "message": "[docker] Fix to let new certificates being built, and something else...\n\nDemo certificates provided by search-guard did expire. To temporarily\nfix this, I got the new script which has embedded new certificates\n(check in docker/Dockerfile-secured).\n\nAdditionally, I'm starting to add support for tests in the installed\ncontainer."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "8ad356c0f430c91aac8f36f4c22274e055e0ff93"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550259.072064,
+    "updated_on": 1526615815.0,
+    "uuid": "f935badd78e06d64d264db7bd4f5a36092c5d245"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Sun Jun 3 23:28:28 2018 +0200",
+        "CommitDate": "Fri Jun 8 14:40:03 2018 +0200",
+        "analysis": {
+            "docker/Dockerfile-secured": {
+                "dependencies": [
+                    "grimoirelab/full"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "7a3a3759e61e1d27d27038d06742c804945c82be",
+        "message": "[docker] Some changes, to improve docker images.\n\nFor grimoirelab/secured, new certificates and stuff.\nFor the list of projects, some update of repos.\nFor Mordred configuration, new stuff for studies.\nFor README.md, how to test that proxies work."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "7a3a3759e61e1d27d27038d06742c804945c82be"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550259.176574,
+    "updated_on": 1528461603.0,
+    "uuid": "cefe3e96e1139ef089b28083190494c379a7a2ec"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Fri Jul 6 12:20:40 2018 +0200",
+        "CommitDate": "Fri Jul 6 13:08:05 2018 +0200",
+        "analysis": {
+            "docker/Dockerfile-installed": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "pandoc",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "c3f36f16b62e5174aa930e5e884eb4881baacca1",
+        "message": "Improvements for testing\n\nThis patch includes several improvements, mainly related to testing:\n\n* build_grimoirelab now supports --testinstall which tests\n  packages after installing them (or using the installed ones,\n  if --install was also specified). This allows to run tests\n  against a certain release of GrimoireLab (as opposed to\n  installing specifically their dependencies, which is what\n  --test does).\n* All dockerfiles and entrypoint scripts for Docker images now use\n  sirmordered instead of mordred.\n* grimoirelab/full Docker image now supports an enviroment variable,\n  TEST, which if it is \"YES\" will produce the container to run\n  tests using --testinstall. This is also documented in\n  docker/README.md\n* Fixed minor error in ansible_release.yml which caused an image\n  to not being of a certain release, even if specified.\n* Improving output in Ansible messages (\\n as newlines).\n* Added testing to ansible_release.yml playbook.\n* docker/README.md is updated with more info about Ansible playbooks,\n  and how to run them."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "c3f36f16b62e5174aa930e5e884eb4881baacca1"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550259.341351,
+    "updated_on": 1530875285.0,
+    "uuid": "d089dd5f450580620505613a79319a36b3f529a6"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Thu Aug 23 12:39:49 2018 +0200",
+        "CommitDate": "Fri Aug 24 13:03:25 2018 +0200",
+        "analysis": {
+            "docker/Dockerfile-full": {
+                "dependencies": [
+                    "grimoirelab/installed",
+                    "openjdk-8-jdk-headless",
+                    "net-tools",
+                    "mariadb-server"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "35f26da4a1e6549c22d08c9245648fdedd0171c1",
+        "message": "[release] Release 0.1.1, corresponding to release file 18.08-01\n\nIncludes minor changes to ensure this works, and fixes\nsome bugs in config files and documentation."
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "35f26da4a1e6549c22d08c9245648fdedd0171c1"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550259.515743,
+    "updated_on": 1535108605.0,
+    "uuid": "fd37113f7fed79034e62f373cf8a8f8159fbde0f"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Fri Nov 9 18:38:18 2018 +0100",
+        "CommitDate": "Mon Nov 12 11:15:44 2018 +0100",
+        "analysis": {
+            "docker/Dockerfile-full": {
+                "dependencies": [
+                    "grimoirelab/installed",
+                    "openjdk-8-jdk-headless",
+                    "net-tools",
+                    "mariadb-server"
+                ]
+            },
+            "docker/Dockerfile-secured": {
+                "dependencies": [
+                    "grimoirelab/full"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "f1bc6e5d1b369012ff790def3f62ad07755f7acd",
+        "message": "[docker] Changes to work with kibiter 6.1.4"
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "f1bc6e5d1b369012ff790def3f62ad07755f7acd"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550259.844593,
+    "updated_on": 1542017744.0,
+    "uuid": "569ae6cb207bdf5c94d060c7e2901871b0d5862e"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Wed Nov 14 23:00:44 2018 +0100",
+        "CommitDate": "Wed Nov 14 23:00:44 2018 +0100",
+        "Merge": "163be36 f1bc6e5",
+        "analysis": {
+            "docker/Dockerfile-full": {
+                "dependencies": [
+                    "grimoirelab/installed",
+                    "openjdk-8-jdk-headless",
+                    "net-tools",
+                    "mariadb-server"
+                ]
+            },
+            "docker/Dockerfile-secured": {
+                "dependencies": [
+                    "grimoirelab/full"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "0ab08a2586cbd2bf6d64c895f6df4a9a38806b45",
+        "message": "Merge branch 'master' into patch-1"
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "0ab08a2586cbd2bf6d64c895f6df4a9a38806b45"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550260.057958,
+    "updated_on": 1542232844.0,
+    "uuid": "2077211fe1b410accf685aa384ac79fd1f641d71"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Mon Nov 26 23:03:35 2018 +0100",
+        "CommitDate": "Wed Jan 9 10:44:11 2019 +0100",
+        "analysis": {
+            "docker/Dockerfile-installed": {
+                "dependencies": [
+                    "debian stretch-slim",
+                    "bash",
+                    "locales",
+                    "gcc",
+                    "git",
+                    "git-core",
+                    "pandoc",
+                    "python3",
+                    "python3-pip",
+                    "python3-venv",
+                    "python3-dev",
+                    "python3-gdbm",
+                    "mariadb-client",
+                    "unzip",
+                    "curl",
+                    "wget",
+                    "sudo",
+                    "ssh"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "3900a3452d68b755e83ca974c404266c4343afc1",
+        "message": "Adapting to 0.2.0 (pkgs and Docker images)"
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "3900a3452d68b755e83ca974c404266c4343afc1"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550260.262424,
+    "updated_on": 1547027051.0,
+    "uuid": "81b487b128eee702cc783f05e0818ecacec7305c"
+},
+{
+    "backend_name": "CoDep",
+    "backend_version": "0.4.0",
+    "category": "code_dependencies_jadolint",
+    "classified_fields_filtered": null,
+    "data": {
+        "AuthorDate": "Tue Dec 3 18:39:58 2019 -0800",
+        "CommitDate": "Wed Dec 4 08:38:35 2019 +0100",
+        "Signed-off-by": [
+            "Kevin Chen <kvn.0218+github@gmail.com>"
+        ],
+        "analysis": {
+            "docker/Dockerfile-full": {
+                "dependencies": [
+                    "grimoirelab/installed",
+                    "openjdk-8-jdk-headless",
+                    "net-tools",
+                    "mariadb-server"
+                ]
+            }
+        },
+        "analyzer": "jadolint",
+        "commit": "1a1d4012425712b3bc2c9fd0a4c6c6bdf3cae550",
+        "message": "chore: update kibiter version\n\nSigned-off-by: Kevin Chen <kvn.0218+github@gmail.com>"
+    },
+    "graal_version": "0.2.4",
+    "origin": "https://github.com/chaoss/grimoirelab",
+    "search_fields": {
+        "item_id": "1a1d4012425712b3bc2c9fd0a4c6c6bdf3cae550"
+    },
+    "tag": "https://github.com/chaoss/grimoirelab",
+    "timestamp": 1577550260.51188,
+    "updated_on": 1575445115.0,
+    "uuid": "50654c5585dea83c171697ff83029f65e988e2da"
+}]
