@@ -115,6 +115,8 @@ class TelegramEnrich(Enrich):
         if "text" in message:
             eitem["text_analyzed"] = message["text"]
 
+        eitem["text_edited"] = False if "edited" not in message else message["edited"]
+
         eitem['chat_id'] = message['chat']['id']
         if 'title' in message['chat']:
             eitem['chat_title'] = message['chat']['title']
