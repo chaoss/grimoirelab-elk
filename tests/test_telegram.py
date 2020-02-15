@@ -45,15 +45,41 @@ class TestTelegram(TestBaseBackend):
         """Test whether JSON items are properly inserted into ES"""
 
         result = self._test_items_to_raw()
-        self.assertEqual(result['items'], 5)
-        self.assertEqual(result['raw'], 5)
+        self.assertEqual(result['items'], 7)
+        self.assertEqual(result['raw'], 7)
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
-        self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 5)
+        self.assertEqual(result['raw'], 6)
+        self.assertEqual(result['enrich'], 6)
+
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertFalse(eitem['text_edited'])
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertFalse(eitem['text_edited'])
+
+        item = self.items[2]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertFalse(eitem['text_edited'])
+
+        item = self.items[3]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertFalse(eitem['text_edited'])
+
+        item = self.items[4]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertFalse(eitem['text_edited'])
+
+        item = self.items[5]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertFalse(eitem['text_edited'])
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
@@ -69,15 +95,15 @@ class TestTelegram(TestBaseBackend):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
-        self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 5)
+        self.assertEqual(result['raw'], 6)
+        self.assertEqual(result['enrich'], 6)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
-        self.assertEqual(result['raw'], 5)
-        self.assertEqual(result['enrich'], 5)
+        self.assertEqual(result['raw'], 6)
+        self.assertEqual(result['enrich'], 6)
 
     def test_refresh_identities(self):
         """Test refresh identities"""

@@ -143,4 +143,79 @@
     "timestamp": 1518165889.551917,
     "updated_on": 1467370379.0,
     "uuid": "2e61e72b64c9084f3c5a36671c3115551c3ae42f"
+},
+{
+    "backend_name": "Telegram",
+    "backend_version": "0.11.1",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "message": {
+            "chat": {
+                "all_members_are_administrators": true,
+                "id": -384130230,
+                "title": "Probando Telegram",
+                "type": "group"
+            },
+            "date": 1581769643,
+            "from": {
+                "first_name": "valerio",
+                "id": 576262216,
+                "is_bot": false
+            },
+            "message_id": 14158,
+            "text": "cccc"
+        },
+        "update_id": 671372334
+    },
+    "offset": 671372334,
+    "origin": "https://telegram.org/owltestbot",
+    "perceval_version": "0.12.26",
+    "search_fields": {
+        "chat_id": -384130230,
+        "chat_name": "Probando Telegram",
+        "item_id": "14158"
+    },
+    "tag": "https://telegram.org/owltestbot",
+    "timestamp": 1581769650.6794,
+    "updated_on": 1581769643.0,
+    "uuid": "640154783a34a65232cb823e246bea20eab26ea2"
+},
+{
+    "backend_name": "Telegram",
+    "backend_version": "0.11.1",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "message": {
+            "chat": {
+                "all_members_are_administrators": true,
+                "id": -384130230,
+                "title": "Probando Telegram",
+                "type": "group"
+            },
+            "date": 1581769647,
+            "edited": true,
+            "from": {
+                "first_name": "valerio",
+                "id": 576262216,
+                "is_bot": false
+            },
+            "message_id": 14158,
+            "text": "cccd"
+        },
+        "update_id": 671372335
+    },
+    "offset": 671372335,
+    "origin": "https://telegram.org/owltestbot",
+    "perceval_version": "0.12.26",
+    "search_fields": {
+        "chat_id": -384130230,
+        "chat_name": "Probando Telegram",
+        "item_id": "14158"
+    },
+    "tag": "https://telegram.org/owltestbot",
+    "timestamp": 1581769650.68041,
+    "updated_on": 1581769647.0,
+    "uuid": "640154783a34a65232cb823e246bea20eab26ea2"
 }]
