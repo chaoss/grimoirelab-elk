@@ -112,3 +112,38 @@ profile information (i.e., identity fields) or (iv) to the project listed in the
 
 #### Data source specific fields
 Details of the fields of each data source is available in the [Schema](https://github.com/chaoss/grimoirelab-elk/tree/master/schema) folder.
+
+## Running tests
+
+Tests are located in the folder [tests](https://github.com/chaoss/grimoirelab-elk/tree/master/tests). In order to run them, you need to have in your machine:
+- instances (or Docker containers) of ElasticSearch and MySQL
+- the [dependencies](https://github.com/chaoss/grimoirelab-elk/blob/master/requirements.txt) installed or available (the latter applies to the dependencies with the other GrimoireLab repositories).
+
+Then you need to:
+- update the file [tests.conf](https://github.com/chaoss/grimoirelab-elk/blob/master/tests/tests.conf) in case your ElasticSearch instance isn't available at http://localhost:9200
+- create the databases `test_sh` and `test_projects` in your MySQL instance (e.g., `mysql -u root -e "create database test_sh"`)
+- populate the database `test_projects` with the SQL file [test_projects.sql](https://github.com/chaoss/grimoirelab-elk/blob/master/tests/test_projects.sql) (e.g., `mysql -u root test_projects < tests/test_projects.sql`)
+
+The full battery of tests can be executed with [run_tests.py](https://github.com/chaoss/grimoirelab-elk/blob/master/tests/run_tests.py). However, it is also possible to execute
+a sub-set of tests by running the single test files (`test_*` files in the [tests folder](https://github.com/chaoss/grimoirelab-elk/tree/master/tests))
+
+The tests can be run in combination with the Python package `coverage`. The steps below show how to do it:
+```buildoutcfg
+$ pip3 install coveralls
+$ cd <path-to-ELK>/tests
+$ python3 -m coverage run run_tests.py --source=grimoire_elk 
+```
+
+Coverage will generate a file `.coverage` in the tests folder, which can be inspected with the following command:
+```buildoutcfg
+cd <path-to-ELK>/tests
+python3 -m coverage report -m
+```
+
+The output will be similar to the following one:
+```buildoutcfg
+Name                                                                                                                Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------------------------------------------------------------------------
+.../ELK/grimoire_elk/__init__.py                                                                                       4      0   100%
+.../ELK/grimoire_elk/_version.py                                                                                       1      0   100%
+```
