@@ -243,19 +243,19 @@ class JiraEnrich(Enrich):
         eitem['changes'] = issue['changelog']['total']
 
         if "creator" in issue["fields"] and issue["fields"]["creator"]:
-            eitem['creator_name'] = issue["fields"]["creator"]["displayName"]
-            eitem['creator_login'] = issue["fields"]["creator"]["name"]
+            eitem['creator_name'] = issue["fields"]["creator"].get("displayName", None)
+            eitem['creator_login'] = issue["fields"]["creator"].get("name", None)
             if "timeZone" in issue["fields"]["creator"]:
                 eitem['creator_tz'] = issue["fields"]["creator"]["timeZone"]
 
         if "assignee" in issue["fields"] and issue["fields"]["assignee"]:
-            eitem['assignee'] = issue["fields"]["assignee"]["displayName"]
+            eitem['assignee'] = issue["fields"]["assignee"].get("displayName", None)
             if "timeZone" in issue["fields"]["assignee"]:
                 eitem['assignee_tz'] = issue["fields"]["assignee"]["timeZone"]
 
         if 'reporter' in issue['fields'] and issue['fields']['reporter']:
-            eitem['reporter_name'] = issue['fields']['reporter']['displayName']
-            eitem['reporter_login'] = issue['fields']['reporter']['name']
+            eitem['reporter_name'] = issue['fields']['reporter'].get('displayName', None)
+            eitem['reporter_login'] = issue['fields']['reporter'].get('name', None)
             if "timeZone" in issue["fields"]["reporter"]:
                 eitem['reporter_tz'] = issue["fields"]["reporter"]["timeZone"]
 
