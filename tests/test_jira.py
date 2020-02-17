@@ -141,7 +141,7 @@ class TestJira(TestBaseBackend):
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['author_name'], 'Maurizio Pillitu')
         self.assertEqual(eitem['author_org_name'], 'Unknown')
-        self.assertEqual(eitem['author_user_name'], 'maoo')
+        self.assertEqual(eitem['author_user_name'], 'Unknown')
         self.assertEqual(eitem['author_type'], 'creator')
 
         item = self.items[0]

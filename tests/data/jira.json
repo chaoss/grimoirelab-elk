@@ -111,7 +111,6 @@
                 },
                 "displayName": "Maurizio Pillitu",
                 "key": "maoo",
-                "name": "maoo",
                 "self": "https://finosfoundation.atlassian.net/rest/api/2/user?accountId=557058%3Afbbe73fc-f16a-419c-8624-c5413dbb7288",
                 "timeZone": "Europe/Madrid"
             },
@@ -1051,7 +1050,6 @@
                     "32x32": "https://avatar-cdn.atlassian.com/da024d15cb00e0e56ea9c904d051fb30?s=32&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2Fda024d15cb00e0e56ea9c904d051fb30%3Fd%3Dmm%26s%3D32%26noRedirect%3Dtrue",
                     "48x48": "https://avatar-cdn.atlassian.com/da024d15cb00e0e56ea9c904d051fb30?s=48&d=https%3A%2F%2Fsecure.gravatar.com%2Favatar%2Fda024d15cb00e0e56ea9c904d051fb30%3Fd%3Dmm%26s%3D48%26noRedirect%3Dtrue"
                 },
-                "displayName": "Maurizio Pillitu",
                 "key": "maoo",
                 "name": "maoo",
                 "self": "https://finosfoundation.atlassian.net/rest/api/2/user?accountId=557058%3Afbbe73fc-f16a-419c-8624-c5413dbb7288",
