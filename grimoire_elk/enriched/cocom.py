@@ -21,6 +21,7 @@
 #
 
 import logging
+
 from dateutil.relativedelta import relativedelta
 
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
@@ -37,6 +38,42 @@ from grimoirelab_toolkit.datetime import datetime_utcnow
 from grimoire_elk.elastic import ElasticSearch
 
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
+LANGUAGES = {
+    'java': 'Java',
+    'py': 'Python',
+    'php': 'PHP',
+    'scala': 'Scala',
+    'js': 'JavaScript',
+    'rb': 'Ruby',
+    'cs': 'C#',
+    'cpp': 'C/C++',
+    'cc': 'C/C++',
+    'c': 'C/C++',
+    'h': 'C/C++',
+    'hpp': 'C/C++',
+    'hs': 'Haskell',
+    'lua': 'Lua',
+    'go': 'Go',
+    'swift': 'Swift',
+    'm': 'Objective-C',
+    'mm': 'Objective-C',
+    'py': 'Python',
+    'lisp': 'Lisp',
+    'pl': 'Perl',
+    'pm': 'Perl',
+    'r': 'R',
+    'sh': 'Shell',
+    'kt': 'Kotlin',
+    'kts': 'Kotlin',
+    'xml': 'XML',
+    'yml': 'YAML',
+    'json': 'JSON',
+    'md': 'Markdown',
+    'gradle': 'Gradle',
+    'dockerfile': 'Docker',
+    'sql': 'SQL',
+    'ts': 'TypeScript'
+}
 
 logger = logging.getLogger(__name__)
 
@@ -144,20 +181,24 @@ class CocomEnrich(Enrich):
 
         return modules
 
+    def get_language(self, ext):
+        language = None
+        if ext:
+            language = LANGUAGES.get(ext.lower(), ext.upper())
+
+        return language
+
     @metadata
     def get_rich_item(self, file_analysis):
-
         eitem = {}
         for metric in self.metrics:
-            if file_analysis.get(metric, None) is not None:
-                eitem[metric] = file_analysis[metric]
-            else:
-                eitem[metric] = None
-
+            eitem[metric] = file_analysis.get(metric, None)
         eitem["file_path"] = file_analysis.get("file_path", None)
-        eitem["ext"] = file_analysis.get("ext", None)
         eitem['modules'] = self.extract_modules(eitem['file_path'])
         eitem = self.__add_derived_metrics(file_analysis, eitem)
+        # Get the name of the file if not extension
+        eitem["ext"] = file_analysis["ext"].split("/")[-1] if "ext" in file_analysis else None
+        eitem['language'] = self.get_language(eitem["ext"])
 
         return eitem
 
@@ -300,33 +341,48 @@ class CocomEnrich(Enrich):
                         continue
 
                     repository_name = repository_url.split("/")[-1]
-                    evolution_item = {
-                        "id": "{}_{}_{}".format(to_month.isoformat(), hash(repository_url_anonymized), interval),
-                        "repo_url": repository_url_anonymized,
-                        "origin": repository_url,
-                        "interval_months": interval,
-                        "study_creation_date": to_month.isoformat(),
-                        "total_files": len(files_at_time)
-                    }
+                    total_per_lang = {}
 
                     for file_ in files_at_time:
                         file_details = file_["1"]["hits"]["hits"][0]["_source"]
 
-                        for metric in self.metrics:
-                            total_metric = "total_" + metric
-                            evolution_item[total_metric] = evolution_item.get(total_metric, 0)
-                            evolution_item[total_metric] += file_details[metric] if file_details[metric] is not None else 0
+                        if "language" in file_details:
+                            lang = file_details["language"]
+                            total_per_lang[lang] = total_per_lang.get(lang, {})
 
-                    # TODO: Fix Logic: None rather than 1
-                    evolution_item["total_comments_per_loc"] = round(
-                        evolution_item["total_comments"] / max(evolution_item["total_loc"], 1), 2)
-                    evolution_item["total_blanks_per_loc"] = round(
-                        evolution_item["total_blanks"] / max(evolution_item["total_loc"], 1), 2)
-                    evolution_item["total_loc_per_function"] = round(
-                        evolution_item["total_loc"] / max(evolution_item["total_num_funs"], 1), 2)
+                            for metric in self.metrics:
+                                total_per_lang[lang][metric] = total_per_lang[lang].get(metric, 0)
+                                total_per_lang[lang][metric] += file_details[metric] if file_details[metric] is not None else 0
 
-                    evolution_item.update(self.get_grimoire_fields(evolution_item["study_creation_date"], "stats"))
-                    evolution_items.append(evolution_item)
+                            total_per_lang[lang]["total_files"] = total_per_lang[lang].get("total_files", 0) + 1
+
+                    for language in total_per_lang:
+                        total = total_per_lang[language]
+                        if total["loc"] > 0:
+                            hash_repo_url = hash(repository_url_anonymized)
+                            to_month_iso = to_month.isoformat()
+                            evolution_item = {
+                                "id": "{}_{}_{}_{}".format(to_month_iso, hash_repo_url, interval, language),
+                                "repo_url": repository_url_anonymized,
+                                "origin": repository_url,
+                                "interval_months": interval,
+                                "study_creation_date": to_month_iso,
+                                "language": language,
+                                "total_files": total["total_files"]
+                            }
+
+                            for metric in self.metrics:
+                                evolution_item["total_" + metric] = total[metric]
+
+                            evolution_item["total_comments_per_loc"] = round(
+                                evolution_item["total_comments"] / max(evolution_item["total_loc"], 1), 2)
+                            evolution_item["total_blanks_per_loc"] = round(
+                                evolution_item["total_blanks"] / max(evolution_item["total_loc"], 1), 2)
+                            evolution_item["total_loc_per_function"] = round(
+                                evolution_item["total_loc"] / max(evolution_item["total_num_funs"], 1), 2)
+
+                            evolution_item.update(self.get_grimoire_fields(evolution_item["study_creation_date"], "stats"))
+                            evolution_items.append(evolution_item)
 
                     if len(evolution_items) >= self.elastic.max_items_bulk:
                         num_items += len(evolution_items)
