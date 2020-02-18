@@ -37,6 +37,9 @@ def get_unique_repository_with_project_name():
                   }}},
                   {"project" : {"terms": {
                       "field": "project"
+                  }}},
+                  {"author_org_name" : {"terms": {
+                      "field": "author_org_name"
                   }}}
               ]
             }

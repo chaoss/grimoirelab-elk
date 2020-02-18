@@ -655,7 +655,7 @@ class GitHubEnrich(Enrich):
 
         return rich_repo
 
-    def __create_backlog_item(self, repository_url, repository_name, project, date, interval, label, map_label, issues):
+    def __create_backlog_item(self, repository_url, repository_name, project, date, org_name, interval, label, map_label, issues):
 
         average_opened_time = 0
         if (len(issues) > 0):
@@ -670,7 +670,8 @@ class GitHubEnrich(Enrich):
             "project": project,
             "interval_days": interval,
             "study_creation_date": date,
-            "metadata__enriched_on": date
+            "metadata__enriched_on": date,
+            "author_org_name": org_name
         }
 
         evolution_item.update(self.get_grimoire_fields(date, "stats"))
@@ -767,6 +768,7 @@ class GitHubEnrich(Enrich):
         for repository in repositories:
             repository_url = repository["origin"]
             project = repository["project"]
+            org_name = repository["author_org_name"]
             repository_name = repository_url.split("/")[-1]
 
             logger.info("[enrich-backlog-analysis] Start analysis for {}".format(repository_url))
@@ -783,7 +785,7 @@ class GitHubEnrich(Enrich):
                 evolution_items = []
                 for date in map(lambda i: i['key_as_string'], dates):
                     evolution_item = self.__create_backlog_item(
-                        repository_url, repository_name, project, date, interval_days, label, map_label,
+                        repository_url, repository_name, project, date, org_name, interval_days, label, map_label,
                         self.__get_opened_issues(es_in, in_index, repository_url, date, interval_days,
                                                  other, label, reduced_labels)
                     )
