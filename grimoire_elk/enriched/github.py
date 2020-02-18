@@ -671,7 +671,7 @@ class GitHubEnrich(Enrich):
             "interval_days": interval,
             "study_creation_date": date,
             "metadata__enriched_on": date,
-            "author_org_name": org_name
+            "organization": org_name
         }
 
         evolution_item.update(self.get_grimoire_fields(date, "stats"))
@@ -768,7 +768,7 @@ class GitHubEnrich(Enrich):
         for repository in repositories:
             repository_url = repository["origin"]
             project = repository["project"]
-            org_name = repository["author_org_name"]
+            org_name = repository["organization"]
             repository_name = repository_url.split("/")[-1]
 
             logger.info("[enrich-backlog-analysis] Start analysis for {}".format(repository_url))
