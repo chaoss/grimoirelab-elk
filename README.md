@@ -74,7 +74,7 @@ Each enriched index includes one or more types of documents, which are summarize
 - **Stackexchange**: each document can be either a question or answer.
 - **Supybot**: each document corresponds to a message.
 - **Telegram**: each document corresponds to a message.
-- **Telegram**: each document corresponds to a tweet.
+- **Twitter**: each document corresponds to a tweet.
 
 ### Fields
 Each enriched document contains a set of fields, they can be (i) common to all data sources (e.g., metadata fields, time field), (ii) specific to the data source, (iii) related to contributor’s
