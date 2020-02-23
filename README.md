@@ -134,11 +134,15 @@ $ cd <path-to-ELK>/tests
 $ python3 -m coverage run run_tests.py --source=grimoire_elk 
 ```
 
+![pycharm-config-run_tests](https://user-images.githubusercontent.com/25265451/75114992-d9e9c400-5680-11ea-8b8e-9c50569367a4.png "pycharm-config-run_tests")
+
 Coverage will generate a file `.coverage` in the tests folder, which can be inspected with the following command:
 ```buildoutcfg
 cd <path-to-ELK>/tests
 python3 -m coverage report -m
 ```
+
+![pycharm-config_report](https://user-images.githubusercontent.com/25265451/75115046-554b7580-5681-11ea-92b4-b20c2ece1283.png "pycharm-config_report")
 
 The output will be similar to the following one:
 ```buildoutcfg
