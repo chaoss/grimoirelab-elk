@@ -1,0 +1,13 @@
+name,type,aggregatable,description
+average_opened_time,long,true,"Average of issue opened time."
+grimoire_creation_date,date,true,"Issue creation date."
+interval_days,long,true,"Number of days between each analysis."
+is_github_stats,boolean,true,"True if is Github Stats."
+labels,keyword,true,"The labels assigned to an issue."
+metadata__enriched_on,date,true,"Date when the data were enriched."
+opened,long,true,"Number of issues opens."
+organization,keyword,true,"Organization name of the repository uthor"
+origin,keyword,true,"The original URL from which the repository was retrieved from."
+project,keyword,true,"Project name."
+study_creation_date,true,"Date when the study is created."
+uuid,keyword,true,"Perceval UUID."
