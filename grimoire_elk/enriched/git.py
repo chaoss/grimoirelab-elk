@@ -222,6 +222,9 @@ class GitEnrich(Enrich):
         if 'message' in commit:
             eitem['message'] = commit['message'][:self.KEYWORD_MAX_LENGTH]
 
+        if 'refs' in commit:
+            eitem["commit_tags"] = list(filter(lambda r: "tag: " in r, commit['refs']))
+
         eitem['hash_short'] = eitem['hash'][0:6]
         # Enrich dates
         author_date = str_to_datetime(commit["AuthorDate"])
