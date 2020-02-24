@@ -720,27 +720,33 @@ class GitHubEnrich(Enrich):
 
         For each repository and label, we start the study on repository
         creation date until today with a day interval (default). For each date
-        we retrieve the number of open issue at this date by difference between
+        we retrieve the number of open issues at this date by difference between
         number of opened issues and number of closed issues. In addition, we
         compute the average opened time for all issues open at this date.
 
-        To differenciate by label, we compute evolution for bugs and all others
+        To differentiate by label, we compute evolution for bugs and all others
         labels (like "enhancement","good first issue" ... ), we call this
         "reduced labels". We need to use theses reduced labels because the
-        complixity to compute evolution for each combinaison of labels would be
-        too big. In addition, we rename "bug" label to "bugs" with map_label.
+        complexity to compute evolution for each combination of labels would be
+        too big. In addition, we can rename "bug" label to "bugs" with map_label.
 
         Entry example in setup.cfg :
+
+        [github]
+        raw_index = github_issues_raw
+        enriched_index = github_issues_enriched
+        ...
+        studies = [enrich_backlog_analysis]
 
         [enrich_backlog_analysis]
         out_index = github_enrich_backlog
         interval_days = 7
-        reduced_labels = ["bug","enhancement"]
-        map_label = ["others", "bugs", "enhancements"]
+        reduced_labels = [bug,enhancement]
+        map_label = [others, bugs, enhancements]
 
         """
 
-        logger.info("[enrich-backlog-analysis] Start enrich_backlog_analysis study")
+        logger.info("[github] Start enrich_backlog_analysis study")
 
         # combine two lists to create the dict to map labels
         map_label = dict(zip([""] + reduced_labels, map_label))
@@ -756,7 +762,7 @@ class GitHubEnrich(Enrich):
             body=get_unique_repository_with_project_name())
         repositories = [repo['key'] for repo in unique_repos['aggregations']['unique_repos'].get('buckets', [])]
 
-        logger.info("[enrich-backlog-analysis] {} repositories to process".format(len(repositories)))
+        logger.debug("[enrich-backlog-analysis] {} repositories to process".format(len(repositories)))
 
         # create the index
         es_out = ElasticSearch(enrich_backend.elastic.url, out_index, mappings=Mapping)
@@ -771,7 +777,7 @@ class GitHubEnrich(Enrich):
             org_name = repository["organization"]
             repository_name = repository_url.split("/")[-1]
 
-            logger.info("[enrich-backlog-analysis] Start analysis for {}".format(repository_url))
+            logger.debug("[enrich-backlog-analysis] Start analysis for {}".format(repository_url))
 
             # get each day since repository creation
             dates = es_in.search(
@@ -827,10 +833,10 @@ class GitHubEnrich(Enrich):
                         str(num_items)
                     )
                 else:
-                    logger.info(
+                    logger.debug(
                         ("[enrich-backlog-analysis] %s items inserted",
                             "for Graal Backlog Analysis Study"),
                         str(num_items)
                     )
 
-        logger.info("[enrich-backlog-analysis] End enrich_backlog_analysis study")
+        logger.info("[github] End enrich_backlog_analysis study")
