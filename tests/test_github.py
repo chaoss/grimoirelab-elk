@@ -25,6 +25,7 @@ import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.enriched.enrich import logger
+from grimoire_elk.enriched.github import logger as logger_github
 from grimoire_elk.enriched.utils import REPO_LABELS
 from grimoire_elk.raw.github import GitHubOcean
 
@@ -200,6 +201,39 @@ class TestGit(TestBaseBackend):
                 self.assertIn('lat', geolocation)
             else:
                 self.assertIsNone(item['user_geolocation'])
+
+    def test_enrich_backlog_analysis(self):
+        """ Test that the backlog analysis works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_backlog_analysis')
+
+        with self.assertLogs(logger_github, level='INFO') as cm:
+
+            if study.__name__ == "enrich_backlog_analysis":
+                study(ocean_backend, enrich_backend)
+
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.github:[github] '
+                                           'Start enrich_backlog_analysis study')
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.github:[github] '
+                                            'End enrich_backlog_analysis study')
+
+        time.sleep(5)  # HACK: Wait until github enrich index has been written
+        url = self.es_con + "/github_enrich_backlog/_search"
+        response = enrich_backend.requests.get(url, verify=False).json()
+        for hit in response['hits']['hits']:
+            source = hit['_source']
+            self.assertIn('uuid', source)
+            self.assertIn('opened', source)
+            self.assertIn('average_opened_time', source)
+            self.assertIn('origin', source)
+            self.assertIn('labels', source)
+            self.assertIn('project', source)
+            self.assertIn('interval_days', source)
+            self.assertIn('study_creation_date', source)
+            self.assertIn('metadata__enriched_on', source)
+            self.assertIn('grimoire_creation_date', source)
+            self.assertIn('is_github_stats', source)
+            self.assertIn('organization', source)
 
 
 if __name__ == "__main__":
