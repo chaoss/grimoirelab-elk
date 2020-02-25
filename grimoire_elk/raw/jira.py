@@ -93,14 +93,6 @@ class JiraOcean(ElasticOcean):
 
     mapping = Mapping
 
-    @classmethod
-    def get_arthur_params_from_url(cls, url):
-        """ Get the arthur params given a URL for the data source """
-
-        tokens = url.split(' ', 1)
-
-        return {"url": tokens[0]}
-
     def _fix_item(self, item):
         # Remove all custom fields to avoid the 1000 fields limit in ES
 

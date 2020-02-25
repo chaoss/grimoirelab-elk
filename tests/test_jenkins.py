@@ -125,16 +125,6 @@ class TestJenkins(TestBaseBackend):
         ]
         self.assertListEqual(JenkinsOcean.get_perceval_params_from_url(url), expected_params)
 
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
-
-        url = 'https://build.opnfv.org/ci'
-        expected_params = {
-            'uri': 'https://build.opnfv.org/ci',
-            'url': 'https://build.opnfv.org/ci'
-        }
-        self.assertDictEqual(JenkinsOcean.get_arthur_params_from_url(url), expected_params)
-
     def test_p2o_params(self):
         """Test the extraction of p2o params from an URL"""
 

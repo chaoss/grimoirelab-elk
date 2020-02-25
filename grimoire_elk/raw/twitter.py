@@ -108,11 +108,3 @@ class TwitterOcean(ElasticOcean):
     """Twitter Ocean feeder"""
 
     mapping = Mapping
-
-    @classmethod
-    def get_arthur_params_from_url(cls, query):
-        # The query is directly passed to the Twitter API
-
-        params = {"query": query}
-
-        return params

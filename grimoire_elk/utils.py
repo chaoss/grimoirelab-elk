@@ -313,17 +313,17 @@ def config_logging(debug):
     logging.getLogger("perceval.backends.core.git").setLevel(logging.WARNING)
 
 
-ARTHUR_USAGE_MSG = ''
-ARTHUR_DESC_MSG = ''
-ARTHUR_EPILOG_MSG = ''
+USAGE_MSG = ''
+DESC_MSG = ''
+EPILOG_MSG = ''
 
 
 def get_params_parser():
     """Parse command line arguments"""
 
-    parser = argparse.ArgumentParser(usage=ARTHUR_USAGE_MSG,
-                                     description=ARTHUR_DESC_MSG,
-                                     epilog=ARTHUR_EPILOG_MSG,
+    parser = argparse.ArgumentParser(usage=USAGE_MSG,
+                                     description=DESC_MSG,
+                                     epilog=EPILOG_MSG,
                                      formatter_class=argparse.RawDescriptionHelpFormatter,
                                      add_help=False)
 
@@ -374,7 +374,6 @@ def get_params_parser():
     parser.add_argument('--scroll-wait', default=900, type=int, help="Wait for available scroll (default 900s)")
     parser.add_argument('--scroll-size', default=100, type=int,
                         help="Number of items to get from Elasticsearch when scrolling.")
-    parser.add_argument('--arthur', action='store_true', help="Read items from arthur redis queue")
     parser.add_argument('--pair-programming', action='store_true', help="Do pair programming in git enrich")
     parser.add_argument('--studies-list', nargs='*', help="List of studies to be executed")
     parser.add_argument('backend', help=argparse.SUPPRESS)

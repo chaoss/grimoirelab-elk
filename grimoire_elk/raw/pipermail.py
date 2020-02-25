@@ -26,10 +26,3 @@ class PipermailOcean(MBoxOcean):
     """Pipermail Ocean feeder"""
 
     mapping = Mapping
-
-    @classmethod
-    def get_arthur_params_from_url(cls, url):
-        # In the url the uri and the data dir are included
-        params = url.split()
-
-        return {"url": params[0], "dirpath": "/tmp"}

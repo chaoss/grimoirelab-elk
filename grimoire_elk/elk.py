@@ -21,15 +21,12 @@
 
 import inspect
 import logging
-import pickle
 
-import redis
 from elasticsearch import Elasticsearch
 
 from datetime import datetime
 from dateutil import parser
 
-from arthur.common import Q_STORAGE_ITEMS
 from perceval.backend import find_signature_parameters, Archive
 from perceval.errors import RateLimitError
 from grimoirelab_toolkit.datetime import datetime_utcnow
@@ -48,62 +45,9 @@ logger = logging.getLogger(__name__)
 
 requests_ses = grimoire_con()
 
-arthur_items = {}  # Hash with tag list with all items collected from arthur queue
-
-
-def feed_arthur():
-    """ Feed Ocean with backend data collected from arthur redis queue"""
-
-    logger.info("Collecting items from redis queue")
-
-    db_url = 'redis://localhost/8'
-
-    conn = redis.StrictRedis.from_url(db_url)
-    logger.debug("Redis connection stablished with {}.".format(db_url))
-
-    # Get and remove queued items in an atomic transaction
-    pipe = conn.pipeline()
-    pipe.lrange(Q_STORAGE_ITEMS, 0, -1)
-    pipe.ltrim(Q_STORAGE_ITEMS, 1, 0)
-    items = pipe.execute()[0]
-
-    for item in items:
-        arthur_item = pickle.loads(item)
-        if arthur_item['tag'] not in arthur_items:
-            arthur_items[arthur_item['tag']] = []
-        arthur_items[arthur_item['tag']].append(arthur_item)
-
-    for tag in arthur_items:
-        logger.debug("Items for {}: {}".format(tag, len(arthur_items[tag])))
-
-
-def feed_backend_arthur(backend_name, backend_params):
-    """ Feed Ocean with backend data collected from arthur redis queue"""
-
-    # Always get pending items from arthur for all data sources
-    feed_arthur()
-
-    logger.debug("Items available for {}".format(arthur_items.keys()))
-
-    # Get only the items for the backend
-    if not get_connector_from_name(backend_name):
-        raise RuntimeError("Unknown backend {}".format(backend_name))
-    connector = get_connector_from_name(backend_name)
-    klass = connector[3]  # BackendCmd for the connector
-
-    backend_cmd = init_backend(klass(*backend_params))
-
-    tag = backend_cmd.backend.tag
-    logger.debug("Getting items for {}.".format(tag))
-
-    if tag in arthur_items:
-        logger.debug("Found items for {}.".format(tag))
-        for item in arthur_items[tag]:
-            yield item
-
 
 def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
-                 es_index=None, es_index_enrich=None, project=None, arthur=False,
+                 es_index=None, es_index_enrich=None, project=None,
                  es_aliases=None, projects_json_repo=None, repo_labels=None):
     """ Feed Ocean with backend data """
 
@@ -204,28 +148,21 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             except AttributeError:
                 latest_items = backend_cmd.parsed_args.latest_items
 
-        # fetch params support
-        if arthur:
-            # If using arthur just provide the items generator to be used
-            # to collect the items and upload to Elasticsearch
-            aitems = feed_backend_arthur(backend_name, backend_params)
-            ocean_backend.feed(arthur_items=aitems)
-        else:
-            params = {}
-            if latest_items:
-                params['latest_items'] = latest_items
-            if category:
-                params['category'] = category
-            if branches:
-                params['branches'] = branches
-            if filter_classified:
-                params['filter_classified'] = filter_classified
-            if from_date and (from_date.replace(tzinfo=None) != parser.parse("1970-01-01")):
-                params['from_date'] = from_date
-            if offset:
-                params['from_offset'] = offset
+        params = {}
+        if latest_items:
+            params['latest_items'] = latest_items
+        if category:
+            params['category'] = category
+        if branches:
+            params['branches'] = branches
+        if filter_classified:
+            params['filter_classified'] = filter_classified
+        if from_date and (from_date.replace(tzinfo=None) != parser.parse("1970-01-01")):
+            params['from_date'] = from_date
+        if offset:
+            params['from_offset'] = offset
 
-            ocean_backend.feed(**params)
+        ocean_backend.feed(**params)
 
     except RateLimitError as ex:
         logger.error("Error feeding raw from {} ({}): rate limit exceeded".format(backend_name, backend.origin))

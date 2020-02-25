@@ -19,12 +19,10 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-import json
 import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.raw.mozillaclub import MozillaClubOcean
 from grimoire_elk.enriched.utils import REPO_LABELS
 
 
@@ -117,16 +115,6 @@ class TestMozillaClub(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
-
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
-
-        with open("data/projects-release.json") as projects_filename:
-            url = json.load(projects_filename)['grimoire']['mozillaclub'][0]
-            url_spread = 'https://spreadsheets.google.com/feeds/cells/'
-            url_spread += '1QHl2bjBhMslyFzR5XXPzMLdzzx7oeSKTbgR5PM8qp64/ohaibtm/public/values?alt=json'
-            arthur_params = {'uri': url_spread, 'url': url_spread}
-            self.assertDictEqual(arthur_params, MozillaClubOcean.get_arthur_params_from_url(url))
 
 
 if __name__ == "__main__":

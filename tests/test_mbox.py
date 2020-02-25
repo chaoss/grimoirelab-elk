@@ -161,16 +161,6 @@ class TestMbox(TestBaseBackend):
         ]
         self.assertListEqual(MBoxOcean.get_perceval_params_from_url(url), expected_params)
 
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
-
-        url = "metrics-grimoire /home/bitergia/.perceval/mbox"
-        expected_params = {
-            'dirpath': '/home/bitergia/.perceval/mbox',
-            'uri': 'metrics-grimoire'
-        }
-        self.assertDictEqual(MBoxOcean.get_arthur_params_from_url(url), expected_params)
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')

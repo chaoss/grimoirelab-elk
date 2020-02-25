@@ -67,13 +67,3 @@ class DockerHubOcean(ElasticOcean):
         params = url.split()
 
         return params
-
-    @classmethod
-    def get_arthur_params_from_url(cls, url):
-        # In the url the org and the repository are included
-
-        params = url.split()
-        """ Get the arthur params given a URL for the data source """
-        params = {"owner": params[0], "repository": params[1]}
-
-        return params

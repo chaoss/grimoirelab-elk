@@ -76,14 +76,6 @@ class SlackOcean(ElasticOcean):
 
     mapping = Mapping
 
-    @classmethod
-    def get_arthur_params_from_url(cls, url):
-        # The URL is directly the slack group
-
-        params = {"channel": url}
-
-        return params
-
     def _fix_item(self, item):
         if 'channel_info' in item['data']:
             item['data']['channel_info'].pop('previous_names', None)

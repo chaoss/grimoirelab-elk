@@ -111,15 +111,6 @@ class TestMeetup(TestBaseBackend):
         ]
         self.assertListEqual(MeetupOcean.get_perceval_params_from_url(url), expected_params)
 
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
-
-        url = "South-East-Puppet-User-Group"
-        expected_params = {
-            'group': 'South-East-Puppet-User-Group'
-        }
-        self.assertDictEqual(MeetupOcean.get_arthur_params_from_url(url), expected_params)
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')

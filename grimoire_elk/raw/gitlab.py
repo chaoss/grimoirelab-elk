@@ -19,8 +19,6 @@
 #   Valerio Cosentino <valcos@bitergia.com>
 #
 
-from perceval.backends.core.gitlab import GitLabCommand
-
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 
@@ -71,23 +69,6 @@ class GitLabOcean(ElasticOcean):
     """GitLab Ocean feeder"""
 
     mapping = Mapping
-
-    @classmethod
-    def get_arthur_params_from_url(cls, url):
-        """ Get the arthur params given a URL for the data source """
-        params = {}
-
-        args = cls.get_perceval_params_from_url(url)
-        parser = GitLabCommand.setup_cmd_parser()
-
-        parsed_args = parser.parse(*args)
-
-        params['owner'] = parsed_args.owner
-        params['repository'] = parsed_args.repository
-        # include only blacklist ids information
-        params['blacklist_ids'] = parsed_args.blacklist_ids
-
-        return params
 
     @classmethod
     def get_perceval_params_from_url(cls, url):
