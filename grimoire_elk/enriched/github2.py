@@ -144,11 +144,11 @@ class GitHubEnrich2(Enrich):
                 if user:
                     yield user
 
-                comments = item.get(comments_attr, [])
-                for comment in comments:
-                    user = self.get_sh_identity(comment['user_data'])
-                    if user:
-                        yield user
+        comments = item.get(comments_attr, [])
+        for comment in comments:
+            user = self.get_sh_identity(comment['user_data'])
+            if user:
+                yield user
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
