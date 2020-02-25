@@ -26,10 +26,3 @@ class GroupsioOcean(MBoxOcean):
     """Groups.io Ocean feeder"""
 
     mapping = Mapping
-
-    @classmethod
-    def get_arthur_params_from_url(cls, url):
-        # In the url the uri and the data dir are included
-        params = url.split()
-
-        return {"group_name": params[0], "dirpath": "/tmp"}

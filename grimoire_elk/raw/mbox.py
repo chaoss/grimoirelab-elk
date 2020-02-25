@@ -72,16 +72,6 @@ class MBoxOcean(ElasticOcean):
 
         return params
 
-    @classmethod
-    def get_arthur_params_from_url(cls, url):
-        # In the url the dirpath and the repository are included
-
-        params = url.split()
-        """ Get the arthur params given a URL for the data source """
-        params = {"dirpath": params[1], "uri": params[0]}
-
-        return params
-
     def _fix_item(self, item):
         # Remove all custom fields to avoid the 1000 fields limit in ES
 

@@ -22,7 +22,6 @@ import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.raw.gitlab import GitLabOcean
 from grimoire_elk.enriched.gitlab import NO_MILESTONE_TAG
 from grimoire_elk.enriched.utils import REPO_LABELS
 
@@ -177,21 +176,6 @@ class TestGitLab(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
-
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
-
-        url = "https://gitlab.com/gitlab-org/gitlab-ee --blacklist-ids 1 10 100 --max-retries 100"
-        arthur_params = {'owner': 'gitlab-org',
-                         'repository': 'gitlab-ee',
-                         'blacklist_ids': [1, 10, 100]}
-
-        self.assertDictEqual(arthur_params, GitLabOcean.get_arthur_params_from_url(url))
-
-        url = "https://gitlab.com/gitlab-org/gitlab-ee --blacklist-ids 1 10 100 --max-retries 100"
-        perceval_params = ['gitlab-org', 'gitlab-ee', '--blacklist-ids', '1', '10', '100', '--max-retries', '100']
-
-        self.assertListEqual(perceval_params, GitLabOcean.get_perceval_params_from_url(url))
 
 
 if __name__ == "__main__":

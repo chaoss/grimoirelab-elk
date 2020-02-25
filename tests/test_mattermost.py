@@ -111,16 +111,6 @@ class TestMattermost(TestBaseBackend):
         ]
         self.assertListEqual(MattermostOcean.get_perceval_params_from_url(url), expected_params)
 
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
-
-        url = "https://chat.openshift.io 8j366ft5affy3p36987pcugaoa"
-        expected_params = {
-            'channel': '8j366ft5affy3p36987pcugaoa',
-            'url': 'https://chat.openshift.io'
-        }
-        self.assertDictEqual(MattermostOcean.get_arthur_params_from_url(url), expected_params)
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')

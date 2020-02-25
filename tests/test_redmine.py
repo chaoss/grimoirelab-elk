@@ -19,12 +19,10 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-import json
 import logging
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.raw.redmine import RedmineOcean
 from grimoire_elk.enriched.utils import REPO_LABELS
 
 
@@ -112,14 +110,6 @@ class TestRedmine(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
-
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
-
-        with open("data/projects-release.json") as projects_filename:
-            url = json.load(projects_filename)['grimoire']['redmine'][0]
-            arthur_params = {'uri': 'http://tracker.ceph.com/', 'url': 'http://tracker.ceph.com/'}
-            self.assertDictEqual(arthur_params, RedmineOcean.get_arthur_params_from_url(url))
 
 
 if __name__ == "__main__":

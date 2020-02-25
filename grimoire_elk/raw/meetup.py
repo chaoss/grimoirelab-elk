@@ -80,11 +80,3 @@ class MeetupOcean(ElasticOcean):
         params.append(url)
 
         return params
-
-    @classmethod
-    def get_arthur_params_from_url(cls, url):
-        # The URL is directly the meetup group
-
-        params = {"group": url}
-
-        return params

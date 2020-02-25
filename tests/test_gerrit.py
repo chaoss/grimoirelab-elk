@@ -19,13 +19,11 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-import json
 import logging
 import time
 import unittest
 
 from base import TestBaseBackend, DB_SORTINGHAT
-from grimoire_elk.raw.gerrit import GerritOcean
 from grimoire_elk.enriched.enrich import (logger,
                                           DEMOGRAPHICS_ALIAS)
 from grimoire_elk.enriched.utils import REPO_LABELS
@@ -300,14 +298,6 @@ class TestGerrit(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
-
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
-
-        with open("data/projects-release.json") as projects_filename:
-            url = json.load(projects_filename)['grimoire']['gerrit'][0]
-            arthur_params = {'uri': 'review.openstack.org', 'url': 'review.openstack.org'}
-            self.assertDictEqual(arthur_params, GerritOcean.get_arthur_params_from_url(url))
 
 
 if __name__ == "__main__":

@@ -89,26 +89,14 @@ class GitHubOcean(ElasticOcean):
     mapping = Mapping
 
     @classmethod
-    def get_arthur_params_from_url(cls, url):
-        """ Get the arthur params given a URL for the data source """
-        params = {}
-
-        owner = url.split('/')[-2]
-        repository = url.split('/')[-1]
-        # params.append('--owner')
-        params['owner'] = owner
-        # params.append('--repository')
-        params['repository'] = repository
-        return params
-
-    @classmethod
     def get_perceval_params_from_url(cls, url):
         """ Get the perceval params given a URL for the data source """
         params = []
 
-        dparam = cls.get_arthur_params_from_url(url)
-        params.append(dparam['owner'])
-        params.append(dparam['repository'])
+        owner = url.split('/')[-2]
+        repository = url.split('/')[-1]
+        params.append(owner)
+        params.append(repository)
         return params
 
     def _fix_item(self, item):

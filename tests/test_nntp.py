@@ -126,16 +126,6 @@ class TestNNTP(TestBaseBackend):
         ]
         self.assertListEqual(NNTPOcean.get_perceval_params_from_url(url), expected_params)
 
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
-
-        url = "news.mozilla.org mozilla.dev.project-link"
-        expected_params = {
-            'group': 'mozilla.dev.project-link',
-            'host': 'news.mozilla.org'
-        }
-        self.assertDictEqual(NNTPOcean.get_arthur_params_from_url(url), expected_params)
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')

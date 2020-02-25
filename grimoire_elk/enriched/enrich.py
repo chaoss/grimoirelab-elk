@@ -159,7 +159,6 @@ class Enrich(ElasticItems):
 
         # params used to configure the backend
         # in perceval backends managed directly inside the backend
-        # in twitter and others managed in arthur logic
         self.backend_params = None
         # Label used during enrichment for identities without a known affiliation
         self.unaffiliated_group = 'Unknown'

@@ -177,14 +177,6 @@ class TestJira(TestBaseBackend):
         result = self._test_refresh_project()
         # ... ?
 
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from the projects.json entry"""
-
-        with open("data/projects-release.json") as projects_filename:
-            url = json.load(projects_filename)['grimoire']['jira'][0]
-            arthur_params = {'url': 'https://jira.opnfv.org'}
-            self.assertDictEqual(arthur_params, JiraOcean.get_arthur_params_from_url(url))
-
     def test_get_p2o_params_from_url(self):
         """Test the extraction of p2o params from the projects.json entry"""
 

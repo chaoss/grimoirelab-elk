@@ -163,16 +163,6 @@ class TestGit(TestBaseBackend):
         ]
         self.assertListEqual(GitHubOcean.get_perceval_params_from_url(url), expected_params)
 
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
-
-        url = "https://github.com/chaoss/grimoirelab-perceval"
-        expected_params = {
-            'owner': 'chaoss',
-            'repository': 'grimoirelab-perceval'
-        }
-        self.assertDictEqual(GitHubOcean.get_arthur_params_from_url(url), expected_params)
-
     def test_geolocation_study(self):
         """ Test that the geolocation study works correctly """
 

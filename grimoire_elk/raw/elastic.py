@@ -133,11 +133,6 @@ class ElasticOcean(ElasticItems):
         """ Get the perceval params given a URL for the data source """
         return [url]
 
-    @classmethod
-    def get_arthur_params_from_url(cls, url):
-        """ Get the arthur params given a URL for the data source """
-        return {"uri": url, "url": url}
-
     def drop_item(self, item):
         """ Drop items not to be inserted in Elastic """
         return False
@@ -155,15 +150,11 @@ class ElasticOcean(ElasticItems):
         item['metadata__timestamp'] = timestamp.isoformat()
 
     def feed(self, from_date=None, from_offset=None, category=None, branches=None,
-             latest_items=None, arthur_items=None, filter_classified=None):
-        """ Feed data in Elastic from Perceval or Arthur """
+             latest_items=None, filter_classified=None):
+        """Feed data in Elastic from Perceval"""
 
         if self.fetch_archive:
             items = self.perceval_backend.fetch_from_archive()
-            self.feed_items(items)
-            return
-        elif arthur_items:
-            items = arthur_items
             self.feed_items(items)
             return
 

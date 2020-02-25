@@ -19,13 +19,11 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
-import json
 import logging
 import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.enriched.utils import REPO_LABELS
-from grimoire_elk.raw.askbot import AskbotOcean
 
 
 class TestAskbot(TestBaseBackend):
@@ -91,15 +89,6 @@ class TestAskbot(TestBaseBackend):
 
         result = self._test_refresh_project()
         # .. ?
-
-    def test_arthur_params(self):
-        """Test the extraction of arthur params from an URL"""
-
-        with open("data/projects-release.json") as projects_filename:
-            url = json.load(projects_filename)['grimoire']['askbot'][0]
-            print(AskbotOcean.get_arthur_params_from_url(url))
-            arthur_params = {'uri': 'https://ask.puppet.com', 'url': 'https://ask.puppet.com'}
-            self.assertDictEqual(arthur_params, AskbotOcean.get_arthur_params_from_url(url))
 
 
 if __name__ == "__main__":

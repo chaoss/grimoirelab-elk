@@ -31,13 +31,3 @@ class SupybotOcean(ElasticOcean):
         params = url.split()
 
         return params
-
-    @classmethod
-    def get_arthur_params_from_url(cls, url):
-        # In the url the uri and the dirpath are included
-
-        params = url.split()
-        """ Get the arthur params given a URL for the data source """
-        params = {"uri": params[0], "dirpath": params[1]}
-
-        return params
