@@ -120,8 +120,8 @@ Tests are located in the folder [tests](https://github.com/chaoss/grimoirelab-el
 - the [dependencies](https://github.com/chaoss/grimoirelab-elk/blob/master/requirements.txt) installed or available (the latter applies to the dependencies with the other GrimoireLab repositories).
 
 Then you need to:
-- update the file [tests.conf](https://github.com/chaoss/grimoirelab-elk/blob/master/tests/tests.conf) in case your ElasticSearch instance isn't available at http://localhost:9200
-- create the databases `test_sh` and `test_projects` in your MySQL instance (e.g., `mysql -u root -e "create database test_sh"`)
+- update the file [tests.conf](https://github.com/chaoss/grimoirelab-elk/blob/master/tests/tests.conf) in case your ElasticSearch instance isn't available at http://localhost:9200. For example, if you are using the secure edition of elasticsearch, it will be located at https://admin:admin@localhost:9200
+- create the databases `test_sh` and `test_projects` in your MySQL instance (e.g., `mysql -u root -e "create database test_sh"`, if you are running mysql in a container use `docker exec -i <container id> mysql -u root -e "create database test_sh"`)
 - populate the database `test_projects` with the SQL file [test_projects.sql](https://github.com/chaoss/grimoirelab-elk/blob/master/tests/test_projects.sql) (e.g., `mysql -u root test_projects < tests/test_projects.sql`)
 
 The full battery of tests can be executed with [run_tests.py](https://github.com/chaoss/grimoirelab-elk/blob/master/tests/run_tests.py). However, it is also possible to execute
