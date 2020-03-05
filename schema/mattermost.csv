@@ -18,7 +18,7 @@ metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich inf
 metadata__gelk_version,keyword,true,"Version of the backend used to enrich information."
 metadata__timestamp,date,true,"Date when the item was stored in RAW index."
 metadata__updated_on,date,true,"Date when the item was updated in its original data source."
-number_attachs,long,true,"Number of message attachments.",
+number_attachs,long,true,"Number of message attachments."
 origin,keyword,true,"Original URL where the repository was retrieved from."
 project,keyword,true,"Project."
 project_1,keyword,true,"Project (if more than one level is allowed in project hierarchy)."
