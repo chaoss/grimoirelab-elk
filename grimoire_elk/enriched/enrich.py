@@ -691,6 +691,31 @@ class Enrich(ElasticItems):
             rol + "_bot": False
         }
 
+    def get_item_no_sh_fields(self, identity, rol):
+        """ Create an item with reasonable data when SH is not enabled """
+
+        username = identity.get('username', '')
+        email = identity.get('email', '')
+        name = identity.get('name', '')
+        backend_name = self.get_connector_name()
+
+        if not (username or email or name):
+            return self.__get_item_sh_fields_empty(rol)
+
+        uuid = utils.uuid(backend_name, email=email,
+                          name=name, username=username)
+        return {
+            rol + "_id": uuid,
+            rol + "_uuid": uuid,
+            rol + "_name": name,
+            rol + "_user_name": username,
+            rol + "_domain": self.get_identity_domain(identity),
+            rol + "_gender": self.unknown_gender,
+            rol + "_gender_acc": None,
+            rol + "_org_name": self.unaffiliated_group,
+            rol + "_bot": False
+        }
+
     def get_item_sh_fields(self, identity=None, item_date=None, sh_id=None,
                            rol='author'):
         """ Get standard SH fields from a SH identity """
@@ -809,9 +834,6 @@ class Enrich(ElasticItems):
         """
         eitem_sh = {}  # Item enriched
 
-        if not self.sortinghat:
-            return eitem_sh
-
         author_field = self.get_field_author()
 
         if not roles:
@@ -827,7 +849,12 @@ class Enrich(ElasticItems):
         for rol in roles:
             if rol in users_data:
                 identity = self.get_sh_identity(item, rol)
-                eitem_sh.update(self.get_item_sh_fields(identity, item_date, rol=rol))
+                if self.sortinghat:
+                    sh_fields = self.get_item_sh_fields(identity, item_date, rol=rol)
+                else:
+                    sh_fields = self.get_item_no_sh_fields(identity, rol)
+
+                eitem_sh.update(sh_fields)
 
                 if not eitem_sh[rol + '_org_name']:
                     eitem_sh[rol + '_org_name'] = SH_UNKNOWN_VALUE
@@ -842,7 +869,11 @@ class Enrich(ElasticItems):
         rol_author = 'author'
         if author_field in users_data and author_field != rol_author:
             identity = self.get_sh_identity(item, author_field)
-            eitem_sh.update(self.get_item_sh_fields(identity, item_date, rol=rol_author))
+            if self.sortinghat:
+                sh_fields = self.get_item_sh_fields(identity, item_date, rol=rol_author)
+            else:
+                sh_fields = self.get_item_no_sh_fields(identity, rol_author)
+            eitem_sh.update(sh_fields)
 
             if not eitem_sh['author_org_name']:
                 eitem_sh['author_org_name'] = SH_UNKNOWN_VALUE
