@@ -53,7 +53,7 @@ state,keyword,true,State of the Pull Request (GitHub has only 2 possible states:
 tag,keyword,true,Perceval tag.
 time_open_days,float,true,Time the Pull Request is open counted in days.
 time_to_close_days,float,true,Time to close a Pull Request counted in days.
-time_to_merge_request_response,float,true,Time to merge a Pull Request in days.
+time_to_merge_request_response,float,true,Time to get a response on a Pull Request in days.
 title,keyword,true,The title of the Pull Request.
 title_analyzed,text,false,Pull Request title split by terms to allow searching.
 updated_at,date,true,Date when the Pull Request was last updated.
