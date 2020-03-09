@@ -213,7 +213,7 @@ class GitLabEnrich(Enrich):
 
         rich_issue['id'] = issue['id']
         rich_issue['id_in_repo'] = issue['iid']
-        rich_issue['repository'] = issue['web_url'].rsplit("/", 2)[0]
+        rich_issue['repository'] = issue['web_url'].rsplit("/", 2)[0].split("/-")[0]
         rich_issue['title'] = issue['title']
         rich_issue['title_analyzed'] = issue['title']
         rich_issue['state'] = issue['state']
