@@ -63,6 +63,7 @@ class TestMeetup(TestBaseBackend):
         self.assertEqual(eitem['meetup_updated'], '2016-04-07T21:39:24+00:00')
         self.assertEqual(eitem['group_created'], '2016-03-20T15:13:47+00:00')
         self.assertEqual(eitem['group_urlname'], 'sqlpass-es')
+        self.assertEqual(eitem['author_uuid'], '029aa3befc96d386e1c7270586f1ec1d673b0b1b')
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""

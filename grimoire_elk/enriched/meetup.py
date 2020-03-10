@@ -255,8 +255,7 @@ class MeetupEnrich(Enrich):
         # created is when the meetup entry was created and it is not the interesting date
         eitem.update(self.get_grimoire_fields(eitem['time_date'], eitem['type']))
 
-        if self.sortinghat:
-            eitem.update(self.get_item_sh(event))
+        eitem.update(self.get_item_sh(event))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
@@ -270,9 +269,6 @@ class MeetupEnrich(Enrich):
 
         sh_fields = {}
 
-        if not self.sortinghat:
-            return sh_fields
-
         # Not shared common get_item_sh because it is pretty specific
         if 'member' in item:
             # comment and rsvp
@@ -284,7 +280,10 @@ class MeetupEnrich(Enrich):
             return sh_fields
 
         created = unixtime_to_datetime(item['created'] / 1000)
-        sh_fields = self.get_item_sh_fields(identity, created)
+        if self.sortinghat:
+            sh_fields = self.get_item_sh_fields(identity, created)
+        else:
+            sh_fields = self.get_item_no_sh_fields(identity, 'author')
 
         return sh_fields
 
@@ -311,8 +310,7 @@ class MeetupEnrich(Enrich):
             ecomment['member_name'] = member['name']
             ecomment['member_url'] = "https://www.meetup.com/members/" + str(member['id'])
 
-            if self.sortinghat:
-                ecomment.update(self.get_item_sh(comment))
+            ecomment.update(self.get_item_sh(comment))
 
             yield ecomment
 
@@ -341,8 +339,7 @@ class MeetupEnrich(Enrich):
             ersvp['rsvps_updated'] = rsvp['updated']
             ersvp['rsvps_response'] = rsvp['response']
 
-            if self.sortinghat:
-                ersvp.update(self.get_item_sh(rsvp))
+            ersvp.update(self.get_item_sh(rsvp))
 
             yield ersvp
 
