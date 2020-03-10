@@ -41,6 +41,7 @@ from ..elastic import ElasticSearch
 from ..elastic_items import (ElasticItems,
                              HEADER_JSON)
 from .study_ceres_onion import ESOnionConnector, onion_study
+from .sortinghat_gelk import MULTI_ORG_NAMES
 from .graal_study_evolution import (get_to_date,
                                     get_unique_repository)
 from statsmodels.duration.survfunc import SurvfuncRight
@@ -674,6 +675,28 @@ class Enrich(ElasticItems):
                     break
         return enroll
 
+    def get_multi_enrollment(self, uuid, item_date):
+        """ Get the enrollments for the uuid when the item was done """
+
+        enrolls = []
+
+        # item_date must be offset-naive (utc)
+        if item_date and item_date.tzinfo:
+            item_date = (item_date - item_date.utcoffset()).replace(tzinfo=None)
+
+        enrollments = self.get_enrollments(uuid)
+
+        if enrollments:
+            for enrollment in enrollments:
+                if not item_date:
+                    enrolls.append(enrollment.organization.name)
+                elif enrollment.start <= item_date <= enrollment.end:
+                    enrolls.append(enrollment.organization.name)
+        else:
+            enrolls.append(self.unaffiliated_group)
+
+        return enrolls
+
     def __get_item_sh_fields_empty(self, rol, undefined=False):
         """ Return a SH identity with all fields to empty_field """
         # If empty_field is None, the fields do not appear in index patterns
@@ -687,7 +710,8 @@ class Enrich(ElasticItems):
             rol + "_gender": empty_field,
             rol + "_gender_acc": None,
             rol + "_org_name": empty_field,
-            rol + "_bot": False
+            rol + "_bot": False,
+            rol + MULTI_ORG_NAMES: [empty_field]
         }
 
     def get_item_no_sh_fields(self, identity, rol):
@@ -764,6 +788,8 @@ class Enrich(ElasticItems):
 
         eitem_sh[rol + "_org_name"] = self.get_enrollment(eitem_sh[rol + "_uuid"], item_date)
         eitem_sh[rol + "_bot"] = self.is_bot(eitem_sh[rol + '_uuid'])
+
+        eitem_sh[rol + MULTI_ORG_NAMES] = self.get_multi_enrollment(eitem_sh[rol + "_uuid"], item_date)
         return eitem_sh
 
     def get_profile_sh(self, uuid):
