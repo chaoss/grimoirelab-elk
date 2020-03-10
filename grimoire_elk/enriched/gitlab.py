@@ -242,9 +242,8 @@ class GitLabEnrich(Enrich):
 
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], "issue"))
 
-        if self.sortinghat:
-            item[self.get_field_date()] = rich_issue[self.get_field_date()]
-            rich_issue.update(self.get_item_sh(item, self.issue_roles))
+        item[self.get_field_date()] = rich_issue[self.get_field_date()]
+        rich_issue.update(self.get_item_sh(item, self.issue_roles))
 
         return rich_issue
 
@@ -353,9 +352,8 @@ class GitLabEnrich(Enrich):
 
         rich_mr.update(self.get_grimoire_fields(merge_request['created_at'], "merge_request"))
 
-        if self.sortinghat:
-            item[self.get_field_date()] = rich_mr[self.get_field_date()]
-            rich_mr.update(self.get_item_sh(item, self.merge_roles))
+        item[self.get_field_date()] = rich_mr[self.get_field_date()]
+        rich_mr.update(self.get_item_sh(item, self.merge_roles))
 
         return rich_mr
 
