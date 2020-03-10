@@ -52,7 +52,9 @@ class TestEnrich(unittest.TestCase):
             "author_gender": "",
             "author_gender_acc": None,
             "author_org_name": "",
-            "author_bot": False
+            "author_bot": False,
+            "author_multi_org_names": [""],
+            "author_multi_org_name_0": ""
         }
 
     def test_get_profile_sh(self):
@@ -97,6 +99,8 @@ class TestEnrich(unittest.TestCase):
             'author_gender_acc': 100,
             'author_org_name': "Bitergia",
             'author_bot': False,
+            'author_multi_org_names': ['Bitergia'],
+            'author_multi_org_name_0': 'Bitergia'
         }
 
         empty_item_by_rol = {'author': self.empty_item}
@@ -139,6 +143,12 @@ class TestEnrich(unittest.TestCase):
             return enrollments[(uuid, item_date)]
         self._enrich.get_enrollment = MagicMock(side_effect=enrollments_side_effect)
 
+        multi_enrollments = {(expected['author_uuid'], None): expected['author_multi_org_names']}
+
+        def multi_enrollments_side_effect(uuid, item_date):
+            return multi_enrollments[(uuid, item_date)]
+        self._enrich.get_multi_enrollment = MagicMock(side_effect=multi_enrollments_side_effect)
+
         bots = {'aaaaa': False}
 
         def bots_side_effect(uuid):
@@ -158,6 +168,8 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender_acc'], expected['author_gender_acc'])
         self.assertEqual(eitem_sh['author_org_name'], expected['author_org_name'])
         self.assertEqual(eitem_sh['author_bot'], expected['author_bot'])
+        self.assertEqual(eitem_sh['author_multi_org_names'], expected['author_multi_org_names'])
+        self.assertEqual(eitem_sh['author_multi_org_name_0'], expected['author_multi_org_name_0'])
 
         # 2. Change role
 
@@ -172,6 +184,8 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['assignee_gender_acc'], expected['author_gender_acc'])
         self.assertEqual(eitem_sh['assignee_org_name'], expected['author_org_name'])
         self.assertEqual(eitem_sh['assignee_bot'], expected['author_bot'])
+        self.assertEqual(eitem_sh['assignee_multi_org_names'], expected['author_multi_org_names'])
+        self.assertEqual(eitem_sh['assignee_multi_org_name_0'], expected['author_multi_org_name_0'])
 
     def test_get_item_sh_fields_identity_no_uuid(self):
         """uuid is None (not found in sortinghat) or does not exist"""
@@ -212,7 +226,8 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender'], '-- UNDEFINED --')
         self.assertEqual(eitem_sh['author_gender_acc'], None)
         self.assertEqual(eitem_sh['author_org_name'], '-- UNDEFINED --')
-        self.assertEqual(eitem_sh['author_bot'], False)
+        self.assertEqual(eitem_sh['author_multi_org_names'], ['-- UNDEFINED --'])
+        self.assertEqual(eitem_sh['author_multi_org_name_0'], '-- UNDEFINED --')
 
         # 2. No uuid field
         sh_ids = {
@@ -231,6 +246,8 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender_acc'], None)
         self.assertEqual(eitem_sh['author_org_name'], '-- UNDEFINED --')
         self.assertEqual(eitem_sh['author_bot'], False)
+        self.assertEqual(eitem_sh['author_multi_org_names'], ['-- UNDEFINED --'])
+        self.assertEqual(eitem_sh['author_multi_org_name_0'], '-- UNDEFINED --')
 
     def test_get_item_sh_fields_identity_no_profile(self):
         """Test retrieval when no profile data is found or data is not what we expected"""
@@ -255,6 +272,8 @@ class TestEnrich(unittest.TestCase):
             'author_gender_acc': 0,
             'author_org_name': "Bitergia",
             'author_bot': False,
+            'author_multi_org_names': ['Bitergia'],
+            'author_multi_org_name_0': 'Bitergia'
         }
 
         # 1. Profile is None
@@ -289,6 +308,13 @@ class TestEnrich(unittest.TestCase):
             return enrollments[(uuid, item_date)]
         self._enrich.get_enrollment = MagicMock(side_effect=enrollments_side_effect)
 
+        multi_enrollments = {(expected['author_uuid'], None): expected['author_multi_org_names']}
+
+        def multi_enrollments_side_effect(uuid, item_date):
+            return multi_enrollments[(uuid, item_date)]
+
+        self._enrich.get_multi_enrollment = MagicMock(side_effect=multi_enrollments_side_effect)
+
         bots = {'aaaaa': False}
 
         def bots_side_effect(uuid):
@@ -306,6 +332,8 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender_acc'], expected['author_gender_acc'])
         self.assertEqual(eitem_sh['author_org_name'], expected['author_org_name'])
         self.assertEqual(eitem_sh['author_bot'], expected['author_bot'])
+        self.assertEqual(eitem_sh['author_multi_org_names'], expected['author_multi_org_names'])
+        self.assertEqual(eitem_sh['author_multi_org_name_0'], expected['author_multi_org_name_0'])
 
         # 2. Profile as empty dict
 
@@ -323,6 +351,8 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender_acc'], expected['author_gender_acc'])
         self.assertEqual(eitem_sh['author_org_name'], expected['author_org_name'])
         self.assertEqual(eitem_sh['author_bot'], expected['author_bot'])
+        self.assertEqual(eitem_sh['author_multi_org_names'], expected['author_multi_org_names'])
+        self.assertEqual(eitem_sh['author_multi_org_name_0'], expected['author_multi_org_name_0'])
 
         # 3 Profile with other fields
 
@@ -346,6 +376,8 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender_acc'], expected['author_gender_acc'])
         self.assertEqual(eitem_sh['author_org_name'], expected['author_org_name'])
         self.assertEqual(eitem_sh['author_bot'], expected['author_bot'])
+        self.assertEqual(eitem_sh['author_multi_org_names'], expected['author_multi_org_names'])
+        self.assertEqual(eitem_sh['author_multi_org_name_0'], expected['author_multi_org_name_0'])
 
     def test_get_item_sh_fields_identity_no_gender(self):
         """Profile with no gender values"""
@@ -366,6 +398,8 @@ class TestEnrich(unittest.TestCase):
             'author_gender_acc': 0,
             'author_org_name': "Bitergia",
             'author_bot': False,
+            'author_multi_org_names': ['Bitergia'],
+            'author_multi_org_name_0': 'Bitergia'
         }
 
         empty_item_by_rol = {'author': self.empty_item}
@@ -408,6 +442,13 @@ class TestEnrich(unittest.TestCase):
             return enrollments[(uuid, item_date)]
         self._enrich.get_enrollment = MagicMock(side_effect=enrollments_side_effect)
 
+        multi_enrollments = {(expected['author_uuid'], None): expected['author_multi_org_names']}
+
+        def multi_enrollments_side_effect(uuid, item_date):
+            return multi_enrollments[(uuid, item_date)]
+
+        self._enrich.get_multi_enrollment = MagicMock(side_effect=multi_enrollments_side_effect)
+
         bots = {'aaaaa': False}
 
         def bots_side_effect(uuid):
@@ -435,6 +476,8 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender_acc'], expected['author_gender_acc'])
         self.assertEqual(eitem_sh['author_org_name'], expected['author_org_name'])
         self.assertEqual(eitem_sh['author_bot'], expected['author_bot'])
+        self.assertEqual(eitem_sh['author_multi_org_names'], expected['author_multi_org_names'])
+        self.assertEqual(eitem_sh['author_multi_org_name_0'], expected['author_multi_org_name_0'])
 
     def test_get_item_sh_fields_sh_id(self):
         """Test retrieval from sortinghat id"""
@@ -451,6 +494,8 @@ class TestEnrich(unittest.TestCase):
             'author_gender_acc': 100,
             'author_org_name': "Bitergia",
             'author_bot': False,
+            'author_multi_org_names': ['Bitergia'],
+            'author_multi_org_name_0': 'Bitergia'
         }
 
         empty_item_by_rol = {'author': self.empty_item}
@@ -489,6 +534,13 @@ class TestEnrich(unittest.TestCase):
             return enrollments[(uuid, item_date)]
         self._enrich.get_enrollment = MagicMock(side_effect=enrollments_side_effect)
 
+        multi_enrollments = {(expected['author_uuid'], None): expected['author_multi_org_names']}
+
+        def multi_enrollments_side_effect(uuid, item_date):
+            return multi_enrollments[(uuid, item_date)]
+
+        self._enrich.get_multi_enrollment = MagicMock(side_effect=multi_enrollments_side_effect)
+
         bots = {'aaaaa': False}
 
         def bots_side_effect(uuid):
@@ -506,6 +558,10 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender_acc'], expected['author_gender_acc'])
         self.assertEqual(eitem_sh['author_org_name'], expected['author_org_name'])
         self.assertEqual(eitem_sh['author_bot'], expected['author_bot'])
+        self.assertEqual(eitem_sh['author_org_name'], expected['author_org_name'])
+        self.assertEqual(eitem_sh['author_bot'], expected['author_bot'])
+        self.assertEqual(eitem_sh['author_multi_org_names'], expected['author_multi_org_names'])
+        self.assertEqual(eitem_sh['author_multi_org_name_0'], expected['author_multi_org_name_0'])
 
     def test_get_item_sh_fields_sh_id_no_uuid(self):
         """Test retrieval from sortinghat id when there is no uuid"""
@@ -533,6 +589,8 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender_acc'], None)
         self.assertEqual(eitem_sh['author_org_name'], '-- UNDEFINED --')
         self.assertEqual(eitem_sh['author_bot'], False)
+        self.assertEqual(eitem_sh['author_multi_org_names'], ['-- UNDEFINED --'])
+        self.assertEqual(eitem_sh['author_multi_org_name_0'], '-- UNDEFINED --')
 
         # 2. uuid is an empty string
 
@@ -549,6 +607,8 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender_acc'], None)
         self.assertEqual(eitem_sh['author_org_name'], '-- UNDEFINED --')
         self.assertEqual(eitem_sh['author_bot'], False)
+        self.assertEqual(eitem_sh['author_multi_org_names'], ['-- UNDEFINED --'])
+        self.assertEqual(eitem_sh['author_multi_org_name_0'], '-- UNDEFINED --')
 
     def test_no_params(self):
         """Neither identity nor sh_id are passed as arguments"""
@@ -570,6 +630,8 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_gender_acc'], self.empty_item['author_gender_acc'])
         self.assertEqual(eitem_sh['author_org_name'], self.empty_item['author_org_name'])
         self.assertEqual(eitem_sh['author_bot'], self.empty_item['author_bot'])
+        self.assertEqual(eitem_sh['author_multi_org_names'], self.empty_item['author_multi_org_names'])
+        self.assertEqual(eitem_sh['author_multi_org_name_0'], self.empty_item['author_multi_org_name_0'])
 
     def test_has_identities(self):
         """Test whether has_identities works"""

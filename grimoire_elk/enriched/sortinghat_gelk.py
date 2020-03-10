@@ -30,6 +30,10 @@ from sortinghat.exceptions import AlreadyExistsError, InvalidValueError
 logger = logging.getLogger(__name__)
 
 
+MULTI_ORG_NAME = '_multi_org_name_'
+MULTI_ORG_NAMES = '_multi_org_names'
+
+
 class SortingHat(object):
 
     @classmethod

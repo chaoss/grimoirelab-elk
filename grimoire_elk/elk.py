@@ -21,6 +21,7 @@
 
 import inspect
 import logging
+import re
 
 from elasticsearch import Elasticsearch
 
@@ -33,7 +34,7 @@ from grimoirelab_toolkit.datetime import datetime_utcnow
 
 from .elastic_mapping import Mapping as BaseMapping
 from .elastic_items import ElasticItems
-from .enriched.sortinghat_gelk import SortingHat
+from .enriched.sortinghat_gelk import SortingHat, MULTI_ORG_NAME
 from .enriched.utils import get_last_enrich, grimoire_con, get_diff_current_date
 from .utils import get_elastic
 from .utils import get_connectors, get_connector_from_name
@@ -217,9 +218,13 @@ def refresh_identities(enrich_backend, author_field=None, author_values=None):
                 roles = enrich_backend.roles
             except AttributeError:
                 pass
+
+            rx = re.compile(r'.*{}.*'.format(MULTI_ORG_NAME))
+            new_eitem = {key: eitem[key] for key in eitem if not rx.search(key)}
             new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
-            eitem.update(new_identities)
-            yield eitem
+            new_eitem.update(new_identities)
+
+            yield new_eitem
 
     logger.debug("Refreshing identities fields from {}".format(
                  enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url)))
