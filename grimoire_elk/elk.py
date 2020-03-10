@@ -217,6 +217,7 @@ def refresh_identities(enrich_backend, author_field=None, author_values=None):
                 roles = enrich_backend.roles
             except AttributeError:
                 pass
+
             new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
             eitem.update(new_identities)
             yield eitem
