@@ -522,9 +522,8 @@ class GitHubEnrich(Enrich):
 
         rich_pr.update(self.get_grimoire_fields(pull_request['created_at'], "pull_request"))
 
-        if self.sortinghat:
-            item[self.get_field_date()] = rich_pr[self.get_field_date()]
-            rich_pr.update(self.get_item_sh(item, self.pr_roles))
+        item[self.get_field_date()] = rich_pr[self.get_field_date()]
+        rich_pr.update(self.get_item_sh(item, self.pr_roles))
 
         return rich_pr
 
@@ -621,9 +620,8 @@ class GitHubEnrich(Enrich):
 
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], "issue"))
 
-        if self.sortinghat:
-            item[self.get_field_date()] = rich_issue[self.get_field_date()]
-            rich_issue.update(self.get_item_sh(item, self.issue_roles))
+        item[self.get_field_date()] = rich_issue[self.get_field_date()]
+        rich_issue.update(self.get_item_sh(item, self.issue_roles))
 
         return rich_issue
 
