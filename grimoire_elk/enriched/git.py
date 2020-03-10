@@ -317,10 +317,9 @@ class GitEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
 
-        if self.sortinghat:
-            # grimoire_creation_date is needed in the item
-            item.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
-            eitem.update(self.get_item_sh(item, self.roles))
+        # grimoire_creation_date is needed in the item
+        item.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
+        eitem.update(self.get_item_sh(item, self.roles))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
