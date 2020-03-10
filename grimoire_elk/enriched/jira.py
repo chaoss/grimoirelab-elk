@@ -353,6 +353,8 @@ class JiraEnrich(Enrich):
             eitem['author_org_name'] = eitem[author_type + '_org_name']
             eitem['author_bot'] = eitem[author_type + '_bot']
 
+            eitem['author_multi_org_names'] = eitem.get(author_type + '_multi_org_names', [])
+
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
 
