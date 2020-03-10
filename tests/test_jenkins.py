@@ -84,25 +84,12 @@ class TestJenkins(TestBaseBackend):
         enrich_backend = self.connectors[self.connector][2]()
         self.assertFalse(enrich_backend.has_identities())
 
-    def test_raw_to_enrich_sorting_hat(self):
-        """Test enrich with SortingHat"""
-
-        result = self._test_raw_to_enrich(sortinghat=True)
-        self.assertEqual(result['raw'], 32)
-        self.assertEqual(result['enrich'], 32)
-
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
         self.assertEqual(result['raw'], 32)
         self.assertEqual(result['enrich'], 32)
-
-    def test_refresh_identities(self):
-        """Test refresh identities"""
-
-        result = self._test_refresh_identities()
-        # ... ?
 
     def test_refresh_project(self):
         """Test refresh project field for all sources"""
