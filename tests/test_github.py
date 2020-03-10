@@ -67,12 +67,24 @@ class TestGit(TestBaseBackend):
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['labels'], [])
         self.assertEqual(item['category'], 'issue')
+        self.assertEqual(eitem['author_uuid'], '5f9d42ce000e46e9eee60a3c64a353b560051a2e')
+        self.assertEqual(eitem['author_domain'], 'zhquan_example.com')
+        self.assertEqual(eitem['user_data_uuid'], '5f9d42ce000e46e9eee60a3c64a353b560051a2e')
+        self.assertEqual(eitem['user_data_domain'], 'zhquan_example.com')
+        self.assertEqual(eitem['assignee_data_uuid'], '5f9d42ce000e46e9eee60a3c64a353b560051a2e')
+        self.assertEqual(eitem['assignee_data_domain'], 'zhquan_example.com')
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['labels'], ['bug', 'feature'])
         self.assertEqual(item['category'], 'pull_request')
         self.assertEqual(eitem['time_to_merge_request_response'], 335.81)
+        self.assertEqual(eitem['author_uuid'], '5f9d42ce000e46e9eee60a3c64a353b560051a2e')
+        self.assertEqual(eitem['author_domain'], 'zhquan_example.com')
+        self.assertEqual(eitem['user_data_uuid'], '5f9d42ce000e46e9eee60a3c64a353b560051a2e')
+        self.assertEqual(eitem['user_data_domain'], 'zhquan_example.com')
+        self.assertEqual(eitem['merged_by_data_uuid'], '5f9d42ce000e46e9eee60a3c64a353b560051a2e')
+        self.assertEqual(eitem['merged_by_data_domain'], 'zhquan_example.com')
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
@@ -105,9 +117,13 @@ class TestGit(TestBaseBackend):
         self.assertIsNone(eitem['user_domain'])
         self.assertIsNone(eitem['user_org'])
         self.assertEqual(eitem['author_name'], 'acs')
+        self.assertEqual(eitem['author_uuid'], 'e8cc482634f2095c935b6a586ddb9ed8215d5cb8')
         self.assertIsNone(eitem['assignee_name'])
         self.assertIsNone(eitem['assignee_domain'])
         self.assertIsNone(eitem['assignee_org'])
+        self.assertEqual(eitem['user_data_name'], 'acs')
+        self.assertEqual(eitem['user_data_uuid'], 'e8cc482634f2095c935b6a586ddb9ed8215d5cb8')
+        self.assertIsNone(eitem['user_data_domain'])
 
         item = self.items[6]
         eitem = enrich_backend.get_rich_item(item)
@@ -116,9 +132,13 @@ class TestGit(TestBaseBackend):
         self.assertIsNone(eitem['user_domain'])
         self.assertIsNone(eitem['user_org'])
         self.assertEqual(eitem['author_name'], 'acs')
+        self.assertEqual(eitem['author_uuid'], 'e8cc482634f2095c935b6a586ddb9ed8215d5cb8')
         self.assertIsNone(eitem['merge_author_name'])
         self.assertIsNone(eitem['merge_author_domain'])
         self.assertIsNone(eitem['merge_author_org'])
+        self.assertEqual(eitem['user_data_name'], 'acs')
+        self.assertEqual(eitem['user_data_uuid'], 'e8cc482634f2095c935b6a586ddb9ed8215d5cb8')
+        self.assertIsNone(eitem['user_data_domain'])
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
