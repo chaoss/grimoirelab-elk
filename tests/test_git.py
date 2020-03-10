@@ -143,10 +143,12 @@ class TestGit(TestBaseBackend):
         self.assertEqual(eitem['Commit_name'], '-- UNDEFINED --')
         self.assertEqual(eitem['Commit_user_name'], '-- UNDEFINED --')
         self.assertEqual(eitem['Commit_org_name'], '-- UNDEFINED --')
+        self.assertEqual(eitem['Commit_multi_org_names'], ['-- UNDEFINED --'])
 
         self.assertEqual(eitem['author_name'], 'Eduardo Morais')
         self.assertEqual(eitem['Author_name'], 'Eduardo Morais')
         self.assertEqual(eitem['Author_user_name'], 'Unknown')
+        self.assertEqual(eitem['Author_multi_org_names'], ['Unknown'])
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
