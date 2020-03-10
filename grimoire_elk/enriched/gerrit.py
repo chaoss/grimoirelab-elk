@@ -326,6 +326,11 @@ class GerritEnrich(Enrich):
                     ecomment['author_org_name'] = ecomment['reviewer_org_name']
                     ecomment['author_bot'] = ecomment['reviewer_bot']
 
+                    ecomment['author_multi_org_names'] = ecomment.get('reviewer_multi_org_names', [])
+                    if ecomment['author_multi_org_names']:
+                        for pos in range(len(ecomment['author_multi_org_names'])):
+                            ecomment['author_multi_org_name_' + str(pos)] = ecomment['author_multi_org_names'][pos]
+
                 # add changeset author
                 self.add_changeset_author(eitem, ecomment)
 
@@ -482,6 +487,11 @@ class GerritEnrich(Enrich):
                 eapproval['author_org_name'] = eapproval.get('by_org_name', None)
                 eapproval['author_bot'] = eapproval.get('by_bot', None)
 
+                eapproval['author_multi_org_names'] = eapproval.get('by_multi_org_names', [])
+                if eapproval['author_multi_org_names']:
+                    for pos in range(len(eapproval['author_multi_org_names'])):
+                        eapproval['author_multi_org_name_' + str(pos)] = eapproval['author_multi_org_names'][pos]
+
                 # add changeset author
                 self.add_changeset_author(epatchset, eapproval)
 
@@ -513,6 +523,12 @@ class GerritEnrich(Enrich):
         target_eitem['changeset_author_gender_acc'] = source_eitem.get(rol + '_gender_acc', None)
         target_eitem['changeset_author_org_name'] = source_eitem.get(rol + '_org_name', None)
         target_eitem['changeset_author_bot'] = source_eitem.get(rol + '_bot', None)
+
+        target_eitem['changeset_author_multi_org_names'] = source_eitem.get(rol + '_multi_org_names', [])
+        if target_eitem['changeset_author_multi_org_names']:
+            for pos in range(len(target_eitem['changeset_author_multi_org_names'])):
+                target_eitem['changeset_author_multi_org_name_' + str(pos)] = \
+                    target_eitem['changeset_author_multi_org_names'][pos]
 
     def get_field_unique_id(self):
         return "id"

@@ -251,6 +251,9 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('changeset_author_gender_acc', eitem)
             self.assertIn('changeset_author_org_name', eitem)
             self.assertIn('changeset_author_bot', eitem)
+            self.assertIn('changeset_author_multi_org_names', eitem)
+            if eitem['changeset_author_multi_org_names']:
+                self.assertIn('changeset_author_multi_org_name_0', eitem)
 
             comments = item['data']['comments']
             ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
@@ -265,6 +268,9 @@ class TestGerrit(TestBaseBackend):
                 self.assertIn('changeset_author_gender_acc', ecomment)
                 self.assertIn('changeset_author_org_name', ecomment)
                 self.assertIn('changeset_author_bot', ecomment)
+                self.assertIn('changeset_author_multi_org_names', ecomment)
+                if ecomment['changeset_author_multi_org_names']:
+                    self.assertIn('changeset_author_multi_org_name_0', ecomment)
 
             patchsets = item['data']['patchSets']
             epatchsets = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
@@ -279,6 +285,9 @@ class TestGerrit(TestBaseBackend):
                 self.assertIn('changeset_author_gender_acc', epatchset)
                 self.assertIn('changeset_author_org_name', epatchset)
                 self.assertIn('changeset_author_bot', epatchset)
+                self.assertIn('changeset_author_multi_org_names', epatchset)
+                if epatchset['changeset_author_multi_org_names']:
+                    self.assertIn('changeset_author_multi_org_name_0', epatchset)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
