@@ -70,6 +70,21 @@ class TestPuppetForge(TestBaseBackend):
         self.assertEqual(result['raw'], 3)
         self.assertEqual(result['enrich'], 3)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        url = self.es_con + "/" + self.enrich_index + "/_search"
+        response = enrich_backend.requests.get(url, verify=False).json()
+        for hit in response['hits']['hits']:
+            source = hit['_source']
+            if 'author_uuid' in source:
+                self.assertIn('author_domain', source)
+                self.assertIn('author_gender', source)
+                self.assertIn('author_gender_acc', source)
+                self.assertIn('author_org_name', source)
+                self.assertIn('author_bot', source)
+                self.assertIn('author_multi_org_names', source)
+                self.assertIn('author_multi_org_name_0', source)
+
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 

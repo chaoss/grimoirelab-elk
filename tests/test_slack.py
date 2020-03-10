@@ -95,18 +95,24 @@ class TestSlack(TestBaseBackend):
         self.assertEqual(eitem['author_name'], 'Unknown')
         self.assertEqual(eitem['author_user_name'], 'Unknown')
         self.assertEqual(eitem['author_org_name'], 'Unknown')
+        self.assertEqual(eitem['author_multi_org_names'], ['Unknown'])
+        self.assertEqual(eitem['author_multi_org_name_0'], 'Unknown')
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
-        self.assertTrue('author_name' not in eitem)
-        self.assertTrue('author_user_name' not in eitem)
-        self.assertTrue('author_org_name' not in eitem)
+        self.assertNotIn('author_name', eitem)
+        self.assertNotIn('author_user_name', eitem)
+        self.assertNotIn('author_org_name', eitem)
+        self.assertNotIn('author_multi_org_names', eitem)
+        self.assertNotIn('author_multi_org_name_0', eitem)
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
         self.assertNotEqual(eitem['author_name'], 'Unknown')
         self.assertNotEqual(eitem['author_user_name'], 'Unknown')
         self.assertEqual(eitem['author_org_name'], 'Unknown')
+        self.assertEqual(eitem['author_multi_org_names'], ['Unknown'])
+        self.assertEqual(eitem['author_multi_org_name_0'], 'Unknown')
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
