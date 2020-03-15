@@ -51,6 +51,7 @@ class ESOnionConnector(ESConnector):
 
     AUTHOR_NAME = 'author_name'
     AUTHOR_ORG = 'author_org_name'
+    AUTHOR_MULTI_ORG_NAMES = 'author_multi_org_names'
     AUTHOR_UUID = 'author_uuid'
     CONTRIBUTIONS = 'contributions'
     LATEST_TS = 'latest_ts'
@@ -86,7 +87,13 @@ class ESOnionConnector(ESConnector):
 
             date_range = {self._timeframe_field: {'gte': quarter.start_time, 'lte': quarter.end_time}}
 
-            orgs = self.__list_uniques(date_range, self.AUTHOR_ORG)
+            orgs = self.__list_uniques(date_range, self.AUTHOR_MULTI_ORG_NAMES)
+            if not orgs:
+                logger.warning("{} Attribute {} not found, using {}".format(
+                    self.__log_prefix, self.AUTHOR_MULTI_ORG_NAMES, self.AUTHOR_ORG)
+                )
+                orgs = self.__list_uniques(date_range, self.AUTHOR_ORG)
+
             projects = self.__list_uniques(date_range, self.PROJECT)
 
             # Get global data
