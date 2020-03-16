@@ -66,6 +66,14 @@ class Mapping(BaseMapping):
                                             "index": true
                                         }
                                     }
+                                },
+                                "comments": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "text",
+                                            "index": true
+                                        }
+                                    }
                                 }
                             }
                         }
