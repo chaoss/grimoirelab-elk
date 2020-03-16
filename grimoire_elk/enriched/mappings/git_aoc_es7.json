@@ -19,6 +19,9 @@
       "author_org_name": {
         "type": "keyword"
       },
+      "author_multi_org_names": {
+          "type": "keyword"
+      },
       "author_user_name": {
         "type": "keyword"
       },
