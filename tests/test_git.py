@@ -154,6 +154,30 @@ class TestGit(TestBaseBackend):
         result = self._test_raw_to_enrich(projects=True)
         self.assertEqual(result['raw'], 9)
         self.assertEqual(result['enrich'], 9)
+        enrich_backend = self.connectors[self.connector][2]()
+        url = self.es_con + "/" + self.enrich_index + "/_search"
+        response = enrich_backend.requests.get(url, verify=False).json()
+
+        for hit in response['hits']['hits']:
+            source = hit['_source']
+            if 'author_uuid' in source:
+                self.assertIn('author_date', source)
+                self.assertIn('author_date_weekday', source)
+                self.assertIn('author_date_hour', source)
+                self.assertIn('utc_author_date_weekday', source)
+                self.assertIn('utc_author_date_hour', source)
+                self.assertIn('author_uuid', source)
+                self.assertIn('author_domain', source)
+                self.assertIn('author_name', source)
+                self.assertIn('commit_date', source)
+                self.assertIn('commit_date_weekday', source)
+                self.assertIn('commit_date_hour', source)
+                self.assertIn('utc_commit_date_weekday', source)
+                self.assertIn('utc_commit_date_hour', source)
+                self.assertIn('project', source)
+                self.assertIn('project_1', source)
+                self.assertEqual(source['project'], 'Main')
+                self.assertEqual(source['project_1'], 'Main')
 
     def test_refresh_identities(self):
         """Test refresh identities"""
