@@ -21,7 +21,9 @@
 
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
+import logging
 
+logger = logging.getLogger(__name__)
 
 class Mapping(BaseMapping):
 
@@ -92,6 +94,10 @@ class GitHubOcean(ElasticOcean):
     def get_perceval_params_from_url(cls, url):
         """ Get the perceval params given a URL for the data source """
         params = []
+
+        if url[-1] == '/':
+            logger.error('Please remove trailing forward slash (/) from the URL.')
+            return None
 
         owner = url.split('/')[-2]
         repository = url.split('/')[-1]
