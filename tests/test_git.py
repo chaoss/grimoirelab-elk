@@ -281,6 +281,20 @@ class TestGit(TestBaseBackend):
         delete_survival = self.es_con + "/git_study_forecast_activity"
         requests.delete(delete_survival, verify=False)
 
+    def test_enrich_areas_of_code(self):
+        """ Test that areas of code works correctly"""
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_areas_of_code')
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_areas_of_code":
+                study(ocean_backend, enrich_backend)#this line is showing error
+
+
+
+
+
+
     def test_onion_study(self):
         """ Test that the onion study works correctly """
 
