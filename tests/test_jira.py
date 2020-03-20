@@ -143,6 +143,7 @@ class TestJira(TestBaseBackend):
         self.assertEqual(eitem['author_org_name'], 'Unknown')
         self.assertEqual(eitem['author_user_name'], 'Unknown')
         self.assertEqual(eitem['author_type'], 'creator')
+        self.assertEqual(eitem['author_multi_org_names'], ['Unknown'])
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item, author_type='assignee')
@@ -150,6 +151,7 @@ class TestJira(TestBaseBackend):
         self.assertEqual(eitem['author_org_name'], 'Unknown')
         self.assertEqual(eitem['author_user_name'], 'peter')
         self.assertEqual(eitem['author_type'], 'assignee')
+        self.assertEqual(eitem['author_multi_org_names'], ['Unknown'])
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item, author_type='reporter')
@@ -157,6 +159,7 @@ class TestJira(TestBaseBackend):
         self.assertEqual(eitem['author_org_name'], 'Unknown')
         self.assertEqual(eitem['author_user_name'], 'maoo')
         self.assertEqual(eitem['author_type'], 'reporter')
+        self.assertEqual(eitem['author_multi_org_names'], ['Unknown'])
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""

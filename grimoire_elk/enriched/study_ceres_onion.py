@@ -51,6 +51,7 @@ class ESOnionConnector(ESConnector):
 
     AUTHOR_NAME = 'author_name'
     AUTHOR_ORG = 'author_org_name'
+    AUTHOR_MULTI_ORG_NAMES = 'author_multi_org_names'
     AUTHOR_UUID = 'author_uuid'
     CONTRIBUTIONS = 'contributions'
     LATEST_TS = 'latest_ts'
@@ -76,6 +77,10 @@ class ESOnionConnector(ESConnector):
         :param size: not used here.
         :return: DataFrame with commit count per author, split by quarter, org and project.
         """
+        # label to check whether the input index contains multiple affiliations. The label is
+        # initialized to True, and can change its value only if no organizations exist in the
+        # attribute `author_multi_org_names`
+        multi_org = True
 
         # Get quarters corresponding to All items (Incremental mode NOT SUPPORTED)
         quarters = self.__quarters()
@@ -86,7 +91,14 @@ class ESOnionConnector(ESConnector):
 
             date_range = {self._timeframe_field: {'gte': quarter.start_time, 'lte': quarter.end_time}}
 
-            orgs = self.__list_uniques(date_range, self.AUTHOR_ORG)
+            orgs = self.__list_uniques(date_range, self.AUTHOR_MULTI_ORG_NAMES)
+            if not orgs:
+                multi_org = False
+                logger.warning("{} Attribute {} not found, using {}".format(
+                    self.__log_prefix, self.AUTHOR_MULTI_ORG_NAMES, self.AUTHOR_ORG)
+                )
+                orgs = self.__list_uniques(date_range, self.AUTHOR_ORG)
+
             projects = self.__list_uniques(date_range, self.PROJECT)
 
             # Get global data
@@ -101,7 +113,7 @@ class ESOnionConnector(ESConnector):
 
                 logger.debug("{} Quarter: {}  Org: {}".format(self.__log_prefix, quarter, org_name))
 
-                s = self.__build_search(date_range, org_name=org_name)
+                s = self.__build_search(date_range, org_name=org_name, multi_org=multi_org)
                 response = s.execute()
 
                 for timing in response.aggregations[self.TIMEFRAME].buckets:
@@ -126,7 +138,7 @@ class ESOnionConnector(ESConnector):
                     logger.debug("{} Quarter: {}  Project: {}  Org: {}".format(
                                  self.__log_prefix, quarter, project, org_name))
 
-                    s = self.__build_search(date_range, project_name=project, org_name=org_name)
+                    s = self.__build_search(date_range, project_name=project, org_name=org_name, multi_org=multi_org)
                     response = s.execute()
 
                     for timing in response.aggregations[self.TIMEFRAME].buckets:
@@ -265,13 +277,17 @@ class ESOnionConnector(ESConnector):
 
         return uniques_list
 
-    def __build_search(self, date_range, project_name=None, org_name=None):
+    def __build_search(self, date_range, project_name=None, org_name=None, multi_org=False):
         s = Search(using=self._es_conn, index=self._es_index)
         s = s.filter('range', **date_range)
         if project_name:
             s = s.filter('term', project=project_name)
+
         if org_name:
-            s = s.filter('term', author_org_name=org_name)
+            if multi_org:
+                s = s.filter('term', author_multi_org_names=org_name)
+            else:
+                s = s.filter('term', author_org_name=org_name)
 
         s = s.filter('term', author_bot='false')
 

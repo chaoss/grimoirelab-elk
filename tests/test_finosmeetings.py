@@ -102,6 +102,7 @@ class TestFinosMeetings(TestBaseBackend):
         self.assertIn('email_uuid', eitem)
         self.assertIn('email_name', eitem)
         self.assertIn('email_user_name', eitem)
+        self.assertIn('email_multi_org_names', eitem)
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
@@ -112,6 +113,7 @@ class TestFinosMeetings(TestBaseBackend):
         self.assertIn('email_uuid', eitem)
         self.assertIn('email_name', eitem)
         self.assertIn('email_user_name', eitem)
+        self.assertIn('email_multi_org_names', eitem)
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
@@ -122,6 +124,7 @@ class TestFinosMeetings(TestBaseBackend):
         self.assertIn('email_uuid', eitem)
         self.assertIn('email_name', eitem)
         self.assertIn('email_user_name', eitem)
+        self.assertIn('email_multi_org_names', eitem)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
