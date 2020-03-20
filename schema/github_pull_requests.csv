@@ -1,77 +1,80 @@
 name,type,aggregatable,description
-assignee_geolocation,geo_point,true,Pull Request assignee geolocation from GitHub.
-author_bot,boolean,true,True/False if the Pull Request author is a bot or not from SortingHat profile.
-author_domain,keyword,true,Pull Request author domain name from SortingHat profile.
+assignee_geolocation,geo_point,true,"Pull Request assignee geolocation from GitHub."
+author_bot,boolean,true,"True/False if the Pull Request author is a bot or not from SortingHat profile."
+author_domain,keyword,true,"Pull Request author domain name from SortingHat profile."
 author_gender,keyword,true,"Pull Request author gender, based on her name, from SortingHat (disabled by default)."
-author_gender_acc,float,true,Pull Request author gender accuracy from SortingHat (disabled by default).
-author_id,keyword,true,Pull Request author ID from SortingHat profile.
-author_name,keyword,true,Pull Request author name from SortingHat profile.
-author_org_name,keyword,true,Pull Request author organization name from SortingHat profile.
-author_user_name,keyword,true,Pull Request author username from SortingHat profile.
-author_uuid,keyword,true,Pull Request author UUID from SortingHat profile.
-closed_at,date,true,Date in which the Issue was closed.
-code_merge_duration,float,true,Difference in days between creation and merging dates.
-created_at,date,true,Date in which the Issue was created.
-forks,long,true,Number of repository forks.
-github_repo,keyword,true,GitHub repository name.
-grimoire_creation_date,date,true,Pull Request creation date.
-id,long,true,ID in GitHub.
-id_in_repo,keyword,true,ID in the GitHub repository it was created.
+author_gender_acc,float,true,"Pull Request author gender accuracy from SortingHat (disabled by default)."
+author_id,keyword,true,"Pull Request author ID from SortingHat profile."
+author_name,keyword,true,"Pull Request author name from SortingHat profile."
+author_org_name,keyword,true,"Pull Request author organization name from SortingHat profile."
+author_multi_org_names,keyword,true,"List of the author organizations from SortingHat profile."
+author_user_name,keyword,true,"Pull Request author username from SortingHat profile."
+author_uuid,keyword,true,"Pull Request author UUID from SortingHat profile."
+closed_at,date,true,"Date in which the Issue was closed."
+code_merge_duration,float,true,"Difference in days between creation and merging dates."
+created_at,date,true,"Date in which the Issue was created."
+forks,long,true,"Number of repository forks."
+github_repo,keyword,true,"GitHub repository name."
+grimoire_creation_date,date,true,"Pull Request creation date."
+id,long,true,"ID in GitHub."
+id_in_repo,keyword,true,"ID in the GitHub repository it was created."
 is_github_pull_request,long,true,"1 indicating this is a Pull Request, used for counting in case other kind of items could be stored in the same index or alias."
 item_type,keyword,true,"Item type, in this case 'pull request'"
-labels,keyword,true,Pull Request assigned labels.
-merge_author_domain,keyword,true,Merge author domain from GitHub.
-merge_author_geolocation,geo_point,true,Merge author geolocation from GitHub.
-merge_author_location,keyword,true,Merge author location as string from GitHub.
-merge_author_login,keyword,true,Merge author login from GitHub.
-merge_author_name,keyword,true,Merge author name from GitHub.
-merge_author_org,keyword,true,Merge author organization from GitHub.
-merged,boolean,true,True if the Pull Request was already merged.
-merged_at,date,true,Date when the Pull Request was merged.
+labels,keyword,true,"Pull Request assigned labels."
+merge_author_domain,keyword,true,"Merge author domain from GitHub."
+merge_author_geolocation,geo_point,true,"Merge author geolocation from GitHub."
+merge_author_location,keyword,true,"Merge author location as string from GitHub."
+merge_author_login,keyword,true,"Merge author login from GitHub."
+merge_author_name,keyword,true,"Merge author name from GitHub."
+merge_author_org,keyword,true,"Merge author organization from GitHub."
+merged,boolean,true,"True if the Pull Request was already merged."
+merged_at,date,true,"Date when the Pull Request was merged."
 merged_by_data_bot,boolean,true,"True/False if the merge author is a bot or not, from SortingHat profile."
-merged_by_data_domain,keyword,true,Merge author domain from SortingHat profile.
+merged_by_data_domain,keyword,true,"Merge author domain from SortingHat profile."
 merged_by_data_gender,keyword,true,"Merge author gender, based on her name, from SortingHat profile(disabled by default)."
-merged_by_data_gender_acc,float,true,Merge author gender accuracy from SortingHat profile(disabled by default).
-merged_by_data_id,keyword,true,Merge author's ID from SortingHat profile.
-merged_by_data_name,keyword,true,Merge author name from SortingHat profile.
-merged_by_data_org_name,keyword,true,Merge author organization from SortingHat profile.
-merged_by_data_user_name,keyword,true,Merge author username from SortingHat profile.
-merged_by_data_uuid,keyword,true,Merge author UUID from SortingHat profile.
-metadata__enriched_on,date,true,Date when the item was enriched.
-metadata__gelk_backend_name,keyword,true,Name of the backend used to enrich information.
-metadata__gelk_version,keyword,true,Version of the backend used to enrich information.
-metadata__timestamp,date,true,Date when the item was stored in RAW index.
-metadata__updated_on,date,true,Date when the item was updated on its original data source.
-num_review_comments,long,true,Number of comments.
-origin,keyword,true,Original URL where the repository was retrieved from.
-project,keyword,true,Project.
-project_1,keyword,true,Project (if more than one level is allowed in project hierarchy).
-pull_request,boolean,true,True indicating this item is a pull request or not (to be used when the index is queried through aliases including other indexes).
-repository,keyword,true,Repository name.
+merged_by_data_gender_acc,float,true,"Merge author gender accuracy from SortingHat profile(disabled by default)."
+merged_by_data_id,keyword,true,"Merge author's ID from SortingHat profile."
+merged_by_data_name,keyword,true,"Merge author name from SortingHat profile."
+merged_by_data_org_name,keyword,true,"Merge author organization from SortingHat profile."
+merged_by_multi_org_names,keyword,true,"List of the merge author organizations from SortingHat profile."
+merged_by_data_user_name,keyword,true,"Merge author username from SortingHat profile."
+merged_by_data_uuid,keyword,true,"Merge author UUID from SortingHat profile."
+metadata__enriched_on,date,true,"Date when the item was enriched."
+metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich information."
+metadata__gelk_version,keyword,true,"Version of the backend used to enrich information."
+metadata__timestamp,date,true,"Date when the item was stored in RAW index."
+metadata__updated_on,date,true,"Date when the item was updated on its original data source."
+num_review_comments,long,true,"Number of comments."
+origin,keyword,true,"Original URL where the repository was retrieved from."
+project,keyword,true,"Project."
+project_1,keyword,true,"Project (if more than one level is allowed in project hierarchy)."
+pull_request,boolean,true,"True indicating this item is a pull request or not (to be used when the index is queried through aliases including other indexes)."
+repository,keyword,true,"Repository name."
 repository_labels,keyword,true,"Custom repository labels defined by the user."
-state,keyword,true,State of the Pull Request (GitHub has only 2 possible states: open or closed).
-tag,keyword,true,Perceval tag.
-time_open_days,float,true,Time the Pull Request is open counted in days.
-time_to_close_days,float,true,Time to close a Pull Request counted in days.
-time_to_merge_request_response,float,true,Time to get a response on a Pull Request in days.
-title,keyword,true,The title of the Pull Request.
-title_analyzed,text,false,Pull Request title split by terms to allow searching.
-updated_at,date,true,Date when the Pull Request was last updated.
-url,keyword,true,Full URL of the Pull Request.
-url_id,keyword,true,Consists of the project path and the Pull Request id.
-user_data_bot,boolean,true,True/False if the Pull Request author is a bot or not from SortingHat profile.
-user_data_domain,keyword,true,Pull Request author domain name from SortingHat profile.
+state,keyword,true,"State of the Pull Request (GitHub has only 2 possible states: open or closed)."
+tag,keyword,true,"Perceval tag."
+time_open_days,float,true,"Time the Pull Request is open counted in days."
+time_to_close_days,float,true,"Time to close a Pull Request counted in days."
+time_to_merge_request_response,float,true,"Time to get a response on a Pull Request in days."
+title,keyword,true,"The title of the Pull Request."
+title_analyzed,text,false,"Pull Request title split by terms to allow searching."
+updated_at,date,true,"Date when the Pull Request was last updated."
+url,keyword,true,"Full URL of the Pull Request."
+url_id,keyword,true,"Consists of the project path and the Pull Request id."
+user_data_bot,boolean,true,"True/False if the Pull Request author is a bot or not from SortingHat profile."
+user_data_domain,keyword,true,"Pull Request author domain name from SortingHat profile."
 user_data_gender,keyword,true,"Pull Request author gender, based on her name, from SortingHat (disabled by default)."
-user_data_gender_acc,float,true,Pull Request author gender accuracy from SortingHat (disabled by default).
-user_data_id,keyword,true,Pull Request author ID from SortingHat profile.
-user_data_name,keyword,true,Pull Request author name from SortingHat profile.
-user_data_org_name,keyword,true,Pull Request author organization name from SortingHat profile.
-user_data_user_name,keyword,true,Pull Request author username from SortingHat profile.
-user_data_uuid,keyword,true,Pull Request author UUID from SortingHat profile.
-user_domain,keyword,true,Pull Request author domain name from GitHub.
-user_geolocation,geo_point,true,Pull Request author geolocation from GitHub.
-user_location,keyword,true,Pull Request author location as string from GitHub.
-user_login,keyword,true,Pull Request author login from GitHub.
-user_name,keyword,true,Pull Request author username from GitHub.
-user_org,keyword,true,Pull Request author organization from GitHub.
-uuid,keyword,true,Perceval UUID.
+user_data_gender_acc,float,true,"Pull Request author gender accuracy from SortingHat (disabled by default)."
+user_data_id,keyword,true,"Pull Request author ID from SortingHat profile."
+user_data_name,keyword,true,"Pull Request author name from SortingHat profile."
+user_data_org_name,keyword,true,"Pull Request author organization name from SortingHat profile."
+user_data_multi_org_names,keyword,true,"List of the Pull Request author organizations from SortingHat profile."
+user_data_user_name,keyword,true,"Pull Request author username from SortingHat profile."
+user_data_uuid,keyword,true,"Pull Request author UUID from SortingHat profile."
+user_domain,keyword,true,"Pull Request author domain name from GitHub."
+user_geolocation,geo_point,true,"Pull Request author geolocation from GitHub."
+user_location,keyword,true,"Pull Request author location as string from GitHub."
+user_login,keyword,true,"Pull Request author login from GitHub."
+user_name,keyword,true,"Pull Request author username from GitHub."
+user_org,keyword,true,"Pull Request author organization from GitHub."
+uuid,keyword,true,"Perceval UUID."
