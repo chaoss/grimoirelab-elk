@@ -326,7 +326,7 @@ class TestGit(TestBaseBackend):
         enrich_backend.projects_json_repo = projects_json_repo
         enrich_backend.prjs_map = prjs_map
 
-        study(ocean_backend, enrich_backend)
+        study(ocean_backend, enrich_backend,in_index='test_git')
         time.sleep(5)  # HACK: Wait until git area of code has been written
         url = self.es_con + "/git_aoc-enriched"
         response = enrich_backend.requests.get(url, verify=False).json()
