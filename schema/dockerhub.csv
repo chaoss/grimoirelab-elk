@@ -1,26 +1,26 @@
-name,type
-description_analyzed,text
-description,keyword
-full_description_analyzed,text
-grimoire_creation_date,date
-id,keyword
-is_automated,boolean
-is_dockerhub_dockerhub,long
-is_docker_image,long
-is_event,long
-is_private,boolean
-last_updated,date
-metadata__enriched_on,date
-metadata__gelk_backend_name,keyword
-metadata__gelk_version,keyword
-metadata__timestamp,date
-metadata__updated_on,date
-origin,keyword
-pull_count,long
-repository_labels,keyword
-repository_type,keyword
-star_count,long
-status,long
-tag,keyword
-user,keyword
-uuid,keyword
+name,type,aggregatable,description
+description,text,false,"Description of the DockerHub repository."
+description_analyzed,text,false,"Analyzed description of the DockerHub repository."
+full_description_analyzed,text,false,"Analyzed full description of the DockerHub repository."
+grimoire_creation_date,date,true,"Date when the repo was fetched."
+id,keyword,true,"Id of the DockerHub repository"
+is_automated,boolean,true,"True/False if updating repository is automated or not."
+is_docker_image,long,true,"Field containing '1' only if the item is a docker image."
+is_dockerhub_dockerhub,long,true,"Field containing '1' only if the item is downloaded from DockerHub."
+is_event,long,true,"Field containing '1' only if the fetching item is an event."
+is_private,boolean,true,"True/False if the repository is private or not."
+last_updated,date,true,"Date when the changeset was last updated."
+metadata__enriched_on,date,true,"Date when the item was enriched."
+metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich information."
+metadata__gelk_version,keyword,true,"Version of the backend used to enrich information."
+metadata__timestamp,date,true,"Date when the item was stored in RAW index."
+metadata__updated_on,date,true,"Date when the item was updated in its original data source."
+origin,keyword,true,"Original URL where the repository was retrieved from."
+pull_count,long,true,"Number of pulls of the repository."
+repository_labels,keyword,true,"Custom repository labels defined by the user."
+repository_type,keyword,true,"Repository type (image)."
+star_count,long,true,"Number of stars of the repository"
+status,long,true,"DockerHub Build status."
+tag,keyword,true,"Perceval tag."
+user,keyword,true,"DockerHub user."
+uuid,keyword,true,"Perceval UUID."
