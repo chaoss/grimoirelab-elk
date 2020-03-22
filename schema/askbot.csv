@@ -1,48 +1,53 @@
-name,type
-answer_status,keyword
-author_askbot_id,keyword
-author_askbot_user_name,keyword
-author_badges,text
-author_bot,boolean
-author_domain,keyword
-author_id,keyword
-author_name,keyword
-author_org_name,keyword
-author_reputation,long
-author_url,keyword
-author_user_name,keyword
-author_uuid,keyword
-comment_count,long
-first_answer,long
-grimoire_creation_date,date
-id,keyword
-is_accepted_answer,long
-is_askbot_answer,long
-is_askbot_comment,long
-is_askbot_question,long
-metadata__enriched_on,date
-metadata__gelk_backend_name,keyword
-metadata__gelk_version,keyword
-metadata__timestamp,date
-metadata__updated_on,date
-origin,keyword
-question_accepted_answer_id,long
-question_answer_count,long
-question_answer_ids,long
-question_has_accepted_answer,long
-question_last_activity_at,date
-question_last_activity_by_id,long
-question_last_activity_by_username,keyword
-question_tags,keyword
-question_title,keyword
-question_view_count,long
-repository_labels,keyword
-score,long
-summary,text
-tag,keyword
-time_from_question,float
-time_to_reply,float
-title,keyword
-type,keyword
-url,keyword
-uuid,keyword
+name,type,aggregatable,description
+answer_status,keyword,true,"Status of the answer (accepted/not_accepted)."
+author_askbot_id,keyword,true,"Author's Askbot id."
+author_askbot_user_name,keyword,true,"Author's Askbot username."
+author_badges,text,false,"Badges possessed by the author."
+author_bot,boolean,true,"True/False if the given author is a bot or not."
+author_domain,keyword,true,"Domain associated to the author in SortingHat profile."
+author_gender,keyword,true,"Author gender."
+author_gender_acc,long,true,"Accuracy to assess author gender."
+author_id,keyword,true,"Author Id from SortingHat."
+author_multi_org_names,keyword,true,"List of the author organizations from SortingHat profile."
+author_name,keyword,true,"Author name."
+author_org_name,keyword,true,"Author organization name."
+author_reputation,long,true,"Author reputation."
+author_url,keyword,true,"Author URL."
+author_user_name,keyword,true,"Author's username from SortingHat profile."
+author_uuid,keyword,true,"Author UUID from SortingHat."
+comment_count,long,true,"Number of comments."
+first_answer,long,true,"Field containing '1' if item is the first answer to question."
+grimoire_creation_date,date,true,"Date when the item was created."
+id,keyword,true,"Id of the item."
+is_accepted_answer,long,true,"Check if item is accepted answer."
+is_askbot_answer,long,true,"Used to separate answers from questions and comments."
+is_askbot_comment,long,true,"Used to separate comments from answers and questions."
+is_askbot_question,long,true,"Used to separate questions from answers and comments."
+metadata__enriched_on,date,true,"Date when the data was enriched."
+metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich the data."
+metadata__gelk_version,keyword,true,"Version of the backend used to enrich the data."
+metadata__timestamp,date,true,"Date when the item was stored in ElasticSearch raw index."
+metadata__updated_on,date,true,"Date when the item was updated on its original data source."
+origin,keyword,true,"The original URL from which the items were retrieved from."
+project,keyword,true,"Project."
+project_1,keyword,true,"Project (if more than one level is allowed in project hierarchy)."
+question_accepted_answer_id,long,true,"Id of accepted question."
+question_answer_count,long,true,"Count of answers to a question."
+question_answer_ids,long,true,"Ids of answers to a question."
+question_has_accepted_answer,long,true,"Check if question has an accepted answer."
+question_last_activity_at,date,true,"Date when the question was lastly answered."
+question_last_activity_by_id,long,true,"Id of the question was lastly answered."
+question_last_activity_by_username,keyword,true,"Username of author who answered the question lastly."
+question_tags,keyword,true,"Tags for questions."
+question_title,keyword,true,"Title of question."
+question_view_count,long,true,"Count of views for the question."
+repository_labels,keyword,true,"Custom repository labels defined by the user."
+score,long,true,"Score to an answer."
+summary,text,false,"Text summary of the item."
+tag,keyword,true,"Perceval tag."
+time_from_question,float,true,"Time taken from question."
+time_to_reply,float,true,"Time taken to reply."
+title,keyword,true,"Title of the item (question)."
+type,keyword,true,"Type of the item (answer, comment, question)."
+url,keyword,true,"URL to the item."
+uuid,keyword,true,"Perceval UUID."
