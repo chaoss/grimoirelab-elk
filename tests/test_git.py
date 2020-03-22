@@ -303,6 +303,76 @@ class TestGit(TestBaseBackend):
         delete_onion = self.es_con + "/git_onion-enriched"
         requests.delete(delete_onion, verify=False)
 
+    def test_enrich_areas_of_code(self):
+        """ Test that areas of code works correctly"""
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_areas_of_code')
+
+        projects_json_repo = "/tmp/perceval_mc84igfc/gittest"
+        projects_json = {
+            "project": {
+                "git": [
+                    "/tmp/perceval_mc84igfc/gittest"
+                ]
+            }
+        }
+        prjs_map = {
+            "git": {
+                "/tmp/perceval_mc84igfc/gittest": "project"
+            }
+        }
+
+        enrich_backend.json_projects = projects_json
+        enrich_backend.projects_json_repo = projects_json_repo
+        enrich_backend.prjs_map = prjs_map
+
+        study(ocean_backend, enrich_backend, in_index="git-raw", out_index="git_aoc-enriched")
+        time.sleep(5)  # HACK: Wait until git area of code has been written
+        url = self.es_con + "/git_aoc-enriched"
+        response = enrich_backend.requests.get(url, verify=False).json()
+
+        source = response['git_aoc-enriched']['mappings']['items']['properties']
+        self.assertIn('addedlines', source)
+        self.assertIn('author_bot', source)
+        self.assertIn('author_domain', source)
+        self.assertIn('author_id', source)
+        self.assertIn('author_name', source)
+        self.assertIn('author_org_name', source)
+        self.assertIn('author_multi_org_names', source)
+        self.assertIn('author_user_name', source)
+        self.assertIn('author_uuid', source)
+        self.assertIn('committer', source)
+        self.assertIn('committer_date', source)
+        self.assertIn('date', source)
+        self.assertIn('eventtype', source)
+        self.assertIn('fileaction', source)
+        self.assertIn('filepath', source)
+        self.assertIn('files', source)
+        self.assertIn('filetype', source)
+        self.assertIn('file_name', source)
+        self.assertIn('file_ext', source)
+        self.assertIn('file_dir_name', source)
+        self.assertIn('file_path_list', source)
+        self.assertIn('git_author_domain', source)
+        self.assertIn('grimoire_creation_date', source)
+        self.assertIn('hash', source)
+        self.assertIn('id', source)
+        self.assertIn('message', source)
+        self.assertIn('metadata__enriched_on', source)
+        self.assertIn('metadata__timestamp', source)
+        self.assertIn('metadata__updated_on', source)
+        self.assertIn('origin', source)
+        self.assertIn('owner', source)
+        self.assertIn('perceval_uuid', source)
+        self.assertIn('project', source)
+        self.assertIn('project_1', source)
+        self.assertIn('removedlines', source)
+        self.assertIn('repository', source)
+        self.assertIn('uuid', source)
+
+        delete_survival = self.es_con + "/git_aoc-enriched"
+        requests.delete(delete_survival, verify=False)
+
     def test_perceval_params(self):
         """Test the extraction of perceval params from an URL"""
 
