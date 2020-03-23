@@ -330,8 +330,16 @@ class TestGit(TestBaseBackend):
         time.sleep(5)  # HACK: Wait until git area of code has been written
         url = self.es_con + "/git_aoc-enriched"
         response = enrich_backend.requests.get(url, verify=False).json()
+        # for obtaining elasticsearch version
+        url2 = self.es_con
+        response2 = enrich_backend.requests.get(url2, verify=False).json()
+        elasticsearch_version = response2['version']['number']
 
-        source = response['git_aoc-enriched']['mappings']['items']['properties']
+        if (elasticsearch_version[0] == "7"):
+            source = response['git_aoc-enriched']['mappings']['properties']
+        else:
+            source = response['git_aoc-enriched']['mappings']['items']['properties']
+
         self.assertIn('addedlines', source)
         self.assertIn('author_bot', source)
         self.assertIn('author_domain', source)
