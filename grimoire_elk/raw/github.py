@@ -19,6 +19,8 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import hashlib
+
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 
@@ -141,3 +143,60 @@ class GitHubOcean(ElasticOcean):
                 'company': None,
                 'location': None,
             }
+
+    def _hash(self, name):
+        sha1 = hashlib.sha1(name.encode('UTF-8', errors="surrogateescape"))
+        return sha1.hexdigest()
+
+    def _anonymize_item(self, item):
+        """ Remove or hash the fields that contain personal information """
+        category = item['category']
+
+        item = item['data']
+        comments_attr = None
+        if category == "issue":
+            identity_types = ['user', 'assignee']
+            comments_attr = 'comments_data'
+        elif category == "pull_request":
+            identity_types = ['user', 'merged_by']
+            comments_attr = 'review_comments_data'
+        else:
+            identity_types = []
+
+        for identity in identity_types:
+            if identity not in item:
+                continue
+            if not item[identity]:
+                continue
+
+            identity_attr = identity + "_data"
+
+            item[identity] = {
+                'login': self._hash(item[identity]['login'])
+            }
+
+            item[identity_attr] = {
+                'name': self._hash(item[identity_attr]['login']),
+                'login': self._hash(item[identity_attr]['login']),
+                'email': None,
+                'company': None,
+                'location': None,
+            }
+
+        comments = item.get(comments_attr, [])
+        for comment in comments:
+            if 'user' in comment and comment['user']:
+                comment['user'] = {
+                    'login': self._hash(comment['user']['login'])
+                }
+            comment['user_data'] = {
+                'name': self._hash(comment['user_data']['login']),
+                'login': self._hash(comment['user_data']['login']),
+                'email': None,
+                'company': None,
+                'location': None,
+            }
+            for reaction in comment['reactions_data']:
+                reaction['user'] = {
+                    'login': self._hash(reaction['user']['login'])
+                }
