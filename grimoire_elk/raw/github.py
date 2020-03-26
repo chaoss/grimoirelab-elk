@@ -21,6 +21,7 @@
 
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
+from ..identities.github import GitHubIdentities
 
 
 class Mapping(BaseMapping):
@@ -87,6 +88,7 @@ class GitHubOcean(ElasticOcean):
     """GitHub Ocean feeder"""
 
     mapping = Mapping
+    identities = GitHubIdentities
 
     @classmethod
     def get_perceval_params_from_url(cls, url):
