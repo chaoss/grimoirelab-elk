@@ -19,6 +19,8 @@
 #   Valerio Cosentino <valcos@bitergia.com>
 #
 
+import hashlib
+
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 
@@ -88,3 +90,34 @@ class GitLabOcean(ElasticOcean):
             params.extend(tokens[1:])
 
         return params
+
+    def _hash(self, name):
+        sha1 = hashlib.sha1(name.encode('UTF-8', errors="surrogateescape"))
+        return sha1.hexdigest()
+
+    def _anonymize_item(self, item):
+        """ Remove or hash the fields that contain personal information """
+        category = item['category']
+
+        item = item['data']
+
+        if category == "issue":
+            identity_types = ['author', 'assignee']
+        elif category == "merge_request":
+            identity_types = ['author', 'merged_by']
+        else:
+            identity_types = []
+
+        for identity in identity_types:
+            if identity not in item:
+                continue
+            if not item[identity]:
+                continue
+
+            item[identity] = {
+                'username': self._hash(item[identity]['username']),
+                'name': self._hash(item[identity]['name']),
+                'email': None,
+                'organization': None,
+                'location': None
+            }
