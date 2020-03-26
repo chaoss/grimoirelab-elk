@@ -39,8 +39,10 @@ class TestGit(TestBaseBackend):
 
     connector = "git"
     ocean_index = "test_" + connector
+    ocean_index_anonymized = "test_" + connector + "_anonymized"
     ocean_aliases = ["a", "b", "git-raw"]
     enrich_index = "test_" + connector + "_enrich"
+    enrich_index_anonymized = "test_" + connector + "_enrich_anonymized"
     enrich_aliases = ["c", "d", "git"]
 
     def test_has_identites(self):
@@ -386,6 +388,62 @@ class TestGit(TestBaseBackend):
             'https://github.com/grimoirelab/perceval'
         ]
         self.assertListEqual(GitOcean.get_perceval_params_from_url(url), expected_params)
+
+    def test_items_to_raw_anonymized(self):
+        """Test whether JSON items are properly inserted into ES anonymized"""
+
+        result = self._test_items_to_raw_anonymized()
+
+        self.assertGreater(result['items'], 0)
+        self.assertGreater(result['raw'], 0)
+        self.assertEqual(result['items'], result['raw'])
+
+        item = self.items[0]['data']
+        self.assertEqual(item['Author'], 'e2ea52f7f782fe08109b762e474ff20656a51f47 <xxxxxx@gmail.com>')
+        self.assertEqual(item['Commit'], '')
+
+        item = self.items[1]['data']
+        self.assertEqual(item['Author'], 'e2ea52f7f782fe08109b762e474ff20656a51f47 <xxxxxx@gmail.com>')
+        self.assertEqual(item['Commit'], 'e2ea52f7f782fe08109b762e474ff20656a51f47 <xxxxxx@gmail.com>')
+
+        item = self.items[6]['data']
+        self.assertEqual(item['Author'], 'abe1a5515d468ed258124c4c946ceb34ef7ffbda <xxxxxx@gmail.com>')
+        self.assertEqual(item['Commit'], 'abe1a5515d468ed258124c4c946ceb34ef7ffbda <xxxxxx@gmail.com>')
+
+    def test_raw_to_enrich_anonymized(self):
+        """Test whether the raw index is properly enriched"""
+
+        result = self._test_raw_to_enrich_anonymized()
+
+        self.assertGreater(result['raw'], 0)
+        self.assertGreater(result['enrich'], 0)
+        self.assertEqual(result['raw'], result['enrich'])
+
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_uuid'], '5fe609e6ddadd19697e69832ac1889bb942cccfb')
+        self.assertEqual(eitem['author_domain'], 'gmail.com')
+        self.assertEqual(eitem['author_name'], 'e2ea52f7f782fe08109b762e474ff20656a51f47')
+        self.assertIsNone(eitem['committer_domain'])
+        self.assertEqual(eitem['committer_name'], '')
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_uuid'], '5fe609e6ddadd19697e69832ac1889bb942cccfb')
+        self.assertEqual(eitem['author_domain'], 'gmail.com')
+        self.assertEqual(eitem['author_name'], 'e2ea52f7f782fe08109b762e474ff20656a51f47')
+        self.assertEqual(eitem['committer_domain'], 'gmail.com')
+        self.assertEqual(eitem['committer_name'], 'e2ea52f7f782fe08109b762e474ff20656a51f47')
+
+        item = self.items[6]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_uuid'], '221aa5305c73e6574dbba1865ccc930eaa6f59a8')
+        self.assertEqual(eitem['author_domain'], 'gmail.com')
+        self.assertEqual(eitem['author_name'], 'abe1a5515d468ed258124c4c946ceb34ef7ffbda')
+        self.assertEqual(eitem['committer_domain'], 'gmail.com')
+        self.assertEqual(eitem['committer_name'], 'abe1a5515d468ed258124c4c946ceb34ef7ffbda')
 
 
 if __name__ == "__main__":
