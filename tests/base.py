@@ -67,6 +67,9 @@ def data2es(items, ocean):
         except KeyError:
             pass
 
+        if ocean.anonymize:
+            ocean.identities.anonymize_item(item)
+
         return item
 
     items_pack = []  # to feed item in packs
@@ -284,3 +287,37 @@ class TestBaseBackend(unittest.TestCase):
                 break
 
         return found
+
+    def _test_items_to_raw_anonymized(self):
+        clean = True
+        perceval_backend = None
+        self.ocean_backend = self.connectors[self.connector][1](perceval_backend, anonymize=True)
+        elastic_ocean = get_elastic(self.es_con, self.ocean_index_anonymized, clean, self.ocean_backend,
+                                    self.ocean_aliases)
+        self.ocean_backend.set_elastic(elastic_ocean)
+
+        raw_items = data2es(self.items, self.ocean_backend)
+
+        return {'items': len(self.items), 'raw': raw_items}
+
+    def _test_raw_to_enrich_anonymized(self, sortinghat=False, projects=False):
+        """Test whether raw indexes are properly enriched"""
+
+        # populate raw index
+        perceval_backend = None
+        clean = True
+        self.ocean_backend = self.connectors[self.connector][1](perceval_backend, anonymize=True)
+        elastic_ocean = get_elastic(self.es_con, self.ocean_index_anonymized, clean, self.ocean_backend)
+        self.ocean_backend.set_elastic(elastic_ocean)
+        data2es(self.items, self.ocean_backend)
+
+        # populate enriched index
+        self.enrich_backend = self.connectors[self.connector][2]()
+
+        elastic_enrich = get_elastic(self.es_con, self.enrich_index_anonymized, clean, self.enrich_backend, self.enrich_aliases)
+        self.enrich_backend.set_elastic(elastic_enrich)
+
+        raw_count = len([item for item in self.ocean_backend.fetch()])
+        enrich_count = self.enrich_backend.enrich_items(self.ocean_backend)
+
+        return {'raw': raw_count, 'enrich': enrich_count}
