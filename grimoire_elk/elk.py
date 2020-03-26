@@ -48,7 +48,8 @@ requests_ses = grimoire_con()
 
 def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
                  es_index=None, es_index_enrich=None, project=None,
-                 es_aliases=None, projects_json_repo=None, repo_labels=None):
+                 es_aliases=None, projects_json_repo=None, repo_labels=None,
+                 anonymize=False):
     """ Feed Ocean with backend data """
 
     error_msg = None
@@ -94,7 +95,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         backend_cmd.backend = backend_cmd.BACKEND(**init_args)
         backend = backend_cmd.backend
 
-        ocean_backend = connector[1](backend, fetch_archive=fetch_archive, project=project)
+        ocean_backend = connector[1](backend, fetch_archive=fetch_archive, project=project, anonymize=anonymize)
         elastic_ocean = get_elastic(url, es_index, clean, ocean_backend, es_aliases)
         ocean_backend.set_elastic(elastic_ocean)
         ocean_backend.set_repo_labels(repo_labels)

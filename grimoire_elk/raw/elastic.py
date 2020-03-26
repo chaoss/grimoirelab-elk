@@ -33,6 +33,7 @@ from ..enriched.utils import get_repository_filter
 from ..elastic_items import ElasticItems
 from ..elastic_mapping import Mapping
 from ..errors import ELKError
+from ..identities.identities import Identities
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,7 @@ PRJ_JSON_FILTER_OP_ASSIGNMENT = "="
 class ElasticOcean(ElasticItems):
 
     mapping = Mapping
+    identities = Identities
 
     @classmethod
     def add_params(cls, cmdline_parser):
@@ -57,12 +59,13 @@ class ElasticOcean(ElasticItems):
                             help="Host with elastic search and enriched indexes")
 
     def __init__(self, perceval_backend, from_date=None, fetch_archive=False,
-                 project=None, insecure=True, offset=None):
+                 project=None, insecure=True, offset=None, anonymize=False):
 
         super().__init__(perceval_backend, from_date, insecure, offset)
 
         self.fetch_archive = fetch_archive  # fetch from archive
         self.project = project  # project to be used for this data source
+        self.anonymize = anonymize
 
     def set_elastic_url(self, url):
         """ Elastic URL """
@@ -245,6 +248,8 @@ class ElasticOcean(ElasticItems):
             self._fix_item(item)
             if self.project:
                 item['project'] = self.project
+            if self.anonymize:
+                self.identities.anonymize_item(item)
             if len(items_pack) >= self.elastic.max_items_bulk:
                 self._items_to_es(items_pack)
                 items_pack = []
