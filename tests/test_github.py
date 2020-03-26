@@ -30,12 +30,14 @@ from grimoire_elk.enriched.utils import REPO_LABELS
 from grimoire_elk.raw.github import GitHubOcean
 
 
-class TestGit(TestBaseBackend):
-    """Test Git backend"""
+class TestGitHub(TestBaseBackend):
+    """Test GitHub backend"""
 
     connector = "github"
     ocean_index = "test_" + connector
     enrich_index = "test_" + connector + "_enrich"
+    ocean_index_anonymized = "test_" + connector + "_anonymized"
+    enrich_index_anonymized = "test_" + connector + "_enrich_anonymized"
 
     def test_has_identites(self):
         """Test value of has_identities method"""
@@ -255,6 +257,66 @@ class TestGit(TestBaseBackend):
             self.assertIn('grimoire_creation_date', source)
             self.assertIn('is_github_stats', source)
             self.assertIn('organization', source)
+
+    def test_items_to_raw_anonymized(self):
+        """Test whether JSON items are properly inserted into ES anonymized"""
+
+        result = self._test_items_to_raw_anonymized()
+
+        self.assertGreater(result['items'], 0)
+        self.assertGreater(result['raw'], 0)
+        self.assertEqual(result['items'], result['raw'])
+
+        item = self.items[0]['data']
+        self.assertEqual(item['assignee']['login'], '176eee2bd2c010d02dd419c453aca854195de172')
+        self.assertEqual(item['assignee_data']['login'], '176eee2bd2c010d02dd419c453aca854195de172')
+        self.assertEqual(item['assignee_data']['name'], '176eee2bd2c010d02dd419c453aca854195de172')
+        self.assertEqual(item['user']['login'], '176eee2bd2c010d02dd419c453aca854195de172')
+        self.assertEqual(item['user_data']['login'], '176eee2bd2c010d02dd419c453aca854195de172')
+        self.assertEqual(item['user_data']['name'], '176eee2bd2c010d02dd419c453aca854195de172')
+
+        item = self.items[5]['data']
+        self.assertEqual(item['comments_data'][0]['user']['login'], '2283e7d3eb1195c11d3ffafe7831f94a4b5952b2')
+        self.assertEqual(item['comments_data'][0]['user_data']['login'], '2283e7d3eb1195c11d3ffafe7831f94a4b5952b2')
+        self.assertEqual(item['comments_data'][0]['user_data']['name'], '2283e7d3eb1195c11d3ffafe7831f94a4b5952b2')
+        self.assertEqual(item['comments_data'][1]['user']['login'], '257c699509389edc61f79193ca52f2b2368a126f')
+        self.assertEqual(item['comments_data'][1]['user_data']['login'], '257c699509389edc61f79193ca52f2b2368a126f')
+        self.assertEqual(item['comments_data'][1]['user_data']['name'], '257c699509389edc61f79193ca52f2b2368a126f')
+
+        item = self.items[7]['data']
+        self.assertEqual(item['merged_by']['login'], '29eb8410db7377c926a7b4b8006536049df4ead8')
+        self.assertEqual(item['merged_by_data']['login'], '29eb8410db7377c926a7b4b8006536049df4ead8')
+        self.assertEqual(item['merged_by_data']['name'], '29eb8410db7377c926a7b4b8006536049df4ead8')
+        self.assertEqual(item['user']['login'], 'b45c6541a53918180164f1ff03c9995b69456b9b')
+        self.assertEqual(item['user_data']['login'], 'b45c6541a53918180164f1ff03c9995b69456b9b')
+        self.assertEqual(item['user_data']['name'], 'b45c6541a53918180164f1ff03c9995b69456b9b')
+
+    def test_raw_to_enrich_anonymized(self):
+        """Test whether the raw index is properly enriched"""
+
+        result = self._test_raw_to_enrich_anonymized()
+
+        self.assertGreater(result['raw'], 0)
+        self.assertGreater(result['enrich'], 0)
+        self.assertEqual(result['raw'], result['enrich'])
+
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_uuid'], 'e4992881f28cf3318a566f0bd45dcf435216a82f')
+        self.assertEqual(eitem['user_data_uuid'], 'e4992881f28cf3318a566f0bd45dcf435216a82f')
+        self.assertEqual(eitem['user_data_name'], '176eee2bd2c010d02dd419c453aca854195de172')
+        self.assertEqual(eitem['assignee_data_uuid'], 'e4992881f28cf3318a566f0bd45dcf435216a82f')
+        self.assertEqual(eitem['assignee_data_name'], '176eee2bd2c010d02dd419c453aca854195de172')
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_uuid'], 'e4992881f28cf3318a566f0bd45dcf435216a82f')
+        self.assertEqual(eitem['user_data_uuid'], 'e4992881f28cf3318a566f0bd45dcf435216a82f')
+        self.assertEqual(eitem['user_data_name'], '176eee2bd2c010d02dd419c453aca854195de172')
+        self.assertEqual(eitem['merged_by_data_uuid'], 'e4992881f28cf3318a566f0bd45dcf435216a82f')
+        self.assertEqual(eitem['merged_by_data_name'], '176eee2bd2c010d02dd419c453aca854195de172')
 
 
 if __name__ == "__main__":
