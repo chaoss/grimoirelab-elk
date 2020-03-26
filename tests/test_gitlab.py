@@ -32,6 +32,8 @@ class TestGitLab(TestBaseBackend):
     connector = "gitlab"
     ocean_index = "test_" + connector
     enrich_index = "test_" + connector + "_enrich"
+    ocean_index_anonymized = "test_" + connector + "_anonymized"
+    enrich_index_anonymized = "test_" + connector + "_enrich_anonymized"
 
     def test_has_identites(self):
         """Test value of has_identities method"""
@@ -200,6 +202,79 @@ class TestGitLab(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_items_to_raw_anonymized(self):
+        """Test whether JSON items are properly inserted into ES anonymized"""
+
+        result = self._test_items_to_raw_anonymized()
+
+        self.assertGreater(result['items'], 0)
+        self.assertGreater(result['raw'], 0)
+        self.assertEqual(result['items'], result['raw'])
+
+        item = self.items[0]['data']
+        self.assertEqual(item['assignee']['username'], 'd04b492e0e54884033ddd4e32d4208a8340e4c85')
+        self.assertEqual(item['assignee']['name'], '4e1e0c87bda6381324fb2b868859e1350c595c71')
+        self.assertEqual(item['author']['username'], 'd04b492e0e54884033ddd4e32d4208a8340e4c85')
+        self.assertEqual(item['author']['name'], '4e1e0c87bda6381324fb2b868859e1350c595c71')
+
+        item = self.items[1]['data']
+        self.assertIsNone(item['assignee'])
+        self.assertEqual(item['author']['username'], 'd04b492e0e54884033ddd4e32d4208a8340e4c85')
+        self.assertEqual(item['author']['name'], '4e1e0c87bda6381324fb2b868859e1350c595c71')
+
+        item = self.items[4]['data']
+        self.assertIsNone(item['assignee'])
+        self.assertIsNone(item['author'])
+
+        item = self.items[5]['data']
+        self.assertEqual(item['merged_by']['username'], '5ef093e29634f927da333b7eaa479c248c93f26c')
+        self.assertEqual(item['merged_by']['name'], '323866ff0cf9b5c7f817d1d444274582bef7d324')
+        self.assertEqual(item['author']['username'], '499986947ba884c3c5946e15600a84f5fee8e9cb')
+        self.assertEqual(item['author']['name'], 'ffcf43a6e72ca6d166ee38df916eee30d079d47c')
+
+    def test_raw_to_enrich_anonymized(self):
+        """Test whether the raw index is properly enriched"""
+
+        result = self._test_raw_to_enrich_anonymized()
+
+        self.assertGreater(result['raw'], 0)
+        self.assertGreater(result['enrich'], 0)
+        self.assertEqual(result['raw'], result['enrich'])
+
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_uuid'], 'b9f586e623a9e6e41df48f8ddcf097c0ca333b52')
+        self.assertEqual(eitem['author_name'], '4e1e0c87bda6381324fb2b868859e1350c595c71')
+        self.assertEqual(eitem['author_username'], 'd04b492e0e54884033ddd4e32d4208a8340e4c85')
+        self.assertEqual(eitem['assignee_name'], '4e1e0c87bda6381324fb2b868859e1350c595c71')
+        self.assertEqual(eitem['assignee_username'], 'd04b492e0e54884033ddd4e32d4208a8340e4c85')
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_uuid'], 'b9f586e623a9e6e41df48f8ddcf097c0ca333b52')
+        self.assertEqual(eitem['author_name'], '4e1e0c87bda6381324fb2b868859e1350c595c71')
+        self.assertEqual(eitem['author_username'], 'd04b492e0e54884033ddd4e32d4208a8340e4c85')
+        self.assertEqual(eitem['assignee_name'], 'Unknown')
+        self.assertEqual(eitem['assignee_username'], None)
+
+        item = self.items[4]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_uuid'], '')
+        self.assertEqual(eitem['author_name'], 'Unknown')
+        self.assertIsNone(eitem['author_username'])
+        self.assertEqual(eitem['assignee_name'], 'Unknown')
+        self.assertIsNone(eitem['assignee_username'])
+
+        item = self.items[5]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author_uuid'], '5a7534f25eaaeacf2d534172b6ed3f9effef94dd')
+        self.assertEqual(eitem['author_name'], 'ffcf43a6e72ca6d166ee38df916eee30d079d47c')
+        self.assertEqual(eitem['author_username'], '499986947ba884c3c5946e15600a84f5fee8e9cb')
+        self.assertEqual(eitem['merge_author_name'], '323866ff0cf9b5c7f817d1d444274582bef7d324')
+        self.assertEqual(eitem['merge_author_login'], '5ef093e29634f927da333b7eaa479c248c93f26c')
 
 
 if __name__ == "__main__":
