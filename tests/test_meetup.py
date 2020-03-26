@@ -33,6 +33,8 @@ class TestMeetup(TestBaseBackend):
     connector = "meetup"
     ocean_index = "test_" + connector
     enrich_index = "test_" + connector + "_enrich"
+    ocean_index_anonymized = "test_" + connector + "_anonymized"
+    enrich_index_anonymized = "test_" + connector + "_enrich_anonymized"
 
     def test_has_identites(self):
         """Test value of has_identities method"""
@@ -125,6 +127,38 @@ class TestMeetup(TestBaseBackend):
             "South-East-Puppet-User-Group"
         ]
         self.assertListEqual(MeetupOcean.get_perceval_params_from_url(url), expected_params)
+
+    def test_items_to_raw_anonymized(self):
+        """Test whether JSON items are properly inserted into ES anonymized"""
+
+        result = self._test_items_to_raw_anonymized()
+
+        self.assertGreater(result['items'], 0)
+        self.assertGreater(result['raw'], 0)
+        self.assertEqual(result['items'], result['raw'])
+
+        item = self.items[0]['data']
+        self.assertEqual(item['event_hosts'][0]['name'], '3b3e55fdc7886baea165a854d080caf9808cac97')
+        self.assertEqual(item['rsvps'][0]['member']['name'], '3b3e55fdc7886baea165a854d080caf9808cac97')
+        self.assertEqual(item['rsvps'][1]['member']['name'], '9b0740c20617be08bd6b81a02017e63235cc0204')
+        self.assertEqual(item['rsvps'][2]['member']['name'], 'cbd5438b1e1084c1d85bec65a96ca566d9b2ef2e')
+
+        item = self.items[1]['data']
+        self.assertEqual(item['event_hosts'][0]['name'], 'aff2cc6caa4228a709ac3bba6b303c7e5dcce550')
+        self.assertEqual(item['event_hosts'][1]['name'], '3b3e55fdc7886baea165a854d080caf9808cac97')
+        self.assertEqual(item['rsvps'][0]['member']['name'], '3b3e55fdc7886baea165a854d080caf9808cac97')
+        self.assertEqual(item['rsvps'][1]['member']['name'], '9b0740c20617be08bd6b81a02017e63235cc0204')
+        self.assertEqual(item['rsvps'][2]['member']['name'], 'cbd5438b1e1084c1d85bec65a96ca566d9b2ef2e')
+        self.assertEqual(item['comments'][0]['member']['name'], '58668e7669fd564d99db5d581fcdb6a5618440b5')
+        self.assertEqual(item['comments'][1]['member']['name'], 'c96634ae1100ab91de991e40bb2fe656bd765de1')
+
+    def test_raw_to_enrich_anonymized(self):
+        """Test whether the raw index is properly enriched"""
+
+        result = self._test_raw_to_enrich_anonymized()
+
+        self.assertEqual(result['raw'], 3)
+        self.assertEqual(result['enrich'], 19)
 
 
 if __name__ == "__main__":

@@ -19,6 +19,8 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import hashlib
+
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 
@@ -80,3 +82,33 @@ class MeetupOcean(ElasticOcean):
         params.append(url)
 
         return params
+
+    def _hash(self, name):
+        sha1 = hashlib.sha1(name.encode('UTF-8', errors="surrogateescape"))
+        return sha1.hexdigest()
+
+    def _anonymize_item(self, item):
+        """ Remove or hash the fields that contain personal information """
+        item = item['data']
+
+        if 'event_hosts' in item:
+            for i, host in enumerate(item['event_hosts']):
+                item['event_hosts'][i] = {
+                    'id': host['id'],
+                    'name': self._hash(host['name']),
+                }
+
+        if 'rsvps' in item:
+            for rsvp in item['rsvps']:
+                rsvp['member'] = {
+                    'id': rsvp['member']['id'],
+                    'name': self._hash(rsvp['member']['name']),
+                    'event_context': {'host': rsvp['member']['event_context']['host']}
+                }
+
+        if 'comments' in item:
+            for comment in item['comments']:
+                comment['member'] = {
+                    'id': comment['member']['id'],
+                    'name': self._hash(comment['member']['name'])
+                }
