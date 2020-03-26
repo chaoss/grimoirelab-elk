@@ -19,6 +19,8 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import hashlib
+
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 
@@ -67,3 +69,30 @@ class GitOcean(ElasticOcean):
         params.append(url)
 
         return params
+
+    def _hash(self, name):
+        sha1 = hashlib.sha1(name.encode('UTF-8', errors="surrogateescape"))
+        return sha1.hexdigest()
+
+    def _get_identity(self, git_user):
+        identity = {}
+        fields = git_user.split("<")
+        identity['name'] = fields[0].strip()
+        try:
+            email = fields[1][:-1]
+            identity['domain'] = email.split("@")[1]
+        except IndexError:
+            identity['domain'] = 'unknown'
+
+        return identity
+
+    def _anonymize_item(self, item):
+        """ Remove or hash the fields that contain personal information """
+        item = item['data']
+
+        if item['Author']:
+            author = self._get_identity(item['Author'])
+            item['Author'] = "{} <xxxxxx@{}>".format(self._hash(author['name']), author['domain'])
+        if item['Commit']:
+            commit = self._get_identity(item['Commit'])
+            item['Commit'] = "{} <xxxxxx@{}>".format(self._hash(commit['name']), commit['domain'])
