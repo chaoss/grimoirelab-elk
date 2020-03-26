@@ -57,12 +57,13 @@ class ElasticOcean(ElasticItems):
                             help="Host with elastic search and enriched indexes")
 
     def __init__(self, perceval_backend, from_date=None, fetch_archive=False,
-                 project=None, insecure=True, offset=None):
+                 project=None, insecure=True, offset=None, anonymize=False):
 
         super().__init__(perceval_backend, from_date, insecure, offset)
 
         self.fetch_archive = fetch_archive  # fetch from archive
         self.project = project  # project to be used for this data source
+        self.anonymize = anonymize
 
     def set_elastic_url(self, url):
         """ Elastic URL """
@@ -139,6 +140,11 @@ class ElasticOcean(ElasticItems):
 
     def _fix_item(self, item):
         """ Some buggy data sources need fixing (like mbox and message-id) """
+        pass
+
+    def _anonymize_item(self, item):
+        """ Remove or hash the fields that contain personal information """
+        # TODO: Question: raise exception if not implemented? or just pass?
         pass
 
     def add_update_date(self, item):
@@ -245,6 +251,8 @@ class ElasticOcean(ElasticItems):
             self._fix_item(item)
             if self.project:
                 item['project'] = self.project
+            if self.anonymize:
+                self._anonymize_item(item)
             if len(items_pack) >= self.elastic.max_items_bulk:
                 self._items_to_es(items_pack)
                 items_pack = []
