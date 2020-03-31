@@ -552,11 +552,8 @@ class TestElastic(unittest.TestCase):
 
         expected_properties = {
             'data': {
-                'properties': {
-                    'message': {
-                        'type': 'text'
-                    }
-                }
+                'type': 'object',
+                'dynamic': 'false'
             }
         }
         elastic = ElasticSearch(self.es_con, self.target_index, GitOcean.mapping)
