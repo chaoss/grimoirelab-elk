@@ -38,11 +38,8 @@ class Mapping(BaseMapping):
             "dynamic":true,
             "properties": {
                 "data": {
-                    "properties": {
-                        "date": {
-                            "type": "keyword"
-                        }
-                    }
+                    "dynamic":false,
+                    "properties": {}
                 }
             }
         }
