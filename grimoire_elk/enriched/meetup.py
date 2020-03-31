@@ -210,10 +210,12 @@ class MeetupEnrich(Enrich):
                 else:
                     eitem[f] = None
 
-            eitem['venue_geolocation'] = {
-                "lat": event['venue']['lat'],
-                "lon": event['venue']['lon'],
-            }
+            eitem['venue_geolocation'] = None
+            if 'lat' in event['venue'] and 'lon' in event['venue']:
+                eitem['venue_geolocation'] = {
+                    "lat": event['venue']['lat'],
+                    "lon": event['venue']['lon']
+                }
 
         if 'series' in event:
             eitem['series_id'] = event['series']['id']
