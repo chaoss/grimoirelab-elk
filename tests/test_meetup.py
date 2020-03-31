@@ -66,6 +66,17 @@ class TestMeetup(TestBaseBackend):
         self.assertEqual(eitem['group_created'], '2016-03-20T15:13:47+00:00')
         self.assertEqual(eitem['group_urlname'], 'sqlpass-es')
         self.assertEqual(eitem['author_uuid'], '029aa3befc96d386e1c7270586f1ec1d673b0b1b')
+        self.assertIsNone(eitem['venue_geolocation'])
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['meetup_created'], '2016-05-31T17:30:48+00:00')
+        self.assertEqual(eitem['meetup_time'], '2016-06-09T16:45:00+00:00')
+        self.assertEqual(eitem['meetup_updated'], '2016-06-09T20:18:18+00:00')
+        self.assertEqual(eitem['group_created'], '2016-03-20T15:13:47+00:00')
+        self.assertEqual(eitem['group_urlname'], 'sqlpass-es')
+        self.assertEqual(eitem['author_uuid'], '810d53ef4a9ae2ebd8064ac690b2e13cfc2df924')
+        self.assertIsNotNone(eitem['venue_geolocation'])
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
