@@ -126,6 +126,7 @@ class TestBaseBackend(unittest.TestCase):
         # Sorting hat settings
         cls.db_user = ''
         cls.db_password = ''
+        cls.db_projects_map = 'test_projects'
         if 'Database' in cls.config:
             if 'user' in cls.config['Database']:
                 cls.db_user = cls.config['Database']['user']
@@ -275,7 +276,8 @@ class TestBaseBackend(unittest.TestCase):
         # populate enriched index
         self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                                  db_user=self.db_user,
-                                                                 db_password=self.db_password)
+                                                                 db_password=self.db_password,
+                                                                 db_projects_map=self.db_projects_map)
 
         elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
         self.enrich_backend.set_elastic(elastic_enrich)
