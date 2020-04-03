@@ -49,6 +49,7 @@ Each enriched index includes one or more types of documents, which are summarize
 - **GitHub repo statistics**: each document includes repo statistics (e.g., forks, watchers).
 - **GitLab issues**: each document corresponds to an issue.
 - **GitLab merge requests**: each document corresponds to a merge request.
+- **Gitter**: each document corresponds to a message.
 - **Googlehits**: each document contains hits information derived from Google.
 - **Groupsio**: each document corresponds to a message.
 - **Hyperkitty**: each document corresponds to a message.

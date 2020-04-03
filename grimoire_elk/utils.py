@@ -46,6 +46,7 @@ from perceval.backends.core.gerrit import Gerrit, GerritCommand
 from perceval.backends.core.git import Git, GitCommand
 from perceval.backends.core.github import GitHub, GitHubCommand
 from perceval.backends.core.gitlab import GitLab, GitLabCommand
+from perceval.backends.core.gitter import Gitter, GitterCommand
 from perceval.backends.core.googlehits import GoogleHits, GoogleHitsCommand
 from perceval.backends.core.groupsio import Groupsio, GroupsioCommand
 from perceval.backends.core.hyperkitty import HyperKitty, HyperKittyCommand
@@ -91,6 +92,7 @@ from .enriched.git import GitEnrich
 from .enriched.github import GitHubEnrich
 from .enriched.github2 import GitHubEnrich2
 from .enriched.gitlab import GitLabEnrich
+from .enriched.gitter import GitterEnrich
 from .enriched.google_hits import GoogleHitsEnrich
 from .enriched.groupsio import GroupsioEnrich
 from .enriched.hyperkitty import HyperKittyEnrich
@@ -130,6 +132,7 @@ from .raw.gerrit import GerritOcean
 from .raw.git import GitOcean
 from .raw.github import GitHubOcean
 from .raw.gitlab import GitLabOcean
+from .raw.gitter import GitterOcean
 from .raw.google_hits import GoogleHitsOcean
 from .raw.graal import GraalOcean
 from .raw.groupsio import GroupsioOcean
@@ -228,6 +231,7 @@ def get_connectors():
             "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
             "github2": [GitHub, GitHubOcean, GitHubEnrich2, GitHubCommand],
             "gitlab": [GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
+            "gitter": [Gitter, GitterOcean, GitterEnrich, GitterCommand],
             "google_hits": [GoogleHits, GoogleHitsOcean, GoogleHitsEnrich, GoogleHitsCommand],
             "groupsio": [Groupsio, GroupsioOcean, GroupsioEnrich, GroupsioCommand],
             "hyperkitty": [HyperKitty, HyperKittyOcean, HyperKittyEnrich, HyperKittyCommand],
