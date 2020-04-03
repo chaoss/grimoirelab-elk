@@ -58,7 +58,7 @@ class PuppetForgeEnrich(Enrich):
 
         entry = item
 
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             entry = item['data']
 
         identity = {f: None for f in ['email', 'name', 'username']}

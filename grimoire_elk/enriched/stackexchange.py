@@ -67,7 +67,7 @@ class StackExchangeEnrich(Enrich):
         identity = {}
 
         user = item
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             user = item['data'][identity_field]
         elif identity_field in item:
             # for answers

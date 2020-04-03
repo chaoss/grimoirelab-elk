@@ -108,7 +108,7 @@ class PhabricatorEnrich(Enrich):
             return identity
 
         user = item
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             user = item['data']['fields'][identity_field]
 
         if user is None:

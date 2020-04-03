@@ -107,7 +107,7 @@ class GitLabEnrich(Enrich):
         identity = {}
 
         user = item  # by default a specific user dict is expected
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             user = item['data'][identity_field]
 
         if not user:

@@ -79,7 +79,7 @@ class CratesEnrich(Enrich):
         identity['name'] = None
 
         user = item  # by default a specific user dict is expected
-        if 'data' in item and isinstance(item, dict):
+        if isinstance(item, dict) and 'data' in item:
             users = item['data'][identity_field]['users']
             if not users:
                 return identity

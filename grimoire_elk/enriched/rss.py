@@ -74,7 +74,7 @@ class RSSEnrich(Enrich):
 
         entry = item
 
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             entry = item['data']
 
         identity = {}

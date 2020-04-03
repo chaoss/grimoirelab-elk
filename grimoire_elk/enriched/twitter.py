@@ -74,7 +74,7 @@ class TwitterEnrich(Enrich):
             identity_field = self.get_field_author()
 
         tweet = item  # by default a specific user dict is expected
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             tweet = item['data']
 
         if identity_field in tweet:
