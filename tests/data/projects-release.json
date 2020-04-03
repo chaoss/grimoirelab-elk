@@ -41,6 +41,9 @@
         "gitlab": [
             "https://gitlab.com/inkscape/inkscape-web"
         ],
+        "gitter": [
+            "https://gitter.im/test_org/test_room"
+        ],
         "groupsio": [
             "updates"
         ],
