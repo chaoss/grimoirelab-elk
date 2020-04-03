@@ -91,7 +91,7 @@ class MBoxEnrich(Enrich):
         identity = {f: None for f in ['email', 'name', 'username']}
 
         from_data = item
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             from_data = item['data'][identity_field]
 
         # First desofuscate the email

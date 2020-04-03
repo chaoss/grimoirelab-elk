@@ -63,7 +63,7 @@ class TelegramEnrich(Enrich):
         identity = {}
 
         from_ = item
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             from_ = item['data']['message'][identity_field]
 
         identity['username'] = from_.get('username', None)

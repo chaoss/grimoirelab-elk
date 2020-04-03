@@ -98,7 +98,7 @@ class MediaWikiEnrich(Enrich):
         identity['email'] = None
         identity['name'] = None
 
-        if 'data' in item and isinstance(item, dict):
+        if isinstance(item, dict) and 'data' in item:
             if 'revisions' not in item['data']:
                 return identity
             # Use as identity the first reviewer for a page

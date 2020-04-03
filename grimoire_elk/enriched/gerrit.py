@@ -109,7 +109,7 @@ class GerritEnrich(Enrich):
             return identity
 
         user = item  # by default a specific user dict is expected
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             user = item['data'][identity_field]
         elif identity_field:
             user = item[identity_field]

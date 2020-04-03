@@ -85,7 +85,7 @@ class BugzillaEnrich(Enrich):
             identity[field] = None
 
         user = item  # by default a specific user dict is used
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             user = item['data'][identity_field]
 
         identity = fill_list_identity(identity, user)

@@ -83,7 +83,7 @@ class JiraEnrich(Enrich):
         """ Return a Sorting Hat identity using jira user data """
 
         user = item
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             user = item['data']['fields'].get(identity_field, None)
         elif identity_field:
             user = item[identity_field]

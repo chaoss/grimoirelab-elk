@@ -64,7 +64,7 @@ class FinosMeetingsEnrich(Enrich):
         for field in ['name', 'email', 'username']:
             identity[field] = None
 
-        user = item['data'] if 'data' in item else item
+        user = item['data'] if isinstance(item, dict) and 'data' in item else item
 
         if 'name' in user and user['name']:
             identity['name'] = user['name']

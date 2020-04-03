@@ -70,7 +70,7 @@ class SlackEnrich(Enrich):
         }
 
         from_ = item
-        if 'data' in item and type(item) == dict:
+        if isinstance(item, dict) and 'data' in item:
             if self.get_field_author() not in item['data']:
                 # Message from bot
                 identity['username'] = item['data']['bot_id']
