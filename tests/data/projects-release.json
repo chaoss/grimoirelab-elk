@@ -81,6 +81,9 @@
         "phabricator": [
             "https://phabricator.wikimedia.org"
         ],
+        "pagure": [
+            "https://pagure.io/Test-group/Project-example-namespace"
+        ],
         "pipermail": [
             "https://mail.gnome.org/archives/libart-hackers/"
         ],
