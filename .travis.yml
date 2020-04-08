@@ -14,6 +14,8 @@ jobs:
 
       before_install:
         - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.1.0.deb && sudo dpkg -i --force-confnew elasticsearch-6.1.0.deb && sudo service elasticsearch restart
+        - pip install --upgrade setuptools
+        - pip install --upgrade pip
         - pip install flake8
         - pip install coveralls
         - pip install -r "requirements.txt"
@@ -98,6 +100,8 @@ jobs:
         - echo -e '-XX:+DisableExplicitGC\n-Djdk.io.permissionsUseCanonicalPath=true\n-Dlog4j.skipJansi=true\n-server\n' | sudo tee -a /etc/elasticsearch/jvm.options
         - sudo chown -R elasticsearch:elasticsearch /etc/default/elasticsearch
         - sudo systemctl start elasticsearch
+        - pip install --upgrade setuptools
+        - pip install --upgrade pip
         - pip install flake8
         - pip install coveralls
         - pip install -r "requirements.txt"
