@@ -88,9 +88,9 @@ class TestGit(TestBaseBackend):
         self.assertEqual(eitem['utc_author_date_weekday'], 2)
         self.assertEqual(eitem['utc_author_date_hour'], 17)
 
-        self.assertEqual(eitem['author_uuid'], 'f3aee5067d4691544f10d915932c9f1d08cb3b36')
+        self.assertEqual(eitem['author_uuid'], '8b8d552af706acff79df0f18f5295391c51acd79')
         self.assertEqual(eitem['author_domain'], 'gmail.com')
-        self.assertEqual(eitem['author_name'], 'Eduardo Morais')
+        self.assertEqual(eitem['author_name'], 'Eduardo Morais and Zhongpeng Lin')
 
         self.assertEqual(eitem['commit_date'], '2012-08-14T14:32:15')
         self.assertEqual(eitem['commit_date_weekday'], 2)
@@ -118,6 +118,43 @@ class TestGit(TestBaseBackend):
 
         aliases = self.enrich_backend.elastic.list_aliases()
         self.assertListEqual(self.enrich_aliases, list(aliases.keys()))
+
+    def test_raw_to_enrich_pair_programming(self):
+        """Test whether the raw index is properly enriched with pair programming info"""
+
+        result = self._test_raw_to_enrich(pair_programming=True)
+        self.assertEqual(result['raw'], 9)
+        self.assertEqual(result['enrich'], 11)
+
+        enrich_backend = self.connectors[self.connector][2](pair_programming=True)
+        url = self.es_con + "/" + self.enrich_index + "/_search"
+        response = enrich_backend.requests.get(url, verify=False).json()
+
+        time.sleep(5)  # HACK: Wait until git enrich index has been written
+        for hit in response['hits']['hits']:
+            source = hit['_source']
+            self.assertIn('author_date', source)
+            self.assertIn('author_date_weekday', source)
+            self.assertIn('author_date_hour', source)
+            self.assertIn('utc_author_date_weekday', source)
+            self.assertIn('utc_author_date_hour', source)
+            self.assertIn('author_uuid', source)
+            self.assertIn('author_domain', source)
+            self.assertIn('author_name', source)
+            self.assertIn('commit_date', source)
+            self.assertIn('commit_date_weekday', source)
+            self.assertIn('commit_date_hour', source)
+            self.assertIn('utc_commit_date_weekday', source)
+            self.assertIn('utc_commit_date_hour', source)
+            self.assertIn('pair_programming_commit', source)
+            self.assertIn('pair_programming_files', source)
+            self.assertIn('pair_programming_lines_added', source)
+            self.assertIn('pair_programming_lines_removed', source)
+            self.assertIn('pair_programming_lines_changed', source)
+            self.assertIn('is_git_commit_multi_author', source)
+            self.assertIn('Signed-off-by_number', source)
+            self.assertIn('is_git_commit_signed_off', source)
+            self.assertIn('git_uuid', source)
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
@@ -403,8 +440,8 @@ class TestGit(TestBaseBackend):
         self.assertEqual(item['Commit'], '')
 
         item = self.items[1]['data']
-        self.assertEqual(item['Author'], 'e2ea52f7f782fe08109b762e474ff20656a51f47 <xxxxxx@gmail.com>')
-        self.assertEqual(item['Commit'], 'e2ea52f7f782fe08109b762e474ff20656a51f47 <xxxxxx@gmail.com>')
+        self.assertEqual(item['Author'], '7bb272958a7c0c54de85dc078aa1b98da7b930de <xxxxxx@gmail.com>')
+        self.assertEqual(item['Commit'], '7bb272958a7c0c54de85dc078aa1b98da7b930de <xxxxxx@gmail.com>')
 
         item = self.items[6]['data']
         self.assertEqual(item['Author'], 'abe1a5515d468ed258124c4c946ceb34ef7ffbda <xxxxxx@gmail.com>')
@@ -431,11 +468,11 @@ class TestGit(TestBaseBackend):
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
-        self.assertEqual(eitem['author_uuid'], '5fe609e6ddadd19697e69832ac1889bb942cccfb')
+        self.assertEqual(eitem['author_uuid'], '0442af9edda128740e57331769ee9e68a99ec36f')
         self.assertEqual(eitem['author_domain'], 'gmail.com')
-        self.assertEqual(eitem['author_name'], 'e2ea52f7f782fe08109b762e474ff20656a51f47')
+        self.assertEqual(eitem['author_name'], '7bb272958a7c0c54de85dc078aa1b98da7b930de')
         self.assertEqual(eitem['committer_domain'], 'gmail.com')
-        self.assertEqual(eitem['committer_name'], 'e2ea52f7f782fe08109b762e474ff20656a51f47')
+        self.assertEqual(eitem['committer_name'], '7bb272958a7c0c54de85dc078aa1b98da7b930de')
 
         item = self.items[6]
         eitem = enrich_backend.get_rich_item(item)

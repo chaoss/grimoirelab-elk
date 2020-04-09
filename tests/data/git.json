@@ -67,10 +67,13 @@
     "backend_version": "0.8.10",
     "category": "commit",
     "data": {
-        "Author": "Eduardo Morais <companheiro.vermelho@gmail.com>",
+        "Author": "Eduardo Morais and Zhongpeng Lin <companheiro.vermelho@gmail.com>",
         "AuthorDate": "Tue Aug 14 14:32:15 2012 -0300",
-        "Commit": "Eduardo Morais <companheiro.vermelho@gmail.com>",
+        "Commit": "Eduardo Morais and Zhongpeng Lin <companheiro.vermelho@gmail.com>",
         "CommitDate": "Tue Aug 14 14:32:15 2012 -0300",
+        "Signed-off-by": [
+            "Eduardo Morais <companheiro.vermelho@gmail.com>"
+        ],
         "commit": "87783129c3f00d2c81a3a8e585eb86a47e39891a",
         "files": [
             {
@@ -89,7 +92,7 @@
                 "removed": "0"
             }
         ],
-        "message": "Renamed file",
+        "message": "Renamed file.\\n\\nSigned-off-by: David Calavera <david.calavera@gmail.com>",
         "parents": [
             "bc57a9209f096a130dcc5ba7089a8663f758a703"
         ],

@@ -162,7 +162,7 @@ class TestBaseBackend(unittest.TestCase):
 
         return {'items': len(self.items), 'raw': raw_items}
 
-    def _test_raw_to_enrich(self, sortinghat=False, projects=False):
+    def _test_raw_to_enrich(self, sortinghat=False, projects=False, pair_programming=False):
         """Test whether raw indexes are properly enriched"""
 
         # populate raw index
@@ -184,6 +184,8 @@ class TestBaseBackend(unittest.TestCase):
             self.enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
                                                                      db_user=self.db_user,
                                                                      db_password=self.db_password)
+        if pair_programming:
+            self.enrich_backend.pair_programming = pair_programming
 
         elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend, self.enrich_aliases)
         self.enrich_backend.set_elastic(elastic_enrich)
