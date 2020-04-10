@@ -143,11 +143,8 @@ class TestBaseBackend(unittest.TestCase):
         self.enrich_aliases = []
 
     def tearDown(self):
-        delete_raw = self.es_con + "/" + self.ocean_index
-        requests.delete(delete_raw, verify=False)
-
-        delete_enrich = self.es_con + "/" + self.enrich_index
-        requests.delete(delete_enrich, verify=False)
+        delete_test_idx = self.es_con + "/" + 'test*'
+        requests.delete(delete_test_idx, verify=False)
 
     def _test_items_to_raw(self):
         """Test whether fetched items are properly loaded to ES"""
