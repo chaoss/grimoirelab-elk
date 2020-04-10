@@ -74,6 +74,14 @@ class Mapping(BaseMapping):
                             "body": {
                                 "type": "text",
                                 "index": true
+                            },
+                            "issue": {
+                                "properties": {
+                                    "body": {
+                                        "type": "text",
+                                        "index": true
+                                    }
+                                }
                             }
                         }
                     }
