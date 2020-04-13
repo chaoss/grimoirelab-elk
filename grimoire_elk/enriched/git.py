@@ -388,8 +388,34 @@ class GitEnrich(Enrich):
         return eitem
 
     def enrich_items(self, ocean_backend, events=False):
-        """ Implementation supporting signed-off and multiauthor/committer commits."""
+        """ Implementation supporting signed-off and multiauthor/committer commits.
+        Multiauthor/Multcommiter commits are the ones authored/commited by more
+        than one users, in such a case, ELK first extracts authors names from
+        raw data through regex, for instance in,
 
+        ...
+        "data": {
+            "Author": "Eduardo Morais and Zhongpeng Lin <companheiro.vermelho@gmail.com>",
+            "AuthorDate": "Tue Aug 14 14:32:15 2012 -0300",
+            "Commit": "Eduardo Morais and Zhongpeng Lin <companheiro.vermelho@gmail.com>",
+            "CommitDate": "Tue Aug 14 14:32:15 2012 -0300",
+            "Signed-off-by": [
+                "Eduardo Morais <companheiro.vermelho@gmail.com>"
+            ],
+            "commit": "87783129c3f00d2c81a3a8e585eb86a47e39891a",
+        ...
+
+        authors extracted are ['Eduardo Morais', 'Zhongpeng Lin'] (can be more than 2).
+        A new rich item is now created using each author name. For multicommitter only
+        the first committer name is used to create the rich item. In case the commit is
+        signed-off by committer, raw data has extra "Signed-off-by" attribute used to
+        create a new rich item for every author who signed off the commit, making sure
+        duplicate entries are not created.
+
+        Note -
+            "message": "Enable users to pass flags\n\nCo-authored-by: mariiapunda <mariiapunda@users.noreply.github.com>",
+        Co-authored commits like these are not considered as multiauthored commits in ELK.
+        """
         headers = {"Content-Type": "application/json"}
 
         max_items = self.elastic.max_items_bulk
