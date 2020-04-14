@@ -25,6 +25,7 @@ creation_date,date
 delta_ts,date
 grimoire_creation_date,date
 is_bugzilla_bug,long
+is_open,boolean
 labels,list
 main_description,keyword
 metadata__enriched_on,date

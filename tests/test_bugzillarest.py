@@ -65,6 +65,7 @@ class TestBugzillaRest(TestBaseBackend):
         self.assertIn('main_description_analyzed', eitem)
         self.assertIn('summary', eitem)
         self.assertIn('summary_analyzed', eitem)
+        self.assertIn('is_open', eitem)
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
