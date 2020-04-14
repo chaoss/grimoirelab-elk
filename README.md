@@ -56,6 +56,7 @@ Each enriched index includes one or more types of documents, which are summarize
 - **Jenkins**: each document corresponds to a single built.
 - **Jira**: each document corresponds to an issue or a comment. To simplify counting user activities, issues are duplicated and they can include assignee, reporter and creator data respectively.
 - **Kitsune**: each document can be either a question or an answer.
+- **Launchpad**: each document corresponds to a bug.
 - **Mattermost**: each document corresponds to a message.
 - **Mbox**: each document corresponds to a message.
 - **Mediawiki**: each document corresponds to a review.
