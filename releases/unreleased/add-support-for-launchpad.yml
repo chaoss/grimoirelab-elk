@@ -1,0 +1,8 @@
+---
+title: Add support for Launchpad
+category: added
+author: Nitish Gupta <imnitish.ng@gmail.com>
+issue: 842
+notes: Added support for creating raw and enriched
+       indexes of launchpad bugs. The schemas and 
+       tests for data have also been added.
