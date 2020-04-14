@@ -53,6 +53,7 @@ from perceval.backends.core.groupsio import Groupsio, GroupsioCommand
 from perceval.backends.core.hyperkitty import HyperKitty, HyperKittyCommand
 from perceval.backends.core.jenkins import Jenkins, JenkinsCommand
 from perceval.backends.core.jira import Jira, JiraCommand
+from perceval.backends.core.launchpad import Launchpad, LaunchpadCommand
 from perceval.backends.core.mattermost import Mattermost, MattermostCommand
 from perceval.backends.core.mbox import MBox, MBoxCommand
 from perceval.backends.core.mediawiki import MediaWiki, MediaWikiCommand
@@ -101,6 +102,7 @@ from .enriched.hyperkitty import HyperKittyEnrich
 from .enriched.jenkins import JenkinsEnrich
 from .enriched.jira import JiraEnrich
 from .enriched.kitsune import KitsuneEnrich
+from .enriched.launchpad import LaunchpadEnrich
 from .enriched.mattermost import MattermostEnrich
 from .enriched.mbox import MBoxEnrich
 from .enriched.mediawiki import MediaWikiEnrich
@@ -142,6 +144,7 @@ from .raw.groupsio import GroupsioOcean
 from .raw.jenkins import JenkinsOcean
 from .raw.jira import JiraOcean
 from .raw.kitsune import KitsuneOcean
+from .raw.launchpad import LaunchpadOcean
 from .raw.mattermost import MattermostOcean
 from .raw.mbox import MBoxOcean
 from .raw.mediawiki import MediaWikiOcean
@@ -242,6 +245,7 @@ def get_connectors():
             "jenkins": [Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
             "jira": [Jira, JiraOcean, JiraEnrich, JiraCommand],
             "kitsune": [Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
+            "launchpad": [Launchpad, LaunchpadOcean, LaunchpadEnrich, LaunchpadCommand],
             "mattermost": [Mattermost, MattermostOcean, MattermostEnrich, MattermostCommand],
             "mbox": [MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
             "mediawiki": [MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
