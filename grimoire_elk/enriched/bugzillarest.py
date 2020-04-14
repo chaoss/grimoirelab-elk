@@ -140,6 +140,9 @@ class BugzillaRESTEnrich(Enrich):
         eitem['time_to_last_update_days'] = None
         eitem['url'] = None
 
+        # Add the field to know if the ticket is open
+        eitem['is_open'] = issue.get('is_open', None)
+
         if 'long_desc' in issue:
             eitem['number_of_comments'] = len(issue['long_desc'])
         if 'comments' in issue:
