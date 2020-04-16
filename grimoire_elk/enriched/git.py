@@ -731,7 +731,11 @@ class GitEnrich(Enrich):
 
                 logger.debug("[git] study git-branches add branch info for repo {} in index {}".format(
                              git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url)))
-                self.add_commit_branches(git_repo, enrich_backend)
+                try:
+                    self.add_commit_branches(git_repo, enrich_backend)
+                except Exception as e:
+                    logger.error("[git] study git-branches failed on repo {}, due to {}".format(git_repo.uri, e))
+                    continue
 
                 logger.debug("[git] study git-branches repo {} in index {} processed".format(
                              git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url)))
