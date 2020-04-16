@@ -29,94 +29,18 @@ class Mapping(BaseMapping):
     def get_elastic_mappings(es_major):
         """Get Elasticsearch mapping.
 
-        Non dynamic discovery of type for:
-            * data.runs
-            * data.actions
-
         :param es_major: major version of Elasticsearch, as string
-        :returns:        dictionary with a key, 'items', with the mapping
+        :returns: dictionary with a key, 'items', with the mapping
         """
-
         mapping = '''
          {
             "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "_class" : {
-                                "type" : "keyword"
-                            },
-                            "runs": {
-                                "dynamic":false,
-                                "properties": {}
-                            },
-                            "actions": {
-                                "dynamic":false,
-                                "properties": {}
-                            },
-                            "building" : {
-                                "type" : "boolean"
-                            },
-                            "builtOn" : {
-                                "type" : "keyword"
-                            },
-                            "changeSet": {
-                                "properties": {
-                                    "items": {
-                                        "properties": {
-                                            "comment": {
-                                                "type": "text",
-                                                "index": true
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            "description" : {
-                                "type" : "keyword"
-                            },
-                            "displayName" : {
-                                "type" : "keyword"
-                            },
-                            "duration" : {
-                                "type" : "long"
-                            },
-                            "estimatedDuration" : {
-                                "type" : "long"
-                            },
-                            "executor" : {
-                                "type" : "object"
-                            },
-                            "fullDisplayName" : {
-                                "type" : "keyword"
-                            },
-                            "id" : {
-                                "type" : "keyword"
-                            },
-                              "keepLog" : {
-                                "type" : "boolean"
-                            },
-                              "number" : {
-                                "type" : "long"
-                            },
-                            "queueId" : {
-                                "type" : "long"
-                            },
-                            "result" : {
-                                "type" : "keyword"
-                            },
-                            "subBuilds" : {
-                                "type" : "object"
-                            },
-                            "timestamp" : {
-                                "type" : "long"
-                            },
-                            "url" : {
-                                "type" : "keyword"
-                            }
-                        }
-                    }
+            "properties": {
+                "data": {
+                    "dynamic":false,
+                    "properties": {}
                 }
+            }
         }
         '''
 

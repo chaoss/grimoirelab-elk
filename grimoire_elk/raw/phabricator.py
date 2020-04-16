@@ -29,41 +29,18 @@ class Mapping(BaseMapping):
     def get_elastic_mappings(es_major):
         """Get Elasticsearch mapping.
 
-        Non dynamic discovery of type for:
-            * data.transaction: has string arrays and dicts arrays
-        Specific type for:
-            * data.fields.priority.subpriority (float)
-
         :param es_major: major version of Elasticsearch, as string
-        :returns:        dictionary with a key, 'items', with the mapping
+        :returns: dictionary with a key, 'items', with the mapping
         """
-
         mapping = '''
-        {
+         {
             "dynamic":true,
             "properties": {
                 "data": {
-                    "properties": {
-                        "transactions": {
-                            "dynamic":false,
-                            "properties": {}
-                        },
-                        "fields": {
-                            "properties": {
-                                "priority" : {
-                                    "properties": {
-                                        "subpriority" : {"type": "float"}
-                                     }
-                                 },
-                                 "description": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                 }
-                             }
-                         }
-                     }
-                 }
-             }
+                    "dynamic":false,
+                    "properties": {}
+                }
+            }
         }
         '''
 

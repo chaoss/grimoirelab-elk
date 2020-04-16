@@ -32,35 +32,17 @@ class Mapping(BaseMapping):
         """Get Elasticsearch mapping.
 
         :param es_major: major version of Elasticsearch, as string
-        :returns:        dictionary with a key, 'items', with the mapping
+        :returns: dictionary with a key, 'items', with the mapping
         """
-
         mapping = '''
          {
             "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "long_desc": {
-                                "dynamic": false,
-                                "properties": {}
-                            },
-                            "short_desc": {
-                                "dynamic": false,
-                                "properties": {
-                                    "__text__": {
-                                        "type": "text",
-                                        "index": true
-                                    }
-                                }
-                            },
-                            "activity": {
-                                "dynamic": false,
-                                "properties": {}
-                            }
-                        }
-                    }
+            "properties": {
+                "data": {
+                    "dynamic":false,
+                    "properties": {}
                 }
+            }
         }
         '''
 

@@ -42,20 +42,12 @@ class Mapping(BaseMapping):
         mapping = '''
          {
             "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "details": {
-                                "dynamic":false,
-                                "properties": {}
-                            },
-                            "trust_indicator": {
-                                "dynamic":false,
-                                "properties": {}
-                            }
-                        }
-                    }
+            "properties": {
+                "data": {
+                    "dynamic":false,
+                    "properties": {}
                 }
+            }
         }
         '''
 

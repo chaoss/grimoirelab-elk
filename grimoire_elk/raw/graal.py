@@ -36,20 +36,12 @@ class Mapping(BaseMapping):
         """
 
         mapping = '''
-        {
+         {
             "dynamic":true,
             "properties": {
                 "data": {
-                    "properties": {
-                        "message": {
-                            "type": "text",
-                            "index": true
-                        },
-                        "analysis": {
-                            "dynamic":false,
-                            "properties": {}
-                        }
-                    }
+                    "dynamic":false,
+                    "properties": {}
                 }
             }
         }

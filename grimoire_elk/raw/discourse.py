@@ -30,60 +30,17 @@ class Mapping(BaseMapping):
         """Get Elasticsearch mapping.
 
         :param es_major: major version of Elasticsearch, as string
-        :returns:        dictionary with a key, 'items', with the mapping
+        :returns: dictionary with a key, 'items', with the mapping
         """
-
         mapping = '''
          {
             "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "details": {
-                                "properties": {
-                                    "suggested_topics": {
-                                        "dynamic": false,
-                                        "properties": {
-                                            "slug": {
-                                                "type": "text",
-                                                "index": true
-                                            },
-                                            "title": {
-                                                "type": "text",
-                                                "index": true
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            "fancy_title": {
-                                "type": "text",
-                                "index": true
-                            },
-                            "slug": {
-                                "type": "text",
-                                "index": true
-                            },
-                            "title": {
-                                "type": "text",
-                                "index": true
-                            },
-                            "post_stream": {
-                                "dynamic": false,
-                                "properties": {
-                                    "posts": {
-                                        "properties": {
-                                            "cooked": {
-                                                "type": "text",
-                                                "index": true
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+            "properties": {
+                "data": {
+                    "dynamic":false,
+                    "properties": {}
                 }
+            }
         }
         '''
 

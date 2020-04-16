@@ -29,38 +29,18 @@ class Mapping(BaseMapping):
     def get_elastic_mappings(es_major):
         """Get Elasticsearch mapping.
 
-        Non dynamic discovery of type for:
-            * data.extensions
-
         :param es_major: major version of Elasticsearch, as string
-        :returns:        dictionary with a key, 'items', with the mapping
+        :returns: dictionary with a key, 'items', with the mapping
         """
-
         mapping = '''
          {
             "dynamic":true,
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "extensions": {
-                                "dynamic":false,
-                                "properties": {}
-                            },
-                            "ancestors": {
-                                "properties": {
-                                    "extensions": {
-                                        "dynamic":false,
-                                        "properties": {}
-                                    }
-                                }
-                            },
-                            "body": {
-                                "dynamic":false,
-                                "properties": {}
-                            }
-                        }
-                    }
+            "properties": {
+                "data": {
+                    "dynamic":false,
+                    "properties": {}
                 }
+            }
         }
         '''
 

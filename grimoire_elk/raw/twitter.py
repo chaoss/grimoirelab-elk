@@ -30,72 +30,15 @@ class Mapping(BaseMapping):
         """Get Elasticsearch mapping.
 
         :param es_major: major version of Elasticsearch, as string
-        :returns:        dictionary with a key, 'items', with the mapping
+        :returns: dictionary with a key, 'items', with the mapping
         """
-
         mapping = '''
          {
             "dynamic":true,
             "properties": {
                 "data": {
-                    "properties": {
-                        "user": {
-                            "properties": {
-                                "entities": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                }
-                            }
-                        },
-                        "hashtags": {
-                            "properties": {
-                                "indices": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                }
-                            }
-                        },
-                        "metadata": {
-                            "dynamic":false,
-                            "properties": {}
-                        },
-                        "entities": {
-                            "properties": {
-                                "media": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                },
-                                "symbols": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                },
-                                "urls": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                },
-                                "user_mentions": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                }
-                            }
-                        },
-                        "extended_entities": {
-                            "dynamic":false,
-                            "properties": {}
-                        },
-                        "extended_tweet": {
-                            "dynamic":false,
-                            "properties": {}
-                        },
-                        "quoted_status": {
-                            "dynamic":false,
-                            "properties": {}
-                        },
-                        "retweeted_status": {
-                            "dynamic":false,
-                            "properties": {}
-                        }
-                    }
+                    "dynamic":false,
+                    "properties": {}
                 }
             }
         }

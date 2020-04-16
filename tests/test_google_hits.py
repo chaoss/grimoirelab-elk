@@ -56,6 +56,11 @@ class TestGoogleHits(TestBaseBackend):
         self.assertGreater(result['enrich'], 0)
         self.assertEqual(result['raw'], result['enrich'])
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        self.assertEqual(enrich_backend.get_identities(item), [])
+
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
 
