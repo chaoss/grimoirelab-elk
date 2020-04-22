@@ -18,6 +18,7 @@
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #   Georg Link <georglink@bitergia.com>
+#   Quan`Zhou <quan@bitergia.com>
 #
 
 import json
@@ -30,7 +31,8 @@ import requests
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 from grimoirelab_toolkit.datetime import (datetime_to_utc,
-                                          str_to_datetime)
+                                          str_to_datetime,
+                                          datetime_utcnow)
 from perceval.backends.core.git import (GitCommand,
                                         GitRepository,
                                         EmptyRepositoryError,
@@ -706,14 +708,37 @@ class GitEnrich(Enrich):
             logger.error(r.text)
             return
 
-    def enrich_git_branches(self, ocean_backend, enrich_backend):
+    def enrich_git_branches(self, ocean_backend, enrich_backend, run_month_days=[7, 14, 21, 28]):
         """Update the information about branches within the documents representing
         commits in the enriched index.
 
+        The example below shows how to activate the study by modifying the setup.cfg. The study
+        `enrich_git_branches` will be run on days depending on the parameter `run_month_days`,
+        by default the days are 7, 14, 21, and 28 of each month.
+
+        ```
+        [git]
+        raw_index = git_raw
+        enriched_index = git_enriched
+        ...
+        studies = [enrich_git_branches]
+
+        [enrich_git_branches]
+        run_month_days = [5, 22]
+        ```
+
         :param ocean_backend: the ocean backend
         :param enrich_backend: the enrich backend
+        :param run_month_days: days of the month to run this study
         """
         logger.debug("[git] study git-branches start")
+        day = datetime_utcnow().day
+        run_month_days = list(map(int, run_month_days))
+        if day not in run_month_days:
+            logger.debug("[git] study git-branches will execute only the days {} of each month".format(run_month_days))
+            logger.debug("[git] study git-branches end")
+            return
+
         for ds in self.prjs_map:
             if ds != "git":
                 continue
