@@ -1,0 +1,64 @@
+[tool.poetry]
+name = "GrimoireELK"
+version = "0.72.0"
+description = "GrimoireELK processes and stores software development data to ElasticSearch"
+readme = "README.md"
+authors = [
+   "Bitergia <grimoirelab-discussions@lists.linuxfoundation.org>"
+]
+repository = "https://github.com/chaoss/grimoirelab-elk"
+keywords = ["development repositories analytics"]
+license = "GPL-3.0-or-later"
+classifiers=[
+    'Development Status :: 5 - Production/Stable',
+    'Intended Audience :: Developers',
+    'Topic :: Software Development',
+    'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.6'
+]
+
+packages = [
+   { include = "grimoire_elk"},
+   { include = "tests", format = "sdist" },
+]
+
+include = [
+  "grimoire_elk/enriched/mappings/*.json"
+]
+
+[tool.poetry.extras]
+mysql = ["PyMySQL"]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/chaoss/grimoirelab-elk/issues"
+
+[tool.poetry.scripts]
+p2o = 'utils.p2o:main'
+gelk_mapping = 'utils.gelk_mapping:main'
+
+[tool.poetry.dependencies]
+python = "3.5 || ^3.6 || ^3.7"
+elasticsearch = "6.3.1"
+elasticsearch-dsl = "6.3.1"
+requests = "2.21.0"
+urllib3 = "1.24.3"
+geopy = "^1.20.0"
+pandas = ">=0.22.0,<=0.25.3"
+statsmodels = "^0.9.0"
+sortinghat = {branch = "master", git = "https://github.com/chaoss/grimoirelab-sortinghat", optional = true}
+grimoirelab-toolkit = {branch = "master", git = "https://github.com/chaoss/grimoirelab-toolkit"}
+cereslib = {branch = "master", git = "https://github.com/chaoss/grimoirelab-cereslib"}
+graal = {branch = "master", git = "https://github.com/chaoss/grimoirelab-graal"}
+perceval = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval"}
+perceval-mozilla = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-mozilla"}
+perceval-opnfv = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-opnfv"}
+perceval-puppet = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-puppet"}
+perceval-finos = {branch = "master", git = "https://github.com/Bitergia/grimoirelab-perceval-finos"}
+
+[tool.poetry.dev-dependencies]
+httpretty = "^0.9.6"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
