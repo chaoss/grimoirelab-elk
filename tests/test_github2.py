@@ -48,15 +48,15 @@ class TestGitHub2(TestBaseBackend):
 
         result = self._test_items_to_raw()
 
-        self.assertEqual(result['items'], 7)
-        self.assertEqual(result['raw'], 7)
+        self.assertEqual(result['items'], 8)
+        self.assertEqual(result['raw'], 8)
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
 
-        self.assertEqual(result['raw'], 6)
+        self.assertEqual(result['raw'], 7)
         self.assertEqual(result['enrich'], 11)
 
         enrich_backend = self.connectors[self.connector][2]()
@@ -146,7 +146,8 @@ class TestGitHub2(TestBaseBackend):
 
         for item in self.items:
             eitem = enrich_backend.get_rich_item(item)
-            self.assertIn(REPO_LABELS, eitem)
+            if eitem:
+                self.assertIn(REPO_LABELS, eitem)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""

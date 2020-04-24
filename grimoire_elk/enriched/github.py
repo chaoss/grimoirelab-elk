@@ -226,6 +226,7 @@ class GitHubEnrich(Enrich):
         else:
             logger.error("[github] rich item not defined for GitHub category {}".format(
                          item['category']))
+            return rich_item
 
         self.add_repository_labels(rich_item)
         self.add_metadata_filter_raw(rich_item)
