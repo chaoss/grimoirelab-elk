@@ -1,8 +1,0 @@
----
-title: Add support for Gitter
-category: added
-author: Nitish Gupta <imnitish.ng@gmail.com>
-issue: 820
-notes: Added support for creating raw and enriched 
-       indexes of message from Gitter. The visualizations 
-       and tests for extracted data have also been added.
