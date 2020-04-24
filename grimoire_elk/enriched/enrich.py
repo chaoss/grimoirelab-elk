@@ -91,6 +91,10 @@ def metadata(func):
     @functools.wraps(func)
     def decorator(self, *args, **kwargs):
         eitem = func(self, *args, **kwargs)
+
+        if not eitem:
+            return eitem
+
         metadata = {
             'metadata__gelk_version': self.gelk_version,
             'metadata__gelk_backend_name': self.__class__.__name__,
@@ -388,6 +392,8 @@ class Enrich(ElasticItems):
 
             if not events:
                 rich_item = self.get_rich_item(item)
+                if not rich_item:
+                    continue
                 data_json = json.dumps(rich_item)
                 bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
                     (item[self.get_field_unique_id()])
