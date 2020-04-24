@@ -4,7 +4,7 @@ category: added
 author: Valerio Cosentio <valcos@bitergia.com>
 issue: #853
 notes: ELK is enhanced to process and store events collected from the GitHub API. 
-       The events currently supported are:
+       The events currently supported are
        - LabeledEvent
        - UnlabeledEvent
        - AddedToProjectEvent
