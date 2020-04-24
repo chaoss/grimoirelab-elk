@@ -148,7 +148,8 @@ class GitLabEnrich(Enrich):
         elif item['category'] == 'merge_request':
             rich_item = self.__get_rich_merge(item)
         else:
-            logger.error("[gerrit] rich item not defined for GitLab category {}".format(item['category']))
+            logger.error("[gitlab] rich item not defined for GitLab category {}".format(item['category']))
+            return rich_item
 
         self.add_repository_labels(rich_item)
         self.add_metadata_filter_raw(rich_item)

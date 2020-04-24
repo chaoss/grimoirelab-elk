@@ -11229,5 +11229,77 @@
         "tag": "https://gitlab.com/fdroid/fdroiddata",
         "timestamp": 1537198073.82518,
         "updated_on": 1526489019.747,
-        "uuid": "11a8636d4c423c4ef45720828ca37ab23e90c31e"}
+        "uuid": "11a8636d4c423c4ef45720828ca37ab23e90c31e"
+    },
+    {
+        "backend_name": "GitLab",
+        "backend_version": "0.5.0",
+        "category": "message",
+        "data": {
+            "assignee": null,
+            "assignees": [],
+            "author": {
+                "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+                "id": 1,
+                "name": "Timothy Engler",
+                "state": "active",
+                "username": "redfish64",
+                "web_url": "https://gitlab.com/redfish64"
+            },
+            "award_emoji_data": [],
+            "closed_at": null,
+            "confidential": false,
+            "created_at": "2017-03-18T09:52:55.303Z",
+            "description": "Feeder (com.nononsenseapps.feeder) unnecessary require Android 7.0\n\nPlease compile it with lower minSDK.",
+            "discussion_locked": null,
+            "downvotes": 0,
+            "due_date": null,
+            "id": 2,
+            "iid": 2,
+            "labels": [],
+            "milestone": null,
+            "notes_data": [
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/b8c8a858811dfece044c3818e21bf4f3?s=80&d=identicon",
+                        "id": 1,
+                        "name": "Timothy Engler",
+                        "state": "active",
+                        "username": "redfish64",
+                        "web_url": "https://gitlab.com/redfish64"
+                    },
+                    "award_emoji_data": [],
+                    "body": "https://github.com/spacecowboy/Feeder/issues/13",
+                    "created_at": "2017-03-18T18:36:39.757Z",
+                    "id": 1,
+                    "noteable_id": 4756532,
+                    "noteable_iid": 641,
+                    "noteable_type": "Issue",
+                    "system": false,
+                    "updated_at": "2017-03-18T18:36:39.757Z"
+                }
+            ],
+            "project_id": 1,
+            "state": "closed",
+            "time_stats": {
+                "human_time_estimate": null,
+                "human_total_time_spent": null,
+                "time_estimate": 0,
+                "total_time_spent": 0
+            },
+            "title": "Feeder (com.nononsenseapps.feeder) unnecessary require Android 7.0",
+            "updated_at": "2017-03-18T18:36:39.764Z",
+            "upvotes": 0,
+            "user_notes_count": 2,
+            "web_url": "https://gitlab.com/fdroid/fdroiddata/-/issues/641",
+            "weight": null
+        },
+        "origin": "https://gitlab.com/fdroid/fdroiddata",
+        "perceval_version": "0.11.10",
+        "tag": "https://gitlab.com/fdroid/fdroiddata",
+        "timestamp": 1536860519.370875,
+        "updated_on": 1489862199.764,
+        "uuid": "0777f3d8ed29fbfa61d897c9c9eefb519c1bce7d"
+    }
 ]

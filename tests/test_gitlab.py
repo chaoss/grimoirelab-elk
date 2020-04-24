@@ -57,7 +57,7 @@ class TestGitLab(TestBaseBackend):
 
         self.assertGreater(result['raw'], 0)
         self.assertGreater(result['enrich'], 0)
-        self.assertEqual(result['raw'], result['enrich'])
+        self.assertEqual(result['raw'] - 1, result['enrich'])
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -161,7 +161,8 @@ class TestGitLab(TestBaseBackend):
 
         for item in self.items:
             eitem = enrich_backend.get_rich_item(item)
-            self.assertIn(REPO_LABELS, eitem)
+            if eitem:
+                self.assertIn(REPO_LABELS, eitem)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
@@ -169,7 +170,7 @@ class TestGitLab(TestBaseBackend):
         result = self._test_raw_to_enrich(sortinghat=True)
         self.assertGreater(result['raw'], 0)
         self.assertGreater(result['enrich'], 0)
-        self.assertEqual(result['raw'], result['enrich'])
+        self.assertEqual(result['raw'] - 1, result['enrich'])
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -240,7 +241,7 @@ class TestGitLab(TestBaseBackend):
 
         self.assertGreater(result['raw'], 0)
         self.assertGreater(result['enrich'], 0)
-        self.assertEqual(result['raw'], result['enrich'])
+        self.assertEqual(result['raw'] - 1, result['enrich'])
 
         enrich_backend = self.connectors[self.connector][2]()
 
