@@ -20,7 +20,6 @@
 #
 
 import datetime
-from dateutil import parser
 import inspect
 import json
 import logging
@@ -96,9 +95,9 @@ def get_time_diff_days(start, end):
         return None
 
     if type(start) is not datetime.datetime:
-        start = parser.parse(start).replace(tzinfo=None)
+        start = str_to_datetime(start).replace(tzinfo=None)
     if type(end) is not datetime.datetime:
-        end = parser.parse(end).replace(tzinfo=None)
+        end = str_to_datetime(end).replace(tzinfo=None)
 
     seconds_day = float(60 * 60 * 24)
     diff_days = (end - start).total_seconds() / seconds_day
@@ -168,7 +167,7 @@ def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
                 offset = backend_cmd.parsed_args.offset
 
         if from_date:
-            if from_date.replace(tzinfo=None) != parser.parse("1970-01-01"):
+            if from_date.replace(tzinfo=None) != str_to_datetime("1970-01-01"):
                 last_enrich = from_date
             # if the index is empty, set the last enrich to None
             elif not enrich_backend.from_date:

@@ -24,8 +24,8 @@ import logging
 import sys
 
 import requests
-from dateutil import parser
 
+from grimoirelab_toolkit.datetime import str_to_datetime
 from grimoire_elk.errors import ElasticError
 from grimoire_elk.elastic import ElasticSearch
 # Connectors for Graal
@@ -420,8 +420,8 @@ def get_time_diff_days(start_txt, end_txt):
     if start_txt is None or end_txt is None:
         return None
 
-    start = parser.parse(start_txt)
-    end = parser.parse(end_txt)
+    start = str_to_datetime(start_txt)
+    end = str_to_datetime(end_txt)
 
     seconds_day = float(60 * 60 * 24)
     diff_days = \

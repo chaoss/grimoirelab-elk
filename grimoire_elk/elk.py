@@ -24,12 +24,9 @@ import logging
 
 from elasticsearch import Elasticsearch
 
-from datetime import datetime
-from dateutil import parser
-
 from perceval.backend import find_signature_parameters, Archive
 from perceval.errors import RateLimitError
-from grimoirelab_toolkit.datetime import datetime_utcnow
+from grimoirelab_toolkit.datetime import (datetime_utcnow, str_to_datetime)
 
 from .elastic_mapping import Mapping as BaseMapping
 from .elastic_items import ElasticItems
@@ -70,7 +67,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         if not es_index:
             logger.error("Raw index not defined for {}".format(backend_name))
 
-        repo['repo_update_start'] = datetime.now().isoformat()
+        repo['repo_update_start'] = datetime_utcnow().isoformat()
 
         # perceval backends fetch params
         offset = None
@@ -158,7 +155,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             params['branches'] = branches
         if filter_classified:
             params['filter_classified'] = filter_classified
-        if from_date and (from_date.replace(tzinfo=None) != parser.parse("1970-01-01")):
+        if from_date and (from_date.replace(tzinfo=None) != str_to_datetime("1970-01-01")):
             params['from_date'] = from_date
         if offset:
             params['from_offset'] = offset
@@ -360,7 +357,7 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw=No
         if params:
             try:
                 date_pos = params.index('--from-date')
-                last_enrich = parser.parse(params[date_pos + 1])
+                last_enrich = str_to_datetime(params[date_pos + 1])
             except ValueError:
                 pass
         if last_enrich:

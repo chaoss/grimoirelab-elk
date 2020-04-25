@@ -22,11 +22,10 @@
 import json
 import logging
 
-from dateutil import parser
-
 from .enrich import Enrich, metadata
 from .utils import get_time_diff_days
 from ..elastic_mapping import Mapping as BaseMapping
+from grimoirelab_toolkit.datetime import str_to_datetime
 
 
 logger = logging.getLogger(__name__)
@@ -141,8 +140,8 @@ class KitsuneEnrich(Enrich):
             eitem["tags_analyzed"] = tags
 
             # Enrich dates
-            eitem["creation_date"] = parser.parse(question["created"]).isoformat()
-            eitem["last_activity_date"] = parser.parse(question["updated"]).isoformat()
+            eitem["creation_date"] = str_to_datetime(question["created"]).isoformat()
+            eitem["last_activity_date"] = str_to_datetime(question["updated"]).isoformat()
 
             eitem['lifetime_days'] = \
                 get_time_diff_days(question['created'], question['updated'])
@@ -189,8 +188,8 @@ class KitsuneEnrich(Enrich):
             eitem["helpful_answer"] = answer['num_helpful_votes']
 
             # Enrich dates
-            eitem["creation_date"] = parser.parse(answer["created"]).isoformat()
-            eitem["last_activity_date"] = parser.parse(answer["updated"]).isoformat()
+            eitem["creation_date"] = str_to_datetime(answer["created"]).isoformat()
+            eitem["last_activity_date"] = str_to_datetime(answer["updated"]).isoformat()
 
             eitem['lifetime_days'] = \
                 get_time_diff_days(answer['created'], answer['updated'])

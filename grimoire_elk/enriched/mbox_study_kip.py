@@ -21,11 +21,8 @@
 
 import logging
 
-from datetime import datetime
-
-from dateutil import parser
-
 from .utils import get_time_diff_days
+from grimoirelab_toolkit.datetime import (datetime_utcnow, str_to_datetime)
 
 logger = logging.getLogger(__name__)
 
@@ -269,7 +266,7 @@ def kafka_kip(enrich):
                 # It is not a KIP message
                 continue
             kip = eitem["kip"]
-            kip_date = parser.parse(eitem["email_date"])
+            kip_date = str_to_datetime(eitem["email_date"])
 
             if eitem['kip_is_discuss']:
                 kip_fields["kip_discuss_time_days"] = \
@@ -290,7 +287,7 @@ def kafka_kip(enrich):
                 max_discuss_date = enrich.kips_dates[kip]['kip_max_discuss']
                 kip_fields['kip_discuss_inactive_days'] = \
                     get_time_diff_days(max_discuss_date.replace(tzinfo=None),
-                                       datetime.utcnow())
+                                       datetime_utcnow())
 
             if eitem['kip_is_vote']:
                 kip_fields["kip_voting_time_days"] = \
@@ -310,7 +307,7 @@ def kafka_kip(enrich):
                 max_vote_date = enrich.kips_dates[kip]['kip_max_vote']
                 kip_fields['kip_voting_inactive_days'] = \
                     get_time_diff_days(max_vote_date.replace(tzinfo=None),
-                                       datetime.utcnow())
+                                       datetime_utcnow())
 
                 # Now check if there is a result from enrich.kips_scores
                 kip_fields['kip_result'] = lazy_result(enrich.kips_scores[kip])
@@ -382,7 +379,7 @@ def kafka_kip(enrich):
             if kip not in enrich.kips_scores:
                 enrich.kips_scores[kip] = []
 
-            kip_date = parser.parse(eitem["email_date"])
+            kip_date = str_to_datetime(eitem["email_date"])
 
             # Analyze the subject to fill the kip fields
             if '[discuss]' in eitem['Subject'].lower() or \
