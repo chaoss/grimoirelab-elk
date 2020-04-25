@@ -24,6 +24,7 @@ import unittest
 from base import TestBaseBackend
 from grimoire_elk.enriched.gitlab import NO_MILESTONE_TAG
 from grimoire_elk.enriched.utils import REPO_LABELS
+from grimoire_elk.raw.gitlab import GitLabOcean
 
 
 class TestGitLab(TestBaseBackend):
@@ -275,6 +276,15 @@ class TestGitLab(TestBaseBackend):
         self.assertEqual(eitem['author_username'], '499986947ba884c3c5946e15600a84f5fee8e9cb')
         self.assertEqual(eitem['merge_author_name'], '323866ff0cf9b5c7f817d1d444274582bef7d324')
         self.assertEqual(eitem['merge_author_login'], '5ef093e29634f927da333b7eaa479c248c93f26c')
+
+    def test_perceval_params(self):
+        """Test the extraction of perceval params from an URL"""
+
+        url = "https://gitlab.com/fdroid/fdroiddata"
+        expected_params = [
+            'fdroid', 'fdroiddata'
+        ]
+        self.assertListEqual(GitLabOcean.get_perceval_params_from_url(url), expected_params)
 
 
 if __name__ == "__main__":
