@@ -23,11 +23,9 @@ import logging
 
 from copy import deepcopy
 
-from dateutil import parser
-
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
-
+from grimoirelab_toolkit.datetime import str_to_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +115,7 @@ class CratesEnrich(Enrich):
             event = deepcopy(eitem)
             event['download_sample_id'] = sample['id']
             event['sample_date'] = sample['date']
-            sample_date = parser.parse(event['sample_date'])
+            sample_date = str_to_datetime(event['sample_date'])
             event['sample_version'] = sample['version']
             event['sample_downloads'] = sample['downloads']
             event.update(self.get_grimoire_fields(sample_date.isoformat(), "downloads_event"))

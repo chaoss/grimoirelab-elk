@@ -19,9 +19,8 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-from dateutil import parser
-
 from .enrich import Enrich, metadata
+from grimoirelab_toolkit.datetime import str_to_datetime
 
 
 class PuppetForgeEnrich(Enrich):
@@ -158,7 +157,7 @@ class PuppetForgeEnrich(Enrich):
             event["source_url"] = release['metadata']['source']
             event["summary"] = release['metadata']['summary']
 
-            event["metadata__updated_on"] = parser.parse(release['updated_at']).isoformat()
+            event["metadata__updated_on"] = str_to_datetime(release['updated_at']).isoformat()
 
             if self.sortinghat:
                 release["metadata__updated_on"] = event["metadata__updated_on"]  # Needed in get_item_sh logic

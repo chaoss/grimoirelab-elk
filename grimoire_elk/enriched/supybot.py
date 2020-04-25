@@ -21,11 +21,9 @@
 
 import logging
 
-from dateutil import parser
-
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
-
+from grimoirelab_toolkit.datetime import str_to_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +104,7 @@ class SupybotEnrich(Enrich):
             eitem[map_fields[fn]] = message[fn]
 
         # Enrich dates
-        eitem["update_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
+        eitem["update_date"] = str_to_datetime(item["metadata__updated_on"]).isoformat()
         eitem["channel"] = eitem["origin"]
 
         eitem.update(self.get_grimoire_fields(eitem["update_date"], "message"))

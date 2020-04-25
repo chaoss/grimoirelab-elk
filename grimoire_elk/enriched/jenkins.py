@@ -23,11 +23,9 @@ import csv
 import logging
 import re
 
-from dateutil import parser
-
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
-
+from grimoirelab_toolkit.datetime import str_to_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -226,7 +224,7 @@ class JenkinsEnrich(Enrich):
         eitem['job_build'] = eitem['job_name'] + '/' + str(eitem['build'])
 
         # Enrich dates
-        eitem["build_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
+        eitem["build_date"] = str_to_datetime(item["metadata__updated_on"]).isoformat()
 
         # Add duration in days
         if "duration" in eitem:

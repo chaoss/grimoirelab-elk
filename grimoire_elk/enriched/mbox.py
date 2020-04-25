@@ -23,13 +23,12 @@ import json
 import logging
 
 from requests.structures import CaseInsensitiveDict
-from dateutil import parser
 import email.utils
 
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 from .mbox_study_kip import kafka_kip, MAX_LINES_FOR_VOTE
-
+from grimoirelab_toolkit.datetime import str_to_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +144,7 @@ class MBoxEnrich(Enrich):
                 eitem[map_fields[fn]] = None
 
         # Enrich dates
-        eitem["email_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
+        eitem["email_date"] = str_to_datetime(item["metadata__updated_on"]).isoformat()
         eitem["list"] = item["origin"]
 
         if 'Subject' in message and message['Subject']:
@@ -167,7 +166,7 @@ class MBoxEnrich(Enrich):
 
         # Time zone
         try:
-            message_date = parser.parse(message['Date'])
+            message_date = str_to_datetime(message['Date'])
             eitem["tz"] = int(message_date.strftime("%z")[0:3])
         except Exception:
             eitem["tz"] = None

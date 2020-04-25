@@ -21,12 +21,11 @@
 
 import logging
 
-from dateutil import parser
 from requests.structures import CaseInsensitiveDict
 
 from .enrich import Enrich, metadata, DEFAULT_PROJECT
 from ..elastic_mapping import Mapping as BaseMapping
-
+from grimoirelab_toolkit.datetime import str_to_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -139,7 +138,7 @@ class TwitterEnrich(Enrich):
                 eitem[f] = None
 
         # Date fields
-        eitem["created_at"] = parser.parse(tweet["created_at"]).isoformat()
+        eitem["created_at"] = str_to_datetime(tweet["created_at"]).isoformat()
 
         # data fields to copy from user
         copy_fields = ["created_at", "description", "followers_count",

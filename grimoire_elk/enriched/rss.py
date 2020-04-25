@@ -21,10 +21,9 @@
 
 import logging
 
-from dateutil import parser
-
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
+from grimoirelab_toolkit.datetime import str_to_datetime
 
 
 logger = logging.getLogger(__name__)
@@ -110,7 +109,7 @@ class RSSEnrich(Enrich):
                 eitem[map_fields[f]] = entry[f]
 
         # Enrich dates
-        eitem["publish_date"] = parser.parse(eitem["published"]).isoformat()
+        eitem["publish_date"] = str_to_datetime(eitem["published"]).isoformat()
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
