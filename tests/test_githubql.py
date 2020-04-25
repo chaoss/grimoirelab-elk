@@ -23,6 +23,7 @@ import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.enriched.utils import REPO_LABELS
+from grimoire_elk.raw.githubql import GitHubQLOcean
 
 
 class TestGitHubQL(TestBaseBackend):
@@ -246,6 +247,15 @@ class TestGitHubQL(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_perceval_params(self):
+        """Test the extraction of perceval params from an URL"""
+
+        url = "https://github.com/chaoss/grimoirelab-perceval"
+        expected_params = [
+            'chaoss', 'grimoirelab-perceval'
+        ]
+        self.assertListEqual(GitHubQLOcean.get_perceval_params_from_url(url), expected_params)
 
 
 if __name__ == "__main__":

@@ -24,6 +24,7 @@ import unittest
 import requests
 from base import TestBaseBackend
 from grimoire_elk.enriched.utils import REPO_LABELS
+from grimoire_elk.raw.gitter import GitterOcean
 
 
 class TestGitter(TestBaseBackend):
@@ -207,6 +208,15 @@ class TestGitter(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_perceval_params(self):
+        """Test the extraction of perceval params from an URL"""
+
+        url = "https://gitter.im/test_org/test_room"
+        expected_params = [
+            'test_org', 'test_room'
+        ]
+        self.assertListEqual(GitterOcean.get_perceval_params_from_url(url), expected_params)
 
 
 if __name__ == "__main__":
