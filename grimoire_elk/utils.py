@@ -25,7 +25,6 @@ import sys
 
 import requests
 
-from grimoirelab_toolkit.datetime import str_to_datetime
 from grimoire_elk.errors import ElasticError
 from grimoire_elk.elastic import ElasticSearch
 # Connectors for Graal
@@ -416,20 +415,3 @@ def get_params():
             sys.exit(1)
 
     return args
-
-
-def get_time_diff_days(start_txt, end_txt):
-    ''' Number of days between two days  '''
-
-    if start_txt is None or end_txt is None:
-        return None
-
-    start = str_to_datetime(start_txt)
-    end = str_to_datetime(end_txt)
-
-    seconds_day = float(60 * 60 * 24)
-    diff_days = \
-        (end - start).total_seconds() / seconds_day
-    diff_days = float('%.2f' % diff_days)
-
-    return diff_days
