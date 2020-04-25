@@ -49,27 +49,13 @@ from statsmodels.duration.survfunc import SurvfuncRight
 from .utils import grimoire_con, METADATA_FILTER_RAW, REPO_LABELS
 from .. import __version__
 
+from sortinghat.db.database import Database
+from sortinghat import api, utils
+from sortinghat.exceptions import NotFoundError, InvalidValueError
+
+from .sortinghat_gelk import SortingHat
+
 logger = logging.getLogger(__name__)
-
-try:
-    import pymysql
-    MYSQL_LIBS = True
-except ImportError:
-    logger.info("MySQL not available")
-    MYSQL_LIBS = False
-
-try:
-    from sortinghat.db.database import Database
-    from sortinghat import api, utils
-    from sortinghat.exceptions import NotFoundError, InvalidValueError
-
-    from .sortinghat_gelk import SortingHat
-
-    SORTINGHAT_LIBS = True
-except ImportError:
-    logger.info("SortingHat not available")
-    SORTINGHAT_LIBS = False
-
 
 UNKNOWN_PROJECT = 'unknown'
 DEFAULT_PROJECT = 'Main'
@@ -120,8 +106,6 @@ class Enrich(ElasticItems):
         self.sortinghat = False
         if db_user == '':
             db_user = DEFAULT_DB_USER
-        if db_sortinghat and not SORTINGHAT_LIBS:
-            raise RuntimeError("Sorting hat configured but libraries not available.")
         if db_sortinghat:
             # self.sh_db = Database("root", "", db_sortinghat, "mariadb")
             if not Enrich.sh_db:
@@ -136,18 +120,6 @@ class Enrich(ElasticItems):
                 self.json_projects = json.load(data_file)
                 # If we have JSON projects always use them for mapping
                 self.prjs_map = self.__convert_json_to_projects_map(self.json_projects)
-        if not self.json_projects:
-            if db_projects_map and not MYSQL_LIBS:
-                raise RuntimeError("Projects configured but MySQL libraries not available.")
-            if db_projects_map and not self.json_projects:
-                self.prjs_map = self.__get_projects_map(db_projects_map,
-                                                        db_user, db_password,
-                                                        db_host)
-
-        if self.prjs_map and self.json_projects:
-            # logger.info("Comparing db and json projects")
-            # self.__compare_projects_map(self.prjs_map, self.json_projects)
-            pass
 
         self.studies = []
 
@@ -298,32 +270,6 @@ class Enrich(ElasticItems):
 
         logger.debug("Number of db projects: {}".format(db_projects))
         logger.debug("Number of json projects: {} (>={})".format(json.keys(), db_projects))
-
-    def __get_projects_map(self, db_projects_map, db_user=None, db_password=None, db_host=None):
-        # Read the repo to project mapping from a database
-        ds_repo_to_prj = {}
-
-        db = pymysql.connect(user=db_user, passwd=db_password, host=db_host,
-                             db=db_projects_map)
-        cursor = db.cursor()
-
-        query = """
-            SELECT data_source, p.id, pr.repository_name
-            FROM projects p
-            JOIN project_repositories pr ON p.project_id=pr.project_id
-        """
-
-        res = int(cursor.execute(query))
-        if res > 0:
-            rows = cursor.fetchall()
-            for row in rows:
-                [ds, name, repo] = row
-                if ds not in ds_repo_to_prj:
-                    ds_repo_to_prj[ds] = {}
-                ds_repo_to_prj[ds][repo] = name
-        else:
-            raise RuntimeError("Can't find projects mapping in {}".format(db_projects_map))
-        return ds_repo_to_prj
 
     def get_field_unique_id(self):
         """ Field in the raw item with the unique id """
@@ -547,11 +493,9 @@ class Enrich(ElasticItems):
             # elk.enrich_backend)
             if self.projects_json_repo:
                 project = self.prjs_map[ds_name][self.projects_json_repo]
-            # if `projects_json_repo`, which shouldn't never happen, use the
-            # method `get_project_repository` (defined in each enricher)
             else:
-                repository = self.get_project_repository(eitem)
-                project = self.prjs_map[ds_name][repository]
+                project = None
+
         # With the introduction of `projects_json_repo` the code in the
         # except should be unreachable, and could be removed
         except KeyError:
