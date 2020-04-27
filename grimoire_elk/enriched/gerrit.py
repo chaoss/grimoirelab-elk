@@ -194,11 +194,7 @@ class GerritEnrich(Enrich):
     def get_rich_item(self, item):
         eitem = {}  # Item enriched
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                eitem[f] = item[f]
-            else:
-                eitem[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, eitem)
         eitem['closed'] = item['metadata__updated_on']
         # The real data
         review = item['data']

@@ -160,8 +160,7 @@ class PagureEnrich(Enrich):
         for comment in comments:
             ecomment = {}
 
-            for f in self.RAW_FIELDS_COPY:
-                ecomment[f] = eitem[f]
+            self.copy_raw_fields(self.RAW_FIELDS_COPY, eitem, ecomment)
 
             # Copy data from the enriched issue
             ecomment['issue_id'] = eitem['id']
@@ -278,11 +277,7 @@ class PagureEnrich(Enrich):
 
         rich_issue = {}
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                rich_issue[f] = item[f]
-            else:
-                rich_issue[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_issue)
 
         # The real data
         issue = item['data']

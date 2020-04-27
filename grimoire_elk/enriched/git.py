@@ -194,11 +194,7 @@ class GitEnrich(Enrich):
     def get_rich_item(self, item):
 
         eitem = {}
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                eitem[f] = item[f]
-            else:
-                eitem[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, eitem)
         # For pair programming uuid is not a unique field. Use git_uuid in general as unique field.
         eitem['git_uuid'] = eitem['uuid']
         # The real data

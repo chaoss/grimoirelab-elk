@@ -195,11 +195,7 @@ class DiscourseEnrich(Enrich):
 
         eitem = {}
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                eitem[f] = item[f]
-            else:
-                eitem[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, eitem)
 
         topic = item['data']
 

@@ -224,11 +224,7 @@ class JiraEnrich(Enrich):
 
         eitem = {}
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                eitem[f] = item[f]
-            else:
-                eitem[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, eitem)
         # The real data
         issue = item['data']
 
@@ -371,8 +367,7 @@ class JiraEnrich(Enrich):
         for comment in comments:
             ecomment = {}
 
-            for f in self.RAW_FIELDS_COPY:
-                ecomment[f] = eitem[f]
+            self.copy_raw_fields(self.RAW_FIELDS_COPY, eitem, ecomment)
 
             # Copy data from the enriched issue
             ecomment['project_id'] = eitem['project_id']

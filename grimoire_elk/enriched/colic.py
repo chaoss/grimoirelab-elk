@@ -302,11 +302,7 @@ class ColicEnrich(Enrich):
         for file_analysis in entry["analysis"]:
             eitem = get_rich_item(file_analysis)
 
-            for f in self.RAW_FIELDS_COPY:
-                if f in item:
-                    eitem[f] = item[f]
-                else:
-                    eitem[f] = None
+            self.copy_raw_fields(self.RAW_FIELDS_COPY, item, eitem)
 
             # common attributes
             eitem['author'] = entry['Author']
