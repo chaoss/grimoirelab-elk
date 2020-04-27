@@ -132,11 +132,7 @@ class MediaWikiEnrich(Enrich):
 
         for rev in item["data"]["revisions"]:
             erevision = {}
-            for f in self.RAW_FIELDS_COPY:
-                if f in eitem:
-                    erevision[f] = eitem[f]
-                else:
-                    erevision[f] = None
+            self.copy_raw_fields(self.RAW_FIELDS_COPY, eitem, erevision)
             # Metadata related to the page according to the enrichment specification
             copy_fields_item = ["origin", "metadata__updated_on", "metadata__timestamp", "pageid", "title"]
             for f in copy_fields_item:
@@ -201,11 +197,7 @@ class MediaWikiEnrich(Enrich):
     def get_rich_item(self, item):
         eitem = {}
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                eitem[f] = item[f]
-            else:
-                eitem[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, eitem)
         # The real data
         page = item['data']
 

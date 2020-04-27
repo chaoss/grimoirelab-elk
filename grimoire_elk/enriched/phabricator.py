@@ -255,11 +255,7 @@ class PhabricatorEnrich(Enrich):
 
         self.__fill_phab_ids(item['data'])
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                eitem[f] = item[f]
-            else:
-                eitem[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, eitem)
         # The real data
         phab_item = item['data']
 

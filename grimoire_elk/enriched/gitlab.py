@@ -158,11 +158,7 @@ class GitLabEnrich(Enrich):
 
         rich_issue = {}
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                rich_issue[f] = item[f]
-            else:
-                rich_issue[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_issue)
         # The real data
         issue = item['data']
 
@@ -250,11 +246,7 @@ class GitLabEnrich(Enrich):
     def __get_rich_merge(self, item):
         rich_mr = {}
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                rich_mr[f] = item[f]
-            else:
-                rich_mr[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_mr)
         # The real data
         merge_request = item['data']
 

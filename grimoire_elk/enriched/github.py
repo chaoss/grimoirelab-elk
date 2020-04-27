@@ -428,11 +428,7 @@ class GitHubEnrich(Enrich):
     def __get_rich_pull(self, item):
         rich_pr = {}
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                rich_pr[f] = item[f]
-            else:
-                rich_pr[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_pr)
         # The real data
         pull_request = item['data']
 
@@ -530,11 +526,7 @@ class GitHubEnrich(Enrich):
     def __get_rich_issue(self, item):
         rich_issue = {}
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                rich_issue[f] = item[f]
-            else:
-                rich_issue[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_issue)
         # The real data
         issue = item['data']
 
@@ -628,11 +620,7 @@ class GitHubEnrich(Enrich):
     def __get_rich_repo(self, item):
         rich_repo = {}
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                rich_repo[f] = item[f]
-            else:
-                rich_repo[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_repo)
 
         repo = item['data']
 

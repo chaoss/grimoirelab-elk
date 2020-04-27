@@ -129,11 +129,7 @@ class GitHubQLEnrich(Enrich):
     def __get_rich_event(self, item):
         rich_event = {}
 
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                rich_event[f] = item[f]
-            else:
-                rich_event[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_event)
 
         event = item['data']
         issue = item['data']['issue']

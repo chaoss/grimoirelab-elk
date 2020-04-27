@@ -107,11 +107,7 @@ class StackExchangeEnrich(Enrich):
                          "last_activity_date", "link", "score", "tags"]
 
         if kind == 'question':
-            for f in self.RAW_FIELDS_COPY:
-                if f in item:
-                    eitem[f] = item[f]
-                else:
-                    eitem[f] = None
+            self.copy_raw_fields(self.RAW_FIELDS_COPY, item, eitem)
             # The real data
             question = item['data']
 

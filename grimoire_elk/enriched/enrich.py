@@ -985,6 +985,15 @@ class Enrich(ElasticItems):
 
         return sh_ids
 
+    def copy_raw_fields(self, copy_fields, source, target):
+        """Copy fields from item to enriched item."""
+
+        for f in copy_fields:
+            if f in source:
+                target[f] = source[f]
+            else:
+                target[f] = None
+
     def enrich_onion(self, enrich_backend, in_index, out_index, data_source,
                      contribs_field, timeframe_field, sort_on_field,
                      seconds=ONION_INTERVAL, no_incremental=False):
