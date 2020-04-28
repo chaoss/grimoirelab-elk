@@ -43,15 +43,15 @@ class TestTelegram(TestBaseBackend):
         """Test whether JSON items are properly inserted into ES"""
 
         result = self._test_items_to_raw()
-        self.assertEqual(result['items'], 7)
-        self.assertEqual(result['raw'], 7)
+        self.assertEqual(result['items'], 9)
+        self.assertEqual(result['raw'], 9)
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
-        self.assertEqual(result['raw'], 6)
-        self.assertEqual(result['enrich'], 6)
+        self.assertEqual(result['raw'], 8)
+        self.assertEqual(result['enrich'], 8)
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -93,8 +93,8 @@ class TestTelegram(TestBaseBackend):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
-        self.assertEqual(result['raw'], 6)
-        self.assertEqual(result['enrich'], 6)
+        self.assertEqual(result['raw'], 8)
+        self.assertEqual(result['enrich'], 8)
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -114,8 +114,8 @@ class TestTelegram(TestBaseBackend):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
-        self.assertEqual(result['raw'], 6)
-        self.assertEqual(result['enrich'], 6)
+        self.assertEqual(result['raw'], 8)
+        self.assertEqual(result['enrich'], 8)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
