@@ -21,6 +21,7 @@
 #
 import logging
 import unittest
+import time
 
 from base import TestBaseBackend
 
@@ -47,15 +48,15 @@ class TestMbox(TestBaseBackend):
         """Test whether JSON items are properly inserted into ES"""
 
         result = self._test_items_to_raw()
-        self.assertEqual(result['items'], 10)
-        self.assertEqual(result['raw'], 10)
+        self.assertEqual(result['items'], 17)
+        self.assertEqual(result['raw'], 17)
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
-        self.assertEqual(result['raw'], 9)
-        self.assertEqual(result['enrich'], 9)
+        self.assertEqual(result['raw'], 16)
+        self.assertEqual(result['enrich'], 16)
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -109,8 +110,8 @@ class TestMbox(TestBaseBackend):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
-        self.assertEqual(result['raw'], 9)
-        self.assertEqual(result['enrich'], 9)
+        self.assertEqual(result['raw'], 16)
+        self.assertEqual(result['enrich'], 16)
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -130,8 +131,8 @@ class TestMbox(TestBaseBackend):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
-        self.assertEqual(result['raw'], 9)
-        self.assertEqual(result['enrich'], 9)
+        self.assertEqual(result['raw'], 16)
+        self.assertEqual(result['enrich'], 16)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
@@ -160,10 +161,39 @@ class TestMbox(TestBaseBackend):
         """ Test that the kafka kip study works correctly """
 
         study, ocean_backend, enrich_backend = self._test_study('kafka_kip')
+
         with self.assertLogs(logger, level='INFO') as cm:
-            study(ocean_backend, enrich_backend)
+
+            if study.__name__ == "kafka_kip":
+                study(ocean_backend, enrich_backend)
+
             self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.mbox:[mbox] study Kafka KIP starting')
             self.assertEqual(cm.output[1], 'INFO:grimoire_elk.enriched.mbox:[mbox] study Kafka KIP end')
+
+            time.sleep(5)  # HACK: Wait until github enrich index has been written
+            url = self.es_con + "/" + self.enrich_index + "/_search"
+            response = enrich_backend.requests.get(url, verify=False).json()
+            for hit in response['hits']['hits']:
+                source = hit['_source']
+                if 'kip' in source:
+                    self.assertIn('kip_is_vote', source)
+                    self.assertIn('kip_is_discuss', source)
+                    self.assertIn('kip_vote', source)
+                    self.assertIn('kip_binding', source)
+                    self.assertIn('kip', source)
+                    self.assertIn('kip_type', source)
+                    self.assertIn('kip_status', source)
+                    self.assertIn('kip_discuss_time_days', source)
+                    self.assertIn('kip_discuss_inactive_days', source)
+                    self.assertIn('kip_voting_time_days', source)
+                    self.assertIn('kip_voting_inactive_days', source)
+                    self.assertIn('kip_is_first_discuss', source)
+                    self.assertIn('kip_is_first_vote', source)
+                    self.assertIn('kip_is_last_discuss', source)
+                    self.assertIn('kip_is_last_vote', source)
+                    self.assertIn('kip_result', source)
+                    self.assertIn('kip_start_end', source)
+                    self.assertIn('kip_final_status', source)
 
     def test_perceval_params(self):
         """Test the extraction of perceval params from an URL"""
