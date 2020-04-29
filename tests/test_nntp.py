@@ -140,6 +140,20 @@ class TestNNTP(TestBaseBackend):
         ]
         self.assertListEqual(NNTPOcean.get_perceval_params_from_url(url), expected_params)
 
+    def test_copy_raw_fields(self):
+        """Test copied raw fields"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        for item in self.items:
+            eitem = enrich_backend.get_rich_item(item)
+            for attribute in enrich_backend.RAW_FIELDS_COPY:
+                if attribute in item:
+                    self.assertEqual(item[attribute], eitem[attribute])
+                else:
+                    self.assertIsNone(eitem[attribute])
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')

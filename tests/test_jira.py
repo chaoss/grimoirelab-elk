@@ -188,6 +188,23 @@ class TestJira(TestBaseBackend):
             p2o_params = {'url': 'https://jira.opnfv.org', 'filter-raw': 'data.fields.project.key:PROJECT-KEY'}
             self.assertDictEqual(p2o_params, JiraOcean.get_p2o_params_from_url(url))
 
+    def test_copy_raw_fields(self):
+        """Test copied raw fields"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        eitems = [enrich_backend.get_rich_item(self.items[0]),
+                  enrich_backend.get_rich_item(self.items[0], author_type='assignee'),
+                  enrich_backend.get_rich_item(self.items[0], author_type='reporter')]
+
+        for eitem in eitems:
+            for attribute in enrich_backend.RAW_FIELDS_COPY:
+                if attribute in self.items[0]:
+                    self.assertEqual(self.items[0][attribute], eitem[attribute])
+                else:
+                    self.assertIsNone(eitem[attribute])
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')

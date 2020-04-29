@@ -318,6 +318,20 @@ class TestGitHub(TestBaseBackend):
         self.assertEqual(eitem['merged_by_data_uuid'], 'e4992881f28cf3318a566f0bd45dcf435216a82f')
         self.assertEqual(eitem['merged_by_data_name'], '176eee2bd2c010d02dd419c453aca854195de172')
 
+    def test_copy_raw_fields(self):
+        """Test copied raw fields"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        for item in self.items:
+            eitem = enrich_backend.get_rich_item(item)
+            for attribute in enrich_backend.RAW_FIELDS_COPY:
+                if attribute in item:
+                    self.assertEqual(item[attribute], eitem[attribute])
+                else:
+                    self.assertIsNone(eitem[attribute])
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
