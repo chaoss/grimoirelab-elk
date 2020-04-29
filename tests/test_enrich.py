@@ -656,6 +656,41 @@ class TestEnrich(unittest.TestCase):
 
         requests.delete(tmp_index_url, verify=False)
 
+    def test_copy_raw_fields(self):
+        """Test whether raw fields are copied properly"""
+
+        raw_fields = ["metadata__updated_on", "metadata__timestamp",
+                      "offset", "origin", "tag", "uuid", "extra"]
+        source = {
+            "metadata__updated_on": "2020-03-19T18:08:45.480000+00:00",
+            "metadata__timestamp": "2020-04-11T12:45:37.229535+00:00",
+            "offset": None,
+            "origin": "https://gitter.im/jenkinsci/jenkins",
+            "tag": "https://gitter.im/jenkinsci/jenkins",
+            "uuid": "a9f92bf99785ad838df6736b7825c6f7ae16ac58",
+        }
+
+        expected = {
+            "metadata__updated_on": "2020-03-19T18:08:45.480000+00:00",
+            "metadata__timestamp": "2020-04-11T12:45:37.229535+00:00",
+            "offset": None,
+            "origin": "https://gitter.im/jenkinsci/jenkins",
+            "tag": "https://gitter.im/jenkinsci/jenkins",
+            "uuid": "a9f92bf99785ad838df6736b7825c6f7ae16ac58",
+            "extra": None
+        }
+
+        eitem = {}
+        self._enrich.copy_raw_fields(raw_fields, source, eitem)
+
+        self.assertEqual(eitem['metadata__updated_on'], expected['metadata__updated_on'])
+        self.assertEqual(eitem['metadata__timestamp'], expected['metadata__timestamp'])
+        self.assertEqual(eitem['offset'], expected['offset'])
+        self.assertEqual(eitem['origin'], expected['origin'])
+        self.assertEqual(eitem['tag'], expected['tag'])
+        self.assertEqual(eitem['uuid'], expected['uuid'])
+        self.assertEqual(eitem['extra'], expected['extra'])
+
 
 if __name__ == '__main__':
     unittest.main()
