@@ -44,8 +44,8 @@ class TestSlack(TestBaseBackend):
         """Test whether JSON items are properly inserted into ES"""
 
         result = self._test_items_to_raw()
-        self.assertEqual(result['items'], 9)
-        self.assertEqual(result['raw'], 9)
+        self.assertEqual(result['items'], 10)
+        self.assertEqual(result['raw'], 10)
 
         for item in self.items:
             self.ocean_backend._fix_item(item)
@@ -56,8 +56,8 @@ class TestSlack(TestBaseBackend):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
-        self.assertEqual(result['raw'], 9)
-        self.assertEqual(result['enrich'], 9)
+        self.assertEqual(result['raw'], 10)
+        self.assertEqual(result['enrich'], 10)
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -69,6 +69,12 @@ class TestSlack(TestBaseBackend):
         for item in self.items[1:]:
             eitem = enrich_backend.get_rich_item(item)
             self.assertEqual(eitem['channel_member_count'], 4565)
+
+        # test to check if files in a message is enriched
+        item = self.items[9]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['number_files'], 2)
+        self.assertEqual(eitem['message_file_size'], 4588)
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
@@ -84,8 +90,8 @@ class TestSlack(TestBaseBackend):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
-        self.assertEqual(result['raw'], 9)
-        self.assertEqual(result['enrich'], 9)
+        self.assertEqual(result['raw'], 10)
+        self.assertEqual(result['enrich'], 10)
 
         enrich_backend = self.connectors[self.connector][2]()
         enrich_backend.sortinghat = True
@@ -116,8 +122,8 @@ class TestSlack(TestBaseBackend):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
-        self.assertEqual(result['raw'], 9)
-        self.assertEqual(result['enrich'], 9)
+        self.assertEqual(result['raw'], 10)
+        self.assertEqual(result['enrich'], 10)
 
         res = requests.get(self.es_con + "/" + self.enrich_index + "/_search", verify=False)
         for eitem in res.json()['hits']['hits']:
