@@ -911,4 +911,208 @@
     "timestamp": 1518165795.539766,
     "updated_on": 1427135634.000066,
     "uuid": "e59d9ca0d9a2ba1c747dc60a0904edd22d69e20e"
-}]
+},
+{
+    "backend_name": "Slack",
+    "backend_version": "0.9.0",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "blocks": [
+            {
+                "block_id": "qg2",
+                "elements": [
+                    {
+                        "elements": [
+                            {
+                                "text": "This message contains 2 files",
+                                "type": "text"
+                            }
+                        ],
+                        "type": "rich_text_section"
+                    }
+                ],
+                "type": "rich_text"
+            }
+        ],
+         "channel_info": {
+            "created": 1480595743,
+            "creator": "U0001",
+            "id": "C011DUKE8",
+            "is_archived": false,
+            "is_channel": true,
+            "is_general": true,
+            "is_member": true,
+            "is_read_only": false,
+            "last_read": "1489127926.000217",
+            "latest": {
+                "bot_id": "B0001",
+                "subtype": "bot_message",
+                "text": "There are no events this week.",
+                "ts": "1486969200.000136",
+                "type": "message"
+            },
+            "members": [
+                "U0001",
+                "U0002",
+                "U0003"
+            ],
+            "name": "test channel",
+            "name_normalized": "test channel",
+            "num_members": 4565,
+            "previous_names": [],
+            "purpose": {
+                "creator": "",
+                "last_set": 0,
+                "value": "Test channel."
+            },
+            "topic": {
+                "creator": "",
+                "last_set": 0,
+                "value": "A test channel for testing Perceval"
+            },
+            "unread_count": 1,
+            "unread_count_display": 1
+        },
+        "client_msg_id": "1234id",
+        "files": [
+            {
+                "created": 1588324635,
+                "display_as_bot": false,
+                "edit_link": "https://testteam-gvn2512.slack.com/files/1234ABC/5678ABC/helloworld.py/edit",
+                "editable": true,
+                "external_type": "",
+                "filetype": "python",
+                "has_rich_preview": false,
+                "id": "F0138UG83GR",
+                "is_external": false,
+                "is_public": true,
+                "is_starred": false,
+                "lines": 2,
+                "lines_more": 0,
+                "mimetype": "text/plain",
+                "mode": "snippet",
+                "name": "helloworld.py",
+                "permalink": "https://testteam-gvn2512.slack.com/files/1234ABC/5678ABC/helloworld.py",
+                "permalink_public": "https://slack-files.com/123MNO-FGH123-PQR234",
+                "pretty_type": "Python",
+                "preview": "print(\"Hello world\")\n",
+                "preview_highlight": "<div class=\"CodeMirror cm-s-default CodeMirrorServer\" oncopy=\"if(event.clipboardData){event.clipboardData.setData('text/plain',window.getSelection().toString().replace(/\\u200b/g,''));event.preventDefault();event.stopPropagation();}\">\n<div class=\"CodeMirror-code\">\n<div><pre><span class=\"cm-builtin\">print</span>(<span class=\"cm-string\">&quot;Hello world&quot;</span>)</pre></div>\n</div>\n</div>\n",
+                "preview_is_truncated": false,
+                "public_url_shared": false,
+                "size": 2123,
+                "timestamp": 1588324635,
+                "title": "helloworld.py",
+                "url_private": "https://files.slack.com/files-pri/123MNO-FGH123/helloworld.py",
+                "url_private_download": "https://files.slack.com/files-pri/123MNO-FGH123/download/helloworld.py",
+                "user": "U0003",
+                "username": ""
+            },
+            {
+                "created": 1588324635,
+                "display_as_bot": false,
+                "edit_link": "https://testteam-gvn2512.slack.com/files/987XYZ/IJK345/test_file/edit",
+                "editable": true,
+                "external_type": "",
+                "filetype": "text",
+                "has_rich_preview": false,
+                "id": "F0138UG8481",
+                "is_external": false,
+                "is_public": true,
+                "is_starred": false,
+                "lines": 2,
+                "lines_more": 0,
+                "mimetype": "text/plain",
+                "mode": "snippet",
+                "name": "test file",
+                "permalink": "https://testteam-gvn2512.slack.com/files/987XYZ/IJK345/test_file",
+                "permalink_public": "https://slack-files.com/JKL456-MNO123-ABC345",
+                "pretty_type": "Plain text",
+                "preview": "Data inside test file\n",
+                "preview_highlight": "<div class=\"CodeMirror cm-s-default CodeMirrorServer\" oncopy=\"if(event.clipboardData){event.clipboardData.setData('text/plain',window.getSelection().toString().replace(/\\u200b/g,''));event.preventDefault();event.stopPropagation();}\">\n<div class=\"CodeMirror-code\">\n<div><pre>Data inside test file</pre></div>\n<div><pre></pre></div>\n</div>\n</div>\n",
+                "preview_is_truncated": false,
+                "public_url_shared": false,
+                "size": 2465,
+                "timestamp": 1588324635,
+                "title": "test file",
+                "url_private": "https://files.slack.com/files-pri/JKL456-MNO123/test_file",
+                "url_private_download": "https://files.slack.com/files-pri/JKL456-MNO123/download/test_file",
+                "user": "U0003",
+                "username": ""
+            }
+        ],
+        "reactions": [
+            {
+                "count": 1,
+                "name": "+1",
+                "users": [
+                    "U0001"
+                ]
+            },
+            {
+                "count": 1,
+                "name": "slightly_smiling_face",
+                "users": [
+                    "U0003"
+                ]
+            }
+        ],
+        "text": "This message contains 2 files",
+        "ts": "1588324642.000100",
+        "type": "message",
+        "upload": true,
+        "user": "U0002",
+        "user_data": {
+            "color": "e7392d",
+            "deleted": false,
+            "id": "U0002",
+            "is_admin": false,
+            "is_app_user": false,
+            "is_bot": false,
+            "is_owner": false,
+            "is_primary_owner": false,
+            "is_restricted": false,
+            "is_ultra_restricted": false,
+            "name": "animesh_username",
+            "profile": {
+                "avatar_hash": "1234hash",
+                "display_name": "Animesh",
+                "display_name_normalized": "Animesh",
+                "image_192": "https://secure.gravatar.com",
+                "image_24": "https://secure.gravatar.com",
+                "image_32": "https://secure.gravatar.com",
+                "image_48": "https://secure.gravatar.com",
+                "image_512": "https://secure.gravatar.com",
+                "image_72": "https://secure.gravatar.com",
+                "phone": "",
+                "real_name": "Animesh",
+                "real_name_normalized": "Animesh",
+                "skype": "",
+                "status_emoji": "",
+                "status_expiration": 0,
+                "status_text": "",
+                "status_text_canonical": "",
+                "team": "T0001",
+                "title": ""
+            },
+            "real_name": "Animesh",
+            "team_id": "T0001",
+            "tz": "Asia/Kolkata",
+            "tz_label": "India Standard Time",
+            "tz_offset": 19800,
+            "updated": 1588082878
+        }
+    },
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.13.0",
+    "search_fields": {
+        "channel_id": "C011DUKE8",
+        "channel_name": "test channel",
+        "item_id": "1588324642.0U08900H12100NA1V"
+    },
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1588324850.898842,
+    "updated_on": 1588324642.0001,
+    "uuid": "8bc7cbaa1fe5a6a56d5758a05100e838bf6f47c2"
+}
+]

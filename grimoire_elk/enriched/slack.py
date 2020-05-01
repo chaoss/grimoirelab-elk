@@ -139,16 +139,12 @@ class SlackEnrich(Enrich):
                 for i in range(0, rdata['count']):
                     eitem['reactions'].append(rdata["name"])
 
-        if 'file' in message:
-            eitem['file_type'] = message['file']['pretty_type']
-            eitem['file_title'] = message['file']['title']
-            eitem['file_size'] = message['file']['size']
-            eitem['file_name'] = message['file']['name']
-            eitem['file_mode'] = message['file']['mode']
-            eitem['file_is_public'] = message['file']['is_public']
-            eitem['file_is_external'] = message['file']['is_external']
-            eitem['file_id'] = message['file']['id']
-            eitem['file_is_editable'] = message['file']['editable']
+        if 'files' in message:
+            eitem['number_files'] = len(message['files'])
+            message_file_size = 0
+            for file in message['files']:
+                message_file_size += file.get('size', 0)
+            eitem['message_file_size'] = message_file_size
 
         if 'user_data' in message:
             eitem['team_id'] = message['user_data']['team_id']
