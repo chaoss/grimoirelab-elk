@@ -235,6 +235,8 @@ class GerritEnrich(Enrich):
             created_on = patchsets[0]['createdOn']
 
         eitem['status_value'] = self.last_changeset_approval_value(patchsets)
+        eitem['changeset_status_value'] = eitem['status_value']
+        eitem['changeset_status'] = eitem['status']
 
         created_on_date = str_to_datetime(created_on)
         eitem["created_on"] = created_on
@@ -358,6 +360,8 @@ class GerritEnrich(Enrich):
             epatchset['repository'] = eitem['repository']
             epatchset['branch'] = eitem['branch']
             epatchset['changeset_number'] = eitem['changeset_number']
+            epatchset['changeset_status'] = eitem['changeset_status']
+            epatchset['changeset_status_value'] = eitem['changeset_status_value']
 
             # Add author info
             epatchset["patchset_author_name"] = None
@@ -439,6 +443,8 @@ class GerritEnrich(Enrich):
             eapproval['repository'] = epatchset['repository']
             eapproval['branch'] = epatchset['branch']
             eapproval['changeset_number'] = epatchset['changeset_number']
+            eapproval['changeset_status'] = epatchset['changeset_status']
+            eapproval['changeset_status_value'] = epatchset['changeset_status_value']
             eapproval['patchset_number'] = epatchset['patchset_number']
             eapproval['patchset_revision'] = epatchset['patchset_revision']
             eapproval['patchset_ref'] = epatchset['patchset_ref']
