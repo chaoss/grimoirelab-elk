@@ -67,6 +67,8 @@ class TestGerrit(TestBaseBackend):
         self.assertIn('metadata__enriched_on', eitem)
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__gelk_version', eitem)
+        self.assertIn('changeset_status', eitem)
+        self.assertIn('changeset_status_value', eitem)
         self.assertIn(REPO_LABELS, eitem)
 
         self.assertEqual(eitem['time_to_first_review'], 0.06)
@@ -92,6 +94,8 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('metadata__enriched_on', epatchset)
             self.assertIn('metadata__gelk_backend_name', epatchset)
             self.assertIn('metadata__gelk_version', epatchset)
+            self.assertIn('changeset_status', epatchset)
+            self.assertIn('changeset_status_value', epatchset)
             self.assertIn(REPO_LABELS, epatchset)
 
         eapprovals = [ei for ei in epatchsets if 'is_gerrit_approval' in ei]
@@ -104,6 +108,8 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('metadata__enriched_on', epatchset)
             self.assertIn('metadata__gelk_backend_name', epatchset)
             self.assertIn('metadata__gelk_version', epatchset)
+            self.assertIn('changeset_status', epatchset)
+            self.assertIn('changeset_status_value', epatchset)
             self.assertIn(REPO_LABELS, epatchset)
             self.assertEqual(epatchset['patchset_time_to_first_review'], expected_patchset_time_to_first_review[i])
 
@@ -111,6 +117,8 @@ class TestGerrit(TestBaseBackend):
         for eapproval in eapprovals:
             self.assertIn('approval_description', eapproval)
             self.assertIn('approval_description_analyzed', eapproval)
+            self.assertIn('changeset_status', eapproval)
+            self.assertIn('changeset_status_value', eapproval)
             self.assertIn('metadata__enriched_on', eapproval)
             self.assertIn('metadata__gelk_backend_name', eapproval)
             self.assertIn('metadata__gelk_version', eapproval)
