@@ -21,6 +21,9 @@
                 "num_funs": 31,
                 "tokens": 2207
             }],
+            "parents" : [
+              "41f207a9349ae497055ac03157d9915ae81031e0"
+            ],
             "analyzer": "lizard_file",
             "commit": "692ed86f888d2e7a5ce81a5b8a90f47d05cc5588",
             "message": "[graal] Derive `git_path` from `uri`\n \n This code derives the `git_path` of a target repository\n  based on its `uri`. This change is needed to allow the\n execution from mordred/ELK, as done with Perceval.\n\n Signed-off-by: Valerio Cosentino <valcos@bitergia.com>"
@@ -55,6 +58,9 @@
                 "num_funs": 52,
                 "tokens": 4623
             }],
+            "parents" : [
+              "bfe91c3f9ca046084143f15e117bdd691e0fe12f"
+            ],
             "analyzer": "lizard_file",
             "commit": "41f207a9349ae497055ac03157d9915ae81031e0"
         },
@@ -127,6 +133,9 @@
                     "num_funs": 3,
                     "tokens": 852
                 }
+            ],
+            "parents" : [
+              "f858376fdb3232417c8de196e04ce9db0e05c3e4"
             ],
             "analyzer": "lizard_file",
             "commit": "bfe91c3f9ca046084143f15e117bdd691e0fe12f",
@@ -206,6 +215,9 @@
                     "loc": 145
                 }
             ],
+            "parents" : [
+              "bf302f17458b477ab029dd5f8139015df47ce719"
+            ],
             "analyzer": "lizard_file",
             "commit": "f858376fdb3232417c8de196e04ce9db0e05c3e4",
             "message": "[graal] Modify git_path parameterThis code replaces the parameter `git_path` to `gitpath` to ease\nthe integration with arthur. Thus git and graal tasks share somecommon parameters."
@@ -265,6 +277,9 @@
                     "comments" : 24,
                     "file_path" : "tests/test_uris.py"
                 }
+            ],
+            "parents" : [
+              "87b1f985970587c758952c486d97e447873fb292"
             ],
             "analyzer" : "lizard_file"
         },
