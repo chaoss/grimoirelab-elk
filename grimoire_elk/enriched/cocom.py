@@ -215,6 +215,7 @@ class CocomEnrich(Enrich):
 
             # common attributes
             eitem['commit_sha'] = entry['commit']
+            eitem['commit_parents'] = entry.get('parents', None)
             eitem['author'] = entry['Author']
             eitem['committer'] = entry['Commit']
             eitem['message'] = entry.get('message', None)
