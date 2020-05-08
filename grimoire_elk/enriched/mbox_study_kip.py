@@ -285,9 +285,7 @@ def kafka_kip(enrich):
                 if "kip_min_vote" not in enrich.kips_dates[kip]:
                     kip_fields['kip_status'] = 'discussion'
                 max_discuss_date = enrich.kips_dates[kip]['kip_max_discuss']
-                kip_fields['kip_discuss_inactive_days'] = \
-                    get_time_diff_days(max_discuss_date.replace(tzinfo=None),
-                                       datetime_utcnow())
+                kip_fields['kip_discuss_inactive_days'] = get_time_diff_days(max_discuss_date, datetime_utcnow())
 
             if eitem['kip_is_vote']:
                 kip_fields["kip_voting_time_days"] = \
@@ -305,9 +303,7 @@ def kafka_kip(enrich):
                 # Detect discussion status
                 kip_fields['kip_status'] = 'voting'
                 max_vote_date = enrich.kips_dates[kip]['kip_max_vote']
-                kip_fields['kip_voting_inactive_days'] = \
-                    get_time_diff_days(max_vote_date.replace(tzinfo=None),
-                                       datetime_utcnow())
+                kip_fields['kip_voting_inactive_days'] = get_time_diff_days(max_vote_date, datetime_utcnow())
 
                 # Now check if there is a result from enrich.kips_scores
                 kip_fields['kip_result'] = lazy_result(enrich.kips_scores[kip])
