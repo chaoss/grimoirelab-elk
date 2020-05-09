@@ -54,7 +54,7 @@ def get_repository_filter(perceval_backend, perceval_backend_name, term=False):
         return filter_
 
     field = 'origin'
-    value = perceval_backend.origin
+    value = anonymize_url(perceval_backend.origin)
 
     if perceval_backend_name in ["meetup", "nntp", "stackexchange", "jira"]:
         # Until tag is supported in all raw and enriched indexes
