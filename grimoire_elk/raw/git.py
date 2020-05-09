@@ -22,6 +22,7 @@
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 from ..identities.git import GitIdentities
+from ..enriched.utils import anonymize_url
 
 
 class Mapping(BaseMapping):
@@ -60,6 +61,9 @@ class GitOcean(ElasticOcean):
 
     mapping = Mapping
     identities = GitIdentities
+
+    def _fix_item(self, item):
+        item['origin'] = anonymize_url(item['origin'])
 
     @classmethod
     def get_perceval_params_from_url(cls, url):
