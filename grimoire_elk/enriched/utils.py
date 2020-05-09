@@ -23,10 +23,10 @@ import datetime
 import inspect
 import json
 import logging
+import re
 
 import requests
 import urllib3
-
 
 from grimoirelab_toolkit.datetime import (datetime_utcnow,
                                           str_to_datetime)
@@ -44,8 +44,7 @@ REPO_LABELS = 'repository_labels'
 logger = logging.getLogger(__name__)
 
 
-def get_repository_filter(perceval_backend, perceval_backend_name,
-                          term=False):
+def get_repository_filter(perceval_backend, perceval_backend_name, term=False):
     """ Get the filter needed for get the items in a repository """
     from .github import GITHUB
 
@@ -86,6 +85,16 @@ def get_repository_filter(perceval_backend, perceval_backend_name,
         filter_ = {}
 
     return filter_
+
+
+def anonymize_url(url):
+    """Remove credentials from the url
+
+    :param url: target url
+    """
+    anonymized = re.sub('://.*@', '://', url)
+
+    return anonymized
 
 
 def get_time_diff_days(start, end):

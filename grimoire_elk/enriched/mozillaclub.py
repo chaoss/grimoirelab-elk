@@ -22,7 +22,7 @@
 import json
 import logging
 
-from grimoire_elk.enriched.enrich import Enrich, metadata
+from grimoire_elk.enriched.enrich import Enrich, metadata, anonymize_url
 from ..elastic_mapping import Mapping as BaseMapping
 
 
@@ -173,8 +173,7 @@ class MozillaClubEnrich(Enrich):
 
         url = self.elastic.get_bulk_url()
 
-        logger.debug("[mozillaclub] Adding items to {} (in {} packs)".format(
-                     self.elastic.anonymize_url(url), max_items))
+        logger.debug("[mozillaclub] Adding items to {} (in {} packs)".format(anonymize_url(url), max_items))
 
         items = ocean_backend.fetch()
         for item in items:

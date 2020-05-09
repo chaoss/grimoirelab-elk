@@ -26,7 +26,7 @@ import unittest
 from base import TestBaseBackend
 from grimoire_elk.enriched.enrich import logger
 from grimoire_elk.enriched.github import logger as logger_github
-from grimoire_elk.enriched.utils import REPO_LABELS
+from grimoire_elk.enriched.utils import REPO_LABELS, anonymize_url
 from grimoire_elk.raw.github import GitHubOcean
 
 
@@ -214,10 +214,10 @@ class TestGitHub(TestBaseBackend):
 
             self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[github] Geolocation '
                                            'starting study %s/test_github_enrich'
-                             % enrich_backend.elastic.anonymize_url(self.es_con))
+                             % anonymize_url(self.es_con))
             self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:[github] Geolocation '
                                             'end %s/test_github_enrich'
-                             % enrich_backend.elastic.anonymize_url(self.es_con))
+                             % anonymize_url(self.es_con))
 
         time.sleep(5)  # HACK: Wait until github enrich index has been written
         items = [item for item in enrich_backend.fetch() if 'user_location' in item]

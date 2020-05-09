@@ -29,7 +29,7 @@ import logging
 from grimoirelab_toolkit.datetime import unixtime_to_datetime
 
 from datetime import datetime
-from ..enriched.utils import get_repository_filter
+from ..enriched.utils import get_repository_filter, anonymize_url
 from ..elastic_items import ElasticItems
 from ..elastic_mapping import Mapping
 from ..errors import ELKError
@@ -166,8 +166,8 @@ class ElasticOcean(ElasticItems):
 
         # We need to filter by repository to support several repositories
         # in the same raw index
-        filters_ = [get_repository_filter(self.perceval_backend,
-                    self.get_connector_name())]
+
+        filters_ = [get_repository_filter(self.perceval_backend, self.get_connector_name())]
 
         # Check if backend supports from_date
         signature = inspect.signature(self.perceval_backend.fetch)
@@ -182,7 +182,7 @@ class ElasticOcean(ElasticItems):
 
             logger.info("[{}] Incremental from: {} for {}".format(
                         self.perceval_backend.__class__.__name__.lower(),
-                        last_update, self.perceval_backend.origin))
+                        last_update, anonymize_url(self.perceval_backend.origin)))
 
         offset = None
         if 'offset' in signature.parameters:
@@ -194,7 +194,7 @@ class ElasticOcean(ElasticItems):
             if offset is not None:
                 logger.info("[{}] Incremental from: {} offset, for {}".format(
                             self.perceval_backend.__class__.__name__.lower(),
-                            offset, self.perceval_backend.origin))
+                            offset, anonymize_url(self.perceval_backend.origin)))
             else:
                 logger.info("[{}] Not incremental".format(
                             self.perceval_backend.__class__.__name__.lower()))

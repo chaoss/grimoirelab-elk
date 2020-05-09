@@ -37,7 +37,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
 
 from .utils import get_time_diff_days
 
-from .enrich import Enrich, metadata
+from .enrich import Enrich, metadata, anonymize_url
 from ..elastic_mapping import Mapping as BaseMapping
 
 from .github_study_evolution import (get_unique_repository_with_project_name,
@@ -297,7 +297,7 @@ class GitHubEnrich(Enrich):
         enrich_index_search_url = self.elastic.index_url + "/_search"
 
         logger.info("[github] Doing enrich_pull_request study for index {}".format(
-                    self.elastic.anonymize_url(self.elastic.index_url)))
+                    anonymize_url(self.elastic.index_url)))
         time.sleep(1)  # HACK: Wait until git enrich index has been written
 
         def make_request(url, error_msg, data=None, req_type="GET"):

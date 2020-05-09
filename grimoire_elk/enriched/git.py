@@ -39,9 +39,9 @@ from perceval.backends.core.git import (GitCommand,
                                         RepositoryError)
 from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
-from ..elastic import ElasticSearch as elastic
 from ..elastic_mapping import Mapping as BaseMapping
 from ..elastic_items import HEADER_JSON, MAX_BULK_UPDATE_SIZE
+from .utils import anonymize_url
 
 GITHUB = 'https://github.com/'
 DEMOGRAPHY_COMMIT_MIN_DATE = '1980-01-01'
@@ -261,7 +261,7 @@ class GitEnrich(Enrich):
         eitem["repo_name"] = item["origin"]
 
         if eitem["repo_name"].startswith('http'):
-            eitem["repo_name"] = elastic.anonymize_url(eitem["repo_name"])
+            eitem["repo_name"] = anonymize_url(eitem["repo_name"])
 
         # Number of files touched
         eitem["files"] = 0
@@ -426,9 +426,7 @@ class GitEnrich(Enrich):
 
         url = self.elastic.get_bulk_url()
 
-        logger.debug("[git] Adding items to {} (in {} packs)".format(
-                     self.elastic.anonymize_url(url), max_items))
-
+        logger.debug("[git] Adding items to {} (in {} packs)".format(anonymize_url(url), max_items))
         items = ocean_backend.fetch()
 
         for item in items:
@@ -458,7 +456,7 @@ class GitEnrich(Enrich):
                     total += self.elastic.safe_put_bulk(url, bulk_json)
                     json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                     logger.debug("[git] Added {} items to {} ({:.2f} MB)".format(
-                                 total, self.elastic.anonymize_url(url), json_size))
+                                 total, anonymize_url(url), json_size))
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
                     logger.warning("[git] Unicode error in enriched items, converting to ascii")
@@ -663,10 +661,10 @@ class GitEnrich(Enrich):
                                 'hash', self.perceval_backend.origin)
 
         logger.debug("[git] update-items {} commits deleted from {} with origin {}.".format(
-                     len(hashes_to_delete), ocean_backend.elastic.anonymize_url(ocean_backend.elastic.index_url),
+                     len(hashes_to_delete), anonymize_url(ocean_backend.elastic.index_url),
                      self.perceval_backend.origin))
         logger.debug("[git] update-items {} commits deleted from {} with origin {}.".format(
-                     len(hashes_to_delete), enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url),
+                     len(hashes_to_delete), anonymize_url(enrich_backend.elastic.index_url),
                      self.perceval_backend.origin))
 
     def remove_commits(self, items, index, attribute, origin):
@@ -700,7 +698,7 @@ class GitEnrich(Enrich):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as ex:
-            logger.error("[git] Error updating deleted commits for {}.".format(self.elastic.anonymize_url(index)))
+            logger.error("[git] Error updating deleted commits for {}.".format(anonymize_url(index)))
             logger.error(r.text)
             return
 
@@ -747,11 +745,11 @@ class GitEnrich(Enrich):
                 git_repo = GitRepository(cmd.parsed_args.uri, cmd.parsed_args.gitpath)
 
                 logger.debug("[git] study git-branches delete branch info for repo {} in index {}".format(
-                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url)))
+                             git_repo.uri, anonymize_url(enrich_backend.elastic.index_url)))
                 self.delete_commit_branches(git_repo, enrich_backend)
 
                 logger.debug("[git] study git-branches add branch info for repo {} in index {}".format(
-                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url)))
+                             git_repo.uri, anonymize_url(enrich_backend.elastic.index_url)))
                 try:
                     self.add_commit_branches(git_repo, enrich_backend)
                 except Exception as e:
@@ -759,7 +757,7 @@ class GitEnrich(Enrich):
                     continue
 
                 logger.debug("[git] study git-branches repo {} in index {} processed".format(
-                             git_repo.uri, self.elastic.anonymize_url(enrich_backend.elastic.index_url)))
+                             git_repo.uri, anonymize_url(enrich_backend.elastic.index_url)))
 
         logger.debug("[git] study git-branches end")
 
@@ -800,13 +798,11 @@ class GitEnrich(Enrich):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            logger.error("[git] Error while deleting branches on {}".format(
-                         self.elastic.anonymize_url(index)))
+            logger.error("[git] Error while deleting branches on {}".format(anonymize_url(index)))
             logger.error(r.text)
             return
 
-        logger.debug("[git] Delete branches {}, index {}".format(
-                     r.text, self.elastic.anonymize_url(index)))
+        logger.debug("[git] Delete branches {}, index {}".format(r.text, anonymize_url(index)))
 
     def add_commit_branches(self, git_repo, enrich_backend):
         """Add the information about branches to the documents representing commits in
@@ -884,11 +880,11 @@ class GitEnrich(Enrich):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            logger.error("[git] Error adding branch info for {}".format(self.elastic.anonymize_url(index)))
+            logger.error("[git] Error adding branch info for {}".format(anonymize_url(index)))
             logger.error(r.text)
             return
 
-        logger.debug("[git] Add branches {}, index {}".format(r.text, self.elastic.anonymize_url(index)))
+        logger.debug("[git] Add branches {}, index {}".format(r.text, anonymize_url(index)))
 
     def __prepare_filter(self, terms_attr, terms_value, repo_origin):
         fltr = """

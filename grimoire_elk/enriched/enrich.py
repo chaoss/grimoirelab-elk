@@ -46,7 +46,7 @@ from .graal_study_evolution import (get_to_date,
                                     get_unique_repository)
 from statsmodels.duration.survfunc import SurvfuncRight
 
-from .utils import grimoire_con, METADATA_FILTER_RAW, REPO_LABELS
+from .utils import grimoire_con, METADATA_FILTER_RAW, REPO_LABELS, anonymize_url
 from .. import __version__
 
 logger = logging.getLogger(__name__)
@@ -365,7 +365,7 @@ class Enrich(ElasticItems):
 
         url = self.elastic.get_bulk_url()
 
-        logger.debug("Adding items to {} (in {} packs)".format(self.elastic.anonymize_url(url), max_items))
+        logger.debug("Adding items to {} (in {} packs)".format(anonymize_url(url), max_items))
 
         if events:
             logger.debug("Adding events items")
@@ -375,8 +375,7 @@ class Enrich(ElasticItems):
                 try:
                     total += self.elastic.safe_put_bulk(url, bulk_json)
                     json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
-                    logger.debug("Added {} items to {} ({:.2f} MB)".format(
-                                 total, self.elastic.anonymize_url(url), json_size))
+                    logger.debug("Added {} items to {} ({:.2f} MB)".format(total, anonymize_url(url), json_size))
                 except UnicodeEncodeError:
                     # Why is requests encoding the POST data as ascii?
                     logger.error("Unicode error in enriched items")
@@ -1125,7 +1124,7 @@ class Enrich(ElasticItems):
         res = self.requests.get(index_url)
         if res.status_code != 200:
             logger.error("[enrich-extra-data] Target index {} doesn't exists, "
-                         "study finished".format(self.elastic.anonymize_url(url)))
+                         "study finished".format(anonymize_url(url)))
             return
 
         res = self.requests.get(json_url)
@@ -1223,7 +1222,7 @@ class Enrich(ElasticItems):
                 return
 
             logger.info("[enrich-extra-data] Target index {} updated with data from {}".format(
-                        self.elastic.anonymize_url(url), json_url))
+                        anonymize_url(url), json_url))
 
     def find_geo_point_in_index(self, es_in, in_index, location_field, location_value, geolocation_field):
         """Look for a geo point in the `in_index` based on the `location_field` and `location_value`
@@ -1345,7 +1344,7 @@ class Enrich(ElasticItems):
         """
         data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
         log_prefix = "[{}] Geolocation".format(data_source)
-        logger.info("{} starting study {}".format(log_prefix, self.elastic.anonymize_url(self.elastic.index_url)))
+        logger.info("{} starting study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
 
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
                    verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
@@ -1398,9 +1397,7 @@ class Enrich(ElasticItems):
                     loc_info = geolocator.geocode(location)
                 except Exception as ex:
                     logger.debug("{} Location {} not found for {}. {}".format(
-                        log_prefix, location,
-                        self.elastic.anonymize_url(enrich_backend.elastic.index_url),
-                        ex)
+                        log_prefix, location, anonymize_url(enrich_backend.elastic.index_url), ex)
                     )
                     continue
 
@@ -1414,12 +1411,10 @@ class Enrich(ElasticItems):
                                             location_field, location)
             except requests.exceptions.HTTPError as ex:
                 logger.error("{} error executing study for {}. {}".format(
-                    log_prefix,
-                    self.elastic.anonymize_url(enrich_backend.elastic.index_url),
-                    ex)
+                    log_prefix, anonymize_url(enrich_backend.elastic.index_url), ex)
                 )
 
-        logger.info("{} end {}".format(log_prefix, self.elastic.anonymize_url(self.elastic.index_url)))
+        logger.info("{} end {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
 
     def enrich_forecast_activity(self, ocean_backend, enrich_backend, out_index,
                                  observations=20, probabilities=[0.5, 0.7, 0.9], interval_months=6,
@@ -1705,7 +1700,7 @@ class Enrich(ElasticItems):
         """
         data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
         log_prefix = "[{}] Demography".format(data_source)
-        logger.info("{} starting study {}".format(log_prefix, self.elastic.anonymize_url(self.elastic.index_url)))
+        logger.info("{} starting study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
 
         # The first step is to find the current min and max date for all the authors
         authors_min_max_data = {}
@@ -1755,7 +1750,7 @@ class Enrich(ElasticItems):
             logger.info("{} Creating alias: {}".format(log_prefix, DEMOGRAPHICS_ALIAS))
             self.elastic.add_alias(DEMOGRAPHICS_ALIAS)
 
-        logger.info("{} end {}".format(log_prefix, self.elastic.anonymize_url(self.elastic.index_url)))
+        logger.info("{} end {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
 
     @staticmethod
     def authors_min_max_dates(date_field, author_field="author_uuid"):
@@ -1889,7 +1884,7 @@ class Enrich(ElasticItems):
             """ % date_field
 
         logger.info("[enrich-feelings] Start study on {} with data from {}".format(
-            self.elastic.anonymize_url(self.elastic.index_url), nlp_rest_url))
+            anonymize_url(self.elastic.index_url), nlp_rest_url))
 
         es = ES([self.elastic_url], timeout=3600, max_retries=50, retry_on_timeout=True, verify_certs=False)
         search_fields = [attr for attr in attributes]
@@ -1949,7 +1944,7 @@ class Enrich(ElasticItems):
             self.__add_feelings_to_index('emotion', emotions_data, uuid_field)
 
         logger.info("[enrich-feelings] End study. Index {} updated with data from {}".format(
-            self.elastic.anonymize_url(self.elastic.index_url), nlp_rest_url))
+            anonymize_url(self.elastic.index_url), nlp_rest_url))
 
     def get_feelings(self, text, nlp_rest_url):
         """This method wraps the calls to the NLP rest service. First the text is converted as plain text,
@@ -1985,7 +1980,7 @@ class Enrich(ElasticItems):
 
         if not message:
             logger.debug("[enrich-feelings] No feelings detected after processing on {} in index {}".format(
-                text, self.elastic.anonymize_url(self.elastic.index_url)))
+                text, anonymize_url(self.elastic.index_url)))
             return sentiment, emotion
 
         sentiment_url = nlp_rest_url + '/sentiment'
@@ -2048,7 +2043,7 @@ class Enrich(ElasticItems):
             try:
                 r.raise_for_status()
                 logger.debug("[enrich-feelings] Adding {} on uuids {} in {}".format(
-                    fd, uuids, self.elastic.anonymize_url(self.elastic.index_url)))
+                    fd, uuids, anonymize_url(self.elastic.index_url)))
             except requests.exceptions.HTTPError as ex:
                 logger.error("[enrich-feelings] Error while executing study. Study aborted.")
                 logger.error(ex)

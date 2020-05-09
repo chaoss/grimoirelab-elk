@@ -25,7 +25,7 @@ import logging
 from requests.structures import CaseInsensitiveDict
 import email.utils
 
-from .enrich import Enrich, metadata
+from .enrich import Enrich, metadata, anonymize_url
 from ..elastic_mapping import Mapping as BaseMapping
 from .mbox_study_kip import kafka_kip, MAX_LINES_FOR_VOTE
 from grimoirelab_toolkit.datetime import str_to_datetime
@@ -208,7 +208,7 @@ class MBoxEnrich(Enrich):
 
         url = self.elastic.get_bulk_url()
 
-        logger.debug("[mbox] Adding items to {} (in {} packs)".format(self.elastic.anonymize_url(url), max_items))
+        logger.debug("[mbox] Adding items to {} (in {} packs)".format(anonymize_url(url), max_items))
 
         for item in items:
             if current >= max_items:
