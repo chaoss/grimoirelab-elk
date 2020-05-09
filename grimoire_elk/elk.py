@@ -31,9 +31,8 @@ from grimoirelab_toolkit.datetime import (datetime_utcnow, str_to_datetime)
 from .elastic_mapping import Mapping as BaseMapping
 from .elastic_items import ElasticItems
 from .enriched.sortinghat_gelk import SortingHat
-from .enriched.utils import get_last_enrich, grimoire_con, get_diff_current_date
-from .utils import get_elastic
-from .utils import get_connectors, get_connector_from_name
+from .enriched.utils import get_last_enrich, grimoire_con, get_diff_current_date, anonymize_url
+from .utils import get_connectors, get_connector_from_name, get_elastic
 
 IDENTITIES_INDEX = "grimoirelab_identities_cache"
 SIZE_SCROLL_IDENTITIES_INDEX = 1000
@@ -173,13 +172,13 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             error_msg = "Error feeding raw from {}".format(ex)
             logger.error(error_msg, exc_info=True)
 
-    logger.info("[{}] Done collection for {}".format(backend_name, backend.origin))
+    logger.info("[{}] Done collection for {}".format(backend_name, anonymize_url(backend.origin)))
     return error_msg
 
 
 def refresh_projects(enrich_backend):
     logger.debug("Refreshing project field in {}".format(
-                 enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url)))
+                 anonymize_url(enrich_backend.elastic.index_url)))
     total = 0
 
     eitems = enrich_backend.fetch()
@@ -221,7 +220,7 @@ def refresh_identities(enrich_backend, author_field=None, author_values=None):
             yield eitem
 
     logger.debug("Refreshing identities fields from {}".format(
-                 enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url)))
+                 anonymize_url(enrich_backend.elastic.index_url)))
 
     total = 0
 
@@ -488,7 +487,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
             do_studies(ocean_backend, enrich_backend, studies_args)
         elif do_refresh_projects:
             logger.info("Refreshing project field in {}".format(
-                        enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url)))
+                        anonymize_url(enrich_backend.elastic.index_url)))
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_projects(enrich_backend)
             enrich_backend.elastic.bulk_upload(eitems, field_id)
@@ -504,7 +503,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                 author_values = [author_uuid]
 
             logger.info("Refreshing identities fields in {}".format(
-                        enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url)))
+                        anonymize_url(enrich_backend.elastic.index_url)))
 
             field_id = enrich_backend.get_field_unique_id()
             eitems = refresh_identities(enrich_backend, author_attr, author_values)
@@ -515,7 +514,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
             ocean_backend.set_elastic(elastic_ocean)
 
             logger.debug("Adding enrichment data to {}".format(
-                         enrich_backend.elastic.anonymize_url(enrich_backend.elastic.index_url)))
+                         anonymize_url(enrich_backend.elastic.index_url)))
 
             if db_sortinghat and enrich_backend.has_identities():
                 # FIXME: This step won't be done from enrich in the future
@@ -541,11 +540,11 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
     except Exception as ex:
         if backend:
             logger.error("Error enriching raw from {} ({}): {}".format(
-                         backend_name, backend.origin, ex), exc_info=True)
+                         backend_name, anonymize_url(backend.origin), ex), exc_info=True)
         else:
             logger.error("Error enriching raw {}".format(ex), exc_info=True)
 
-    logger.info("[{}] Done enrichment for {}".format(backend_name, backend.origin))
+    logger.info("[{}] Done enrichment for {}".format(backend_name, anonymize_url(backend.origin)))
 
 
 def delete_orphan_unique_identities(es, sortinghat_db, current_data_source, active_data_sources):

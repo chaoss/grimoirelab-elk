@@ -471,7 +471,7 @@ class TestElastic(unittest.TestCase):
         elastic = ElasticSearch(self.es_con, self.target_index, GitOcean.mapping)
 
         new_items = elastic.bulk_upload(items, field_id="uuid")
-        self.assertEqual(new_items, 9)
+        self.assertEqual(new_items, 11)
 
     def test_bulk_upload_max_bulk(self):
         """Test whether items are correctly uploaded to an index"""
@@ -481,7 +481,7 @@ class TestElastic(unittest.TestCase):
         elastic.max_items_bulk = 2
 
         new_items = elastic.bulk_upload(items, field_id="uuid")
-        self.assertEqual(new_items, 9)
+        self.assertEqual(new_items, 11)
 
     def test_bulk_upload_no_items(self):
         """Test whether items are correctly uploaded to an index"""
@@ -600,11 +600,11 @@ class TestElastic(unittest.TestCase):
         items = json.loads(read_file('data/git.json'))
         elastic = ElasticSearch(self.es_con, self.target_index, GitOcean.mapping)
         new_items = elastic.bulk_upload(items, field_id="uuid")
-        self.assertEqual(new_items, 9)
+        self.assertEqual(new_items, 11)
 
         # no filter
         last_date = elastic.get_last_date('updated_on')
-        self.assertEqual(last_date.isoformat(), '2014-02-12T06:11:12+00:00')
+        self.assertEqual(last_date.isoformat(), '2019-10-01T18:05:52+00:00')
 
         # filter including all items
         fltr = {
@@ -656,15 +656,15 @@ class TestElastic(unittest.TestCase):
         items = json.loads(read_file('data/git.json'))
         elastic = ElasticSearch(self.es_con, self.target_index, GitOcean.mapping)
         new_items = elastic.bulk_upload(items, field_id="uuid")
-        self.assertEqual(new_items, 9)
+        self.assertEqual(new_items, 11)
 
         # no filter
         last_date = elastic.get_last_item_field('updated_on')
-        self.assertEqual(last_date.isoformat(), '2014-02-12T06:11:12+00:00')
+        self.assertEqual(last_date.isoformat(), '2019-10-01T18:05:52+00:00')
 
         # None filter
         last_date = elastic.get_last_item_field('updated_on', filters_=None)
-        self.assertEqual(last_date.isoformat(), '2014-02-12T06:11:12+00:00')
+        self.assertEqual(last_date.isoformat(), '2019-10-01T18:05:52+00:00')
 
         # Multiple filters
         fltrs = [
@@ -702,10 +702,10 @@ class TestElastic(unittest.TestCase):
         items[-1]['updated_on'] = items[-1]['updated_on'] * 1000
         elastic = ElasticSearch(self.es_con, self.target_index, GitOcean.mapping)
         new_items = elastic.bulk_upload(items, field_id="uuid")
-        self.assertEqual(new_items, 9)
+        self.assertEqual(new_items, 11)
 
         last_date = elastic.get_last_item_field('updated_on')
-        self.assertEqual(last_date.isoformat(), '2014-02-12T06:10:42.304000+00:00')
+        self.assertEqual(last_date.isoformat(), '2019-10-01T18:05:53.024000+00:00')
 
     def test_delete_items(self):
         """Test whether items are correctly deleted"""
@@ -717,13 +717,13 @@ class TestElastic(unittest.TestCase):
 
         elastic = ElasticSearch(self.es_con, self.target_index, GitOcean.mapping)
         new_items = elastic.bulk_upload(items, field_id="uuid")
-        self.assertEqual(new_items, 9)
+        self.assertEqual(new_items, 11)
 
         url = self.es_con + '/' + self.target_index + '/_count'
 
         elastic.delete_items(retention_time=90000000, time_field='timestamp')
         left_items = elastic.requests.get(url).json()['count']
-        self.assertEqual(left_items, 9)
+        self.assertEqual(left_items, 11)
 
         elastic.delete_items(retention_time=1, time_field='timestamp')
         left_items = elastic.requests.get(url).json()['count']
@@ -739,17 +739,17 @@ class TestElastic(unittest.TestCase):
 
         elastic = ElasticSearch(self.es_con, self.target_index, GitOcean.mapping)
         new_items = elastic.bulk_upload(items, field_id="uuid")
-        self.assertEqual(new_items, 9)
+        self.assertEqual(new_items, 11)
 
         url = self.es_con + '/' + self.target_index + '/_count'
 
         elastic.delete_items(retention_time=None, time_field='timestamp')
         left_items = elastic.requests.get(url).json()['count']
-        self.assertEqual(left_items, 9)
+        self.assertEqual(left_items, 11)
 
         elastic.delete_items(retention_time=-1, time_field='timestamp')
         left_items = elastic.requests.get(url).json()['count']
-        self.assertEqual(left_items, 9)
+        self.assertEqual(left_items, 11)
 
     def test_delete_items_error(self):
         """Test whether an error message is logged if the items aren't deleted"""
@@ -758,7 +758,7 @@ class TestElastic(unittest.TestCase):
 
         elastic = ElasticSearch(self.es_con, self.target_index, GitOcean.mapping)
         new_items = elastic.bulk_upload(items, field_id="uuid")
-        self.assertEqual(new_items, 9)
+        self.assertEqual(new_items, 11)
 
         with self.assertLogs(logger, level='ERROR') as cm:
             elastic.delete_items(retention_time=1, time_field='timestamp')

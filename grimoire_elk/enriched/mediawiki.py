@@ -24,7 +24,7 @@ import logging
 
 from grimoirelab_toolkit.datetime import str_to_datetime
 
-from .enrich import Enrich, metadata
+from .enrich import Enrich, metadata, anonymize_url
 from ..elastic_mapping import Mapping as BaseMapping
 
 logger = logging.getLogger(__name__)
@@ -240,7 +240,7 @@ class MediaWikiEnrich(Enrich):
 
         url = self.elastic.get_bulk_url()
 
-        logger.debug("[mediawiki] Adding items to {} (in {} packs)".format(self.elastic.anonymize_url(url), max_items))
+        logger.debug("[mediawiki] Adding items to {} (in {} packs)".format(anonymize_url(url), max_items))
 
         items = ocean_backend.fetch()
         for item in items:

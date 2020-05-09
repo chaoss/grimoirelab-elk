@@ -27,7 +27,7 @@ import logging
 import re
 import time
 
-from .enriched.utils import get_repository_filter, grimoire_con
+from .enriched.utils import get_repository_filter, grimoire_con, anonymize_url
 from .elastic_mapping import Mapping
 
 HEADER_JSON = {"Content-Type": "application/json"}
@@ -189,7 +189,7 @@ class ElasticItems:
             res = self.requests.delete(url, data=query_data, headers=headers)
             res.raise_for_status()
         except Exception:
-            logger.debug("Error releasing scroll: {}/{}".format(self.elastic.anonymize_url(url), scroll_id))
+            logger.debug("Error releasing scroll: {}/{}".format(anonymize_url(url), scroll_id))
             logger.debug("Error releasing scroll: {}".format(res.json()))
 
     # Items generator
@@ -228,14 +228,14 @@ class ElasticItems:
 
         if scroll_size == 0:
             logger.debug("No results found from {} and filter {}".format(
-                         self.elastic.anonymize_url(self.elastic.index_url), _filter))
+                         anonymize_url(self.elastic.index_url), _filter))
             self.free_scroll(scroll_id)
             return
 
         while scroll_size > 0:
 
             logger.debug("Fetching from {}: {} received".format(
-                         self.elastic.anonymize_url(self.elastic.index_url), len(page['hits']['hits'])))
+                         anonymize_url(self.elastic.index_url), len(page['hits']['hits'])))
             for item in page['hits']['hits']:
                 eitem = item['_source']
                 yield eitem
@@ -248,7 +248,7 @@ class ElasticItems:
             scroll_size = len(page['hits']['hits'])
 
         self.free_scroll(scroll_id)
-        logger.debug("Fetching from {}: done receiving".format(self.elastic.anonymize_url(self.elastic.index_url)))
+        logger.debug("Fetching from {}: done receiving".format(anonymize_url(self.elastic.index_url)))
 
     def get_elastic_items(self, elastic_scroll_id=None, _filter=None, ignore_incremental=False):
         """Get the items from the index related to the backend applying and
@@ -349,7 +349,7 @@ class ElasticItems:
             }
             """ % (filters, order_query)
 
-            logger.debug("Raw query to {}\n{}".format(self.elastic.anonymize_url(url),
+            logger.debug("Raw query to {}\n{}".format(anonymize_url(url),
                          json.dumps(json.loads(query), indent=4)))
             query_data = query
 
@@ -362,7 +362,7 @@ class ElasticItems:
             rjson = res.json()
         except Exception:
             # The index could not exists yet or it could be empty
-            logger.debug("No results found from {}".format(self.elastic.anonymize_url(url)))
+            logger.debug("No results found from {}".format(anonymize_url(url)))
 
         return rjson
 

@@ -27,7 +27,7 @@ from .enrich import (Enrich,
                      metadata)
 from .graal_study_evolution import (get_to_date,
                                     get_unique_repository)
-from .utils import fix_field_date
+from .utils import fix_field_date, anonymize_url
 from ..elastic_mapping import Mapping as BaseMapping
 
 from grimoirelab_toolkit.datetime import datetime_utcnow
@@ -317,7 +317,7 @@ class ColicEnrich(Enrich):
             # Other enrichment
             eitem["repo_url"] = item["origin"]
             if eitem["repo_url"].startswith('http'):
-                eitem["repo_url"] = ElasticSearch.anonymize_url(eitem["repo_url"])
+                eitem["repo_url"] = anonymize_url(eitem["repo_url"])
 
             if self.prjs_map:
                 eitem.update(self.get_item_project(eitem))
@@ -391,7 +391,7 @@ class ColicEnrich(Enrich):
         for repository_url in repositories:
             repository_url_anonymized = repository_url
             if repository_url_anonymized.startswith('http'):
-                repository_url_anonymized = ElasticSearch.anonymize_url(repository_url_anonymized)
+                repository_url_anonymized = anonymize_url(repository_url_anonymized)
 
             logger.info("[colic] study enrich-colic-analysis start analysis for {}".format(
                         repository_url_anonymized))

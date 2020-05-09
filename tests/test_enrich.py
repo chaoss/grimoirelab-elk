@@ -28,7 +28,8 @@ from unittest.mock import MagicMock
 from grimoire_elk.elastic import logger
 from grimoire_elk.enriched.enrich import (Enrich,
                                           DEMOGRAPHICS_ALIAS,
-                                          HEADER_JSON)
+                                          HEADER_JSON,
+                                          anonymize_url)
 from sortinghat.db.model import UniqueIdentity, Profile
 from grimoire_elk.utils import get_connectors, get_elastic
 
@@ -641,7 +642,7 @@ class TestEnrich(unittest.TestCase):
 
         self.assertEqual(cm.output[0],
                          'INFO:grimoire_elk.elastic:Alias %s created on %s.'
-                         % (DEMOGRAPHICS_ALIAS, self._enrich.elastic.anonymize_url(tmp_index_url)))
+                         % (DEMOGRAPHICS_ALIAS, anonymize_url(tmp_index_url)))
 
         r = self._enrich.requests.get(self._enrich.elastic.index_url + "/_alias", headers=HEADER_JSON, verify=False)
         self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[self._enrich.elastic.index]['aliases'])
@@ -652,7 +653,7 @@ class TestEnrich(unittest.TestCase):
 
         self.assertEqual(cm.output[0],
                          'DEBUG:grimoire_elk.elastic:Alias %s already exists on %s.'
-                         % (DEMOGRAPHICS_ALIAS, self._enrich.elastic.anonymize_url(tmp_index_url)))
+                         % (DEMOGRAPHICS_ALIAS, anonymize_url(tmp_index_url)))
 
         requests.delete(tmp_index_url, verify=False)
 

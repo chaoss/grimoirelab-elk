@@ -23,7 +23,7 @@ import json
 import logging
 
 from .enrich import Enrich, metadata
-from .utils import get_time_diff_days
+from .utils import get_time_diff_days, anonymize_url
 from ..elastic_mapping import Mapping as BaseMapping
 from grimoirelab_toolkit.datetime import str_to_datetime
 
@@ -219,7 +219,7 @@ class KitsuneEnrich(Enrich):
 
         url = self.elastic.get_bulk_url()
 
-        logger.debug("[kitsune] Adding items to {} (in {} packs)".format(self.elastic.anonymize_url(url), max_items))
+        logger.debug("[kitsune] Adding items to {} (in {} packs)".format(anonymize_url(url), max_items))
 
         items = ocean_backend.fetch()
         for item in items:

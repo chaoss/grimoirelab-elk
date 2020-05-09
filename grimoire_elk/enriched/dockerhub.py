@@ -23,7 +23,7 @@ import json
 import logging
 import sys
 
-from .enrich import Enrich, metadata
+from .enrich import Enrich, metadata, anonymize_url
 from ..elastic_mapping import Mapping as BaseMapping
 
 
@@ -133,15 +133,14 @@ class DockerHubEnrich(Enrich):
 
         url = self.elastic.get_bulk_url()
 
-        logger.debug("[dockerhub] Adding items to {} (in {} packs)".format(
-                     self.elastic.anonymize_url(url), max_items))
+        logger.debug("[dockerhub] Adding items to {} (in {} packs)".format(anonymize_url(url), max_items))
 
         for item in items:
             if current >= max_items:
                 total += self.elastic.safe_put_bulk(url, bulk_json)
                 json_size = sys.getsizeof(bulk_json) / (1024 * 1024)
                 logger.debug("[dockerhub] Added {} items to {} ({:.2f} MB)".format(
-                             total, self.elastic.anonymize_url(url), json_size))
+                             total, anonymize_url(url), json_size))
                 bulk_json = ""
                 current = 0
 

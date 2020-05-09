@@ -25,7 +25,8 @@ import unittest
 
 from base import TestBaseBackend, DB_SORTINGHAT
 from grimoire_elk.enriched.enrich import (logger,
-                                          DEMOGRAPHICS_ALIAS)
+                                          DEMOGRAPHICS_ALIAS,
+                                          anonymize_url)
 from grimoire_elk.enriched.utils import REPO_LABELS
 
 
@@ -217,10 +218,10 @@ class TestGerrit(TestBaseBackend):
             self.assertEqual(cm.output[0],
                              'INFO:grimoire_elk.enriched.enrich:[gerrit] '
                              'Demography starting study %s/test_gerrit_enrich'
-                             % enrich_backend.elastic.anonymize_url(self.es_con))
+                             % anonymize_url(self.es_con))
             self.assertEqual(cm.output[-1],
                              'INFO:grimoire_elk.enriched.enrich:[gerrit] Demography end %s/test_gerrit_enrich'
-                             % enrich_backend.elastic.anonymize_url(self.es_con))
+                             % anonymize_url(self.es_con))
 
         time.sleep(5)  # HACK: Wait until git enrich index has been written
         items = [i for i in enrich_backend.fetch()]

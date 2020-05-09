@@ -21,7 +21,7 @@
 
 import logging
 
-from .utils import get_time_diff_days
+from .utils import get_time_diff_days, anonymize_url
 from grimoirelab_toolkit.datetime import (datetime_utcnow, str_to_datetime)
 
 logger = logging.getLogger(__name__)
@@ -425,7 +425,7 @@ def kafka_kip(enrich):
 
         logger.info("[mbox] study Kafka KIP total eitems with kafka kip fields {}".format(total))
 
-    logger.debug("[mbox] study Kafka KIP doing from {}".format(enrich.elastic.anonymize_url(enrich.elastic.index_url)))
+    logger.debug("[mbox] study Kafka KIP doing from {}".format(anonymize_url(enrich.elastic.index_url)))
 
     # First iteration with the basic fields
     eitems = add_kip_fields(enrich)
