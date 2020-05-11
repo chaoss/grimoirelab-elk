@@ -56,30 +56,42 @@ class TestGit(TestBaseBackend):
         """Test whether JSON items are properly inserted into ES"""
 
         result = self._test_items_to_raw()
-        self.assertEqual(result['items'], 9)
-        self.assertEqual(result['raw'], 9)
+        self.assertEqual(result['items'], 11)
+        self.assertEqual(result['raw'], 11)
 
         aliases = self.ocean_backend.elastic.list_aliases()
         self.assertListEqual(self.ocean_aliases, list(aliases.keys()))
+
+        url = self.es_con + "/" + self.ocean_index + "/_search?size=20"
+        response = self.ocean_backend.requests.get(url, verify=False).json()
+
+        time.sleep(5)  # HACK: Wait until git enrich index has been written
+        for hit in response['hits']['hits']:
+            item = hit['_source']
+            self.assertNotIn('username:password', item['origin'])
+            self.assertNotIn('username:password', item['tag'])
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
-        self.assertEqual(result['raw'], 9)
-        self.assertEqual(result['enrich'], 9)
+        self.assertEqual(result['raw'], 11)
+        self.assertEqual(result['enrich'], 11)
 
         enrich_backend = self.connectors[self.connector][2]()
 
         item = self.items[0]
-        item['origin'] = 'https://admin:admin@gittest'
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['committer_name'], '')
+        self.assertNotIn('username:password', eitem['origin'])
+        self.assertNotIn('username:password', eitem['tag'])
 
         for item in self.items[1:]:
             eitem = enrich_backend.get_rich_item(item)
             self.assertNotEqual(eitem['committer_name'], 'Unknown')
             self.assertNotEqual(eitem['author_name'], 'Unknown')
+            self.assertNotIn('username:password', eitem['origin'])
+            self.assertNotIn('username:password', eitem['tag'])
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
@@ -88,11 +100,9 @@ class TestGit(TestBaseBackend):
         self.assertEqual(eitem['author_date_hour'], 14)
         self.assertEqual(eitem['utc_author_date_weekday'], 2)
         self.assertEqual(eitem['utc_author_date_hour'], 17)
-
         self.assertEqual(eitem['author_uuid'], '8b8d552af706acff79df0f18f5295391c51acd79')
         self.assertEqual(eitem['author_domain'], 'gmail.com')
         self.assertEqual(eitem['author_name'], 'Eduardo Morais and Zhongpeng Lin')
-
         self.assertEqual(eitem['commit_date'], '2012-08-14T14:32:15')
         self.assertEqual(eitem['commit_date_weekday'], 2)
         self.assertEqual(eitem['commit_date_hour'], 14)
@@ -106,11 +116,9 @@ class TestGit(TestBaseBackend):
         self.assertEqual(eitem['author_date_hour'], 22)
         self.assertEqual(eitem['utc_author_date_weekday'], 3)
         self.assertEqual(eitem['utc_author_date_hour'], 6)
-
         self.assertEqual(eitem['author_uuid'], '8abda7ad626330d5065d4c3a93fb45029a32bdcb')
         self.assertEqual(eitem['author_domain'], 'gmail.com')
         self.assertEqual(eitem['author_name'], 'Zhongpeng Lin (林中鹏)')
-
         self.assertEqual(eitem['commit_date'], '2014-02-11T22:10:39')
         self.assertEqual(eitem['commit_date_weekday'], 2)
         self.assertEqual(eitem['commit_date_hour'], 22)
@@ -124,11 +132,11 @@ class TestGit(TestBaseBackend):
         """Test whether the raw index is properly enriched with pair programming info"""
 
         result = self._test_raw_to_enrich(pair_programming=True)
-        self.assertEqual(result['raw'], 9)
-        self.assertEqual(result['enrich'], 11)
+        self.assertEqual(result['raw'], 11)
+        self.assertEqual(result['enrich'], 13)
 
         enrich_backend = self.connectors[self.connector][2](pair_programming=True)
-        url = self.es_con + "/" + self.enrich_index + "/_search"
+        url = self.es_con + "/" + self.enrich_index + "/_search?size=20"
         response = enrich_backend.requests.get(url, verify=False).json()
 
         time.sleep(5)  # HACK: Wait until git enrich index has been written
@@ -166,38 +174,41 @@ class TestGit(TestBaseBackend):
         for item in self.items:
             eitem = enrich_backend.get_rich_item(item)
             self.assertIn(REPO_LABELS, eitem)
+            self.assertNotIn('username:password', eitem['origin'])
+            self.assertNotIn('username:password', eitem['tag'])
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
-        self.assertEqual(result['raw'], 9)
-        self.assertEqual(result['enrich'], 9)
+        self.assertEqual(result['raw'], 11)
+        self.assertEqual(result['enrich'], 11)
 
         enrich_backend = self.connectors[self.connector][2]()
         enrich_backend.sortinghat = True
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
-        self.assertEqual(eitem['committer_name'], '')
-        self.assertEqual(eitem['Commit_name'], '-- UNDEFINED --')
-        self.assertEqual(eitem['Commit_user_name'], '-- UNDEFINED --')
-        self.assertEqual(eitem['Commit_org_name'], '-- UNDEFINED --')
-        self.assertEqual(eitem['Commit_multi_org_names'], ['-- UNDEFINED --'])
-
-        self.assertEqual(eitem['author_name'], 'Eduardo Morais')
-        self.assertEqual(eitem['Author_name'], 'Eduardo Morais')
-        self.assertEqual(eitem['Author_user_name'], 'Unknown')
-        self.assertEqual(eitem['Author_multi_org_names'], ['Unknown'])
+        self.assertIn('Commit_org_name', eitem)
+        self.assertIn('Commit_user_name', eitem)
+        self.assertIn('Commit_name', eitem)
+        self.assertIn('committer_name', eitem)
+        self.assertIn('Author_name', eitem)
+        self.assertIn('author_name', eitem)
+        self.assertIn('Commit_multi_org_names', eitem)
+        self.assertIn('Author_user_name', eitem)
+        self.assertIn('Author_multi_org_names', eitem)
+        self.assertNotIn('username:password', eitem['origin'])
+        self.assertNotIn('username:password', eitem['tag'])
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
-        self.assertEqual(result['raw'], 9)
-        self.assertEqual(result['enrich'], 9)
+        self.assertEqual(result['raw'], 11)
+        self.assertEqual(result['enrich'], 11)
         enrich_backend = self.connectors[self.connector][2]()
-        url = self.es_con + "/" + self.enrich_index + "/_search"
+        url = self.es_con + "/" + self.enrich_index + "/_search?size=20"
         response = enrich_backend.requests.get(url, verify=False).json()
 
         for hit in response['hits']['hits']:
@@ -220,6 +231,8 @@ class TestGit(TestBaseBackend):
                 self.assertIn('project_1', source)
                 self.assertEqual(source['project'], 'Main')
                 self.assertEqual(source['project_1'], 'Main')
+                self.assertNotIn('username:password', source['origin'])
+                self.assertNotIn('username:password', source['tag'])
 
     def test_refresh_identities(self):
         """Test refresh identities"""
@@ -251,9 +264,13 @@ class TestGit(TestBaseBackend):
                              % anonymize_url(self.es_con))
 
         time.sleep(5)  # HACK: Wait until git enrich index has been written
-        for item in enrich_backend.fetch():
+        items = [item for item in enrich_backend.fetch()]
+        self.assertEqual(len(items), 11)
+        for item in items:
             self.assertTrue('demography_min_date' in item.keys())
             self.assertTrue('demography_max_date' in item.keys())
+            self.assertNotIn('username:password', item['origin'])
+            self.assertNotIn('username:password', item['tag'])
 
         r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
                                                 headers=HEADER_JSON, verify=False)
@@ -272,8 +289,13 @@ class TestGit(TestBaseBackend):
                                "ba298a6fb09558e68c5e4ec6ae23b1c89fe920ef/test_extra_study.txt")
 
         time.sleep(5)  # HACK: Wait until git enrich index has been written
-        for item in enrich_backend.fetch():
-            self.assertTrue('extra_secret_repo' in item.keys())
+        items = [item for item in enrich_backend.fetch()]
+        self.assertEqual(len(items), 11)
+        for item in items:
+            if item['origin'] == '/tmp/perceval_mc84igfc/gittest':
+                self.assertIn('extra_secret_repo', item.keys())
+            else:
+                self.assertNotIn('extra_secret_repo', item.keys())
 
     def test_enrich_forecast_activity(self):
         """ Test that the forecast activity study works correctly """
@@ -291,7 +313,7 @@ class TestGit(TestBaseBackend):
                                                 '[enrich-forecast-activity] End study')
 
         time.sleep(5)  # HACK: Wait until git enrich index has been written
-        url = self.es_con + "/git_study_forecast_activity/_search"
+        url = self.es_con + "/git_study_forecast_activity/_search?size=20"
         response = enrich_backend.requests.get(url, verify=False).json()
         for hit in response['hits']['hits']:
             source = hit['_source']
@@ -335,18 +357,32 @@ class TestGit(TestBaseBackend):
 
         time.sleep(1)
 
-        url = self.es_con + "/git_onion-enriched/_count"
+        url = self.es_con + "/git_onion-enriched/_search?size=20"
         response = requests.get(url, verify=False).json()
-
-        self.assertGreater(response['count'], 0)
+        hits = response['hits']['hits']
+        self.assertEqual(len(hits), 12)
+        for hit in hits:
+            source = hit['_source']
+            self.assertIn('timeframe', source)
+            self.assertIn('author_uuid', source)
+            self.assertIn('author_name', source)
+            self.assertIn('contributions', source)
+            self.assertIn('metadata__timestamp', source)
+            self.assertIn('project', source)
+            self.assertIn('author_org_name', source)
+            self.assertIn('cum_net_sum', source)
+            self.assertIn('percent_cum_net_sum', source)
+            self.assertIn('onion_role', source)
+            self.assertIn('quarter', source)
+            self.assertIn('metadata__enriched_on', source)
+            self.assertIn('data_source', source)
+            self.assertIn('grimoire_creation_date', source)
 
         delete_onion = self.es_con + "/git_onion-enriched"
         requests.delete(delete_onion, verify=False)
 
     def test_enrich_areas_of_code(self):
         """ Test that areas of code works correctly"""
-
-        study, ocean_backend, enrich_backend = self._test_study('enrich_areas_of_code')
 
         projects_json_repo = "/tmp/perceval_mc84igfc/gittest"
         projects_json = {
@@ -362,14 +398,18 @@ class TestGit(TestBaseBackend):
             }
         }
 
-        enrich_backend.json_projects = projects_json
-        enrich_backend.projects_json_repo = projects_json_repo
-        enrich_backend.prjs_map = prjs_map
+        study, ocean_backend, enrich_backend = self._test_study('enrich_areas_of_code',
+                                                                projects_json=projects_json,
+                                                                prjs_map=prjs_map,
+                                                                projects_json_repo=projects_json_repo)
+
         study(ocean_backend, enrich_backend, in_index='test_git')
         time.sleep(5)  # HACK: Wait until git area of code has been written
-        url = self.es_con + "/git_aoc-enriched/_search"
+        url = self.es_con + "/git_aoc-enriched/_search?size=20"
         response = enrich_backend.requests.get(url, verify=False).json()
-        for hit in response['hits']['hits']:
+        hits = response['hits']['hits']
+        self.assertEqual(len(hits), 12)
+        for hit in hits:
             source = hit['_source']
             self.assertIn('addedlines', source)
             self.assertIn('author_bot', source)
@@ -408,9 +448,84 @@ class TestGit(TestBaseBackend):
             self.assertIn('removedlines', source)
             self.assertIn('repository', source)
             self.assertIn('uuid', source)
+            self.assertEqual(source['origin'], '/tmp/perceval_mc84igfc/gittest')
+            self.assertEqual(source['repository'], '/tmp/perceval_mc84igfc/gittest')
 
-        delete_survival = self.es_con + "/git_aoc-enriched"
-        requests.delete(delete_survival, verify=False)
+        delete_aoc = self.es_con + "/git_aoc-enriched"
+        requests.delete(delete_aoc, verify=False)
+
+    def test_enrich_areas_of_code_private_repo(self):
+        """ Test that areas of code works correctly for git private repos"""
+
+        projects_json_repo = "https://username:password@github.com/acme/errors"
+        projects_json = {
+            "secret-repo": {
+                "git": [
+                    "https://username:password@github.com/acme/errors"
+                ]
+            }
+        }
+        prjs_map = {
+            "git": {
+                "https://username:password@github.com/acme/errors": "secret-repo"
+            }
+        }
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_areas_of_code',
+                                                                projects_json=projects_json,
+                                                                prjs_map=prjs_map,
+                                                                projects_json_repo=projects_json_repo)
+
+        study(ocean_backend, enrich_backend, in_index='test_git')
+        time.sleep(5)  # HACK: Wait until git area of code has been written
+        url = self.es_con + "/git_aoc-enriched_anonymized/_search?size=20"
+        response = enrich_backend.requests.get(url, verify=False).json()
+        hits = response['hits']['hits']
+        self.assertEqual(len(hits), 2)
+        for hit in hits:
+            source = hit['_source']
+            self.assertIn('addedlines', source)
+            self.assertIn('author_bot', source)
+            self.assertIn('author_domain', source)
+            self.assertIn('author_id', source)
+            self.assertIn('author_name', source)
+            self.assertIn('author_org_name', source)
+            self.assertIn('author_multi_org_names', source)
+            self.assertIn('author_user_name', source)
+            self.assertIn('author_uuid', source)
+            self.assertIn('committer', source)
+            self.assertIn('committer_date', source)
+            self.assertIn('date', source)
+            self.assertIn('eventtype', source)
+            self.assertIn('fileaction', source)
+            self.assertIn('filepath', source)
+            self.assertIn('files', source)
+            self.assertIn('filetype', source)
+            self.assertIn('file_name', source)
+            self.assertIn('file_ext', source)
+            self.assertIn('file_dir_name', source)
+            self.assertIn('file_path_list', source)
+            self.assertIn('git_author_domain', source)
+            self.assertIn('grimoire_creation_date', source)
+            self.assertIn('hash', source)
+            self.assertIn('id', source)
+            self.assertIn('message', source)
+            self.assertIn('metadata__enriched_on', source)
+            self.assertIn('metadata__timestamp', source)
+            self.assertIn('metadata__updated_on', source)
+            self.assertIn('origin', source)
+            self.assertIn('owner', source)
+            self.assertIn('perceval_uuid', source)
+            self.assertIn('project', source)
+            self.assertIn('project_1', source)
+            self.assertIn('removedlines', source)
+            self.assertIn('repository', source)
+            self.assertIn('uuid', source)
+            self.assertEqual(source['origin'], 'https://github.com/acme/errors')
+            self.assertEqual(source['repository'], 'https://github.com/acme/errors')
+
+        delete_aoc = self.es_con + "/git_aoc-enriched_anonymized"
+        requests.delete(delete_aoc, verify=False)
 
     def test_perceval_params(self):
         """Test the extraction of perceval params from an URL"""

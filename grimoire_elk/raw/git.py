@@ -64,6 +64,7 @@ class GitOcean(ElasticOcean):
 
     def _fix_item(self, item):
         item['origin'] = anonymize_url(item['origin'])
+        item['tag'] = anonymize_url(item['tag'])
 
     @classmethod
     def get_perceval_params_from_url(cls, url):

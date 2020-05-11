@@ -20,7 +20,7 @@
 #   Nishchith Shetty <inishchith@gmail.com>
 #
 
-from grimoirelab_toolkit.datetime import str_to_datetime
+from grimoirelab_toolkit.datetime import str_to_datetime, unixtime_to_datetime
 
 
 def get_unique_repository():
@@ -178,9 +178,15 @@ def get_to_date(es_in, in_index, out_index, repository_url, interval):
             index=out_index,
             body=get_last_study_date(repository_url, interval))["aggregations"]["1"]
 
-        if last_study_date["value"] is not None:
+        if "value_as_string" in last_study_date and last_study_date["value_as_string"]:
             study_data_available = True
             to_date = str_to_datetime(last_study_date["value_as_string"])
+        elif "value" in last_study_date and last_study_date["value"]:
+            study_data_available = True
+            try:
+                to_date = unixtime_to_datetime(last_study_date["value"])
+            except Exception:
+                to_date = unixtime_to_datetime(last_study_date["value"] / 1000)
 
     if not study_data_available:
         first_item_date = es_in.search(
