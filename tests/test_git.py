@@ -305,7 +305,7 @@ class TestGit(TestBaseBackend):
         with self.assertLogs(logger, level='INFO') as cm:
 
             if study.__name__ == "enrich_forecast_activity":
-                study(ocean_backend, enrich_backend, out_index='git_study_forecast_activity', observations=2)
+                study(ocean_backend, enrich_backend, out_index='test_git_study_forecast_activity', observations=2)
 
                 self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:'
                                                '[enrich-forecast-activity] Start study')
@@ -313,7 +313,7 @@ class TestGit(TestBaseBackend):
                                                 '[enrich-forecast-activity] End study')
 
         time.sleep(5)  # HACK: Wait until git enrich index has been written
-        url = self.es_con + "/git_study_forecast_activity/_search?size=20"
+        url = self.es_con + "/test_git_study_forecast_activity/_search?size=20"
         response = enrich_backend.requests.get(url, verify=False).json()
         for hit in response['hits']['hits']:
             source = hit['_source']
@@ -342,22 +342,19 @@ class TestGit(TestBaseBackend):
             self.assertIn('metadata__gelk_backend_name', source)
             self.assertIn('metadata__enriched_on', source)
 
-        delete_survival = self.es_con + "/git_study_forecast_activity"
-        requests.delete(delete_survival, verify=False)
-
     def test_onion_study(self):
         """ Test that the onion study works correctly """
 
         study, ocean_backend, enrich_backend = self._test_study('enrich_onion')
-        study(ocean_backend, enrich_backend, in_index='test_git_enrich')
+        study(ocean_backend, enrich_backend, in_index='test_git_enrich', out_index='test_git_onion')
 
         url = self.es_con + "/_aliases"
         response = requests.get(url, verify=False).json()
-        self.assertTrue('git_onion-enriched' in response)
+        self.assertTrue('test_git_onion' in response)
 
         time.sleep(1)
 
-        url = self.es_con + "/git_onion-enriched/_search?size=20"
+        url = self.es_con + "/test_git_onion/_search?size=20"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
         self.assertEqual(len(hits), 12)
@@ -377,9 +374,6 @@ class TestGit(TestBaseBackend):
             self.assertIn('metadata__enriched_on', source)
             self.assertIn('data_source', source)
             self.assertIn('grimoire_creation_date', source)
-
-        delete_onion = self.es_con + "/git_onion-enriched"
-        requests.delete(delete_onion, verify=False)
 
     def test_enrich_areas_of_code(self):
         """ Test that areas of code works correctly"""
@@ -403,9 +397,9 @@ class TestGit(TestBaseBackend):
                                                                 prjs_map=prjs_map,
                                                                 projects_json_repo=projects_json_repo)
 
-        study(ocean_backend, enrich_backend, in_index='test_git')
+        study(ocean_backend, enrich_backend, in_index='test_git', out_index='test_git_aoc')
         time.sleep(5)  # HACK: Wait until git area of code has been written
-        url = self.es_con + "/git_aoc-enriched/_search?size=20"
+        url = self.es_con + "/test_git_aoc/_search?size=20"
         response = enrich_backend.requests.get(url, verify=False).json()
         hits = response['hits']['hits']
         self.assertEqual(len(hits), 12)
@@ -451,9 +445,6 @@ class TestGit(TestBaseBackend):
             self.assertEqual(source['origin'], '/tmp/perceval_mc84igfc/gittest')
             self.assertEqual(source['repository'], '/tmp/perceval_mc84igfc/gittest')
 
-        delete_aoc = self.es_con + "/git_aoc-enriched"
-        requests.delete(delete_aoc, verify=False)
-
     def test_enrich_areas_of_code_private_repo(self):
         """ Test that areas of code works correctly for git private repos"""
 
@@ -476,9 +467,9 @@ class TestGit(TestBaseBackend):
                                                                 prjs_map=prjs_map,
                                                                 projects_json_repo=projects_json_repo)
 
-        study(ocean_backend, enrich_backend, in_index='test_git')
+        study(ocean_backend, enrich_backend, in_index='test_git', out_index='test_git_aoc_anonymized')
         time.sleep(5)  # HACK: Wait until git area of code has been written
-        url = self.es_con + "/git_aoc-enriched_anonymized/_search?size=20"
+        url = self.es_con + "/test_git_aoc_anonymized/_search?size=20"
         response = enrich_backend.requests.get(url, verify=False).json()
         hits = response['hits']['hits']
         self.assertEqual(len(hits), 2)
@@ -523,9 +514,6 @@ class TestGit(TestBaseBackend):
             self.assertIn('uuid', source)
             self.assertEqual(source['origin'], 'https://github.com/acme/errors')
             self.assertEqual(source['repository'], 'https://github.com/acme/errors')
-
-        delete_aoc = self.es_con + "/git_aoc-enriched_anonymized"
-        requests.delete(delete_aoc, verify=False)
 
     def test_perceval_params(self):
         """Test the extraction of perceval params from an URL"""
