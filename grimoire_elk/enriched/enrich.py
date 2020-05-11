@@ -546,7 +546,7 @@ class Enrich(ElasticItems):
             # elk.enrich_backend)
             if self.projects_json_repo:
                 project = self.prjs_map[ds_name][self.projects_json_repo]
-            # if `projects_json_repo`, which shouldn't never happen, use the
+            # if `projects_json_repo` (e.g., AOC study), use the
             # method `get_project_repository` (defined in each enricher)
             else:
                 repository = self.get_project_repository(eitem)
@@ -561,6 +561,16 @@ class Enrich(ElasticItems):
                 fltr = eitem['origin'] + ' --filter-raw=' + self.filter_raw
                 if ds_name in self.prjs_map and fltr in self.prjs_map[ds_name]:
                     project = self.prjs_map[ds_name][fltr]
+            elif ds_name in self.prjs_map:
+                # this code is executed to retrieve the project of private repositories (in particular Git ones)
+                # the URLs in the prjs_map are retrieved, anonymized and compared with the value
+                # returned by `get_project_repository`
+                repository = self.get_project_repository(eitem)
+                for r in self.prjs_map[ds_name]:
+                    anonymized_repo = anonymize_url(r)
+                    if repository == anonymized_repo:
+                        project = self.prjs_map[ds_name][r]
+                        break
 
             if project == UNKNOWN_PROJECT:
                 return None

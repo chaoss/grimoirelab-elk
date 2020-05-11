@@ -261,7 +261,7 @@ class TestBaseBackend(unittest.TestCase):
         total = refresh_projects(self.enrich_backend)
         return total
 
-    def _test_study(self, test_study):
+    def _test_study(self, test_study, projects_json_repo=None, projects_json=None, prjs_map=None):
         """Test the execution of a study"""
 
         # populate raw index
@@ -280,6 +280,16 @@ class TestBaseBackend(unittest.TestCase):
 
         elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
         self.enrich_backend.set_elastic(elastic_enrich)
+
+        if projects_json:
+            self.enrich_backend.json_projects = projects_json
+
+        if projects_json_repo:
+            self.enrich_backend.projects_json_repo = projects_json_repo
+
+        if prjs_map:
+            self.enrich_backend.prjs_map = prjs_map
+
         self.enrich_backend.enrich_items(self.ocean_backend)
 
         for study in self.enrich_backend.studies:

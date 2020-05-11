@@ -568,9 +568,10 @@ class GitEnrich(Enrich):
                 repos.extend(items)
 
         for repo in repos:
-            logger.info("{} Processing repo: {}".format(log_prefix, repo))
-            in_conn.update_repo(repo)
-            out_conn.update_repo(repo)
+            anonymize_repo = anonymize_url(repo)
+            logger.info("{} Processing repo: {}".format(log_prefix, anonymize_repo))
+            in_conn.update_repo(anonymize_repo)
+            out_conn.update_repo(anonymize_repo)
             areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
 
         # Create alias if output index exists and alias does not
@@ -776,7 +777,7 @@ class GitEnrich(Enrich):
                     }
                 }
             ]
-        """ % git_repo.uri
+        """ % anonymize_url(git_repo.uri)
 
         # reset references in enrich index
         es_query = """
@@ -856,7 +857,7 @@ class GitEnrich(Enrich):
             logger.warning("[git] Change branch name from {} to {}".format(branch_name, digested_branch_name))
 
         # update enrich index
-        fltr = self.__prepare_filter("hash", commits_str, repo_origin)
+        fltr = self.__prepare_filter("hash", commits_str, anonymize_url(repo_origin))
 
         es_query = """
             {
