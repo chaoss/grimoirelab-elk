@@ -379,8 +379,8 @@ def kafka_kip(enrich):
 
             # Analyze the subject to fill the kip fields
             if '[discuss]' in eitem['Subject'].lower() or \
-               '[kip-discussion]'in eitem['Subject'].lower() or \
-               '[discussion]'in eitem['Subject'].lower():
+               '[kip-discussion]' in eitem['Subject'].lower() or \
+               '[discussion]' in eitem['Subject'].lower():
                 kip_fields['kip_is_discuss'] = 1
                 kip_fields['kip_type'] = "discuss"
                 kip_fields['kip'] = kip

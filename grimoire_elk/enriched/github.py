@@ -768,7 +768,7 @@ class GitHubEnrich(Enrich):
             )['aggregations']['created_per_interval'].get("buckets", [])
 
             # for each selected label + others labels
-            for label, other in [("", True)] + [(l, False) for l in reduced_labels]:
+            for label, other in [("", True)] + [(label, False) for label in reduced_labels]:
                 # compute metrics for each day (ES request for each day)
                 evolution_items = []
                 for date in map(lambda i: i['key_as_string'], dates):

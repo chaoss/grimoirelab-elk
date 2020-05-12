@@ -277,7 +277,7 @@ class JiraEnrich(Enrich):
             eitem['priority'] = issue['fields']['priority']['name']
 
         # data.fields.progress.percent not exists in Puppet JIRA
-        if 'progress'in issue['fields']:
+        if 'progress' in issue['fields']:
             eitem['progress_total'] = issue['fields']['progress']['total']
         eitem['project_id'] = issue['fields']['project']['id']
         eitem['project_key'] = issue['fields']['project']['key']
