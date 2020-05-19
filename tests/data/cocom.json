@@ -24,6 +24,9 @@
             "parents" : [
               "41f207a9349ae497055ac03157d9915ae81031e0"
             ],
+            "files": [
+                "graal/graal.py"
+            ],
             "analyzer": "lizard_file",
             "commit": "692ed86f888d2e7a5ce81a5b8a90f47d05cc5588",
             "message": "[graal] Derive `git_path` from `uri`\n \n This code derives the `git_path` of a target repository\n  based on its `uri`. This change is needed to allow the\n execution from mordred/ELK, as done with Perceval.\n\n Signed-off-by: Valerio Cosentino <valcos@bitergia.com>"
@@ -60,6 +63,10 @@
             }],
             "parents" : [
               "bfe91c3f9ca046084143f15e117bdd691e0fe12f"
+            ],
+            "files": [
+                "graal/graal.py",
+                "tests/test_graal.py"
             ],
             "analyzer": "lizard_file",
             "commit": "41f207a9349ae497055ac03157d9915ae81031e0"
@@ -136,6 +143,14 @@
             ],
             "parents" : [
               "f858376fdb3232417c8de196e04ce9db0e05c3e4"
+            ],
+            "files": [
+                "graal/graal.py",
+                "tests/test_graal.py",
+                "graal/backends/core/analyzers/lizard.py",
+                "graal/backends/core/cocom.py",
+                "tests/test_cocom.py",
+                "tests/test_lizard.py"
             ],
             "analyzer": "lizard_file",
             "commit": "bfe91c3f9ca046084143f15e117bdd691e0fe12f",
@@ -218,6 +233,17 @@
             "parents" : [
               "bf302f17458b477ab029dd5f8139015df47ce719"
             ],
+            "files": [
+                "graal/graal.py",
+                "tests/test_graal.py",
+                "graal/backends/core/analyzers/lizard.py",
+                "graal/backends/core/cocom.py",
+                "tests/test_cocom.py",
+                "tests/test_lizard.py",
+                "tests/data/analyzers/sample_code.py",
+                "tests/data/graaltest.zip",
+                "tests/data/sample_code.py"
+            ],
             "analyzer": "lizard_file",
             "commit": "f858376fdb3232417c8de196e04ce9db0e05c3e4",
             "message": "[graal] Modify git_path parameterThis code replaces the parameter `git_path` to `gitpath` to ease\nthe integration with arthur. Thus git and graal tasks share somecommon parameters."
@@ -280,6 +306,10 @@
             ],
             "parents" : [
               "87b1f985970587c758952c486d97e447873fb292"
+            ],
+            "files": [
+                "grimoirelab/toolkit/uris.py",
+                "tests/test_uris.py"
             ],
             "analyzer" : "lizard_file"
         },
