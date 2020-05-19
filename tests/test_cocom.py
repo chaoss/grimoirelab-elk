@@ -77,6 +77,7 @@ class TestCoCom(TestBaseBackend):
         self.assertEqual(eitem["blanks_per_loc"], 0.42)
         self.assertEqual(eitem["loc_per_function"], 12.0)
         self.assertIn('commit_parents', eitem)
+        self.assertIn('files_at_commit', eitem)
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_items(item)[0]
@@ -93,6 +94,7 @@ class TestCoCom(TestBaseBackend):
         self.assertEqual(eitem["blanks_per_loc"], 0.39)
         self.assertEqual(eitem["loc_per_function"], 10.13)
         self.assertIn('commit_parents', eitem)
+        self.assertIn('files_at_commit', eitem)
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_items(item)[0]
@@ -109,6 +111,7 @@ class TestCoCom(TestBaseBackend):
         self.assertEqual(eitem["blanks_per_loc"], 0.33)
         self.assertEqual(eitem["loc_per_function"], 26.67)
         self.assertIn('commit_parents', eitem)
+        self.assertIn('files_at_commit', eitem)
 
         item = self.items[3]
         eitem = enrich_backend.get_rich_items(item)[0]
@@ -125,6 +128,7 @@ class TestCoCom(TestBaseBackend):
         self.assertEqual(eitem["blanks_per_loc"], None)
         self.assertEqual(eitem["loc_per_function"], None)
         self.assertIn('commit_parents', eitem)
+        self.assertIn('files_at_commit', eitem)
 
     def test_cocom_analysis_study(self):
         """ Test that the cocom analysis study works correctly """
