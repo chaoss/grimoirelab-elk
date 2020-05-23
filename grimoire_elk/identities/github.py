@@ -19,10 +19,14 @@
 #   Jose Javier Merchante Picazo <jjmerchante@gcauldron.io>
 #
 
+from grimoire_elk.enriched.enrich import Enrich
 from grimoire_elk.identities.identities import Identities
 
 
-class GitHubIdentities(Identities):
+class GitHubIdentities(Enrich, Identities):
+
+    def __init__(self):
+        super().__init__()
 
     @classmethod
     def anonymize_item(cls, item):
@@ -78,3 +82,46 @@ class GitHubIdentities(Identities):
                 reaction['user'] = {
                     'login': cls._hash(reaction['user']['login'])
                 }
+
+    def get_field_author(self):
+        return "user_data"
+
+    def get_identities(self, item):
+        """Return the identities from an item"""
+
+        category = item['category']
+        item = item['data']
+
+        if category == "issue":
+            identity_types = ['user', 'assignee']
+        elif category == "pull_request":
+            identity_types = ['user', 'merged_by']
+        else:
+            identity_types = []
+
+        for identity in identity_types:
+            identity_attr = identity + "_data"
+            if item[identity] and identity_attr in item:
+                # In user_data we have the full user data
+                user = self.get_sh_identity(item[identity_attr])
+                if user:
+                    yield user
+
+    def get_sh_identity(self, item, identity_field=None):
+        identity = {}
+
+        user = item  # by default a specific user dict is expected
+        if isinstance(item, dict) and 'data' in item:
+            user = item['data'][identity_field]
+
+        if not user:
+            return identity
+
+        identity['username'] = user['login']
+        identity['email'] = None
+        identity['name'] = None
+        if 'email' in user:
+            identity['email'] = user['email']
+        if 'name' in user:
+            identity['name'] = user['name']
+        return identity

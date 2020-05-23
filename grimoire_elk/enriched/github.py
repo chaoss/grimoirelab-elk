@@ -38,6 +38,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
 from .utils import get_time_diff_days
 
 from .enrich import Enrich, metadata, anonymize_url
+from ..identities.identities import Identities
 from ..elastic_mapping import Mapping as BaseMapping
 
 from .github_study_evolution import (get_unique_repository_with_project_name,
@@ -91,7 +92,7 @@ class Mapping(BaseMapping):
         return {"items": mapping}
 
 
-class GitHubEnrich(Enrich):
+class GitHubEnrich(Enrich, Identities):
 
     mapping = Mapping
 
@@ -114,52 +115,9 @@ class GitHubEnrich(Enrich):
     def set_elastic(self, elastic):
         self.elastic = elastic
 
-    def get_field_author(self):
-        return "user_data"
-
     def get_field_date(self):
         """ Field with the date in the JSON enriched items """
         return "grimoire_creation_date"
-
-    def get_identities(self, item):
-        """Return the identities from an item"""
-
-        category = item['category']
-        item = item['data']
-
-        if category == "issue":
-            identity_types = ['user', 'assignee']
-        elif category == "pull_request":
-            identity_types = ['user', 'merged_by']
-        else:
-            identity_types = []
-
-        for identity in identity_types:
-            identity_attr = identity + "_data"
-            if item[identity] and identity_attr in item:
-                # In user_data we have the full user data
-                user = self.get_sh_identity(item[identity_attr])
-                if user:
-                    yield user
-
-    def get_sh_identity(self, item, identity_field=None):
-        identity = {}
-
-        user = item  # by default a specific user dict is expected
-        if isinstance(item, dict) and 'data' in item:
-            user = item['data'][identity_field]
-
-        if not user:
-            return identity
-
-        identity['username'] = user['login']
-        identity['email'] = None
-        identity['name'] = None
-        if 'email' in user:
-            identity['email'] = user['email']
-        if 'name' in user:
-            identity['name'] = user['name']
-        return identity
 
     def get_project_repository(self, eitem):
         repo = eitem['origin']
