@@ -134,6 +134,7 @@ class ScmsMboxEnrich(Enrich):
         #         eitem[f] = message[f]
         #     else:
         #         eitem[f] = None
+
         # Fields which names are translated
         map_fields = {
             "Subject": "Scms_Subject_analyzed"
@@ -183,6 +184,16 @@ class ScmsMboxEnrich(Enrich):
         #
         # self.add_repository_labels(eitem)
         # self.add_metadata_filter_raw(eitem)
+        # Part of the body is needed in studies like kafka_kip
+        eitem["Scms_body_extract"] = ""
+        if 'plain' in message['body']:
+            eitem["Scms_body_extract"] = "\n".join(message['body']['plain'].split("\n")[:MAX_LINES_FOR_VOTE])
+
+
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
+
         eitem.update(self.get_grimoire_fields(message['Date'], "message"))
 
         return eitem
