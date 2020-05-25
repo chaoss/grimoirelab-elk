@@ -104,6 +104,7 @@ from .enriched.kitsune import KitsuneEnrich
 from .enriched.launchpad import LaunchpadEnrich
 from .enriched.mattermost import MattermostEnrich
 from .enriched.mbox import MBoxEnrich
+from .enriched.scmsmbox import ScmsMboxEnrich
 from .enriched.mediawiki import MediaWikiEnrich
 from .enriched.meetup import MeetupEnrich
 from .enriched.mozillaclub import MozillaClubEnrich
@@ -111,6 +112,7 @@ from .enriched.nntp import NNTPEnrich
 from .enriched.pagure import PagureEnrich
 from .enriched.phabricator import PhabricatorEnrich
 from .enriched.pipermail import PipermailEnrich
+from .enriched.scmspipermail import ScmsPipermailEnrich
 from .enriched.puppetforge import PuppetForgeEnrich
 from .enriched.redmine import RedmineEnrich
 from .enriched.remo import ReMoEnrich
@@ -247,6 +249,7 @@ def get_connectors():
             "launchpad": [Launchpad, LaunchpadOcean, LaunchpadEnrich, LaunchpadCommand],
             "mattermost": [Mattermost, MattermostOcean, MattermostEnrich, MattermostCommand],
             "mbox": [MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
+            "scmsmbox":[MBox,MBoxOcean,ScmsMboxEnrich,MBoxCommand],
             "mediawiki": [MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
             "meetup": [Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
             "mozillaclub": [MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
@@ -254,6 +257,7 @@ def get_connectors():
             "pagure": [Pagure, PagureOcean, PagureEnrich, PagureCommand],
             "phabricator": [Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail": [Pipermail, PipermailOcean, PipermailEnrich, PipermailCommand],
+            "scmspipermail":[Pipermail,PipermailOcean,ScmsPipermailEnrich,PipermailCommand],
             "puppetforge": [PuppetForge, PuppetForgeOcean, PuppetForgeEnrich, PuppetForgeCommand],
             "redmine": [Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo": [ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
