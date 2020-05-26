@@ -64,6 +64,7 @@ from perceval.backends.core.pipermail import Pipermail, PipermailCommand
 from perceval.backends.core.twitter import Twitter, TwitterCommand
 from perceval.backends.puppet.puppetforge import PuppetForge, PuppetForgeCommand
 from perceval.backends.core.redmine import Redmine, RedmineCommand
+from perceval.backends.core.rocketchat import RocketChat, RocketChatCommand
 from perceval.backends.core.rss import RSS, RSSCommand
 from perceval.backends.core.slack import Slack, SlackCommand
 from perceval.backends.core.stackexchange import StackExchange, StackExchangeCommand
@@ -114,6 +115,7 @@ from .enriched.pipermail import PipermailEnrich
 from .enriched.puppetforge import PuppetForgeEnrich
 from .enriched.redmine import RedmineEnrich
 from .enriched.remo import ReMoEnrich
+from .enriched.rocketchat import RocketChatEnrich
 from .enriched.rss import RSSEnrich
 from .enriched.slack import SlackEnrich
 from .enriched.stackexchange import StackExchangeEnrich
@@ -156,6 +158,7 @@ from .raw.pipermail import PipermailOcean
 from .raw.puppetforge import PuppetForgeOcean
 from .raw.redmine import RedmineOcean
 from .raw.remo import ReMoOcean
+from .raw.rocketchat import RocketChatOcean
 from .raw.rss import RSSOcean
 from .raw.slack import SlackOcean
 from .raw.stackexchange import StackExchangeOcean
@@ -257,6 +260,7 @@ def get_connectors():
             "puppetforge": [PuppetForge, PuppetForgeOcean, PuppetForgeEnrich, PuppetForgeCommand],
             "redmine": [Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo": [ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
+            "rocketchat": [RocketChat, RocketChatOcean, RocketChatEnrich, RocketChatCommand],
             "rss": [RSS, RSSOcean, RSSEnrich, RSSCommand],
             "slack": [Slack, SlackOcean, SlackEnrich, SlackCommand],
             "stackexchange": [StackExchange, StackExchangeOcean,
