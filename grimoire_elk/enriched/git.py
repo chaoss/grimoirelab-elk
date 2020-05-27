@@ -605,37 +605,44 @@ class GitEnrich(Enrich):
                              no_incremental=no_incremental,
                              seconds=seconds)
 
-    def update_items(self, ocean_backend, enrich_backend):
-        """Retrieve the commits not present in the original repository and delete
-        the corresponding documents from the raw and enriched indexes"""
+    def get_diff_commits_origin_raw(self, ocean_backend):
+        """Return the commit hashes which are stored in the raw index but not in the original repo.
 
+        :param ocean_backend: Ocean backend
+        """
+        repo_origin = anonymize_url(self.perceval_backend.origin)
         fltr = {
             'name': 'origin',
-            'value': [self.perceval_backend.origin]
+            'value': [repo_origin]
         }
 
-        logger.debug("[git] update-items Checking commits for {}.".format(self.perceval_backend.origin))
-
+        current_hashes = []
         try:
             git_repo = GitRepository(self.perceval_backend.uri, self.perceval_backend.gitpath)
-            current_hashes = set([commit for commit in git_repo.rev_list()])
+            current_hashes = [commit for commit in git_repo.rev_list()]
         except EmptyRepositoryError:
-            logger.warning("[git] Skip updating branch info for repo {}, "
-                           "repo is empty".format(self.perceval_backend.origin))
-            return
+            logger.warning("No commits retrieved from {}, repo is empty".format(repo_origin))
         except RepositoryError:
-            logger.warning("[git] Skip updating branch info for repo {}, "
-                           "repo doesn't exist locally".format(self.perceval_backend.origin))
-            return
+            logger.warning("No commits retrieved from {}, repo doesn't exist locally".format(repo_origin))
         except Exception as e:
-            logger.error("[git] Skip updating branch info for repo {}, "
-                         "git rev-list command failed: {}".format(self.perceval_backend.origin, e))
-            return
+            logger.error("[git] No commits retrieved from {}, "
+                         "git rev-list command failed: {}".format(repo_origin, e))
 
+        current_hashes = set(current_hashes)
         raw_hashes = set([item['data']['commit']
                           for item in ocean_backend.fetch(ignore_incremental=True, _filter=fltr)])
 
         hashes_to_delete = list(raw_hashes.difference(current_hashes))
+
+        return hashes_to_delete
+
+    def update_items(self, ocean_backend, enrich_backend):
+        """Retrieve the commits not present in the original repository and delete
+        the corresponding documents from the raw and enriched indexes"""
+
+        repo_origin = anonymize_url(self.perceval_backend.origin)
+        logger.debug("[git] update-items Checking commits for {}.".format(repo_origin))
+        hashes_to_delete = self.get_diff_commits_origin_raw(ocean_backend)
 
         to_process = []
         for _hash in hashes_to_delete:
@@ -645,36 +652,33 @@ class GitEnrich(Enrich):
                 continue
 
             # delete documents from the raw index
-            self.remove_commits(to_process, ocean_backend.elastic.index_url,
-                                'data.commit', self.perceval_backend.origin)
+            self.remove_commits(to_process, ocean_backend.elastic.index_url, 'data.commit', repo_origin)
             # delete documents from the enriched index
-            self.remove_commits(to_process, enrich_backend.elastic.index_url,
-                                'hash', self.perceval_backend.origin)
+            self.remove_commits(to_process, enrich_backend.elastic.index_url, 'hash', repo_origin)
 
             to_process = []
 
         if to_process:
             # delete documents from the raw index
-            self.remove_commits(to_process, ocean_backend.elastic.index_url,
-                                'data.commit', self.perceval_backend.origin)
+            self.remove_commits(to_process, ocean_backend.elastic.index_url, 'data.commit', repo_origin)
             # delete documents from the enriched index
-            self.remove_commits(to_process, enrich_backend.elastic.index_url,
-                                'hash', self.perceval_backend.origin)
+            self.remove_commits(to_process, enrich_backend.elastic.index_url, 'hash', repo_origin)
 
         logger.debug("[git] update-items {} commits deleted from {} with origin {}.".format(
                      len(hashes_to_delete), anonymize_url(ocean_backend.elastic.index_url),
-                     self.perceval_backend.origin))
+                     repo_origin))
         logger.debug("[git] update-items {} commits deleted from {} with origin {}.".format(
                      len(hashes_to_delete), anonymize_url(enrich_backend.elastic.index_url),
-                     self.perceval_backend.origin))
+                     repo_origin))
 
-    def remove_commits(self, items, index, attribute, origin):
+    def remove_commits(self, items, index, attr, origin, origin_attr='origin'):
         """Delete documents that correspond to commits deleted in the Git repository
 
         :param items: target items to be deleted
         :param index: target index
-        :param attribute: name of the term attribute to search items
+        :param attr: name of the term attribute to search items
         :param origin: name of the origin from where the items must be deleted
+        :param origin_attr: attribute where the origin info is stored.
         """
         es_query = '''
             {
@@ -682,7 +686,7 @@ class GitEnrich(Enrich):
                 "bool": {
                     "must": {
                         "term": {
-                            "origin": "%s"
+                            "%s": "%s"
                         }
                     },
                     "filter": {
@@ -693,7 +697,7 @@ class GitEnrich(Enrich):
                 }
               }
             }
-            ''' % (origin, attribute, ",".join(['"%s"' % i for i in items]))
+            ''' % (origin_attr, origin, attr, ",".join(['"%s"' % i for i in items]))
 
         r = self.requests.post(index + "/_delete_by_query?refresh", data=es_query, headers=HEADER_JSON, verify=False)
         try:
