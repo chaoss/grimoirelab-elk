@@ -19,11 +19,10 @@
 #   Jose Javier Merchante Picazo <jjmerchante@gcauldron.io>
 #
 
-from grimoire_elk.enriched.enrich import Enrich
 from grimoire_elk.identities.identities import Identities
 
 
-class GitHubIdentities(Enrich, Identities):
+class GitHubIdentities(Identities):
 
     def __init__(self):
         super().__init__()

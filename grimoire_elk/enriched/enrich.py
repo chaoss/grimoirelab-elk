@@ -29,7 +29,6 @@ from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
 import pkg_resources
-from functools import lru_cache
 
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
 from geopy.geocoders import Nominatim
@@ -41,7 +40,6 @@ from ..elastic import ElasticSearch
 from ..elastic_items import (ElasticItems,
                              HEADER_JSON)
 from .study_ceres_onion import ESOnionConnector, onion_study
-from .sortinghat_gelk import MULTI_ORG_NAMES
 from .graal_study_evolution import (get_to_date,
                                     get_unique_repository)
 from statsmodels.duration.survfunc import SurvfuncRight
@@ -60,10 +58,10 @@ except ImportError:
 
 try:
     from sortinghat.db.database import Database
-    from sortinghat import api, utils
-    from sortinghat.exceptions import NotFoundError, InvalidValueError
+    # from sortinghat import api, utils
+    from sortinghat.exceptions import NotFoundError
 
-    from .sortinghat_gelk import SortingHat
+    # from .sortinghat_gelk import SortingHat
 
     SORTINGHAT_LIBS = True
 except ImportError:

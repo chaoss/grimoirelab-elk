@@ -24,21 +24,20 @@ import logging
 from functools import lru_cache
 
 from grimoirelab_toolkit.datetime import (str_to_datetime)
-from ..elastic_items import ElasticItems
 
 from ..enriched.sortinghat_gelk import MULTI_ORG_NAMES
 
 logger = logging.getLogger(__name__)
 
 try:
-    import pymysql
+    # import pymysql
     MYSQL_LIBS = True
 except ImportError:
     logger.info("MySQL not available")
     MYSQL_LIBS = False
 
 try:
-    from sortinghat.db.database import Database
+    # from sortinghat.db.database import Database
     from sortinghat import api, utils
     from sortinghat.exceptions import NotFoundError, InvalidValueError
 
@@ -146,7 +145,6 @@ class Identities:
         if u.profile:
             bot = u.profile.is_bot
         return bot
-
 
     def __get_item_sh_fields_empty(self, rol, undefined=False):
         """ Return a SH identity with all fields to empty_field """
@@ -361,7 +359,6 @@ class Identities:
                 eitem_sh['author_user_name'] = SH_UNKNOWN_VALUE
 
         return eitem_sh
-
 
     def get_enrollment(self, uuid, item_date):
         """ Get the enrollment for the uuid when the item was done """

@@ -38,7 +38,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
 from .utils import get_time_diff_days
 
 from .enrich import Enrich, metadata, anonymize_url
-from ..identities.identities import Identities
+from ..identities.github import GitHubIdentities
 from ..elastic_mapping import Mapping as BaseMapping
 
 from .github_study_evolution import (get_unique_repository_with_project_name,
@@ -92,7 +92,7 @@ class Mapping(BaseMapping):
         return {"items": mapping}
 
 
-class GitHubEnrich(Enrich, Identities):
+class GitHubEnrich(Enrich, GitHubIdentities):
 
     mapping = Mapping
 
