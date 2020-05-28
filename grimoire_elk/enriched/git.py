@@ -574,6 +574,10 @@ class GitEnrich(Enrich):
             out_conn.update_repo(anonymize_repo)
             areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
 
+            # delete the documents in the AOC index which correspond to commits that don't exist in the raw index
+            if out_conn.exists():
+                self.update_items_aoc(ocean_backend, es_out, out_index, anonymize_repo)
+
         # Create alias if output index exists and alias does not
         if out_conn.exists():
             if not out_conn.exists_alias(AREAS_OF_CODE_ALIAS) \
@@ -584,6 +588,139 @@ class GitEnrich(Enrich):
                 logger.warning("{} alias already exists: {}.".format(log_prefix, AREAS_OF_CODE_ALIAS))
 
         logger.info("{} end".format(log_prefix))
+
+    def get_unique_hashes_aoc(self, es_aoc, index_aoc, repository):
+        """Retrieve the unique commit hashes in the AOC index
+
+        :param es_aoc: the ES object to access AOC data
+        :param index_aoc: the AOC index
+        :param repository: the target repository
+        """
+
+        def __unique_commit_hashes_aoc(repository, until_date=None):
+            """Retrieve all unique commit hashes in ascending order on grimoire_creation_date
+            for a given repository in the AOC index"""
+
+            fltr = [
+                {
+                    "term": {
+                        "repository": repository
+                    }
+                }
+            ]
+
+            if until_date:
+                fltr.append({
+                    "range": {
+                        "metadata__updated_on": {
+                            "gte": until_date
+                        }
+                    }
+                })
+
+            query_unique_hashes = """
+            {
+                "aggs": {
+                    "2": {
+                      "terms": {
+                        "field": "hash",
+                        "size": 1000,
+                        "order": {
+                          "1": "asc"
+                        }
+                      },
+                      "aggs": {
+                        "1": {
+                          "max": {
+                            "field": "grimoire_creation_date"
+                          }
+                        }
+                      }
+                    }
+                },
+                "size": 0,
+                "query": {
+                    "bool": {
+                        "filter": %s
+                    }
+                }
+            }
+            """ % json.dumps(fltr)
+
+            return query_unique_hashes
+
+        aoc_hashes = []
+        fetching = True
+        last_date = None
+        previous_date = None
+        while fetching:
+            hits = es_aoc.search(index=index_aoc, body=__unique_commit_hashes_aoc(repository, last_date))
+            buckets = hits['aggregations']['2']['buckets']
+
+            if not buckets:
+                fetching = False
+
+            for bucket in buckets:
+                aoc_hashes.append(bucket['key'])
+                last_date = bucket['1']['value_as_string']
+
+            if previous_date == last_date:
+                fetching = False
+
+            previous_date = last_date
+
+        return aoc_hashes
+
+    def get_diff_commits_raw_aoc(self, ocean_backend, es_aoc, index_aoc, repository):
+        """Return the commit hashes which are stored in the AOC index but not in the Git raw index.
+
+        :param ocean_backend: Ocean backend
+        :param es_aoc: the ES object to access AOC data
+        :param index_aoc: the AOC index
+        :param repository: the target repository
+        """
+        fltr = {
+            'name': 'origin',
+            'value': [repository]
+        }
+
+        raw_hashes = set([item['data']['commit']
+                          for item in ocean_backend.fetch(ignore_incremental=True, _filter=fltr)])
+        aoc_hashes = set(self.get_unique_hashes_aoc(es_aoc, index_aoc, repository))
+
+        hashes_to_delete = list(aoc_hashes.difference(raw_hashes))
+
+        return hashes_to_delete
+
+    def update_items_aoc(self, ocean_backend, es_aoc, index_aoc, repository):
+        """Update the documents stored in the AOC index by deleting those ones corresponding
+        to deleted commits
+
+        :param ocean_backend: the Ocean backend to access the raw data
+        :param es_aoc: the ES object to access AOC data
+        :param index_aoc: the AOC index
+        :param repository: the target repository
+        """
+        aoc_index_url = self.elastic_url + '/' + index_aoc
+        hashes_to_delete = self.get_diff_commits_raw_aoc(ocean_backend, es_aoc, index_aoc, repository)
+        to_process = []
+        for _hash in hashes_to_delete:
+            to_process.append(_hash)
+
+            if len(to_process) != MAX_BULK_UPDATE_SIZE:
+                continue
+
+            # delete documents from the AOC index
+            self.remove_commits(to_process, aoc_index_url, 'hash', repository)
+
+            to_process = []
+
+        if to_process:
+            # delete documents from the AOC index
+            self.remove_commits(to_process, aoc_index_url, 'hash', repository)
+
+        logger.debug("[git] study areas_of_code {} commits deleted from {} with origin {}.".format(
+            len(hashes_to_delete), anonymize_url(aoc_index_url), repository))
 
     def enrich_onion(self, ocean_backend, enrich_backend,
                      no_incremental=False,
