@@ -92,6 +92,7 @@ from .enriched.functest import FunctestEnrich
 from .enriched.gerrit import GerritEnrich
 from .enriched.git import GitEnrich
 from .enriched.github import GitHubEnrich
+from .enriched.scmsgithub import ScmsGitHubEnrich
 from .enriched.githubql import GitHubQLEnrich
 from .enriched.github2 import GitHubEnrich2
 from .enriched.gitlab import GitLabEnrich
@@ -239,6 +240,7 @@ def get_connectors():
             "gerrit": [Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git": [Git, GitOcean, GitEnrich, GitCommand],
             "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
+            "scmsgithub":[GitHub,GitHubOcean,ScmsGitHubEnrich,GitHubCommand],
             "githubql": [GitHubQL, GitHubQLOcean, GitHubQLEnrich, GitHubQLCommand],
             "github2": [GitHub, GitHubOcean, GitHubEnrich2, GitHubCommand],
             "gitlab": [GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
