@@ -16,16 +16,13 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Authors:
-#   Jose Javier Merchante Picazo <jjmerchante@gcauldron.io>
+#   Nitish Gupta <imnitish.ng@gmail.com>
 #
 
 from grimoire_elk.identities.identities import Identities
 
 
 class GitHubIdentities(Identities):
-
-    def __init__(self):
-        super().__init__()
 
     @classmethod
     def anonymize_item(cls, item):

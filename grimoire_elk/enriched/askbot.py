@@ -27,6 +27,7 @@ from grimoirelab_toolkit.datetime import (str_to_datetime,
 from .utils import get_time_diff_days
 
 from .enrich import Enrich, metadata
+from ..identities.askbot import AskbotIdentities
 from ..elastic_mapping import Mapping as BaseMapping
 
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
@@ -65,57 +66,9 @@ class Mapping(BaseMapping):
         return {"items": mapping}
 
 
-class AskbotEnrich(Enrich):
+class AskbotEnrich(Enrich, AskbotIdentities):
 
     mapping = Mapping
-
-    def get_identities(self, item):
-        """ Return the identities from an item """
-
-        # question
-        user = self.get_sh_identity(item, self.get_field_author())
-        yield user
-
-        # answers
-        if 'answers' in item['data']:
-            for answer in item['data']['answers']:
-                # avoid "answered_by" : "This post is a wiki" corner case
-                if type(answer['answered_by']) is dict:
-                    user = self.get_sh_identity(answer['answered_by'])
-                    yield user
-                if 'comments' in answer:
-                    for comment in answer['comments']:
-                        commenter = self.get_sh_identity(comment)
-                        yield commenter
-
-    def get_sh_identity(self, item, identity_field=None):
-        identity = {key: None for key in ['username', 'name', 'email']}
-
-        user = item  # by default a specific user dict is expected
-        if isinstance(item, dict) and 'data' in item:
-            user = item['data'][identity_field]
-        elif 'author' in item:
-            user = item['author']
-
-        if user is None:
-            return identity
-
-        if 'username' in user:
-            identity['username'] = user['username']
-        elif 'user_display_name' in user:
-            identity['username'] = user['user_display_name']
-        elif 'answered_by' in user:
-            if 'username' in user['answered_by']:
-                identity['username'] = user['answered_by']['username']
-            else:
-                # "answered_by" : "This post is a wiki"
-                identity['username'] = user['answered_by']
-        identity['name'] = identity['username']
-
-        return identity
-
-    def get_field_author(self):
-        return 'author'
 
     @metadata
     def get_rich_item(self, item):
