@@ -25,6 +25,8 @@ import sys
 
 import requests
 
+import pkg_resources
+
 from grimoire_elk.errors import ElasticError
 from grimoire_elk.elastic import ElasticSearch
 # Connectors for Graal
@@ -170,6 +172,7 @@ logger = logging.getLogger(__name__)
 
 kibiter_version = None
 
+ENTRY_POINT_NAME = "grimoire_elk"
 
 def get_connector_from_name(name):
 
@@ -221,7 +224,7 @@ def get_connector_name_from_cls_name(cls_name):
 
 def get_connectors():
 
-    return {"askbot": [Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
+    connectors = {"askbot": [Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
             "bugzilla": [Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
             "bugzillarest": [BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
             "cocom": [CoCom, GraalOcean, CocomEnrich, CoComCommand],
@@ -269,6 +272,11 @@ def get_connectors():
             "telegram": [Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
             "twitter": [Twitter, TwitterOcean, TwitterEnrich, TwitterCommand]
             }  # Will come from Registry
+
+    for entry_point in pkg_resources.iter_entry_points(ENTRY_POINT_NAME):
+        connectors.update(entry_point.load()())
+
+    return connectors
 
 
 def get_elastic(url, es_index, clean=None, backend=None, es_aliases=None, mapping=None):
