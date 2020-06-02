@@ -86,15 +86,9 @@ class ConfluenceEnrich(Enrich):
         if isinstance(item, dict) and 'data' in item:
             user = item['data']['version'][identity_field]
 
-        identity['username'] = None
-        identity['email'] = None
-        identity['name'] = None
-        if 'username' in user:
-            identity['username'] = user['username']
-        if 'email' in user:
-            identity['email'] = user['email']
-        if 'displayName' in user:
-            identity['name'] = user['displayName']
+        identity['username'] = user['username'] if 'username' in user else user.get('publicName', None)
+        identity['email'] = user.get('email', None)
+        identity['name'] = user.get('displayName', None)
 
         return identity
 
