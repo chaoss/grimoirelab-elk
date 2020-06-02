@@ -82,6 +82,32 @@ class TestConfluence(TestBaseBackend):
         self.assertEqual(result['raw'], 4)
         self.assertEqual(result['enrich'], 4)
 
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        identity = enrich_backend.get_sh_identity(item, identity_field='by')
+        self.assertEqual(identity['username'], 'jdoe')
+        self.assertIsNone(identity['email'])
+        self.assertEqual(identity['name'], 'John Doe')
+
+        item = self.items[1]
+        identity = enrich_backend.get_sh_identity(item, identity_field='by')
+        self.assertEqual(identity['username'], 'jsmith')
+        self.assertIsNone(identity['email'])
+        self.assertEqual(identity['name'], 'John Smith')
+
+        item = self.items[2]
+        identity = enrich_backend.get_sh_identity(item, identity_field='by')
+        self.assertEqual(identity['username'], 'anonymous')
+        self.assertIsNone(identity['email'])
+        self.assertEqual(identity['name'], 'Anonymous')
+
+        item = self.items[3]
+        identity = enrich_backend.get_sh_identity(item, identity_field='by')
+        self.assertIsNone(identity['username'])
+        self.assertIsNone(identity['email'])
+        self.assertEqual(identity['name'], 'Anonymous')
+
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
 
