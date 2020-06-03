@@ -22,6 +22,7 @@
 import logging
 
 from .enrich import Enrich, metadata
+from .scmsenrich import ScmsEnrich
 from ..elastic_mapping import Mapping as BaseMapping
 
 
@@ -78,7 +79,7 @@ class Mapping(BaseMapping):
         return {"items": mapping}
 
 
-class ScmsGitHubEnrich(Enrich):
+class ScmsGitHubEnrich(ScmsEnrich):
 
     mapping = Mapping
 
@@ -187,14 +188,11 @@ class ScmsGitHubEnrich(Enrich):
 
             self.copy_raw_fields(self.RAW_FIELDS_COPY, eitem, ecomment)
 
-            # Copy data from the raw comment
-            ecomment['body'] = comment['body'][:self.KEYWORD_MAX_LENGTH]
-            ecomment['Context']=eitem['issue_title']
-
-            ecomment['comment_updated_at'] = comment['updated_at']
-
             # Add id info to allow to coexistence of items of different types in the same index
             ecomment['id'] = '{}_issue_comment_{}'.format(eitem['id'], comment['id'])
+            # Copy data from the raw comment
+            ecomment['context']=eitem['issue_title']
+            ecomment['body'] = comment['body'][:self.KEYWORD_MAX_LENGTH]
             ecomment.update(self.get_grimoire_fields(comment['updated_at'], ISSUE_COMMENT_TYPE))
 
             ecomments.append(ecomment)
@@ -222,14 +220,9 @@ class ScmsGitHubEnrich(Enrich):
             # Add id info to allow to coexistence of items of different types in the same index
             ecomment['id'] = '{}_review_comment_{}'.format(eitem['id'], comment['id'])
             # Copy data from the raw comment
+            ecomment['context'] = eitem['pr_title']
             ecomment['body'] = comment['body'][:self.KEYWORD_MAX_LENGTH]
-            ecomment['Context'] = eitem['issue_title']
-
-            ecomment['comment_updated_at'] = comment['updated_at']
-
             ecomment.update(self.get_grimoire_fields(comment['updated_at'], REVIEW_COMMENT_TYPE))
-
-
             ecomments.append(ecomment)
 
         return ecomments
@@ -277,13 +270,9 @@ class ScmsGitHubEnrich(Enrich):
         self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_pr)
         # The real data
         pull_request = item['data']
-
-
         rich_pr['id'] = pull_request['id']
-        rich_pr['issue_title'] = pull_request['title']
+        rich_pr['pr_title'] = pull_request['title']
         rich_pr['item_type'] = PULL_TYPE
-
-
         rich_pr.update(self.get_grimoire_fields(pull_request['created_at'], PULL_TYPE))
 
         return rich_pr
@@ -294,15 +283,9 @@ class ScmsGitHubEnrich(Enrich):
         self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_issue)
         # The real data
         issue = item['data']
-
-
         rich_issue['id'] = issue['id']
         rich_issue['issue_title'] = issue['title']
-
         rich_issue['item_type'] = ISSUE_TYPE
-
-
-
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], ISSUE_TYPE))
 
         return rich_issue

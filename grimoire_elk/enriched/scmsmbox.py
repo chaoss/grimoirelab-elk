@@ -26,7 +26,7 @@ import email.utils
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 from .mbox_study_kip import kafka_kip, MAX_LINES_FOR_VOTE
-
+from .scmsenrich import ScmsEnrich
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ class Mapping(BaseMapping):
         mapping = """
         {
             "properties": {
-                 "Subject_analyzed": {
+                 "context": {
                    "type": "text",
                    "fielddata": true,
                    "index": true
@@ -59,7 +59,7 @@ class Mapping(BaseMapping):
         return {"items": mapping}
 
 
-class ScmsMboxEnrich(Enrich):
+class ScmsMboxEnrich(ScmsEnrich):
 
     mapping = Mapping
 
@@ -130,7 +130,7 @@ class ScmsMboxEnrich(Enrich):
 
         # Fields which names are translated
         map_fields = {
-            "Subject": "Context"
+            "Subject": "context"
         }
         for fn in map_fields:
             if fn in message:
