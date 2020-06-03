@@ -14,14 +14,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+# Authors:
+#   Ria Gupta <ria18405@iiitd.ac.in>
+#
 
 import logging
-import re
-
-from grimoirelab_toolkit.datetime import (datetime_utcnow,
-                                          str_to_datetime)
-
-from .utils import get_time_diff_days
 
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
@@ -102,8 +100,10 @@ class ScmsGitHubEnrich(Enrich):
         """ Field with the date in the JSON enriched items """
         return "grimoire_creation_date"
 
+
     def get_identities(self, item):
         """Return the identities from an item"""
+
 
         category = item['category']
         item = item['data']
@@ -163,14 +163,10 @@ class ScmsGitHubEnrich(Enrich):
             rich_item = self.__get_rich_issue(item)
         elif item['category'] == 'pull_request':
             rich_item = self.__get_rich_pull(item)
-        elif item['category'] == 'repository':
-            rich_item = self.__get_rich_repo(item)
         else:
             logger.error("[github] rich item not defined for GitHub category {}".format(
                          item['category']))
 
-        # self.add_repository_labels(rich_item)
-        # self.add_metadata_filter_raw(rich_item)
         return rich_item
 
     def enrich_issue(self, item, eitem):
@@ -191,27 +187,15 @@ class ScmsGitHubEnrich(Enrich):
 
             self.copy_raw_fields(self.RAW_FIELDS_COPY, eitem, ecomment)
 
-
-
             # Copy data from the raw comment
             ecomment['body'] = comment['body'][:self.KEYWORD_MAX_LENGTH]
-
-
-
+            ecomment['Context']=eitem['issue_title']
 
             ecomment['comment_updated_at'] = comment['updated_at']
 
             # Add id info to allow to coexistence of items of different types in the same index
             ecomment['id'] = '{}_issue_comment_{}'.format(eitem['id'], comment['id'])
             ecomment.update(self.get_grimoire_fields(comment['updated_at'], ISSUE_COMMENT_TYPE))
-            # due to backtrack compatibility, `is_github2_*` is replaced with `is_github_*`
-            # ecomment.pop('is_github2_{}'.format(ISSUE_COMMENT_TYPE))
-            # ecomment['is_github_{}'.format(ISSUE_COMMENT_TYPE)] = 1
-            # ecomment['is_github_comment'] = 1
-
-            # self.add_repository_labels(ecomment)
-            # self.add_metadata_filter_raw(ecomment)
-            # self.add_gelk_metadata(ecomment)
 
             ecomments.append(ecomment)
 
@@ -235,26 +219,16 @@ class ScmsGitHubEnrich(Enrich):
 
             self.copy_raw_fields(self.RAW_FIELDS_COPY, eitem, ecomment)
 
-            # Copy data from the raw comment
+            # Add id info to allow to coexistence of items of different types in the same index
             ecomment['id'] = '{}_review_comment_{}'.format(eitem['id'], comment['id'])
+            # Copy data from the raw comment
             ecomment['body'] = comment['body'][:self.KEYWORD_MAX_LENGTH]
-
+            ecomment['Context'] = eitem['issue_title']
 
             ecomment['comment_updated_at'] = comment['updated_at']
 
-
-            # Add id info to allow to coexistence of items of different types in the same index
-
-
             ecomment.update(self.get_grimoire_fields(comment['updated_at'], REVIEW_COMMENT_TYPE))
-            # due to backtrack compatibility, `is_github2_*` is replaced with `is_github_*`
-            # ecomment.pop('is_github2_{}'.format(REVIEW_COMMENT_TYPE))
-            # ecomment['is_github_{}'.format(REVIEW_COMMENT_TYPE)] = 1
-            # ecomment['is_github_comment'] = 1
 
-            # self.add_repository_labels(ecomment)
-            # self.add_metadata_filter_raw(ecomment)
-            # self.add_gelk_metadata(ecomment)
 
             ecomments.append(ecomment)
 
@@ -269,7 +243,7 @@ class ScmsGitHubEnrich(Enrich):
             eitems = []
 
             eitem = self.get_rich_item(item)
-            items_to_enrich.append(eitem)
+            # items_to_enrich.append(eitem)
             if item['category'] == ISSUE_TYPE:
                 eitems = self.enrich_issue(item, eitem)
             elif item['category'] == PULL_TYPE:
@@ -306,32 +280,11 @@ class ScmsGitHubEnrich(Enrich):
 
 
         rich_pr['id'] = pull_request['id']
-        # rich_pr['pull_id'] = pull_request['id']
-        # rich_pr['pull_id_in_repo'] = pull_request['html_url'].split("/")[-1]
-        # rich_pr['issue_id_in_repo'] = pull_request['html_url'].split("/")[-1]
-        # rich_pr['repository'] = self.get_project_repository(rich_pr)
         rich_pr['issue_title'] = pull_request['title']
-
-
-
         rich_pr['item_type'] = PULL_TYPE
 
 
-
-        # if self.prjs_map:
-        #     rich_pr.update(self.get_item_project(rich_pr))
-        # #
-        # if 'project' in item:
-        #     rich_pr['project'] = item['project']
-
         rich_pr.update(self.get_grimoire_fields(pull_request['created_at'], PULL_TYPE))
-        # due to backtrack compatibility, `is_github2_*` is replaced with `is_github_*`
-        # rich_pr.pop('is_github2_{}'.format(PULL_TYPE))
-        # rich_pr['is_github_{}'.format(PULL_TYPE)] = 1
-
-        # if self.sortinghat:
-        #     item[self.get_field_date()] = rich_pr[self.get_field_date()]
-        #     rich_pr.update(self.get_item_sh(item, self.pr_roles))
 
         return rich_pr
 
@@ -344,40 +297,12 @@ class ScmsGitHubEnrich(Enrich):
 
 
         rich_issue['id'] = issue['id']
-        # rich_issue['issue_id'] = issue['id']
-        # rich_issue['issue_id_in_repo'] = issue['html_url'].split("/")[-1]
-        # rich_issue['repository'] = self.get_project_repository(rich_issue)
         rich_issue['issue_title'] = issue['title']
-
-
 
         rich_issue['item_type'] = ISSUE_TYPE
 
 
 
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], ISSUE_TYPE))
-        # due to backtrack compatibility, `is_github2_*` is replaced with `is_github_*`
-        # rich_issue.pop('is_github2_{}'.format(ISSUE_TYPE))
-        # rich_issue['is_github_{}'.format(ISSUE_TYPE)] = 1
-
-        # if self.sortinghat:
-        #     item[self.get_field_date()] = rich_issue[self.get_field_date()]
-        #     rich_issue.update(self.get_item_sh(item, self.issue_roles))
 
         return rich_issue
-
-    def __get_rich_repo(self, item):
-        rich_repo = {}
-
-        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_repo)
-
-        repo = item['data']
-
-        rich_repo['id'] = str(repo['fetched_on'])
-
-        # rich_repo.update(self.get_grimoire_fields(item['metadata__updated_on'], REPOSITORY_TYPE))
-        # due to backtrack compatibility, `is_github2_*` is replaced with `is_github_*`
-        # rich_repo.pop('is_github2_{}'.format(REPOSITORY_TYPE))
-        # rich_repo['is_github_{}'.format(REPOSITORY_TYPE)] = 1
-
-        return rich_repo

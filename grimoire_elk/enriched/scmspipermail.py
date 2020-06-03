@@ -14,7 +14,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-
+#
+# Authors:
+#   Ria Gupta <ria18405@iiitd.ac.in>
+#
 
 
 from .scmsmbox import ScmsMboxEnrich

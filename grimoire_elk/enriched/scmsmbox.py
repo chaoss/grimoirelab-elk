@@ -14,14 +14,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-
+#
+# Authors:
+#   Ria Gupta <ria18405@iiitd.ac.in>
+#
 import json
 import logging
 
 from requests.structures import CaseInsensitiveDict
-from dateutil import parser
 import email.utils
-
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 from .mbox_study_kip import kafka_kip, MAX_LINES_FOR_VOTE
@@ -129,7 +130,7 @@ class ScmsMboxEnrich(Enrich):
 
         # Fields which names are translated
         map_fields = {
-            "Subject": "Scms_Subject_analyzed"
+            "Subject": "Context"
         }
         for fn in map_fields:
             if fn in message:
@@ -138,14 +139,14 @@ class ScmsMboxEnrich(Enrich):
                 eitem[map_fields[fn]] = None
 
         # Part of the body is needed in studies like kafka_kip
-        eitem["Scms_body_extract"] = ""
+        eitem["body"] = ""
         if 'plain' in message['body']:
-            eitem["Scms_body_extract"] = "\n".join(message['body']['plain'].split("\n")[:MAX_LINES_FOR_VOTE])
+            eitem["body"] = "\n".join(message['body']['plain'].split("\n")[:MAX_LINES_FOR_VOTE])
 
 
 
-        if self.prjs_map:
-            eitem.update(self.get_item_project(eitem))
+        # if self.prjs_map:
+        #     eitem.update(self.get_item_project(eitem))
 
         eitem.update(self.get_grimoire_fields(message['Date'], "message"))
 
