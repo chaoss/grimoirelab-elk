@@ -20,7 +20,40 @@
 #
 
 from .enrich import Enrich
+from ..elastic_mapping import Mapping as BaseMapping
+
+class ScmsMapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns:        dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = """
+        {
+            "properties": {
+                 "context": {
+                   "type": "text",
+                   "fielddata": true,
+                   "index": true
+                 },
+                 "body": {
+                   "type": "text",
+                   "index": true
+                 },
+                 "id": {
+                    "type": "keyword"
+                },
+               "channel": {
+                    "type": "keyword"
+                }                
+           }
+        } """
+
+        return {"items": mapping}
 
 class ScmsEnrich(Enrich):
-    RAW_FIELDS_COPY = ["origin", "tag", "uuid"]
-
+    mapping = ScmsMapping
