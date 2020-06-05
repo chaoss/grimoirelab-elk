@@ -31,37 +31,7 @@ from .scmsenrich import ScmsEnrich
 logger = logging.getLogger(__name__)
 
 
-class Mapping(BaseMapping):
-
-    @staticmethod
-    def get_elastic_mappings(es_major):
-        """Get Elasticsearch mapping.
-
-        :param es_major: major version of Elasticsearch, as string
-        :returns:        dictionary with a key, 'items', with the mapping
-        """
-
-        mapping = """
-        {
-            "properties": {
-                 "context": {
-                   "type": "text",
-                   "fielddata": true,
-                   "index": true
-                 },
-                 "body": {
-                   "type": "text",
-                   "index": true
-                 }
-           }
-        } """
-
-        return {"items": mapping}
-
-
 class ScmsMboxEnrich(ScmsEnrich):
-
-    mapping = Mapping
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
@@ -119,12 +89,7 @@ class ScmsMboxEnrich(ScmsEnrich):
     @metadata
     def get_rich_item(self, item):
         eitem = {}
-
-        for f in self.RAW_FIELDS_COPY:
-            if f in item:
-                eitem[f] = item[f]
-            else:
-                eitem[f] = None
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, eitem)
         # The real data
         message = CaseInsensitiveDict(item['data'])
 
@@ -138,7 +103,8 @@ class ScmsMboxEnrich(ScmsEnrich):
 
         # Fields which names are translated
         map_fields = {
-            "Subject": "context"
+            "Subject": "context",
+            "uuid":"id"
         }
         for fn in map_fields:
             if fn in message:
@@ -191,12 +157,14 @@ class ScmsMboxEnrich(ScmsEnrich):
             eitem["body"] = "\n".join(message['body']['plain'].split("\n")[:MAX_LINES_FOR_VOTE])
 
 
+        if 'uuid' in item:
+            eitem['id'] = item['uuid']
 
-        # if self.prjs_map:
-        #     eitem.update(self.get_item_project(eitem))
+        if 'plain' in message['body']:
+            eitem['body'] = " ".join(message['body']['plain'].split("\n")[:])
 
         eitem.update(self.get_grimoire_fields(message['Date'], "message"))
-
+        eitem['data_source']='Mbox'
         return eitem
 
     def enrich_items(self, ocean_backend):

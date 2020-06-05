@@ -39,50 +39,7 @@ REPOSITORY_TYPE = 'repository'
 logger = logging.getLogger(__name__)
 
 
-class Mapping(BaseMapping):
-
-    @staticmethod
-    def get_elastic_mappings(es_major):
-        """Get Elasticsearch mapping.
-
-        geopoints type is not created in dynamic mapping
-
-        :param es_major: major version of Elasticsearch, as string
-        :returns:        dictionary with a key, 'items', with the mapping
-        """
-
-        mapping = """
-        {
-            "properties": {
-               "merge_author_geolocation": {
-                   "type": "geo_point"
-               },
-               "assignee_geolocation": {
-                   "type": "geo_point"
-               },
-               "issue_state": {
-                   "type": "keyword"
-               },
-               "pull_state": {
-                   "type": "keyword"
-               },
-               "user_geolocation": {
-                   "type": "geo_point"
-               },
-               "id": {
-                    "type": "keyword"
-               }
-            }
-        }
-        """
-
-        return {"items": mapping}
-
-
 class ScmsGitHubEnrich(ScmsEnrich):
-
-    mapping = Mapping
-
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
@@ -194,7 +151,7 @@ class ScmsGitHubEnrich(ScmsEnrich):
             ecomment['context']=eitem['issue_title']
             ecomment['body'] = comment['body'][:self.KEYWORD_MAX_LENGTH]
             ecomment.update(self.get_grimoire_fields(comment['updated_at'], ISSUE_COMMENT_TYPE))
-
+            ecomment['data_source']='Github'
             ecomments.append(ecomment)
 
         return ecomments
@@ -223,6 +180,7 @@ class ScmsGitHubEnrich(ScmsEnrich):
             ecomment['context'] = eitem['pr_title']
             ecomment['body'] = comment['body'][:self.KEYWORD_MAX_LENGTH]
             ecomment.update(self.get_grimoire_fields(comment['updated_at'], REVIEW_COMMENT_TYPE))
+            ecomment['data_source'] = 'Github'
             ecomments.append(ecomment)
 
         return ecomments
