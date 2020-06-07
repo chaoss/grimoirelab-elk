@@ -1,0 +1,1723 @@
+[
+    {
+        "backend_name": "GitLab",
+        "backend_version": "0.12.0",
+        "category": "issue",
+        "classified_fields_filtered": null,
+        "data": {
+            "_links": {
+                "award_emoji": "https://gitlab.com/api/v4/projects/16307213/issues/25/award_emoji",
+                "notes": "https://gitlab.com/api/v4/projects/16307213/issues/25/notes",
+                "project": "https://gitlab.com/api/v4/projects/16307213",
+                "self": "https://gitlab.com/api/v4/projects/16307213/issues/25"
+            },
+            "assignee": null,
+            "assignees": [],
+            "author": {
+                "avatar_url": "https://assets.gitlab-static.net/uploads/-/system/user/avatar/1503111/avatar.png",
+                "id": 1503111,
+                "name": "Vibhoothi",
+                "state": "active",
+                "username": "mindfreeze",
+                "web_url": "https://gitlab.com/mindfreeze"
+            },
+            "award_emoji_data": [
+                {
+                    "awardable_id": 32985061,
+                    "awardable_type": "Issue",
+                    "created_at": "2020-05-26T16:51:48.872Z",
+                    "id": 4567403,
+                    "name": "thumbsdown",
+                    "updated_at": "2020-05-26T16:51:48.872Z",
+                    "user": {
+                        "avatar_url": "https://assets.gitlab-static.net/uploads/-/system/user/avatar/2409720/avatar.png",
+                        "id": 2409720,
+                        "name": "Venu Vardhan Reddy Tekula",
+                        "state": "active",
+                        "username": "vchrombie",
+                        "web_url": "https://gitlab.com/vchrombie"
+                    }
+                }
+            ],
+            "closed_at": null,
+            "closed_by": null,
+            "confidential": false,
+            "created_at": "2020-04-07T11:31:36.167Z",
+            "description": "The current Profile Page is very vague and has little details \n\nThings would be good if we have \n- [X] More Details \n- [X] Links \n- [X] Option to edit details\n- [ ] Option to Change/Remove the current DP\n- [X] Removal of GitHub Username at top and start using [amFOSS Page](https://amfoss.in/@abhishekbvs)",
+            "discussion_locked": null,
+            "downvotes": 1,
+            "due_date": null,
+            "epic": null,
+            "epic_iid": null,
+            "has_tasks": true,
+            "id": 32985061,
+            "iid": 25,
+            "labels": [
+                "UI",
+                "enhancement",
+                "feature"
+            ],
+            "merge_requests_count": 0,
+            "milestone": null,
+            "moved_to_id": null,
+            "notes_data": [
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://assets.gitlab-static.net/uploads/-/system/user/avatar/1503111/avatar.png",
+                        "id": 1503111,
+                        "name": "Vibhoothi",
+                        "state": "active",
+                        "username": "mindfreeze",
+                        "web_url": "https://gitlab.com/mindfreeze"
+                    },
+                    "award_emoji_data": [],
+                    "body": "changed the description",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-07T11:32:24.925Z",
+                    "id": 319122638,
+                    "noteable_id": 32985061,
+                    "noteable_iid": 25,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-07T11:32:24.926Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "marked the task **Option to edit details** as completed",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-18T17:56:58.184Z",
+                    "id": 326691203,
+                    "noteable_id": 32985061,
+                    "noteable_iid": 25,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-18T17:56:58.188Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "marked the task **More Details** as completed",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T11:05:23.025Z",
+                    "id": 328034243,
+                    "noteable_id": 32985061,
+                    "noteable_iid": 25,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-21T11:05:23.028Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "marked the task **Links** as completed",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T11:05:23.062Z",
+                    "id": 328034244,
+                    "noteable_id": 32985061,
+                    "noteable_iid": 25,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-21T11:05:23.064Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "marked the task **Removal of GitHub Username at top and start using [amFOSS Page](https://amfoss.in/@abhishekbvs)** as completed",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T11:05:23.094Z",
+                    "id": 328034245,
+                    "noteable_id": 32985061,
+                    "noteable_iid": 25,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-21T11:05:23.096Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/96b58cb8a1bd5aefbaa8f4b5b96d9863?s=80&d=identicon",
+                        "id": 5028715,
+                        "name": "Sai Rajendra Immadi",
+                        "state": "active",
+                        "username": "immadisairaj",
+                        "web_url": "https://gitlab.com/immadisairaj"
+                    },
+                    "award_emoji_data": [
+                        {
+                            "awardable_id": 341879486,
+                            "awardable_type": "Note",
+                            "created_at": "2020-05-20T12:21:42.312Z",
+                            "id": 4508195,
+                            "name": "basketball",
+                            "updated_at": "2020-05-20T12:21:42.312Z",
+                            "user": {
+                                "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                                "id": 3418756,
+                                "name": "Yash Khare",
+                                "state": "active",
+                                "username": "yashk2000",
+                                "web_url": "https://gitlab.com/yashk2000"
+                            }
+                        }
+                    ],
+                    "body": "I also have few more to add\n\n- [ ] If the gitlab/github username doesn't exist we can hide the icon\n\n<img src=\"/uploads/5d51f832d6a6ddf98fb469a463239614/photo_2020-05-13_20-37-34.jpg\"  width=\"150\" height=\"300\">\n\n- [ ] The list can be matched to parent and the padding can be set to the members inside the list\n\n<img src=\"/uploads/f0799b23163463eab8ae70009e4f0cdb/photo_2020-05-13_20-37-32.jpg\"  width=\"150\" height=\"300\">",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-05-13T15:11:57.647Z",
+                    "id": 341879486,
+                    "noteable_id": 32985061,
+                    "noteable_iid": 25,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": false,
+                    "type": null,
+                    "updated_at": "2020-05-13T15:11:57.647Z"
+                }
+            ],
+            "project_id": 16307213,
+            "references": {
+                "full": "amfoss/cms-mobile#25",
+                "relative": "#25",
+                "short": "#25"
+            },
+            "state": "opened",
+            "task_completion_status": {
+                "completed_count": 4,
+                "count": 5
+            },
+            "task_status": "4 of 5 tasks completed",
+            "time_stats": {
+                "human_time_estimate": null,
+                "human_total_time_spent": null,
+                "time_estimate": 0,
+                "total_time_spent": 0
+            },
+            "title": "Improve the Profile Page",
+            "updated_at": "2020-05-13T15:11:57.668Z",
+            "upvotes": 1,
+            "user_notes_count": 1,
+            "web_url": "https://gitlab.com/amfoss/cms-mobile/-/issues/25",
+            "weight": null
+        },
+        "origin": "https://gitlab.com/amfoss/cms-mobile",
+        "perceval_version": "0.14.0",
+        "search_fields": {
+            "groups": null,
+            "iid": 25,
+            "item_id": "32985061",
+            "owner": "amfoss",
+            "project": "cms-mobile"
+        },
+        "tag": "https://gitlab.com/amfoss/cms-mobile",
+        "timestamp": 1591699837.969952,
+        "updated_on": 1589382717.668,
+        "uuid": "fa0223023445bd85fdb201e960d816fe3a99b306"
+    },
+    {
+        "backend_name": "GitLab",
+        "backend_version": "0.12.0",
+        "category": "merge_request",
+        "classified_fields_filtered": null,
+        "data": {
+            "allow_collaboration": false,
+            "allow_maintainer_to_push": false,
+            "approvals_before_merge": null,
+            "assignee": null,
+            "assignees": [],
+            "author": {
+                "avatar_url": "https://secure.gravatar.com/avatar/2bf24a4231306842f743a28529e3347e?s=80&d=identicon",
+                "id": 5162683,
+                "name": "Athira",
+                "state": "active",
+                "username": "athiranair2000",
+                "web_url": "https://gitlab.com/athiranair2000"
+            },
+            "award_emoji_data": [],
+            "blocking_discussions_resolved": true,
+            "changes_count": "1",
+            "closed_at": "2020-04-24T12:41:55.207Z",
+            "closed_by": {
+                "avatar_url": "https://secure.gravatar.com/avatar/2bf24a4231306842f743a28529e3347e?s=80&d=identicon",
+                "id": 5162683,
+                "name": "Athira",
+                "state": "active",
+                "username": "athiranair2000",
+                "web_url": "https://gitlab.com/athiranair2000"
+            },
+            "created_at": "2020-04-20T19:17:54.576Z",
+            "description": "Closes #18\r\nCloses #28 \r\n\r\nChanges: Add alert notification if a user doesn't enter his/her credentials.\r\n\r\nScreenshots of the change: \r\n\r\n![login_validation](/uploads/173f17e178d90484db1693c30019fd7b/login_validation.gif)",
+            "diff_refs": {
+                "base_sha": "6747f667897a462b37ddc6ab1a6920705774d9d2",
+                "head_sha": "67b9ec6db4362e8f2265c66f5f310d317ce1df8c",
+                "start_sha": "6747f667897a462b37ddc6ab1a6920705774d9d2"
+            },
+            "discussion_locked": null,
+            "downvotes": 0,
+            "first_contribution": false,
+            "first_deployed_to_production_at": null,
+            "force_remove_source_branch": true,
+            "has_conflicts": false,
+            "head_pipeline": {
+                "before_sha": "a2d3376f1cb6c7df2e49dffdc24999f688daac5d",
+                "committed_at": null,
+                "coverage": null,
+                "created_at": "2020-04-24T11:38:17.909Z",
+                "detailed_status": {
+                    "details_path": "/athiranair2000/cms-mobile/-/pipelines/139527982",
+                    "favicon": "https://gitlab.com/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png",
+                    "group": "success",
+                    "has_details": true,
+                    "icon": "status_success",
+                    "illustration": null,
+                    "label": "passed",
+                    "text": "passed",
+                    "tooltip": "passed"
+                },
+                "duration": 523,
+                "finished_at": "2020-04-24T11:47:02.978Z",
+                "id": 139527982,
+                "ref": "cms-18",
+                "sha": "67b9ec6db4362e8f2265c66f5f310d317ce1df8c",
+                "started_at": "2020-04-24T11:38:19.464Z",
+                "status": "success",
+                "tag": false,
+                "updated_at": "2020-04-24T11:47:02.984Z",
+                "user": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/2bf24a4231306842f743a28529e3347e?s=80&d=identicon",
+                    "id": 5162683,
+                    "name": "Athira",
+                    "state": "active",
+                    "username": "athiranair2000",
+                    "web_url": "https://gitlab.com/athiranair2000"
+                },
+                "web_url": "https://gitlab.com/athiranair2000/cms-mobile/-/pipelines/139527982",
+                "yaml_errors": null
+            },
+            "id": 56306189,
+            "iid": 41,
+            "labels": [],
+            "latest_build_finished_at": "2020-04-24T11:47:02.978Z",
+            "latest_build_started_at": "2020-04-24T11:38:19.464Z",
+            "merge_commit_sha": null,
+            "merge_error": null,
+            "merge_status": "can_be_merged",
+            "merge_when_pipeline_succeeds": false,
+            "merged_at": null,
+            "merged_by": null,
+            "milestone": null,
+            "notes_data": [
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "@athiranair2000 thanks a lot for sending this MR :)\n\nAs you notice, the text seems to jump out of the decoration box when the error is shown. \nIt seems to be an issue with flutter itself, though I'm not very sure. \nA workaround I thought of is to increase the size of the input box so that even if the text jumps up, it will stay inside the box and therefore not look half inside and half outside the box.\n\n@padth4i @immadisairaj If you know of any better fix for this please mention.",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-20T19:59:05.344Z",
+                    "id": 327583642,
+                    "noteable_id": 56306189,
+                    "noteable_iid": 41,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": false,
+                    "type": null,
+                    "updated_at": "2020-04-20T20:01:59.377Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "changed the description",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-20T20:03:30.053Z",
+                    "id": 327587422,
+                    "noteable_id": 56306189,
+                    "noteable_iid": 41,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-20T20:03:30.056Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "@Chromicle I don't think this will work. A validator also returns and sets the error text without being explicitly told to do so. \nSo in both cases error text is being set itself.",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T04:50:41.178Z",
+                    "id": 327749521,
+                    "noteable_id": 56306189,
+                    "noteable_iid": 41,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": true,
+                    "resolved": false,
+                    "resolved_by": null,
+                    "system": false,
+                    "type": "DiscussionNote",
+                    "updated_at": "2020-04-21T04:50:41.178Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/924a72e21eb76c29ed58ffb96f900781?s=80&d=identicon",
+                        "id": 4248740,
+                        "name": "Ajay Prabhakar",
+                        "state": "active",
+                        "username": "Chromicle",
+                        "web_url": "https://gitlab.com/Chromicle"
+                    },
+                    "award_emoji_data": [],
+                    "body": "Great work @athiranair2000, instead of using `validator` you can use errortext in decoration\n\nPlease go through this https://stackoverflow.com/questions/53424916/textfield-validation-in-flutter",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T04:23:16.010Z",
+                    "id": 327743031,
+                    "noteable_id": 56306189,
+                    "noteable_iid": 41,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": true,
+                    "resolved": false,
+                    "resolved_by": null,
+                    "system": false,
+                    "type": "DiscussionNote",
+                    "updated_at": "2020-04-21T04:50:41.275Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "Yeah, this is the same as the thing I suggested. It won't look good in our approach unless we increase the height to make the text stay inside the text box even after jumping.",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T04:52:11.801Z",
+                    "id": 327750110,
+                    "noteable_id": 56306189,
+                    "noteable_iid": 41,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": true,
+                    "resolved": false,
+                    "resolved_by": null,
+                    "system": false,
+                    "type": "DiscussionNote",
+                    "updated_at": "2020-04-21T04:52:11.801Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/96b58cb8a1bd5aefbaa8f4b5b96d9863?s=80&d=identicon",
+                        "id": 5028715,
+                        "name": "Sai Rajendra Immadi",
+                        "state": "active",
+                        "username": "immadisairaj",
+                        "web_url": "https://gitlab.com/immadisairaj"
+                    },
+                    "award_emoji_data": [],
+                    "body": "Also, you can go through [this](https://github.com/flutter/flutter/issues/15400) link. Maybe this is related to that.",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T04:33:26.933Z",
+                    "id": 327745403,
+                    "noteable_id": 56306189,
+                    "noteable_iid": 41,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": true,
+                    "resolved": false,
+                    "resolved_by": null,
+                    "system": false,
+                    "type": "DiscussionNote",
+                    "updated_at": "2020-04-21T04:52:11.874Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/96b58cb8a1bd5aefbaa8f4b5b96d9863?s=80&d=identicon",
+                        "id": 5028715,
+                        "name": "Sai Rajendra Immadi",
+                        "state": "active",
+                        "username": "immadisairaj",
+                        "web_url": "https://gitlab.com/immadisairaj"
+                    },
+                    "award_emoji_data": [],
+                    "body": "Yeah, I guess we can have it like the way you suggested or maybe we can have a separate Text right above the submit button. I am fine with any of the solution. Check which looks better and implement that.",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T05:37:32.752Z",
+                    "id": 327761712,
+                    "noteable_id": 56306189,
+                    "noteable_iid": 41,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": true,
+                    "resolved": false,
+                    "resolved_by": null,
+                    "system": false,
+                    "type": "DiscussionNote",
+                    "updated_at": "2020-04-21T05:37:32.752Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "@Chromicle @immadisairaj @athiranair2000 IMO even after increasing the size, the UI will look a bit odd. \nI say since we're using a box to wrap text around, instead of using the errorText approach directly/through a validator, we can show a toast instead.\n\nThat will keep our UI neat and show a user a notification as well.",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T04:53:40.321Z",
+                    "id": 327750407,
+                    "noteable_id": 56306189,
+                    "noteable_iid": 41,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": true,
+                    "resolved": false,
+                    "resolved_by": null,
+                    "system": false,
+                    "type": "DiscussionNote",
+                    "updated_at": "2020-04-21T05:37:32.834Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "I thought of a new text view. But I think our current UI looks good. If we change some spacings, it might look awkward. So I think toast is the best option. \n\n@athiranair2000 can you please make a toast in the validator instead of returning a string for the error text?",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T05:48:49.223Z",
+                    "id": 327764854,
+                    "noteable_id": 56306189,
+                    "noteable_iid": 41,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": true,
+                    "resolved": false,
+                    "resolved_by": null,
+                    "system": false,
+                    "type": "DiscussionNote",
+                    "updated_at": "2020-04-21T05:49:02.911Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/2bf24a4231306842f743a28529e3347e?s=80&d=identicon",
+                        "id": 5162683,
+                        "name": "Athira",
+                        "state": "active",
+                        "username": "athiranair2000",
+                        "web_url": "https://gitlab.com/athiranair2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "added 4 commits\n\n<ul><li>a2d3376f...6747f667 - 3 commits from branch <code>amfoss:master</code></li><li>67b9ec6d - fix: Notification in login page</li></ul>\n\n[Compare with previous version](/amfoss/cms-mobile/-/merge_requests/41/diffs?diff_id=87275919&start_sha=a2d3376f1cb6c7df2e49dffdc24999f688daac5d)",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-24T11:38:22.609Z",
+                    "id": 330882340,
+                    "noteable_id": 56306189,
+                    "noteable_iid": 41,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-24T11:38:22.611Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/2bf24a4231306842f743a28529e3347e?s=80&d=identicon",
+                        "id": 5162683,
+                        "name": "Athira",
+                        "state": "active",
+                        "username": "athiranair2000",
+                        "web_url": "https://gitlab.com/athiranair2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "closed",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-24T12:41:55.245Z",
+                    "id": 330928663,
+                    "noteable_id": 56306189,
+                    "noteable_iid": 41,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-24T12:41:55.247Z"
+                }
+            ],
+            "pipeline": {
+                "created_at": "2020-04-24T11:38:17.909Z",
+                "id": 139527982,
+                "ref": "cms-18",
+                "sha": "67b9ec6db4362e8f2265c66f5f310d317ce1df8c",
+                "status": "success",
+                "updated_at": "2020-04-24T11:47:02.984Z",
+                "web_url": "https://gitlab.com/athiranair2000/cms-mobile/-/pipelines/139527982"
+            },
+            "project_id": 16307213,
+            "reference": "!41",
+            "references": {
+                "full": "amfoss/cms-mobile!41",
+                "relative": "!41",
+                "short": "!41"
+            },
+            "sha": "67b9ec6db4362e8f2265c66f5f310d317ce1df8c",
+            "should_remove_source_branch": null,
+            "source_branch": "cms-18",
+            "source_project_id": 18249015,
+            "squash": false,
+            "squash_commit_sha": null,
+            "state": "closed",
+            "subscribed": false,
+            "target_branch": "master",
+            "target_project_id": 16307213,
+            "task_completion_status": {
+                "completed_count": 0,
+                "count": 0
+            },
+            "time_stats": {
+                "human_time_estimate": null,
+                "human_total_time_spent": null,
+                "time_estimate": 0,
+                "total_time_spent": 0
+            },
+            "title": "fix: Notification in login page",
+            "updated_at": "2020-04-24T12:41:55.107Z",
+            "upvotes": 0,
+            "user": {
+                "can_merge": false
+            },
+            "user_notes_count": 8,
+            "versions_data": [
+                {
+                    "base_commit_sha": "6747f667897a462b37ddc6ab1a6920705774d9d2",
+                    "commits": [
+                        {
+                            "author_email": "athinair2000@gmail.com",
+                            "author_name": "athiranair2000",
+                            "authored_date": "2020-04-20T19:01:09.000Z",
+                            "committed_date": "2020-04-24T11:38:16.000Z",
+                            "committer_email": "athinair2000@gmail.com",
+                            "committer_name": "Athira",
+                            "created_at": "2020-04-24T11:38:16.000Z",
+                            "id": "67b9ec6db4362e8f2265c66f5f310d317ce1df8c",
+                            "message": "fix: Notification in login page\n",
+                            "parent_ids": [],
+                            "short_id": "67b9ec6d",
+                            "title": "fix: Notification in login page",
+                            "web_url": "https://gitlab.com/amfoss/cms-mobile/-/commit/67b9ec6db4362e8f2265c66f5f310d317ce1df8c"
+                        }
+                    ],
+                    "created_at": "2020-04-24T11:38:18.595Z",
+                    "head_commit_sha": "67b9ec6db4362e8f2265c66f5f310d317ce1df8c",
+                    "id": 87275919,
+                    "merge_request_id": 56306189,
+                    "real_size": "1",
+                    "start_commit_sha": "6747f667897a462b37ddc6ab1a6920705774d9d2",
+                    "state": "collected"
+                },
+                {
+                    "base_commit_sha": "8cda588e5fa519c92d9832631147010a075fa76b",
+                    "commits": [
+                        {
+                            "author_email": "athinair2000@gmail.com",
+                            "author_name": "athiranair2000",
+                            "authored_date": "2020-04-20T19:01:09.000Z",
+                            "committed_date": "2020-04-20T19:01:09.000Z",
+                            "committer_email": "athinair2000@gmail.com",
+                            "committer_name": "athiranair2000",
+                            "created_at": "2020-04-20T19:01:09.000Z",
+                            "id": "a2d3376f1cb6c7df2e49dffdc24999f688daac5d",
+                            "message": "fix: Notification in login page\n",
+                            "parent_ids": [],
+                            "short_id": "a2d3376f",
+                            "title": "fix: Notification in login page",
+                            "web_url": "https://gitlab.com/amfoss/cms-mobile/-/commit/a2d3376f1cb6c7df2e49dffdc24999f688daac5d"
+                        }
+                    ],
+                    "created_at": "2020-04-20T19:17:54.959Z",
+                    "head_commit_sha": "a2d3376f1cb6c7df2e49dffdc24999f688daac5d",
+                    "id": 86399689,
+                    "merge_request_id": 56306189,
+                    "real_size": "1",
+                    "start_commit_sha": "8cda588e5fa519c92d9832631147010a075fa76b",
+                    "state": "collected"
+                }
+            ],
+            "web_url": "https://gitlab.com/amfoss/cms-mobile/-/merge_requests/41",
+            "work_in_progress": false
+        },
+        "origin": "https://gitlab.com/amfoss/cms-mobile",
+        "perceval_version": "0.14.0",
+        "search_fields": {
+            "groups": null,
+            "iid": 41,
+            "item_id": "56306189",
+            "owner": "amfoss",
+            "project": "cms-mobile"
+        },
+        "tag": "https://gitlab.com/amfoss/cms-mobile",
+        "timestamp": 1591699045.756355,
+        "updated_on": 1587732115.107,
+        "uuid": "5735986bb9f2bb58920bb5a263e6e85f1308beb1"
+    },
+    {
+        "backend_name": "GitLab",
+        "backend_version": "0.12.0",
+        "category": "merge_request",
+        "classified_fields_filtered": null,
+        "data": {
+            "allow_collaboration": false,
+            "allow_maintainer_to_push": false,
+            "approvals_before_merge": null,
+            "assignee": null,
+            "assignees": [],
+            "author": {
+                "avatar_url": "https://secure.gravatar.com/avatar/924a72e21eb76c29ed58ffb96f900781?s=80&d=identicon",
+                "id": 4248740,
+                "name": "Ajay Prabhakar",
+                "state": "active",
+                "username": "Chromicle",
+                "web_url": "https://gitlab.com/Chromicle"
+            },
+            "award_emoji_data": [
+                {
+                    "awardable_id": 56390497,
+                    "awardable_type": "MergeRequest",
+                    "created_at": "2020-05-20T08:10:03.606Z",
+                    "id": 4503657,
+                    "name": "rocket",
+                    "updated_at": "2020-05-20T08:10:03.606Z",
+                    "user": {
+                        "avatar_url": "https://assets.gitlab-static.net/uploads/-/system/user/avatar/2409720/avatar.png",
+                        "id": 2409720,
+                        "name": "Venu Vardhan Reddy Tekula",
+                        "state": "active",
+                        "username": "vchrombie",
+                        "web_url": "https://gitlab.com/vchrombie"
+                    }
+                }
+            ],
+            "blocking_discussions_resolved": true,
+            "changes_count": "6",
+            "closed_at": null,
+            "closed_by": null,
+            "created_at": "2020-04-21T10:59:26.163Z",
+            "description": "#### Changes\nAdded more details in profile screen\n\n* About \n* Github link\n* GitLab link\n* Telegram link\n* Last seen in lab\n\nUpdated some icons \n\n#### ScreenShot\n<img src=\"/uploads/97efd0e41a0d84b828cfb5cfa4017a91/device-2020-04-21-162620.png\" heigth=\"400\" width=\"200\"/>",
+            "diff_refs": {
+                "base_sha": "8cda588e5fa519c92d9832631147010a075fa76b",
+                "head_sha": "5b61c15a2d53b6a34fd880f4f2a3d236ab1ea7b3",
+                "start_sha": "8cda588e5fa519c92d9832631147010a075fa76b"
+            },
+            "discussion_locked": null,
+            "downvotes": 0,
+            "first_contribution": false,
+            "first_deployed_to_production_at": null,
+            "force_remove_source_branch": true,
+            "has_conflicts": false,
+            "head_pipeline": {
+                "before_sha": "0000000000000000000000000000000000000000",
+                "committed_at": null,
+                "coverage": null,
+                "created_at": "2020-04-21T10:52:37.577Z",
+                "detailed_status": {
+                    "details_path": "/Chromicle/cms-mobile/-/pipelines/138240206",
+                    "favicon": "https://gitlab.com/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png",
+                    "group": "success",
+                    "has_details": true,
+                    "icon": "status_success",
+                    "illustration": null,
+                    "label": "passed",
+                    "text": "passed",
+                    "tooltip": "passed"
+                },
+                "duration": 474,
+                "finished_at": "2020-04-21T11:00:32.395Z",
+                "id": 138240206,
+                "ref": "prof",
+                "sha": "5b61c15a2d53b6a34fd880f4f2a3d236ab1ea7b3",
+                "started_at": "2020-04-21T10:52:38.076Z",
+                "status": "success",
+                "tag": false,
+                "updated_at": "2020-04-21T11:00:32.401Z",
+                "user": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/924a72e21eb76c29ed58ffb96f900781?s=80&d=identicon",
+                    "id": 4248740,
+                    "name": "Ajay Prabhakar",
+                    "state": "active",
+                    "username": "Chromicle",
+                    "web_url": "https://gitlab.com/Chromicle"
+                },
+                "web_url": "https://gitlab.com/Chromicle/cms-mobile/-/pipelines/138240206",
+                "yaml_errors": null
+            },
+            "id": 56390497,
+            "iid": 42,
+            "labels": [
+                "enhancement",
+                "feature"
+            ],
+            "latest_build_finished_at": "2020-04-21T11:00:32.395Z",
+            "latest_build_started_at": "2020-04-21T10:52:38.076Z",
+            "merge_commit_sha": null,
+            "merge_error": null,
+            "merge_status": "can_be_merged",
+            "merge_when_pipeline_succeeds": false,
+            "merged_at": "2020-04-21T11:04:45.087Z",
+            "merged_by": {
+                "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                "id": 3418756,
+                "name": "Yash Khare",
+                "state": "active",
+                "username": "yashk2000",
+                "web_url": "https://gitlab.com/yashk2000"
+            },
+            "milestone": null,
+            "notes_data": [
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "approved this merge request",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T11:02:47.868Z",
+                    "id": 328032741,
+                    "noteable_id": 56390497,
+                    "noteable_iid": 42,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-21T11:02:47.870Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/96b58cb8a1bd5aefbaa8f4b5b96d9863?s=80&d=identicon",
+                        "id": 5028715,
+                        "name": "Sai Rajendra Immadi",
+                        "state": "active",
+                        "username": "immadisairaj",
+                        "web_url": "https://gitlab.com/immadisairaj"
+                    },
+                    "award_emoji_data": [],
+                    "body": "approved this merge request",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T11:04:04.989Z",
+                    "id": 328033475,
+                    "noteable_id": 56390497,
+                    "noteable_iid": 42,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-21T11:04:04.990Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "merged",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T11:04:45.260Z",
+                    "id": 328033866,
+                    "noteable_id": 56390497,
+                    "noteable_iid": 42,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-21T11:04:45.262Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/96b58cb8a1bd5aefbaa8f4b5b96d9863?s=80&d=identicon",
+                        "id": 5028715,
+                        "name": "Sai Rajendra Immadi",
+                        "state": "active",
+                        "username": "immadisairaj",
+                        "web_url": "https://gitlab.com/immadisairaj"
+                    },
+                    "award_emoji_data": [],
+                    "body": "@Chromicle Maybe as we are adding Flutter Icons, see if any icons in other screens also needed changes.",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T11:04:57.343Z",
+                    "id": 328033971,
+                    "noteable_id": 56390497,
+                    "noteable_iid": 42,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": false,
+                    "type": null,
+                    "updated_at": "2020-04-21T11:04:57.343Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/924a72e21eb76c29ed58ffb96f900781?s=80&d=identicon",
+                        "id": 4248740,
+                        "name": "Ajay Prabhakar",
+                        "state": "active",
+                        "username": "Chromicle",
+                        "web_url": "https://gitlab.com/Chromicle"
+                    },
+                    "award_emoji_data": [
+                        {
+                            "awardable_id": 328038233,
+                            "awardable_type": "Note",
+                            "created_at": "2020-04-21T11:13:52.961Z",
+                            "id": 4181914,
+                            "name": "thumbsup_tone1",
+                            "updated_at": "2020-04-21T11:13:52.961Z",
+                            "user": {
+                                "avatar_url": "https://secure.gravatar.com/avatar/96b58cb8a1bd5aefbaa8f4b5b96d9863?s=80&d=identicon",
+                                "id": 5028715,
+                                "name": "Sai Rajendra Immadi",
+                                "state": "active",
+                                "username": "immadisairaj",
+                                "web_url": "https://gitlab.com/immadisairaj"
+                            }
+                        }
+                    ],
+                    "body": "yeah, I already made some changes in drawer and bottom navigation\\\n<img src=\"/uploads/fdb59650ea32331f672bc181749eb657/device-2020-04-21-164112.png\" height=\"400\" width=\"200\"/>",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-21T11:12:22.820Z",
+                    "id": 328038233,
+                    "noteable_id": 56390497,
+                    "noteable_iid": 42,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": false,
+                    "type": null,
+                    "updated_at": "2020-04-21T11:12:22.820Z"
+                }
+            ],
+            "pipeline": {
+                "created_at": "2020-04-21T10:52:37.577Z",
+                "id": 138240206,
+                "ref": "prof",
+                "sha": "5b61c15a2d53b6a34fd880f4f2a3d236ab1ea7b3",
+                "status": "success",
+                "updated_at": "2020-04-21T11:00:32.401Z",
+                "web_url": "https://gitlab.com/Chromicle/cms-mobile/-/pipelines/138240206"
+            },
+            "project_id": 16307213,
+            "reference": "!42",
+            "references": {
+                "full": "amfoss/cms-mobile!42",
+                "relative": "!42",
+                "short": "!42"
+            },
+            "sha": "5b61c15a2d53b6a34fd880f4f2a3d236ab1ea7b3",
+            "should_remove_source_branch": null,
+            "source_branch": "prof",
+            "source_project_id": 17875277,
+            "squash": false,
+            "squash_commit_sha": null,
+            "state": "merged",
+            "subscribed": true,
+            "target_branch": "master",
+            "target_project_id": 16307213,
+            "task_completion_status": {
+                "completed_count": 0,
+                "count": 0
+            },
+            "time_stats": {
+                "human_time_estimate": null,
+                "human_total_time_spent": null,
+                "time_estimate": 0,
+                "total_time_spent": 0
+            },
+            "title": "feat: Add more details in profile screen",
+            "updated_at": "2020-04-21T11:12:22.847Z",
+            "upvotes": 0,
+            "user": {
+                "can_merge": false
+            },
+            "user_notes_count": 2,
+            "versions_data": [
+                {
+                    "base_commit_sha": "8cda588e5fa519c92d9832631147010a075fa76b",
+                    "commits": [
+                        {
+                            "author_email": "ajayprabhakar369@gmail.com",
+                            "author_name": "chromicle",
+                            "authored_date": "2020-04-21T10:52:12.000Z",
+                            "committed_date": "2020-04-21T10:52:12.000Z",
+                            "committer_email": "ajayprabhakar369@gmail.com",
+                            "committer_name": "chromicle",
+                            "created_at": "2020-04-21T10:52:12.000Z",
+                            "id": "5b61c15a2d53b6a34fd880f4f2a3d236ab1ea7b3",
+                            "message": "feat: Add more details in profile screen\n",
+                            "parent_ids": [],
+                            "short_id": "5b61c15a",
+                            "title": "feat: Add more details in profile screen",
+                            "web_url": "https://gitlab.com/amfoss/cms-mobile/-/commit/5b61c15a2d53b6a34fd880f4f2a3d236ab1ea7b3"
+                        }
+                    ],
+                    "created_at": "2020-04-21T10:59:26.398Z",
+                    "head_commit_sha": "5b61c15a2d53b6a34fd880f4f2a3d236ab1ea7b3",
+                    "id": 86533739,
+                    "merge_request_id": 56390497,
+                    "real_size": "6",
+                    "start_commit_sha": "8cda588e5fa519c92d9832631147010a075fa76b",
+                    "state": "collected"
+                }
+            ],
+            "web_url": "https://gitlab.com/amfoss/cms-mobile/-/merge_requests/42",
+            "work_in_progress": false
+        },
+        "origin": "https://gitlab.com/amfoss/cms-mobile",
+        "perceval_version": "0.14.0",
+        "search_fields": {
+            "groups": null,
+            "iid": 42,
+            "item_id": "56390497",
+            "owner": "amfoss",
+            "project": "cms-mobile"
+        },
+        "tag": "https://gitlab.com/amfoss/cms-mobile",
+        "timestamp": 1591698996.703761,
+        "updated_on": 1587467542.847,
+        "uuid": "3c6480ce858722bad95955a3fc65daa8c0f8df0c"
+    },
+    {
+        "backend_name": "GitLab",
+        "backend_version": "0.12.0",
+        "category": "issue",
+        "classified_fields_filtered": null,
+        "data": {
+            "_links": {
+                "award_emoji": "https://gitlab.com/api/v4/projects/16307213/issues/18/award_emoji",
+                "notes": "https://gitlab.com/api/v4/projects/16307213/issues/18/notes",
+                "project": "https://gitlab.com/api/v4/projects/16307213",
+                "self": "https://gitlab.com/api/v4/projects/16307213/issues/18"
+            },
+            "assignee": {
+                "avatar_url": "https://secure.gravatar.com/avatar/2bf24a4231306842f743a28529e3347e?s=80&d=identicon",
+                "id": 5162683,
+                "name": "Athira",
+                "state": "active",
+                "username": "athiranair2000",
+                "web_url": "https://gitlab.com/athiranair2000"
+            },
+            "assignees": [
+                {
+                    "avatar_url": "https://secure.gravatar.com/avatar/2bf24a4231306842f743a28529e3347e?s=80&d=identicon",
+                    "id": 5162683,
+                    "name": "Athira",
+                    "state": "active",
+                    "username": "athiranair2000",
+                    "web_url": "https://gitlab.com/athiranair2000"
+                }
+            ],
+            "author": {
+            },
+            "award_emoji_data": [],
+            "closed_at": "2020-04-26T05:52:44.262Z",
+            "closed_by": {
+                "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                "id": 3418756,
+                "name": "Yash Khare",
+                "state": "active",
+                "username": "yashk2000",
+                "web_url": "https://gitlab.com/yashk2000"
+            },
+            "confidential": false,
+            "created_at": "2020-04-06T17:05:34.517Z",
+            "description": "**Describe the bug**\n\nIf the user presses the Login button without entering anything in username and password then it doesn't show any alert notification.\n\n**Screenshot**\n\n![No_message](/uploads/82d66a5723b4c850f0c52e3019f89ea5/No_message.gif)",
+            "discussion_locked": null,
+            "downvotes": 0,
+            "due_date": null,
+            "epic": null,
+            "epic_iid": null,
+            "has_tasks": false,
+            "id": 32953131,
+            "iid": 18,
+            "labels": [
+                "enhancement",
+                "good first issue"
+            ],
+            "merge_requests_count": 2,
+            "milestone": null,
+            "moved_to_id": null,
+            "notes_data": [
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/2bf24a4231306842f743a28529e3347e?s=80&d=identicon",
+                        "id": 5162683,
+                        "name": "Athira",
+                        "state": "active",
+                        "username": "athiranair2000",
+                        "web_url": "https://gitlab.com/athiranair2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "Hi, can I work on this issue?",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-19T18:41:26.580Z",
+                    "id": 326914119,
+                    "noteable_id": 32953131,
+                    "noteable_iid": 18,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": false,
+                    "type": null,
+                    "updated_at": "2020-04-19T18:41:26.580Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "@athiranair2000 sure, go ahead :)",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-19T18:43:49.324Z",
+                    "id": 326914411,
+                    "noteable_id": 32953131,
+                    "noteable_iid": 18,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": false,
+                    "type": null,
+                    "updated_at": "2020-04-19T18:43:49.324Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "assigned to @athiranair2000",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-19T18:44:00.690Z",
+                    "id": 326914447,
+                    "noteable_id": 32953131,
+                    "noteable_iid": 18,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-19T18:44:00.692Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/2bf24a4231306842f743a28529e3347e?s=80&d=identicon",
+                        "id": 5162683,
+                        "name": "Athira",
+                        "state": "active",
+                        "username": "athiranair2000",
+                        "web_url": "https://gitlab.com/athiranair2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "mentioned in merge request !41",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-20T19:17:56.040Z",
+                    "id": 327563457,
+                    "noteable_id": 32953131,
+                    "noteable_iid": 18,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-20T19:17:56.042Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/2bf24a4231306842f743a28529e3347e?s=80&d=identicon",
+                        "id": 5162683,
+                        "name": "Athira",
+                        "state": "active",
+                        "username": "athiranair2000",
+                        "web_url": "https://gitlab.com/athiranair2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "mentioned in merge request !46",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-24T13:30:12.675Z",
+                    "id": 330962993,
+                    "noteable_id": 32953131,
+                    "noteable_iid": 18,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-24T13:30:12.677Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "closed via merge request !46",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-26T05:52:44.430Z",
+                    "id": 331502229,
+                    "noteable_id": 32953131,
+                    "noteable_iid": 18,
+                    "noteable_type": "Issue",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-26T05:52:44.431Z"
+                }
+            ],
+            "project_id": 16307213,
+            "references": {
+                "full": "amfoss/cms-mobile#18",
+                "relative": "#18",
+                "short": "#18"
+            },
+            "state": "closed",
+            "task_completion_status": {
+                "completed_count": 0,
+                "count": 0
+            },
+            "time_stats": {
+                "human_time_estimate": null,
+                "human_total_time_spent": null,
+                "time_estimate": 0,
+                "total_time_spent": 0
+            },
+            "title": "No notification in login page",
+            "updated_at": "2020-04-26T05:52:44.358Z",
+            "upvotes": 0,
+            "user_notes_count": 2,
+            "web_url": "https://gitlab.com/amfoss/cms-mobile/-/issues/18",
+            "weight": null
+        },
+        "origin": "https://gitlab.com/amfoss/cms-mobile",
+        "perceval_version": "0.14.0",
+        "search_fields": {
+            "groups": null,
+            "iid": 18,
+            "item_id": "32953131",
+            "owner": "amfoss",
+            "project": "cms-mobile"
+        },
+        "tag": "https://gitlab.com/amfoss/cms-mobile",
+        "timestamp": 1591699796.859146,
+        "updated_on": 1587880364.358,
+        "uuid": "b0266ccecda35146780c076ad009015cf24927b3"
+    },
+    {
+        "backend_name": "GitLab",
+        "backend_version": "0.12.0",
+        "category": "merge_request",
+        "classified_fields_filtered": null,
+        "data": {
+            "allow_collaboration": false,
+            "allow_maintainer_to_push": false,
+            "approvals_before_merge": null,
+            "assignee": null,
+            "assignees": [],
+            "author": {
+            },
+            "award_emoji_data": [
+                {
+                    "awardable_id": 56958021,
+                    "awardable_type": "MergeRequest",
+                    "created_at": "2020-05-20T07:56:31.195Z",
+                    "id": 4503450,
+                    "name": "thumbsup",
+                    "updated_at": "2020-05-20T07:56:31.195Z",
+                    "user": {
+                        "avatar_url": "https://assets.gitlab-static.net/uploads/-/system/user/avatar/2409720/avatar.png",
+                        "id": 2409720,
+                        "name": "Venu Vardhan Reddy Tekula",
+                        "state": "active",
+                        "username": "vchrombie",
+                        "web_url": "https://gitlab.com/vchrombie"
+                    }
+                },
+                {
+                    "awardable_id": 56958021,
+                    "awardable_type": "MergeRequest",
+                    "created_at": "2020-06-06T19:14:55.656Z",
+                    "id": 4688007,
+                    "name": "thumbsup",
+                    "updated_at": "2020-06-06T19:14:55.656Z",
+                    "user": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/b2503e814e0b2c4fb93aed9fe71bd27d?s=80&d=identicon",
+                        "id": 5276179,
+                        "name": "Harshith Pabbati",
+                        "state": "active",
+                        "username": "harshithpabbati",
+                        "web_url": "https://gitlab.com/harshithpabbati"
+                    }
+                },
+                {
+                    "awardable_id": 56958021,
+                    "awardable_type": "MergeRequest",
+                    "created_at": "2020-06-06T19:15:53.560Z",
+                    "id": 4688008,
+                    "name": "basketball",
+                    "updated_at": "2020-06-06T19:15:53.560Z",
+                    "user": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/b2503e814e0b2c4fb93aed9fe71bd27d?s=80&d=identicon",
+                        "id": 5276179,
+                        "name": "Harshith Pabbati",
+                        "state": "active",
+                        "username": "harshithpabbati",
+                        "web_url": "https://gitlab.com/harshithpabbati"
+                    }
+                },
+                {
+                    "awardable_id": 56958021,
+                    "awardable_type": "MergeRequest",
+                    "created_at": "2020-06-06T19:16:55.091Z",
+                    "id": 4688010,
+                    "name": "thumbsdown",
+                    "updated_at": "2020-06-06T19:16:55.091Z",
+                    "user": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/b2503e814e0b2c4fb93aed9fe71bd27d?s=80&d=identicon",
+                        "id": 5276179,
+                        "name": "Harshith Pabbati",
+                        "state": "active",
+                        "username": "harshithpabbati",
+                        "web_url": "https://gitlab.com/harshithpabbati"
+                    }
+                },
+                {
+                    "awardable_id": 56958021,
+                    "awardable_type": "MergeRequest",
+                    "created_at": "2020-06-06T19:20:11.764Z",
+                    "id": 4688016,
+                    "name": "thumbsup",
+                    "updated_at": "2020-06-06T19:20:11.764Z",
+                    "user": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    }
+                },
+                {
+                    "awardable_id": 56958021,
+                    "awardable_type": "MergeRequest",
+                    "created_at": "2020-06-06T19:20:58.920Z",
+                    "id": 4688018,
+                    "name": "basketball",
+                    "updated_at": "2020-06-06T19:20:58.920Z",
+                    "user": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    }
+                },
+                {
+                    "awardable_id": 56958021,
+                    "awardable_type": "MergeRequest",
+                    "created_at": "2020-06-06T19:22:23.034Z",
+                    "id": 4688021,
+                    "name": "rocket",
+                    "updated_at": "2020-06-06T19:22:23.034Z",
+                    "user": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/dcb6dca61de3778b46b14fba4931184a?s=80&d=identicon",
+                        "id": 2378565,
+                        "name": "Abhishek Bvs",
+                        "state": "active",
+                        "username": "abhishekbvs",
+                        "web_url": "https://gitlab.com/abhishekbvs"
+                    }
+                },
+                {
+                    "awardable_id": 56958021,
+                    "awardable_type": "MergeRequest",
+                    "created_at": "2020-06-06T19:22:25.159Z",
+                    "id": 4688022,
+                    "name": "thumbsup",
+                    "updated_at": "2020-06-06T19:22:25.159Z",
+                    "user": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/dcb6dca61de3778b46b14fba4931184a?s=80&d=identicon",
+                        "id": 2378565,
+                        "name": "Abhishek Bvs",
+                        "state": "active",
+                        "username": "abhishekbvs",
+                        "web_url": "https://gitlab.com/abhishekbvs"
+                    }
+                },
+                {
+                    "awardable_id": 56958021,
+                    "awardable_type": "MergeRequest",
+                    "created_at": "2020-06-06T19:22:45.464Z",
+                    "id": 4688025,
+                    "name": "8ball",
+                    "updated_at": "2020-06-06T19:22:45.464Z",
+                    "user": {
+                        "avatar_url": "https://assets.gitlab-static.net/uploads/-/system/user/avatar/2409720/avatar.png",
+                        "id": 2409720,
+                        "name": "Venu Vardhan Reddy Tekula",
+                        "state": "active",
+                        "username": "vchrombie",
+                        "web_url": "https://gitlab.com/vchrombie"
+                    }
+                }
+            ],
+            "blocking_discussions_resolved": true,
+            "changes_count": "6",
+            "closed_at": null,
+            "closed_by": null,
+            "created_at": "2020-04-26T16:31:32.694Z",
+            "description": "Changes:  \nWhen the user logs in to the app for the first time, their credentials get stored in the app database. The next time the app is opened, the database is checked for credentials. If they exist, the app navigates directly to the home page.\n\nVideo:\n![Screenrecorder-2020-04-26-21-55-39-488](/uploads/a1d9a80934fa38a9925240222f44fde5/Screenrecorder-2020-04-26-21-55-39-488.mp4)",
+            "diff_refs": {
+                "base_sha": "bbba6a149b0304495fe6cfd5c087188bdb88cebd",
+                "head_sha": "4d9ffd65c453d83c8a6ec5fe26e3fe61f133d819",
+                "start_sha": "bbba6a149b0304495fe6cfd5c087188bdb88cebd"
+            },
+            "discussion_locked": null,
+            "downvotes": 1,
+            "first_contribution": false,
+            "first_deployed_to_production_at": null,
+            "force_remove_source_branch": true,
+            "has_conflicts": false,
+            "head_pipeline": {
+                "before_sha": "bbba6a149b0304495fe6cfd5c087188bdb88cebd",
+                "committed_at": null,
+                "coverage": null,
+                "created_at": "2020-04-26T15:23:13.859Z",
+                "detailed_status": {
+                    "details_path": "/padth4i/cms-mobile/-/pipelines/139987704",
+                    "favicon": "https://gitlab.com/assets/ci_favicons/favicon_status_success-8451333011eee8ce9f2ab25dc487fe24a8758c694827a582f17f42b0a90446a2.png",
+                    "group": "success",
+                    "has_details": true,
+                    "icon": "status_success",
+                    "illustration": null,
+                    "label": "passed",
+                    "text": "passed",
+                    "tooltip": "passed"
+                },
+                "duration": 469,
+                "finished_at": "2020-04-26T15:31:04.330Z",
+                "id": 139987704,
+                "ref": "rememberMe",
+                "sha": "4d9ffd65c453d83c8a6ec5fe26e3fe61f133d819",
+                "started_at": "2020-04-26T15:23:15.096Z",
+                "status": "success",
+                "tag": false,
+                "updated_at": "2020-04-26T15:31:04.337Z",
+                "user": {
+                    "avatar_url": "https://secure.gravatar.com/avatar/a5f39a251241ebd0ce9aab4ae28ba04c?s=80&d=identicon",
+                    "id": 4778175,
+                    "name": "Vaishnav",
+                    "state": "active",
+                    "username": "padth4i",
+                    "web_url": "https://gitlab.com/padth4i"
+                },
+                "web_url": "https://gitlab.com/padth4i/cms-mobile/-/pipelines/139987704",
+                "yaml_errors": null
+            },
+            "id": 56958021,
+            "iid": 50,
+            "labels": [],
+            "latest_build_finished_at": null,
+            "latest_build_started_at": null,
+            "merge_commit_sha": null,
+            "merge_error": null,
+            "merge_status": "can_be_merged",
+            "merge_when_pipeline_succeeds": false,
+            "merged_at": "2020-04-26T16:35:24.147Z",
+            "merged_by": {
+                "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                "id": 3418756,
+                "name": "Yash Khare",
+                "username": "yashk2000",
+                "state": "active",
+                "web_url": "https://gitlab.com/yashk2000"
+            },
+            "milestone": null,
+            "notes_data": [
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "approved this merge request",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-26T16:35:21.265Z",
+                    "id": 331598319,
+                    "noteable_id": 56958021,
+                    "noteable_iid": 50,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-26T16:35:21.267Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "merged",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-26T16:35:24.319Z",
+                    "id": 331598323,
+                    "noteable_id": 56958021,
+                    "noteable_iid": 50,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-26T16:35:24.322Z"
+                },
+                {
+                    "attachment": null,
+                    "author": {
+                        "avatar_url": "https://secure.gravatar.com/avatar/7db83a0a0c0d8ec464bf562143e669db?s=80&d=identicon",
+                        "id": 3418756,
+                        "name": "Yash Khare",
+                        "state": "active",
+                        "username": "yashk2000",
+                        "web_url": "https://gitlab.com/yashk2000"
+                    },
+                    "award_emoji_data": [],
+                    "body": "mentioned in issue #29",
+                    "commands_changes": {},
+                    "confidential": false,
+                    "created_at": "2020-04-26T16:36:54.759Z",
+                    "id": 331598567,
+                    "noteable_id": 56958021,
+                    "noteable_iid": 50,
+                    "noteable_type": "MergeRequest",
+                    "resolvable": false,
+                    "system": true,
+                    "type": null,
+                    "updated_at": "2020-04-26T16:36:54.760Z"
+                }
+            ],
+            "pipeline": null,
+            "project_id": 16307213,
+            "reference": "!50",
+            "references": {
+                "full": "amfoss/cms-mobile!50",
+                "relative": "!50",
+                "short": "!50"
+            },
+            "sha": "4d9ffd65c453d83c8a6ec5fe26e3fe61f133d819",
+            "should_remove_source_branch": null,
+            "source_branch": "rememberMe",
+            "source_project_id": 17885307,
+            "squash": false,
+            "squash_commit_sha": null,
+            "state": "merged",
+            "subscribed": true,
+            "target_branch": "master",
+            "target_project_id": 16307213,
+            "task_completion_status": {
+                "completed_count": 0,
+                "count": 0
+            },
+            "time_stats": {
+                "human_time_estimate": null,
+                "human_total_time_spent": null,
+                "time_estimate": 0,
+                "total_time_spent": 0
+            },
+            "title": "feat: Remember user details after login",
+            "updated_at": "2020-04-26T16:36:54.783Z",
+            "upvotes": 4,
+            "user": {
+                "can_merge": false
+            },
+            "user_notes_count": 0,
+            "versions_data": [
+                {
+                    "base_commit_sha": "bbba6a149b0304495fe6cfd5c087188bdb88cebd",
+                    "commits": [
+                        {
+                            "author_email": "vaishnavs4201@gmail.com",
+                            "author_name": "Vaishnav Sivaprasad",
+                            "authored_date": "2020-04-26T15:24:07.000Z",
+                            "committed_date": "2020-04-26T15:24:07.000Z",
+                            "committer_email": "vaishnavs4201@gmail.com",
+                            "committer_name": "Vaishnav Sivaprasad",
+                            "created_at": "2020-04-26T15:24:07.000Z",
+                            "id": "4d9ffd65c453d83c8a6ec5fe26e3fe61f133d819",
+                            "message": "feat: Remember user details after login\n",
+                            "parent_ids": [],
+                            "short_id": "4d9ffd65",
+                            "title": "feat: Remember user details after login",
+                            "web_url": "https://gitlab.com/amfoss/cms-mobile/-/commit/4d9ffd65c453d83c8a6ec5fe26e3fe61f133d819"
+                        }
+                    ],
+                    "created_at": "2020-04-26T16:31:32.840Z",
+                    "head_commit_sha": "4d9ffd65c453d83c8a6ec5fe26e3fe61f133d819",
+                    "id": 87484095,
+                    "merge_request_id": 56958021,
+                    "real_size": "6",
+                    "start_commit_sha": "bbba6a149b0304495fe6cfd5c087188bdb88cebd",
+                    "state": "collected"
+                }
+            ],
+            "web_url": "https://gitlab.com/amfoss/cms-mobile/-/merge_requests/50",
+            "work_in_progress": false
+        },
+        "origin": "https://gitlab.com/amfoss/cms-mobile",
+        "perceval_version": "0.14.0",
+        "search_fields": {
+            "groups": null,
+            "iid": 50,
+            "item_id": "56958021",
+            "owner": "amfoss",
+            "project": "cms-mobile"
+        },
+        "tag": "https://gitlab.com/amfoss/cms-mobile",
+        "timestamp": 1591699121.686227,
+        "updated_on": 1587919014.783,
+        "uuid": "55e9da339312d5e5fa13d687cd36312c79da7dc4"
+    }
+]
