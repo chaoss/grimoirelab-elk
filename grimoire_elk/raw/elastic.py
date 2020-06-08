@@ -108,7 +108,7 @@ class ElasticOcean(ElasticItems):
             return {"url": url}
 
         # otherwise, add the url to the params
-        params = {'url': url.split(' ', 1)[0]}
+        params = {'url': url.split(PRJ_JSON_FILTER_SEPARATOR, 1)[0].strip()}
         # tokenize the filter and add them to the param dict
         tokens = url.split(PRJ_JSON_FILTER_SEPARATOR)[1:]
 
