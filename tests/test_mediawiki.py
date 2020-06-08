@@ -110,7 +110,8 @@ class TestMediawiki(TestBaseBackend):
         self.assertEqual(eitem['isrevision'], 1)
 
         eitem = eitems[4]
-        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org//Technical_Collaboration_Guideline/Translation')
+        self.assertEqual(eitem['url'],
+                         'https://wiki-archive.opendaylight.org/Technical_Collaboration_Guideline/Translation')
         self.assertIn('metadata__gelk_version', eitem)
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__enriched_on', eitem)
@@ -122,7 +123,8 @@ class TestMediawiki(TestBaseBackend):
         self.assertEqual(eitem['isrevision'], 0)
 
         eitem = eitems[5]
-        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org//Technical_Collaboration_Guideline/Translation')
+        self.assertEqual(eitem['url'],
+                         'https://wiki-archive.opendaylight.org/Technical_Collaboration_Guideline/Translation')
         self.assertIn('metadata__gelk_version', eitem)
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__enriched_on', eitem)
@@ -134,7 +136,8 @@ class TestMediawiki(TestBaseBackend):
         self.assertEqual(eitem['isrevision'], 1)
 
         eitem = eitems[6]
-        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org//Technical_Collaboration_Guideline/Translation')
+        self.assertEqual(eitem['url'],
+                         'https://wiki-archive.opendaylight.org/Technical_Collaboration_Guideline/Translation')
         self.assertIn('metadata__gelk_version', eitem)
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__enriched_on', eitem)
@@ -146,7 +149,8 @@ class TestMediawiki(TestBaseBackend):
         self.assertEqual(eitem['isrevision'], 1)
 
         eitem = eitems[7]
-        self.assertEqual(eitem['url'], 'https://wiki.mozilla.org//Technical_Collaboration_Guideline/Translation')
+        self.assertEqual(eitem['url'],
+                         'https://wiki-archive.opendaylight.org/Technical_Collaboration_Guideline/Translation')
         self.assertIn('metadata__gelk_version', eitem)
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__enriched_on', eitem)

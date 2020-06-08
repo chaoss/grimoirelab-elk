@@ -24,6 +24,7 @@ import logging
 
 from grimoirelab_toolkit.datetime import str_to_datetime
 
+from ..raw.elastic import PRJ_JSON_FILTER_SEPARATOR
 from .enrich import Enrich, metadata, anonymize_url
 from ..elastic_mapping import Mapping as BaseMapping
 
@@ -161,6 +162,7 @@ class MediaWikiEnrich(Enrich):
             # And now some calculated fields
             if self.prjs_map and "mediawiki" in self.prjs_map:
                 for repo in self.prjs_map["mediawiki"].keys():
+                    repo = repo.split(PRJ_JSON_FILTER_SEPARATOR)[0].strip()
                     if erevision["page_origin"] in repo:
                         urls = repo.split()
                         # If only one URL is given, then we consider same URL for API and web server
