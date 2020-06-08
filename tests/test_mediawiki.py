@@ -239,6 +239,24 @@ class TestMediawiki(TestBaseBackend):
         ]
         self.assertListEqual(MediaWikiOcean.get_perceval_params_from_url(url), expected_params)
 
+        url = "https://wiki-archive.opendaylight.org https://wiki-archive.opendaylight.org/view"
+        expected_params = [
+            "https://wiki-archive.opendaylight.org"
+        ]
+        self.assertListEqual(MediaWikiOcean.get_perceval_params_from_url(url), expected_params)
+
+    def test_p2o_params(self):
+        """Test the extraction of p2o params from an URL"""
+
+        url = "https://wiki-archive.opendaylight.org " \
+              "https://wiki-archive.opendaylight.org/view" \
+              "--filter-no-collection=true"
+        expected_params = {
+            'url': 'https://wiki-archive.opendaylight.org https://wiki-archive.opendaylight.org/view',
+            'filter-no-collection': 'true'
+        }
+        self.assertDictEqual(MediaWikiOcean.get_p2o_params_from_url(url), expected_params)
+
     def test_copy_raw_fields(self):
         """Test copied raw fields"""
 
