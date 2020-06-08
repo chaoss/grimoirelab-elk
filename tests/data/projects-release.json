@@ -73,7 +73,8 @@
             "metrics-grimoire /home/bitergia/.perceval/mbox"
         ],
         "mediawiki": [
-            "https://wiki.mozilla.org https://wiki.mozilla.org/view"
+            "https://wiki.mozilla.org https://wiki.mozilla.org/view",
+            "https://wiki-archive.opendaylight.org https://wiki-archive.opendaylight.org/view --filter-no-collection=true"
         ],
         "meetup": [
             "South-East-Puppet-User-Group"
