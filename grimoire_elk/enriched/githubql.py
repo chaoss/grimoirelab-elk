@@ -171,6 +171,7 @@ class GitHubQLEnrich(Enrich):
             rich_event['label_updated_at'] = label['updatedAt']
         elif rich_event['event_type'] in CLOSED_EVENTS:
             closer = event['closer']
+            rich_event['label'] = rich_event['issue_labels']
             if closer and closer['type'] == 'PullRequest':
                 rich_event['closer_event_url'] = event['url']
                 rich_event['closer_type'] = closer['type']
