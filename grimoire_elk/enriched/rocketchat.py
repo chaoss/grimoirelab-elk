@@ -17,6 +17,7 @@
 #
 # Authors:
 #   Animesh Kumar<animuz111@gmail.com>
+#   Obaro Ikoh <obaroikohb@gmail.com>
 #
 
 import logging
@@ -42,7 +43,7 @@ class Mapping(BaseMapping):
         mapping = """
         {
             "properties": {
-                "text_analyzed": {
+                "msg_analyzed": {
                   "type": "text",
                   "fielddata": true,
                   "index": true
@@ -55,11 +56,6 @@ class Mapping(BaseMapping):
 
 class RocketChatEnrich(Enrich):
     mapping = Mapping
-
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
-                 db_user='', db_password='', db_host=''):
-        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
-                         db_user, db_password, db_host)
 
     def get_field_author(self):
         return "u"
@@ -99,44 +95,58 @@ class RocketChatEnrich(Enrich):
 
         message = item['data']
 
-        eitem['text_analyzed'] = message['msg']
+        eitem['msg_analyzed'] = message['msg']
         eitem['msg'] = message['msg']
         eitem['rid'] = message['rid']
-        eitem['id'] = message['_id']
+        eitem['msg_id'] = message['_id']
         # parent exists in case message is a reply
-        eitem['parent'] = message.get('parent', None)
+        eitem['msg_parent'] = message.get('parent', None)
 
-        if 'u' in message and message['u']:
-            author = message['u']
+        author = message.get('u', None)
+        if author:
             eitem['user_id'] = author.get('_id', None)
             eitem['user_name'] = author.get('name', None)
             eitem['user_username'] = author.get('username', None)
 
-        if 'editedBy' in message and message['editedBy']:
+        eitem['is_edited'] = 0
+        editor = message.get('editedBy', None)
+        if editor:
             eitem['edited_at'] = str_to_datetime(message['editedAt']).isoformat()
-            editor = message['editedBy']
             eitem['edited_by_username'] = editor.get('username', None)
             eitem['edited_by_user_id'] = editor.get('_id', None)
+            eitem['is_edited'] = 1
 
-        if 'file' in message and message['file']:
-            eitem['file_id'] = message['file'].get('_id', None)
-            eitem['file_name'] = message['file'].get('name', None)
-            eitem['file_type'] = message['file'].get('type', None)
+        file = message.get('file', None)
+        if file:
+            eitem['file_id'] = file.get('_id', None)
+            eitem['file_name'] = file.get('name', None)
+            eitem['file_type'] = file.get('type', None)
 
-        if 'replies' in message and message['replies']:
-            eitem['replies'] = message['replies']
+        eitem['replies'] = len(message['replies']) if message.get('replies', None) else 0
 
-        if 'reactions' in message and message['reactions']:
-            eitem.update(self.__get_reactions(message))
+        eitem['total_reactions'] = 0
+        reactions = message.get('reactions', None)
+        if reactions:
+            reaction_types, total_reactions = self.__get_reactions(reactions)
+            eitem.update({'reactions': reaction_types})
+            eitem['total_reactions'] = total_reactions
 
-        if 'mentions' in message and message['mentions']:
-            eitem['mentions'] = self.__get_mentions(message['mentions'])
+        eitem['total_mentions'] = 0
+        mentions = message.get('mentions', None)
+        if mentions:
+            eitem['mentions'] = self.__get_mentions(mentions)
+            eitem['total_mentions'] = len(mentions)
 
-        if 'channel_info' in message and message['channel_info']:
-            eitem.update(self.__get_channel_info(message['channel_info']))
+        channel_info = message.get('channel_info', None)
+        if channel_info:
+            eitem.update(self.__get_channel_info(channel_info))
 
-        if 'urls' in message and message['urls']:
-            eitem['message_urls'] = self.__get_urls(message['urls'])
+        eitem['total_urls'] = 0
+        urls = message.get('urls', None)
+        if urls:
+            urls = [{'url': url['url']} for url in urls]
+            eitem['message_urls'] = urls
+            eitem['total_urls'] = len(urls)
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
@@ -144,20 +154,31 @@ class RocketChatEnrich(Enrich):
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
 
+        eitem.update(self.get_grimoire_fields(item["metadata__updated_on"], "message"))
+
         self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem
 
-    def __get_reactions(self, item):
+    def __get_reactions(self, reactions):
         """Enrich reactions for the message"""
 
-        reactions = {}
+        reaction_types = []
+        total_reactions = 0
+        for reaction_type in reactions:
+            reaction_data = reactions[reaction_type]
+            usernames = reaction_data.get('usernames', [])
+            names = reaction_data.get('names', [])
+            reaction_type = {
+                "type": reaction_type,
+                "username": usernames,
+                "names": names,
+                "count": len(usernames)
+            }
+            total_reactions += len(usernames)
+            reaction_types.append(reaction_type)
 
-        item_reactions = item.get('reactions', {})
-        for reaction in item_reactions:
-            reactions['reaction_{}'.format(reaction)] = item_reactions[reaction]
-
-        return reactions
+        return reaction_types, total_reactions
 
     def __get_mentions(self, mentioned):
         """Enrich users mentioned in the message"""
@@ -165,38 +186,28 @@ class RocketChatEnrich(Enrich):
         rich_mentions = []
 
         for usr in mentioned:
-            if '_id' in usr.keys():
-                rich_mentions.append({'username': usr['username'], 'id': usr['_id'],
-                                      'name': usr['name']})
+            rich_mention = {
+                'username': usr.get('username', None),
+                'id': usr.get('_id', None),
+                'name': usr.get('name', None)
+            }
+            rich_mentions.append(rich_mention)
 
         return rich_mentions
 
     def __get_channel_info(self, channel):
         """Enrich channel info of the message"""
 
-        rich_channel = {'channel_id': channel['_id'],
-                        'channel_updated_at': str_to_datetime(channel['_updatedAt']).isoformat(),
-                        'channel_num_messages': channel['msgs'],
-                        'channel_name': channel['name'],
-                        'channel_num_users': channel['usersCount'],
-                        }
+        rich_channel = {
+            'channel_id': channel['_id'],
+            'channel_updated_at': str_to_datetime(channel['_updatedAt']).isoformat(),
+            'channel_num_messages': channel.get('msgs', None),
+            'channel_name': channel.get('name', ''),
+            'channel_num_users': channel.get('usersCount', 0),
+            'channel_topic': channel.get('topic', ''),
+        }
+        rich_channel['avatar'] = ''
         if 'lastMessage' in channel and channel['lastMessage']:
-            rich_channel['channel_last_message_id'] = channel['lastMessage']['_id']
-            rich_channel['channel_last_message'] = channel['lastMessage']['msg']
+            rich_channel['avatar'] = channel['lastMessage']['avatar']
 
         return rich_channel
-
-    def __get_urls(self, urls):
-        """Enrich urls mentioned in the message"""
-
-        rich_urls = []
-        for url in urls:
-            rich_url = {}
-            if 'meta' in url:
-                rich_url['url_metadata_description'] = url['meta'].get('description', None)
-                rich_url['url_metadata_page_title'] = url['meta'].get('pageTitle', None)
-            rich_url['url'] = url['url']
-
-            rich_urls.append(rich_url)
-
-        return rich_urls

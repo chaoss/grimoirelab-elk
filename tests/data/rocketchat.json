@@ -1,0 +1,997 @@
+[{
+    "backend_name": "RocketChat",
+    "backend_version": "0.1.0",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "_hidden": true,
+        "_id": "FEDGKw9Fs2DG3F3ZY",
+        "_updatedAt": "2020-01-24T11:49:56.122Z",
+        "attachments": [],
+        "channel_info": {
+            "_id": "GENERAL",
+            "_updatedAt": "2020-06-10T22:24:56.891Z",
+            "announcement": "Please review our [Code of Conduct](https://rocket.chat/code-of-conduct). Violations, including unwanted solicitations, will not be tolerated.",
+            "default": true,
+            "jitsiTimeout": "2020-06-05T02:43:19.459Z",
+            "lastMessage": {
+                "_id": "rhjdPaWuwEacmpToC",
+                "_updatedAt": "2020-06-10T22:23:34.000Z",
+                "alias": "acooma",
+                "attachments": [
+                    {
+                        "author_link": "https://github.com/RocketChat/Rocket.Chat/stargazers",
+                        "author_name": "Click here to star the project too.",
+                        "ts": "1970-01-01T00:00:00.000Z"
+                    }
+                ],
+                "avatar": "https://avatars1.githubusercontent.com/u/25372243?v=4",
+                "bot": {
+                    "i": "QyWmDsdtdyzvkjucS"
+                },
+                "channels": [],
+                "groupable": false,
+                "mentions": [],
+                "msg": ":star: starred [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat). We have now *27230* stars at GitHub.",
+                "parseUrls": false,
+                "rid": "GENERAL",
+                "ts": "2020-06-10T22:23:33.956Z",
+                "u": {
+                    "_id": "rocket.cat",
+                    "name": "Rocket.Cat",
+                    "username": "rocket.cat"
+                }
+            },
+            "lm": "2020-06-10T22:23:33.956Z",
+            "msgs": 714994,
+            "muted": [
+                "geekgonecrazy",
+                "alexa32",
+                "fixedgames2088",
+                "terrygarry1",
+                "petersmid40",
+                "timeyinblessing14",
+                "sarahcourt63"
+            ],
+            "name": "general",
+            "t": "c",
+            "topic": "Community support",
+            "unmuted": [
+                "singli"
+            ],
+            "usersCount": 315467
+        },
+        "channels": [],
+        "editedAt": "2020-01-24T11:49:56.122Z",
+        "editedBy": {
+            "_id": "yyQKW2dpTqbgsRWLA",
+            "username": "xanndcosta2401"
+        },
+        "file": {
+            "_id": "gBxqCZGRfc5S9mciH",
+            "name": "IMG-20200115-WA0010.jpg",
+            "type": "image/jpeg"
+        },
+        "groupable": false,
+        "mentions": [],
+        "msg": "",
+        "parent": "qvW8ii2TkE5cPvZGW",
+        "reactions": [],
+        "rid": "GENERAL",
+        "t": "rm",
+        "ts": "2020-01-24T11:19:04.201Z",
+        "u": {
+            "_id": "yyQKW2dpTqbgsRWLA",
+            "name": "Unknown",
+            "username": "Unknown"
+        },
+        "urls": []
+    },
+    "origin": "https://open.rocket.chat/general",
+    "perceval_version": "0.14.0",
+    "search_fields": {
+        "channel_id": "GENERAL",
+        "channel_name": "general",
+        "item_id": "FEDGKw9Fs2DG3F3ZY"
+    },
+    "tag": "https://open.rocket.chat/general",
+    "timestamp": 1591828185.579359,
+    "updated_on": 1579866596.122,
+    "uuid": "f81899fb341cd8c9f1e303301a69f333c4344f90"
+},
+{
+    "backend_name": "RocketChat",
+    "backend_version": "0.1.0",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "_id": "QTfwAlikiDThorXTn",
+        "_updatedAt": "2020-02-04T11:09:44.991Z",
+        "attachments": [
+            {
+                "attachments": [],
+                "author_icon": "https://open.rocket.chat/avatar/akashchaudharymax",
+                "author_name": "akashchaudharymax",
+                "message_link": "https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx",
+                "text": "I want to contribute to Rocket.Chat android app but i couldn't find code for it to work upon. Can anyone please help me",
+                "translations": {
+                    "ar": "\u00d8\u00a3\u00d8\u00b1\u00d8\u00ba\u00d8\u00a8 \u00d9\ufffd\u00d9\u0160 \u00d8\u00a7\u00d9\u201e\u00d9\u2026\u00d8\u00b3\u00d8\u00a7\u00d9\u2021\u00d9\u2026\u00d8\u00a9 \u00d9\ufffd\u00d9\u0160 \u00d8\u00aa\u00d8\u00b7\u00d8\u00a8\u00d9\u0160\u00d9\u201a Android Rocket.Chat \u00d9\u201e\u00d9\u0192\u00d9\u2020\u00d9\u0160 \u00d9\u201e\u00d9\u2026 \u00d8\u00a3\u00d8\u00ac\u00d8\u00af \u00d8\u00b1\u00d9\u2026\u00d8\u00b2\u00d9\u2039\u00d8\u00a7 \u00d9\u201e\u00d9\u201e\u00d8\u00b9\u00d9\u2026\u00d9\u201e \u00d8\u00b9\u00d9\u201e\u00d9\u0160\u00d9\u2021. \u00d9\u0160\u00d9\u2026\u00d9\u0192\u00d9\u2020 \u00d9\u201e\u00d8\u00a3\u00d9\u0160 \u00d8\u00b4\u00d8\u00ae\u00d8\u00b5 \u00d8\u00a7\u00d9\u201e\u00d8\u00b1\u00d8\u00ac\u00d8\u00a7\u00d8\u00a1 \u00d9\u2026\u00d8\u00b3\u00d8\u00a7\u00d8\u00b9\u00d8\u00af\u00d8\u00aa\u00d9\u0160",
+                    "de": "Ich m\u00c3\u00b6chte einen Beitrag zur Rocket.Chat Android App leisten, aber ich konnte keinen Code finden, an dem ich arbeiten konnte. Kann mir bitte jemand helfen?",
+                    "en": "I want to contribute to Rocket.Chat android app but i couldn't find code for it to work upon. Can anyone please help me",
+                    "es": "Quiero contribuir a la aplicaci\u00c3\u00b3n de Android Rocket.Chat, pero no pude encontrar el c\u00c3\u00b3digo para que funcione. Alguien puede ayudarme por favor",
+                    "fa": "\u00d9\u2026\u00d9\u2020 \u00d9\u2026\u00db\u0152 \u00d8\u00ae\u00d9\u02c6\u00d8\u00a7\u00d9\u2021\u00d9\u2026 \u00d8\u00a8\u00d9\u2021 \u00d8\u00a8\u00d8\u00b1\u00d9\u2020\u00d8\u00a7\u00d9\u2026\u00d9\u2021 \u00d8\u00a7\u00d9\u2020\u00d8\u00af\u00d8\u00b1\u00d9\u02c6\u00db\u0152\u00d8\u00af Rocket.Chat \u00da\u00a9\u00d9\u2026\u00da\u00a9 \u00da\u00a9\u00d9\u2020\u00d9\u2026 \u00d8\u00a7\u00d9\u2026\u00d8\u00a7 \u00d9\u2020\u00d8\u00aa\u00d9\u02c6\u00d8\u00a7\u00d9\u2020\u00d8\u00b3\u00d8\u00aa\u00d9\u2026 \u00da\u00a9\u00d8\u00af\u00db\u0152 \u00d8\u00b1\u00d8\u00a7 \u00d9\u00be\u00db\u0152\u00d8\u00af\u00d8\u00a7 \u00da\u00a9\u00d9\u2020\u00d9\u2026 \u00da\u00a9\u00d9\u2021 \u00d8\u00a8\u00d8\u00aa\u00d9\u02c6\u00d8\u00a7\u00d9\u2020\u00d9\u2026 \u00d8\u00b1\u00d9\u02c6\u00db\u0152 \u00d8\u00a2\u00d9\u2020 \u00da\u00a9\u00d8\u00a7\u00d8\u00b1 \u00da\u00a9\u00d9\u2020\u00d9\u2026. \u00d9\u2021\u00d8\u00b1 \u00da\u00a9\u00d8\u00b3\u00db\u0152 \u00d9\u2026\u00db\u0152 \u00d8\u00aa\u00d9\u02c6\u00d8\u00a7\u00d9\u2020\u00d8\u00af \u00d8\u00a8\u00d9\u2021 \u00d9\u2026\u00d9\u2020 \u00da\u00a9\u00d9\u2026\u00da\u00a9 \u00da\u00a9\u00d9\u2020\u00d8\u00af",
+                    "fr": "Je veux contribuer \u00c3\u00a0 l&#39;application Android Rocket.Chat mais je n&#39;ai pas trouv\u00c3\u00a9 de code pour qu&#39;elle fonctionne. Est-ce que quelqu&#39;un peut m&#39;aider s&#39;il vous plait",
+                    "hi": "\u00e0\u00a4\u00ae\u00e0\u00a5\u02c6\u00e0\u00a4\u201a Rocket.Chat Android \u00e0\u00a4\ufffd\u00e0\u00a4\u00aa \u00e0\u00a4\u00ae\u00e0\u00a5\u2021\u00e0\u00a4\u201a \u00e0\u00a4\u00af\u00e0\u00a5\u2039\u00e0\u00a4\u2014\u00e0\u00a4\u00a6\u00e0\u00a4\u00be\u00e0\u00a4\u00a8 \u00e0\u00a4\u2022\u00e0\u00a4\u00b0\u00e0\u00a4\u00a8\u00e0\u00a4\u00be \u00e0\u00a4\u0161\u00e0\u00a4\u00be\u00e0\u00a4\u00b9\u00e0\u00a4\u00a4\u00e0\u00a4\u00be \u00e0\u00a4\u00b9\u00e0\u00a5\u201a\u00e0\u00a4\u201a, \u00e0\u00a4\u00b2\u00e0\u00a5\u2021\u00e0\u00a4\u2022\u00e0\u00a4\u00bf\u00e0\u00a4\u00a8 \u00e0\u00a4\u00ae\u00e0\u00a5\ufffd\u00e0\u00a4\ufffd\u00e0\u00a5\u2021 \u00e0\u00a4\u2021\u00e0\u00a4\u00b8 \u00e0\u00a4\u00aa\u00e0\u00a4\u00b0 \u00e0\u00a4\u2022\u00e0\u00a4\u00be\u00e0\u00a4\u00ae \u00e0\u00a4\u2022\u00e0\u00a4\u00b0\u00e0\u00a4\u00a8\u00e0\u00a5\u2021 \u00e0\u00a4\u2022\u00e0\u00a5\u2021 \u00e0\u00a4\u00b2\u00e0\u00a4\u00bf\u00e0\u00a4\ufffd \u00e0\u00a4\u2022\u00e0\u00a5\u2039\u00e0\u00a4\u00a1 \u00e0\u00a4\u00a8\u00e0\u00a4\u00b9\u00e0\u00a5\u20ac\u00e0\u00a4\u201a \u00e0\u00a4\u00ae\u00e0\u00a4\u00bf\u00e0\u00a4\u00b2\u00e0\u00a4\u00be\u00e0\u00a5\u00a4 \u00e0\u00a4\u2022\u00e0\u00a5\ufffd\u00e0\u00a4\u00af\u00e0\u00a4\u00be \u00e0\u00a4\u2022\u00e0\u00a5\u2039\u00e0\u00a4\u02c6 \u00e0\u00a4\u00ae\u00e0\u00a5\u2021\u00e0\u00a4\u00b0\u00e0\u00a5\u20ac \u00e0\u00a4\u00ae\u00e0\u00a4\u00a6\u00e0\u00a4\u00a6 \u00e0\u00a4\u2022\u00e0\u00a4\u00b0 \u00e0\u00a4\u00b8\u00e0\u00a4\u2022\u00e0\u00a4\u00a4\u00e0\u00a4\u00be \u00e0\u00a4\u00b9\u00e0\u00a5\u02c6\u00e0\u00a4\u201a",
+                    "id": "Saya ingin berkontribusi ke aplikasi android Rocket.Chat tetapi saya tidak dapat menemukan kode untuk berfungsi. Adakah yang bisa membantu saya?",
+                    "ja": "Rocket.Chat Android\u00e3\u201a\u00a2\u00e3\u0192\u2014\u00e3\u0192\u00aa\u00e3\ufffd\u00ab\u00e8\u00b2\u00a2\u00e7\u0152\u00ae\u00e3\ufffd\u2014\u00e3\ufffd\u0178\u00e3\ufffd\u201e\u00e3\ufffd\u00ae\u00e3\ufffd\u00a7\u00e3\ufffd\u2122\u00e3\ufffd\u0152\u00e3\u20ac\ufffd\u00e5\u2039\u2022\u00e4\u00bd\u0153\u00e3\ufffd\u2122\u00e3\u201a\u2039\u00e3\u201a\u00b3\u00e3\u0192\u00bc\u00e3\u0192\u2030\u00e3\ufffd\u0152\u00e8\u00a6\u2039\u00e3\ufffd\u00a4\u00e3\ufffd\u2039\u00e3\u201a\u0160\u00e3\ufffd\u00be\u00e3\ufffd\u203a\u00e3\u201a\u201c\u00e3\ufffd\u00a7\u00e3\ufffd\u2014\u00e3\ufffd\u0178\u00e3\u20ac\u201a\u00e8\u00aa\u00b0\u00e3\ufffd\u00a7\u00e3\u201a\u201a\u00e5\u0160\u00a9\u00e3\ufffd\u2018\u00e3\ufffd\u00a6\u00e3\ufffd\ufffd\u00e3\ufffd\u00a0\u00e3\ufffd\u2022\u00e3\ufffd\u201e",
+                    "pl": "Chc\u00c4\u2122 wsp\u00c3\u00b3\u00c5\u201apracowa\u00c4\u2021 z aplikacj\u00c4\u2026 dla systemu Android Rocket.Chat, ale nie mog\u00c5\u201aem znale\u00c5\u00ba\u00c4\u2021 kodu, na kt\u00c3\u00b3rym mog\u00c5\u201aaby dzia\u00c5\u201aa\u00c4\u2021. Czy kto\u00c5\u203a mo\u00c5\u00bce mi pom\u00c3\u00b3c",
+                    "pt": "Quero contribuir para o aplicativo Android Rocket.Chat, mas n\u00c3\u00a3o consegui encontrar o c\u00c3\u00b3digo para trabalhar. Algu\u00c3\u00a9m pode me ajudar por favor",
+                    "ru": "\u011e\u00af \u00d1\u2026\u011e\u00be\u00d1\u2021\u00d1\u0192 \u011e\u00b2\u011e\u00bd\u011e\u00b5\u00d1\ufffd\u00d1\u201a\u011e\u00b8 \u00d1\ufffd\u011e\u00b2\u011e\u00be\u011e\u00b9 \u011e\u00b2\u011e\u00ba\u011e\u00bb\u011e\u00b0\u011e\u00b4 \u011e\u00b2 \u011e\u00bf\u00d1\u20ac\u011e\u00b8\u011e\u00bb\u011e\u00be\u011e\u00b6\u011e\u00b5\u011e\u00bd\u011e\u00b8\u011e\u00b5 Rocket.Chat \u011e\u00b4\u011e\u00bb\u00d1\ufffd Android, \u011e\u00bd\u011e\u00be \u00d1\ufffd \u011e\u00bd\u011e\u00b5 \u00d1\ufffd\u011e\u00bc\u011e\u00be\u011e\u00b3 \u011e\u00bd\u011e\u00b0\u011e\u00b9\u00d1\u201a\u011e\u00b8 \u011e\u00ba\u011e\u00be\u011e\u00b4 \u011e\u00b4\u011e\u00bb\u00d1\ufffd \u011e\u00b5\u011e\u00b3\u011e\u00be \u00d1\u20ac\u011e\u00b0\u011e\u00b1\u011e\u00be\u00d1\u201a\u00d1\u2039. \u011e\u0153\u011e\u00be\u011e\u00b6\u011e\u00b5\u00d1\u201a \u011e\u00ba\u00d1\u201a\u011e\u00be-\u011e\u00bd\u011e\u00b8\u011e\u00b1\u00d1\u0192\u011e\u00b4\u00d1\u0152 \u011e\u00bc\u011e\u00bd\u011e\u00b5 \u011e\u00bf\u011e\u00be\u011e\u00bc\u011e\u00be\u00d1\u2021\u00d1\u0152",
+                    "ta": "\u00e0\u00ae\u00a8\u00e0\u00ae\u00be\u00e0\u00ae\u00a9\u00e0\u00af\ufffd \u00e0\u00ae\u00b0\u00e0\u00ae\u00be\u00e0\u00ae\u2022\u00e0\u00af\ufffd\u00e0\u00ae\u2022\u00e0\u00af\u2020\u00e0\u00ae\u0178\u00e0\u00af\ufffd.\u00e0\u00ae\u0161\u00e0\u00ae\u00be\u00e0\u00ae\u0178\u00e0\u00af\ufffd \u00e0\u00ae\u2020\u00e0\u00ae\u00a3\u00e0\u00af\ufffd\u00e0\u00ae\u0178\u00e0\u00af\ufffd\u00e0\u00ae\u00b0\u00e0\u00ae\u00be\u00e0\u00ae\u00af\u00e0\u00af\ufffd\u00e0\u00ae\u0178\u00e0\u00af\ufffd \u00e0\u00ae\u00aa\u00e0\u00ae\u00af\u00e0\u00ae\u00a9\u00e0\u00af\ufffd\u00e0\u00ae\u00aa\u00e0\u00ae\u00be\u00e0\u00ae\u0178\u00e0\u00af\ufffd\u00e0\u00ae\u0178\u00e0\u00ae\u00bf\u00e0\u00ae\u00b1\u00e0\u00af\ufffd\u00e0\u00ae\u2022\u00e0\u00af\ufffd \u00e0\u00ae\u00aa\u00e0\u00ae\u2122\u00e0\u00af\ufffd\u00e0\u00ae\u2022\u00e0\u00ae\u00b3\u00e0\u00ae\u00bf\u00e0\u00ae\u2022\u00e0\u00af\ufffd\u00e0\u00ae\u2022 \u00e0\u00ae\u00b5\u00e0\u00ae\u00bf\u00e0\u00ae\u00b0\u00e0\u00af\ufffd\u00e0\u00ae\u00ae\u00e0\u00af\ufffd\u00e0\u00ae\u00aa\u00e0\u00af\ufffd\u00e0\u00ae\u2022\u00e0\u00ae\u00bf\u00e0\u00ae\u00b1\u00e0\u00af\u2021\u00e0\u00ae\u00a9\u00e0\u00af\ufffd, \u00e0\u00ae\u2020\u00e0\u00ae\u00a9\u00e0\u00ae\u00be\u00e0\u00ae\u00b2\u00e0\u00af\ufffd \u00e0\u00ae\u2026\u00e0\u00ae\u00a4\u00e0\u00af\ufffd \u00e0\u00ae\u2021\u00e0\u00ae\u00af\u00e0\u00ae\u2122\u00e0\u00af\ufffd\u00e0\u00ae\u2022\u00e0\u00af\ufffd\u00e0\u00ae\u00b5\u00e0\u00ae\u00a4\u00e0\u00ae\u00b1\u00e0\u00af\ufffd\u00e0\u00ae\u2022\u00e0\u00ae\u00be\u00e0\u00ae\u00a9 \u00e0\u00ae\u2022\u00e0\u00af\ufffd\u00e0\u00ae\u00b1\u00e0\u00ae\u00bf\u00e0\u00ae\u00af\u00e0\u00af\u20ac\u00e0\u00ae\u0178\u00e0\u00af\ufffd\u00e0\u00ae\u0178\u00e0\u00af\u02c6 \u00e0\u00ae\ufffd\u00e0\u00ae\u00a9\u00e0\u00af\ufffd\u00e0\u00ae\u00a9\u00e0\u00ae\u00be\u00e0\u00ae\u00b2\u00e0\u00af\ufffd \u00e0\u00ae\u2022\u00e0\u00ae\u00a3\u00e0\u00af\ufffd\u00e0\u00ae\u0178\u00e0\u00af\ufffd\u00e0\u00ae\u00aa\u00e0\u00ae\u00bf\u00e0\u00ae\u0178\u00e0\u00ae\u00bf\u00e0\u00ae\u2022\u00e0\u00af\ufffd\u00e0\u00ae\u2022 \u00e0\u00ae\u00ae\u00e0\u00af\ufffd\u00e0\u00ae\u0178\u00e0\u00ae\u00bf\u00e0\u00ae\u00af\u00e0\u00ae\u00b5\u00e0\u00ae\u00bf\u00e0\u00ae\u00b2\u00e0\u00af\ufffd\u00e0\u00ae\u00b2\u00e0\u00af\u02c6. \u00e0\u00ae\u00a4\u00e0\u00ae\u00af\u00e0\u00ae\u00b5\u00e0\u00af\ufffd\u00e0\u00ae\u0161\u00e0\u00af\u2020\u00e0\u00ae\u00af\u00e0\u00af\ufffd\u00e0\u00ae\u00a4\u00e0\u00af\ufffd \u00e0\u00ae\u00af\u00e0\u00ae\u00be\u00e0\u00ae\u00b0\u00e0\u00ae\u00be\u00e0\u00ae\u00b5\u00e0\u00ae\u00a4\u00e0\u00af\ufffd \u00e0\u00ae\ufffd\u00e0\u00ae\u00a9\u00e0\u00ae\u2022\u00e0\u00af\ufffd\u00e0\u00ae\u2022\u00e0\u00af\ufffd \u00e0\u00ae\u2030\u00e0\u00ae\u00a4\u00e0\u00ae\u00b5 \u00e0\u00ae\u00ae\u00e0\u00af\ufffd\u00e0\u00ae\u0178\u00e0\u00ae\u00bf\u00e0\u00ae\u00af\u00e0\u00af\ufffd\u00e0\u00ae\u00ae\u00e0\u00ae\u00be?",
+                    "tr": "Rocket.Chat android uygulamas\u00c4\u00b1na katk\u00c4\u00b1da bulunmak istiyorum ama \u00c3\u00bczerinde \u00c3\u00a7al\u00c4\u00b1\u00c5\u0178mas\u00c4\u00b1 i\u00c3\u00a7in kod bulamad\u00c4\u00b1m. Herkes bana yard\u00c4\u00b1m edebilir mi",
+                    "uk": "\u011e\u00af \u00d1\u2026\u011e\u00be\u00d1\u2021\u00d1\u0192 \u011e\u00b2\u011e\u00bd\u011e\u00b5\u00d1\ufffd\u00d1\u201a\u011e\u00b8 \u00d1\ufffd\u011e\u00b2\u00d1\u2013\u011e\u00b9 \u011e\u00b2\u011e\u00bd\u011e\u00b5\u00d1\ufffd\u011e\u00be\u011e\u00ba \u00d1\u0192 \u011e\u00b4\u011e\u00be\u011e\u00b4\u011e\u00b0\u00d1\u201a\u011e\u00be\u011e\u00ba Rocket.Chat \u011e\u00b4\u011e\u00bb\u00d1\ufffd Android, \u011e\u00b0\u011e\u00bb\u011e\u00b5 \u00d1\ufffd \u011e\u00bd\u011e\u00b5 \u011e\u00b7\u011e\u00bc\u00d1\u2013\u011e\u00b3 \u011e\u00b7\u011e\u00bd\u011e\u00b0\u011e\u00b9\u00d1\u201a\u011e\u00b8 \u011e\u00ba\u011e\u00be\u011e\u00b4 \u011e\u00b4\u011e\u00bb\u00d1\ufffd \u00d1\u20ac\u011e\u00be\u011e\u00b1\u011e\u00be\u00d1\u201a\u011e\u00b8. \u011e\u00a7\u011e\u00b8 \u00d1\u2026\u00d1\u201a\u011e\u00be\u00d1\ufffd\u00d1\u0152, \u011e\u00b1\u00d1\u0192\u011e\u00b4\u00d1\u0152 \u011e\u00bb\u011e\u00b0\u00d1\ufffd\u011e\u00ba\u011e\u00b0, \u011e\u00b4\u011e\u00be\u011e\u00bf\u011e\u00be\u011e\u00bc\u011e\u00be\u011e\u00b6\u011e\u00b5 \u011e\u00bc\u011e\u00b5\u011e\u00bd\u00d1\u2013",
+                    "zh": "\u00e6\u02c6\u2018\u00e6\u0192\u00b3\u00e4\u00b8\u00baRocket.Chat android\u00e5\u00ba\u201d\u00e7\u201d\u00a8\u00e7\u00a8\u2039\u00e5\u00ba\ufffd\u00e5\ufffd\u0161\u00e8\u00b4\u00a1\u00e7\u0152\u00ae\u00ef\u00bc\u0152\u00e4\u00bd\u2020\u00e6\u02c6\u2018\u00e6\u2030\u00be\u00e4\u00b8\ufffd\u00e5\u02c6\u00b0\u00e4\u00bb\u00a3\u00e7\u00a0\ufffd\u00e5\ufffd\u00af\u00e4\u00bb\u00a5\u00e4\u00bd\u00bf\u00e7\u201d\u00a8\u00e3\u20ac\u201a\u00e8\u00b0\ufffd\u00e8\u0192\u00bd\u00e5\u00b8\u00ae\u00e5\u00b8\u00ae\u00e6\u02c6\u2018\u00e5\ufffd\u2014",
+                    "zh-TW": "\u00e6\u02c6\u2018\u00e6\u0192\u00b3\u00e7\u201a\u00baRocket.Chat android\u00e6\u2021\u2030\u00e7\u201d\u00a8\u00e7\u00a8\u2039\u00e5\u00ba\ufffd\u00e5\ufffd\u0161\u00e8\u00b2\u00a2\u00e7\ufffd\u00bb\u00ef\u00bc\u0152\u00e4\u00bd\u2020\u00e6\u02dc\u00af\u00e6\u02c6\u2018\u00e6\u2030\u00be\u00e4\u00b8\ufffd\u00e5\u02c6\u00b0\u00e4\u00bb\u00a3\u00e7\u00a2\u00bc\u00e5\ufffd\u00af\u00e4\u00bb\u00a5\u00e4\u00bd\u00bf\u00e7\u201d\u00a8\u00e3\u20ac\u201a\u00e8\u00aa\u00b0\u00e8\u0192\u00bd\u00e5\u00b9\u00ab\u00e5\u00b9\u00ab\u00e6\u02c6\u2018\u00e5\u2014\ufffd"
+                },
+                "ts": "2020-02-04T06:37:45.093Z"
+            }
+        ],
+        "channel_info": {
+            "_id": "GENERAL",
+            "_updatedAt": "2020-06-10T22:24:56.891Z",
+            "announcement": "Please review our [Code of Conduct](https://rocket.chat/code-of-conduct). Violations, including unwanted solicitations, will not be tolerated.",
+            "default": true,
+            "jitsiTimeout": "2020-06-05T02:43:19.459Z",
+            "lastMessage": {
+                "_id": "rhjdPaWuwEacmpToC",
+                "_updatedAt": "2020-06-10T22:23:34.000Z",
+                "alias": "acooma",
+                "attachments": [
+                    {
+                        "author_link": "https://github.com/RocketChat/Rocket.Chat/stargazers",
+                        "author_name": "Click here to star the project too.",
+                        "ts": "1970-01-01T00:00:00.000Z"
+                    }
+                ],
+                "avatar": "https://avatars1.githubusercontent.com/u/25372243?v=4",
+                "bot": {
+                    "i": "QyWmDsdtdyzvkjucS"
+                },
+                "channels": [],
+                "groupable": false,
+                "mentions": [],
+                "msg": ":star: starred [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat). We have now *27230* stars at GitHub.",
+                "parseUrls": false,
+                "rid": "GENERAL",
+                "ts": "2020-06-10T22:23:33.956Z",
+                "u": {
+                    "_id": "rocket.cat",
+                    "name": "Rocket.Cat",
+                    "username": "rocket.cat"
+                }
+            },
+            "lm": "2020-06-10T22:23:33.956Z",
+            "msgs": 714994,
+            "muted": [
+                "geekgonecrazy",
+                "alexa32",
+                "fixedgames2088",
+                "terrygarry1",
+                "petersmid40",
+                "timeyinblessing14",
+                "sarahcourt63"
+            ],
+            "name": "general",
+            "t": "c",
+            "topic": "Community support in [#support](https://open.rocket.chat/channel/support). Discussions in our [forums](https://forums.rocket.chat/).  Find jobs in [#jobs](https://open.rocket.chat/channel/jobs)",
+            "unmuted": [
+                "singli"
+            ],
+            "usersCount": 315467
+        },
+        "channels": [],
+        "mentions": [],
+        "msg": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx)  On Github",
+        "reactions": {
+            ":banana:": {
+                "names": [
+                    "json"
+                ],
+                "usernames": [
+                    "jsonjoe"
+                ]
+            },
+            ":bee:": {
+                "names": [
+                    "json"
+                ],
+                "usernames": [
+                    "jsonjoe"
+                ]
+            },
+            ":troll:": {
+                "names": [
+                    "json",
+                    "Arcane Omniscient"
+                ],
+                "usernames": [
+                    "jsonjoe",
+                    "arcane.omniscient"
+                ]
+            }
+        },
+        "rid": "GENERAL",
+        "translations": {
+            "ar": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) \u00d8\u00b9\u00d9\u201e\u00d9\u2030 \u00d8\u00ac\u00d9\u0160\u00d8\u00ab\u00d8\u00a8",
+            "de": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) Auf Github",
+            "en": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx)  On Github",
+            "es": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) en Github",
+            "fa": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) \u00d8\u00af\u00d8\u00b1 \u00da\u00af\u00db\u0152\u00d8\u00aa\u00d9\u02c6\u00d8\u00a8",
+            "fr": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) Sur Github",
+            "hi": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) \u00e0\u00a4\u2014\u00e0\u00a4\u00bf\u00e0\u00a4\u00a4\u00e0\u00a5\ufffd\u00e0\u00a4\u00ac \u00e0\u00a4\u00aa\u00e0\u00a4\u00b0",
+            "id": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) Di Github",
+            "ja": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) Github\u00e3\ufffd\u00a7",
+            "pl": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) W serwisie Github",
+            "pt": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) No Github",
+            "ru": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) \u011e\u00bd\u011e\u00b0 Github",
+            "ta": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx)",
+            "tr": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) On Github",
+            "uk": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx) \u011e\ufffd\u011e\u00b0 Github",
+            "zh": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx)\u00e5\u0153\u00a8Github\u00e4\u00b8\u0160",
+            "zh-TW": "[ ](https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx)\u00e5\u0153\u00a8Github\u00e4\u00b8\u0160"
+        },
+        "ts": "2020-02-04T07:04:49.566Z",
+        "u": {
+            "_id": "niFhx5gKsztKEkzDh",
+            "name": "json",
+            "username": "jsonjoe"
+        },
+        "urls": [
+            {
+                "ignoreParse": true,
+                "url": "https://open.rocket.chat/channel/general?msg=3Dv6at5SYgBjf9kyx"
+            }
+        ]
+    },
+    "origin": "https://open.rocket.chat/general",
+    "perceval_version": "0.14.0",
+    "search_fields": {
+        "channel_id": "GENERAL",
+        "channel_name": "general",
+        "item_id": "QTfwAlikiDThorXTn"
+    },
+    "tag": "https://open.rocket.chat/general",
+    "timestamp": 1591828287.382039,
+    "updated_on": 1580814584.991,
+    "uuid": "2abf07e25ae6cc50c849a8812005ecc71dc2e1cc"
+},
+{
+    "backend_name": "RocketChat",
+    "backend_version": "0.1.0",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "_id": "b4f516ea-f0bd-4883-9750-0bf1dc5cdb64",
+        "_updatedAt": "2020-01-09T03:05:15.774Z",
+        "channel_info": {
+            "_id": "GENERAL",
+            "_updatedAt": "2020-06-10T22:24:56.891Z",
+            "announcement": "Please review our [Code of Conduct](https://rocket.chat/code-of-conduct). Violations, including unwanted solicitations, will not be tolerated.",
+            "default": true,
+            "jitsiTimeout": "2020-06-05T02:43:19.459Z",
+            "lastMessage": {
+                "_id": "rhjdPaWuwEacmpToC",
+                "_updatedAt": "2020-06-10T22:23:34.000Z",
+                "alias": "acooma",
+                "attachments": [
+                    {
+                        "author_link": "https://github.com/RocketChat/Rocket.Chat/stargazers",
+                        "author_name": "Click here to star the project too.",
+                        "ts": "1970-01-01T00:00:00.000Z"
+                    }
+                ],
+                "avatar": "https://avatars1.githubusercontent.com/u/25372243?v=4",
+                "bot": {
+                    "i": "QyWmDsdtdyzvkjucS"
+                },
+                "channels": [],
+                "groupable": false,
+                "mentions": [],
+                "msg": ":star: starred [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat). We have now *27230* stars at GitHub.",
+                "parseUrls": false,
+                "rid": "GENERAL",
+                "ts": "2020-06-10T22:23:33.956Z",
+                "u": {
+                    "_id": "rocket.cat",
+                    "name": "Rocket.Cat",
+                    "username": "rocket.cat"
+                }
+            },
+            "lm": "2020-06-10T22:23:33.956Z",
+            "msgs": 714994,
+            "muted": [
+                "geekgonecrazy",
+                "alexa32",
+                "fixedgames2088",
+                "terrygarry1",
+                "petersmid40",
+                "timeyinblessing14",
+                "sarahcourt63"
+            ],
+            "name": "general",
+            "t": "c",
+            "topic": "Community support in [#support](https://open.rocket.chat/channel/support). Discussions in our [forums](https://forums.rocket.chat/).  Find jobs in [#jobs](https://open.rocket.chat/channel/jobs)",
+            "unmuted": [
+                "singli"
+            ],
+            "usersCount": 315467
+        },
+        "channels": [],
+        "mentions": [],
+        "msg": "Iejenx",
+        "replies": [
+            "DtQcvbSJJGTpFQFBf",
+            "sQXAtsXjbQWJGqC5D"
+        ],
+        "rid": "GENERAL",
+        "starred": [],
+        "tcount": 3,
+        "tlm": "2020-01-09T03:05:15.640Z",
+        "translations": {
+            "ar": "Iejenx",
+            "de": "Iejenx",
+            "en": "Iejenx",
+            "es": "Iejenx",
+            "fa": "Iejenx",
+            "fr": "Iejenx",
+            "hi": "Iejenx",
+            "id": "Iejenx",
+            "ja": "Iejenx",
+            "pl": "Iejenx",
+            "pt": "Iejenx",
+            "ru": "Iejenx",
+            "ta": "Iejenx",
+            "tr": "Iejenx",
+            "uk": "Iejenx",
+            "zh": "Iejenx",
+            "zh-TW": "Iejenx"
+        },
+        "ts": "2020-01-09T02:31:41.487Z",
+        "u": {
+            "_id": "DtQcvbSJJGTpFQFBf",
+            "name": "foohwa",
+            "username": "foohwa12"
+        }
+    },
+    "origin": "https://open.rocket.chat/general",
+    "perceval_version": "0.14.0",
+    "search_fields": {
+        "channel_id": "GENERAL",
+        "channel_name": "general",
+        "item_id": "b4f516ea-f0bd-4883-9750-0bf1dc5cdb64"
+    },
+    "tag": "https://open.rocket.chat/general",
+    "timestamp": 1591828085.464754,
+    "updated_on": 1578539115.774,
+    "uuid": "cd6ed5978f77efe232bdde1aa0a6b6cb327d42a1"
+},
+{
+    "backend_name": "RocketChat",
+    "backend_version": "0.1.0",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "_id": "SW7uKMbaLoKxNprZh",
+        "_updatedAt": "2020-01-24T12:00:41.249Z",
+        "channel_info": {
+            "_id": "GENERAL",
+            "_updatedAt": "2020-06-10T22:24:56.891Z",
+            "announcement": "Please review our [Code of Conduct](https://rocket.chat/code-of-conduct). Violations, including unwanted solicitations, will not be tolerated.",
+            "default": true,
+            "jitsiTimeout": "2020-06-05T02:43:19.459Z",
+            "lastMessage": {
+                "_id": "rhjdPaWuwEacmpToC",
+                "_updatedAt": "2020-06-10T22:23:34.000Z",
+                "alias": "acooma",
+                "attachments": [
+                    {
+                        "author_link": "https://github.com/RocketChat/Rocket.Chat/stargazers",
+                        "author_name": "Click here to star the project too.",
+                        "ts": "1970-01-01T00:00:00.000Z"
+                    }
+                ],
+                "avatar": "https://avatars1.githubusercontent.com/u/25372243?v=4",
+                "bot": {
+                    "i": "QyWmDsdtdyzvkjucS"
+                },
+                "channels": [],
+                "groupable": false,
+                "mentions": [],
+                "msg": ":star: starred [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat). We have now *27230* stars at GitHub.",
+                "parseUrls": false,
+                "rid": "GENERAL",
+                "ts": "2020-06-10T22:23:33.956Z",
+                "u": {
+                    "_id": "rocket.cat",
+                    "name": "Rocket.Cat",
+                    "username": "rocket.cat"
+                }
+            },
+            "lm": "2020-06-10T22:23:33.956Z",
+            "msgs": 714994,
+            "muted": [
+                "geekgonecrazy",
+                "alexa32",
+                "fixedgames2088",
+                "terrygarry1",
+                "petersmid40",
+                "timeyinblessing14",
+                "sarahcourt63"
+            ],
+            "name": "general",
+            "t": "c",
+            "topic": "Community support in [#support](https://open.rocket.chat/channel/support). Discussions in our [forums](https://forums.rocket.chat/).  Find jobs in [#jobs](https://open.rocket.chat/channel/jobs)",
+            "unmuted": [
+                "singli"
+            ],
+            "usersCount": 315467
+        },
+        "groupable": false,
+        "msg": "AdmiralSperg",
+        "rid": "GENERAL",
+        "t": "uj",
+        "ts": "2020-01-24T11:59:15.705Z",
+        "u": {
+            "_id": "9Ho3iGpzWZFaNWzgk",
+            "name": "AdmiralSperg1",
+            "username": "AdmiralSperg1"
+        }
+    },
+    "origin": "https://open.rocket.chat/general",
+    "perceval_version": "0.14.0",
+    "search_fields": {
+        "channel_id": "GENERAL",
+        "channel_name": "general",
+        "item_id": "SW7uKMbaLoKxNprZh"
+    },
+    "tag": "https://open.rocket.chat/general",
+    "timestamp": 1591828185.580921,
+    "updated_on": 1579867241.249,
+    "uuid": "55b1a3391b7c659ecb9aa722eb1fdb12780004f7"
+},
+{
+    "backend_name": "RocketChat",
+    "backend_version": "0.1.0",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "_id": "dYnsJoEhEEHG78rTr",
+        "_updatedAt": "2020-01-24T12:02:07.956Z",
+        "channel_info": {
+            "_id": "GENERAL",
+            "_updatedAt": "2020-06-10T22:24:56.891Z",
+            "announcement": "Please review our [Code of Conduct](https://rocket.chat/code-of-conduct). Violations, including unwanted solicitations, will not be tolerated.",
+            "default": true,
+            "jitsiTimeout": "2020-06-05T02:43:19.459Z",
+            "lastMessage": {
+                "_id": "rhjdPaWuwEacmpToC",
+                "_updatedAt": "2020-06-10T22:23:34.000Z",
+                "alias": "acooma",
+                "attachments": [
+                    {
+                        "author_link": "https://github.com/RocketChat/Rocket.Chat/stargazers",
+                        "author_name": "Click here to star the project too.",
+                        "ts": "1970-01-01T00:00:00.000Z"
+                    }
+                ],
+                "avatar": "https://avatars1.githubusercontent.com/u/25372243?v=4",
+                "bot": {
+                    "i": "QyWmDsdtdyzvkjucS"
+                },
+                "channels": [],
+                "groupable": false,
+                "mentions": [],
+                "msg": ":star: starred [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat). We have now *27230* stars at GitHub.",
+                "parseUrls": false,
+                "rid": "GENERAL",
+                "ts": "2020-06-10T22:23:33.956Z",
+                "u": {
+                    "_id": "rocket.cat",
+                    "name": "Rocket.Cat",
+                    "username": "rocket.cat"
+                }
+            },
+            "lm": "2020-06-10T22:23:33.956Z",
+            "msgs": 714994,
+            "muted": [
+                "geekgonecrazy",
+                "alexa32",
+                "fixedgames2088",
+                "terrygarry1",
+                "petersmid40",
+                "timeyinblessing14",
+                "sarahcourt63"
+            ],
+            "name": "general",
+            "t": "c",
+            "topic": "Community support in [#support](https://open.rocket.chat/channel/support). Discussions in our [forums](https://forums.rocket.chat/).  Find jobs in [#jobs](https://open.rocket.chat/channel/jobs)",
+            "unmuted": [
+                "singli"
+            ],
+            "usersCount": 315467
+        },
+        "groupable": false,
+        "msg": "tsingyao",
+        "rid": "GENERAL",
+        "t": "uj",
+        "ts": "2020-01-24T12:02:07.956Z",
+        "u": {
+            "_id": "Rn2PvPub5eBNzD5PF",
+            "name": "\u6e05\u66dc\u7f51\u7edc",
+            "username": "tsingyao"
+        }
+    },
+    "origin": "https://open.rocket.chat/general",
+    "perceval_version": "0.14.0",
+    "search_fields": {
+        "channel_id": "GENERAL",
+        "channel_name": "general",
+        "item_id": "dYnsJoEhEEHG78rTr"
+    },
+    "tag": "https://open.rocket.chat/general",
+    "timestamp": 1591828185.581351,
+    "updated_on": 1579867327.956,
+    "uuid": "0681e781a81708063c5345e117810da2e21d1ef0"
+},
+{
+    "backend_name": "RocketChat",
+    "backend_version": "0.1.0",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "_id": "wxD47jdHxK7KTCfsP",
+        "_updatedAt": "2020-01-24T12:04:19.163Z",
+        "channel_info": {
+            "_id": "GENERAL",
+            "_updatedAt": "2020-06-10T22:24:56.891Z",
+            "announcement": "Please review our [Code of Conduct](https://rocket.chat/code-of-conduct). Violations, including unwanted solicitations, will not be tolerated.",
+            "default": true,
+            "jitsiTimeout": "2020-06-05T02:43:19.459Z",
+            "lastMessage": {
+                "_id": "rhjdPaWuwEacmpToC",
+                "_updatedAt": "2020-06-10T22:23:34.000Z",
+                "alias": "acooma",
+                "attachments": [
+                    {
+                        "author_link": "https://github.com/RocketChat/Rocket.Chat/stargazers",
+                        "author_name": "Click here to star the project too.",
+                        "ts": "1970-01-01T00:00:00.000Z"
+                    }
+                ],
+                "avatar": "https://avatars1.githubusercontent.com/u/25372243?v=4",
+                "bot": {
+                    "i": "QyWmDsdtdyzvkjucS"
+                },
+                "channels": [],
+                "groupable": false,
+                "mentions": [],
+                "msg": ":star: starred [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat). We have now *27230* stars at GitHub.",
+                "parseUrls": false,
+                "rid": "GENERAL",
+                "ts": "2020-06-10T22:23:33.956Z",
+                "u": {
+                    "_id": "rocket.cat",
+                    "name": "Rocket.Cat",
+                    "username": "rocket.cat"
+                }
+            },
+            "lm": "2020-06-10T22:23:33.956Z",
+            "msgs": 714994,
+            "muted": [
+                "geekgonecrazy",
+                "alexa32",
+                "fixedgames2088",
+                "terrygarry1",
+                "petersmid40",
+                "timeyinblessing14",
+                "sarahcourt63"
+            ],
+            "name": "general",
+            "t": "c",
+            "topic": "Community support in [#support](https://open.rocket.chat/channel/support). Discussions in our [forums](https://forums.rocket.chat/).  Find jobs in [#jobs](https://open.rocket.chat/channel/jobs)",
+            "unmuted": [
+                "singli"
+            ],
+            "usersCount": 315467
+        },
+        "groupable": false,
+        "msg": "romulo.sup.pack",
+        "rid": "GENERAL",
+        "t": "uj",
+        "ts": "2020-01-24T12:04:19.163Z",
+        "u": {
+            "_id": "pWK22eSkwepfbYnM6",
+            "name": "R\u00f4mulo Lins",
+            "username": "romulo.sup.pack"
+        }
+    },
+    "origin": "https://open.rocket.chat/general",
+    "perceval_version": "0.14.0",
+    "search_fields": {
+        "channel_id": "GENERAL",
+        "channel_name": "general",
+        "item_id": "wxD47jdHxK7KTCfsP"
+    },
+    "tag": "https://open.rocket.chat/general",
+    "timestamp": 1591828185.582238,
+    "updated_on": 1579867459.163,
+    "uuid": "9f815aee40fd3ffdb954e67b01bd03b5d697f8fe"
+},
+{
+    "backend_name": "RocketChat",
+    "backend_version": "0.1.0",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "_id": "Xg4HuDc3mt7ycLvqD",
+        "_updatedAt": "2020-01-24T12:29:36.189Z",
+        "channel_info": {
+            "_id": "GENERAL",
+            "_updatedAt": "2020-06-10T22:24:56.891Z",
+            "announcement": "Please review our [Code of Conduct](https://rocket.chat/code-of-conduct). Violations, including unwanted solicitations, will not be tolerated.",
+            "default": true,
+            "jitsiTimeout": "2020-06-05T02:43:19.459Z",
+            "lastMessage": {
+                "_id": "rhjdPaWuwEacmpToC",
+                "_updatedAt": "2020-06-10T22:23:34.000Z",
+                "alias": "acooma",
+                "attachments": [
+                    {
+                        "author_link": "https://github.com/RocketChat/Rocket.Chat/stargazers",
+                        "author_name": "Click here to star the project too.",
+                        "ts": "1970-01-01T00:00:00.000Z"
+                    }
+                ],
+                "avatar": "https://avatars1.githubusercontent.com/u/25372243?v=4",
+                "bot": {
+                    "i": "QyWmDsdtdyzvkjucS"
+                },
+                "channels": [],
+                "groupable": false,
+                "mentions": [],
+                "msg": ":star: starred [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat). We have now *27230* stars at GitHub.",
+                "parseUrls": false,
+                "rid": "GENERAL",
+                "ts": "2020-06-10T22:23:33.956Z",
+                "u": {
+                    "_id": "rocket.cat",
+                    "name": "Rocket.Cat",
+                    "username": "rocket.cat"
+                }
+            },
+            "lm": "2020-06-10T22:23:33.956Z",
+            "msgs": 714994,
+            "muted": [
+                "geekgonecrazy",
+                "alexa32",
+                "fixedgames2088",
+                "terrygarry1",
+                "petersmid40",
+                "timeyinblessing14",
+                "sarahcourt63"
+            ],
+            "name": "general",
+            "t": "c",
+            "topic": "Community support in [#support](https://open.rocket.chat/channel/support). Discussions in our [forums](https://forums.rocket.chat/).  Find jobs in [#jobs](https://open.rocket.chat/channel/jobs)",
+            "unmuted": [
+                "singli"
+            ],
+            "usersCount": 315467
+        },
+        "groupable": false,
+        "msg": "schmidt.st",
+        "rid": "GENERAL",
+        "t": "uj",
+        "ts": "2020-01-24T12:29:36.189Z",
+        "u": {
+            "_id": "D9C9ELj4iZsBfnMkj",
+            "name": "Stefan",
+            "username": "schmidt.st"
+        }
+    },
+    "origin": "https://open.rocket.chat/general",
+    "perceval_version": "0.14.0",
+    "search_fields": {
+        "channel_id": "GENERAL",
+        "channel_name": "general",
+        "item_id": "Xg4HuDc3mt7ycLvqD"
+    },
+    "tag": "https://open.rocket.chat/general",
+    "timestamp": 1591828185.582597,
+    "updated_on": 1579868976.189,
+    "uuid": "a0a4b25cdb27ff1733ad706ba3666b7aa5d6839c"
+},
+{
+    "backend_name": "RocketChat",
+    "backend_version": "0.1.0",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "_id": "jewxvFPDXEEpbPhuW",
+        "_updatedAt": "2020-01-24T12:38:49.886Z",
+        "channel_info": {
+            "_id": "GENERAL",
+            "_updatedAt": "2020-06-10T22:24:56.891Z",
+            "announcement": "Please review our [Code of Conduct](https://rocket.chat/code-of-conduct). Violations, including unwanted solicitations, will not be tolerated.",
+            "default": true,
+            "jitsiTimeout": "2020-06-05T02:43:19.459Z",
+            "lastMessage": {
+                "_id": "rhjdPaWuwEacmpToC",
+                "_updatedAt": "2020-06-10T22:23:34.000Z",
+                "alias": "acooma",
+                "attachments": [
+                    {
+                        "author_link": "https://github.com/RocketChat/Rocket.Chat/stargazers",
+                        "author_name": "Click here to star the project too.",
+                        "ts": "1970-01-01T00:00:00.000Z"
+                    }
+                ],
+                "avatar": "https://avatars1.githubusercontent.com/u/25372243?v=4",
+                "bot": {
+                    "i": "QyWmDsdtdyzvkjucS"
+                },
+                "channels": [],
+                "groupable": false,
+                "mentions": [],
+                "msg": ":star: starred [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat). We have now *27230* stars at GitHub.",
+                "parseUrls": false,
+                "rid": "GENERAL",
+                "ts": "2020-06-10T22:23:33.956Z",
+                "u": {
+                    "_id": "rocket.cat",
+                    "name": "Rocket.Cat",
+                    "username": "rocket.cat"
+                }
+            },
+            "lm": "2020-06-10T22:23:33.956Z",
+            "msgs": 714994,
+            "muted": [
+                "geekgonecrazy",
+                "alexa32",
+                "fixedgames2088",
+                "terrygarry1",
+                "petersmid40",
+                "timeyinblessing14",
+                "sarahcourt63"
+            ],
+            "name": "general",
+            "t": "c",
+            "topic": "Community support in [#support](https://open.rocket.chat/channel/support). Discussions in our [forums](https://forums.rocket.chat/).  Find jobs in [#jobs](https://open.rocket.chat/channel/jobs)",
+            "unmuted": [
+                "singli"
+            ],
+            "usersCount": 315467
+        },
+        "groupable": false,
+        "msg": "denio.gomes",
+        "rid": "GENERAL",
+        "t": "uj",
+        "ts": "2020-01-24T12:38:49.886Z",
+        "u": {
+            "_id": "F4KCcdb3rHANtHPux",
+            "name": "D\u00c3\u00aanio Gomes",
+            "username": "denio.gomes"
+        }
+    },
+    "origin": "https://open.rocket.chat/general",
+    "perceval_version": "0.14.0",
+    "search_fields": {
+        "channel_id": "GENERAL",
+        "channel_name": "general",
+        "item_id": "jewxvFPDXEEpbPhuW"
+    },
+    "tag": "https://open.rocket.chat/general",
+    "timestamp": 1591828187.830494,
+    "updated_on": 1579869529.886,
+    "uuid": "1ca1e192103e1649231d4bfbd98a1b7dd4e0b77a"
+},
+{
+    "backend_name": "RocketChat",
+    "backend_version": "0.1.0",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "_id": "tNcKxg9gs9jYvBnX7",
+        "_updatedAt": "2020-01-24T12:40:13.448Z",
+        "channel_info": {
+            "_id": "GENERAL",
+            "_updatedAt": "2020-06-10T22:24:56.891Z",
+            "announcement": "Please review our [Code of Conduct](https://rocket.chat/code-of-conduct). Violations, including unwanted solicitations, will not be tolerated.",
+            "default": true,
+            "jitsiTimeout": "2020-06-05T02:43:19.459Z",
+            "lastMessage": {
+                "_id": "rhjdPaWuwEacmpToC",
+                "_updatedAt": "2020-06-10T22:23:34.000Z",
+                "alias": "acooma",
+                "attachments": [
+                    {
+                        "author_link": "https://github.com/RocketChat/Rocket.Chat/stargazers",
+                        "author_name": "Click here to star the project too.",
+                        "ts": "1970-01-01T00:00:00.000Z"
+                    }
+                ],
+                "avatar": "https://avatars1.githubusercontent.com/u/25372243?v=4",
+                "bot": {
+                    "i": "QyWmDsdtdyzvkjucS"
+                },
+                "channels": [],
+                "groupable": false,
+                "mentions": [],
+                "msg": ":star: starred [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat). We have now *27230* stars at GitHub.",
+                "parseUrls": false,
+                "rid": "GENERAL",
+                "ts": "2020-06-10T22:23:33.956Z",
+                "u": {
+                    "_id": "rocket.cat",
+                    "name": "Rocket.Cat",
+                    "username": "rocket.cat"
+                }
+            },
+            "lm": "2020-06-10T22:23:33.956Z",
+            "msgs": 714994,
+            "muted": [
+                "geekgonecrazy",
+                "alexa32",
+                "fixedgames2088",
+                "terrygarry1",
+                "petersmid40",
+                "timeyinblessing14",
+                "sarahcourt63"
+            ],
+            "name": "general",
+            "t": "c",
+            "topic": "Community support",
+            "unmuted": [
+                "singli"
+            ],
+            "usersCount": 315467
+        },
+        "groupable": false,
+        "msg": "raquel.baldussi",
+        "rid": "GENERAL",
+        "t": "uj",
+        "ts": "2020-01-24T12:40:13.448Z",
+        "u": {
+            "_id": "EqX82yYnCvJTMnzrb",
+            "name": "raquel.baldussi",
+            "username": "raquel.baldussi"
+        }
+    },
+    "origin": "https://open.rocket.chat/general",
+    "perceval_version": "0.14.0",
+    "search_fields": {
+        "channel_id": "GENERAL",
+        "channel_name": "general",
+        "item_id": "tNcKxg9gs9jYvBnX7"
+    },
+    "tag": "https://open.rocket.chat/general",
+    "timestamp": 1591828187.831096,
+    "updated_on": 1579869613.448,
+    "uuid": "f99445473b5af22bb571408d89d209cbf8fb1460"
+},{
+    "backend_name": "RocketChat",
+    "backend_version": "0.1.0",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "_id": "K8JjHuB43qg9vNuEN",
+        "_updatedAt": "2020-01-18T21:37:18.094Z",
+        "attachments": [],
+        "channel_info": {
+            "_id": "GENERAL",
+            "_updatedAt": "2020-06-10T22:24:56.891Z",
+            "announcement": "Please review our [Code of Conduct](https://rocket.chat/code-of-conduct). Violations, including unwanted solicitations, will not be tolerated.",
+            "default": true,
+            "jitsiTimeout": "2020-06-05T02:43:19.459Z",
+            "lastMessage": {
+                "_id": "rhjdPaWuwEacmpToC",
+                "_updatedAt": "2020-06-10T22:23:34.000Z",
+                "alias": "acooma",
+                "attachments": [
+                    {
+                        "author_link": "https://github.com/RocketChat/Rocket.Chat/stargazers",
+                        "author_name": "Click here to star the project too.",
+                        "ts": "1970-01-01T00:00:00.000Z"
+                    }
+                ],
+                "avatar": "https://avatars1.githubusercontent.com/u/25372243?v=4",
+                "bot": {
+                    "i": "QyWmDsdtdyzvkjucS"
+                },
+                "channels": [],
+                "groupable": false,
+                "mentions": [],
+                "msg": ":star: starred [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat). We have now *27230* stars at GitHub.",
+                "parseUrls": false,
+                "rid": "GENERAL",
+                "ts": "2020-06-10T22:23:33.956Z",
+                "u": {
+                    "_id": "rocket.cat",
+                    "name": "Rocket.Cat",
+                    "username": "rocket.cat"
+                }
+            },
+            "lm": "2020-06-10T22:23:33.956Z",
+            "msgs": 714994,
+            "muted": [
+                "geekgonecrazy",
+                "alexa32",
+                "fixedgames2088",
+                "terrygarry1",
+                "petersmid40",
+                "timeyinblessing14",
+                "sarahcourt63"
+            ],
+            "name": "general",
+            "t": "c",
+            "topic": "Community support in [#support](https://open.rocket.chat/channel/support). Discussions in our [forums](https://forums.rocket.chat/).  Find jobs in [#jobs](https://open.rocket.chat/channel/jobs)",
+            "unmuted": [
+                "singli"
+            ],
+            "usersCount": 315467
+        },
+        "channels": [],
+        "editedAt": "2020-01-18T21:37:18.094Z",
+        "editedBy": {
+            "_id": "DkznQ6zmk9Bjn6Xeq",
+            "username": "boiethios"
+        },
+        "mentions": [],
+        "msg": "",
+        "reactions": [],
+        "replies": [
+            "DkznQ6zmk9Bjn6Xeq"
+        ],
+        "rid": "GENERAL",
+        "t": "rm",
+        "tcount": 1,
+        "tlm": "2020-01-18T21:36:51.129Z",
+        "translations": {
+            "ar": "\u0645\u0648\u0636\u0648\u0639 \u0622\u062e\u0631",
+            "de": "Ein weiterer Thread",
+            "en": "Another thread",
+            "es": "Otro hilo",
+            "fa": "\u0645\u0648\u0636\u0648\u0639 \u062f\u06cc\u06af\u0631",
+            "fr": "Un autre fil",
+            "hi": "\u090f\u0915 \u0914\u0930 \u0927\u093e\u0917\u093e",
+            "id": "Utas lainnya",
+            "ja": "\u5225\u306e\u30b9\u30ec\u30c3\u30c9",
+            "pl": "Kolejny w\u0105tek",
+            "pt": "Outra discuss\u00e3o",
+            "ru": "\u0414\u0440\u0443\u0433\u0430\u044f \u0442\u0435\u043c\u0430",
+            "ta": "\u0bae\u0bb1\u0bcd\u0bb1\u0bca\u0bb0\u0bc1 \u0ba8\u0bc2\u0bb2\u0bcd",
+            "tr": "Ba\u015fka bir i\u015f par\u00e7ac\u0131\u011f\u0131",
+            "uk": "\u0429\u0435 \u043e\u0434\u043d\u0430 \u043d\u0438\u0442\u043a\u0430",
+            "zh": "\u53e6\u4e00\u4e2a\u7ebf\u7a0b",
+            "zh-TW": "\u53e6\u4e00\u500b\u7dda\u7a0b"
+        },
+        "ts": "2020-01-18T21:36:11.594Z",
+        "u": {
+            "_id": "DkznQ6zmk9Bjn6Xeq",
+            "name": "Boiethios",
+            "username": "boiethios"
+        },
+        "urls": []
+    },
+    "origin": "https://open.rocket.chat/general",
+    "perceval_version": "0.14.0",
+    "search_fields": {
+        "channel_id": "GENERAL",
+        "channel_name": "general",
+        "item_id": "K8JjHuB43qg9vNuEN"
+    },
+    "tag": "https://open.rocket.chat/general",
+    "timestamp": 1591828152.153906,
+    "updated_on": 1579383438.094,
+    "uuid": "e89af1b04333ca86355690b7a2fded58d211bde7"
+}]
