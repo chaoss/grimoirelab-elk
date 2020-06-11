@@ -21,10 +21,8 @@
 
 import logging
 
-from .enrich import Enrich, metadata
+from .enrich import metadata
 from .scmsenrich import ScmsEnrich
-from ..elastic_mapping import Mapping as BaseMapping
-
 
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
 GEOLOCATION_INDEX = '/github/'
@@ -47,6 +45,7 @@ class ScmsGitHubEnrich(ScmsEnrich):
                          db_user, db_password, db_host)
 
         self.studies = []
+        self.studies.append(self.enrich_extra_data)
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -58,11 +57,8 @@ class ScmsGitHubEnrich(ScmsEnrich):
         """ Field with the date in the JSON enriched items """
         return "grimoire_creation_date"
 
-
     def get_identities(self, item):
         """Return the identities from an item"""
-
-
         category = item['category']
         item = item['data']
         comments_attr = None
@@ -91,9 +87,7 @@ class ScmsGitHubEnrich(ScmsEnrich):
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
-
         user = item  # by default a specific user dict is expected
-
         if isinstance(item, dict) and 'data' in item:
             user = item['data'][identity_field]
         elif identity_field:
@@ -108,10 +102,8 @@ class ScmsGitHubEnrich(ScmsEnrich):
 
         return identity
 
-
     def get_field_unique_id(self):
         return "id"
-
 
     @metadata
     def get_rich_item(self, item):
@@ -148,10 +140,10 @@ class ScmsGitHubEnrich(ScmsEnrich):
             # Add id info to allow to coexistence of items of different types in the same index
             ecomment['id'] = '{}_issue_comment_{}'.format(eitem['id'], comment['id'])
             # Copy data from the raw comment
-            ecomment['context']=eitem['issue_title']
+            ecomment['context'] = eitem['issue_title']
             ecomment['body'] = comment['body'][:self.KEYWORD_MAX_LENGTH]
             ecomment.update(self.get_grimoire_fields(comment['updated_at'], ISSUE_COMMENT_TYPE))
-            ecomment['data_source']='Github'
+            ecomment['data_source'] = 'Github'
             ecomments.append(ecomment)
 
         return ecomments
@@ -220,7 +212,6 @@ class ScmsGitHubEnrich(ScmsEnrich):
             logger.info("%s items inserted for GitHub", str(num_items))
 
         return num_items
-
 
     def __get_rich_pull(self, item):
         rich_pr = {}

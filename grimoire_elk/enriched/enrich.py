@@ -1183,7 +1183,7 @@ class Enrich(ElasticItems):
                 a_field = "{}_{}".format(EXTRA_PREFIX, a['field'])
                 a_value = a['value']
 
-                if isinstance(a_value, int) or isinstance(a_value, float):
+                if isinstance(a_value, int) or isinstance(a_value, float) or isinstance(a_value, list):
                     if isinstance(a_value, bool):
                         stmt = "ctx._source.{} = {}".format(a_field, str(a_value).lower())
                     else:
