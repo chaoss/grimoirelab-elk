@@ -22,6 +22,7 @@
 from .enrich import Enrich
 from ..elastic_mapping import Mapping as BaseMapping
 
+
 class ScmsMapping(BaseMapping):
 
     @staticmethod
@@ -47,13 +48,14 @@ class ScmsMapping(BaseMapping):
                  "id": {
                     "type": "keyword"
                 },
-               "channel": {
+                "channel": {
                     "type": "keyword"
-                }                
+                }
            }
         } """
 
         return {"items": mapping}
+
 
 class ScmsEnrich(Enrich):
     mapping = ScmsMapping

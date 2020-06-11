@@ -23,9 +23,7 @@ import logging
 
 from requests.structures import CaseInsensitiveDict
 import email.utils
-from .enrich import Enrich, metadata
-from ..elastic_mapping import Mapping as BaseMapping
-from .mbox_study_kip import kafka_kip, MAX_LINES_FOR_VOTE
+from .enrich import metadata
 from .scmsenrich import ScmsEnrich
 
 logger = logging.getLogger(__name__)
@@ -38,7 +36,8 @@ class ScmsMboxEnrich(ScmsEnrich):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
 
-        self.studies = [self.kafka_kip]
+        self.studies = []
+        self.studies.append(self.enrich_extra_data)
 
     def get_field_author(self):
         return "From"
@@ -104,7 +103,7 @@ class ScmsMboxEnrich(ScmsEnrich):
         # Fields which names are translated
         map_fields = {
             "Subject": "context",
-            "uuid":"id"
+            "uuid": "id"
         }
         for fn in map_fields:
             if fn in message:
@@ -164,7 +163,8 @@ class ScmsMboxEnrich(ScmsEnrich):
             eitem['body'] = " ".join(message['body']['plain'].split("\n")[:])
 
         eitem.update(self.get_grimoire_fields(message['Date'], "message"))
-        eitem['data_source']='Mbox'
+        eitem['data_source'] = 'Mbox'
+
         return eitem
 
     def enrich_items(self, ocean_backend):
@@ -217,10 +217,3 @@ class ScmsMboxEnrich(ScmsEnrich):
             total += self.elastic.safe_put_bulk(url, bulk_json)
 
         return total
-
-    def kafka_kip(self, ocean_backend, enrich_backend, no_incremental=False):
-        # KIP study is not incremental
-
-        logger.info("[mbox] study Kafka KIP starting")
-        kafka_kip(self)
-        logger.info("[mbox] study Kafka KIP end")
