@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "GrimoireELK"
-version = "0.72.0"
+version = "0.73.0"
 description = "GrimoireELK processes and stores software development data to ElasticSearch"
 readme = "README.md"
 authors = [
