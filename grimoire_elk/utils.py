@@ -95,6 +95,7 @@ from .enriched.github import GitHubEnrich
 from .enriched.githubql import GitHubQLEnrich
 from .enriched.github2 import GitHubEnrich2
 from .enriched.gitlab import GitLabEnrich
+from .enriched.gitlabqm import GitLabQMEnrich
 from .enriched.gitter import GitterEnrich
 from .enriched.google_hits import GoogleHitsEnrich
 from .enriched.groupsio import GroupsioEnrich
@@ -240,6 +241,7 @@ def get_connectors():
             "githubql": [GitHubQL, GitHubQLOcean, GitHubQLEnrich, GitHubQLCommand],
             "github2": [GitHub, GitHubOcean, GitHubEnrich2, GitHubCommand],
             "gitlab": [GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
+            "gitlabqm": [GitLab, GitLabOcean, GitLabQMEnrich, GitLabCommand],
             "gitter": [Gitter, GitterOcean, GitterEnrich, GitterCommand],
             "google_hits": [GoogleHits, GoogleHitsOcean, GoogleHitsEnrich, GoogleHitsCommand],
             "groupsio": [Groupsio, GroupsioOcean, GroupsioEnrich, GroupsioCommand],
