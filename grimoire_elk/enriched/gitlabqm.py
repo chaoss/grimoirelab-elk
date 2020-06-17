@@ -22,7 +22,6 @@
 
 import logging
 
-from datetime import datetime
 from .qmenrich import QMEnrich
 
 from perceval.backend import uuid
@@ -41,7 +40,7 @@ class GitLabQMEnrich(QMEnrich):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
 
-        self.users = {}  # cache users
+        self.date_items = {}
 
         self.studies = []
 
@@ -63,53 +62,104 @@ class GitLabQMEnrich(QMEnrich):
         return "id"
 
     def normalized_date(self, dt):
-        dt = datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S.%fZ")
-        return str_to_datetime(str(dt.date())).isoformat()
+
+        processed_dt = None
+
+        if dt and dt is not None:
+            processed_dt = str_to_datetime(dt).replace(hour=0, minute=0, second=0, microsecond=0)
+            processed_dt = processed_dt.isoformat()
+
+        return processed_dt
+
+    def extract_project(self, item):
+        return item['search_fields']['project']
 
     def filter_items(self, items):
+
         for item in items:
-            created_at = self.normalized_date(item['data']['created_at'])
+            project = self.extract_project(item)
+            issue = item['data']
 
-            if created_at in DATE_ITEMS.keys():
-                DATE_ITEMS[created_at] += 1
+            created_at = self.normalized_date(issue['created_at'])
+            closed_at = self.normalized_date(issue['closed_at'])
+
+            if project in self.date_items.keys():
+
+                if created_at in self.date_items[project]['opened'].keys():
+                    self.date_items[project]['opened'][created_at] += 1
+                else:
+                    self.date_items[project]['opened'][created_at] = 1
+
+                if closed_at and closed_at is not None:
+                    if closed_at in self.date_items[project]['closed'].keys():
+                        self.date_items[project]['closed'][closed_at] += 1
+                    else:
+                        self.date_items[project]['closed'][closed_at] = 1
+
             else:
-                DATE_ITEMS[created_at] = 1
+                opened = {}
+                closed = {}
 
-    def add_project(self, item):
-        return {"project": item['search_fields']['project']}
+                opened[created_at] = 1
+                if closed_at and closed_at is not None:
+                    closed[closed_at] = 1
+
+                self.date_items[project] = {"opened": opened, "closed": closed}
+
+        logger.info("filtering done")
 
     def add_extra_data(self):
-        eitem = {'metric_class': "issues",
-                 'metric_type': "LineChart",
-                 'metric_es_compute': "sample",
-                 'metric_id': "issues.numberOpenIssues",
-                 'metric_desc': "The number of issues opened on a current date.",
-                 'metric_name': "Number of Open Issues"
-                 }
+        eitem = {
+            'metric_class': "issues",
+            'metric_type': "LineChart",
+            'metric_es_compute': "sample",
+        }
 
         return eitem
 
-    def enrich_issue(self, item):
+    def enrich_opened_items(self, project):
+        edates = []
 
-        eitem = {}
-        issue = item['data']
+        for dt in self.date_items[project]['opened'].keys():
+            edate = {}
 
-        dt = self.normalized_date(issue['created_at'])
+            edate.update(self.add_extra_data())
+            edate['metric_id'] = "issues.numberOpenedIssues"
+            edate['metric_desc'] = "The number of issues opened on a current date."
+            edate['metric_name'] = "Number of Opened Issues"
+            edate['project'] = project
+            edate['datetime'] = dt
+            edate['metric_es_value'] = self.date_items[project]['opened'][dt]
+            edate['metric_es_value_weighted'] = self.date_items[project]['opened'][dt]
+            edate['uuid'] = uuid(edate['metric_id'], edate['project'], edate['datetime'])
+            edate['id'] = 'opened_issue_{}'.format(edate['uuid'])
+            edate.update(self.get_grimoire_fields(dt, "date"))
 
-        if dt in DATE_ITEMS.keys():
-            eitem['category'] = "issue"
-            eitem['state'] = issue['state']
-            eitem['datetime'] = dt
-            eitem['metric_es_value'] = DATE_ITEMS[dt]
-            eitem['metric_es_value_weighted'] = DATE_ITEMS[dt]
-            eitem.update(self.add_project(item))
-            eitem.update(self.add_extra_data())
-            eitem['uuid'] = uuid(eitem['metric_id'], eitem['project'], eitem['datetime'])
-            eitem['id'] = '{}_issue_{}'.format(eitem['state'], eitem['uuid'])
+            edates.append(edate)
 
-            DATE_ITEMS.pop(dt)
+        return edates
 
-        return eitem
+    def enrich_closed_items(self, project):
+        edates = []
+
+        for dt in self.date_items[project]['closed'].keys():
+            edate = {}
+
+            edate.update(self.add_extra_data())
+            edate['metric_id'] = "issues.numberClosedIssues"
+            edate['metric_desc'] = "The number of issues closed on a current date."
+            edate['metric_name'] = "Number of Closed Issues"
+            edate['project'] = project
+            edate['datetime'] = dt
+            edate['metric_es_value'] = self.date_items[project]['closed'][dt]
+            edate['metric_es_value_weighted'] = self.date_items[project]['closed'][dt]
+            edate['uuid'] = uuid(edate['metric_id'], edate['project'], edate['datetime'])
+            edate['id'] = 'closed_issue_{}'.format(edate['uuid'])
+            edate.update(self.get_grimoire_fields(dt, "date"))
+
+            edates.append(edate)
+
+        return edates
 
     def enrich_items(self, ocean_backend):
         items_to_enrich = []
@@ -118,21 +168,16 @@ class GitLabQMEnrich(QMEnrich):
 
         self.filter_items(ocean_backend.fetch())
 
-        for item in ocean_backend.fetch():
+        for project in self.date_items.keys():
+            eitems = []
 
-            eitem = {}
+            rich_items = self.enrich_opened_items(project)
+            eitems.extend(rich_items)
 
-            if item['category'] == 'issue':
-                eitem = self.enrich_issue(item)
+            rich_items = self.enrich_closed_items(project)
+            eitems.extend(rich_items)
 
-            # elif item['category'] == 'merge_request':
-            #     rich_item = self.enrich_merge(item)
-            # else:
-            #     logger.error("[gitlab] rich item not defined for GitLab category {}".format(
-            #                  item['category']))
-
-            if eitem is not None and eitem:
-                items_to_enrich.append(eitem)
+            items_to_enrich.extend(eitems)
 
             if len(items_to_enrich) < MAX_SIZE_BULK_ENRICHED_ITEMS:
                 continue

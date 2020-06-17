@@ -21,31 +21,8 @@
 
 
 from .enrich import Enrich
-from ..elastic_mapping import Mapping as BaseMapping
-
-
-class QMMapping(BaseMapping):
-
-    @staticmethod
-    def get_elastic_mappings(es_major):
-        """Get Elasticsearch mapping.
-
-        :param es_major: major version of Elasticsearch, as string
-        :returns:        dictionary with a key, 'items', with the mapping
-        """
-
-        mapping = """
-        {
-            "properties": {
-               "id": {
-                    "type": "keyword"
-               }
-            }
-        }
-        """
-
-        return {"items": mapping}
+from ..elastic_mapping import Mapping
 
 
 class QMEnrich(Enrich):
-    mapping = QMMapping
+    mapping = Mapping
