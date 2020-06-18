@@ -19,11 +19,13 @@
 #     Valerio Cosentino <valcos@bitergia.com>
 #
 import logging
+import time
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.enriched.utils import REPO_LABELS
+from grimoire_elk.enriched.utils import REPO_LABELS, anonymize_url
 from grimoire_elk.raw.githubql import GitHubQLOcean
+from grimoire_elk.enriched.githubql import logger
 
 
 class TestGitHubQL(TestBaseBackend):
@@ -74,7 +76,7 @@ class TestGitHubQL(TestBaseBackend):
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(item['category'], 'event')
         self.assertEqual(eitem['event_type'], 'UnlabeledEvent')
-        self.assertEqual(eitem['created_at'], '2020-04-07T11:21:32Z')
+        self.assertEqual(eitem['created_at'], '2020-04-09T11:21:32Z')
         self.assertEqual(eitem['author_uuid'], 'ee5d85148ccdeab3efc341cb12fc70ae6b3236ae')
         self.assertEqual(eitem['author_name'], 'Unknown')
         self.assertEqual(eitem['author_user_name'], 'valeriocos')
@@ -270,6 +272,32 @@ class TestGitHubQL(TestBaseBackend):
                     self.assertEqual(item[attribute], eitem[attribute])
                 else:
                     self.assertIsNone(eitem[attribute])
+
+    def test_duration_analysis(self):
+        """Test that the geolocation study works correctly"""
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_duration_analysis')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_duration_analysis":
+                study(ocean_backend, enrich_backend,
+                      start_event_type="UnlabeledEvent", target_attr="label",
+                      fltr_attr="label", fltr_event_types=["LabeledEvent"])
+
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.githubql:[githubql] Duration analysis '
+                                           'starting study %s/test_githubql_enrich'
+                             % anonymize_url(self.es_con))
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.githubql:[githubql] Duration analysis '
+                                            'ending study %s/test_githubql_enrich'
+                             % anonymize_url(self.es_con))
+
+        time.sleep(5)  # HACK: Wait until github enrich index has been written
+        items = [item for item in enrich_backend.fetch() if item['event_type'] == 'UnlabeledEvent']
+        self.assertEqual(len(items), 1)
+        for item in items:
+            self.assertEqual(item['previous_event_uuid'], 'f371d54454d297f86f08ab52a440ae5f9e4afeb1')
+            self.assertEqual(item['duration_from_previous_event'], 2.0)
 
 
 if __name__ == "__main__":
