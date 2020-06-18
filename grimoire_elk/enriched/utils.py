@@ -176,7 +176,7 @@ def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
                 offset = backend_cmd.parsed_args.offset
 
         if from_date:
-            if from_date.replace(tzinfo=None) != str_to_datetime("1970-01-01"):
+            if from_date.replace(tzinfo=None) != str_to_datetime("1970-01-01").replace(tzinfo=None):
                 last_enrich = from_date
             # if the index is empty, set the last enrich to None
             elif not enrich_backend.from_date:

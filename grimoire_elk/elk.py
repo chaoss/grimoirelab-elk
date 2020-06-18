@@ -154,7 +154,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             params['branches'] = branches
         if filter_classified:
             params['filter_classified'] = filter_classified
-        if from_date and (from_date.replace(tzinfo=None) != str_to_datetime("1970-01-01")):
+        if from_date and (from_date.replace(tzinfo=None) != str_to_datetime("1970-01-01").replace(tzinfo=None)):
             params['from_date'] = from_date
         if offset:
             params['from_offset'] = offset
