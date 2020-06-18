@@ -204,9 +204,9 @@ class RocketChatEnrich(Enrich):
             'channel_num_messages': channel.get('msgs', None),
             'channel_name': channel.get('name', ''),
             'channel_num_users': channel.get('usersCount', None),
-            'channel_topic': channel.get('topic', ''),
-            'avatar': ''
+            'channel_topic': channel.get('topic', '')
         }
+        rich_channel['avatar'] = ''
         if 'lastMessage' in channel and channel['lastMessage']:
             rich_channel['avatar'] = channel['lastMessage']['avatar']
 

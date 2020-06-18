@@ -66,6 +66,8 @@ class TestRocketChat(TestBaseBackend):
         self.assertEqual(eitem['is_edited'], 1)
         self.assertEqual(eitem['avatar'], 'https://avatars1.githubusercontent.com/u/25372243?v=4')
         self.assertEqual(eitem['channel_topic'], 'Community support')
+        self.assertEqual(eitem['total_mentions'], 2)
+        self.assertEqual(eitem['replies'], 0)
         self.assertIn(REPO_LABELS, eitem)
         self.assertEqual(eitem['total_mentions'], 2)
         self.assertEqual(eitem['replies'], 0)
