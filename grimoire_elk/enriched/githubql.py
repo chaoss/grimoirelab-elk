@@ -22,7 +22,10 @@
 import logging
 import re
 
+from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
+
 from .enrich import Enrich, metadata
+from .utils import anonymize_url, get_time_diff_days
 from ..elastic_mapping import Mapping as BaseMapping
 
 GITHUB = 'https://github.com/'
@@ -74,7 +77,7 @@ class GitHubQLEnrich(Enrich):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
 
-        self.studies = []
+        self.studies = [self.enrich_duration_analysis]
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -233,3 +236,194 @@ class GitHubQLEnrich(Enrich):
         rich_event['author_multi_org_names'] = rich_event.get('actor_multi_org_names', None)
 
         return rich_event
+
+    def enrich_duration_analysis(self, ocean_backend, enrich_backend, start_event_type, target_attr,
+                                 fltr_event_types, fltr_attr=None):
+        """The purpose of this study is to calculate the duration between two GitHub events. It requires
+        a start event type (e.g., UnlabeledEvent or MovedColumnsInProjectEvent), which is used to
+        retrieve for each issue all events of that type. For each issue event obtained, the first
+        previous event of one of the types defined at `fltr_event_types` is returned, and used to
+        calculate the duration (in days) between the two events. Optionally, an additional filter
+        can be defined to retain the events that share a given property (e.g., a specific label,
+        the name of project board). Finally, the duration and the previous event uuid are added to
+        the start event via the attributes `duration_from_previous_event` and `previous_event_uuid`.
+
+        This study is executed in a incremental way, thus only the start events that don't
+        include the attribute `duration_from_previous_event` are retrieved and processed.
+
+        The examples below show how to activate the study by modifying the setup.cfg. The first example
+        calculates the duration between Unlabeled and Labeled events per label. The second example
+        calculates the duration between the MovedColumnsInProject and AddedToProject events per
+        column in each board
+
+        ```
+        [githubql]
+        ...
+        studies = [enrich_duration_analysis:label, enrich_duration_analysis:kanban]
+
+        [enrich_duration_analysis:kanban]
+        start_event_type = MovedColumnsInProjectEvent
+        fltr_attr = board_name
+        target_attr = board_column
+        fltr_event_types = [MovedColumnsInProjectEvent, AddedToProjectEvent]
+
+        [enrich_duration_analysis:label]
+        start_event_type = UnlabeledEvent
+        target_attr = label
+        fltr_attr = label
+        fltr_event_types = [LabeledEvent]
+        ```
+
+        :param ocean_backend: backend from which to read the raw items
+        :param enrich_backend:  backend from which to read the enriched items
+        :param start_event_type: the type of the start event (e.g., UnlabeledEvent)
+        :param target_attr: the attribute returned from the events (e.g., label)
+        :param fltr_event_types: a list of event types to select the previous events (e.g., LabeledEvent)
+        :param fltr_attr: an optional attribute to filter in the events with a given property (e.g., label)
+        """
+        data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
+        log_prefix = "[{}] Duration analysis".format(data_source)
+        logger.info("{} starting study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
+
+        es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
+                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+        in_index = enrich_backend.elastic.index
+
+        # get all start events that don't have the attribute `duration_from_previous_event`
+        query_start_event_type = {
+            "query": {
+                "bool": {
+                    "filter": {
+                        "term": {
+                            "event_type": start_event_type
+                        }
+                    },
+                    "must_not": {
+                        "exists": {
+                            "field": "duration_from_previous_event"
+                        }
+                    }
+                }
+            },
+            "_source": [
+                "uuid", "issue_url_id", "grimoire_creation_date", target_attr
+            ],
+            "sort": [
+                {
+                    "grimoire_creation_date": {
+                        "order": "asc"
+                    }
+                }
+            ],
+            "size": 1000
+        }
+
+        if fltr_attr:
+            query_start_event_type['_source'].append(fltr_attr)
+
+        start_event_types = es_in.search(index=in_index, body=query_start_event_type, scroll='2m')
+
+        sid = start_event_types['_scroll_id']
+        scroll_size = len(start_event_types['hits']['hits'])
+
+        while scroll_size > 0:
+
+            # for each event, retrieve the previous event included in `fltr_event_types`
+            for start_event in start_event_types['hits']['hits']:
+                start_event = start_event['_source']
+                start_uuid = start_event['uuid']
+                start_issue_url_id = start_event['issue_url_id']
+                start_date_event = start_event['grimoire_creation_date']
+
+                query_previous_events = {
+                    "size": 1,
+                    "query": {
+                        "bool": {
+                            "filter": [
+                                {
+                                    "term": {
+                                        "issue_url_id": start_issue_url_id
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "event_type": fltr_event_types
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "grimoire_creation_date": {
+                                            "lt": start_date_event
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "_source": [
+                        "uuid", "grimoire_creation_date", target_attr
+                    ],
+                    "sort": [
+                        {
+                            "grimoire_creation_date": {
+                                "order": "desc"
+                            }
+                        }
+                    ]
+                }
+
+                if fltr_attr:
+                    _fltr = {
+                        "term": {
+                            fltr_attr: start_event[fltr_attr]
+                        }
+                    }
+
+                    query_previous_events['query']['bool']['filter'].append(_fltr)
+                    query_start_event_type['_source'].append(fltr_attr)
+
+                previous_events = es_in.search(index=in_index, body=query_previous_events)['hits']['hits']
+                if not previous_events:
+                    continue
+
+                previous_event = previous_events[0]['_source']
+                previous_event_date = previous_event['grimoire_creation_date']
+                previous_event_uuid = previous_event['uuid']
+                duration = get_time_diff_days(previous_event_date, start_date_event)
+
+                painless_code = "ctx._source.duration_from_previous_event=params.duration;" \
+                                "ctx._source.previous_event_uuid=params.uuid"
+
+                add_previous_event_query = {
+                    "script": {
+                        "source": painless_code,
+                        "lang": "painless",
+                        "params": {
+                            "duration": duration,
+                            "uuid": previous_event_uuid
+                        }
+                    },
+                    "query": {
+                        "bool": {
+                            "filter": {
+                                "term": {
+                                    "uuid": start_uuid
+                                }
+                            }
+                        }
+                    }
+                }
+                r = es_in.update_by_query(index=in_index, body=add_previous_event_query, conflicts='proceed')
+                if r['failures']:
+                    logger.error("{} Error while executing study {}".format(log_prefix,
+                                                                            anonymize_url(self.elastic.index_url)))
+                    logger.error(str(r['failures'][0]))
+                    return
+
+            start_event_types = es_in.scroll(scroll_id=sid, scroll='2m')
+            # update the scroll ID
+            sid = start_event_types['_scroll_id']
+            # get the number of results that returned in the last scroll
+            scroll_size = len(start_event_types['hits']['hits'])
+
+        logger.info("{} ending study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
