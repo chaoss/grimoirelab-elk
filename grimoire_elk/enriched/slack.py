@@ -72,8 +72,9 @@ class SlackEnrich(Enrich):
         from_ = item
         if isinstance(item, dict) and 'data' in item:
             if self.get_field_author() not in item['data']:
-                # Message from bot
-                identity['username'] = item['data']['bot_id']
+                # Message from bot. For the rare cases where both user
+                # and bot_id are not present, an empty identity is returned
+                identity['username'] = item['data'].get('bot_id', None)
                 return identity
             from_ = item['data'][self.get_field_author()]
 
