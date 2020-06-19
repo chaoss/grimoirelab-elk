@@ -70,7 +70,7 @@ class GitHubQLEnrich(Enrich):
 
     mapping = Mapping
 
-    event_roles = ['actor']
+    event_roles = ['actor', 'reporter']
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
@@ -92,19 +92,29 @@ class GitHubQLEnrich(Enrich):
     def get_identities(self, item):
         """Return the identities from an item"""
 
-        item = item['data']
-        identity_attr = "actor"
-        if item[identity_attr] and identity_attr in item:
-            user = self.get_sh_identity(item[identity_attr])
-            if user:
-                yield user
+        event = item['data']
+        event_actor = event.get("actor", None)
+        if event_actor:
+            identity = self.get_sh_identity(event_actor)
+            if identity:
+                yield identity
+
+        issue = event['issue']
+        issue_reporter = issue.get("user", None)
+        if issue_reporter:
+            identity = self.get_sh_identity(issue_reporter)
+            if identity:
+                yield identity
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
 
         user = item  # by default a specific user dict is expected
         if isinstance(item, dict) and 'data' in item:
-            user = item['data'][identity_field]
+            if identity_field == 'actor':
+                user = item['data'][identity_field]
+            elif identity_field == 'reporter':
+                user = item['data']['issue']['user']
 
         if not user:
             return identity
@@ -137,6 +147,11 @@ class GitHubQLEnrich(Enrich):
         event = item['data']
         issue = item['data']['issue']
         actor = item['data']['actor']
+
+        # move the issue reporter to level of actor. This is needed to
+        # allow `get_item_sh` adding SortingHat identities
+        reporter = issue['user']
+        item['data']['reporter'] = reporter
 
         rich_event['event_type'] = event['eventType']
         rich_event['created_at'] = event['createdAt']

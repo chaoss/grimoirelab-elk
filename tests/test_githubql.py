@@ -71,6 +71,10 @@ class TestGitHubQL(TestBaseBackend):
         self.assertTrue(eitem['label_is_default'])
         self.assertEqual(eitem['label_created_at'], '2020-04-07T10:30:46Z')
         self.assertEqual(eitem['label_updated_at'], '2020-04-07T10:30:46Z')
+        self.assertEqual(eitem['reporter_uuid'], 'ee5d85148ccdeab3efc341cb12fc70ae6b3236ae')
+        self.assertEqual(eitem['reporter_name'], 'Unknown')
+        self.assertEqual(eitem['reporter_user_name'], 'valeriocos')
+        self.assertIsNone(eitem['reporter_domain'])
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
@@ -88,6 +92,10 @@ class TestGitHubQL(TestBaseBackend):
         self.assertTrue(eitem['label_is_default'])
         self.assertEqual(eitem['label_created_at'], '2020-04-07T10:30:46Z')
         self.assertEqual(eitem['label_updated_at'], '2020-04-07T10:30:46Z')
+        self.assertEqual(eitem['reporter_uuid'], 'ee5d85148ccdeab3efc341cb12fc70ae6b3236ae')
+        self.assertEqual(eitem['reporter_name'], 'Unknown')
+        self.assertEqual(eitem['reporter_user_name'], 'valeriocos')
+        self.assertIsNone(eitem['reporter_domain'])
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
@@ -107,6 +115,10 @@ class TestGitHubQL(TestBaseBackend):
         self.assertEqual(eitem['board_updated_at'], '2020-04-09T18:54:08Z')
         self.assertIsNone(eitem['board_closed_at'])
         self.assertEqual(eitem['board_state'], 'open')
+        self.assertEqual(eitem['reporter_uuid'], 'ee5d85148ccdeab3efc341cb12fc70ae6b3236ae')
+        self.assertEqual(eitem['reporter_name'], 'Unknown')
+        self.assertEqual(eitem['reporter_user_name'], 'valeriocos')
+        self.assertIsNone(eitem['reporter_domain'])
 
         item = self.items[3]
         eitem = enrich_backend.get_rich_item(item)
@@ -127,6 +139,10 @@ class TestGitHubQL(TestBaseBackend):
         self.assertEqual(eitem['board_updated_at'], '2020-04-09T18:54:08Z')
         self.assertIsNone(eitem['board_closed_at'])
         self.assertEqual(eitem['board_state'], 'open')
+        self.assertEqual(eitem['reporter_uuid'], 'ee5d85148ccdeab3efc341cb12fc70ae6b3236ae')
+        self.assertEqual(eitem['reporter_name'], 'Unknown')
+        self.assertEqual(eitem['reporter_user_name'], 'valeriocos')
+        self.assertIsNone(eitem['reporter_domain'])
 
         item = self.items[4]
         eitem = enrich_backend.get_rich_item(item)
@@ -146,6 +162,10 @@ class TestGitHubQL(TestBaseBackend):
         self.assertEqual(eitem['board_updated_at'], '2020-04-09T18:54:08Z')
         self.assertIsNone(eitem['board_closed_at'])
         self.assertEqual(eitem['board_state'], 'open')
+        self.assertEqual(eitem['reporter_uuid'], 'ee5d85148ccdeab3efc341cb12fc70ae6b3236ae')
+        self.assertEqual(eitem['reporter_name'], 'Unknown')
+        self.assertEqual(eitem['reporter_user_name'], 'valeriocos')
+        self.assertIsNone(eitem['reporter_domain'])
 
         item = self.items[5]
         eitem = enrich_backend.get_rich_item(item)
@@ -168,6 +188,10 @@ class TestGitHubQL(TestBaseBackend):
         self.assertIsNone(eitem['reference_source_closed_at'])
         self.assertFalse(eitem['reference_source_closed'])
         self.assertIsNone(eitem['reference_source_merged'])
+        self.assertEqual(eitem['reporter_uuid'], 'ee5d85148ccdeab3efc341cb12fc70ae6b3236ae')
+        self.assertEqual(eitem['reporter_name'], 'Unknown')
+        self.assertEqual(eitem['reporter_user_name'], 'valeriocos')
+        self.assertIsNone(eitem['reporter_domain'])
 
         item = self.items[6]
         eitem = enrich_backend.get_rich_item(item)
@@ -188,6 +212,10 @@ class TestGitHubQL(TestBaseBackend):
         self.assertEqual(eitem['closer_closed_at'], '2020-04-12T07:51:05Z')
         self.assertTrue(eitem['closer_closed'])
         self.assertTrue(eitem['closer_merged'])
+        self.assertEqual(eitem['reporter_uuid'], 'ee5d85148ccdeab3efc341cb12fc70ae6b3236ae')
+        self.assertEqual(eitem['reporter_name'], 'Unknown')
+        self.assertEqual(eitem['reporter_user_name'], 'valeriocos')
+        self.assertIsNone(eitem['reporter_domain'])
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
@@ -220,6 +248,13 @@ class TestGitHubQL(TestBaseBackend):
                 self.assertIn('author_org_name', source)
                 self.assertIn('author_bot', source)
                 self.assertIn('author_multi_org_names', source)
+            if 'reporter_uuid' in source:
+                self.assertIn('reporter_domain', source)
+                self.assertIn('reporter_gender', source)
+                self.assertIn('reporter_gender_acc', source)
+                self.assertIn('reporter_org_name', source)
+                self.assertIn('reporter_bot', source)
+                self.assertIn('reporter_multi_org_names', source)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
