@@ -162,6 +162,8 @@ class MBoxEnrich(Enrich):
         eitem["size"] = None
         if 'plain' in message['body']:
             eitem["body_extract"] = "\n".join(message['body']['plain'].split("\n")[:MAX_LINES_FOR_VOTE])
+            if len(eitem["body_extract"]) > self.KEYWORD_MAX_LENGTH:
+                eitem["body_extract"] = eitem["body_extract"][:self.KEYWORD_MAX_LENGTH]
             eitem["size"] = len(message['body']['plain'])
 
         # Time zone
