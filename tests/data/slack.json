@@ -1107,12 +1107,143 @@
     "perceval_version": "0.13.0",
     "search_fields": {
         "channel_id": "C011DUKE8",
-        "channel_name": "test channel",
+        "channel_name": "general",
         "item_id": "1588324642.0U08900H12100NA1V"
     },
     "tag": "https://slack.com/C011DUKE8",
     "timestamp": 1588324850.898842,
     "updated_on": 1588324642.0001,
     "uuid": "8bc7cbaa1fe5a6a56d5758a05100e838bf6f47c2"
+},
+{
+    "backend_name": "Slack",
+    "backend_version": "0.9.1",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "bot_id": "B0CELKA3V",
+        "channel_info": {
+            "created": 1417520065,
+            "creator": "U02K3A647",
+            "id": "C033RE5D6",
+            "is_archived": false,
+            "is_channel": true,
+            "is_ext_shared": false,
+            "is_general": false,
+            "is_group": false,
+            "is_im": false,
+            "is_member": false,
+            "is_mpim": false,
+            "is_org_shared": false,
+            "is_pending_ext_shared": false,
+            "is_private": false,
+            "is_shared": false,
+            "name": "darden",
+            "name_normalized": "darden",
+            "num_members": 4565,
+            "parent_conversation": null,
+            "pending_connected_team_ids": [],
+            "pending_shared": [],
+            "previous_names": [],
+            "purpose": {
+                "creator": "U05KN71R3",
+                "last_set": 1431689272,
+                "value": "Dardeners\u2019"
+            },
+            "shared_team_ids": [
+                "T02FL4A12"
+            ],
+            "topic": {
+                "creator": "U4YWUSQAJ",
+                "last_set": 1588855518,
+                "value": "Interrupt"
+            },
+            "unlinked": 0
+        },
+        "icons": {
+            "image_48": "https://example.png"
+        },
+        "subtype": "bot_message",
+        "text": ":rotating_light:",
+        "ts": "1487773145.012411",
+        "type": "message",
+        "username": "raiden"
+    },
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.15.0",
+    "search_fields": {
+        "channel_id": "C011DUKE8",
+        "channel_name": "general",
+        "item_id": "1487773145.012411B0CELKA3V"
+    },
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1592559490.170055,
+    "updated_on": 1487773145.012411,
+    "uuid": "aaac053b62e79c2d6b6d74334f6fb6741ac883df"
+},
+{
+    "backend_name": "Slack",
+    "backend_version": "0.9.1",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "channel_info": {
+            "created": 1417520069,
+            "creator": "U02K3A647",
+            "id": "C033RE5D6",
+            "is_archived": false,
+            "is_channel": true,
+            "is_ext_shared": false,
+            "is_general": false,
+            "is_group": false,
+            "is_im": false,
+            "is_member": false,
+            "is_mpim": false,
+            "is_org_shared": false,
+            "is_pending_ext_shared": false,
+            "is_private": false,
+            "is_shared": false,
+            "name": "darden",
+            "name_normalized": "darden",
+            "num_members": 4565,
+            "parent_conversation": null,
+            "pending_connected_team_ids": [],
+            "pending_shared": [],
+            "previous_names": [],
+            "purpose": {
+                "creator": "U05KN71R3",
+                "last_set": 1431689272,
+                "value": "Dardeners\u2019"
+            },
+            "shared_team_ids": [
+                "T02FL4A12"
+            ],
+            "topic": {
+                "creator": "U4YWUSQAJ",
+                "last_set": 1588855518,
+                "value": "Interrupt"
+            },
+            "unlinked": 0
+        },
+        "icons": {
+            "image_48": "https://example.png"
+        },
+        "subtype": "bot_message",
+        "text": ":+1:",
+        "ts": "1487773145.012415",
+        "type": "message",
+        "username": "raiden"
+    },
+    "origin": "https://slack.com/C011DUKE8",
+    "perceval_version": "0.15.0",
+    "search_fields": {
+        "channel_id": "C011DUKE8",
+        "channel_name": "general",
+        "item_id": "1487773145.012411B0CELKAZV"
+    },
+    "tag": "https://slack.com/C011DUKE8",
+    "timestamp": 1592559495.170057,
+    "updated_on": 1487773148.012413,
+    "uuid": "aaac053b62e79c2d6b6d74334f6fb6741ac883de"
 }
 ]
