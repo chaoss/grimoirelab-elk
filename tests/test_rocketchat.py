@@ -23,6 +23,7 @@ import unittest
 
 import requests
 from base import TestBaseBackend
+from grimoire_elk.raw.rocketchat import RocketChatOcean
 from grimoire_elk.enriched.utils import REPO_LABELS
 
 
@@ -66,19 +67,26 @@ class TestRocketChat(TestBaseBackend):
         self.assertEqual(eitem['avatar'], 'https://avatars1.githubusercontent.com/u/25372243?v=4')
         self.assertEqual(eitem['channel_topic'], 'Community support')
         self.assertIn(REPO_LABELS, eitem)
+        self.assertEqual(eitem['total_mentions'], 2)
+        self.assertEqual(eitem['replies'], 0)
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['total_mentions'], 0)
         self.assertEqual(eitem['total_reactions'], 4)
         self.assertEqual(eitem['total_urls'], 1)
-
-        item = self.items[9]
-        eitem = enrich_backend.get_rich_item(item)
-        self.assertEqual(eitem['total_reactions'], 0)
+        self.assertEqual(eitem['replies'], 0)
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['total_mentions'], 0)
         self.assertEqual(eitem['replies'], 2)
+
+        item = self.items[9]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['total_mentions'], 0)
+        self.assertEqual(eitem['total_reactions'], 0)
+        self.assertEqual(eitem['replies'], 1)
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the
@@ -144,6 +152,16 @@ class TestRocketChat(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_perceval_params(self):
+        """Test the extraction of perceval params"""
+
+        url = "https://open.rocket.chat general"
+        expected_params = [
+            'https://open.rocket.chat',
+            'general'
+        ]
+        self.assertListEqual(RocketChatOcean.get_perceval_params_from_url(url), expected_params)
 
 
 if __name__ == "__main__":
