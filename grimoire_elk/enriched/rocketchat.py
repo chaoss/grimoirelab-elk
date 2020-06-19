@@ -203,10 +203,10 @@ class RocketChatEnrich(Enrich):
             'channel_updated_at': str_to_datetime(channel['_updatedAt']).isoformat(),
             'channel_num_messages': channel.get('msgs', None),
             'channel_name': channel.get('name', ''),
-            'channel_num_users': channel.get('usersCount', 0),
+            'channel_num_users': channel.get('usersCount', None),
             'channel_topic': channel.get('topic', ''),
+            'avatar': ''
         }
-        rich_channel['avatar'] = ''
         if 'lastMessage' in channel and channel['lastMessage']:
             rich_channel['avatar'] = channel['lastMessage']['avatar']
 

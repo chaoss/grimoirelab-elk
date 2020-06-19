@@ -73,7 +73,18 @@
             "type": "image/jpeg"
         },
         "groupable": false,
-        "mentions": [],
+        "mentions": [
+            {
+              "_id": "Xr2s2apQtLdZpKzod",
+              "username": "owlalb",
+              "name": "Albert Owlstein"
+            },
+            {
+              "_id": "Xr2s2apQtLdZpKzod",
+              "username": "owlcap",
+              "name": "Owl Capone"
+            }
+        ],
         "msg": "",
         "parent": "qvW8ii2TkE5cPvZGW",
         "reactions": [],
@@ -976,11 +987,6 @@
             "zh-TW": "\u53e6\u4e00\u500b\u7dda\u7a0b"
         },
         "ts": "2020-01-18T21:36:11.594Z",
-        "u": {
-            "_id": "DkznQ6zmk9Bjn6Xeq",
-            "name": "Boiethios",
-            "username": "boiethios"
-        },
         "urls": []
     },
     "origin": "https://open.rocket.chat/general",

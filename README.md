@@ -68,6 +68,7 @@ Each enriched index includes one or more types of documents, which are summarize
 - **Phabricator**: each document corresponds to a task.
 - **Pipermail**: each document corresponds to a message.
 - **Puppetforge**: each document corresponds to a module.
+- **Rocketchat**: each document corresponds to a message.
 - **Redmine**: each document corresponds to an issue.
 - **Remo activities**: each document corresponds to an activity.
 - **Remo events**: each document corresponds to an event.
