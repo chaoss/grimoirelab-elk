@@ -1,0 +1,13 @@
+---
+title: Add support for RocketChat
+category: added
+author: Obaro Ikoh <obaroikohb@gmail.com>
+issue: 876
+notes: >
+  Added support for collecting and enriching
+  the messages of RocketChat instances. The
+  schema of the enriched data has been included.
+  Tests have been added too.
+  This work is a community contribution, which
+  has been possible thanks to Obaro Ikoh and
+  Animesh Kumar.
