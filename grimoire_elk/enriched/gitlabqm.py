@@ -28,7 +28,9 @@ from perceval.backend import uuid
 from grimoirelab_toolkit.datetime import str_to_datetime
 
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
-DATE_ITEMS = {}
+
+ISSUE_TYPE = 'issue'
+MERGE_TYPE = 'merge_request'
 
 logger = logging.getLogger(__name__)
 
@@ -74,117 +76,179 @@ class GitLabQMEnrich(QMEnrich):
     def extract_project(self, item):
         return item['search_fields']['project']
 
-    def filter_items(self, items):
+    def extract_issue_metric(self, item):
+        issue = item['data']
 
-        for item in items:
-            project = self.extract_project(item)
-            issue = item['data']
+        created_at = self.normalized_date(issue['created_at'])
+        closed_at = self.normalized_date(issue['closed_at'])
 
-            created_at = self.normalized_date(issue['created_at'])
-            closed_at = self.normalized_date(issue['closed_at'])
+        if 'project' in self.date_items.keys():
 
-            if project in self.date_items.keys():
-
-                if created_at in self.date_items[project]['opened'].keys():
-                    self.date_items[project]['opened'][created_at] += 1
-                else:
-                    self.date_items[project]['opened'][created_at] = 1
-
-                if closed_at and closed_at is not None:
-                    if closed_at in self.date_items[project]['closed'].keys():
-                        self.date_items[project]['closed'][closed_at] += 1
-                    else:
-                        self.date_items[project]['closed'][closed_at] = 1
-
+            if created_at in self.date_items['data']['created_issue'].keys():
+                self.date_items['data']['created_issue'][created_at] += 1
             else:
-                opened = {}
-                closed = {}
+                self.date_items['data']['created_issue'][created_at] = 1
 
-                opened[created_at] = 1
-                if closed_at and closed_at is not None:
-                    closed[closed_at] = 1
+            if closed_at and closed_at is not None:
+                if closed_at in self.date_items['data']['closed_issue'].keys():
+                    self.date_items['data']['closed_issue'][closed_at] += 1
+                else:
+                    self.date_items['data']['closed_issue'][closed_at] = 1
 
-                self.date_items[project] = {"opened": opened, "closed": closed}
+        else:
+            project = self.extract_project(item)
 
-        logger.info("filtering done")
+            created = {}
+            closed = {}
 
-    def add_extra_data(self):
+            created[created_at] = 1
+            if closed_at and closed_at is not None:
+                closed[closed_at] = 1
+
+            self.date_items = {
+                "project": project,
+                "data": {
+                    "created_issue": created,
+                    "closed_issue": closed
+                }
+            }
+
+    def extract_merge_metric(self, item):
+        merge = item['data']
+
+        created_at = self.normalized_date(merge['created_at'])
+        closed_at = self.normalized_date(merge['closed_at'])
+        merged_at = self.normalized_date(merge['merged_at'])
+
+        if 'project' in self.date_items.keys():
+
+            if created_at in self.date_items['data']['created_merge'].keys():
+                self.date_items['data']['created_merge'][created_at] += 1
+            else:
+                self.date_items['data']['created_merge'][created_at] = 1
+
+            if closed_at and closed_at is not None:
+                if closed_at in self.date_items['data']['closed_merge'].keys():
+                    self.date_items['data']['closed_merge'][closed_at] += 1
+                else:
+                    self.date_items['data']['closed_merge'][closed_at] = 1
+
+            if merged_at and merged_at is not None:
+                if merged_at in self.date_items['data']['merged_merge'].keys():
+                    self.date_items['data']['merged_merge'][merged_at] += 1
+                else:
+                    self.date_items['data']['merged_merge'][merged_at] = 1
+
+        else:
+            project = self.extract_project(item)
+
+            created = {}
+            closed = {}
+            merged = {}
+
+            created[created_at] = 1
+            if closed_at and closed_at is not None:
+                closed[closed_at] = 1
+            if merged_at and merged_at is not None:
+                merged[merged_at] = 1
+
+            self.date_items = {
+                "project": project,
+                "data": {
+                    "created_merge": created,
+                    "closed_merge": closed,
+                    "merged_merge": merged
+                }
+            }
+
+    def update_metric_items(self, category):
         eitem = {
-            'metric_class': "issues",
-            'metric_type': "LineChart",
-            'metric_es_compute': "sample",
+            "metric_es_compute": 'sample',
+            "metric_type": 'LineChart'
         }
+
+        edict = {}
+
+        if category == 'created_issue':
+            edict = {
+                "metric_class": 'issues',
+                "metric_id": 'issues.numberCreatedIssues',
+                "metric_desc": 'The number of issues created on a current date.',
+                "metric_name": 'Number of Created Issues'
+            }
+        elif category == 'closed_issue':
+            edict = {
+                "metric_class": 'issues',
+                "metric_id": 'issues.numberClosedIssues',
+                "metric_desc": 'The number of issues closed on a current date.',
+                "metric_name": 'Number of Closed Issues'
+            }
+        elif category == 'created_merge':
+            edict = {
+                "metric_class": 'merges',
+                "metric_id": 'merges.numberCreatedMerges',
+                "metric_desc": 'The number of merge requests created on a current date.',
+                "metric_name": 'Number of Created Merge Requests'
+            }
+        elif category == 'closed_merge':
+            edict = {
+                "metric_class": 'merges',
+                "metric_id": 'merges.numberClosedMerges',
+                "metric_desc": 'The number of merge requests closed on a current date.',
+                "metric_name": 'Number of Closed Merge Requests'
+            }
+        elif category == 'merged_merge':
+            edict = {
+                "metric_class": 'merges',
+                "metric_id": 'merges.numberMergedMerges',
+                "metric_desc": 'The number of merge requests merged on a current date.',
+                "metric_name": 'Number of Merged Merge Requests'
+            }
+
+        eitem.update(edict)
 
         return eitem
 
-    def enrich_opened_items(self, project):
-        edates = []
+    def get_rich_item(self, dt, category):
+        edate = {}
 
-        for dt in self.date_items[project]['opened'].keys():
-            edate = {}
+        edate.update(self.update_metric_items(category))
 
-            edate.update(self.add_extra_data())
-            edate['metric_id'] = "issues.numberOpenedIssues"
-            edate['metric_desc'] = "The number of issues opened on a current date."
-            edate['metric_name'] = "Number of Opened Issues"
-            edate['project'] = project
-            edate['datetime'] = dt
-            edate['metric_es_value'] = self.date_items[project]['opened'][dt]
-            edate['metric_es_value_weighted'] = self.date_items[project]['opened'][dt]
-            edate['uuid'] = uuid(edate['metric_id'], edate['project'], edate['datetime'])
-            edate['id'] = 'opened_issue_{}'.format(edate['uuid'])
-            edate.update(self.get_grimoire_fields(dt, "date"))
+        edate['project'] = self.date_items['project']
+        edate['datetime'] = dt
+        edate['metric_es_value'] = self.date_items['data'][category][dt]
+        edate['metric_es_value_weighted'] = self.date_items['data'][category][dt]
+        edate['uuid'] = uuid(edate['metric_id'], edate['project'], edate['datetime'])
+        edate['id'] = '{}_{}'.format(category, edate['uuid'])
 
-            edates.append(edate)
+        edate.update(self.get_grimoire_fields(dt, "date"))
 
-        return edates
-
-    def enrich_closed_items(self, project):
-        edates = []
-
-        for dt in self.date_items[project]['closed'].keys():
-            edate = {}
-
-            edate.update(self.add_extra_data())
-            edate['metric_id'] = "issues.numberClosedIssues"
-            edate['metric_desc'] = "The number of issues closed on a current date."
-            edate['metric_name'] = "Number of Closed Issues"
-            edate['project'] = project
-            edate['datetime'] = dt
-            edate['metric_es_value'] = self.date_items[project]['closed'][dt]
-            edate['metric_es_value_weighted'] = self.date_items[project]['closed'][dt]
-            edate['uuid'] = uuid(edate['metric_id'], edate['project'], edate['datetime'])
-            edate['id'] = 'closed_issue_{}'.format(edate['uuid'])
-            edate.update(self.get_grimoire_fields(dt, "date"))
-
-            edates.append(edate)
-
-        return edates
+        return edate
 
     def enrich_items(self, ocean_backend):
         items_to_enrich = []
         num_items = 0
         ins_items = 0
 
-        self.filter_items(ocean_backend.fetch())
+        for item in ocean_backend.fetch():
 
-        for project in self.date_items.keys():
-            eitems = []
+            if item['category'] == ISSUE_TYPE:
+                self.extract_issue_metric(item)
+            elif item['category'] == MERGE_TYPE:
+                self.extract_merge_metric(item)
 
-            rich_items = self.enrich_opened_items(project)
-            eitems.extend(rich_items)
+        for category in self.date_items['data'].keys():
+            for dt in self.date_items['data'][category].keys():
+                eitem = self.get_rich_item(dt, category)
 
-            rich_items = self.enrich_closed_items(project)
-            eitems.extend(rich_items)
+                items_to_enrich.append(eitem)
 
-            items_to_enrich.extend(eitems)
+                if len(items_to_enrich) < MAX_SIZE_BULK_ENRICHED_ITEMS:
+                    continue
 
-            if len(items_to_enrich) < MAX_SIZE_BULK_ENRICHED_ITEMS:
-                continue
-
-            num_items += len(items_to_enrich)
-            ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
-            items_to_enrich = []
+                num_items += len(items_to_enrich)
+                ins_items += self.elastic.bulk_upload(items_to_enrich, self.get_field_unique_id())
+                items_to_enrich = []
 
         if len(items_to_enrich) > 0:
             num_items += len(items_to_enrich)
