@@ -762,8 +762,10 @@ class GitEnrich(Enrich):
         except RepositoryError:
             logger.warning("No commits retrieved from {}, repo doesn't exist locally".format(repo_origin))
         except Exception as e:
-            logger.error("[git] No commits retrieved from {}, "
-                         "git rev-list command failed: {}".format(repo_origin, e))
+            logger.error("[git] No commits retrieved from {}, git rev-list command failed: {}".format(repo_origin, e))
+
+        if not current_hashes:
+            return current_hashes
 
         current_hashes = set(current_hashes)
         raw_hashes = set([item['data']['commit']
