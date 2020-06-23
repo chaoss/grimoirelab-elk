@@ -253,7 +253,7 @@ class GitHubQLEnrich(Enrich):
         return rich_event
 
     def enrich_duration_analysis(self, ocean_backend, enrich_backend, start_event_type, target_attr,
-                                 fltr_event_types, fltr_attr=None):
+                                 fltr_event_types, fltr_attr=None, page_size=200):
         """The purpose of this study is to calculate the duration between two GitHub events. It requires
         a start event type (e.g., UnlabeledEvent or MovedColumnsInProjectEvent), which is used to
         retrieve for each issue all events of that type. For each issue event obtained, the first
@@ -295,6 +295,7 @@ class GitHubQLEnrich(Enrich):
         :param target_attr: the attribute returned from the events (e.g., label)
         :param fltr_event_types: a list of event types to select the previous events (e.g., LabeledEvent)
         :param fltr_attr: an optional attribute to filter in the events with a given property (e.g., label)
+        :param page_size: number of events without `duration_from_previous_event` per page
         """
         data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
         log_prefix = "[{}] Duration analysis".format(data_source)
@@ -330,13 +331,13 @@ class GitHubQLEnrich(Enrich):
                     }
                 }
             ],
-            "size": 1000
+            "size": page_size
         }
 
         if fltr_attr:
             query_start_event_type['_source'].append(fltr_attr)
 
-        start_event_types = es_in.search(index=in_index, body=query_start_event_type, scroll='2m')
+        start_event_types = es_in.search(index=in_index, body=query_start_event_type, scroll='5m')
 
         sid = start_event_types['_scroll_id']
         scroll_size = len(start_event_types['hits']['hits'])
