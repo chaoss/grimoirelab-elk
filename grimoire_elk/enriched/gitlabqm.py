@@ -43,6 +43,10 @@ class GitLabQMEnrich(QMEnrich):
                          db_user, db_password, db_host)
 
         self.date_items = {}
+        self.comments = {
+            'number_comments': {},
+            'number_attended': {}
+        }
 
         self.studies = []
 
@@ -76,8 +80,32 @@ class GitLabQMEnrich(QMEnrich):
     def extract_project(self, item):
         return item['search_fields']['project']
 
+    def extract_comment_metric(self, item):
+
+        comments = item['notes_data']
+
+        author = item['author']['username']
+
+        if comments and comments is not None:
+            for comment in comments:
+                comment_date = self.normalized_date(comment['created_at'])
+                comment_author = comment['author']['username']
+
+                if comment_date in self.comments['number_comments'].keys():
+                    self.comments['number_comments'][comment_date] += 1
+                else:
+                    self.comments['number_comments'][comment_date] = 1
+
+                if comment_author != author:
+                    if comment_date in self.comments['number_attended'].keys():
+                        self.comments['number_attended'][comment_date].add(item['iid'])
+                    else:
+                        self.comments['number_attended'][comment_date] = {item['iid']}
+
     def extract_issue_metric(self, item):
         issue = item['data']
+
+        self.extract_comment_metric(issue)
 
         created_at = self.normalized_date(issue['created_at'])
         closed_at = self.normalized_date(issue['closed_at'])
@@ -109,12 +137,16 @@ class GitLabQMEnrich(QMEnrich):
                 "project": project,
                 "data": {
                     "created_issue": created,
-                    "closed_issue": closed
+                    "closed_issue": closed,
+                    "issue_comment": {},
+                    "issue_attended": {}
                 }
             }
 
     def extract_merge_metric(self, item):
         merge = item['data']
+
+        self.extract_comment_metric(merge)
 
         created_at = self.normalized_date(merge['created_at'])
         closed_at = self.normalized_date(merge['closed_at'])
@@ -157,7 +189,9 @@ class GitLabQMEnrich(QMEnrich):
                 "data": {
                     "created_merge": created,
                     "closed_merge": closed,
-                    "merged_merge": merged
+                    "merged_merge": merged,
+                    "merge_comment": {},
+                    "merge_attended": {}
                 }
             }
 
@@ -183,6 +217,20 @@ class GitLabQMEnrich(QMEnrich):
                 "metric_desc": 'The number of issues closed on a current date.',
                 "metric_name": 'Number of Closed Issues'
             }
+        elif category == 'issue_comment':
+            edict = {
+                "metric_class": 'issues',
+                "metric_id": 'issues.numberIssueComments',
+                "metric_desc": 'The number of issue comments posted on a current date.',
+                "metric_name": 'Number of Issue Comments'
+            }
+        elif category == 'issue_attended':
+            edict = {
+                "metric_class": 'issues',
+                "metric_id": 'issues.numberIssueAttended',
+                "metric_desc": 'The number of issues attended on a current date.',
+                "metric_name": 'Number of Issues Attended'
+            }
         elif category == 'created_merge':
             edict = {
                 "metric_class": 'merges',
@@ -203,6 +251,20 @@ class GitLabQMEnrich(QMEnrich):
                 "metric_id": 'merges.numberMergedMerges',
                 "metric_desc": 'The number of merge requests merged on a current date.',
                 "metric_name": 'Number of Merged Merge Requests'
+            }
+        elif category == 'merge_comment':
+            edict = {
+                "metric_class": 'merges',
+                "metric_id": 'merges.numberMergeComments',
+                "metric_desc": 'The number of merge comments posted on a current date.',
+                "metric_name": 'Number of Merge Comments'
+            }
+        elif category == 'merge_attended':
+            edict = {
+                "metric_class": 'merges',
+                "metric_id": 'merges.numberMergeAttended',
+                "metric_desc": 'The number of merge requests attended on a current date.',
+                "metric_name": 'Number of Merge Requests Attended'
             }
 
         eitem.update(edict)
@@ -230,12 +292,21 @@ class GitLabQMEnrich(QMEnrich):
         num_items = 0
         ins_items = 0
 
+        item_tag = None
+
         for item in ocean_backend.fetch():
 
             if item['category'] == ISSUE_TYPE:
                 self.extract_issue_metric(item)
+                item_tag = 'issue'
             elif item['category'] == MERGE_TYPE:
                 self.extract_merge_metric(item)
+                item_tag = 'merge'
+
+        self.date_items['data']['{}_comment'.format(item_tag)] = self.comments['number_comments']
+
+        for k, v in self.comments['number_attended'].items():
+            self.date_items['data']['{}_attended'.format(item_tag)][k] = len(v)
 
         for category in self.date_items['data'].keys():
             for dt in self.date_items['data'][category].keys():
