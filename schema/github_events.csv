@@ -54,7 +54,7 @@ issue_url_id,keyword,true,"Consists of the project path and the issue's id."
 issue_url,keyword,true,"Full URL of the issue."
 item_type,keyword,true,"The type of the item (issue/pull request)."
 label,keyword,true,"Label name."
-label_description,keyword,true,"Label description".
+label_description,keyword,true,"Label description."
 label_created_at,date,true,"Date when the label was created."
 label_is_default,boolean,true,"True/False whether the label is a GitHub default one."
 label_updated_at,date,true,"Date when the label was updated."
