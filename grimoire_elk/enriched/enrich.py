@@ -1390,7 +1390,7 @@ class Enrich(ElasticItems):
 
         locations_no_geo_points = es_in.search(index=in_index, body=query_locations_no_geo_points)
         locations = [loc['key'] for loc in locations_no_geo_points['aggregations']['locations'].get('buckets', [])]
-        geolocator = Nominatim()
+        geolocator = Nominatim(user_agent='grimoirelab-elk')
 
         for location in locations:
             # Default lat and lon coordinates point to the Null Island https://en.wikipedia.org/wiki/Null_Island
