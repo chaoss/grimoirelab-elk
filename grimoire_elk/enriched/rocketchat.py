@@ -20,6 +20,7 @@
 #   Obaro Ikoh <obaroikohb@gmail.com>
 #
 
+import emoji
 import logging
 
 from grimoirelab_toolkit.datetime import str_to_datetime
@@ -163,14 +164,19 @@ class RocketChatEnrich(Enrich):
     def __get_reactions(self, reactions):
         """Enrich reactions for the message"""
 
+        emojis = {}
         reaction_types = []
         total_reactions = 0
         for reaction_type in reactions:
             reaction_data = reactions[reaction_type]
             usernames = reaction_data.get('usernames', [])
             names = reaction_data.get('names', [])
+            data = emojis.get(reaction_type, None)
+            if not data:
+                emojis[reaction_type] = emoji.emojize(reaction_type, use_aliases=True)
             reaction_type = {
                 "type": reaction_type,
+                "emoji": emojis[reaction_type],
                 "username": usernames,
                 "names": names,
                 "count": len(usernames)

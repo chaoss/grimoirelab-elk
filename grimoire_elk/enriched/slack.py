@@ -19,6 +19,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import emoji
 import logging
 
 
@@ -128,6 +129,8 @@ class SlackEnrich(Enrich):
         if 'reactions' in message:
             eitem['reaction_count'] = len(message['reactions'])
             eitem['reactions'] = []
+            eitem['emojis'] = []
+            emojis = {}
             for rdata in message['reactions']:
                 # {
                 #         "count": 2,
@@ -138,6 +141,10 @@ class SlackEnrich(Enrich):
                 #         "name": "+1"
                 # }
                 for i in range(0, rdata['count']):
+                    data = emojis.get(rdata["name"], None)
+                    if not data:
+                        emojis[rdata["name"]] = emoji.emojize(':' + rdata["name"] + ':', use_aliases=True)
+                    eitem['emojis'].append(emojis[rdata["name"]])
                     eitem['reactions'].append(rdata["name"])
 
         if 'files' in message:
