@@ -22,6 +22,8 @@
 
 import logging
 
+import hashlib
+
 from dateutil.relativedelta import relativedelta
 
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
@@ -357,7 +359,7 @@ class CocomEnrich(Enrich):
                     for language in total_per_lang:
                         total = total_per_lang[language]
                         if total["loc"] > 0:
-                            hash_repo_url = hash(repository_url_anonymized)
+                            hash_repo_url = hashlib.md5(repository_url_anonymized.encode('utf-8')).hexdigest()
                             to_month_iso = to_month.isoformat()
                             evolution_item = {
                                 "id": "{}_{}_{}_{}".format(to_month_iso, hash_repo_url, interval, language),
