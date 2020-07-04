@@ -37,8 +37,12 @@ REPOSITORY_TYPE = 'repository'
 logger = logging.getLogger(__name__)
 
 
-class ScmsGitHubEnrich(ScmsEnrich):
 
+class ScmsGitHubEnrich(ScmsEnrich):
+    comment_roles = ['user_data']
+    issue_roles = ['user_data']
+    pr_roles = ['user_data']
+    roles = ['user_data']
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
@@ -144,6 +148,9 @@ class ScmsGitHubEnrich(ScmsEnrich):
             ecomment['body'] = comment['body'][:self.KEYWORD_MAX_LENGTH]
             ecomment.update(self.get_grimoire_fields(comment['updated_at'], ISSUE_COMMENT_TYPE))
             ecomment['data_source'] = 'Github'
+            if self.sortinghat:
+                ecomment.update(self.get_item_sh(comment, self.comment_roles, 'updated_at'))
+
             ecomments.append(ecomment)
 
         return ecomments
@@ -173,6 +180,9 @@ class ScmsGitHubEnrich(ScmsEnrich):
             ecomment['body'] = comment['body'][:self.KEYWORD_MAX_LENGTH]
             ecomment.update(self.get_grimoire_fields(comment['updated_at'], REVIEW_COMMENT_TYPE))
             ecomment['data_source'] = 'Github'
+            if self.sortinghat:
+                ecomment.update(self.get_item_sh(comment, self.comment_roles, 'updated_at'))
+
             ecomments.append(ecomment)
 
         return ecomments
@@ -224,6 +234,10 @@ class ScmsGitHubEnrich(ScmsEnrich):
         rich_pr['item_type'] = PULL_TYPE
         rich_pr.update(self.get_grimoire_fields(pull_request['created_at'], PULL_TYPE))
 
+        if self.sortinghat:
+            item[self.get_field_date()] = rich_pr[self.get_field_date()]
+            rich_pr.update(self.get_item_sh(item, self.pr_roles))
+
         return rich_pr
 
     def __get_rich_issue(self, item):
@@ -236,5 +250,9 @@ class ScmsGitHubEnrich(ScmsEnrich):
         rich_issue['issue_title'] = issue['title']
         rich_issue['item_type'] = ISSUE_TYPE
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], ISSUE_TYPE))
+
+        if self.sortinghat:
+            item[self.get_field_date()] = rich_issue[self.get_field_date()]
+            rich_issue.update(self.get_item_sh(item, self.issue_roles))
 
         return rich_issue

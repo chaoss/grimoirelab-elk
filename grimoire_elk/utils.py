@@ -121,6 +121,7 @@ from .enriched.rss import RSSEnrich
 from .enriched.slack import SlackEnrich
 from .enriched.stackexchange import StackExchangeEnrich
 from .enriched.supybot import SupybotEnrich
+from .enriched.scmssupybot import ScmsSupybotEnrich
 from .enriched.telegram import TelegramEnrich
 from .enriched.twitter import TwitterEnrich
 # Connectors for Ocean
@@ -268,6 +269,7 @@ def get_connectors():
             "stackexchange": [StackExchange, StackExchangeOcean,
                               StackExchangeEnrich, StackExchangeCommand],
             "supybot": [Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
+            "scmssupybot":[Supybot, SupybotOcean, ScmsSupybotEnrich, SupybotCommand],
             "telegram": [Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
             "twitter": [Twitter, TwitterOcean, TwitterEnrich, TwitterCommand]
             }  # Will come from Registry
