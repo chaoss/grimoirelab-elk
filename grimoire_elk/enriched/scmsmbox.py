@@ -164,6 +164,8 @@ class ScmsMboxEnrich(ScmsEnrich):
 
         eitem.update(self.get_grimoire_fields(message['Date'], "message"))
         eitem['data_source'] = 'Mbox'
+        if self.sortinghat:
+            eitem.update(self.get_item_sh(item))
 
         return eitem
 
