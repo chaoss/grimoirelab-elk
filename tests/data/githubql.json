@@ -607,7 +607,10 @@
                 "number": 3,
                 "type": "PullRequest",
                 "updatedAt": "2020-04-12T07:51:05Z",
-                "url": "https://github.com/valeriocos/test-issues-update/pull/3"
+                "url": "https://github.com/valeriocos/test-issues-update/pull/3",
+                "author": {
+                    "login": "valeriocos"
+                }
             },
             "createdAt": "2020-04-12T07:51:05Z",
             "eventType": "ClosedEvent",

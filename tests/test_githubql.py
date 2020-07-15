@@ -216,6 +216,11 @@ class TestGitHubQL(TestBaseBackend):
         self.assertEqual(eitem['reporter_name'], 'Unknown')
         self.assertEqual(eitem['reporter_user_name'], 'valeriocos')
         self.assertIsNone(eitem['reporter_domain'])
+        self.assertEqual(eitem['submitter_uuid'], 'ee5d85148ccdeab3efc341cb12fc70ae6b3236ae')
+        self.assertEqual(eitem['submitter_name'], 'Unknown')
+        self.assertEqual(eitem['submitter_user_name'], 'valeriocos')
+        self.assertIsNone(eitem['submitter_domain'])
+        self.assertEqual(eitem['closer_pull_submitter'], 'valeriocos')
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
@@ -255,6 +260,13 @@ class TestGitHubQL(TestBaseBackend):
                 self.assertIn('reporter_org_name', source)
                 self.assertIn('reporter_bot', source)
                 self.assertIn('reporter_multi_org_names', source)
+            if 'submitter_uuid' in source:
+                self.assertIn('submitter_domain', source)
+                self.assertIn('submitter_gender', source)
+                self.assertIn('submitter_gender_acc', source)
+                self.assertIn('submitter_org_name', source)
+                self.assertIn('submitter_bot', source)
+                self.assertIn('submitter_multi_org_names', source)
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
