@@ -70,7 +70,7 @@ class GitHubQLEnrich(Enrich):
 
     mapping = Mapping
 
-    event_roles = ['actor', 'reporter']
+    event_roles = ['actor', 'reporter', 'submitter']
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
@@ -106,6 +106,13 @@ class GitHubQLEnrich(Enrich):
             if identity:
                 yield identity
 
+        closer = event.get('closer', None)
+        if closer and closer['type'] == 'PullRequest':
+            pull_submitter = closer.get('author', None)
+            identity = self.get_sh_identity(pull_submitter)
+            if identity:
+                yield identity
+
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
 
@@ -115,6 +122,10 @@ class GitHubQLEnrich(Enrich):
                 user = item['data'][identity_field]
             elif identity_field == 'reporter':
                 user = item['data']['issue']['user']
+            elif identity_field == 'submitter':
+                closer = item['data'].get('closer', None)
+                if closer:
+                    user = closer['author']
 
         if not user:
             return identity
@@ -190,6 +201,12 @@ class GitHubQLEnrich(Enrich):
         elif rich_event['event_type'] in CLOSED_EVENTS:
             closer = event['closer']
             rich_event['label'] = rich_event['issue_labels']
+            # In GitHub every pull request is an issue. When retrieving closed events for
+            # issues using the GraphQL API, the closed events related to pull requests are
+            # collected too. Since the attribute closer is not defined for pull requests,
+            # the condition below makes sure to prevent NPE errors.
+            # The test data at tests/data/githubql.json contains two examples with the
+            # attribute closer being null and not null.
             if closer and closer['type'] == 'PullRequest':
                 rich_event['closer_event_url'] = event['url']
                 rich_event['closer_type'] = closer['type']
@@ -201,6 +218,11 @@ class GitHubQLEnrich(Enrich):
                 rich_event['closer_closed_at'] = closer['closedAt']
                 rich_event['closer_closed'] = closer['closed']
                 rich_event['closer_merged'] = closer.get('merged', None)
+                submitter = closer['author']
+                rich_event['closer_pull_submitter'] = submitter.get('login', None) if submitter else None
+                # move the pull request submitter to level of actor. This is needed to
+                # allow `get_item_sh` adding SortingHat identities
+                item['data']['submitter'] = submitter
         elif rich_event['event_type'] in REFERENCE_EVENTS:
             source = event['source']
             rich_event['reference_cross_repo'] = event['isCrossRepository']
