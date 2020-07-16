@@ -22,13 +22,14 @@
 
 import logging
 
-from .enrich import Enrich, metadata
+from grimoire_elk.enriched.enrich import metadata
+from .scmsenrich import ScmsEnrich
 from grimoirelab_toolkit.datetime import str_to_datetime
 
 logger = logging.getLogger(__name__)
 
 
-class ScmsSupybotEnrich(Enrich):
+class ScmsSupybotEnrich(ScmsEnrich):
 
     def get_field_author(self):
         return "nick"
@@ -65,6 +66,19 @@ class ScmsSupybotEnrich(Enrich):
         # The real data
         message = item['data']
 
+        # Fields which names are translated
+        map_fields = {
+            "uuid": "id"
+        }
+        for fn in map_fields:
+            if fn in message:
+                eitem[map_fields[fn]] = message[fn]
+            else:
+                eitem[map_fields[fn]] = None
+
+        if 'uuid' in item:
+            eitem['id'] = item['uuid']
+
         # data fields to copy
         copy_fields = ["body"]
         for f in copy_fields:
@@ -73,9 +87,14 @@ class ScmsSupybotEnrich(Enrich):
             else:
                 eitem[f] = None
 
-        eitem["data_source"]="IRC"
+        eitem["data_source"] = "IRC"
+        eitem["context"] = eitem['origin'].split('/')[-1] + " discussions"
         eitem.update(self.get_grimoire_fields(str_to_datetime(item["metadata__updated_on"]).isoformat(), "message"))
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
+
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
 
+        self.add_repository_labels(eitem)
         return eitem

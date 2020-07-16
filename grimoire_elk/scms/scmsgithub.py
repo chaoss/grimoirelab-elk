@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2020 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 import logging
 
-from .enrich import metadata
+from grimoire_elk.enriched.enrich import metadata
 from .scmsenrich import ScmsEnrich
 
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
@@ -37,19 +37,11 @@ REPOSITORY_TYPE = 'repository'
 logger = logging.getLogger(__name__)
 
 
-
 class ScmsGitHubEnrich(ScmsEnrich):
     comment_roles = ['user_data']
     issue_roles = ['user_data']
     pr_roles = ['user_data']
     roles = ['user_data']
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
-                 db_user='', db_password='', db_host=''):
-        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
-                         db_user, db_password, db_host)
-
-        self.studies = []
-        self.studies.append(self.enrich_extra_data)
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -106,6 +98,10 @@ class ScmsGitHubEnrich(ScmsEnrich):
 
         return identity
 
+    def get_project_repository(self, eitem):
+        repo = eitem['origin']
+        return repo
+
     def get_field_unique_id(self):
         return "id"
 
@@ -120,7 +116,7 @@ class ScmsGitHubEnrich(ScmsEnrich):
         else:
             logger.error("[github] rich item not defined for GitHub category {}".format(
                          item['category']))
-
+        self.add_repository_labels(rich_item)
         return rich_item
 
     def enrich_issue(self, item, eitem):
@@ -151,8 +147,11 @@ class ScmsGitHubEnrich(ScmsEnrich):
             if self.sortinghat:
                 ecomment.update(self.get_item_sh(comment, self.comment_roles, 'updated_at'))
 
-            ecomments.append(ecomment)
+            if 'project' in eitem:
+                ecomment['project'] = eitem['project']
 
+            self.add_repository_labels(ecomment)
+            ecomments.append(ecomment)
         return ecomments
 
     def enrich_pulls(self, item, eitem):
@@ -183,6 +182,10 @@ class ScmsGitHubEnrich(ScmsEnrich):
             if self.sortinghat:
                 ecomment.update(self.get_item_sh(comment, self.comment_roles, 'updated_at'))
 
+            if 'project' in eitem:
+                ecomment['project'] = eitem['project']
+
+            self.add_repository_labels(ecomment)
             ecomments.append(ecomment)
 
         return ecomments
@@ -232,6 +235,9 @@ class ScmsGitHubEnrich(ScmsEnrich):
         rich_pr['id'] = pull_request['id']
         rich_pr['pr_title'] = pull_request['title']
         rich_pr['item_type'] = PULL_TYPE
+        if 'project' in item:
+            rich_pr['project'] = item['project']
+
         rich_pr.update(self.get_grimoire_fields(pull_request['created_at'], PULL_TYPE))
 
         if self.sortinghat:
@@ -249,6 +255,10 @@ class ScmsGitHubEnrich(ScmsEnrich):
         rich_issue['id'] = issue['id']
         rich_issue['issue_title'] = issue['title']
         rich_issue['item_type'] = ISSUE_TYPE
+
+        if 'project' in item:
+            rich_issue['project'] = item['project']
+
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], ISSUE_TYPE))
 
         if self.sortinghat:
