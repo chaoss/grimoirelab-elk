@@ -18,18 +18,18 @@
 # Authors:
 #     Ria Gupta <ria18405@iiitd.ac.in>
 #
-
 import logging
 import unittest
 
 from base import TestBaseBackend
+from grimoire_elk.raw.supybot import SupybotOcean
 from grimoire_elk.enriched.utils import REPO_LABELS
 
 
-class TestScmsPipermail(TestBaseBackend):
-    """Test ScmsPipermail backend"""
+class TestScmsSupybot(TestBaseBackend):
+    """Test ScmsSupybot backend"""
 
-    connector = "scmspipermail"
+    connector = "scmssupybot"
     ocean_index = "test_" + connector
     enrich_index = "test_" + connector + "_enrich"
 
@@ -43,25 +43,15 @@ class TestScmsPipermail(TestBaseBackend):
         """Test whether JSON items are properly inserted into ES"""
 
         result = self._test_items_to_raw()
-        self.assertEqual(result['items'], 14)
-        self.assertEqual(result['raw'], 14)
+        self.assertEqual(result['items'], 16)
+        self.assertEqual(result['raw'], 16)
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
-        self.assertEqual(result['raw'], 6)
-        self.assertEqual(result['enrich'], 6)
-
-        enrich_backend = self.connectors[self.connector][2]()
-
-        item = self.items[0]
-        eitem = enrich_backend.get_rich_item(item)
-        self.assertEqual(eitem['data_source'],'Mbox')
-
-        item = self.items[1]
-        eitem = enrich_backend.get_rich_item(item)
-        self.assertEqual(eitem['data_source'], 'Mbox')
+        self.assertEqual(result['raw'], 16)
+        self.assertEqual(result['enrich'], 16)
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
@@ -77,8 +67,8 @@ class TestScmsPipermail(TestBaseBackend):
         """Test enrich with SortingHat"""
 
         result = self._test_raw_to_enrich(sortinghat=True)
-        self.assertEqual(result['raw'], 6)
-        self.assertEqual(result['enrich'], 6)
+        self.assertEqual(result['raw'], 16)
+        self.assertEqual(result['enrich'], 16)
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -93,15 +83,13 @@ class TestScmsPipermail(TestBaseBackend):
                 self.assertIn('author_org_name', source)
                 self.assertIn('author_bot', source)
                 self.assertIn('author_multi_org_names', source)
-            if 'data_source' in source:
-                self.assertEqual(source['data_source'], "Mbox")
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
-        self.assertEqual(result['raw'], 6)
-        self.assertEqual(result['enrich'], 6)
+        self.assertEqual(result['raw'], 16)
+        self.assertEqual(result['enrich'], 16)
 
     def test_refresh_identities(self):
         """Test refresh identities"""
@@ -114,6 +102,16 @@ class TestScmsPipermail(TestBaseBackend):
 
         result = self._test_refresh_project()
         # ... ?
+
+    def test_perceval_params(self):
+        """Test the extraction of perceval params from an URL"""
+
+        url = "openshift /home/bitergia/.perceval/irc/percevalbot/logs/ChannelLogger/freenode/#openshift/"
+        expected_params = [
+            'openshift',
+            '/home/bitergia/.perceval/irc/percevalbot/logs/ChannelLogger/freenode/#openshift/'
+        ]
+        self.assertListEqual(SupybotOcean.get_perceval_params_from_url(url), expected_params)
 
     def test_copy_raw_fields(self):
         """Test copied raw fields"""

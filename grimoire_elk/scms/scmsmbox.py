@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2020 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,21 +23,13 @@ import logging
 
 from requests.structures import CaseInsensitiveDict
 import email.utils
-from .enrich import metadata
+from grimoire_elk.enriched.enrich import metadata
 from .scmsenrich import ScmsEnrich
 
 logger = logging.getLogger(__name__)
 
 
 class ScmsMboxEnrich(ScmsEnrich):
-
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
-                 db_user='', db_password='', db_host=''):
-        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
-                         db_user, db_password, db_host)
-
-        self.studies = []
-        self.studies.append(self.enrich_extra_data)
 
     def get_field_author(self):
         return "From"
@@ -113,6 +105,11 @@ class ScmsMboxEnrich(ScmsEnrich):
         eitem['data_source'] = 'Mbox'
         if self.sortinghat:
             eitem.update(self.get_item_sh(item))
+
+        if self.prjs_map:
+            eitem.update(self.get_item_project(eitem))
+
+        self.add_repository_labels(eitem)
 
         return eitem
 

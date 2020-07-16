@@ -91,7 +91,6 @@ from .enriched.functest import FunctestEnrich
 from .enriched.gerrit import GerritEnrich
 from .enriched.git import GitEnrich
 from .enriched.github import GitHubEnrich
-from .enriched.scmsgithub import ScmsGitHubEnrich
 from .enriched.githubql import GitHubQLEnrich
 from .enriched.github2 import GitHubEnrich2
 from .enriched.gitlab import GitLabEnrich
@@ -105,7 +104,6 @@ from .enriched.kitsune import KitsuneEnrich
 from .enriched.launchpad import LaunchpadEnrich
 from .enriched.mattermost import MattermostEnrich
 from .enriched.mbox import MBoxEnrich
-from .enriched.scmsmbox import ScmsMboxEnrich
 from .enriched.mediawiki import MediaWikiEnrich
 from .enriched.meetup import MeetupEnrich
 from .enriched.mozillaclub import MozillaClubEnrich
@@ -113,7 +111,6 @@ from .enriched.nntp import NNTPEnrich
 from .enriched.pagure import PagureEnrich
 from .enriched.phabricator import PhabricatorEnrich
 from .enriched.pipermail import PipermailEnrich
-from .enriched.scmspipermail import ScmsPipermailEnrich
 from .enriched.puppetforge import PuppetForgeEnrich
 from .enriched.redmine import RedmineEnrich
 from .enriched.remo import ReMoEnrich
@@ -121,9 +118,12 @@ from .enriched.rss import RSSEnrich
 from .enriched.slack import SlackEnrich
 from .enriched.stackexchange import StackExchangeEnrich
 from .enriched.supybot import SupybotEnrich
-from .enriched.scmssupybot import ScmsSupybotEnrich
 from .enriched.telegram import TelegramEnrich
 from .enriched.twitter import TwitterEnrich
+from grimoire_elk.scms.scmsgithub import ScmsGitHubEnrich
+from grimoire_elk.scms.scmsmbox import ScmsMboxEnrich
+from grimoire_elk.scms.scmspipermail import ScmsPipermailEnrich
+from grimoire_elk.scms.scmssupybot import ScmsSupybotEnrich
 # Connectors for Ocean
 from .raw.askbot import AskbotOcean
 from .raw.bugzilla import BugzillaOcean
@@ -269,7 +269,7 @@ def get_connectors():
             "stackexchange": [StackExchange, StackExchangeOcean,
                               StackExchangeEnrich, StackExchangeCommand],
             "supybot": [Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
-            "scmssupybot":[Supybot, SupybotOcean, ScmsSupybotEnrich, SupybotCommand],
+            "scmssupybot": [Supybot, SupybotOcean, ScmsSupybotEnrich, SupybotCommand],
             "telegram": [Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
             "twitter": [Twitter, TwitterOcean, TwitterEnrich, TwitterCommand]
             }  # Will come from Registry
