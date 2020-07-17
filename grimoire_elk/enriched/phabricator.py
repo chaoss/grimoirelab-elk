@@ -21,8 +21,7 @@
 
 import logging
 
-from grimoirelab_toolkit.datetime import (datetime_utcnow,
-                                          unixtime_to_datetime)
+from grimoirelab_toolkit.datetime import (unixtime_to_datetime)
 
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
@@ -31,7 +30,9 @@ from .utils import get_time_diff_days
 
 
 TASK_OPEN_STATUS = 'Open'
-TASK_CLOSED_STATUS = 'Resolved'
+CLOSED_STATUSES = ['resolved', 'wontfix', 'invalid', 'duplicate', 'spite']
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -304,16 +305,7 @@ class PhabricatorEnrich(Enrich):
         # Time to attend (time to assign-> time to first activity from assignee)
         eitem['time_to_attend_days'] = None
         # Time to close (time open -> time last updated for closed tasks)
-        # We can improve it later using events: time open event -> time resolved event
-        eitem['time_to_close_days'] = None
-        if eitem['status'] not in [TASK_OPEN_STATUS, 'Spite', 'Stalled']:
-            eitem['time_to_close_days'] = \
-                get_time_diff_days(eitem['creation_date'], eitem['update_date'])
-        # Time open (time to open -> now): with painless
-        # Time open using the enrich date. Field needed for filtering.
-        eitem['time_open_days_enrich'] = get_time_diff_days(eitem['creation_date'],
-                                                            datetime_utcnow().replace(tzinfo=None))
-        # Time from last update (time last update -> now): with painless
+        eitem['closed_at'] = None
 
         eitem['changes'] = len(phab_item['transactions'])
         # Number of assignments changes
@@ -337,6 +329,13 @@ class PhabricatorEnrich(Enrich):
                         and change['authorData']['userName'] not in changes_assignee_list:
                     changes_assignee_list.append(change['authorData']['userName'])
                 eitem['changes_assignment'] += 1
+            elif change["transactionType"] in ["mergedinto"]:
+                eitem['closed_at'] = change_date
+                eitem['time_to_close_days'] = get_time_diff_days(eitem['creation_date'], eitem['closed_at'])
+            elif change["transactionType"] in ["status"]:
+                if change['newValue'] in CLOSED_STATUSES:
+                    eitem['closed_at'] = change_date
+                    eitem['time_to_close_days'] = get_time_diff_days(eitem['creation_date'], eitem['closed_at'])
             if not eitem['time_to_attend_days'] and first_assignee_phid:
                 if 'authorData' in change and change['authorData'] and change['authorData']['phid'] == first_assignee_phid:
                     eitem['time_to_attend_days'] = get_time_diff_days(first_assignee_date, change_date)
@@ -362,8 +361,6 @@ class PhabricatorEnrich(Enrich):
 
         eitem.update(self.get_grimoire_fields(eitem['creation_date'], "task"))
 
-        # Support old fields used in maniphest panel T2305
-        eitem['timeopen_days'] = eitem['time_open_days_enrich']
         assigned_to = {}
         for f in eitem.keys():
             if 'ownerData' in f:
