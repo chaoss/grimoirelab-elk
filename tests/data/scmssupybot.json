@@ -8,7 +8,6 @@
         "timestamp": "2012-10-17T09:16:21+0000",
         "type": "comment"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -25,7 +24,6 @@
         "timestamp": "2012-10-17T09:16:29+0000",
         "type": "comment"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -42,7 +40,6 @@
         "timestamp": "2012-10-17T09:16:35+0000",
         "type": "comment"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -59,7 +56,6 @@
         "timestamp": "2012-10-17T09:16:50+0000",
         "type": "server"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -76,7 +72,6 @@
         "timestamp": "2012-10-17T09:16:51+0000",
         "type": "server"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -93,7 +88,6 @@
         "timestamp": "2012-10-17T09:17:27+0000",
         "type": "comment"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -110,7 +104,6 @@
         "timestamp": "2012-10-17T09:17:40+0000",
         "type": "comment"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -127,7 +120,6 @@
         "timestamp": "2012-10-17T09:18:48+0000",
         "type": "comment"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -144,7 +136,6 @@
         "timestamp": "2012-10-18T09:30:30+0000",
         "type": "comment"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -161,7 +152,6 @@
         "timestamp": "2012-10-18T09:30:30+0000",
         "type": "server"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -178,7 +168,6 @@
         "timestamp": "2012-10-18T09:30:58+0000",
         "type": "server"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -195,7 +184,6 @@
         "timestamp": "2012-10-18T09:33:05+0000",
         "type": "comment"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -212,7 +200,6 @@
         "timestamp": "2012-10-18T18:13:31+0000",
         "type": "server"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -229,7 +216,6 @@
         "timestamp": "2012-10-18T18:14:01+0000",
         "type": "server"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -246,7 +232,6 @@
         "timestamp": "2012-10-18T19:35:30+0000",
         "type": "comment"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -263,7 +248,6 @@
         "timestamp": "2012-10-18T19:35:30+0000",
         "type": "comment"
     },
-    "data_source": "IRC",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",

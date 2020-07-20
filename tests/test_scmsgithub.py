@@ -19,14 +19,10 @@
 #     Ria Gupta <ria18405@iiitd.ac.in>
 #
 import logging
-import time
-import unittest
 import unittest.mock
-from unittest.mock import MagicMock
 
 from base import TestBaseBackend
-from grimoire_elk.enriched.enrich import logger
-from grimoire_elk.enriched.utils import REPO_LABELS, anonymize_url
+from grimoire_elk.enriched.utils import REPO_LABELS
 from grimoire_elk.raw.github import GitHubOcean
 
 
@@ -48,30 +44,28 @@ class TestScmsGitHub(TestBaseBackend):
 
         result = self._test_items_to_raw()
 
-        self.assertEqual(result['items'], 7)
-        self.assertEqual(result['raw'], 7)
+        self.assertEqual(result['items'], 5)
+        self.assertEqual(result['raw'], 5)
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
 
-        self.assertEqual(result['raw'], 6)
-        self.assertEqual(result['enrich'], 7)
+        self.assertEqual(result['raw'], 4)
+        self.assertEqual(result['enrich'], 5)
 
         enrich_backend = self.connectors[self.connector][2]()
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(item['category'], 'issue')
-        self.assertEqual(eitem['data_source'],'Github')
+        self.assertEqual(eitem['data_source'], 'Github')
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(item['category'], 'pull_request')
         self.assertEqual(eitem['data_source'], 'Github')
-        self.assertEqual(eitem['time_to_merge_request_response'], 335.81)
-
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
@@ -80,9 +74,7 @@ class TestScmsGitHub(TestBaseBackend):
         self.assertIsNone(eitem['user_domain'])
         self.assertIsNone(eitem['user_org'])
         self.assertEqual(eitem['author_name'], 'acs')
-        self.assertIsNone(eitem['assignee_name'])
-        self.assertIsNone(eitem['assignee_domain'])
-        self.assertIsNone(eitem['assignee_org'])
+        self.assertEqual(eitem['data_source'], 'Github')
 
         item = self.items[3]
         eitem = enrich_backend.get_rich_item(item)
@@ -91,9 +83,7 @@ class TestScmsGitHub(TestBaseBackend):
         self.assertIsNone(eitem['user_domain'])
         self.assertIsNone(eitem['user_org'])
         self.assertEqual(eitem['author_name'], 'acs')
-        self.assertIsNone(eitem['merge_author_name'])
-        self.assertIsNone(eitem['merge_author_domain'])
-        self.assertIsNone(eitem['merge_author_org'])
+        self.assertEqual(eitem['context'], "PR to integrate Perceval and Arthur")
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
@@ -128,7 +118,6 @@ class TestScmsGitHub(TestBaseBackend):
                 self.assertIn('author_multi_org_names', source)
             if 'data_source' in source:
                 self.assertEqual(source['data_source'], "Github")
-
 
     def test_perceval_params(self):
         """Test the extraction of perceval params from an URL"""

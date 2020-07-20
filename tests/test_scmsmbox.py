@@ -21,7 +21,6 @@
 
 import logging
 import unittest
-import time
 
 from base import TestBaseBackend
 
