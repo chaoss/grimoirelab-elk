@@ -2,7 +2,6 @@
     "backend_name": "MBox",
     "backend_version": "0.8.1",
     "category": "message",
-    "context": "[List-name] Protocol Buffers anyone?",
     "data": {
         "Date": "Wed, 01 Dec 2010 14:26:40 +0100",
         "From": "goran at domain.com ( G\u00f6ran Lastname )",
@@ -13,7 +12,6 @@
         },
         "unixfrom": "goran at domain.com  Wed Dec  1 08:26:40 2010"
     },
-    "data_source": "Mbox",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -24,7 +22,6 @@
     "backend_name": "MBox",
     "backend_version": "0.8.1",
     "category": "message",
-    "context": "[List-name] Protocol Buffers anyone?",
     "data": {
         "Date": "Wed, 01 Dec 2010 14:26:40 +0100",
         "From": "goran at domain.com ( G\u00f6ran Lastname )",
@@ -35,7 +32,6 @@
         },
         "unixfrom": "goran at domain.com  Wed Dec  1 08:26:40 2010"
     },
-    "data_source": "Mbox",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -46,7 +42,6 @@
     "backend_name": "MBox",
     "backend_version": "0.8.1",
     "category": "message",
-    "context": "Re: Revisiting the Gnome Bindings",
     "data": {
         "Cc": null,
         "Content-Transfer-Encoding": "7bit",
@@ -85,7 +80,6 @@
         },
         "unixfrom": "eloli@hotmail.com  Wed Sep 22 05:05:28 2004"
     },
-    "data_source": "Mbox",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -96,7 +90,6 @@
     "backend_name": "MBox",
     "backend_version": "0.8.1",
     "category": "message",
-    "context": "Re: Low memory hacks",
     "data": {
         "Cc": "desktop-devel-list@gnome.org, \"Nikolay V. Shmyrev\" <nshmyrev@yandex.ru>,\n\tBrian Nitz <Brian.Nitz@sun.com>, Bastien Nocera <hadess@hadess.net>",
         "Content-Transfer-Encoding": "quoted-printable",
@@ -136,7 +129,6 @@
         },
         "unixfrom": "danilo@adsl-236-193.eunet.yu  Mon Mar 17 09:35:25 2008"
     },
-    "data_source": "Mbox",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -147,7 +139,6 @@
     "backend_name": "MBox",
     "backend_version": "0.8.1",
     "category": "message",
-    "context": "[esl-dev] Committer vote for Chuwei Huang has concluded successfully",
     "data": {
         "Content-Type": "multipart/alternative;\n\tboundary=\"----=_NextPart_000_0199_01CA6348.55FBC940\"",
         "Content-language": "en-us",
@@ -179,7 +170,6 @@
         },
         "unixfrom": "yves.yang@example.org  Wed Nov 11 21:29:20 2009"
     },
-    "data_source": "Mbox",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -190,7 +180,6 @@
     "backend_name": "MBox",
     "backend_version": "0.8.1",
     "category": "message",
-    "context": "[platform-dev] Removing standard menus and toolbar icons",
     "data": {
         "Content-Type": "multipart/alternative;\n    boundary=\"----_=_NextPart_001_01C2C7EA.7C35AD84\"",
         "Date": "Wed, 29 Jan 2003 17:02:30 -0600",
@@ -220,7 +209,6 @@
         },
         "unixfrom": "Daniel.Nehren@example.com  Wed Jan 29 17:30:32 2003"
     },
-    "data_source": "Mbox",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -231,7 +219,6 @@
     "backend_name": "MBox",
     "backend_version": "0.8.1",
     "category": "message",
-    "context": "[List-name] Protocol Buffers anyone?",
     "data": {
         "Date": "Wed, 01 Dec 2010 14:26:40 +0100",
         "From": "goran at domain.com ( G\u00f6ran Lastname )",
@@ -242,7 +229,6 @@
         },
         "unixfrom": "goran at domain.com  Wed Dec  1 08:26:40 2010"
     },
-    "data_source": "Mbox",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -253,7 +239,6 @@
     "backend_name": "MBox",
     "backend_version": "0.8.1",
     "category": "message",
-    "context": "[Analytics] DNT, standards, and expectations",
     "data": {
         "Date": "Thu, 15 Jan 2015 14:22:25 +0100",
         "From": "christian at example.org (Christian Aistleitner)",
@@ -266,7 +251,6 @@
         },
         "unixfrom": "christian at \u201cexample.org\u201d  Thu Jan 15 13:22:25 2015"
     },
-    "data_source": "Mbox",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -277,7 +261,6 @@
     "backend_name": "MBox",
     "backend_version": "0.8.1",
     "category": "message",
-    "context": "[platform-swt-dev] How to refresh a control in another thread?",
     "data": {
         "Content-Type": "text/plain",
         "Date": "Sat, 24 Aug 2002 01:24:49 +0800",
@@ -305,7 +288,6 @@
         },
         "unixfrom": "yuancong@example.com  Fri Aug 23 13:11:33 2002"
     },
-    "data_source": "Mbox",
     "origin": "http://example.com/",
     "perceval_version": "0.9.10",
     "tag": "http://example.com/",
@@ -317,7 +299,6 @@
     "backend_version": "0.13.0",
     "category": "message",
     "classified_fields_filtered": null,
-    "context": "Re: [VOTE] KIP-221: Enhance KStream with Connecting Topic Creation\n and Repartition Hint",
     "data": {
         "Authentication-Results": "spamd1-us-west.apache.org (amavisd-new);\n\tdkim=pass (2048-bit key) header.d=gmail.com",
         "Content-Transfer-Encoding": "quoted-printable",
@@ -358,7 +339,6 @@
         },
         "unixfrom": "dev-return-106211-apmail-kafka-dev-archive=kafka.apache.org@kafka.apache.org  Thu Aug  1 06:56:03 2019"
     },
-    "data_source": "Mbox",
     "origin": "nitish_box",
     "perceval_version": "0.14.0",
     "search_fields": {
@@ -373,7 +353,6 @@
     "backend_version": "0.13.0",
     "category": "message",
     "classified_fields_filtered": null,
-    "context": "Re: [DISCUSS] KIP-470: TopologyTestDriver test input and output\n usability improvements",
     "data": {
         "Authentication-Results": "spamd3-us-west.apache.org (amavisd-new);\n\tdkim=pass (2048-bit key) header.d=gmail.com",
         "Content-Type": "multipart/alternative; boundary=\"0000000000006bd02c058f0f3fe1\"",
@@ -412,7 +391,6 @@
         },
         "unixfrom": "dev-return-106217-apmail-kafka-dev-archive=kafka.apache.org@kafka.apache.org  Thu Aug  1 14:42:35 2019"
     },
-    "data_source": "Mbox",
     "origin": "nitish_box",
     "perceval_version": "0.14.0",
     "search_fields": {
@@ -427,7 +405,6 @@
     "backend_version": "0.13.0",
     "category": "message",
     "classified_fields_filtered": null,
-    "context": "Re: [VOTE] KIP-455: Create an Administrative API for Replica Reassignment",
     "data": {
         "Authentication-Results": "spamd4-us-west.apache.org (amavisd-new);\n\tdkim=pass (2048-bit key) header.d=confluent.io",
         "Content-Type": "multipart/alternative; boundary=\"000000000000e818fc058f12d74d\"",
@@ -466,7 +443,6 @@
         },
         "unixfrom": "dev-return-106224-apmail-kafka-dev-archive=kafka.apache.org@kafka.apache.org  Thu Aug  1 18:59:56 2019"
     },
-    "data_source": "Mbox",
     "origin": "nitish_box",
     "perceval_version": "0.14.0",
     "search_fields": {
@@ -481,7 +457,6 @@
     "backend_version": "0.13.0",
     "category": "message",
     "classified_fields_filtered": null,
-    "context": "Re: [VOTE] KIP-2232131Enhance",
     "data": {
         "Authentication-Results": "spamd1-us-west.apache.org (amavisd-new);\n\tdkim=pass (2048-bit key) header.d=gmail.com",
         "Content-Transfer-Encoding": "quoted-printable",
@@ -522,7 +497,6 @@
         },
         "unixfrom": "dev-return-106211-apmail-kafka-dev-archive=kafka.apache.org@kafka.apache.org  Thu Aug  1 06:56:03 2019"
     },
-    "data_source": "Mbox",
     "origin": "nitish_box",
     "perceval_version": "0.14.0",
     "search_fields": {
@@ -537,7 +511,6 @@
     "backend_version": "0.13.0",
     "category": "message",
     "classified_fields_filtered": null,
-    "context": "Re: [VOTE] KIP 22231Enhance",
     "data": {
         "Authentication-Results": "spamd1-us-west.apache.org (amavisd-new);\n\tdkim=pass (2048-bit key) header.d=gmail.com",
         "Content-Transfer-Encoding": "quoted-printable",
@@ -578,7 +551,6 @@
         },
         "unixfrom": "dev-return-106211-apmail-kafka-dev-archive=kafka.apache.org@kafka.apache.org  Thu Aug  1 06:56:03 2019"
     },
-    "data_source": "Mbox",
     "origin": "nitish_box",
     "perceval_version": "0.14.0",
     "search_fields": {
@@ -593,7 +565,6 @@
     "backend_version": "0.13.0",
     "category": "message",
     "classified_fields_filtered": null,
-    "context":"Re: [VOTE] KIP:2242341Enhance",
     "data": {
         "Authentication-Results": "spamd1-us-west.apache.org (amavisd-new);\n\tdkim=pass (2048-bit key) header.d=gmail.com",
         "Content-Transfer-Encoding": "quoted-printable",
@@ -634,7 +605,6 @@
         },
         "unixfrom": "dev-return-106211-apmail-kafka-dev-archive=kafka.apache.org@kafka.apache.org  Thu Aug  1 06:56:03 2019"
     },
-    "data_source": "Mbox",
     "origin": "nitish_box",
     "perceval_version": "0.14.0",
     "search_fields": {
@@ -649,7 +619,6 @@
     "backend_version": "0.13.0",
     "category": "message",
     "classified_fields_filtered": null,
-    "context": "Re: [VOTE] KIP-455: Create an Administrative API for Replica Reassignment",
     "data": {
         "Authentication-Results": "spamd4-us-west.apache.org (amavisd-new);\n\tdkim=pass (2048-bit key) header.d=confluent.io",
         "Content-Type": "multipart/alternative; boundary=\"000000000000e818fc058f12d74d\"",
@@ -688,7 +657,6 @@
         },
         "unixfrom": "dev-return-106224-apmail-kafka-dev-archive=kafka.apache.org@kafka.apache.org  Thu Aug  1 18:59:56 2019"
     },
-    "data_source": "Mbox",
     "origin": "nitish_box",
     "perceval_version": "0.14.0",
     "search_fields": {

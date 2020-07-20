@@ -1,7 +1,6 @@
 [{
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "ART_HACKPDF 1.4 transparency",
     "data": {
         "Date": "Mon, 24 Jul 2000 14:35:53 -0700",
         "Delivered-To": "libart-hackers@gnome.org",
@@ -24,7 +23,6 @@
         },
         "unixfrom": "raph@acm.org  Mon Jul 24 17:34:04 2000"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.143259,
@@ -34,7 +32,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "ART_HACKPDF 1.4 transparency",
     "data": {
         "Content-Type": "MULTIPART/MIXED; BOUNDARY=\"-1345348566-1290319401-1005931453=:14570\"",
         "Date": "Fri, 16 Nov 2001 12:24:13 -0500 (EST)",
@@ -65,7 +62,6 @@
         },
         "unixfrom": "alexl@redhat.com  Fri Nov 16 12:24:15 2001"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.156706,
@@ -75,7 +71,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] libart patch",
     "data": {
         "Content-Type": "MULTIPART/MIXED; BOUNDARY=\"-1345348566-1290319401-1005931453=:14570\"",
         "Date": "Fri, 16 Nov 2001 12:24:13 -0500 (EST)",
@@ -106,7 +101,6 @@
         },
         "unixfrom": "alexl@redhat.com  Fri Nov 16 12:24:15 2001"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.162231,
@@ -116,7 +110,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] libart patch",
     "data": {
         "Content-Type": "MULTIPART/MIXED; BOUNDARY=\"-1345348566-1290319401-1005931453=:14570\"",
         "Date": "Fri, 16 Nov 2001 12:24:13 -0500 (EST)",
@@ -147,7 +140,6 @@
         },
         "unixfrom": "alexl@redhat.com  Fri Nov 16 12:24:15 2001"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.166884,
@@ -157,7 +149,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] libart patch",
     "data": {
         "Content-Type": "MULTIPART/MIXED; BOUNDARY=\"-1345348566-1290319401-1005931453=:14570\"",
         "Date": "Fri, 16 Nov 2001 12:24:13 -0500 (EST)",
@@ -188,7 +179,6 @@
         },
         "unixfrom": "alexl@redhat.com  Fri Nov 16 12:24:15 2001"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.172733,
@@ -198,7 +188,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] ArtBpath",
     "data": {
         "Content-type": "multipart/alternative;\n boundary=\"Boundary_(ID_3cB7I41QIQkAMte1Uc2+lw)\"",
         "Date": "Tue, 05 Mar 2002 16:47:31 +0800",
@@ -232,7 +221,6 @@
         },
         "unixfrom": "kevinmay@public.xm.fj.cn  Tue Mar  5 03:23:58 2002"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.191685,
@@ -242,7 +230,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] ArtBpath",
     "data": {
         "Content-type": "multipart/alternative;\n boundary=\"Boundary_(ID_3cB7I41QIQkAMte1Uc2+lw)\"",
         "Date": "Tue, 05 Mar 2002 16:47:31 +0800",
@@ -276,7 +263,6 @@
         },
         "unixfrom": "kevinmay@public.xm.fj.cn  Tue Mar  5 03:23:58 2002"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.198397,
@@ -286,7 +272,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] ArtBpath",
     "data": {
         "Content-type": "multipart/alternative;\n boundary=\"Boundary_(ID_3cB7I41QIQkAMte1Uc2+lw)\"",
         "Date": "Tue, 05 Mar 2002 16:47:31 +0800",
@@ -320,7 +305,6 @@
         },
         "unixfrom": "kevinmay@public.xm.fj.cn  Tue Mar  5 03:23:58 2002"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.204908,
@@ -330,7 +314,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] ArtBpath",
     "data": {
         "Content-type": "multipart/alternative;\n boundary=\"Boundary_(ID_3cB7I41QIQkAMte1Uc2+lw)\"",
         "Date": "Tue, 05 Mar 2002 16:47:31 +0800",
@@ -364,7 +347,6 @@
         },
         "unixfrom": "kevinmay@public.xm.fj.cn  Tue Mar  5 03:23:58 2002"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.211523,
@@ -374,7 +356,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] Re: rendering svps on a pixel buffer that has an alpha channel",
     "data": {
         "Cc": "libart-hackers@gnome.org,\n\tGnome Hackers <gnome-hackers@gnome.org>, raph@acm.org",
         "Content-Transfer-Encoding": "7bit",
@@ -411,7 +392,6 @@
         },
         "unixfrom": "murrayc@t-online.de  Tue Jan 14 09:01:17 2003"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.238181,
@@ -421,7 +401,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] Re: rendering svps on a pixel buffer that has an alpha channel",
     "data": {
         "Cc": "libart-hackers@gnome.org, <gnome-hackers@gnome.org>,\n\t<raph@acm.org>",
         "Content-Type": "TEXT/PLAIN; charset=US-ASCII",
@@ -454,7 +433,6 @@
         },
         "unixfrom": "alexl@redhat.com  Tue Jan 14 09:42:42 2003"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.241297,
@@ -464,7 +442,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] rendering svps on a pixel buffer that has an alpha channel",
     "data": {
         "Cc": "gnome-hackers@gnome.org, raph@acm.org",
         "Content-Type": "multipart/mixed; boundary=\"=-WNfSv/DRYgy9USsdlJKs\"",
@@ -498,7 +475,6 @@
         },
         "unixfrom": "sxpert@esitcom.org  Tue Jan 14 04:15:08 2003"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.249211,
@@ -508,7 +484,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] Re: rendering svps on a pixel buffer that has an alpha channel",
     "data": {
         "Cc": "libart-hackers@gnome.org,\n\tGnome Hackers <gnome-hackers@gnome.org>, raph@acm.org",
         "Content-Transfer-Encoding": "7bit",
@@ -545,7 +520,6 @@
         },
         "unixfrom": "murrayc@t-online.de  Tue Jan 14 09:01:17 2003"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.252518,
@@ -555,7 +529,6 @@
 {
     "backend_name": "Pipermail",
     "backend_version": "0.1.0",
-    "context": "[ART_HACK] Re: rendering svps on a pixel buffer that has an alpha channel",
     "data": {
         "Cc": "libart-hackers@gnome.org, <gnome-hackers@gnome.org>,\n\t<raph@acm.org>",
         "Content-Type": "TEXT/PLAIN; charset=US-ASCII",
@@ -588,7 +561,6 @@
         },
         "unixfrom": "alexl@redhat.com  Tue Jan 14 09:42:42 2003"
     },
-    "data_source": "Mbox",
     "origin": "https://mail.gnome.org/archives/libart-hackers/",
     "perceval_version": "0.2.0",
     "timestamp": 1469618584.255637,

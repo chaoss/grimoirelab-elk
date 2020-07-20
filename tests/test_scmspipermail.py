@@ -57,7 +57,7 @@ class TestScmsPipermail(TestBaseBackend):
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item)
-        self.assertEqual(eitem['data_source'],'Mbox')
+        self.assertEqual(eitem['data_source'], 'Mbox')
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)

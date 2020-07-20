@@ -32,7 +32,6 @@ PULL_TYPE = 'pull_request'
 COMMENT_TYPE = 'comment'
 ISSUE_COMMENT_TYPE = 'issue_comment'
 REVIEW_COMMENT_TYPE = 'review_comment'
-REPOSITORY_TYPE = 'repository'
 
 logger = logging.getLogger(__name__)
 
@@ -237,6 +236,24 @@ class ScmsGitHubEnrich(ScmsEnrich):
         rich_pr['item_type'] = PULL_TYPE
         if 'project' in item:
             rich_pr['project'] = item['project']
+        rich_pr['context'] = pull_request['title']
+        rich_pr['data_source'] = 'Github'
+
+        user = pull_request.get('user_data', None)
+        if user is not None and user:
+            rich_pr['user_name'] = user['name']
+            rich_pr['author_name'] = user['name']
+            rich_pr["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
+            rich_pr['user_org'] = user['company']
+            rich_pr['user_location'] = user['location']
+            rich_pr['user_geolocation'] = None
+        else:
+            rich_pr['user_name'] = None
+            rich_pr["user_domain"] = None
+            rich_pr['user_org'] = None
+            rich_pr['user_location'] = None
+            rich_pr['user_geolocation'] = None
+            rich_pr['author_name'] = None
 
         rich_pr.update(self.get_grimoire_fields(pull_request['created_at'], PULL_TYPE))
 
@@ -258,6 +275,24 @@ class ScmsGitHubEnrich(ScmsEnrich):
 
         if 'project' in item:
             rich_issue['project'] = item['project']
+        rich_issue['context'] = issue['title']
+        rich_issue['data_source'] = 'Github'
+
+        user = issue.get('user_data', None)
+        if user is not None and user:
+            rich_issue['user_name'] = user['name']
+            rich_issue['author_name'] = user['name']
+            rich_issue["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
+            rich_issue['user_org'] = user['company']
+            rich_issue['user_location'] = user['location']
+            rich_issue['user_geolocation'] = None
+        else:
+            rich_issue['user_name'] = None
+            rich_issue["user_domain"] = None
+            rich_issue['user_org'] = None
+            rich_issue['user_location'] = None
+            rich_issue['user_geolocation'] = None
+            rich_issue['author_name'] = None
 
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], ISSUE_TYPE))
 
