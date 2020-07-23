@@ -84,14 +84,6 @@ class ScmsMboxEnrich(ScmsEnrich):
         # The real data
         message = CaseInsensitiveDict(item['data'])
 
-        # Fields that are the same in message and eitem
-        # copy_fields = ["Subject"]
-        # for f in copy_fields:
-        #     if f in message:
-        #         eitem[f] = message[f]
-        #     else:
-        #         eitem[f] = None
-
         # Fields which names are translated
         map_fields = {
             "Subject": "context",
@@ -102,51 +94,6 @@ class ScmsMboxEnrich(ScmsEnrich):
                 eitem[map_fields[fn]] = message[fn]
             else:
                 eitem[map_fields[fn]] = None
-
-        # Enrich dates
-        # eitem["email_date"] = parser.parse(item["metadata__updated_on"]).isoformat()
-        # eitem["list"] = item["origin"]
-
-        # if 'Subject' in message and message['Subject']:
-        #     eitem['Subject'] = eitem['Subject'][:self.KEYWORD_MAX_LENGTH]
-
-        # Root message
-        # if 'In-Reply-To' in message:
-        #     eitem["root"] = False
-        # else:
-        #     eitem["root"] = True
-
-        # Part of the body is needed in studies like kafka_kip
-        eitem["Scms_body_extract"] = ""
-        # Size of the message
-        # eitem["size"] = None
-        if 'plain' in message['body']:
-            eitem["Scms_body_extract"] = "\n".join(message['body']['plain'].split("\n")[:MAX_LINES_FOR_VOTE])
-            # eitem["size"] = len(message['body']['plain'])
-
-        # Time zone
-        # try:
-        #     message_date = parser.parse(message['Date'])
-        #     eitem["tz"] = int(message_date.strftime("%z")[0:3])
-        # except Exception:
-        #     eitem["tz"] = None
-
-        # identity = self.get_sh_identity(message['from'])
-        # eitem["mbox_author_domain"] = self.get_identity_domain(identity)
-
-        # if self.sortinghat:
-        #     eitem.update(self.get_item_sh(item))
-        #
-        if self.prjs_map:
-            eitem.update(self.get_item_project(eitem))
-        #
-        # self.add_repository_labels(eitem)
-        # self.add_metadata_filter_raw(eitem)
-        # Part of the body is needed in studies like kafka_kip
-        eitem["body"] = ""
-        if 'plain' in message['body']:
-            eitem["body"] = "\n".join(message['body']['plain'].split("\n")[:MAX_LINES_FOR_VOTE])
-
 
         if 'uuid' in item:
             eitem['id'] = item['uuid']
