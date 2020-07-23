@@ -190,6 +190,7 @@ class MediaWikiEnrich(Enrich):
             erevision['metadata__gelk_version'] = eitem['metadata__gelk_version']
             erevision['metadata__gelk_backend_name'] = eitem['metadata__gelk_backend_name']
             erevision['metadata__enriched_on'] = eitem['metadata__enriched_on']
+            erevision['repository_labels'] = eitem['repository_labels']
 
             erevision.update(self.get_grimoire_fields(erevision['creation_date'], REVISION_TYPE))
 

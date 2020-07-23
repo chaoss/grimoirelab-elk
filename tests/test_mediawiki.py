@@ -167,9 +167,11 @@ class TestMediawiki(TestBaseBackend):
         self._test_raw_to_enrich()
         enrich_backend = self.connectors[self.connector][2]()
 
-        for item in self.items:
-            eitem = enrich_backend.get_rich_item(item)
-            self.assertIn(REPO_LABELS, eitem)
+        item = self.items[0]
+        eitems = enrich_backend.get_rich_item_reviews(item)
+
+        for ei in eitems:
+            self.assertIn(REPO_LABELS, ei)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
