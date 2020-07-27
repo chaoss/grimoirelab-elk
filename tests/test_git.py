@@ -445,6 +445,40 @@ class TestGit(TestBaseBackend):
             self.assertEqual(source['origin'], '/tmp/perceval_mc84igfc/gittest')
             self.assertEqual(source['repository'], '/tmp/perceval_mc84igfc/gittest')
 
+    def test_enrich_areas_of_code_extra_fields(self):
+        """ Test that areas of code works correctly when the repo contains extra fields"""
+
+        projects_json_repo = "https://github.com/acme/errors"
+        projects_json = {
+            "labels-repo": {
+                "git": [
+                    "https://github.com/acme/errors --labels=[errors]"
+                ]
+            }
+        }
+        prjs_map = {
+            "git": {
+                "https://github.com/acme/errors": "labels-repo"
+            }
+        }
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_areas_of_code',
+                                                                projects_json=projects_json,
+                                                                prjs_map=prjs_map,
+                                                                projects_json_repo=projects_json_repo)
+
+        study(ocean_backend, enrich_backend, in_index='test_git', out_index='test_git_aoc_repo_name')
+        time.sleep(5)  # HACK: Wait until git area of code has been written
+        url = self.es_con + "/test_git_aoc_repo_name/_search?size=20"
+        response = enrich_backend.requests.get(url, verify=False).json()
+        hits = response['hits']['hits']
+        self.assertEqual(len(hits), 2)
+        for hit in hits:
+            source = hit['_source']
+            print(source['origin'])
+            self.assertEqual(source['origin'], 'https://github.com/acme/errors')
+            self.assertEqual(source['repository'], 'https://github.com/acme/errors')
+
     def test_enrich_areas_of_code_private_repo(self):
         """ Test that areas of code works correctly for git private repos"""
 

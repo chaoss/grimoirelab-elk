@@ -569,14 +569,15 @@ class GitEnrich(Enrich):
 
         for repo in repos:
             anonymize_repo = anonymize_url(repo)
-            logger.info("{} Processing repo: {}".format(log_prefix, anonymize_repo))
-            in_conn.update_repo(anonymize_repo)
-            out_conn.update_repo(anonymize_repo)
+            repo_name = anonymize_repo.split()[0]
+            logger.info("{} Processing repo: {}".format(log_prefix, repo_name))
+            in_conn.update_repo(repo_name)
+            out_conn.update_repo(repo_name)
             areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
 
             # delete the documents in the AOC index which correspond to commits that don't exist in the raw index
             if out_conn.exists():
-                self.update_items_aoc(ocean_backend, es_out, out_index, anonymize_repo)
+                self.update_items_aoc(ocean_backend, es_out, out_index, repo_name)
 
         # Create alias if output index exists and alias does not
         if out_conn.exists():
