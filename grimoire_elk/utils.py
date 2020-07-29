@@ -126,6 +126,8 @@ from grimoire_elk.scms.scmsgithub import ScmsGitHubEnrich
 from grimoire_elk.scms.scmsmbox import ScmsMboxEnrich
 from grimoire_elk.scms.scmspipermail import ScmsPipermailEnrich
 from grimoire_elk.scms.scmssupybot import ScmsSupybotEnrich
+from grimoire_elk.scms.scmstwitter import ScmsTwitterEnrich
+
 # Connectors for Ocean
 from .raw.askbot import AskbotOcean
 from .raw.bugzilla import BugzillaOcean
@@ -241,7 +243,6 @@ def get_connectors():
             "gerrit": [Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git": [Git, GitOcean, GitEnrich, GitCommand],
             "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
-            "scmsgithub": [GitHub, GitHubOcean, ScmsGitHubEnrich, GitHubCommand],
             "githubql": [GitHubQL, GitHubQLOcean, GitHubQLEnrich, GitHubQLCommand],
             "github2": [GitHub, GitHubOcean, GitHubEnrich2, GitHubCommand],
             "gitlab": [GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
@@ -255,7 +256,6 @@ def get_connectors():
             "launchpad": [Launchpad, LaunchpadOcean, LaunchpadEnrich, LaunchpadCommand],
             "mattermost": [Mattermost, MattermostOcean, MattermostEnrich, MattermostCommand],
             "mbox": [MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
-            "scmsmbox": [MBox, MBoxOcean, ScmsMboxEnrich, MBoxCommand],
             "mediawiki": [MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
             "meetup": [Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
             "mozillaclub": [MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
@@ -263,7 +263,6 @@ def get_connectors():
             "pagure": [Pagure, PagureOcean, PagureEnrich, PagureCommand],
             "phabricator": [Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
             "pipermail": [Pipermail, PipermailOcean, PipermailEnrich, PipermailCommand],
-            "scmspipermail": [Pipermail, PipermailOcean, ScmsPipermailEnrich, PipermailCommand],
             "puppetforge": [PuppetForge, PuppetForgeOcean, PuppetForgeEnrich, PuppetForgeCommand],
             "redmine": [Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
             "remo": [ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
@@ -273,9 +272,13 @@ def get_connectors():
             "stackexchange": [StackExchange, StackExchangeOcean,
                               StackExchangeEnrich, StackExchangeCommand],
             "supybot": [Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
-            "scmssupybot": [Supybot, SupybotOcean, ScmsSupybotEnrich, SupybotCommand],
             "telegram": [Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
-            "twitter": [Twitter, TwitterOcean, TwitterEnrich, TwitterCommand]
+            "twitter": [Twitter, TwitterOcean, TwitterEnrich, TwitterCommand],
+            "scmsgithub": [GitHub, GitHubOcean, ScmsGitHubEnrich, GitHubCommand],
+            "scmsmbox": [MBox, MBoxOcean, ScmsMboxEnrich, MBoxCommand],
+            "scmspipermail": [Pipermail, PipermailOcean, ScmsPipermailEnrich, PipermailCommand],
+            "scmssupybot": [Supybot, SupybotOcean, ScmsSupybotEnrich, SupybotCommand],
+            "scmstwitter": [Twitter, TwitterOcean, ScmsTwitterEnrich, TwitterCommand]
             }  # Will come from Registry
 
 

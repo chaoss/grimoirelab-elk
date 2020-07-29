@@ -1,0 +1,1115 @@
+[
+{
+    "backend_name": "Twitter",
+    "backend_version": "0.1.0",
+    "category": "tweet",
+    "data": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Tue Jun 19 14:29:46 +0000 2018",
+        "entities": {
+            "hashtags": [
+                {
+                    "indices": [
+                        49,
+                        61
+                    ],
+                    "text": "GrimoireLab"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "blog.bitergia.com/2018/06/19/the\u2026",
+                    "expanded_url": "https://blog.bitergia.com/2018/06/19/the-onion-model-analyzing-community-structure/",
+                    "indices": [
+                        63,
+                        86
+                    ],
+                    "url": "https://t.co/OAGW5aAyZY"
+                }
+            ],
+            "user_mentions": [
+                {
+                    "id": 487623589,
+                    "id_str": "487623589",
+                    "indices": [
+                        3,
+                        12
+                    ],
+                    "name": "Bitergia",
+                    "screen_name": "Bitergia"
+                }
+            ]
+        },
+        "favorite_count": 0,
+        "favorited": false,
+        "geo": null,
+        "id": 1009080805363257344,
+        "id_str": "1009080805363257344",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "metadata": {
+            "iso_language_code": "en",
+            "result_type": "recent"
+        },
+        "place": null,
+        "possibly_sensitive": false,
+        "retweet_count": 4,
+        "retweeted": false,
+        "retweeted_status": {
+            "contributors": null,
+            "coordinates": null,
+            "created_at": "Tue Jun 19 11:29:55 +0000 2018",
+            "entities": {
+                "hashtags": [
+                    {
+                        "indices": [
+                            35,
+                            47
+                        ],
+                        "text": "GrimoireLab"
+                    }
+                ],
+                "symbols": [],
+                "urls": [
+                    {
+                        "display_url": "blog.bitergia.com/2018/06/19/the\u2026",
+                        "expanded_url": "https://blog.bitergia.com/2018/06/19/the-onion-model-analyzing-community-structure/",
+                        "indices": [
+                            49,
+                            72
+                        ],
+                        "url": "https://t.co/OAGW5aAyZY"
+                    }
+                ],
+                "user_mentions": []
+            },
+            "favorite_count": 2,
+            "favorited": false,
+            "geo": null,
+            "id": 1009035544595173376,
+            "id_str": "1009035544595173376",
+            "in_reply_to_screen_name": null,
+            "in_reply_to_status_id": null,
+            "in_reply_to_status_id_str": null,
+            "in_reply_to_user_id": null,
+            "in_reply_to_user_id_str": null,
+            "is_quote_status": false,
+            "lang": "en",
+            "metadata": {
+                "iso_language_code": "en",
+                "result_type": "recent"
+            },
+            "place": null,
+            "possibly_sensitive": false,
+            "retweet_count": 4,
+            "retweeted": false,
+            "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+            "text": "Analyzing community structure with #GrimoireLab! https://t.co/OAGW5aAyZY",
+            "truncated": false,
+            "user": {
+                "contributors_enabled": false,
+                "created_at": "Thu Feb 09 15:25:57 +0000 2012",
+                "default_profile": false,
+                "default_profile_image": false,
+                "description": "Software development analytics to better understand and improve development processes in InnerSource & OpenSource teams. We \u2764 Free/Libre Open Source Software!",
+                "entities": {
+                    "description": {
+                        "urls": []
+                    },
+                    "url": {
+                        "urls": [
+                            {
+                                "display_url": "bitergia.com",
+                                "expanded_url": "http://bitergia.com",
+                                "indices": [
+                                    0,
+                                    23
+                                ],
+                                "url": "https://t.co/z7cRLOfz89"
+                            }
+                        ]
+                    }
+                },
+                "favourites_count": 5182,
+                "follow_request_sent": null,
+                "followers_count": 1101,
+                "following": null,
+                "friends_count": 650,
+                "geo_enabled": true,
+                "has_extended_profile": false,
+                "id": 487623589,
+                "id_str": "487623589",
+                "is_translation_enabled": false,
+                "is_translator": false,
+                "lang": "en",
+                "listed_count": 208,
+                "location": "Madrid, Spain",
+                "name": "Bitergia",
+                "notifications": null,
+                "profile_background_color": "FFA500",
+                "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+                "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+                "profile_background_tile": false,
+                "profile_banner_url": "https://pbs.twimg.com/profile_banners/487623589/1398254668",
+                "profile_image_url": "http://pbs.twimg.com/profile_images/458938585555562496/Pzsyz0ix_normal.png",
+                "profile_image_url_https": "https://pbs.twimg.com/profile_images/458938585555562496/Pzsyz0ix_normal.png",
+                "profile_link_color": "FF9900",
+                "profile_sidebar_border_color": "FFFFFF",
+                "profile_sidebar_fill_color": "DDEEF6",
+                "profile_text_color": "333333",
+                "profile_use_background_image": true,
+                "protected": false,
+                "screen_name": "Bitergia",
+                "statuses_count": 5534,
+                "time_zone": null,
+                "translator_type": "none",
+                "url": "https://t.co/z7cRLOfz89",
+                "utc_offset": null,
+                "verified": false
+            }
+        },
+        "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+        "text": "RT @Bitergia: Analyzing community structure with #GrimoireLab! https://t.co/OAGW5aAyZY",
+        "truncated": false,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Mon Aug 24 16:18:52 +0000 2009",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "I'm me, my circumstances, and my Internet connection",
+            "entities": {
+                "description": {
+                    "urls": []
+                },
+                "url": {
+                    "urls": [
+                        {
+                            "display_url": "gsyc.es/~jgb",
+                            "expanded_url": "http://gsyc.es/~jgb",
+                            "indices": [
+                                0,
+                                22
+                            ],
+                            "url": "http://t.co/pP4qVDuIAL"
+                        }
+                    ]
+                }
+            },
+            "favourites_count": 1431,
+            "follow_request_sent": null,
+            "followers_count": 2409,
+            "following": null,
+            "friends_count": 420,
+            "geo_enabled": true,
+            "has_extended_profile": false,
+            "id": 68442845,
+            "id_str": "68442845",
+            "is_translation_enabled": false,
+            "is_translator": false,
+            "lang": "en",
+            "listed_count": 341,
+            "location": "",
+            "name": "JM Gonzalez-Barahona",
+            "notifications": null,
+            "profile_background_color": "C0DEED",
+            "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_tile": false,
+            "profile_image_url": "http://pbs.twimg.com/profile_images/951846681393364992/JuxVClXO_normal.jpg",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/951846681393364992/JuxVClXO_normal.jpg",
+            "profile_link_color": "1DA1F2",
+            "profile_sidebar_border_color": "C0DEED",
+            "profile_sidebar_fill_color": "DDEEF6",
+            "profile_text_color": "333333",
+            "profile_use_background_image": true,
+            "protected": false,
+            "screen_name": "jgbarah",
+            "statuses_count": 15548,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": "http://t.co/pP4qVDuIAL",
+            "utc_offset": null,
+            "verified": false
+        }
+    },
+    "origin": "https://twitter.com/",
+    "perceval_version": "0.11.2",
+    "tag": "https://twitter.com/",
+    "timestamp": 1529420930.975816,
+    "updated_on": 1529418586.0,
+    "uuid": "2b17e3f879d054075351edcafdaa814e8c1e55d6"
+},
+{
+    "backend_name": "Twitter",
+    "backend_version": "0.1.0",
+    "category": "tweet",
+    "data": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Tue Jun 19 13:56:08 +0000 2018",
+        "entities": {
+            "hashtags": [
+                {
+                    "indices": [
+                        49,
+                        61
+                    ],
+                    "text": "GrimoireLab"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "blog.bitergia.com/2018/06/19/the\u2026",
+                    "expanded_url": "https://blog.bitergia.com/2018/06/19/the-onion-model-analyzing-community-structure/",
+                    "indices": [
+                        63,
+                        86
+                    ],
+                    "url": "https://t.co/OAGW5aAyZY"
+                }
+            ],
+            "user_mentions": [
+                {
+                    "id": 487623589,
+                    "id_str": "487623589",
+                    "indices": [
+                        3,
+                        12
+                    ],
+                    "name": "Bitergia",
+                    "screen_name": "Bitergia"
+                }
+            ]
+        },
+        "favorite_count": 0,
+        "favorited": false,
+        "geo": null,
+        "id": 1009072342436274176,
+        "id_str": "1009072342436274176",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "metadata": {
+            "iso_language_code": "en",
+            "result_type": "recent"
+        },
+        "place": null,
+        "possibly_sensitive": false,
+        "retweet_count": 4,
+        "retweeted": false,
+        "retweeted_status": {
+            "contributors": null,
+            "coordinates": null,
+            "created_at": "Tue Jun 19 11:29:55 +0000 2018",
+            "entities": {
+                "hashtags": [
+                    {
+                        "indices": [
+                            35,
+                            47
+                        ],
+                        "text": "GrimoireLab"
+                    }
+                ],
+                "symbols": [],
+                "urls": [
+                    {
+                        "display_url": "blog.bitergia.com/2018/06/19/the\u2026",
+                        "expanded_url": "https://blog.bitergia.com/2018/06/19/the-onion-model-analyzing-community-structure/",
+                        "indices": [
+                            49,
+                            72
+                        ],
+                        "url": "https://t.co/OAGW5aAyZY"
+                    }
+                ],
+                "user_mentions": []
+            },
+            "favorite_count": 2,
+            "favorited": false,
+            "geo": null,
+            "id": 1009035544595173376,
+            "id_str": "1009035544595173376",
+            "in_reply_to_screen_name": null,
+            "in_reply_to_status_id": null,
+            "in_reply_to_status_id_str": null,
+            "in_reply_to_user_id": null,
+            "in_reply_to_user_id_str": null,
+            "is_quote_status": false,
+            "lang": "en",
+            "metadata": {
+                "iso_language_code": "en",
+                "result_type": "recent"
+            },
+            "place": null,
+            "possibly_sensitive": false,
+            "retweet_count": 4,
+            "retweeted": false,
+            "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+            "text": "Analyzing community structure with #GrimoireLab! https://t.co/OAGW5aAyZY",
+            "truncated": false,
+            "user": {
+                "contributors_enabled": false,
+                "created_at": "Thu Feb 09 15:25:57 +0000 2012",
+                "default_profile": false,
+                "default_profile_image": false,
+                "description": "Software development analytics to better understand and improve development processes in InnerSource & OpenSource teams. We \u2764 Free/Libre Open Source Software!",
+                "entities": {
+                    "description": {
+                        "urls": []
+                    },
+                    "url": {
+                        "urls": [
+                            {
+                                "display_url": "bitergia.com",
+                                "expanded_url": "http://bitergia.com",
+                                "indices": [
+                                    0,
+                                    23
+                                ],
+                                "url": "https://t.co/z7cRLOfz89"
+                            }
+                        ]
+                    }
+                },
+                "favourites_count": 5182,
+                "follow_request_sent": null,
+                "followers_count": 1101,
+                "following": null,
+                "friends_count": 650,
+                "geo_enabled": true,
+                "has_extended_profile": false,
+                "id": 487623589,
+                "id_str": "487623589",
+                "is_translation_enabled": false,
+                "is_translator": false,
+                "lang": "en",
+                "listed_count": 208,
+                "location": "Madrid, Spain",
+                "name": "Bitergia",
+                "notifications": null,
+                "profile_background_color": "FFA500",
+                "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+                "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+                "profile_background_tile": false,
+                "profile_banner_url": "https://pbs.twimg.com/profile_banners/487623589/1398254668",
+                "profile_image_url": "http://pbs.twimg.com/profile_images/458938585555562496/Pzsyz0ix_normal.png",
+                "profile_image_url_https": "https://pbs.twimg.com/profile_images/458938585555562496/Pzsyz0ix_normal.png",
+                "profile_link_color": "FF9900",
+                "profile_sidebar_border_color": "FFFFFF",
+                "profile_sidebar_fill_color": "DDEEF6",
+                "profile_text_color": "333333",
+                "profile_use_background_image": true,
+                "protected": false,
+                "screen_name": "Bitergia",
+                "statuses_count": 5534,
+                "time_zone": null,
+                "translator_type": "none",
+                "url": "https://t.co/z7cRLOfz89",
+                "utc_offset": null,
+                "verified": false
+            }
+        },
+        "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+        "text": "RT @Bitergia: Analyzing community structure with #GrimoireLab! https://t.co/OAGW5aAyZY",
+        "truncated": false,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Mon Jan 21 08:23:30 +0000 2008",
+            "default_profile": false,
+            "default_profile_image": false,
+            "description": "human living 1 degree north 103 degrees east; FOSS; HHH; ieee; 9V1HP",
+            "entities": {
+                "description": {
+                    "urls": []
+                },
+                "url": {
+                    "urls": [
+                        {
+                            "display_url": "harishpillay.wordpress.com",
+                            "expanded_url": "http://harishpillay.wordpress.com",
+                            "indices": [
+                                0,
+                                22
+                            ],
+                            "url": "http://t.co/oJja8p7BOc"
+                        }
+                    ]
+                }
+            },
+            "favourites_count": 931,
+            "follow_request_sent": null,
+            "followers_count": 2443,
+            "following": null,
+            "friends_count": 3562,
+            "geo_enabled": true,
+            "has_extended_profile": true,
+            "id": 12486322,
+            "id_str": "12486322",
+            "is_translation_enabled": false,
+            "is_translator": false,
+            "lang": "en",
+            "listed_count": 432,
+            "location": "West Coast Way, Singapore",
+            "name": "harishpillay",
+            "notifications": null,
+            "profile_background_color": "709397",
+            "profile_background_image_url": "http://abs.twimg.com/images/themes/theme6/bg.gif",
+            "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme6/bg.gif",
+            "profile_background_tile": false,
+            "profile_image_url": "http://pbs.twimg.com/profile_images/99978402/HarishPillaycloseupshot_normal.jpg",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/99978402/HarishPillaycloseupshot_normal.jpg",
+            "profile_link_color": "91D2FA",
+            "profile_sidebar_border_color": "FFFFFF",
+            "profile_sidebar_fill_color": "A0C5C7",
+            "profile_text_color": "333333",
+            "profile_use_background_image": true,
+            "protected": false,
+            "screen_name": "harishpillay",
+            "statuses_count": 41536,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": "http://t.co/oJja8p7BOc",
+            "utc_offset": null,
+            "verified": false
+        }
+    },
+    "origin": "https://twitter.com/",
+    "perceval_version": "0.11.2",
+    "tag": "https://twitter.com/",
+    "timestamp": 1529420930.978474,
+    "updated_on": 1529416568.0,
+    "uuid": "4eed1f2b2db3e36b8afee7293e04d1ac5df290d4"
+},
+{
+    "backend_name": "Twitter",
+    "backend_version": "0.1.0",
+    "category": "tweet",
+    "data": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Tue Jun 19 12:14:50 +0000 2018",
+        "entities": {
+            "hashtags": [
+                {
+                    "indices": [
+                        49,
+                        61
+                    ],
+                    "text": "GrimoireLab"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "blog.bitergia.com/2018/06/19/the\u2026",
+                    "expanded_url": "https://blog.bitergia.com/2018/06/19/the-onion-model-analyzing-community-structure/",
+                    "indices": [
+                        63,
+                        86
+                    ],
+                    "url": "https://t.co/OAGW5aAyZY"
+                }
+            ],
+            "user_mentions": [
+                {
+                    "id": 487623589,
+                    "id_str": "487623589",
+                    "indices": [
+                        3,
+                        12
+                    ],
+                    "name": "Bitergia",
+                    "screen_name": "Bitergia"
+                }
+            ]
+        },
+        "favorite_count": 0,
+        "favorited": false,
+        "geo": null,
+        "id": 1009046850459062272,
+        "id_str": "1009046850459062272",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "metadata": {
+            "iso_language_code": "en",
+            "result_type": "recent"
+        },
+        "place": null,
+        "possibly_sensitive": false,
+        "retweet_count": 4,
+        "retweeted": false,
+        "retweeted_status": {
+            "contributors": null,
+            "coordinates": null,
+            "created_at": "Tue Jun 19 11:29:55 +0000 2018",
+            "entities": {
+                "hashtags": [
+                    {
+                        "indices": [
+                            35,
+                            47
+                        ],
+                        "text": "GrimoireLab"
+                    }
+                ],
+                "symbols": [],
+                "urls": [
+                    {
+                        "display_url": "blog.bitergia.com/2018/06/19/the\u2026",
+                        "expanded_url": "https://blog.bitergia.com/2018/06/19/the-onion-model-analyzing-community-structure/",
+                        "indices": [
+                            49,
+                            72
+                        ],
+                        "url": "https://t.co/OAGW5aAyZY"
+                    }
+                ],
+                "user_mentions": []
+            },
+            "favorite_count": 2,
+            "favorited": false,
+            "geo": null,
+            "id": 1009035544595173376,
+            "id_str": "1009035544595173376",
+            "in_reply_to_screen_name": null,
+            "in_reply_to_status_id": null,
+            "in_reply_to_status_id_str": null,
+            "in_reply_to_user_id": null,
+            "in_reply_to_user_id_str": null,
+            "is_quote_status": false,
+            "lang": "en",
+            "metadata": {
+                "iso_language_code": "en",
+                "result_type": "recent"
+            },
+            "place": null,
+            "possibly_sensitive": false,
+            "retweet_count": 4,
+            "retweeted": false,
+            "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+            "text": "Analyzing community structure with #GrimoireLab! https://t.co/OAGW5aAyZY",
+            "truncated": false,
+            "user": {
+                "contributors_enabled": false,
+                "created_at": "Thu Feb 09 15:25:57 +0000 2012",
+                "default_profile": false,
+                "default_profile_image": false,
+                "description": "Software development analytics to better understand and improve development processes in InnerSource & OpenSource teams. We \u2764 Free/Libre Open Source Software!",
+                "entities": {
+                    "description": {
+                        "urls": []
+                    },
+                    "url": {
+                        "urls": [
+                            {
+                                "display_url": "bitergia.com",
+                                "expanded_url": "http://bitergia.com",
+                                "indices": [
+                                    0,
+                                    23
+                                ],
+                                "url": "https://t.co/z7cRLOfz89"
+                            }
+                        ]
+                    }
+                },
+                "favourites_count": 5182,
+                "follow_request_sent": null,
+                "followers_count": 1101,
+                "following": null,
+                "friends_count": 650,
+                "geo_enabled": true,
+                "has_extended_profile": false,
+                "id": 487623589,
+                "id_str": "487623589",
+                "is_translation_enabled": false,
+                "is_translator": false,
+                "lang": "en",
+                "listed_count": 208,
+                "location": "Madrid, Spain",
+                "name": "Bitergia",
+                "notifications": null,
+                "profile_background_color": "FFA500",
+                "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+                "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+                "profile_background_tile": false,
+                "profile_banner_url": "https://pbs.twimg.com/profile_banners/487623589/1398254668",
+                "profile_image_url": "http://pbs.twimg.com/profile_images/458938585555562496/Pzsyz0ix_normal.png",
+                "profile_image_url_https": "https://pbs.twimg.com/profile_images/458938585555562496/Pzsyz0ix_normal.png",
+                "profile_link_color": "FF9900",
+                "profile_sidebar_border_color": "FFFFFF",
+                "profile_sidebar_fill_color": "DDEEF6",
+                "profile_text_color": "333333",
+                "profile_use_background_image": true,
+                "protected": false,
+                "screen_name": "Bitergia",
+                "statuses_count": 5534,
+                "time_zone": null,
+                "translator_type": "none",
+                "url": "https://t.co/z7cRLOfz89",
+                "utc_offset": null,
+                "verified": false
+            }
+        },
+        "source": "<a href=\"https://about.twitter.com/products/tweetdeck\" rel=\"nofollow\">TweetDeck</a>",
+        "text": "RT @Bitergia: Analyzing community structure with #GrimoireLab! https://t.co/OAGW5aAyZY",
+        "truncated": false,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Wed May 30 12:00:07 +0000 2007",
+            "default_profile": false,
+            "default_profile_image": false,
+            "description": "Mobile & Open Source technologies, Friends, Surf and Live passionate. Bilba\u00edno born in Gij\u00f3n living in Fuenla and working in @bitergia",
+            "entities": {
+                "description": {
+                    "urls": []
+                },
+                "url": {
+                    "urls": [
+                        {
+                            "display_url": "about.me/jsmanrique",
+                            "expanded_url": "http://about.me/jsmanrique",
+                            "indices": [
+                                0,
+                                23
+                            ],
+                            "url": "https://t.co/mJRvRuAt26"
+                        }
+                    ]
+                }
+            },
+            "favourites_count": 16968,
+            "follow_request_sent": null,
+            "followers_count": 1873,
+            "following": null,
+            "friends_count": 998,
+            "geo_enabled": true,
+            "has_extended_profile": true,
+            "id": 6440602,
+            "id_str": "6440602",
+            "is_translation_enabled": false,
+            "is_translator": false,
+            "lang": "es",
+            "listed_count": 455,
+            "location": "Fuenlabrada, Madrid, Spain",
+            "name": "Manrique Lopez",
+            "notifications": null,
+            "profile_background_color": "9AE4E8",
+            "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_tile": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/6440602/1398237800",
+            "profile_image_url": "http://pbs.twimg.com/profile_images/1005901328701419526/gUt4-_Dm_normal.jpg",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1005901328701419526/gUt4-_Dm_normal.jpg",
+            "profile_link_color": "0000FF",
+            "profile_sidebar_border_color": "5A5A5A",
+            "profile_sidebar_fill_color": "D7D7D7",
+            "profile_text_color": "000000",
+            "profile_use_background_image": true,
+            "protected": false,
+            "screen_name": "jsmanrique",
+            "statuses_count": 31171,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": "https://t.co/mJRvRuAt26",
+            "utc_offset": null,
+            "verified": false
+        }
+    },
+    "origin": "https://twitter.com/",
+    "perceval_version": "0.11.2",
+    "tag": "https://twitter.com/",
+    "timestamp": 1529420930.981368,
+    "updated_on": 1529410490.0,
+    "uuid": "7a424ed283d7183dee00d62f72509755a2bcc0a8"
+},
+{
+    "backend_name": "Twitter",
+    "backend_version": "0.1.0",
+    "category": "tweet",
+    "data": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Tue Jun 19 11:36:31 +0000 2018",
+        "entities": {
+            "hashtags": [
+                {
+                    "indices": [
+                        49,
+                        61
+                    ],
+                    "text": "GrimoireLab"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "blog.bitergia.com/2018/06/19/the\u2026",
+                    "expanded_url": "https://blog.bitergia.com/2018/06/19/the-onion-model-analyzing-community-structure/",
+                    "indices": [
+                        63,
+                        86
+                    ],
+                    "url": "https://t.co/OAGW5aAyZY"
+                }
+            ],
+            "user_mentions": [
+                {
+                    "id": 487623589,
+                    "id_str": "487623589",
+                    "indices": [
+                        3,
+                        12
+                    ],
+                    "name": "Bitergia",
+                    "screen_name": "Bitergia"
+                }
+            ]
+        },
+        "favorite_count": 0,
+        "favorited": false,
+        "geo": null,
+        "id": 1009037204646191104,
+        "id_str": "1009037204646191104",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "metadata": {
+            "iso_language_code": "en",
+            "result_type": "recent"
+        },
+        "place": null,
+        "possibly_sensitive": false,
+        "retweet_count": 4,
+        "retweeted": false,
+        "retweeted_status": {
+            "contributors": null,
+            "coordinates": null,
+            "created_at": "Tue Jun 19 11:29:55 +0000 2018",
+            "entities": {
+                "hashtags": [
+                    {
+                        "indices": [
+                            35,
+                            47
+                        ],
+                        "text": "GrimoireLab"
+                    }
+                ],
+                "symbols": [],
+                "urls": [
+                    {
+                        "display_url": "blog.bitergia.com/2018/06/19/the\u2026",
+                        "expanded_url": "https://blog.bitergia.com/2018/06/19/the-onion-model-analyzing-community-structure/",
+                        "indices": [
+                            49,
+                            72
+                        ],
+                        "url": "https://t.co/OAGW5aAyZY"
+                    }
+                ],
+                "user_mentions": []
+            },
+            "favorite_count": 2,
+            "favorited": false,
+            "geo": null,
+            "id": 1009035544595173376,
+            "id_str": "1009035544595173376",
+            "in_reply_to_screen_name": null,
+            "in_reply_to_status_id": null,
+            "in_reply_to_status_id_str": null,
+            "in_reply_to_user_id": null,
+            "in_reply_to_user_id_str": null,
+            "is_quote_status": false,
+            "lang": "en",
+            "metadata": {
+                "iso_language_code": "en",
+                "result_type": "recent"
+            },
+            "place": null,
+            "possibly_sensitive": false,
+            "retweet_count": 4,
+            "retweeted": false,
+            "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+            "text": "Analyzing community structure with #GrimoireLab! https://t.co/OAGW5aAyZY",
+            "truncated": false,
+            "user": {
+                "contributors_enabled": false,
+                "created_at": "Thu Feb 09 15:25:57 +0000 2012",
+                "default_profile": false,
+                "default_profile_image": false,
+                "description": "Software development analytics to better understand and improve development processes in InnerSource & OpenSource teams. We \u2764 Free/Libre Open Source Software!",
+                "entities": {
+                    "description": {
+                        "urls": []
+                    },
+                    "url": {
+                        "urls": [
+                            {
+                                "display_url": "bitergia.com",
+                                "expanded_url": "http://bitergia.com",
+                                "indices": [
+                                    0,
+                                    23
+                                ],
+                                "url": "https://t.co/z7cRLOfz89"
+                            }
+                        ]
+                    }
+                },
+                "favourites_count": 5182,
+                "follow_request_sent": null,
+                "followers_count": 1101,
+                "following": null,
+                "friends_count": 650,
+                "geo_enabled": true,
+                "has_extended_profile": false,
+                "id": 487623589,
+                "id_str": "487623589",
+                "is_translation_enabled": false,
+                "is_translator": false,
+                "lang": "en",
+                "listed_count": 208,
+                "location": "Madrid, Spain",
+                "name": "Bitergia",
+                "notifications": null,
+                "profile_background_color": "FFA500",
+                "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+                "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+                "profile_background_tile": false,
+                "profile_banner_url": "https://pbs.twimg.com/profile_banners/487623589/1398254668",
+                "profile_image_url": "http://pbs.twimg.com/profile_images/458938585555562496/Pzsyz0ix_normal.png",
+                "profile_image_url_https": "https://pbs.twimg.com/profile_images/458938585555562496/Pzsyz0ix_normal.png",
+                "profile_link_color": "FF9900",
+                "profile_sidebar_border_color": "FFFFFF",
+                "profile_sidebar_fill_color": "DDEEF6",
+                "profile_text_color": "333333",
+                "profile_use_background_image": true,
+                "protected": false,
+                "screen_name": "Bitergia",
+                "statuses_count": 5534,
+                "time_zone": null,
+                "translator_type": "none",
+                "url": "https://t.co/z7cRLOfz89",
+                "utc_offset": null,
+                "verified": false
+            }
+        },
+        "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+        "text": "RT @Bitergia: Analyzing community structure with #GrimoireLab! https://t.co/OAGW5aAyZY",
+        "truncated": false,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Thu Jun 15 13:48:55 +0000 2017",
+            "default_profile": false,
+            "default_profile_image": false,
+            "description": "Software developer @ Bitergia",
+            "entities": {
+                "description": {
+                    "urls": []
+                },
+                "url": {
+                    "urls": [
+                        {
+                            "display_url": "valeriocos.github.io",
+                            "expanded_url": "https://valeriocos.github.io/",
+                            "indices": [
+                                0,
+                                23
+                            ],
+                            "url": "https://t.co/l637foisNV"
+                        }
+                    ]
+                }
+            },
+            "favourites_count": 422,
+            "follow_request_sent": null,
+            "followers_count": 51,
+            "following": null,
+            "friends_count": 98,
+            "geo_enabled": false,
+            "has_extended_profile": true,
+            "id": 875349400930983937,
+            "id_str": "875349400930983937",
+            "is_translation_enabled": false,
+            "is_translator": false,
+            "lang": "it",
+            "listed_count": 1,
+            "location": "Madrid, Spagna",
+            "name": "Valerio Cosentino",
+            "notifications": null,
+            "profile_background_color": "000000",
+            "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_tile": false,
+            "profile_image_url": "http://pbs.twimg.com/profile_images/926127024632160256/rf3H9XLd_normal.jpg",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/926127024632160256/rf3H9XLd_normal.jpg",
+            "profile_link_color": "000000",
+            "profile_sidebar_border_color": "000000",
+            "profile_sidebar_fill_color": "000000",
+            "profile_text_color": "000000",
+            "profile_use_background_image": false,
+            "protected": false,
+            "screen_name": "_valcos_",
+            "statuses_count": 274,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": "https://t.co/l637foisNV",
+            "utc_offset": null,
+            "verified": false
+        }
+    },
+    "origin": "https://twitter.com/",
+    "perceval_version": "0.11.2",
+    "tag": "https://twitter.com/",
+    "timestamp": 1529420930.98415,
+    "updated_on": 1529408191.0,
+    "uuid": "a228ba72041e510a7c49e815602efe686a2d83af"
+},
+{
+    "backend_name": "Twitter",
+    "backend_version": "0.1.0",
+    "category": "tweet",
+    "data": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Tue Jun 19 11:29:55 +0000 2018",
+        "entities": {
+            "hashtags": [
+                {
+                    "indices": [
+                        35,
+                        47
+                    ],
+                    "text": "GrimoireLab"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "blog.bitergia.com/2018/06/19/the\u2026",
+                    "expanded_url": "https://blog.bitergia.com/2018/06/19/the-onion-model-analyzing-community-structure/",
+                    "indices": [
+                        49,
+                        72
+                    ],
+                    "url": "https://t.co/OAGW5aAyZY"
+                }
+            ],
+            "user_mentions": []
+        },
+        "favorite_count": 2,
+        "favorited": false,
+        "geo": null,
+        "id": 1009035544595173376,
+        "id_str": "1009035544595173376",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "metadata": {
+            "iso_language_code": "en",
+            "result_type": "recent"
+        },
+        "place": null,
+        "possibly_sensitive": false,
+        "retweet_count": 4,
+        "retweeted": false,
+        "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+        "text": "Analyzing community structure with #GrimoireLab! https://t.co/OAGW5aAyZY",
+        "truncated": false,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Thu Feb 09 15:25:57 +0000 2012",
+            "default_profile": false,
+            "default_profile_image": false,
+            "description": "Software development analytics to better understand and improve development processes in InnerSource & OpenSource teams. We \u2764 Free/Libre Open Source Software!",
+            "entities": {
+                "description": {
+                    "urls": []
+                },
+                "url": {
+                    "urls": [
+                        {
+                            "display_url": "bitergia.com",
+                            "expanded_url": "http://bitergia.com",
+                            "indices": [
+                                0,
+                                23
+                            ],
+                            "url": "https://t.co/z7cRLOfz89"
+                        }
+                    ]
+                }
+            },
+            "favourites_count": 5182,
+            "follow_request_sent": null,
+            "followers_count": 1101,
+            "following": null,
+            "friends_count": 650,
+            "geo_enabled": true,
+            "has_extended_profile": false,
+            "id": 487623589,
+            "id_str": "487623589",
+            "is_translation_enabled": false,
+            "is_translator": false,
+            "lang": "en",
+            "listed_count": 208,
+            "location": "Madrid, Spain",
+            "name": "Bitergia",
+            "notifications": null,
+            "profile_background_color": "FFA500",
+            "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_tile": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/487623589/1398254668",
+            "profile_image_url": "http://pbs.twimg.com/profile_images/458938585555562496/Pzsyz0ix_normal.png",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/458938585555562496/Pzsyz0ix_normal.png",
+            "profile_link_color": "FF9900",
+            "profile_sidebar_border_color": "FFFFFF",
+            "profile_sidebar_fill_color": "DDEEF6",
+            "profile_text_color": "333333",
+            "profile_use_background_image": true,
+            "protected": false,
+            "screen_name": "Bitergia",
+            "statuses_count": 5534,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": "https://t.co/z7cRLOfz89",
+            "utc_offset": null,
+            "verified": false
+        }
+    },
+    "origin": "https://twitter.com/",
+    "perceval_version": "0.11.2",
+    "tag": "https://twitter.com/",
+    "timestamp": 1529420930.986539,
+    "updated_on": 1529407795.0,
+    "uuid": "72863462ebf3952b76fa780672c5db2c06476efc"
+}
+]
