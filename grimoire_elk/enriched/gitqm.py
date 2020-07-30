@@ -25,12 +25,14 @@ import re
 
 from .qmenrich import QMEnrich
 
+from datetime import timezone
+
 from perceval.backend import uuid
 from grimoirelab_toolkit.datetime import str_to_datetime
 
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
 
-URL_PATTERN = "^(https|git)(://|@)([^/:]+)[/:]([^/:]+)/(.+).git$"
+URL_PATTERN = "^(https|git)(://|@)([^/:]+)[/:]([^/:]+)/(.+)[.git]?$"
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +70,7 @@ class GitQMEnrich(QMEnrich):
         processed_dt = None
 
         if dt and dt is not None:
-            processed_dt = str_to_datetime(dt).replace(hour=0, minute=0, second=0, microsecond=0)
+            processed_dt = str_to_datetime(dt).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
             processed_dt = processed_dt.isoformat()
 
         return processed_dt
@@ -78,8 +80,8 @@ class GitQMEnrich(QMEnrich):
 
     def extract_commit_metric(self, item):
         commit = item['data']
-
         commit_date = self.normalized_date(commit['CommitDate'])
+
         files = commit['files']
 
         added = 0
@@ -88,10 +90,11 @@ class GitQMEnrich(QMEnrich):
         files_changed = []
 
         for file in files:
-            added += int(file['added']) if file['added'].isdigit() else 0
-            removed += int(file['removed']) if file['removed'].isdigit() else 0
-            actions += 1 if file['action'] else 0
-            files_changed.append(file['file'])
+
+            added += int(file['added']) if 'added' in file and file['added'].isdigit() else 0
+            removed += int(file['removed']) if 'removed' in file and file['removed'].isdigit() else 0
+            actions += 1 if 'action' in file else 0
+            files_changed.append(file['file'] if 'file' in file else None)
 
         if 'project' in self.date_items.keys():
 
