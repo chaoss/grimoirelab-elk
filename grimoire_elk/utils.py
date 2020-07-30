@@ -109,6 +109,7 @@ from .enriched.mattermost import MattermostEnrich
 from .enriched.mbox import MBoxEnrich
 from .enriched.mediawiki import MediaWikiEnrich
 from .enriched.meetup import MeetupEnrich
+from .enriched.meetupqm import MeetupQMEnrich
 from .enriched.mozillaclub import MozillaClubEnrich
 from .enriched.nntp import NNTPEnrich
 from .enriched.pagure import PagureEnrich
@@ -257,6 +258,7 @@ def get_connectors():
             "mbox": [MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
             "mediawiki": [MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
             "meetup": [Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
+            "meetupqm": [Meetup, MeetupOcean, MeetupQMEnrich, MeetupCommand],
             "mozillaclub": [MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
             "nntp": [NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
             "pagure": [Pagure, PagureOcean, PagureEnrich, PagureCommand],
