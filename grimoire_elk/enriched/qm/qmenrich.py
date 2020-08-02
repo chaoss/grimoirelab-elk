@@ -20,8 +20,8 @@
 #
 
 
-from .enrich import Enrich
-from ..elastic_mapping import Mapping
+from grimoire_elk.enriched.enrich import Enrich
+from grimoire_elk.elastic_mapping import Mapping
 
 
 class QMEnrich(Enrich):
