@@ -33,6 +33,7 @@ from .utils import get_time_diff_days
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
 ISSUE_TYPE = 'issue'
 COMMENT_TYPE = 'comment'
+CLOSED_STATUS_CATEGORY_KEY = 'done'
 
 logger = logging.getLogger(__name__)
 
@@ -291,6 +292,10 @@ class JiraEnrich(Enrich):
         eitem['resolution_date'] = issue['fields']['resolutiondate']
         eitem['status_description'] = issue['fields']['status']['description']
         eitem['status'] = issue['fields']['status']['name']
+        eitem['status_category_key'] = issue['fields']['status']['statusCategory']['key']
+        eitem['is_closed'] = 0
+        if eitem['status_category_key'] == CLOSED_STATUS_CATEGORY_KEY:
+            eitem['is_closed'] = 1
         eitem['summary'] = issue['fields']['summary']
         if 'timeoriginalestimate' in issue['fields']:
             eitem['original_time_estimation'] = issue['fields']['timeoriginalestimate']
