@@ -74,6 +74,8 @@ class TestJira(TestBaseBackend):
         self.assertIn("main_description", eitem)
         self.assertIn("main_description_analyzed", eitem)
         self.assertEqual(eitem['author_type'], 'assignee')
+        self.assertEqual(eitem['status_category_key'], 'done')
+        self.assertEqual(eitem['is_closed'], 1)
 
         item = self.items[0]
         eitem = enrich_backend.get_rich_item(item, author_type='reporter')
@@ -90,6 +92,8 @@ class TestJira(TestBaseBackend):
         self.assertEqual(eitem['id'], "d6b4168fd458f910fb9af1df0e9edcfaa188cc67_issue_10008_user_creator")
         self.assertEqual(eitem['number_of_comments'], 0)
         self.assertEqual(eitem['author_type'], 'creator')
+        self.assertEqual(eitem['status_category_key'], 'done')
+        self.assertEqual(eitem['is_closed'], 1)
 
         item = self.items[3]
         eitem = enrich_backend.get_rich_item(item)
@@ -97,6 +101,8 @@ class TestJira(TestBaseBackend):
         self.assertEqual(eitem['id'], "305dbd15b1f250cb6941d8b9270af3d3a4405084_issue_10017_user_creator")
         self.assertEqual(eitem['number_of_comments'], 0)
         self.assertEqual(eitem['author_type'], 'creator')
+        self.assertEqual(eitem['status_category_key'], 'done')
+        self.assertEqual(eitem['is_closed'], 1)
 
         item = self.items[4]
         eitem = enrich_backend.get_rich_item(item)
@@ -104,6 +110,8 @@ class TestJira(TestBaseBackend):
         self.assertEqual(eitem['id'], "929182e386ddb7d290c0dbd2eb34140993c8f567_issue_10018_user_creator")
         self.assertEqual(eitem['number_of_comments'], 2)
         self.assertEqual(eitem['author_type'], 'creator')
+        self.assertEqual(eitem['status_category_key'], 'done')
+        self.assertEqual(eitem['is_closed'], 1)
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
