@@ -42,10 +42,13 @@ class GitLabQMEnrich(QMEnrich):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
 
-        self.date_items = {}
         self.comments = {
             'number_comments': {},
             'number_attended': {}
+        }
+
+        self.date_items = {
+            'data': {}
         }
 
         self.studies = []

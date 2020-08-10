@@ -41,7 +41,9 @@ class MeetupQMEnrich(QMEnrich):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
 
-        self.date_items = {}
+        self.date_items = {
+            'data': {}
+        }
 
         self.studies = []
 
@@ -143,7 +145,7 @@ class MeetupQMEnrich(QMEnrich):
                 "metric_class": 'events',
                 "metric_id": 'events.numberComments',
                 "metric_desc": 'The number of comments on a current date.',
-                "metric_name": 'Number of Threads'
+                "metric_name": 'Number of Comments'
             }
         elif category == 'yes_rsvp_count':
             edict = {
