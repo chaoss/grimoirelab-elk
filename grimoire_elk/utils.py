@@ -95,6 +95,7 @@ from grimoire_elk.enriched.qm.gitqm import GitQMEnrich
 from .enriched.github import GitHubEnrich
 from .enriched.githubql import GitHubQLEnrich
 from .enriched.github2 import GitHubEnrich2
+from grimoire_elk.enriched.qm.githubqm import GitHubQMEnrich
 from .enriched.gitlab import GitLabEnrich
 from grimoire_elk.enriched.qm.gitlabqm import GitLabQMEnrich
 from .enriched.gitter import GitterEnrich
@@ -244,6 +245,7 @@ def get_connectors():
             "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
             "githubql": [GitHubQL, GitHubQLOcean, GitHubQLEnrich, GitHubQLCommand],
             "github2": [GitHub, GitHubOcean, GitHubEnrich2, GitHubCommand],
+            "githubqm": [GitHub, GitHubOcean, GitHubQMEnrich, GitHubCommand],
             "gitlab": [GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
             "gitlabqm": [GitLab, GitLabOcean, GitLabQMEnrich, GitLabCommand],
             "gitter": [Gitter, GitterOcean, GitterEnrich, GitterCommand],
