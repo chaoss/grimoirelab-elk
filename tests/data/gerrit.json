@@ -410,6 +410,7 @@
         "lastUpdated": 1469621492,
         "number": "343936",
         "open": true,
+        "wip": true,
         "owner": {
             "email": "kevin_at_benton.pub@example.com",
             "name": "Kevin Benton",
@@ -1001,6 +1002,7 @@
         "lastUpdated": 1469621487,
         "number": "334401",
         "open": true,
+        "wip": true,
         "owner": {
             "email": "xianms_at_cn.ibm.com",
             "name": "MingShuang Xian",

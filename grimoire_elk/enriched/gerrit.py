@@ -271,6 +271,9 @@ class GerritEnrich(Enrich):
         # specific field to count changeset review
         eitem.update(self.get_grimoire_fields(review['createdOn'], CHANGESET_TYPE))
 
+        eitem['wip'] = review.get('wip', False)
+        eitem['open'] = review.get('open', None)
+
         self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem
@@ -285,6 +288,8 @@ class GerritEnrich(Enrich):
                 ecomment[f] = eitem[f]
 
             # Copy data from the enriched review
+            ecomment['wip'] = eitem['wip']
+            ecomment['open'] = eitem['open']
             ecomment['url'] = eitem['url']
             ecomment['summary'] = eitem['summary']
             ecomment['repository'] = eitem['repository']
@@ -355,6 +360,8 @@ class GerritEnrich(Enrich):
                 epatchset[f] = eitem[f]
 
             # Copy data from the enriched review
+            epatchset['wip'] = eitem['wip']
+            epatchset['open'] = eitem['open']
             epatchset['url'] = eitem['url']
             epatchset['summary'] = eitem['summary']
             epatchset['repository'] = eitem['repository']
@@ -438,6 +445,8 @@ class GerritEnrich(Enrich):
                 eapproval[f] = epatchset[f]
 
             # Copy data from the enriched patchset
+            eapproval['wip'] = epatchset['wip']
+            eapproval['open'] = epatchset['open']
             eapproval['url'] = epatchset['url']
             eapproval['summary'] = epatchset['summary']
             eapproval['repository'] = epatchset['repository']

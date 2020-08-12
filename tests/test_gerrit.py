@@ -74,6 +74,8 @@ class TestGerrit(TestBaseBackend):
 
         self.assertEqual(eitem['time_to_first_review'], 0.06)
         self.assertEqual(eitem['status_value'], '1')
+        self.assertTrue(eitem['open'])
+        self.assertTrue(eitem['wip'])
 
         comments = item['data']['comments']
         ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
@@ -86,6 +88,8 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('metadata__gelk_backend_name', ecomment)
             self.assertIn('metadata__gelk_version', ecomment)
             self.assertIn(REPO_LABELS, ecomment)
+            self.assertTrue(ecomment['open'])
+            self.assertTrue(ecomment['wip'])
 
         patchsets = item['data']['patchSets']
         epatchsets = enrich_backend.get_rich_item_patchsets(patchsets, eitem)
@@ -98,6 +102,8 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('changeset_status', epatchset)
             self.assertIn('changeset_status_value', epatchset)
             self.assertIn(REPO_LABELS, epatchset)
+            self.assertTrue(epatchset['open'])
+            self.assertTrue(epatchset['wip'])
 
         eapprovals = [ei for ei in epatchsets if 'is_gerrit_approval' in ei]
         epatchsets = [ei for ei in epatchsets if 'is_gerrit_patchset' in ei]
@@ -113,6 +119,8 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('changeset_status_value', epatchset)
             self.assertIn(REPO_LABELS, epatchset)
             self.assertEqual(epatchset['patchset_time_to_first_review'], expected_patchset_time_to_first_review[i])
+            self.assertTrue(epatchset['open'])
+            self.assertTrue(epatchset['wip'])
 
         self.assertEqual(len(eapprovals), 14)
         for eapproval in eapprovals:
@@ -124,6 +132,8 @@ class TestGerrit(TestBaseBackend):
             self.assertIn('metadata__gelk_backend_name', eapproval)
             self.assertIn('metadata__gelk_version', eapproval)
             self.assertIn(REPO_LABELS, eapproval)
+            self.assertTrue(eapproval['open'])
+            self.assertTrue(eapproval['wip'])
 
         # 2nd review
         item = self.items[1]
@@ -132,6 +142,8 @@ class TestGerrit(TestBaseBackend):
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__gelk_version', eitem)
         self.assertIn(REPO_LABELS, eitem)
+        self.assertTrue(eitem['open'])
+        self.assertTrue(eitem['wip'])
 
         comments = item['data']['comments']
         ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
@@ -148,6 +160,8 @@ class TestGerrit(TestBaseBackend):
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__gelk_version', eitem)
         self.assertIn(REPO_LABELS, eitem)
+        self.assertTrue(eitem['open'])
+        self.assertFalse(eitem['wip'])
 
         comments = item['data']['comments']
         ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
@@ -164,6 +178,8 @@ class TestGerrit(TestBaseBackend):
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__gelk_version', eitem)
         self.assertIn(REPO_LABELS, eitem)
+        self.assertTrue(eitem['open'])
+        self.assertFalse(eitem['wip'])
 
         comments = item['data']['comments']
         ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
@@ -180,6 +196,8 @@ class TestGerrit(TestBaseBackend):
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__gelk_version', eitem)
         self.assertIn(REPO_LABELS, eitem)
+        self.assertTrue(eitem['open'])
+        self.assertFalse(eitem['wip'])
 
         comments = item['data']['comments']
         ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
@@ -196,6 +214,8 @@ class TestGerrit(TestBaseBackend):
         self.assertIn('metadata__gelk_backend_name', eitem)
         self.assertIn('metadata__gelk_version', eitem)
         self.assertIn(REPO_LABELS, eitem)
+        self.assertTrue(eitem['open'])
+        self.assertFalse(eitem['wip'])
 
         comments = item['data']['comments']
         ecomments = enrich_backend.get_rich_item_comments(comments, eitem)
