@@ -1063,7 +1063,7 @@ class Enrich(ElasticItems):
 
         logger.info("{} end".format(log_prefix))
 
-    def enrich_extra_data(self, ocean_backend, enrich_backend, json_url, target_index=None):
+    def enrich_extra_data(self, ocean_backend, enrich_backend, json_url, target_index=None, conflicts=None):
         """
         This study enables setting/removing extra fields on/from a target index. For example if a use case
         requires tagging specific documents in an index with extra fields, like tagging all kernel
@@ -1126,10 +1126,14 @@ class Enrich(ElasticItems):
         :param json_url: url to json file that containing the target documents and the extra fields to be added
         :param target_index: an optional target index to be enriched (e.g., an enriched or study index). If not
                              declared it will be the index defined in the enrich_backend.
+        :param conflicts: an optional conflicts field which takes the value conflicts='proceed'.
         """
         index_url = "{}/{}".format(enrich_backend.elastic_url,
                                    target_index) if target_index else enrich_backend.elastic.index_url
-        url = "{}/_update_by_query?wait_for_completion=true&conflicts=proceed".format(index_url)
+        if conflicts == "proceed":
+            url = "{}/_update_by_query?wait_for_completion=true&conflicts=proceed".format(index_url)
+        else:
+            url = "{}/_update_by_query?wait_for_completion=true".format(index_url)
 
         res = self.requests.get(index_url)
         if res.status_code != 200:
