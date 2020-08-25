@@ -90,7 +90,9 @@ setup(name="grimoire-elk",
           'pandas>=0.22.0,<=0.25.3',
           'numpy<=1.18.3',
           'geopy>=2.0.0',
-          'statsmodels >= 0.9.0'
+          'statsmodels >= 0.9.0',
+          'gspread == 3.6.0',
+          'oauth2client == 4.1.3',
       ],
       zip_safe=False
       )

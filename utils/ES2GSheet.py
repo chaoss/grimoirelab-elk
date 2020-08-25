@@ -65,16 +65,11 @@ def ES2Excel():
         }
     )
     convert_csv(df)
-    convert_xlsx(df)
     Excel2GSheets(spreadsheetname='Testing')
 
 
 def convert_csv(df):
     df.to_csv(csv_file_name, index=None)
-
-
-def convert_xlsx(df):
-    df.to_excel(xls_file_name, index=None)
 
 
 def Excel2GSheets(spreadsheetname):
@@ -102,10 +97,9 @@ def Excel2GSheets(spreadsheetname):
 
 
 def main():
-    global xls_file_name, csv_file_name
+    global csv_file_name
     filename = "all_scms_enriched"
     csv_file_name = filename + ".csv"
-    xls_file_name = filename + ".xlsx"
     ES2Excel()
 
 

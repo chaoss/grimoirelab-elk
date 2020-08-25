@@ -37,18 +37,18 @@ def formatexcel(spreadsheetname):
             if isinstance(x, str):
                 scms_tags.append(scms_df["Tag {0}".format(i)][j])
         formatted_df['scms_tags'][j] = scms_tags
-    formatted_df.to_excel("formatted.xlsx", index=False)
-    Excel2JSON("formatted.xlsx")
+    formatted_df.to_csv("formatted.csv", index=False)
+    Excel2JSON("formatted.csv")
 
 
 def Excel2JSON(tagged_file):
     """
-    Input: Tagged excel file containing Weight, Category, scms_tag
+    Input: Tagged CSV file containing Weight, Category, scms_tag
 
     Output: formatted json string (extra_data.json)
 
     """
-    tagged_file_df = pd.read_excel(tagged_file)
+    tagged_file_df = pd.read_csv(tagged_file)
     json_str = '['
     for i in range(len(tagged_file_df)):
         d = json.dumps(tagged_file_df['scms_tags'][i])
