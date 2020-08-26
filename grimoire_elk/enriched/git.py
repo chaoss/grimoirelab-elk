@@ -41,7 +41,7 @@ from .enrich import Enrich, metadata
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
 from ..elastic_mapping import Mapping as BaseMapping
 from ..elastic_items import HEADER_JSON, MAX_BULK_UPDATE_SIZE
-from .utils import anonymize_url
+from .utils import anonymize_url, get_lines_of_code
 
 GITHUB = 'https://github.com/'
 DEMOGRAPHY_COMMIT_MIN_DATE = '1980-01-01'
@@ -324,6 +324,8 @@ class GitEnrich(Enrich):
 
         if self.pair_programming:
             eitem = self.__add_pair_programming_metrics(commit, eitem)
+
+        eitem['lines_of_code'] = get_lines_of_code(item['origin'])
 
         self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
