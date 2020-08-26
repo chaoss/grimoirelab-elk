@@ -18,15 +18,18 @@
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
-
+import enum
+import os
 import datetime
 import inspect
 import json
 import logging
 import re
+import time
 
 import requests
 import urllib3
+from git import Repo, RemoteProgress
 
 from grimoirelab_toolkit.datetime import (datetime_utcnow,
                                           str_to_datetime)
@@ -40,6 +43,7 @@ MAX_RETRIES_ON_CONNECT = 21
 STATUS_FORCE_LIST = [408, 409, 429, 502, 503, 504]
 METADATA_FILTER_RAW = 'metadata__filter_raw'
 REPO_LABELS = 'repository_labels'
+REPO_BASE_DIR = '/var/tmp/repo'
 
 logger = logging.getLogger(__name__)
 
@@ -234,3 +238,135 @@ def fix_field_date(date_value):
         field_date = field_date.replace(tzinfo=None)
 
     return field_date.isoformat()
+
+
+class CloneProgress(RemoteProgress):
+
+    def update(self, op_code, cur_count, max_count=None, message=''):
+        if message:
+            print(message)
+
+
+class GitOperation(enum.Enum):
+    clone = 'clone'
+    purge = 'purge'
+
+
+def get_list_of_files(dir_name):
+    # create a list of file and sub directories
+    # names in the given directory
+    list_of_file = os.listdir(dir_name)
+    all_files = list()
+    # Iterate over all the entries
+    for entry in list_of_file:
+        # Create full path
+        full_path = os.path.join(dir_name, entry)
+        # If entry is a directory then get the list of files in this directory
+        if os.path.isdir(full_path) and not full_path.endswith('.git'):
+            all_files = all_files + get_list_of_files(full_path)
+        else:
+            all_files.append(full_path)
+
+    return all_files
+
+
+def get_git_repo_dir(base_dir, repo_dir):
+    return os.path.join(base_dir, repo_dir)
+
+
+def get_git_repo_name(repo_url):
+    return (repo_url.split('/')[-1]).replace('.git', '')
+
+
+def build_git_clone_command(repo_url, base_dir=REPO_BASE_DIR):
+    cmd_git = '/usr/bin/git'
+    cmd_ops_git = 'clone'
+    return f'{cmd_git} {cmd_ops_git} {repo_url}'
+
+
+def build_git_purge_repo(base_dir, repo_dir):
+    cmd_purge = 'rm -rf'
+    return f'{cmd_purge} {os.path.join(base_dir, repo_dir)}'
+
+
+def exec_git_command(command):
+    os.popen(command)
+
+
+def exec_git_clone_operation(repo_url, path):
+    result = Repo.clone_from(url=repo_url, to_path=path,
+                             progress=CloneProgress())
+
+
+def process_git_operation(choice, args):
+    if GitOperation.clone.value == choice:
+        # command = build_git_clone_command(repo_url=args.get('repo_url'))
+        # exec_git_command(command)
+        exec_git_clone_operation(repo_url=args.get('repo_url'),
+                                 path=args.get('path'))
+    elif GitOperation.purge.value == choice:
+        command = build_git_purge_repo(base_dir=args.get('base_dir'),
+                                       repo_dir=args.get('repo_dir'))
+        exec_git_command(command)
+    else:
+        pass
+
+
+def build_cloc_command(path):
+    cmd_loc = 'cloc'
+    return f'{cmd_loc} {path}'
+
+
+def exec_cloc_command(command):
+    return os.popen(command)
+
+
+def get_lines_of_code(repo_url):
+    lines_of_code = -1
+    repo_dir = get_git_repo_name(repo_url)
+    repo_dir_path = get_git_repo_dir(REPO_BASE_DIR, repo_dir)
+
+    def read_os_stream(stream):
+        return stream.read()
+
+    def extract_lines_of_code(value):
+        if 'SUM:' in value:
+            return int((value.split('\n')[-3]).split(' ')[-1])
+        return 0
+
+    start = time.time()
+    logger.debug('Get lines of code process started')
+    logger.debug(f"Runtime of the program start {start}")
+    try:
+        logger.debug('Purge the repository directory if exists')
+        if os.path.exists(repo_dir_path):
+            logger.debug('Purge the repository started')
+            process_git_operation(choice=GitOperation.purge.value,
+                                  args={'base_dir': REPO_BASE_DIR,
+                                        'repo_dir': repo_dir})
+            logger.debug('Purge the repository started')
+
+        logger.debug('Pull repository in repository base location')
+        process_git_operation(choice=GitOperation.clone.value,
+                              args={'repo_url': repo_url,
+                                    'path': repo_dir_path})
+
+        logger.debug('The lines of code calculation started')
+        command = build_cloc_command(repo_dir_path)
+        os_stream = exec_cloc_command(command)
+        lines_of_code += extract_lines_of_code(read_os_stream(os_stream))
+        logger.debug('The lines of code calculation finished')
+    except Exception as e:
+        logger.debug('Oops error in execution')
+        logger.debug(e)
+    else:
+        logger.debug('Purge the repository directory if exists')
+        process_git_operation(choice=GitOperation.purge.value,
+                              args={'base_dir': REPO_BASE_DIR,
+                                    'repo_dir': repo_dir})
+        end = time.time()
+        logger.debug(f"Runtime of the program end {end}")
+        logger.debug(f"Runtime of the program is {end - start}")
+
+        # Return lines of code value otherwise -1 for error
+        return lines_of_code
