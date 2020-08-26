@@ -28,6 +28,7 @@ is_git_commit,long,true,"Field containing '1' that allows to sum fields when con
 lines_added,long,true,"Number of lines added by this commit."
 lines_changed,long,true,"Number of lines changed by this commit."
 lines_removed,long,true,"Number of lines removed by this commit."
+lines_of_code,long,true,"Number of lines of code in the repository."
 message_analyzed,text,false,"Commit message split by terms to allow searching."
 message,keyword,true,"Commit message as a single String."
 metadata__enriched_on,date,true,"Date when the item was enriched."
