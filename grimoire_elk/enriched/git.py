@@ -264,25 +264,12 @@ class GitEnrich(Enrich):
             eitem["repo_name"] = anonymize_url(eitem["repo_name"])
 
         # Number of files touched
-        eitem["files"] = 0
-        # Number of lines added and removed
-        lines_added = 0
-        lines_removed = 0
-        for cfile in commit["files"]:
-            if 'action' not in cfile:
-                # merges are not counted
-                continue
-            eitem["files"] += 1
-            if 'added' in cfile and 'removed' in cfile:
-                try:
-                    lines_added += int(cfile["added"])
-                    lines_removed += int(cfile["removed"])
-                except ValueError:
-                    # logger.warning(cfile)
-                    continue
-        eitem["lines_added"] = lines_added
-        eitem["lines_removed"] = lines_removed
-        eitem["lines_changed"] = lines_added + lines_removed
+        eitem["files"] = item.get("count_files_touch", 0)
+
+        eitem["lines_added"] = item.get("count_lines_added", 0)
+        eitem["lines_removed"] = item.get("count_lines_removed", 0)
+        eitem["lines_changed"] = item.get("count_lines_changed", 0)
+        eitem["total_lines_of_code"] = item.get("count_lines_of_code", 0)
 
         # author_name and author_domain are added always
         identity = self.get_sh_identity(commit["Author"])
