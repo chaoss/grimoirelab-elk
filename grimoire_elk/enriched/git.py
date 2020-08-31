@@ -337,7 +337,7 @@ class GitEnrich(Enrich):
             ladded = eitem['lines_added']
             lremoved = eitem['lines_removed']
             lchanged = eitem['lines_changed']
-            total_loc = eitem['total_line_of_code']
+            total_loc = eitem['total_lines_of_code']
             metrics['pair_programming_commit'] = round(1.0 / nauthors, ndecimals)
             metrics['pair_programming_files'] = round(files / nauthors, ndecimals)
             metrics["pair_programming_lines_added"] = round(ladded / nauthors, ndecimals)
