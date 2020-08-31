@@ -160,6 +160,7 @@ class TestGit(TestBaseBackend):
             self.assertIn('pair_programming_lines_added', source)
             self.assertIn('pair_programming_lines_removed', source)
             self.assertIn('pair_programming_lines_changed', source)
+            self.assertIn('pair_programming_total_lines_of_code', source)
             self.assertIn('is_git_commit_multi_author', source)
             self.assertIn('Signed-off-by_number', source)
             self.assertIn('is_git_commit_signed_off', source)
