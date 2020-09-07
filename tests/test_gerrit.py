@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2020 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,11 @@
 # Authors:
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
+#     Quan Zhou <quan@bitergia.com>
+#     Miguel Ángel Fernández <mafesan@bitergia.com>
 #
+
+
 import logging
 import time
 import unittest
@@ -26,6 +30,7 @@ import unittest
 from base import TestBaseBackend, DB_SORTINGHAT
 from grimoire_elk.enriched.enrich import (logger,
                                           DEMOGRAPHICS_ALIAS,
+                                          DEMOGRAPHICS_CONTRIBUTION_ALIAS,
                                           anonymize_url)
 from grimoire_elk.enriched.utils import REPO_LABELS
 
@@ -256,6 +261,47 @@ class TestGerrit(TestBaseBackend):
         r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
                                                 headers=HEADER_JSON, verify=False)
         self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
+
+    def test_demography_contribution_study(self):
+        """ Test that the demography contribution study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_demography_contribution')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_demography_contribution":
+                study(ocean_backend, enrich_backend, date_field="grimoire_creation_date")
+
+            self.assertEqual(cm.output[0],
+                             'INFO:grimoire_elk.enriched.enrich:[gerrit] '
+                             'Demography Contribution starting study %s/test_gerrit_enrich'
+                             % anonymize_url(self.es_con))
+            self.assertEqual(cm.output[-1],
+                             'INFO:grimoire_elk.enriched.enrich:[gerrit] Demography Contribution end %s/test_gerrit_enrich'
+                             % anonymize_url(self.es_con))
+
+        time.sleep(5)  # HACK: Wait until gerrit enrich index has been written
+        items = [i for i in enrich_backend.fetch()]
+        for item in items:
+            if 'author_uuid' not in item:
+                continue
+            field_type = item['type']
+            if field_type == 'approval':
+                self.assertIn('approval_min_date', item)
+                self.assertIn('approval_max_date', item)
+            elif field_type == 'changeset':
+                self.assertIn('changeset_min_date', item)
+                self.assertIn('changeset_max_date', item)
+            elif field_type == 'comment':
+                self.assertIn('comment_min_date', item)
+                self.assertIn('comment_max_date', item)
+            elif field_type == 'patchset':
+                self.assertIn('patchset_min_date', item)
+                self.assertIn('patchset_max_date', item)
+
+        r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
+                                                headers=HEADER_JSON, verify=False)
+        self.assertIn(DEMOGRAPHICS_CONTRIBUTION_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
