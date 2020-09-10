@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2020 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 #
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
+#   Quan Zhou <quan@bitergia.com>
+#   Miguel Ángel Fernández <mafesan@bitergia.com>
 #
 
 import json
@@ -24,6 +26,7 @@ import functools
 import logging
 import requests
 import sys
+import time
 
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
@@ -78,6 +81,7 @@ CUSTOM_META_PREFIX = 'cm'
 EXTRA_PREFIX = 'extra'
 SH_UNKNOWN_VALUE = 'Unknown'
 DEMOGRAPHICS_ALIAS = 'demographics'
+DEMOGRAPHICS_CONTRIBUTION_ALIAS = 'demographics_contribution'
 ONION_ALIAS = 'all_onion'
 
 
@@ -1691,15 +1695,59 @@ class Enrich(ElasticItems):
 
         return es_query
 
+    def enrich_demography_contribution(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
+                                       author_field="author_uuid"):
+        """
+        Run demography study for the different types of the author activities and add the resulting enriched items.
+
+        The resulting min and max dates are updated in all items including attributes following the pattern
+        <contribution_type>_min_date and <contribution_type>_max_date.
+
+        The different contribution types available are obtained with a query asking for unique "type" elements
+        within the contributions from all authors.
+
+        :param ocean_backend: backend from which to read the raw items
+        :param enrich_backend:  backend from which to read the enriched items
+        :param date_field: field used to find the mix and max dates for the author's activity
+        :param author_field: field of the author
+
+        :return: None
+        """
+        data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
+        log_prefix = "[{}] Demography Contribution".format(data_source)
+        logger.info("{} starting study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
+
+        es_query = Enrich.fetch_contribution_types()
+        r = self.requests.post(self.elastic.index_url + "/_search",
+                               data=es_query, headers=HEADER_JSON,
+                               verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as ex:
+            logger.error("{} error getting contribution types. Aborted.".format(log_prefix))
+            logger.error(ex)
+            return
+
+        # Obtain the list of contribution types
+        type_fields = []
+        for type_field in r.json()['aggregations']['uniq_gender']['buckets']:
+            type_fields.append(type_field['key'])
+
+        # Run demography study for each contribution type
+        type_fields.sort()
+        for field in type_fields:
+            Enrich.run_demography(self, date_field, author_field, log_prefix, contribution_type=field)
+
+        if not self.elastic.alias_in_use(DEMOGRAPHICS_CONTRIBUTION_ALIAS):
+            logger.info("{} Creating alias: {}".format(log_prefix, DEMOGRAPHICS_CONTRIBUTION_ALIAS))
+            self.elastic.add_alias(DEMOGRAPHICS_CONTRIBUTION_ALIAS)
+
+        logger.info("{} end {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
+
     def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
                           author_field="author_uuid"):
         """
-        The goal of the algorithm is to add to all enriched items the first and last date
-        (i.e., demography_min_date, demography_max_date) of the author activities.
-
-        In order to implement the algorithm first, the min and max dates (based on the date_field attribute)
-        are retrieved for all authors. Then, demography_min_date and demography_max_date attributes are
-        updated in all items.
+        Run demography study for all of the author activities and add the resulting enriched items.
 
         :param ocean_backend: backend from which to read the raw items
         :param enrich_backend:  backend from which to read the enriched items
@@ -1712,10 +1760,39 @@ class Enrich(ElasticItems):
         log_prefix = "[{}] Demography".format(data_source)
         logger.info("{} starting study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
 
+        Enrich.run_demography(self, date_field, author_field, log_prefix)
+
+        if not self.elastic.alias_in_use(DEMOGRAPHICS_ALIAS):
+            logger.info("{} Creating alias: {}".format(log_prefix, DEMOGRAPHICS_ALIAS))
+            self.elastic.add_alias(DEMOGRAPHICS_ALIAS)
+
+        logger.info("{} end {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
+
+    def run_demography(self, date_field, author_field, log_prefix, contribution_type=None):
+        """
+        The goal of the algorithm is to add to all enriched items the first and last date
+        of all the activities or an specific contribution type of the author activities.
+
+        In case there is no specific contribution type, by default all contributions will be considered.
+
+        In order to implement the algorithm first, the min and max dates (based on the date_field attribute)
+        are retrieved for all authors, including the contribution type in the corresponding query. Then,
+        the resulting min and max dates are updated in all items including attributes following the pattern
+        <contribution_type>_min_date and <contribution_type>_max_date. In case no contribution type is specified,
+        the default fields are `demography_min_date` and `demography_max_date`.
+
+        :param date_field: field used to find the mix and max dates for the author's activity
+        :param author_field: field of the author
+        :param log_prefix: log prefix used on logger
+        :param contribution_type: name of the contribution type (if any) which the dates are computed for.
+            In case there is no specific contribution type, by default all contributions will be considered.
+        """
         # The first step is to find the current min and max date for all the authors
         authors_min_max_data = {}
 
-        es_query = Enrich.authors_min_max_dates(date_field, author_field=author_field)
+        es_query = Enrich.authors_min_max_dates(date_field,
+                                                author_field=author_field,
+                                                contribution_type=contribution_type)
         r = self.requests.post(self.elastic.index_url + "/_search",
                                data=es_query, headers=HEADER_JSON,
                                verify=False)
@@ -1734,8 +1811,9 @@ class Enrich(ElasticItems):
             author_min_date = authors_min_max_data[author_key]['min']['value_as_string']
             author_max_date = authors_min_max_data[author_key]['max']['value_as_string']
 
+            field_name = contribution_type if contribution_type else 'demography'
             es_update = Enrich.update_author_min_max_date(author_min_date, author_max_date,
-                                                          author_key, author_field=author_field)
+                                                          author_key, field_name, author_field=author_field)
 
             try:
                 r = self.requests.post(
@@ -1743,8 +1821,10 @@ class Enrich(ElasticItems):
                     data=es_update, headers=HEADER_JSON,
                     verify=False
                 )
+                self.check_version_conflicts(es_update, r.json()['version_conflicts'], log_prefix)
+
             except requests.exceptions.RetryError:
-                logger.warning("{} retry execeeded while executing demography."
+                logger.warning("{} retry exceeded while executing demography."
                                " The following query is skipped {}".format(log_prefix, es_update))
                 continue
 
@@ -1756,29 +1836,64 @@ class Enrich(ElasticItems):
                 logger.error(ex)
                 return
 
-        if not self.elastic.alias_in_use(DEMOGRAPHICS_ALIAS):
-            logger.info("{} Creating alias: {}".format(log_prefix, DEMOGRAPHICS_ALIAS))
-            self.elastic.add_alias(DEMOGRAPHICS_ALIAS)
+    def check_version_conflicts(self, es_update, version_conflicts, log_prefix, max_retries=5):
+        """
+        Check if there are version conflicts within a query response and retries the request.
+        The time between requests is 0.5 second. This method will perform the retries until there are no
+        more version conflicts.
 
-        logger.info("{} end {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
+        :param es_update: ES update query
+        :param version_conflicts: number of version conflicts from a query response
+        :param log_prefix: log prefix used on logger
+        :param max_retries: max number of retries to perform the query again when version conflicts are found
+        """
+        if version_conflicts == 0 or max_retries == 0:
+            return
+
+        logger.debug("{}: Found version_conflicts: {}, retries left: {}, retry query: {}".format(log_prefix,
+                                                                                                 version_conflicts,
+                                                                                                 max_retries,
+                                                                                                 es_update))
+        time.sleep(0.5)  # Wait 0.5 second between requests
+        r = self.requests.post(
+            self.elastic.index_url + "/_update_by_query?wait_for_completion=true&conflicts=proceed",
+            data=es_update, headers=HEADER_JSON,
+            verify=False
+        )
+        r.raise_for_status()
+        retries = max_retries - 1
+        self.check_version_conflicts(es_update, r.json()['version_conflicts'], log_prefix, max_retries=retries)
 
     @staticmethod
-    def authors_min_max_dates(date_field, author_field="author_uuid"):
+    def authors_min_max_dates(date_field, author_field="author_uuid", contribution_type=None):
         """
         Get the aggregation of author with their min and max activity dates
 
         :param date_field: field used to find the mix and max dates for the author's activity
         :param author_field: field of the author
+        :param contribution_type: name of the contribution type (if any) which the dates are computed for.
+            In case there is no specific contribution type, by default all contributions will be considered.
 
         :return: the query to be executed to get the authors min and max aggregation data
         """
 
         # Limit aggregations: https://github.com/elastic/elasticsearch/issues/18838
         # 30000 seems to be a sensible number of the number of people in git
-
+        query_type = ""
+        if contribution_type:
+            query_type = """"query": {
+            "bool" : {
+              "must" : {
+                "term" : {
+                  "type" : "%s"
+                }
+              }
+            }
+          },""" % contribution_type
         es_query = """
         {
           "size": 0,
+          %s
           "aggs": {
             "author": {
               "terms": {
@@ -1800,18 +1915,33 @@ class Enrich(ElasticItems):
             }
           }
         }
-        """ % (author_field, date_field, date_field)
+        """ % (query_type, author_field, date_field, date_field)
 
         return es_query
 
     @staticmethod
-    def update_author_min_max_date(min_date, max_date, target_author, author_field="author_uuid"):
+    def fetch_contribution_types():
+        query = '''
+        {
+            "size":"0",
+            "aggs" : {
+                "uniq_gender" : {
+                    "terms" : { "field" : "type" }
+                }
+            }
+        }
+        '''
+        return query
+
+    @staticmethod
+    def update_author_min_max_date(min_date, max_date, target_author, field, author_field="author_uuid"):
         """
         Get the query to update demography_min_date and demography_max_date of a given author
 
-        :param min_date: new demography_min_date
-        :param max_date: new demography_max_date
+        :param min_date: new <field>_min_date
+        :param max_date: new <field>_max_date
         :param target_author: target author to be updated
+        :param field: enriched field name
         :param author_field: author field
 
         :return: the query to be executed to update demography data of an author
@@ -1821,7 +1951,7 @@ class Enrich(ElasticItems):
         {
           "script": {
             "source":
-            "ctx._source.demography_min_date = params.min_date;ctx._source.demography_max_date = params.max_date;",
+            "ctx._source.%s_min_date = params.min_date;ctx._source.%s_max_date = params.max_date;",
             "lang": "painless",
             "params": {
                 "min_date": "%s",
@@ -1834,7 +1964,7 @@ class Enrich(ElasticItems):
             }
           }
         }
-        ''' % (min_date, max_date, author_field, target_author)
+        ''' % (field, field, min_date, max_date, author_field, target_author)
 
         return es_query
 

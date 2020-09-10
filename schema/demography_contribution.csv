@@ -1,0 +1,3 @@
+name,type,aggregatable,description
+<contribution>_max_date,date,true,"Date of the latest contribution of a certain type for a given author. For Gerrit, <contribution> can be approval, changeset, comment or patchset."
+<contribution>_min_date,date,true,"Date of the first (oldest) contribution of a certain type for a given author. For Gerrit, <contribution> can be approval, changeset, comment or patchset."
