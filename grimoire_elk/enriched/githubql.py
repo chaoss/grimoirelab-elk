@@ -17,6 +17,7 @@
 #
 # Authors:
 #   Valerio Cosentino <valcos@bitergia.com>
+#   Miguel Ángel Fernández <mafesan@bitergia.com>
 #
 
 import logging
@@ -77,7 +78,7 @@ class GitHubQLEnrich(Enrich):
         super().__init__(db_sortinghat, db_projects_map, json_projects_map,
                          db_user, db_password, db_host)
 
-        self.studies = [self.enrich_duration_analysis]
+        self.studies = [self.enrich_duration_analysis, self.enrich_reference_analysis]
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -463,5 +464,178 @@ class GitHubQLEnrich(Enrich):
             sid = start_event_types['_scroll_id']
             # get the number of results that returned in the last scroll
             scroll_size = len(start_event_types['hits']['hits'])
+
+        logger.info("{} ending study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
+
+    def enrich_reference_analysis(self, ocean_backend, enrich_backend):
+        """
+        The purpose of this study is to gather all the issues and pull requests which are
+        mutually referenced. Once these references are obtained, all of the events for the given issue
+        or pull request are updated with the corresponding list of URLs from the referenced items.
+
+        This study is not executed in a incremental way, as it only takes the `CrossReferencedEvent`
+        items to build a dictionary containing all the mutual references per each Issue or Pull Request,
+        identified by `issue_url`. Then, it updates all the events belonging to the same `issue_url`
+        adding the following fields:
+        * `referenced_by_issues`: List of issues referenced by a given Issue or Pull Request,
+            from the same repository.
+        * `referenced_by_prs`: List of pull requests referenced by a given Issue or Pull Request,
+            from the same repository.
+        * `referenced_by_external_issues`: List of issues referenced by a given Issue or Pull Request,
+            from different (external) repositories.
+        * `referenced_by_external_prs`: List of pull requests referenced by a given Issue or Pull Request,
+            from different (external) repositories.
+
+        The examples below show how to activate the study by modifying the setup.cfg.
+
+        ```
+        [githubql]
+        ...
+        studies = [..., enrich_reference_analysis]
+
+        [enrich_reference_analysis]]
+        ```
+
+        :param ocean_backend: backend from which to read the raw items
+        :param enrich_backend:  backend from which to read the enriched items
+        """
+        def _is_pull_request(issue_url):
+            """Return True if `issue_url` belongs to a Pull Request"""
+            return '/pull/' in issue_url
+
+        def _get_github_repo(issue_url):
+            """Return GitHub repository path using `owner/repository` format"""
+            repo = ''
+            url_info = issue_url.split('/')
+            if url_info[2] == 'github.com':
+                repo = '/'.join([url_info[3], url_info[4]])
+            return repo
+
+        data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
+        log_prefix = "[{}] Cross reference analysis".format(data_source)
+        logger.info("{} starting study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
+
+        es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
+                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+        in_index = enrich_backend.elastic.index
+
+        es_query = {
+            "size": 0,
+            "query": {
+                "bool": {
+                    "must": {
+                        "term": {
+                            "event_type": "CrossReferencedEvent"
+                        }
+                    }
+                }
+            },
+            "aggs": {
+                "issue_url": {
+                    "terms": {
+                        "field": "issue_url",
+                        "size": 30000
+                    },
+                    "aggs": {
+                        "uniq_gender": {
+                            "terms": {"field": "reference_source_url"}
+                        }
+                    }
+                }
+            }
+        }
+
+        # Get all CrossReferencedEvent items and their referenced issues and pull requests
+        cross_references = es_in.search(index=in_index, body=es_query)
+        buckets = cross_references['aggregations']['issue_url']['buckets']
+
+        reference_dict = {}
+        for item in buckets:
+            issue_url = item['key']
+            references = [ref['key'] for ref in item['uniq_gender']['buckets']]
+
+            # Update reference dictionary
+            if issue_url not in reference_dict.keys():
+                reference_dict[issue_url] = references
+            else:
+                prev_references = reference_dict[issue_url]
+                prev_references.append(references)
+                reference_dict[issue_url] = list(set(prev_references))
+
+        # Adding list entries from reversed references
+        for issue_url in reference_dict.keys():
+            reference_list = reference_dict[issue_url]
+            if not reference_list:
+                continue
+            for ref in reference_list:
+                try:
+                    ref_entry_list = reference_dict[ref]
+                except KeyError:
+                    continue
+                if ref_entry_list:
+                    ref_entry_list.append(issue_url)
+                else:
+                    ref_entry_list = [issue_url]
+                reference_dict[ref] = list(set(ref_entry_list))
+
+        # Updated affected issues and pull requests
+        painless_code = """
+            ctx._source.referenced_by_issues = params.referenced_by_issues;
+            ctx._source.referenced_by_prs = params.referenced_by_prs;
+            ctx._source.referenced_by_external_issues = params.referenced_by_external_issues;
+            ctx._source.referenced_by_external_prs = params.referenced_by_external_prs;
+        """
+        for issue_url in reference_dict.keys():
+            ref_issues_repo = []
+            ref_prs_repo = []
+            ref_issues_ext = []
+            ref_prs_ext = []
+
+            issue_repo = _get_github_repo(issue_url)
+
+            # Classify references internal/external repo + issues/pull-requests
+            reference_list = reference_dict[issue_url]
+            for ref in reference_list:
+                ref_repo = _get_github_repo(ref)
+                ref_is_pr = _is_pull_request(ref)
+
+                if ref_repo == issue_repo:
+                    if ref_is_pr:
+                        ref_prs_repo.append(ref)
+                    else:
+                        ref_issues_repo.append(ref)
+                else:
+                    if ref_is_pr:
+                        ref_prs_ext.append(ref)
+                    else:
+                        ref_issues_ext.append(ref)
+
+            # Update items with the corresponding fields
+            update_query = {
+                "script": {
+                    "source": painless_code,
+                    "lang": "painless",
+                    "params": {
+                        "referenced_by_issues": ref_issues_repo,
+                        "referenced_by_prs": ref_prs_repo,
+                        "referenced_by_external_issues": ref_issues_ext,
+                        "referenced_by_external_prs": ref_prs_ext,
+                    }
+                },
+                "query": {
+                    "term": {
+                        "issue_url": issue_url
+                    }
+                }
+            }
+
+            logger.info('{} - Updating fields from events with issue_url: {}'.format(log_prefix,
+                                                                                     issue_url))
+            r = es_in.update_by_query(index=in_index, body=update_query, conflicts='proceed')
+            if r['failures']:
+                logger.error("{} Error while executing study {}".format(log_prefix,
+                                                                        anonymize_url(self.elastic.index_url)))
+                logger.error(str(r['failures'][0]))
+                return
 
         logger.info("{} ending study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))

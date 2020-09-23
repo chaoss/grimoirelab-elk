@@ -17,7 +17,9 @@
 #
 # Authors:
 #     Valerio Cosentino <valcos@bitergia.com>
+#     Miguel Ángel Fernández <mafesan@bitergia.com>
 #
+
 import logging
 import time
 import unittest
@@ -345,6 +347,55 @@ class TestGitHubQL(TestBaseBackend):
         for item in items:
             self.assertEqual(item['previous_event_uuid'], 'f371d54454d297f86f08ab52a440ae5f9e4afeb1')
             self.assertEqual(item['duration_from_previous_event'], 2.0)
+
+    def test_reference_analysis(self):
+        """Test that the cross reference study works correctly"""
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_reference_analysis')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_reference_analysis":
+                study(ocean_backend, enrich_backend)
+
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.githubql:[githubql] Cross reference analysis '
+                                           'starting study %s/test_githubql_enrich'
+                             % anonymize_url(self.es_con))
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.githubql:[githubql] Cross reference analysis '
+                                            'ending study %s/test_githubql_enrich'
+                             % anonymize_url(self.es_con))
+
+        time.sleep(5)  # HACK: Wait until github enrich index has been written
+        referenced_items = []
+        for item in enrich_backend.fetch():
+            if ('referenced_by_issues' or 'referenced_by_prs') in item.keys():
+                referenced_items.append(item)
+
+        self.assertEqual(len(referenced_items), 7)
+
+        for item in referenced_items:
+            self.assertIn('referenced_by_issues', item)
+            self.assertIn('referenced_by_prs', item)
+            self.assertIn('referenced_by_external_issues', item)
+            self.assertIn('referenced_by_external_prs', item)
+
+            ref_issues = item['referenced_by_issues']
+            self.assertEqual(len(ref_issues), 1)
+
+            ref = ref_issues[0]
+            self.assertEqual(ref, 'https://github.com/valeriocos/test-issues-update/issues/2')
+
+            ref_prs = item['referenced_by_prs']
+            self.assertEqual(len(ref_issues), 1)
+
+            ref = ref_prs[0]
+            self.assertEqual(ref, 'https://github.com/valeriocos/test-issues-update/pull/3')
+
+            ref_ext_issues = item['referenced_by_external_issues']
+            self.assertEqual(len(ref_ext_issues), 0)
+
+            ref_ext_prs = item['referenced_by_external_prs']
+            self.assertEqual(len(ref_ext_prs), 0)
 
 
 if __name__ == "__main__":
