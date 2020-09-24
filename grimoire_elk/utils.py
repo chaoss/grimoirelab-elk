@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2020 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 #
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
+#   Quan Zhou <quan@bitergia.com>
 #
 
 import argparse
@@ -75,6 +76,8 @@ from perceval.backends.mozilla.kitsune import Kitsune, KitsuneCommand
 from perceval.backends.mozilla.mozillaclub import MozillaClub, MozillaClubCommand
 from perceval.backends.mozilla.remo import ReMo, ReMoCommand
 from perceval.backends.opnfv.functest import Functest, FunctestCommand
+from perceval.backends.weblate.weblate import Weblate, WeblateCommand
+
 # Connectors for EnrichOcean
 from .enriched.askbot import AskbotEnrich
 from .enriched.bugzilla import BugzillaEnrich
@@ -122,6 +125,7 @@ from .enriched.stackexchange import StackExchangeEnrich
 from .enriched.supybot import SupybotEnrich
 from .enriched.telegram import TelegramEnrich
 from .enriched.twitter import TwitterEnrich
+from .enriched.weblate import WeblateEnrich
 # Connectors for Ocean
 from .raw.askbot import AskbotOcean
 from .raw.bugzilla import BugzillaOcean
@@ -165,6 +169,7 @@ from .raw.stackexchange import StackExchangeOcean
 from .raw.supybot import SupybotOcean
 from .raw.telegram import TelegramOcean
 from .raw.twitter import TwitterOcean
+from .raw.weblate import WeblateOcean
 
 logger = logging.getLogger(__name__)
 
@@ -267,7 +272,8 @@ def get_connectors():
                               StackExchangeEnrich, StackExchangeCommand],
             "supybot": [Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
             "telegram": [Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
-            "twitter": [Twitter, TwitterOcean, TwitterEnrich, TwitterCommand]
+            "twitter": [Twitter, TwitterOcean, TwitterEnrich, TwitterCommand],
+            "weblate": [Weblate, WeblateOcean, WeblateEnrich, WeblateCommand]
             }  # Will come from Registry
 
 
