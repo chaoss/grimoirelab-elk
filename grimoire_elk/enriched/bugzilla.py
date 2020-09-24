@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2020 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 #
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
+#   Quan Zhou <quan@bitergia.com>
 #
 
 import logging
@@ -139,6 +140,8 @@ class BugzillaEnrich(Enrich):
         eitem['product'] = item['data']['product'][0]['__text__']
         eitem['component'] = item['data']['component'][0]['__text__']
         eitem['platform'] = item['data']['rep_platform'][0]['__text__']
+        if '__text__' in item['data']['status_whiteboard'][0]:
+            eitem['whiteboard'] = item['data']['status_whiteboard'][0]['__text__']
         if '__text__' in item['data']['resolution'][0]:
             eitem['resolution'] = item['data']['resolution'][0]['__text__']
         if 'watchers' in item['data']:
