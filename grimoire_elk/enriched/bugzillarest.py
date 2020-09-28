@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2020 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 #
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
+#   Quan Zhou <quan@bitergia.com>
 #
 
 import logging
@@ -155,6 +156,9 @@ class BugzillaRESTEnrich(Enrich):
         for history in issue['history']:
             if 'changes' in history:
                 eitem['changes'] += len(history['changes'])
+
+        if issue['whiteboard'] != "":
+            eitem['whiteboard'] = issue['whiteboard']
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item, self.roles))
