@@ -870,12 +870,12 @@ class GitEnrich(Enrich):
         :param enrich_backend: the enrich backend
         :param run_month_days: days of the month to run this study
         """
-        logger.debug("[git] study git-branches start")
+        logger.info("[git] study git-branches start")
         day = datetime_utcnow().day
         run_month_days = list(map(int, run_month_days))
         if day not in run_month_days:
-            logger.debug("[git] study git-branches will execute only the days {} of each month".format(run_month_days))
-            logger.debug("[git] study git-branches end")
+            logger.info("[git] study git-branches will execute only the days {} of each month".format(run_month_days))
+            logger.info("[git] study git-branches end")
             return
 
         for ds in self.prjs_map:
@@ -885,6 +885,10 @@ class GitEnrich(Enrich):
             urls = self.prjs_map[ds]
 
             for url in urls:
+                if '--filter-no-collection=true' in url:
+                    # Skip study when --filter-no-collection is present
+                    logger.info("[git] study git-branches skipping repo {}".format(anonymize_url(url)))
+                    continue
                 cmd = GitCommand(*[url])
 
                 git_repo = GitRepository(cmd.parsed_args.uri, cmd.parsed_args.gitpath)
@@ -904,7 +908,7 @@ class GitEnrich(Enrich):
                 logger.debug("[git] study git-branches repo {} in index {} processed".format(
                              git_repo.uri, anonymize_url(enrich_backend.elastic.index_url)))
 
-        logger.debug("[git] study git-branches end")
+        logger.info("[git] study git-branches end")
 
     def delete_commit_branches(self, git_repo, enrich_backend):
         """Delete the information about branches from the documents representing

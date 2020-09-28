@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2020 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,11 @@
 # Authors:
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
+#     Quan Zhou <quan@bitergia.com>
 #
+
+
+import datetime
 import logging
 import requests
 import time
@@ -29,6 +33,7 @@ from grimoire_elk.raw.git import GitOcean
 from grimoire_elk.enriched.enrich import (logger,
                                           DEMOGRAPHICS_ALIAS,
                                           anonymize_url)
+from grimoire_elk.enriched.git import logger as git_logger
 from grimoire_elk.enriched.utils import REPO_LABELS
 
 
@@ -548,6 +553,47 @@ class TestGit(TestBaseBackend):
             self.assertIn('uuid', source)
             self.assertEqual(source['origin'], 'https://github.com/acme/errors')
             self.assertEqual(source['repository'], 'https://github.com/acme/errors')
+
+    def test_enrich_git_branches_study(self):
+        """ Test that the git branches study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_git_branches')
+
+        items = [item for item in enrich_backend.fetch()]
+        self.assertEqual(len(items), 11)
+        for item in items:
+            self.assertTrue('branches' in item.keys())
+
+    def test_enrich_git_branches_study_filter_no_collection(self):
+        """ Test that the git branches study skip when --filter-no-collection is present """
+
+        projects_json_repo = "https://github.com/grimoirelab/perceval.git --filter-no-collection=true"
+        projects_json = {
+            "filter-repo": {
+                "git": [
+                    "https://github.com/grimoirelab/perceval.git --filter-no-collection=true"
+                ]
+            }
+        }
+        prjs_map = {
+            "git": {
+                "https://github.com/grimoirelab/perceval.git --filter-no-collection=true": "filter-repo"
+            }
+        }
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_git_branches',
+                                                                projects_json=projects_json,
+                                                                prjs_map=prjs_map,
+                                                                projects_json_repo=projects_json_repo)
+
+        today = datetime.datetime.today().day
+        with self.assertLogs(git_logger, level='INFO') as cm:
+            if study.__name__ == "enrich_git_branches":
+                study(ocean_backend, enrich_backend, run_month_days=[today])
+                self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.git:[git] study git-branches start')
+                self.assertEqual(cm.output[1], 'INFO:grimoire_elk.enriched.git:[git] study git-branches skipping'
+                                               ' repo {}'.format(projects_json_repo))
+                self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.git:[git] study git-branches end')
 
     def test_perceval_params(self):
         """Test the extraction of perceval params from an URL"""
