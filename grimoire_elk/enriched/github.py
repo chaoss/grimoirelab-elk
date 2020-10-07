@@ -18,6 +18,7 @@
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #   Florent Kaisser <florent.pro@kaisser.name>
+#   Miguel Ángel Fernández <mafesan@bitergia.com>
 #
 
 import logging
@@ -487,6 +488,8 @@ class GitHubEnrich(Enrich):
         rich_pr['merged_at'] = pull_request['merged_at']
         rich_pr['closed_at'] = pull_request['closed_at']
         rich_pr['url'] = pull_request['html_url']
+        # Adding this field for consistency with the rest of github-related enrichers
+        rich_pr['issue_url'] = pull_request['html_url']
         labels = []
         [labels.append(label['name']) for label in pull_request['labels'] if 'labels' in pull_request]
         rich_pr['labels'] = labels
@@ -584,6 +587,8 @@ class GitHubEnrich(Enrich):
         rich_issue['updated_at'] = issue['updated_at']
         rich_issue['closed_at'] = issue['closed_at']
         rich_issue['url'] = issue['html_url']
+        # Adding this field for consistency with the rest of github-related enrichers
+        rich_issue['issue_url'] = issue['html_url']
         labels = []
         [labels.append(label['name']) for label in issue['labels'] if 'labels' in issue]
         rich_issue['labels'] = labels

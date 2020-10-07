@@ -18,6 +18,7 @@
 # Authors:
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
+#     Miguel Ángel Fernández <mafesan@bitergia.com>
 #
 import logging
 import time
@@ -76,6 +77,9 @@ class TestGitHub(TestBaseBackend):
         self.assertEqual(eitem['assignee_data_uuid'], '5f9d42ce000e46e9eee60a3c64a353b560051a2e')
         self.assertEqual(eitem['assignee_data_domain'], 'zhquan_example.com')
 
+        self.assertEqual(eitem['url'], 'https://github.com/zhquan_example/repo/pull/1')
+        self.assertEqual(eitem['issue_url'], 'https://github.com/zhquan_example/repo/pull/1')
+
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(eitem['labels'], ['bug', 'feature'])
@@ -87,6 +91,9 @@ class TestGitHub(TestBaseBackend):
         self.assertEqual(eitem['user_data_domain'], 'zhquan_example.com')
         self.assertEqual(eitem['merged_by_data_uuid'], '5f9d42ce000e46e9eee60a3c64a353b560051a2e')
         self.assertEqual(eitem['merged_by_data_domain'], 'zhquan_example.com')
+
+        self.assertEqual(eitem['url'], 'https://github.com/zhquan_example/repo/pull/1')
+        self.assertEqual(eitem['issue_url'], 'https://github.com/zhquan_example/repo/pull/1')
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
@@ -127,6 +134,9 @@ class TestGitHub(TestBaseBackend):
         self.assertEqual(eitem['user_data_uuid'], 'e8cc482634f2095c935b6a586ddb9ed8215d5cb8')
         self.assertIsNone(eitem['user_data_domain'])
 
+        self.assertEqual(eitem['url'], 'https://github.com/chaoss/grimoirelab-perceval/pull/7')
+        self.assertEqual(eitem['issue_url'], 'https://github.com/chaoss/grimoirelab-perceval/pull/7')
+
         item = self.items[6]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(item['category'], 'pull_request')
@@ -141,6 +151,9 @@ class TestGitHub(TestBaseBackend):
         self.assertEqual(eitem['user_data_name'], 'acs')
         self.assertEqual(eitem['user_data_uuid'], 'e8cc482634f2095c935b6a586ddb9ed8215d5cb8')
         self.assertIsNone(eitem['user_data_domain'])
+
+        self.assertEqual(eitem['url'], 'https://github.com/chaoss/grimoirelab-perceval/pull/4')
+        self.assertEqual(eitem['issue_url'], 'https://github.com/chaoss/grimoirelab-perceval/pull/4')
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
