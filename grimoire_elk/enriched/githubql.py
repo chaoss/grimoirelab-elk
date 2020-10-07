@@ -467,7 +467,7 @@ class GitHubQLEnrich(Enrich):
 
         logger.info("{} ending study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
 
-    def enrich_reference_analysis(self, ocean_backend, enrich_backend):
+    def enrich_reference_analysis(self, ocean_backend, enrich_backend, aliases_update=None):
         """
         The purpose of this study is to gather all the issues and pull requests which are
         mutually referenced. Once these references are obtained, all of the events for the given issue
@@ -486,6 +486,12 @@ class GitHubQLEnrich(Enrich):
         * `referenced_by_external_prs`: List of pull requests referenced by a given Issue or Pull Request,
             from different (external) repositories.
 
+        The method accepts a list of ES aliases or indices where these new fields will be updated too,
+        for the referenced elements identified by a given `issue_url`. An example would be the `github_issues`
+        alias, which points to the corresponding enriched indexes from GitHub issues. Note that if the
+        referenced aliases or indexes do not contain the `issue_url` field, the affected elements can't
+        be updated.
+
         The examples below show how to activate the study by modifying the setup.cfg.
 
         ```
@@ -494,10 +500,12 @@ class GitHubQLEnrich(Enrich):
         studies = [..., enrich_reference_analysis]
 
         [enrich_reference_analysis]]
+        aliases_update = [github_issues, github2_issues, github2_pull_requests]
         ```
 
         :param ocean_backend: backend from which to read the raw items
         :param enrich_backend:  backend from which to read the enriched items
+        :param aliases_update: list of aliases where to update the referenced items
         """
         def _is_pull_request(issue_url):
             """Return True if `issue_url` belongs to a Pull Request"""
@@ -629,13 +637,21 @@ class GitHubQLEnrich(Enrich):
                 }
             }
 
-            logger.info('{} - Updating fields from events with issue_url: {}'.format(log_prefix,
-                                                                                     issue_url))
-            r = es_in.update_by_query(index=in_index, body=update_query, conflicts='proceed')
-            if r['failures']:
-                logger.error("{} Error while executing study {}".format(log_prefix,
-                                                                        anonymize_url(self.elastic.index_url)))
-                logger.error(str(r['failures'][0]))
-                return
+            update_indexes = [in_index]
+            # Update data in the additional related indexes (if any) identified by their aliases
+            if aliases_update:
+                update_indexes += aliases_update
+
+            for update_index in update_indexes:
+                logger.info('{} - Updating fields from items with issue_url: {} from index {}'.format(log_prefix,
+                                                                                                      issue_url,
+                                                                                                      in_index))
+
+                r = es_in.update_by_query(index=update_index, body=update_query, conflicts='proceed')
+                if r['failures']:
+                    logger.error("{} Error while executing study {}".format(log_prefix,
+                                                                            anonymize_url(self.elastic.index_url)))
+                    logger.error(str(r['failures'][0]))
+                    return
 
         logger.info("{} ending study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
