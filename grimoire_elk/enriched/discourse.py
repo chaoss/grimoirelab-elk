@@ -27,6 +27,9 @@ from .utils import get_time_diff_days, grimoire_con
 from .enrich import Enrich, metadata
 
 MAX_SIZE_BULK_ENRICHED_ITEMS = 200
+# Headers
+HKEY = 'Api-Key'
+HUSER = 'Api-Username'
 
 
 logger = logging.getLogger(__name__)
@@ -146,18 +149,30 @@ class DiscourseEnrich(Enrich):
 
         return answers_enrich
 
-    def __collect_categories(self, origin):
+    def _set_extra_headers(self):
+        """Set extra headers for session"""
+        headers = {}
+        api_token = self.perceval_backend.api_token
+        api_username = self.perceval_backend.api_username
+        if api_token and api_username:
+            headers[HKEY] = api_token
+            headers[HUSER] = api_username
+
+        return headers
+
+    def __collect_categories(self, origin, headers):
         categories = {}
         con = grimoire_con()
-        raw_site = con.get(origin + "/site.json")
+
+        raw_site = con.get(origin + "/site.json", headers=headers)
         for cat in raw_site.json()['categories']:
             categories[cat['id']] = cat['name']
         return categories
 
-    def __collect_categories_tree(self, origin):
+    def __collect_categories_tree(self, origin, headers):
         tree = {}
         con = grimoire_con()
-        raw = con.get(origin + "/categories.json")
+        raw = con.get(origin + "/categories.json", headers=headers)
         raw_json = raw.json()
         if "category_list" in raw_json and 'categories' in raw_json["category_list"]:
             categories = raw_json["category_list"]['categories']
@@ -185,12 +200,12 @@ class DiscourseEnrich(Enrich):
         if not self.categories:
             logger.info("[discourse] Getting the categories data from {}".format(
                         item['origin']))
-            self.categories = self.__collect_categories(item['origin'])
+            self.categories = self.__collect_categories(item['origin'], self._set_extra_headers())
         # Get the categories tree if not already done
         if not self.categories_tree:
             logger.info("[discourse] Getting the categories tree data from {}".format(
                         item['origin']))
-            self.categories_tree = self.__collect_categories_tree(item['origin'])
+            self.categories_tree = self.__collect_categories_tree(item['origin'], self._set_extra_headers())
             # self.__show_categories_tree()
 
         eitem = {}
