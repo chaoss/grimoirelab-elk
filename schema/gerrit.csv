@@ -37,6 +37,7 @@ changeset_author_uuid,keyword,true,"Changeset author unique identifier from Sort
 changeset_number,long,true,"Gerrit changeset unique identifier."
 changeset_status,keyword,true,"Changeset status such as Abandoned, Merged or Open. The actual value depends on the instance of Gerrit."
 changeset_status_value,keyword,true,"Value of the last code-review approval made by someone else than the author for a given changeset, it can be -2 -1 1 or 2."
+changeset_status_value_verified,keyword,true,"Value of the last Verified approval made by someone else than the author for a given changeset, it can be -2 -1 1 or 2."
 closed,date,true,"Closing date of the changeset."
 comment_created_on,date,true,"Creation date of the changeset comment."
 comment_message,keyword,true,"Message of the patchset comment"
