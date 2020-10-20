@@ -18,6 +18,7 @@
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #   Quan Zhou <quan@bitergia.com>
+#   Miguel Ángel Fernández <mafesan@bitergia.com>
 #
 
 import logging
@@ -39,6 +40,7 @@ PATCHSET_TYPE = 'patchset'
 APPROVAL_TYPE = 'approval'
 
 CODE_REVIEW_TYPE = 'Code-Review'
+VERIFIED_TYPE = 'Verified'
 
 logger = logging.getLogger(__name__)
 
@@ -236,8 +238,10 @@ class GerritEnrich(Enrich):
         if len(patchsets) > 0:
             created_on = patchsets[0]['createdOn']
 
-        eitem['status_value'] = self.last_changeset_approval_value(patchsets)
+        status_value_code_review, status_value_verified = self.last_changeset_approval_value(patchsets)
+        eitem['status_value'] = status_value_code_review
         eitem['changeset_status_value'] = eitem['status_value']
+        eitem['changeset_status_value_verified'] = status_value_verified
         eitem['changeset_status'] = eitem['status']
 
         created_on_date = str_to_datetime(created_on)
@@ -371,6 +375,7 @@ class GerritEnrich(Enrich):
             epatchset['changeset_number'] = eitem['changeset_number']
             epatchset['changeset_status'] = eitem['changeset_status']
             epatchset['changeset_status_value'] = eitem['changeset_status_value']
+            epatchset['changeset_status_value_verified'] = eitem['changeset_status_value_verified']
 
             # Add author info
             epatchset["patchset_author_name"] = None
@@ -456,6 +461,7 @@ class GerritEnrich(Enrich):
             eapproval['changeset_number'] = epatchset['changeset_number']
             eapproval['changeset_status'] = epatchset['changeset_status']
             eapproval['changeset_status_value'] = epatchset['changeset_status_value']
+            eapproval['changeset_status_value_verified'] = epatchset['changeset_status_value_verified']
             eapproval['patchset_number'] = epatchset['patchset_number']
             eapproval['patchset_revision'] = epatchset['patchset_revision']
             eapproval['patchset_ref'] = epatchset['patchset_ref']
@@ -617,24 +623,17 @@ class GerritEnrich(Enrich):
 
     def last_changeset_approval_value(self, patchsets):
         """Get the last approval value for a given changeset by iterating on the
-        corresponding patchsets. Non code-review patchset approvals and approvals
-        reviewed by the author of the patchset are filtered out."""
-
-        approval_status = None
-        # reverse the patchsets list to get the latest ones first
-        for patchset in reversed(patchsets):
-
-            patchset_author = patchset.get('author', None)
+        corresponding patchsets. Non code-review or non verified patchset approvals,
+        and approvals reviewed by the author of the patchset are filtered out.
+        """
+        def _get_last_status(approvals_list, patchset_author):
+            """Get the first-found approval value from a reversed list of approvals.
+            The value won't be considered if the patchset author matches with the approval author.
+            """
             patchset_author_username = patchset_author.get('username', None) if patchset_author else None
             patchset_author_email = patchset_author.get('email', None) if patchset_author else None
 
-            approvals = patchset.get('approvals', [])
-            if not approvals:
-                continue
-
-            approvals_filtered = [a for a in reversed(approvals) if a['type'] == CODE_REVIEW_TYPE]
-
-            for approval in approvals_filtered:
+            for approval in approvals_list:
                 approval_by = approval.get('by', None)
                 approval_by_username = approval_by.get('username', None) if approval_by else None
                 approval_by_email = approval_by.get('email', None) if approval_by else None
@@ -650,7 +649,24 @@ class GerritEnrich(Enrich):
                 if approval_status:
                     return approval_status
 
-        return approval_status
+        last_status_code_review = None
+        last_status_verified = None
+        # reverse the patchsets list to get the latest ones first
+        for patchset in reversed(patchsets):
+            patchset_author = patchset.get('author', None)
+            approvals = patchset.get('approvals', [])
+            if not approvals:
+                continue
+
+            approvals_code_review = [a for a in reversed(approvals) if a['type'] == CODE_REVIEW_TYPE]
+            approvals_verified = [a for a in reversed(approvals) if a['type'] == VERIFIED_TYPE]
+
+            if not last_status_code_review:
+                last_status_code_review = _get_last_status(approvals_code_review, patchset_author)
+            if not last_status_verified:
+                last_status_verified = _get_last_status(approvals_verified, patchset_author)
+
+        return last_status_code_review, last_status_verified
 
     def enrich_items(self, ocean_backend):
         items_to_enrich = []
