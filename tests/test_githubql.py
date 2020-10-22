@@ -224,6 +224,25 @@ class TestGitHubQL(TestBaseBackend):
         self.assertIsNone(eitem['submitter_domain'])
         self.assertEqual(eitem['closer_pull_submitter'], 'valeriocos')
 
+        item = self.items[13]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(item['category'], 'event')
+        self.assertEqual(eitem['event_type'], 'MergedEvent')
+        self.assertEqual(eitem['created_at'], '2020-10-23T18:45:14Z')
+        self.assertEqual(eitem['author_uuid'], '09c94d1fdc9523c9db2244d7ae4d1ab9603cd683')
+        self.assertEqual(eitem['author_name'], 'Unknown')
+        self.assertEqual(eitem['author_user_name'], 'zhquan')
+        self.assertIsNone(eitem['author_domain'])
+        self.assertEqual(eitem['repository'], 'https://github.com/zhquan/test-merged-event')
+        self.assertEqual(eitem['title'], 'Initial directory setup')
+        self.assertTrue(eitem['merge_closed'])
+        self.assertEqual(eitem['merge_closed_at'], '2020-10-23T18:45:14Z')
+        self.assertEqual(eitem['merge_created_at'], '2020-10-23T18:45:06Z')
+        self.assertTrue(eitem['merge_merged'])
+        self.assertEqual(eitem['merge_merged_at'], '2020-10-23T18:45:14Z')
+        self.assertEqual(eitem['merge_updated_at'], '2020-10-23T18:45:14Z')
+        self.assertEqual(eitem['merge_url'], 'https://github.com/zhquan/test-merged-event/pull/3')
+
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
 
