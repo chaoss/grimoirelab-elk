@@ -18,6 +18,7 @@
 # Authors:
 #   Valerio Cosentino <valcos@bitergia.com>
 #   Miguel Ángel Fernández <mafesan@bitergia.com>
+#   Quan Zhou <quan@bitergia.com>
 #
 
 import logging
@@ -34,6 +35,7 @@ LABEL_EVENTS = ['LabeledEvent', 'UnlabeledEvent']
 PROJECT_EVENTS = ['AddedToProjectEvent', 'MovedColumnsInProjectEvent', 'RemovedFromProjectEvent']
 REFERENCE_EVENTS = ['CrossReferencedEvent']
 CLOSED_EVENTS = ['ClosedEvent']
+MERGED_EVENTS = ['MergedEvent']
 
 logger = logging.getLogger(__name__)
 
@@ -251,6 +253,15 @@ class GitHubQLEnrich(Enrich):
             # only for events of type MovedColumnsInProjectEvent
             if 'previousProjectColumnName' in event:
                 rich_event['board_previous_column'] = event['previousProjectColumnName']
+        elif rich_event['event_type'] in MERGED_EVENTS:
+            merge = event['pullRequest']
+            rich_event['merge_closed'] = merge['closed']
+            rich_event['merge_closed_at'] = merge['closedAt']
+            rich_event['merge_created_at'] = merge['createdAt']
+            rich_event['merge_merged'] = merge['merged']
+            rich_event['merge_merged_at'] = merge['mergedAt']
+            rich_event['merge_updated_at'] = merge['updatedAt']
+            rich_event['merge_url'] = merge['url']
         else:
             logger.warning("[github] event {} not processed".format(rich_event['event_type']))
 
