@@ -492,10 +492,16 @@ class GitHubQLEnrich(Enrich):
             from the same repository.
         * `referenced_by_prs`: List of pull requests referenced by a given Issue or Pull Request,
             from the same repository.
+          `referenced_by_merged_prs`: List of merged pull requests referenced by a given Issue or Pull
+            Request, from the same repository.
         * `referenced_by_external_issues`: List of issues referenced by a given Issue or Pull Request,
             from different (external) repositories.
         * `referenced_by_external_prs`: List of pull requests referenced by a given Issue or Pull Request,
             from different (external) repositories.
+        * `referenced_by_external_merged_prs`: List of merged pull requests referenced by a given Issue
+            or Pull Request, from different (external) repositories.
+
+        To classify the merged Pull Requests, the study asks for the list of the URLs from `MergedEvents`.
 
         The method accepts a list of ES aliases or indices where these new fields will be updated too,
         for the referenced elements identified by a given `issue_url`. An example would be the `github_issues`
@@ -520,15 +526,55 @@ class GitHubQLEnrich(Enrich):
         """
         def _is_pull_request(issue_url):
             """Return True if `issue_url` belongs to a Pull Request"""
+
             return '/pull/' in issue_url
 
         def _get_github_repo(issue_url):
             """Return GitHub repository path using `owner/repository` format"""
+
             repo = ''
             url_info = issue_url.split('/')
             if url_info[2] == 'github.com':
                 repo = '/'.join([url_info[3], url_info[4]])
             return repo
+
+        def _get_merged_prs(es_input):
+            """Return a list of merged Pull Requests based on MergedEvent items"""
+
+            # Ask for the URL from `MergedEvent` items, filtering by merged PRs
+            es_query = {
+                "size": 0,
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {"event_type": "MergedEvent"}
+                            },
+                            {
+                                "term": {"pull_request": True}
+                            },
+                            {
+                                "term": {"merge_merged": True}
+                            }
+                        ]
+                    }
+                },
+                "aggs": {
+                    "merge_url": {
+                        "terms": {
+                            "field": "merge_url",
+                            "size": 30000
+                        }
+                    }
+                }
+            }
+
+            merged_prs = es_input.search(index=in_index, body=es_query)
+            buckets = merged_prs['aggregations']['merge_url']['buckets']
+
+            merged_prs_list = [item['key'] for item in buckets]
+
+            return merged_prs_list
 
         data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
         log_prefix = "[{}] Cross reference analysis".format(data_source)
@@ -538,6 +584,11 @@ class GitHubQLEnrich(Enrich):
                    verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
         in_index = enrich_backend.elastic.index
 
+        # Get all the merged pull requests from MergedEvents
+        logger.info("{} Retrieving the merged PRs from MergeEvents".format(log_prefix))
+        merged_prs = _get_merged_prs(es_in)
+
+        # Get all CrossReferencedEvent items and their referenced issues and pull requests
         es_query = {
             "size": 0,
             "query": {
@@ -564,7 +615,6 @@ class GitHubQLEnrich(Enrich):
             }
         }
 
-        # Get all CrossReferencedEvent items and their referenced issues and pull requests
         cross_references = es_in.search(index=in_index, body=es_query)
         buckets = cross_references['aggregations']['issue_url']['buckets']
 
@@ -601,14 +651,18 @@ class GitHubQLEnrich(Enrich):
         painless_code = """
             ctx._source.referenced_by_issues = params.referenced_by_issues;
             ctx._source.referenced_by_prs = params.referenced_by_prs;
+            ctx._source.referenced_by_merged_prs = params.referenced_by_merged_prs;        
             ctx._source.referenced_by_external_issues = params.referenced_by_external_issues;
             ctx._source.referenced_by_external_prs = params.referenced_by_external_prs;
+            ctx._source.referenced_by_external_merged_prs = params.referenced_by_external_merged_prs;
         """
         for issue_url in reference_dict.keys():
             ref_issues_repo = []
             ref_prs_repo = []
+            ref_prs_merged_repo = []
             ref_issues_ext = []
             ref_prs_ext = []
+            ref_prs_merged_ext = []
 
             issue_repo = _get_github_repo(issue_url)
 
@@ -618,14 +672,19 @@ class GitHubQLEnrich(Enrich):
                 ref_repo = _get_github_repo(ref)
                 ref_is_pr = _is_pull_request(ref)
 
+                # Classify references
                 if ref_repo == issue_repo:
                     if ref_is_pr:
                         ref_prs_repo.append(ref)
+                        if ref in merged_prs:
+                            ref_prs_merged_repo.append(ref)
                     else:
                         ref_issues_repo.append(ref)
                 else:
                     if ref_is_pr:
                         ref_prs_ext.append(ref)
+                        if ref in merged_prs:
+                            ref_prs_merged_ext.append(ref)
                     else:
                         ref_issues_ext.append(ref)
 
@@ -637,8 +696,10 @@ class GitHubQLEnrich(Enrich):
                     "params": {
                         "referenced_by_issues": ref_issues_repo,
                         "referenced_by_prs": ref_prs_repo,
+                        "referenced_by_merged_prs": ref_prs_merged_repo,
                         "referenced_by_external_issues": ref_issues_ext,
                         "referenced_by_external_prs": ref_prs_ext,
+                        "referenced_by_external_merged_prs": ref_prs_merged_ext,
                     }
                 },
                 "query": {
@@ -656,7 +717,7 @@ class GitHubQLEnrich(Enrich):
             for update_index in update_indexes:
                 logger.info('{} - Updating fields from items with issue_url: {} from index {}'.format(log_prefix,
                                                                                                       issue_url,
-                                                                                                      in_index))
+                                                                                                      update_index))
 
                 r = es_in.update_by_query(index=update_index, body=update_query, conflicts='proceed')
                 if r['failures']:

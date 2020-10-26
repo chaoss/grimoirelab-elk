@@ -1,3 +1,5 @@
 name,type,aggregatable,description
 referenced_by_<element>,keyword,true,"Array of URLs of the elements (GitHub Issues `issues` or Pull Requests `prs`) referencing a given Issue or Pull request from the same repository."
 referenced_by_external_<element>,keyword,true,"Array of URLs of the elements (GitHub Issues or Pull Requests) referencing a given Issue or Pull request. These elements belong to a different repository than the Issue or PR they are referencing."
+referenced_by_merged_prs,keyword,true,"Array of URLs of the merged GitHub Pull Requests referencing a given Issue or Pull request from the same repository."
+referenced_by_external_merged_prs,keyword,true,"Array of URLs of the merged GitHub Pull Requests referencing a given Issue or Pull request. These elements belong to a different repository than the merged PR they are referencing."
