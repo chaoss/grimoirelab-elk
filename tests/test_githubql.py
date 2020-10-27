@@ -395,8 +395,10 @@ class TestGitHubQL(TestBaseBackend):
         for item in referenced_items:
             self.assertIn('referenced_by_issues', item)
             self.assertIn('referenced_by_prs', item)
+            self.assertIn('referenced_by_merged_prs', item)
             self.assertIn('referenced_by_external_issues', item)
             self.assertIn('referenced_by_external_prs', item)
+            self.assertIn('referenced_by_external_merged_prs', item)
 
             ref_issues = item['referenced_by_issues']
             self.assertEqual(len(ref_issues), 1)
@@ -405,9 +407,15 @@ class TestGitHubQL(TestBaseBackend):
             self.assertEqual(ref, 'https://github.com/valeriocos/test-issues-update/issues/2')
 
             ref_prs = item['referenced_by_prs']
-            self.assertEqual(len(ref_issues), 1)
+            self.assertEqual(len(ref_prs), 1)
 
             ref = ref_prs[0]
+            self.assertEqual(ref, 'https://github.com/valeriocos/test-issues-update/pull/3')
+
+            ref_merged_prs = item['referenced_by_merged_prs']
+            self.assertEqual(len(ref_merged_prs), 1)
+
+            ref = ref_merged_prs[0]
             self.assertEqual(ref, 'https://github.com/valeriocos/test-issues-update/pull/3')
 
             ref_ext_issues = item['referenced_by_external_issues']
@@ -415,6 +423,9 @@ class TestGitHubQL(TestBaseBackend):
 
             ref_ext_prs = item['referenced_by_external_prs']
             self.assertEqual(len(ref_ext_prs), 0)
+
+            ref_ext_merged_prs = item['referenced_by_external_merged_prs']
+            self.assertEqual(len(ref_ext_merged_prs), 0)
 
 
 if __name__ == "__main__":
