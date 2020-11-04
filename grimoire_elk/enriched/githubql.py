@@ -651,7 +651,7 @@ class GitHubQLEnrich(Enrich):
         painless_code = """
             ctx._source.referenced_by_issues = params.referenced_by_issues;
             ctx._source.referenced_by_prs = params.referenced_by_prs;
-            ctx._source.referenced_by_merged_prs = params.referenced_by_merged_prs;        
+            ctx._source.referenced_by_merged_prs = params.referenced_by_merged_prs;
             ctx._source.referenced_by_external_issues = params.referenced_by_external_issues;
             ctx._source.referenced_by_external_prs = params.referenced_by_external_prs;
             ctx._source.referenced_by_external_merged_prs = params.referenced_by_external_merged_prs;
