@@ -79,7 +79,7 @@ class PhabricatorOcean(ElasticOcean):
         # fields cannot contain dots in ES 2.2. For consistency reason, this fix is applied also
         # to more recent versions of ES
 
-        for field in item["data"]["fields"]:
+        for field in list(item["data"]["fields"]):
             if '.' in field:
                 undotted_field = field.replace('.', '_')
                 item["data"]["fields"][undotted_field] = item["data"]["fields"][field]
