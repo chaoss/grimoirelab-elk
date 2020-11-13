@@ -78,6 +78,8 @@ class SlackEnrich(Enrich):
                 return identity
             from_ = item['data'][self.get_field_author()]
 
+        if not from_:
+            return identity
         identity['username'] = from_['name']
         identity['name'] = from_['name']
         if 'real_name' in from_:
@@ -147,7 +149,7 @@ class SlackEnrich(Enrich):
                 message_file_size += file.get('size', 0)
             eitem['message_file_size'] = message_file_size
 
-        if 'user_data' in message:
+        if 'user_data' in message and message['user_data']:
             eitem['team_id'] = message['user_data']['team_id']
             if 'tz_offset' in message['user_data']:
                 eitem['tz'] = message['user_data']['tz_offset']
