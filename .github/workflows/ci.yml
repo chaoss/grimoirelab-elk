@@ -1,0 +1,86 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      # How to use MySQL
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    
+    name: Python ${{ matrix.python-version }} for ES ${{ matrix.elasticsearch-version }}
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        elasticsearch-version: [6.1.0, 7.2.0]
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+      
+    - name: Configure sysctl limits
+      run: |
+        sudo swapoff -a
+        sudo sysctl -w vm.swappiness=1
+        sudo sysctl -w fs.file-max=262144
+        sudo sysctl -w vm.max_map_count=262144
+      
+    - name: Runs Elasticsearch ${{ matrix.elasticsearch-version }}
+      uses: elastic/elastic-github-actions/elasticsearch@master
+      with:
+        stack-version: ${{ matrix.elasticsearch-version }}
+      
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip==18.1
+        pip install --upgrade setuptools==49.6.0
+        pip install --upgrade wheel
+        pip install -r "requirements.txt"
+        pip install -r "requirements_tests.txt"
+        pip install flake8 coveralls
+      
+    - name: Verify MySQL connection
+      run: |
+        sudo apt-get install -y mysql-client libmysqlclient-dev
+        mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot -e "SHOW GRANTS FOR 'root'@'localhost'"
+        mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot mysql
+      
+    - name: Verify Elasticsearch connection
+      run: |
+        curl -fsSL "http://localhost:9200/_cat/health?h=status"
+      
+    - name: Setup MySQL Database
+      env:
+        DB_HOST: 127.0.0.1
+        DB_PORT: ${{ job.services.mysql.ports[3306] }}
+      run: |
+        mysql --host $DB_HOST --port $DB_PORT -uroot -proot -e "SHOW DATABASES"
+        mysql --host $DB_HOST --port $DB_PORT -uroot -proot -e "CREATE DATABASE test_sh"
+        mysql --host $DB_HOST --port $DB_PORT -uroot -proot -e "CREATE DATABASE test_projects"
+        mysql --host $DB_HOST --port $DB_PORT -uroot -proot test_projects < tests/test_projects.sql
+        mysql --host $DB_HOST --port $DB_PORT -uroot -proot -e "SHOW DATABASES"
+      
+    - name: Lint with flake8
+      run: flake8 . --exclude ./src
+      
+    - name: Tests and Coverage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd tests
+        coverage run --source=grimoire_elk run_tests.py
+        # --service=github is a workaround for bug
+        # https://github.com/coveralls-clients/coveralls-python/issues/251
+        coveralls --service=github
