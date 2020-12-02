@@ -55,7 +55,7 @@ class WeblateOcean(ElasticOcean):
 
     def _fix_item(self, item):
         change = item['data']
-        if change['author_data'] or not change['author']:
+        if change.get('author_data', None) or not change['author']:
             return
 
         name = change['author'].split('api/users/')[1].split('/')[0]
