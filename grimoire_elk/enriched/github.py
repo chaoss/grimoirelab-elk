@@ -488,6 +488,9 @@ class GitHubEnrich(Enrich):
         rich_pr['merged_at'] = pull_request['merged_at']
         rich_pr['closed_at'] = pull_request['closed_at']
         rich_pr['url'] = pull_request['html_url']
+        rich_pr['additions'] = pull_request['additions']
+        rich_pr['deletions'] = pull_request['deletions']
+        rich_pr['changed_files'] = pull_request['changed_files']
         # Adding this field for consistency with the rest of github-related enrichers
         rich_pr['issue_url'] = pull_request['html_url']
         labels = []

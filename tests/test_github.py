@@ -91,6 +91,9 @@ class TestGitHub(TestBaseBackend):
         self.assertEqual(eitem['user_data_domain'], 'zhquan_example.com')
         self.assertEqual(eitem['merged_by_data_uuid'], '5f9d42ce000e46e9eee60a3c64a353b560051a2e')
         self.assertEqual(eitem['merged_by_data_domain'], 'zhquan_example.com')
+        self.assertEqual(eitem['additions'], 528)
+        self.assertEqual(eitem['deletions'], 0)
+        self.assertEqual(eitem['changed_files'], 4)
 
         self.assertEqual(eitem['url'], 'https://github.com/zhquan_example/repo/pull/1')
         self.assertEqual(eitem['issue_url'], 'https://github.com/zhquan_example/repo/pull/1')
@@ -151,6 +154,9 @@ class TestGitHub(TestBaseBackend):
         self.assertEqual(eitem['user_data_name'], 'acs')
         self.assertEqual(eitem['user_data_uuid'], 'e8cc482634f2095c935b6a586ddb9ed8215d5cb8')
         self.assertIsNone(eitem['user_data_domain'])
+        self.assertEqual(eitem['additions'], 5)
+        self.assertEqual(eitem['deletions'], 1)
+        self.assertEqual(eitem['changed_files'], 1)
 
         self.assertEqual(eitem['url'], 'https://github.com/chaoss/grimoirelab-perceval/pull/4')
         self.assertEqual(eitem['issue_url'], 'https://github.com/chaoss/grimoirelab-perceval/pull/4')
