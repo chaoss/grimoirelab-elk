@@ -1,5 +1,6 @@
 name,type,aggregatable,description
 <Cross-references fields>,NA,NA,"Fields coming from cross references study (available only when it is active), see cross_references.csv."
+additions,long,true,"Number of additions in the Pull Request."
 assignee_geolocation,geo_point,true,"Pull Request assignee geolocation from GitHub."
 author_bot,boolean,true,"True/False if the Pull Request author is a bot or not from SortingHat profile."
 author_domain,keyword,true,"Pull Request author domain name from SortingHat profile."
@@ -11,9 +12,11 @@ author_org_name,keyword,true,"Pull Request author organization name from Sorting
 author_multi_org_names,keyword,true,"List of the author organizations from SortingHat profile."
 author_user_name,keyword,true,"Pull Request author username from SortingHat profile."
 author_uuid,keyword,true,"Pull Request author UUID from SortingHat profile."
+changed_files,long,true,"Number of changed files in the Pull Request."
 closed_at,date,true,"Date in which the Issue was closed."
 code_merge_duration,float,true,"Difference in days between creation and merging dates."
 created_at,date,true,"Date in which the Issue was created."
+deletions,long,true,"Number of deletions in the Pull Request."
 forks,long,true,"Number of repository forks."
 github_repo,keyword,true,"GitHub repository name."
 grimoire_creation_date,date,true,"Pull Request creation date."
