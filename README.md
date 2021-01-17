@@ -1,4 +1,4 @@
-# Welcome to GrimoireELK [![Build Status](https://travis-ci.org/chaoss/grimoirelab-elk.svg?branch=master)](https://travis-ci.org/chaoss/grimoirelab-elk)[![Coverage Status](https://coveralls.io/repos/github/chaoss/grimoirelab-elk/badge.svg?branch=master)](https://coveralls.io/github/chaoss/grimoirelab-elk?branch=master)
+# Welcome to GrimoireELK [![Build Status](https://github.com/chaoss/grimoirelab-elk/workflows/build/badge.svg)](https://github.com/chaoss/grimoirelab-elk/actions?query=workflow:build+branch:master+event:push) [![Coverage Status](https://coveralls.io/repos/github/chaoss/grimoirelab-elk/badge.svg?branch=master)](https://coveralls.io/github/chaoss/grimoirelab-elk?branch=master)
 
 GrimoireELK is the component that interacts with the ElasticSearch database. Its goal is two-fold, first it aims at offering a convenient
 way to store the data coming from Perceval, second it processes and enriches the data in a format that can be consumed by Kibiter.
