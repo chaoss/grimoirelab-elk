@@ -53,17 +53,21 @@ class Mapping(BaseMapping):
                                 "priority" : {
                                     "properties": {
                                         "subpriority" : {"type": "float"}
-                                     }
-                                 },
-                                 "description": {
+                                    }
+                                },
+                                "description": {
                                     "dynamic":false,
                                     "properties": {}
-                                 }
-                             }
-                         }
-                     }
-                 }
-             }
+                                },
+                                "custom_error_stack": {
+                                    "type": "text",
+                                    "index": true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         '''
 
