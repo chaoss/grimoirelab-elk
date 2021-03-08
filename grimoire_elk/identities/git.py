@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Authors:
-#   Jose Javier Merchante Picazo <jjmerchante@gcauldron.io>
+#   Jose Javier Merchante Picazo <jjmerchante@cauldron.io>
 #
 
 from grimoire_elk.identities.identities import Identities
