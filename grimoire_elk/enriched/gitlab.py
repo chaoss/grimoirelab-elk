@@ -267,7 +267,7 @@ class GitLabEnrich(Enrich):
         author = merge_request.get('author', None)
         if author:
             rich_mr['author_username'] = merge_request['author']['username']
-            rich_mr['author_name'] = author['name']
+            rich_mr['author_name'] = author.get('name', None)
             if 'email' in author and author['email']:
                 rich_mr["author_domain"] = self.get_email_domain(author['email'])
             if 'organization' in author and author['organization']:
