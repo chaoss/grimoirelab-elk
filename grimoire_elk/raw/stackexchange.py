@@ -21,6 +21,7 @@
 
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
+from ..identities.stackexchange import StackExchangeIdentities
 
 
 class Mapping(BaseMapping):
@@ -64,6 +65,7 @@ class StackExchangeOcean(ElasticOcean):
     """StackExchange Ocean feeder"""
 
     mapping = Mapping
+    identities = StackExchangeIdentities
 
     @classmethod
     def get_perceval_params_from_url(cls, url):

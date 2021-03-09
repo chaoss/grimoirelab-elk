@@ -32,7 +32,9 @@ class TestStackexchange(TestBaseBackend):
 
     connector = "stackexchange"
     ocean_index = "test_" + connector
+    ocean_index_anonymized = "test_" + connector + "_anonymized"
     enrich_index = "test_" + connector + "_enrich"
+    enrich_index_anonymized = "test_" + connector + "_enrich_anonymized"
 
     def test_has_identites(self):
         """Test value of has_identities method"""
@@ -128,6 +130,41 @@ class TestStackexchange(TestBaseBackend):
                     self.assertEqual(item[attribute], eitem[attribute])
                 else:
                     self.assertIsNone(eitem[attribute])
+
+    def test_items_to_raw_anonymized(self):
+        """Test whether JSON items are properly inserted into ES anonymized"""
+
+        result = self._test_items_to_raw_anonymized()
+
+        self.assertEqual(result['items'], 3)
+        self.assertEqual(result['raw'], 3)
+
+        item = self.items[0]['data']
+        self.assertEqual(item['owner']['display_name'], '80490d00f668dde48d4e0ce62142c8a2ac9a1465')
+        self.assertEqual(item['owner']['user_id'], '182b39d390fc9fde7594184cbe6e6f8653cfd5b2')
+        self.assertEqual(item['owner']['link'], '')
+        self.assertEqual(item['owner']['profile_image'], '')
+        self.assertEqual(len(item['comments']), 0)
+        self.assertEqual(item['answers'][0]['owner']['display_name'], '0d2244465bfc8b636bf1fbe74912cc2c748b42e4')
+        self.assertEqual(item['answers'][0]['owner']['user_id'], 'c7b7c5dea6f6a1a4531bf491b207d123ca41da4c')
+        self.assertEqual(item['answers'][0]['owner']['link'], '')
+        self.assertEqual(item['answers'][0]['owner']['profile_image'], '')
+        self.assertEqual(len(item['answers'][0]['comments']), 0)
+
+    def test_raw_to_enrich_anonymized(self):
+        """Test whether the raw index is properly enriched"""
+
+        result = self._test_raw_to_enrich_anonymized()
+
+        self.assertEqual(result['raw'], 3)
+        self.assertEqual(result['enrich'], 6)
+
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['author'], '80490d00f668dde48d4e0ce62142c8a2ac9a1465')
+        self.assertEqual(eitem['author_link'], '')
 
 
 if __name__ == "__main__":
