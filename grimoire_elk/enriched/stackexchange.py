@@ -170,13 +170,18 @@ class StackExchangeEnrich(Enrich):
             answer = item
 
             eitem["type"] = 'answer'
-            eitem["author"] = answer['owner']['display_name']
-            eitem["author_link"] = None
             eitem["item_id"] = answer['answer_id']
-            if 'link' in answer['owner']:
-                eitem["author_link"] = answer['owner']['link']
-            if 'reputation' in answer['owner']:
-                eitem["author_reputation"] = answer['owner']['reputation']
+            eitem["author"] = None
+            if 'owner' in answer and answer['owner']['user_type'] == "does_not_exist":
+                logger.warning("[stackexchange] answer without owner: {}".format(answer['question_id']))
+            else:
+                eitem["author"] = answer['owner']['display_name']
+                eitem["author_link"] = None
+                if 'link' in answer['owner']:
+                    eitem["author_link"] = answer['owner']['link']
+                eitem["reputation"] = None
+                if 'reputation' in answer['owner']:
+                    eitem["author_reputation"] = answer['owner']['reputation']
 
             # data fields to copy
             copy_fields = common_fields + ["origin", "tag", "creation_date", "is_accepted", "answer_id"]
