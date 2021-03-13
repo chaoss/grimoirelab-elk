@@ -142,8 +142,8 @@ class TwitterEnrich(Enrich):
 
         # data fields to copy from user
         copy_fields = ["created_at", "description", "followers_count",
-                       "friends_count", "id_str", "lang", "location", "name",
-                       "url", "utc_offset", "verified"]
+                       "friends_count", "id_str", "location", "name",
+                       "url", "verified"]
         for f in copy_fields:
             if f in tweet['user']:
                 eitem["user_" + f] = tweet['user'][f]
