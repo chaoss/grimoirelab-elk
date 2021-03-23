@@ -1,56 +1,59 @@
-name,type
-answer_status,keyword
-answer_count,long
-answer_id,long
-answer_tags,keyword
-answers_tags, keyword
-author_bot,boolean
-author_id,keyword
-author,keyword
-author_link,keyword
-author_name,keyword
-author_org_name,keyword
-author_reputation,long
-author_user_name,keyword
-author_uuid,keyword
-comment_count,long
-creation_date,date
-delete_vote_count,long
-down_vote_count,long
-favorite_count,long
-grimoire_creation_date,date
-is_accepted,boolean
-is_accepted_answer,long
-is_stackexchange_answer,long
-is_stackexchange_question,long
-item_id,long
-last_activity_date,long
-link,keyword
-metadata__enriched_on,date
-metadata__gelk_backend_name,keyword
-metadata__gelk_version,keyword
-metadata__timestamp,date
-metadata__updated_on,date
-origin,keyword
-owner_bot,boolean
-owner_id,keyword
-owner_name,keyword
-owner_org_name,keyword
-owner_user_name,keyword
-owner_uuid,keyword
-question_accepted_answer_id,long
-question_has_accepted_answer,boolean
-question_id,long
-question_tags,keyword
-question_title,keyword
-repository_labels,keyword
-score,long
-tag,keyword
-tags,keyword
-thread_tags, keyword
-title_analyzed,text
-title,keyword
-type,keyword
-up_vote_count,long
-uuid,keyword
-view_count,long
+name,type,aggregatable,description
+answer_count,long,true,"Count of answers to a question."
+answer_id,long,true,"ID of answer."
+answer_status,keyword,true,"Status of the answer (accepted/not_accepted)."
+author,keyword,true,"Stackexchange username of the author."
+author_bot,boolean,true,"True/False if the given author is a bot or not."
+author_gender,keyword,true,"Author gender."
+author_gender_acc,long,true,"Accuracy to assess author gender."
+author_id,keyword,true,"Author Id from SortingHat."
+author_link,keyword,true,"URL to Stackexchange profile of the author."
+author_name,keyword,true,"Author name from SortingHat profile."
+author_org_name,keyword,true,"Author's organization name from SortingHat profile."
+author_reputation,long,true,"Author's reputation on Stackexchange."
+author_user_name,keyword,true,"Author's username from SortingHat profile."
+author_uuid,keyword,true,"Author profile unique identifier."
+comment_count,long,true,"Number of comments."
+creation_date,date,true,"Date when the item was created."
+delete_vote_count,long,true,"Number of votes recommending to delete an item."
+down_vote_count,long,true,"Number of downvotes on an item."
+favorite_count,long,true,"Number of users who have bookmarked/favourited an item."
+grimoire_creation_date,date,true,"Date when the item was created."
+is_accepted,boolean,true,"Check if item is accepted."
+is_accepted_answer,long,true,"Check if item is accepted answer."
+is_stackexchange_answer,long,true,"Check if an item is Stackexchange answer."
+is_stackexchange_question,long,true,"Check if an item is Stackexchange question."
+item_id,long,true,"ID of an item according to Stackexchange"
+last_activity_date,long,true,"Unix time of last activity of the item."
+link,keyword,true,"URL of the item."
+metadata__enriched_on,date,true,"Date when the item was enriched and stored in the index with enriched documents."
+metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich information."
+metadata__gelk_version,keyword,true,"Version of the backend used to enrich information."
+metadata__timestamp,date,true,"Date when the item was retrieved from the original data source and stored in the index with raw documents."
+metadata__updated_on,date,true,"Date when the item was updated in its original data source."
+origin,keyword,true,"Original URL where the item was retrieved from."
+owner_bot,boolean,true,"True if the given item owner is identified as a bot."
+owner_gender,keyword,true,"Item owner gender."
+owner_gender_acc,long,true,"Accuracy of the item owner gender."
+owner_id,keyword,true,"Item owner Id from SortingHat."
+owner_name,keyword,true,"Item owner name"
+owner_org_name,keyword,true,"Organization the item owner belongs to."
+owner_user_name,keyword,true,"Item owner user name."
+owner_uuid,keyword,true,"Item owner unique identifier from SortingHat."
+project,keyword,true,"Project name as defined in the JSON file where repositories are grouped by project."
+project_1,keyword,true,"Project (if more than one level is allowed in project hierarchy)."
+question_accepted_answer_id,long,true,"ID of the accepted answer to a question. None if no answer is accepted."
+question_has_accepted_answer,boolean,true,"Check if a question has an accepted answer."
+question_id,long,true,"ID of a question."
+question_tags,keyword,true,"Words or phrases that a question is tagged with."
+question_title,keyword,true,"Title of the question."
+score,long,true,"Score of an item."
+tag,keyword,true,"Perceval tag."
+tags,keyword,true,"Words or phrases that an item is tagged with."
+thread_tags,keyword,true,"Words or phrases that a thread is tagged with."
+title,keyword,true,"Title of the item (question)."
+title_analyzed,text,false,"Question title split by terms to allow searching."
+type,keyword,true,"Type of the item (answer, question)."
+up_vote_count,long,true,"Number of upvotes on an item."
+uuid,keyword,true,"Perceval UUID."
+view_count,long,true,"Count of views for the item."
