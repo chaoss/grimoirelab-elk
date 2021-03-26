@@ -33,6 +33,12 @@ class TestPhabricator(TestBaseBackend):
     ocean_index = "test_" + connector
     enrich_index = "test_" + connector + "_enrich"
 
+    def test_get_field_event_unique_id(self):
+        """Test value of get_field_event_unique_id"""
+
+        enrich_backend = self.connectors[self.connector][2]()
+        self.assertEqual(enrich_backend.get_field_event_unique_id(), 'transactionID')
+
     def test_has_identites(self):
         """Test value of has_identities method"""
 
