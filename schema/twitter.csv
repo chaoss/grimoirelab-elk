@@ -23,7 +23,7 @@ metadata__gelk_version,keyword,true,"Version of the backend used to enrich infor
 metadata__timestamp,date,true,"Date when the item was stored in RAW index."
 metadata__updated_on,date,true,"Date when the item was updated on its original data source."
 origin,keyword,true,"Original URL where tweet was retrieved from."
-place.bounding_box.coordinates,long,keyword,"A series of longitude and latitude points, defining a box which will contain the Place entity this bounding box is related to"
+place.bounding_box.coordinates,long,true,"A series of longitude and latitude points, defining a box which will contain the Place entity this bounding box is related to"
 place.bounding_box.type,keyword,true,"A box of coordinates"
 place.country,keyword,true,"Name of the country containing this place"
 place.country_code,keyword,true,"Shortened country code representing the country containing this place."
