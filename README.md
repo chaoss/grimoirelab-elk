@@ -31,8 +31,8 @@ Each raw document stored in an ElasticSearch index contains a set of common firs
 Each enriched index includes one or more types of documents, which are summarized below.
 
 - **Askbot**: each document can be either a question, an answer or answer's comments.
-- **Bugzilla**: each document corresponds to a single issue.
-- **Bugzillarest**: each document corresponds to a single issue.
+- **Bugzilla**: each document corresponds to a single issue (fetched using CGI calls).
+- **Bugzillarest**: each document corresponds to a single issue (fetched using Bugzilla REST API).
 - **Cocom**: each document corresponds to single file in a commit, with code complexity information.
 - **Colic**: each document corresponds to single file in a commit, with license information.
 - **Confluence**: each document can be either a new page, a page edit, a comment or an attachment.
