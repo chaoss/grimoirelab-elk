@@ -333,5 +333,80 @@
     "timestamp": 1588071688.3739,
     "updated_on": 1588071683.0,
     "uuid": "31f3fdb5641680f47bd415f1299adc53f2d9c3f2"
+},
+{
+    "backend_name": "Telegram",
+    "backend_version": "0.11.1",
+    "category": "message",
+    "classified_fields_filtered": null,
+    "data": {
+        "message": {
+            "chat": {
+                "all_members_are_administrators": true,
+                "id": -375078074,
+                "title": "test api",
+                "type": "group"
+            },
+            "date": 1588071460,
+            "from": {
+                "first_name": "Animesh",
+                "id": 473180335,
+                "is_bot": false,
+                "language_code": "en",
+                "last_name": "Kumar",
+                "username": "animesh_username"
+            },
+            "message_id": 15,
+            "reply_to_message": {
+                "chat": {
+                    "all_members_are_administrators": true,
+                    "id": -375078074,
+                    "title": "test api",
+                    "type": "group"
+                },
+                "date": 1588071445,
+                "from": {
+                    "first_name": "Animesh",
+                    "id": 473180335,
+                    "is_bot": false,
+                    "language_code": "en",
+                    "last_name": "Kumar",
+                    "username": "animesh_username"
+                },
+                "message_id": 14,
+                "sticker": {
+                    "emoji": "\ud83d\udc40",
+                    "file_id": "CAACAgIAAxkBAAMPXqgNA1oj66ib0qG1ZA122OOQrV8AAikAAygPahS3xhSCjzmChhkE",
+                    "file_size": 28338,
+                    "file_unique_id": "AgADKQADKA9qFA",
+                    "height": 512,
+                    "is_animated": true,
+                    "set_name": "Cat2O",
+                    "thumb": {
+                        "file_id": "AAMCAgADGQEAAw9eqA0DWiPrqJvSobVkDXbY45CtXwACKQADKA9qFLfGFIKPOYKGyJnMkS4AAwEAB20AA794AAIZBA",
+                        "file_size": 5968,
+                        "file_unique_id": "AQADyJnMkS4AA794AAI",
+                        "height": 128,
+                        "width": 128
+                    },
+                    "width": 512
+                }
+            },
+            "text": "test reply"
+        },
+        "update_id": 78683186
+    },
+    "offset": 78683186,
+    "origin": "https://telegram.org/owltestbot",
+    "perceval_version": "0.13.0",
+    "search_fields": {
+        "chat_id": -375078074,
+        "chat_name": "test api",
+        "item_id": "14"
+    },
+    "tag": "https://telegram.org/owltestbot",
+    "timestamp": 1588071463.96439,
+    "updated_on": 1588071460.0,
+    "uuid": "fcde9c211a41a5293dd72b2f806b5a7c2c8e0cb7"
 }
 ]

@@ -43,8 +43,32 @@ class TestTelegram(TestBaseBackend):
         """Test whether JSON items are properly inserted into ES"""
 
         result = self._test_items_to_raw()
-        self.assertEqual(result['items'], 9)
-        self.assertEqual(result['raw'], 9)
+        self.assertEqual(result['items'], 10)
+        self.assertEqual(result['raw'], 10)
+
+    def test_reply_to_message_text(self):
+        """Test whether item has text field available"""
+
+        self._test_items_to_raw()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        for item in self.items:
+            message = item['data']['message']
+            eitem = enrich_backend.get_rich_item(item)
+            if 'reply_to_message' in message:
+                if 'text' in message['reply_to_message']:
+                    self.assertEqual(message['reply_to_message']['text'], eitem['reply_to_message'])
+
+    def test_reply_to_message_sticker(self):
+        """Test whether item has sticker field available"""
+
+        self._test_items_to_raw()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[9]
+        message = item['data']['message']
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(message['reply_to_message']['sticker'], eitem['reply_to_message'])
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
