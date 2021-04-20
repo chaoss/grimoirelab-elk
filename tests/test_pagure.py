@@ -225,12 +225,6 @@ class TestPagure(TestBaseBackend):
         result = self._test_refresh_identities()
         # ... ?
 
-    def test_refresh_project(self):
-        """Test refresh project field for all sources"""
-
-        result = self._test_refresh_project()
-        # ... ?
-
     def test_max_bulk_item_exceed(self):
         """Test bulk upload of documents when number of documents
          exceeds max bulk item limit"""

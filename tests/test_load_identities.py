@@ -30,11 +30,11 @@ import unittest
 if '..' not in sys.path:
     sys.path.insert(0, '..')
 
+from base import DB_HOST, DB_SORTINGHAT
 from grimoire_elk.utils import get_connectors
 from grimoire_elk.enriched.sortinghat_gelk import SortingHat
 
 CONFIG_FILE = 'tests.conf'
-DB_SORTINGHAT = "test_sh"
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +75,8 @@ class TestLoadIdentities(unittest.TestCase):
         # The name of the connector is needed only to get access to the SortingHat DB
         self.enrich_backend = get_connectors()["github"][2](db_sortinghat=DB_SORTINGHAT,
                                                             db_user=self.db_user,
-                                                            db_password=self.db_password)
+                                                            db_password=self.db_password,
+                                                            db_host=DB_HOST)
 
     def _test_load_identities(self, items=10):
         """Test whether fetched items are properly loaded to ES"""

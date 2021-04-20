@@ -92,9 +92,9 @@ class GitEnrich(Enrich):
     meta_fields_suffixes = ['_bots', '_domains', '_names', '_org_names', '_uuids']
     meta_non_authored_prefix = 'non_authored_'
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+    def __init__(self, db_sortinghat=None, json_projects_map=None,
                  db_user='', db_password='', db_host='', pair_programming=False):
-        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+        super().__init__(db_sortinghat, json_projects_map,
                          db_user, db_password, db_host)
 
         self.studies = []

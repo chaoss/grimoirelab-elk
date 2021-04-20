@@ -111,12 +111,6 @@ class TestRemo(TestBaseBackend):
         result = self._test_refresh_identities()
         # ... ?
 
-    def test_refresh_project(self):
-        """Test refresh project field for all sources"""
-
-        result = self._test_refresh_project()
-        # ... ?
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')

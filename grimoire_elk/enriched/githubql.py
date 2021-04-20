@@ -76,9 +76,9 @@ class GitHubQLEnrich(Enrich):
 
     event_roles = ['actor', 'reporter', 'submitter']
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+    def __init__(self, db_sortinghat=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
-        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+        super().__init__(db_sortinghat, json_projects_map,
                          db_user, db_password, db_host)
 
         self.studies = [self.enrich_duration_analysis, self.enrich_reference_analysis]

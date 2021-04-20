@@ -201,12 +201,6 @@ class TestGitLab(TestBaseBackend):
         result = self._test_refresh_identities()
         # ... ?
 
-    def test_refresh_project(self):
-        """Test refresh project field for all sources"""
-
-        result = self._test_refresh_project()
-        # ... ?
-
     def test_items_to_raw_anonymized(self):
         """Test whether JSON items are properly inserted into ES anonymized"""
 

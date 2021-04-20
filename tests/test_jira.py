@@ -182,12 +182,6 @@ class TestJira(TestBaseBackend):
         result = self._test_refresh_identities()
         # ... ?
 
-    def test_refresh_project(self):
-        """Test refresh project field for all sources"""
-
-        result = self._test_refresh_project()
-        # ... ?
-
     def test_get_p2o_params_from_url(self):
         """Test the extraction of p2o params from the projects.json entry"""
 

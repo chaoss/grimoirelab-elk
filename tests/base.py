@@ -34,11 +34,13 @@ if '..' not in sys.path:
 
 from grimoire_elk.elk import load_identities
 from grimoire_elk.utils import get_connectors, get_elastic
+
 from tests.model import ESMapping
 
 CONFIG_FILE = 'tests.conf'
 DB_SORTINGHAT = "test_sh"
 DB_PROJECTS = "test_projects"
+DB_HOST = '127.0.0.1'
 FILE_PROJECTS = "data/projects-release.json"
 SCHEMA_DIR = '../schema/'
 
@@ -126,7 +128,6 @@ class TestBaseBackend(unittest.TestCase):
         # Sorting hat settings
         cls.db_user = ''
         cls.db_password = ''
-        cls.db_projects_map = 'test_projects'
         if 'Database' in cls.config:
             if 'user' in cls.config['Database']:
                 cls.db_user = cls.config['Database']['user']
@@ -159,7 +160,7 @@ class TestBaseBackend(unittest.TestCase):
 
         return {'items': len(self.items), 'raw': raw_items}
 
-    def _test_raw_to_enrich(self, sortinghat=False, projects=False, pair_programming=False):
+    def _test_raw_to_enrich(self, sortinghat=True, projects=False, pair_programming=False):
         """Test whether raw indexes are properly enriched"""
 
         # populate raw index
@@ -176,11 +177,19 @@ class TestBaseBackend(unittest.TestCase):
         elif sortinghat and not projects:
             self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                                      db_user=self.db_user,
-                                                                     db_password=self.db_password)
+                                                                     db_password=self.db_password,
+                                                                     db_host=DB_HOST)
+        elif sortinghat and projects:
+            self.enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
+                                                                     db_sortinghat=DB_SORTINGHAT,
+                                                                     db_user=self.db_user,
+                                                                     db_password=self.db_password,
+                                                                     db_host=DB_HOST)
         elif not sortinghat and projects:
             self.enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
                                                                      db_user=self.db_user,
-                                                                     db_password=self.db_password)
+                                                                     db_password=self.db_password,
+                                                                     db_host=DB_HOST)
         if pair_programming:
             self.enrich_backend.pair_programming = pair_programming
 
@@ -230,35 +239,13 @@ class TestBaseBackend(unittest.TestCase):
         load_identities(self.ocean_backend, self.enrich_backend)
         self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                                  db_user=self.db_user,
-                                                                 db_password=self.db_password)
+                                                                 db_password=self.db_password,
+                                                                 db_host=DB_HOST)
         elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
         self.enrich_backend.set_elastic(elastic_enrich)
         self.enrich_backend.enrich_items(self.ocean_backend)
 
         total = refresh_identities(self.enrich_backend)
-        return total
-
-    def _test_refresh_project(self):
-        """Test refresh project field"""
-
-        # populate raw index
-        perceval_backend = None
-        clean = True
-        self.ocean_backend = self.connectors[self.connector][1](perceval_backend)
-        elastic_ocean = get_elastic(self.es_con, self.ocean_index, clean, self.ocean_backend)
-        self.ocean_backend.set_elastic(elastic_ocean)
-        data2es(self.items, self.ocean_backend)
-
-        # populate enriched index
-        self.enrich_backend = self.connectors[self.connector][2](db_projects_map=DB_PROJECTS,
-                                                                 db_user=self.db_user,
-                                                                 db_password=self.db_password)
-
-        elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
-        self.enrich_backend.set_elastic(elastic_enrich)
-        self.enrich_backend.enrich_items(self.ocean_backend)
-
-        total = refresh_projects(self.enrich_backend)
         return total
 
     def _test_study(self, test_study, projects_json_repo=None, projects_json=None, prjs_map=None):
@@ -276,7 +263,8 @@ class TestBaseBackend(unittest.TestCase):
         self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                                  db_user=self.db_user,
                                                                  db_password=self.db_password,
-                                                                 db_projects_map=self.db_projects_map)
+                                                                 json_projects_map=FILE_PROJECTS,
+                                                                 db_host=DB_HOST)
 
         elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
         self.enrich_backend.set_elastic(elastic_enrich)
@@ -323,7 +311,10 @@ class TestBaseBackend(unittest.TestCase):
         data2es(self.items, self.ocean_backend)
 
         # populate enriched index
-        self.enrich_backend = self.connectors[self.connector][2]()
+        self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
+                                                                 db_user=self.db_user,
+                                                                 db_password=self.db_password,
+                                                                 db_host=DB_HOST)
 
         elastic_enrich = get_elastic(self.es_con, self.enrich_index_anonymized, clean, self.enrich_backend, self.enrich_aliases)
         self.enrich_backend.set_elastic(elastic_enrich)

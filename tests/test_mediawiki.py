@@ -230,12 +230,6 @@ class TestMediawiki(TestBaseBackend):
         result = self._test_refresh_identities()
         # ... ?
 
-    def test_refresh_project(self):
-        """Test refresh project field for all sources"""
-
-        result = self._test_refresh_project()
-        # ... ?
-
     def test_perceval_params(self):
         """Test the extraction of perceval params from an URL"""
 

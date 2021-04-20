@@ -61,9 +61,9 @@ class LaunchpadEnrich(Enrich):
     mapping = Mapping
     roles = ['assignee_data', 'owner_data']
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+    def __init__(self, db_sortinghat=None, json_projects_map=None,
                  db_user='', db_password='', db_host=''):
-        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+        super().__init__(db_sortinghat, json_projects_map,
                          db_user, db_password, db_host)
 
     def get_field_author(self):

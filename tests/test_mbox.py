@@ -140,12 +140,6 @@ class TestMbox(TestBaseBackend):
         result = self._test_refresh_identities()
         # ... ?
 
-    def test_refresh_project(self):
-        """Test refresh project field for all sources"""
-
-        result = self._test_refresh_project()
-        # ... ?
-
     def test_empty_identity(self):
         """ Test support for from value with None"""
         enricher = MBoxEnrich()

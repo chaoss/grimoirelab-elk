@@ -294,12 +294,6 @@ class TestGit(TestBaseBackend):
         result = self._test_refresh_identities()
         # ... ?
 
-    def test_refresh_project(self):
-        """Test refresh project field for all sources"""
-
-        result = self._test_refresh_project()
-        # ... ?
-
     def test_demography_study(self):
         """ Test that the demography study works correctly """
 
