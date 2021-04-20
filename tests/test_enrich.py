@@ -32,7 +32,6 @@ from grimoire_elk.elastic import logger
 from grimoire_elk.enriched.enrich import (Enrich,
                                           HEADER_JSON,
                                           anonymize_url)
-from sortinghat.db.model import UniqueIdentity, Profile
 from grimoire_elk.utils import get_connectors, get_elastic
 
 # Make sure we use our code and not any other could we have installed
@@ -108,25 +107,25 @@ class TestEnrich(unittest.TestCase):
     def test_get_profile_sh(self):
         """Test whether a profile from sortinghat model is correctly retrieved as a dict"""
 
-        p = Profile()
-        p.name = 'pepe'
-        p.email = 'pepe@host.com'
-        p.gender = 'male'
-        p.gender_acc = 100
-        uidentity = UniqueIdentity()
-        uidentity.profile = p
-
-        vals = {'00000': uidentity}
+        uidentity = {
+            "mk": "00000",
+            "profile": {
+                "name": "pepe",
+                "email": "pepe@host.com",
+                "gender": 'male',
+                "genderAcc": 100
+            }
+        }
 
         def side_effect(uuid):
-            return vals[uuid]
+            return uidentity
         self._enrich.get_unique_identity = MagicMock(side_effect=side_effect)
 
-        profile = self._enrich.get_profile_sh('00000')
-        self.assertEqual(profile['name'], uidentity.profile.name)
-        self.assertEqual(profile['email'], uidentity.profile.email)
-        self.assertEqual(profile['gender'], uidentity.profile.gender)
-        self.assertEqual(profile['gender_acc'], uidentity.profile.gender_acc)
+        uprofile = self._enrich.get_profile_sh('00000')
+        self.assertEqual(uprofile['profile']['name'], uidentity['profile']['name'])
+        self.assertEqual(uprofile['profile']['email'], uidentity['profile']['email'])
+        self.assertEqual(uprofile['profile']['gender'], uidentity['profile']['gender'])
+        self.assertEqual(uprofile['profile']['genderAcc'], uidentity['profile']['genderAcc'])
 
     def test_get_item_sh_fields_identity(self):
         """Test sortinghat fields retrieval for a given identity"""
@@ -677,11 +676,6 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_bot'], self.empty_item['author_bot'])
         self.assertEqual(eitem_sh['author_multi_org_names'], self.empty_item['author_multi_org_names'])
 
-    def test_has_identities(self):
-        """Test whether has_identities works"""
-
-        self.assertTrue(self._enrich.has_identities())
-
     def test_add_alias(self):
         """Test whether add_alias properly works"""
 
@@ -877,6 +871,48 @@ class TestEnrich(unittest.TestCase):
         for author_key in authors_min_max_data:
             all_authors.append(author_key)
         self.assertListEqual(all_authors, expected)
+
+    def test_get_field_unique_id(self):
+        self.assertEqual(self._enrich.get_field_unique_id(), 'uuid')
+
+    def test_get_field_event_unique_id(self):
+        with self.assertRaises(NotImplementedError):
+            self._enrich.get_field_event_unique_id()
+
+    def test_get_rich_item(self):
+        with self.assertRaises(NotImplementedError):
+            self._enrich.get_rich_item({})
+
+    def test_get_rich_events(self):
+        with self.assertRaises(NotImplementedError):
+            self._enrich.get_rich_events({})
+
+    def test_get_field_author(self):
+        with self.assertRaises(NotImplementedError):
+            self._enrich.get_field_author()
+
+    def test_get_field_date(self):
+        self.assertEqual(self._enrich.get_field_date(), 'metadata__updated_on')
+
+    def test_get_identities(self):
+        with self.assertRaises(NotImplementedError):
+            self._enrich.get_identities(item=None)
+
+    def test_add_repository_labels(self):
+        item = {}
+        self._enrich.add_repository_labels(item)
+        self.assertIsNone(item['repository_labels'])
+
+    def test_add_metadata_filter_raw(self):
+        item = {}
+        self._enrich.add_metadata_filter_raw(item)
+        self.assertIsNone(item['metadata__filter_raw'])
+
+    def test_get_item_id(self):
+        item = {
+            "_id": "0000"
+        }
+        self.assertEqual(self._enrich.get_item_id(item), item['_id'])
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2020 Bitergia
+# Copyright (C) 2015-2021 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
 from geopy.geocoders import Nominatim
 
 from perceval.backend import find_signature_parameters
-from grimoirelab_toolkit.datetime import (datetime_utcnow, str_to_datetime)
+from grimoirelab_toolkit.datetime import datetime_utcnow, str_to_datetime
 
 from ..elastic import ElasticSearch
 from ..elastic_analyzer import Analyzer
@@ -55,17 +55,17 @@ from .. import __version__
 
 logger = logging.getLogger(__name__)
 
-try:
-    import pymysql
-    MYSQL_LIBS = True
-except ImportError:
-    logger.info("MySQL not available")
-    MYSQL_LIBS = False
+# try:
+#     import pymysql
+#
+#     MYSQL_LIBS = True
+# except ImportError:
+#     logger.info("MySQL not available")
+#     MYSQL_LIBS = False
 
 try:
-    from sortinghat.db.database import Database
-    from sortinghat import api, utils
-    from sortinghat.exceptions import NotFoundError, InvalidValueError
+    from sortinghat.cli.client import (SortingHatClient,
+                                       SortingHatClientError)
 
     from .sortinghat_gelk import SortingHat
 
@@ -73,7 +73,6 @@ try:
 except ImportError:
     logger.info("SortingHat not available")
     SORTINGHAT_LIBS = False
-
 
 UNKNOWN_PROJECT = 'unknown'
 DEFAULT_PROJECT = 'Main'
@@ -90,6 +89,7 @@ def metadata(func):
     the gelk revision used.
 
     """
+
     @functools.wraps(func)
     def decorator(self, *args, **kwargs):
         eitem = func(self, *args, **kwargs)
@@ -100,6 +100,7 @@ def metadata(func):
         }
         eitem.update(metadata)
         return eitem
+
     return decorator
 
 
@@ -113,8 +114,9 @@ class Enrich(ElasticItems):
 
     ONION_INTERVAL = seconds = 3600 * 24 * 7
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
-                 db_user='', db_password='', db_host='', insecure=True):
+    def __init__(self, db_sortinghat=None, json_projects_map=None, db_user='',
+                 db_password='', db_host='', insecure=True, db_port='8000', db_path='api/'):
+
         perceval_backend = None
         super().__init__(perceval_backend, insecure=insecure)
 
@@ -126,7 +128,12 @@ class Enrich(ElasticItems):
         if db_sortinghat:
             # self.sh_db = Database("root", "", db_sortinghat, "mariadb")
             if not Enrich.sh_db:
-                Enrich.sh_db = Database(db_user, db_password, db_sortinghat, db_host)
+                client = SortingHatClient(host=db_host, port=db_port,
+                                          path=db_path, ssl=False,
+                                          user=db_user, password=db_password)
+                client.connect()
+                Enrich.sh_db = client
+
             self.sortinghat = True
 
         self.prjs_map = None  # mapping beetween repositories and projects
@@ -137,13 +144,6 @@ class Enrich(ElasticItems):
                 self.json_projects = json.load(data_file)
                 # If we have JSON projects always use them for mapping
                 self.prjs_map = self.__convert_json_to_projects_map(self.json_projects)
-        if not self.json_projects:
-            if db_projects_map and not MYSQL_LIBS:
-                raise RuntimeError("Projects configured but MySQL libraries not available.")
-            if db_projects_map and not self.json_projects:
-                self.prjs_map = self.__get_projects_map(db_projects_map,
-                                                        db_user, db_password,
-                                                        db_host)
 
         if self.prjs_map and self.json_projects:
             # logger.info("Comparing db and json projects")
@@ -266,7 +266,7 @@ class Enrich(ElasticItems):
                     db_projects.append(project)
                 if project not in json:
                     logger.error("Project not found in JSON {}".format(project))
-                    raise NotFoundError("Project not found in JSON {}".format(project))
+                    raise Exception("Project not found in JSON {}".format(project))
                 else:
                     if ds == 'mls':
                         repo_mls = repository.split("/")[-1]
@@ -299,32 +299,6 @@ class Enrich(ElasticItems):
 
         logger.debug("Number of db projects: {}".format(db_projects))
         logger.debug("Number of json projects: {} (>={})".format(json.keys(), db_projects))
-
-    def __get_projects_map(self, db_projects_map, db_user=None, db_password=None, db_host=None):
-        # Read the repo to project mapping from a database
-        ds_repo_to_prj = {}
-
-        db = pymysql.connect(user=db_user, passwd=db_password, host=db_host,
-                             db=db_projects_map)
-        cursor = db.cursor()
-
-        query = """
-            SELECT data_source, p.id, pr.repository_name
-            FROM projects p
-            JOIN project_repositories pr ON p.project_id=pr.project_id
-        """
-
-        res = int(cursor.execute(query))
-        if res > 0:
-            rows = cursor.fetchall()
-            for row in rows:
-                [ds, name, repo] = row
-                if ds not in ds_repo_to_prj:
-                    ds_repo_to_prj[ds] = {}
-                ds_repo_to_prj[ds][repo] = name
-        else:
-            raise RuntimeError("Can't find projects mapping in {}".format(db_projects_map))
-        return ds_repo_to_prj
 
     def get_field_unique_id(self):
         """ Field in the raw item with the unique id """
@@ -390,7 +364,7 @@ class Enrich(ElasticItems):
                 rich_item = self.get_rich_item(item)
                 data_json = json.dumps(rich_item)
                 bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                    (item[self.get_field_unique_id()])
+                             (item[self.get_field_unique_id()])
                 bulk_json += data_json + "\n"  # Bulk document
                 current += 1
             else:
@@ -398,8 +372,8 @@ class Enrich(ElasticItems):
                 for rich_event in rich_events:
                     data_json = json.dumps(rich_event)
                     bulk_json += '{"index" : {"_id" : "%s_%s" } }\n' % \
-                        (item[self.get_field_unique_id()],
-                         rich_event[self.get_field_event_unique_id()])
+                                 (item[self.get_field_unique_id()],
+                                  rich_event[self.get_field_event_unique_id()])
                     bulk_json += data_json + "\n"  # Bulk document
                     current += 1
 
@@ -451,7 +425,7 @@ class Enrich(ElasticItems):
 
     def get_identity_domain(self, identity):
         domain = None
-        if identity['email']:
+        if 'email' in identity and identity['email']:
             domain = self.get_email_domain(identity['email'])
         return domain
 
@@ -473,11 +447,11 @@ class Enrich(ElasticItems):
 
         return last_update
 
-#    def get_elastic_mappings(self):
-#        """ Mappings for enriched indexes """
-#
-#        mapping = '{}'
-#        return {"items": mapping}
+    # def get_elastic_mappings(self):
+    #     """ Mappings for enriched indexes """
+    #
+    #     mapping = '{}'
+    #     return {"items": mapping}
 
     def get_elastic_analyzers(self):
         """ Custom analyzers for our indexes  """
@@ -658,13 +632,6 @@ class Enrich(ElasticItems):
                 pass
         return domain
 
-    def is_bot(self, uuid):
-        bot = False
-        u = self.get_unique_identity(uuid)
-        if u.profile:
-            bot = u.profile.is_bot
-        return bot
-
     def get_enrollment(self, uuid, item_date):
         """ Get the enrollment for the uuid when the item was done """
         # item_date must be offset-naive (utc)
@@ -675,11 +642,13 @@ class Enrich(ElasticItems):
         enroll = self.unaffiliated_group
         if enrollments:
             for enrollment in enrollments:
+                start = str_to_datetime(enrollment['start'])
+                end = str_to_datetime(enrollment['end'])
                 if not item_date:
-                    enroll = enrollment.organization.name
+                    enroll = enrollment['group']['name']
                     break
-                elif item_date >= enrollment.start and item_date <= enrollment.end:
-                    enroll = enrollment.organization.name
+                elif start.isoformat() <= item_date.isoformat() <= end.isoformat():
+                    enroll = enrollment['group']['name']
                     break
         return enroll
 
@@ -697,10 +666,10 @@ class Enrich(ElasticItems):
         if enrollments:
             for enrollment in enrollments:
                 if not item_date:
-                    enrolls.append(enrollment.organization.name)
-                elif enrollment.start <= item_date <= enrollment.end:
-                    enrolls.append(enrollment.organization.name)
-
+                    enrolls.append(enrollment['group']['name'])
+                elif str_to_datetime(enrollment['start']).isoformat() <= item_date.isoformat() \
+                        <= str_to_datetime(enrollment['end']).isoformat():
+                    enrolls.append(enrollment['group']['name'])
         if not enrolls:
             enrolls.append(self.unaffiliated_group)
 
@@ -763,8 +732,8 @@ class Enrich(ElasticItems):
         if not (username or email or name):
             return self.__get_item_sh_fields_empty(rol)
 
-        uuid = utils.uuid(backend_name, email=email,
-                          name=name, username=username)
+        uuid = self.get_uuid(backend_name, email=email, name=name, username=username)
+
         return {
             rol + "_id": uuid,
             rol + "_uuid": uuid,
@@ -835,14 +804,8 @@ class Enrich(ElasticItems):
         return eitem_sh
 
     def get_profile_sh(self, uuid):
-        profile = {}
 
-        u = self.get_unique_identity(uuid)
-        if u.profile:
-            profile['name'] = u.profile.name
-            profile['email'] = u.profile.email
-            profile['gender'] = u.profile.gender
-            profile['gender_acc'] = u.profile.gender_acc
+        profile = self.get_unique_identity(uuid)
 
         return profile
 
@@ -1004,12 +967,26 @@ class Enrich(ElasticItems):
         return eitem_sh
 
     @lru_cache()
+    def get_entity(self, id):
+        return SortingHat.get_entity(self.sh_db, id)
+
+    @lru_cache()
+    def is_bot(self, uuid):
+        return SortingHat.is_bot(self.sh_db, uuid)
+
+    @lru_cache()
+    def get_uuid(self, backend_name, email=None, name=None, username=None):
+        # SortingHat GraphQL has not query that given the backend_name, email, name, and username
+        # return the uuid. That is why we use add_id to get the uuid
+        return SortingHat.add_id(self.sh_db, backend_name, email=email, name=name, username=username)
+
+    @lru_cache()
     def get_enrollments(self, uuid):
-        return api.enrollments(self.sh_db, uuid)
+        return SortingHat.get_enrollments(self.sh_db, uuid)
 
     @lru_cache()
     def get_unique_identity(self, uuid):
-        return api.unique_identities(self.sh_db, uuid)[0]
+        return SortingHat.get_unique_identity(self.sh_db, uuid)
 
     @lru_cache()
     def get_uuid_from_id(self, sh_id):
@@ -1052,29 +1029,22 @@ class Enrich(ElasticItems):
             logger.warning("Name, email and username are none in {}".format(backend_name))
             return sh_ids
 
-        try:
-            # Find the uuid for a given id.
-            id = utils.uuid(backend_name, email=iden['email'],
-                            name=iden['name'], username=iden['username'])
+        id = self.get_uuid(backend_name, email=iden['email'], name=iden['name'], username=iden['username'])
 
-            if not id:
-                logger.warning("Id not found in SortingHat for name: {}, email: {} and username: {} in {}".format(
-                               iden['name'], iden['email'], iden['username'], backend_name))
+        if not id:
+            logger.warning("Id not found in SortingHat for name: {}, email: {} and username: {} in {}".format(
+                           iden['name'], iden['email'], iden['username'], backend_name))
+            return sh_ids
+
+        try:
+            identity_found = self.get_entity(id)
+            if not identity_found:
                 return sh_ids
 
-            with self.sh_db.connect() as session:
-                identity_found = api.find_identity(session, id)
-
-                if not identity_found:
-                    return sh_ids
-
-                sh_ids['id'] = identity_found.id
-                sh_ids['uuid'] = identity_found.uuid
-        except InvalidValueError:
+            sh_ids['id'] = identity_found['identities'][0]['uuid']
+            sh_ids['uuid'] = identity_found['mk']
+        except SortingHatClientError:
             msg = "None Identity found {}".format(backend_name)
-            logger.debug(msg)
-        except NotFoundError:
-            msg = "Identity not found in SortingHat {}".format(backend_name)
             logger.debug(msg)
         except UnicodeEncodeError:
             msg = "UnicodeEncodeError {}, identity: {}".format(backend_name, identity)
@@ -2156,11 +2126,11 @@ class Enrich(ElasticItems):
                 },
                 "sort": [
                     {
-                      "%s": {
-                        "order": "asc"
-                      }
+                        "%s": {
+                           "order": "asc"
+                        }
                     }
-                  ]
+                ]
             }
             """ % date_field
 
