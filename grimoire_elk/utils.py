@@ -285,7 +285,10 @@ def get_elastic(url, es_index, clean=None, backend=None, es_aliases=None, mappin
         backend.set_elastic_url(url)
 #        mapping = backend.get_elastic_mappings()
         mapping = backend.mapping
-        analyzers = backend.get_elastic_analyzers()
+        if hasattr(backend, 'analyzer'):
+            analyzers = backend.analyzer
+        else:
+            analyzers = backend.get_elastic_analyzers()
     try:
         insecure = True
         elastic = ElasticSearch(url=url, index=es_index, mappings=mapping,
