@@ -51,6 +51,10 @@ from .github_study_evolution import (get_unique_repository_with_project_name,
 
 GITHUB = 'https://github.com/'
 
+# Perceval returns this dict when the user no longer exists
+# or the token has no permission
+NO_USER_INFO = {"organizations": []}
+
 logger = logging.getLogger(__name__)
 
 
@@ -134,7 +138,6 @@ class GitHubEnrich(Enrich):
             identity_types = ['user', 'merged_by']
         else:
             identity_types = []
-
         for identity in identity_types:
             identity_attr = identity + "_data"
             if item[identity] and identity_attr in item:
@@ -150,9 +153,8 @@ class GitHubEnrich(Enrich):
         if isinstance(item, dict) and 'data' in item:
             user = item['data'][identity_field]
 
-        if not user:
+        if not self.__has_user(user):
             return identity
-
         identity['username'] = user['login']
         identity['email'] = None
         identity['name'] = None
@@ -445,7 +447,7 @@ class GitHubEnrich(Enrich):
         rich_pr['user_login'] = pull_request['user']['login']
 
         user = pull_request.get('user_data', None)
-        if user is not None and user:
+        if self.__has_user(user):
             rich_pr['user_name'] = user['name']
             rich_pr['author_name'] = user['name']
             rich_pr["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
@@ -548,7 +550,7 @@ class GitHubEnrich(Enrich):
         rich_issue['user_login'] = issue['user']['login']
 
         user = issue.get('user_data', None)
-        if user is not None and user:
+        if self.__has_user(user):
             rich_issue['user_name'] = user['name']
             rich_issue['author_name'] = user['name']
             rich_issue["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
@@ -564,7 +566,7 @@ class GitHubEnrich(Enrich):
             rich_issue['author_name'] = None
 
         assignee = issue.get('assignee_data', None)
-        if assignee and assignee is not None:
+        if self.__has_user(assignee):
             assignee = issue['assignee_data']
             rich_issue['assignee_login'] = assignee['login']
             rich_issue['assignee_name'] = assignee['name']
@@ -698,6 +700,13 @@ class GitHubEnrich(Enrich):
                         str_to_datetime(next_date)
                         ), issues)
                     )
+
+    @staticmethod
+    def __has_user(user):
+        """ Check if the user does exist"""
+        if user and user is not None and user != NO_USER_INFO:
+            return True
+        return False
 
     def enrich_backlog_analysis(self, ocean_backend, enrich_backend, no_incremental=False,
                                 out_index="github_enrich_backlog",
