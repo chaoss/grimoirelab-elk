@@ -25,10 +25,12 @@ import time
 import unittest
 
 from base import TestBaseBackend
-from grimoire_elk.enriched.enrich import logger
+from grimoire_elk.enriched.enrich import logger, DEMOGRAPHICS_ALIAS
 from grimoire_elk.enriched.github import logger as logger_github
 from grimoire_elk.enriched.utils import REPO_LABELS, anonymize_url
 from grimoire_elk.raw.github import GitHubOcean
+
+HEADER_JSON = {"Content-Type": "application/json"}
 
 
 class TestGitHub(TestBaseBackend):
@@ -219,6 +221,37 @@ class TestGitHub(TestBaseBackend):
             'chaoss', 'grimoirelab-perceval'
         ]
         self.assertListEqual(GitHubOcean.get_perceval_params_from_url(url), expected_params)
+
+    def test_demography_study(self):
+        """ Test that the demography study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_demography')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_demography":
+                study(ocean_backend, enrich_backend)
+
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[github] Demography '
+                                           'starting study %s/test_github_enrich'
+                             % anonymize_url(self.es_con))
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:[github] Demography '
+                                            'end %s/test_github_enrich'
+                             % anonymize_url(self.es_con))
+
+        time.sleep(5)  # HACK: Wait until github enrich index has been written
+        items = [item for item in enrich_backend.fetch()]
+        self.assertEqual(len(items), 7)
+        for item in items:
+            self.assertNotIn('username:password', item['origin'])
+            self.assertNotIn('username:password', item['tag'])
+            if 'author_uuid' in item:
+                self.assertTrue('demography_min_date' in item.keys())
+                self.assertTrue('demography_max_date' in item.keys())
+
+        r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
+                                                headers=HEADER_JSON, verify=False)
+        self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
 
     def test_geolocation_study(self):
         """ Test that the geolocation study works correctly """

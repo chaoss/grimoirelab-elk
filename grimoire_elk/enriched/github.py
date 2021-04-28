@@ -115,6 +115,7 @@ class GitHubEnrich(Enrich):
         self.studies.append(self.enrich_geolocation)
         self.studies.append(self.enrich_extra_data)
         self.studies.append(self.enrich_backlog_analysis)
+        self.studies.append(self.enrich_demography)
 
     def set_elastic(self, elastic):
         self.elastic = elastic
@@ -233,6 +234,11 @@ class GitHubEnrich(Enrich):
         self.add_repository_labels(rich_item)
         self.add_metadata_filter_raw(rich_item)
         return rich_item
+
+    def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
+                          author_field="author_uuid"):
+
+        super().enrich_demography(ocean_backend, enrich_backend, date_field, author_field=author_field)
 
     def enrich_onion(self, ocean_backend, enrich_backend,
                      no_incremental=False,
