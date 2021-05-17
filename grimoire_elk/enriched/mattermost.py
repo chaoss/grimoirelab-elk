@@ -21,12 +21,10 @@
 
 import logging
 
-
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
 
 from grimoirelab_toolkit.datetime import unixtime_to_datetime
-
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +42,7 @@ class Mapping(BaseMapping):
         mapping = """
         {
             "properties": {
-                "text_analyzed": {
+                "message_analyzed": {
                   "type": "text",
                   "fielddata": true,
                   "index": true
@@ -56,7 +54,6 @@ class Mapping(BaseMapping):
 
 
 class MattermostEnrich(Enrich):
-
     # This enricher must compatible with the Slack enricher to reuse the Kibiter panel
 
     mapping = Mapping
@@ -121,66 +118,59 @@ class MattermostEnrich(Enrich):
         message = item['data']
 
         eitem["reply_count"] = 0  # be sure it is always included
+        eitem['message_id'] = message['id']
 
         # data fields to copy
-        copy_fields = ["text", "type", "reply_count", "subscribed", "subtype",
-                       "unread_count", "user"]
+        copy_fields = ["message", "type", "reply_count", "hashtags", "is_pinned"]
         for f in copy_fields:
             if f in message:
                 eitem[f] = message[f]
             else:
                 eitem[f] = None
 
-        eitem['text_analyzed'] = eitem['text']
-
-        eitem['number_attachs'] = 0
-        if 'attachments' in message and message['attachments']:
-            eitem['number_attachs'] = len(message['attachments'])
+        eitem['message_analyzed'] = eitem['message']
 
         eitem['reaction_count'] = 0
-        if 'reactions' in message:
-            eitem['reaction_count'] = len(message['reactions'])
-            eitem['reactions'] = []
-            for rdata in message['reactions']:
-                for i in range(0, rdata['count']):
-                    eitem['reactions'].append(rdata["name"])
-
-        if 'file' in message:
-            eitem['file_type'] = message['file']['pretty_type']
-            eitem['file_title'] = message['file']['title']
-            eitem['file_size'] = message['file']['size']
-            eitem['file_name'] = message['file']['name']
-            eitem['file_mode'] = message['file']['mode']
-            eitem['file_is_public'] = message['file']['is_public']
-            eitem['file_is_external'] = message['file']['is_external']
-            eitem['file_id'] = message['file']['id']
-            eitem['file_is_editable'] = message['file']['editable']
+        eitem['file_count'] = 0
+        if 'metadata' in message:
+            if 'reactions' in message['metadata']:
+                eitem['reaction_count'] = len(message['metadata']['reactions'])
+                eitem['reactions'] = self.__get_reactions(message['metadata']['reactions'])
+            if 'files' in message['metadata']:
+                eitem['file_count'] = len(message['metadata']['files'])
+                eitem['files'] = self.__get_files(message['metadata']['files'])
 
         if 'user_data' in message:
+            user_data = message['user_data']
+            eitem['roles'] = user_data['roles']
+            eitem['position'] = user_data['position']
             eitem['team_id'] = None  # not exists in Mattermost
-            if 'timezone' in message['user_data']:
-                if message['user_data']['timezone']['useAutomaticTimezone']:
-                    eitem['tz'] = message['user_data']['timezone']['automaticTimezone']
+            if 'timezone' in user_data:
+                if user_data['timezone']['useAutomaticTimezone']:
+                    eitem['tz'] = user_data['timezone']['automaticTimezone']
                 else:
-                    eitem['tz'] = message['user_data']['timezone']['manualTimezone']
+                    eitem['tz'] = user_data['timezone']['manualTimezone']
                 # tz must be in -12h to 12h interval, so seconds -> hours
                 if eitem['tz']:
                     eitem['tz'] = round(int(eitem['tz']) / (60 * 60))
-            if 'is_admin' in message['user_data']:
-                eitem['is_admin'] = message['user_data']['is_admin']
-            if 'is_owner' in message['user_data']:
-                eitem['is_owner'] = message['user_data']['is_owner']
-            if 'is_primary_owner' in message['user_data']:
-                eitem['is_primary_owner'] = message['user_data']['is_primary_owner']
-            if 'profile' in message['user_data']:
-                if 'title' in message['user_data']['profile']:
-                    eitem['profile_title'] = message['user_data']['profile']['title']
-                eitem['avatar'] = message['user_data']['profile']['image_32']
 
-        eitem['channel_name'] = message['channel_data']['name']
-        eitem['channel_id'] = message['channel_data']['id']
-        eitem['channel_created'] = unixtime_to_datetime(message['channel_data']['create_at'] / 1000).isoformat()
-        eitem['channel_member_count'] = None
+        if 'channel_data' in message:
+            channel_data = message['channel_data']
+            eitem['channel_name'] = channel_data['display_name']
+            eitem['channel_id'] = channel_data['id']
+            eitem['channel_create_at'] = unixtime_to_datetime(channel_data['create_at'] / 1000).isoformat()
+            eitem['channel_delete_at'] = None if channel_data['delete_at'] == 0 else \
+                unixtime_to_datetime(channel_data['delete_at'] / 1000).isoformat()
+            eitem['channel_update_at'] = unixtime_to_datetime(channel_data['update_at'] / 1000).isoformat()
+            eitem['channel_member_count'] = None
+            eitem['channel_message_count'] = channel_data['total_msg_count']
+            eitem['channel_team_id'] = channel_data['team_id']
+
+        eitem['is_reply'] = False
+        eitem['parent_id'] = None
+        if message['parent_id']:
+            eitem['is_reply'] = True
+            eitem['parent_id'] = message['parent_id']
 
         eitem = self.__convert_booleans(eitem)
 
@@ -195,6 +185,42 @@ class MattermostEnrich(Enrich):
         self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem
+
+    @staticmethod
+    def __get_files(message):
+        files = []
+        for file in message:
+            new_file = {
+                'file_user_id': file['user_id'],
+                'file_post_id': file['post_id'],
+                'file_create_at': unixtime_to_datetime(file['create_at'] / 1000).isoformat(),
+                'file_update_at': unixtime_to_datetime(file['update_at'] / 1000).isoformat(),
+                'file_delete_at': None if file['delete_at'] == 0 else unixtime_to_datetime(
+                    file['delete_at'] / 1000).isoformat(),
+                'file_name': file['name'],
+                'file_extension': file['extension'],
+                'file_size': file['size'],
+                'file_type': file['mime_type'],
+                'file_mini_preview': file['mini_preview']
+            }
+            files.append(new_file)
+        return files
+
+    @staticmethod
+    def __get_reactions(message):
+        reactions = []
+        for reaction in message:
+            new_reaction = {
+                'reaction_user_id': reaction['user_id'],
+                'reaction_post_id': reaction['post_id'],
+                'reaction_emoji_name': reaction['emoji_name'],
+                'reaction_create_at': unixtime_to_datetime(reaction['create_at'] / 1000).isoformat(),
+                'reaction_update_at': unixtime_to_datetime(reaction['update_at'] / 1000).isoformat(),
+                'reaction_delete_at': None if reaction['delete_at'] == 0 else unixtime_to_datetime(
+                    reaction['delete_at'] / 1000).isoformat()
+            }
+            reactions.append(new_reaction)
+        return reactions
 
     def __convert_booleans(self, eitem):
         """ Convert True/False to 1/0 for better kibana processing """
