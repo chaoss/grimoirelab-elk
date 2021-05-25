@@ -59,7 +59,7 @@ class TestMattermost(TestBaseBackend):
 
         for item in self.items:
             eitem = enrich_backend.get_rich_item(item)
-            self.assertEqual(eitem['channel_name'], "test-channel")
+            self.assertEqual(eitem['channel_name'], "Eclipse Che")
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
