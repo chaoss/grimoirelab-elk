@@ -1,56 +1,60 @@
-name,type
-author_bot,boolean
-author_domain,keyword
-author_id,keyword
-author_name,keyword
-author_org_name,keyword
-author_uuid,keyword
-body_extract,keyword
-body,text
-Date,keyword
-email_date,date
-From_bot,boolean
-From_domain,keyword
-From_id,keyword
-From,keyword
-From_name,keyword
-From_org_name,keyword
-From_uuid,keyword
-grimoire_creation_date,date
-is_pipermail_message,long
-kip_binding,long
-kip_discuss_inactive_days,float
-kip_discuss_time_days,float
-kip_final_status,keyword
-kip_is_discuss,long
-kip_is_first_discuss,long
-kip_is_first_vote,long
-kip_is_last_discuss,long
-kip_is_last_vote,long
-kip_is_vote,long
-kip,long
-kip_result,long
-kip_start_end,keyword
-kip_status,keyword
-kip_type,keyword
-kip_vote,long
-kip_voting_inactive_days,float
-kip_voting_time_days,float
-list,keyword
-Message-ID,keyword
-metadata__enriched_on,date
-metadata__gelk_backend_name,keyword
-metadata__gelk_version,keyword
-metadata__timestamp,date
-metadata__updated_on,date
-origin,keyword
-project_1,keyword
-project,keyword
-repository_labels,keyword,true
-root,boolean
-size,long
-Subject_analyzed,text
-Subject,keyword
-tag,keyword
-tz,long
-uuid,keyword
+name,type,aggregatable,description
+Date,keyword,true,"String with the date when the message was sent. Includes timezone."
+From_bot,boolean,true,"True if the author is identified as a bot."
+From_domain,keyword,true,"Domain associated to the author in SortingHat profile."
+From_gender,keyword,true,"Author gender."
+From_gender_acc,long,true,"Accuracy to assess author gender."
+From_id,keyword,true,"Author Id from SortingHat."
+From_name,keyword,true,"Author name."
+From_org_name,keyword,true,"Author organization name from SortingHat profile."
+From_user_name,keyword,true,"Author's username from SortingHat profile."
+From_uuid,keyword,true,"Author UUID from SortingHat."
+Message-ID,keyword,true,"String with the unique message header Message-ID."
+Subject,keyword,true,"Subject of the message."
+Subject_analyzed,text,true,"Subject of the message."
+author_bot,boolean,true,"True if the given author is identified as a bot."
+author_domain,keyword,true,"Domain associated to the author in SortingHat profile."
+author_gender,keyword,true,"Author gender."
+author_gender_acc,long,true,"Accuracy to assess author gender."
+author_id,keyword,true,"Author Id from SortingHat."
+author_name,keyword,true,"Author name."
+author_org_name,keyword,true,"Author organization name from SortingHat profile."
+author_user_name,keyword,true,"Author's username from SortingHat profile."
+author_uuid,keyword,true,"Author UUID from SortingHat."
+body_extract,text,true,"Extract of the body from the email, depending on the size of the body it could have the entire message."
+body,text,false,"Body of the email."
+email_date,date,true,"Date when the message was sent."
+grimoire_creation_date,date,true,"Commit date (when the original author made the commit)."
+is_pipermail_message,long,true,"Value of 1 if the mailing list backend is pipermail."
+kip,long,true,"Id of the KIP item."
+kip_binding,long,true,"Value of 1 when the vote is binding, value of 0 when it is not."
+kip_discuss_inactive_days,float,true,"Number of days since last discussion message."
+kip_discuss_time_days,float,true,"Number of days between first and last discussion message."
+kip_final_status,keyword,true,"String with the final status of the KIP."
+kip_is_discuss,long,true,"Value of 1 when the message is part of a discussion, value of 0 when it is not."
+kip_is_first_discuss,long,true,"Value of 1 when the message is the first message of a discussion thread, value of 0 when it is not."
+kip_is_first_vote,long,true,"Value of 1 when the message is the first message of a voting thread, value of 0 when it is not."
+kip_is_last_discuss,long,true,"Value of 1 when the message is the last message of a discussion thread, value of 0 when it is not."
+kip_is_last_vote,long,true,"Value of 1 when the message is the last message of a voting thread, value of 0 when it is not."
+kip_is_vote,long,true,"Value of 1 when the message is a vote, value of 0 when it is not."
+kip_result,long,true,"Value of 1 when the KIP was accepted, value of -1 when discarded and empty otherwise."
+kip_start_end,keyword,true,"String with any of the following values: discuss_start, discuss_end, voting_start, voting_end."
+kip_status,keyword,true,"String with any of the following values: adopted, discussion, voting, inactive, discarded."
+kip_type,keyword,true,"String with any of the following values: discuss, vote."
+kip_vote,long,true,"Number with the vote: 1, 0, -1."
+kip_voting_inactive_days,float,true,"Number of days since last message with a vote."
+kip_voting_time_days,float,true,"Number of days between first and last voting message."
+list,keyword,true,"String with the uri of the mailing list."
+metadata__enriched_on,date,true,"Date when the item was enriched."
+metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich information."
+metadata__gelk_version,keyword,true,"Version of the backend used to enrich information."
+metadata__timestamp,date,true,"Date when the item was stored in RAW index."
+metadata__updated_on,date,true,"Date when the item was updated in its original data source."
+origin,keyword,true,"Original URL where the repository was retrieved from."
+project,keyword,true,"Project name."
+project_1,keyword,true,"Project name (if more than one level is allowed in project hierarchy)"
+root,boolean,true,"True when the message is sent by a root account."
+size,long,true,"Size of the body of the message."
+tag,keyword,true,"Perceval tag."
+tz,long,true,"Number representation of the timezone."
+uuid,keyword,true,"Perceval UUID."
