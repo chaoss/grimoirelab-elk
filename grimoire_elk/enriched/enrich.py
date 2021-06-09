@@ -41,6 +41,7 @@ from perceval.backend import find_signature_parameters
 from grimoirelab_toolkit.datetime import (datetime_utcnow, str_to_datetime)
 
 from ..elastic import ElasticSearch
+from ..elastic_analyzer import Analyzer
 from ..elastic_items import (ElasticItems,
                              HEADER_JSON)
 from .study_ceres_onion import ESOnionConnector, onion_study
@@ -106,7 +107,7 @@ def metadata(func):
 
 
 class Enrich(ElasticItems):
-
+    analyzer = Analyzer
     sh_db = None
     kibiter_version = None
     RAW_FIELDS_COPY = ["metadata__updated_on", "metadata__timestamp",
@@ -485,9 +486,7 @@ class Enrich(ElasticItems):
     def get_elastic_analyzers(self):
         """ Custom analyzers for our indexes  """
 
-        analyzers = '''
-        {}
-        '''
+        analyzers = '{}'
 
         return analyzers
 

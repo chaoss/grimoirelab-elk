@@ -74,7 +74,16 @@ class ElasticSearch(object):
 
         self.requests = grimoire_con(insecure)
 
-        self.create_index(analyzers, clean)
+        analyzer_settings = None
+
+        if analyzers:
+            analyzers_dict = analyzers.get_elastic_analyzers(es_major=self.major)
+            analyzer_settings = analyzers_dict['items']
+
+        self.create_index(analyzer_settings, clean)
+
+        if analyzers:
+            self.update_analyzers(analyzer_settings)
         if mappings:
             map_dict = mappings.get_elastic_mappings(es_major=self.major)
             self.create_mappings(map_dict)
@@ -344,6 +353,57 @@ class ElasticSearch(object):
                          time() - task_init, new_items, json_size))
 
         return new_items
+
+    def update_analyzers(self, analyzers):
+        """Update the settings with the analyzer for a given index.
+        To update the settings we have to:
+        1. Close the index
+        2. Update the settings
+        3. Open the index.
+
+        :param analyzers: elastic_analyzer.Analyzer object
+        """
+        if analyzers == '{}':
+            return
+
+        headers = {"Content-Type": "application/json"}
+
+        # Check if the settings are already updated
+        res = self.requests.get(self.index_url + "/_settings")
+        try:
+            res.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logger.error("Error getting the index settings: {}".format(res.text))
+
+        settings = res.json()
+        index_settings = settings[self.index]['settings']['index']
+        analysis = json.loads(analyzers)['settings']['analysis']
+        if 'analysis' in index_settings and analysis == index_settings['analysis']:
+            logger.debug("Index settings for {} is already updated. No need to update it".format(self.index))
+            return
+
+        close_index_url = "{}/_close".format(self.index_url)
+        res = self.requests.post(close_index_url, headers=headers)
+        try:
+            res.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logger.error("Error closing the index before updating settings: {}".format(res.text))
+
+        url_set = "{}/_settings".format(self.index_url)
+        res = self.requests.put(url_set, data=analyzers,
+                                headers=headers)
+        try:
+            res.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logger.error("Error updating index settings {}. Settings: {}".format(res.text, analyzers))
+
+        open_index_url = "{}/_open".format(self.index_url)
+        res = self.requests.post(open_index_url, headers=headers)
+        try:
+            res.raise_for_status()
+            logger.debug("Index settings updated {}: {}".format(self.index, analyzers))
+        except requests.exceptions.HTTPError:
+            logger.error("Error opening the index after updating settings: {}".format(res.text))
 
     def create_mappings(self, mappings):
         """Create the mappings for a given index. It includes the index
