@@ -112,57 +112,52 @@ class WeblateEnrich(Enrich):
         eitem['tz'] = int(change_timestamp.strftime("%H"))
         eitem['action'] = change['action']
         eitem['action_name'] = change['action_name']
-        eitem['glossary_term'] = change['glossary_term']
+        eitem['glossary_term'] = change.get('glossary_term', None)
         eitem['change_id'] = change['id']
         eitem['target'] = change['target']
         eitem['change_api_url'] = change['url']
 
         eitem['author_api_url'] = change['author']
-        if 'author_data' in change:
-            user_data = change['author_data']
-            for data in user_data:
-                eitem['author_' + data] = user_data[data]
+        author_data = change.get('author_data', None)
+        if author_data:
+            for data in author_data:
+                eitem['author_' + data] = author_data[data]
 
-        eitem['user_api_url'] = change['user']
-        if 'user' in change:
-            username = change['user']
-            eitem['user_name'] = username.split('api/users/')[1].split('/')[0] \
-                if username is not None and username else None
-        if 'user_data' in change:
-            user_data = change['user_data']
+        eitem['user_api_url'] = change.get('user', None)
+        if eitem['user_api_url']:
+            username = eitem['user_api_url']
+            eitem['user_name'] = username.split('api/users/')[1].split('/')[0] if username else None
+
+        user_data = change.get('user_data', None)
+        if user_data:
             for data in user_data:
                 eitem['user_' + data] = user_data[data]
 
         eitem['unit_api_url'] = change['unit']
-        if 'unit_data' in change:
-            user_data = change['unit_data']
-            for data in user_data:
+        unit_data = change.get('unit_data', None)
+        if unit_data:
+            for data in unit_data:
                 if 'has_' in data:
-                    eitem['unit_' + data] = 1 if user_data[data] else 0
+                    eitem['unit_' + data] = 1 if unit_data[data] else 0
                 else:
-                    eitem['unit_' + data] = user_data[data]
+                    eitem['unit_' + data] = unit_data[data]
 
-        eitem['component_api_url'] = change['component']
-        if 'component' in change:
-            component = change['component']
+        eitem['component_api_url'] = change.get('component', None)
+        if eitem['component_api_url']:
+            component = eitem['component_api_url']
             # component = <source>/api/components/<project>/<component>
-            project_name = component.split('api/components/')[1].split('/')[0] \
-                if component is not None and component else None
-            component_name = component.split('api/components/')[1].split('/')[1] \
-                if component is not None and component else None
+            project_name = component.split('api/components/')[1].split('/')[0] if component else None
+            component_name = component.split('api/components/')[1].split('/')[1] if component else None
             eitem['project_name'] = project_name
             eitem['component_name'] = component_name
 
-        eitem['translation_api_url'] = change['translation']
-        if 'translation' in change:
-            translation = change['translation']
-            # component = <source>/api/components/<project>/<component>/<translation>
-            project_name = translation.split('api/translations/')[1].split('/')[0] \
-                if translation is not None and translation else None
-            component_name = translation.split('api/translations/')[1].split('/')[1] \
-                if translation is not None and translation else None
-            translation_name = translation.split('api/translations/')[1].split('/')[2] \
-                if translation is not None and translation else None
+        eitem['translation_api_url'] = change.get('translation', None)
+        if eitem['translation_api_url']:
+            translation = eitem['translation_api_url']
+            # component = <source>/api/translations/<project>/<component>/<translation>
+            project_name = translation.split('api/translations/')[1].split('/')[0] if translation else None
+            component_name = translation.split('api/translations/')[1].split('/')[1] if translation else None
+            translation_name = translation.split('api/translations/')[1].split('/')[2] if translation else None
             eitem['project_name'] = project_name
             eitem['component_name'] = component_name
             eitem['translation_name'] = translation_name
