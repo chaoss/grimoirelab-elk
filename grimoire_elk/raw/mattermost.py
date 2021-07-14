@@ -37,30 +37,39 @@ class Mapping(BaseMapping):
         """
 
         mapping = '''
-             {
+            {
                 "dynamic":true,
-                    "properties": {
-                        "data": {
-                            "properties": {
-                                "attachments": {
-                                    "dynamic":false,
-                                    "properties": {}
-                                },
-                                "channel_info": {
-                                    "properties": {
-                                        "latest": {
-                                            "dynamic": false,
-                                            "properties": {}
-                                        }
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "attachments": {
+                                "dynamic":false,
+                                "properties": {}
+                            },
+                            "channel_info": {
+                                "properties": {
+                                    "latest": {
+                                        "dynamic": false,
+                                        "properties": {}
                                     }
-                                },
-                                "root": {
-                                   "dynamic":false,
-                                    "properties": {}
                                 }
+                            },
+                            "props": {
+                                "dynamic":false,
+                                "properties": {
+                                    "meeting_id": {
+                                        "type": "text",
+                                        "index": true
+                                    }
+                                }
+                            },
+                            "root": {
+                               "dynamic":false,
+                                "properties": {}
                             }
                         }
                     }
+                }
             }
             '''
 
