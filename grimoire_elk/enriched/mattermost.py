@@ -145,15 +145,12 @@ class MattermostEnrich(Enrich):
             eitem['roles'] = user_data['roles']
             eitem['position'] = user_data['position']
             eitem['team_id'] = None  # not exists in Mattermost
-            if 'timezone' in user_data:
-                if user_data['timezone']['useAutomaticTimezone']:
-                    eitem['tz'] = user_data['timezone']['automaticTimezone']
+            timezone = user_data.get('timezone', None)
+            if timezone:
+                if timezone['useAutomaticTimezone']:
+                    eitem['tz'] = timezone['automaticTimezone']
                 else:
-                    eitem['tz'] = user_data['timezone']['manualTimezone']
-                # tz must be in -12h to 12h interval, so seconds -> hours
-                if eitem['tz']:
-                    eitem['tz'] = round(int(eitem['tz']) / (60 * 60))
-
+                    eitem['tz'] = timezone['manualTimezone']
         if 'channel_data' in message:
             channel_data = message['channel_data']
             eitem['channel_name'] = channel_data['display_name']
