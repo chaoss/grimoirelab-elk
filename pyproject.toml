@@ -38,7 +38,7 @@ p2o = 'utils.p2o:main'
 gelk_mapping = 'utils.gelk_mapping:main'
 
 [tool.poetry.dependencies]
-python = "3.5 || ^3.6 || ^3.7"
+python = "^3.6"
 elasticsearch = "6.3.1"
 elasticsearch-dsl = "6.3.1"
 requests = "2.21.0"
