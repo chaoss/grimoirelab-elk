@@ -59,6 +59,8 @@ perceval-finos = {branch = "master", git = "https://github.com/Bitergia/grimoire
 
 [tool.poetry.dev-dependencies]
 httpretty = "^0.9.6"
+flake8 = "^3.9.2"
+coverage = "^5.5"
 
 [build-system]
 requires = ["poetry>=0.12"]
