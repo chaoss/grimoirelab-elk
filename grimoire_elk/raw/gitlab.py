@@ -80,6 +80,12 @@ class GitLabOcean(ElasticOcean):
         tokens = url.split(' ')
         repo = tokens[0]
 
+        # This removes the last two components from the URL (user & project) leaving only
+        # the host and protocol
+        host = '/'.join(repo.split('/')[:-2])
+        if host != 'https://gitlab.com':
+            params.extend(("--enterprise-url", host))
+
         owner = repo.split('/')[-2]
         repository = repo.split('/')[-1]
 
