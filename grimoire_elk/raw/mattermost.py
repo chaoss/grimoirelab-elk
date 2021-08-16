@@ -19,6 +19,7 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
+import re
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 
@@ -80,15 +81,66 @@ class MattermostOcean(ElasticOcean):
     """Mattermost Ocean feeder"""
 
     mapping = Mapping
+    URL_REGEX = re.compile('^'  # Pattern starts from the begining of the string
+
+                           # Both legacy and standard URLs start with the base URL
+                           r'(?P<base>https?://[\w\.\-]+\.[\w\-]+)'
+
+                           # Now match one of the types of URLs
+                           r'(?:'
+
+                           # Pattern for a standard URL
+                           r'(/(?P<team>[a-z\-_\d]+)/channels/(?P<channel>[a-z\-_\d]+)/?)'
+
+                           # OR
+                           r'|'
+
+                           # Pattern for a legacy URL
+                           r'(/? (?P<channel_id>[a-z\d]{26}))'
+
+                           r')$')  # Pattern ends at the end of the string
 
     @classmethod
     def get_perceval_params_from_url(cls, url):
-        """ Get the perceval params given a URL for the data source """
+        """ Get the perceval params given a mattermost URL
+
+        Mattermost URLs can be passed in two formats:
+        - Legacy, which looks like <base_url> <channel_id>
+        - Standard, which is just the URL for a specific channel.
+
+        An example Legacy "URL" looks like `https://my.mattermost.host/
+        993bte1an3dyjmqdgxsr8jr5kh`
+
+        An example Standard URL looks like
+        `https://my.mattermost.host/my_team_name/channels/my_channel_name`
+        """
         params = []
 
-        data = url.split()
-        url = data[0]
-        channel = data[1]
+        # Match the provided URL against the validator/parser regex
+        data = cls.URL_REGEX.match(url.lower())
+
+        # If there was no match, the URL was formatted wrong
+        if data is None:
+            raise RuntimeError(f"Couldn't parse mattermost URL ({url}), unknown format\n"
+                               "URLs must be either a url like "
+                               "'https://my.mattermost.host/my_team_name/channels/my_channel_name' "
+                               "or just a base URL and a channel ID, such as "
+                               "'https://my.mattermost.host/ 993bte1an3dyjmqdgxsr8jr5kh'")
+
+        # The `base` group should be matched for both URLs, and is the 1st parameter
+        url = data.group('base')
         params.append(url)
-        params.append(channel)
+
+        # Extract the other groups
+        team = data.group('team')
+        channel = data.group('channel')
+        channel_id = data.group('channel_id')
+
+        # Check if this is a Standard URL by the presence of the `team` group
+        if team is not None:
+            params.append(channel)
+            params.append(team)
+        else:
+            params.append(channel_id)
+
         return params
