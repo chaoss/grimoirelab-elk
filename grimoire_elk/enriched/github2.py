@@ -163,9 +163,9 @@ class GitHubEnrich2(Enrich):
         if not user:
             return identity
 
-        identity['name'] = user.get('login', None)
-        identity['username'] = user.get('username', None)
+        identity['name'] = user.get('name', user.get('login', None))
         identity['email'] = user.get('email', None)
+        identity['username'] = user.get('username', user.get('login', None))
 
         return identity
 
