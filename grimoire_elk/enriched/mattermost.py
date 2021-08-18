@@ -164,10 +164,9 @@ class MattermostEnrich(Enrich):
             eitem['channel_team_id'] = channel_data['team_id']
 
         eitem['is_reply'] = False
-        eitem['parent_id'] = None
-        if message['parent_id']:
+        eitem['parent_id'] = message.get('parent_id', message.get('root_id', None))
+        if eitem['parent_id']:
             eitem['is_reply'] = True
-            eitem['parent_id'] = message['parent_id']
 
         eitem = self.__convert_booleans(eitem)
 
