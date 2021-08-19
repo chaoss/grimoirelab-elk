@@ -36,6 +36,7 @@ PROJECT_EVENTS = ['AddedToProjectEvent', 'MovedColumnsInProjectEvent', 'RemovedF
 REFERENCE_EVENTS = ['CrossReferencedEvent']
 CLOSED_EVENTS = ['ClosedEvent']
 MERGED_EVENTS = ['MergedEvent']
+PULL_REQUEST_REVIEW_EVENTS = ['PullRequestReview']
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +97,7 @@ class GitHubQLEnrich(Enrich):
         """Return the identities from an item"""
 
         event = item['data']
-        event_actor = event.get("actor", None)
+        event_actor = event.get("actor", event.get("author", None))
         if event_actor:
             identity = self.get_sh_identity(event_actor)
             if identity:
@@ -160,7 +161,7 @@ class GitHubQLEnrich(Enrich):
 
         event = item['data']
         issue = item['data']['issue']
-        actor = item['data']['actor']
+        actor = item['data'].get('actor', item['data'].get('author', None))
 
         # move the issue reporter to level of actor. This is needed to
         # allow `get_item_sh` adding SortingHat identities
@@ -262,6 +263,19 @@ class GitHubQLEnrich(Enrich):
             rich_event['merge_merged_at'] = merge['mergedAt']
             rich_event['merge_updated_at'] = merge['updatedAt']
             rich_event['merge_url'] = merge['url']
+        elif rich_event['event_type'] in PULL_REQUEST_REVIEW_EVENTS:
+            review = event['pullRequest']
+            rich_event['merge_approved'] = 0
+            rich_event['merge_state'] = event['state']
+            rich_event['merge_approved'] = int(rich_event['merge_state'] == 'APPROVED')
+            rich_event['merge_closed'] = review['closed']
+            rich_event['merge_closed_at'] = review['closedAt']
+            rich_event['merge_created_at'] = review['createdAt']
+            rich_event['merge_merged'] = review['merged']
+            rich_event['merge_merged_at'] = review['mergedAt']
+            rich_event['merge_updated_at'] = review['updatedAt']
+            rich_event['merge_url'] = review['url']
+            item['data']['actor'] = item['data']['author']
         else:
             logger.warning("[github] event {} not processed".format(rich_event['event_type']))
 
