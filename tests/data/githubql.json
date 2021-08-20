@@ -1430,5 +1430,108 @@
         "timestamp": 1603726681.688073,
         "updated_on": 1586677865,
         "uuid": "bd94b736428477b4a56ca30a2db2d6c5b89a5564"
+    },
+    {
+        "backend_name": "GitHubQL",
+        "backend_version": "0.3.0",
+        "perceval_version": "0.17.9",
+        "timestamp": 1629364761.200887,
+        "origin": "https://github.com/zhquan/test-merged-event",
+        "uuid": "6c80e36918fe0db689894e241854677972930b37",
+        "updated_on": 1628246010,
+        "classified_fields_filtered": null,
+        "category": "event",
+        "search_fields": {
+            "item_id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NzI0MjIyNjEy",
+            "owner": "zhquan",
+            "repo": "test-merged-event"
+        },
+        "tag": "https://github.com/zhquan/test-merged-event",
+        "data": {
+            "eventType": "PullRequestReview",
+            "state": "APPROVED",
+            "body": "LGTM",
+            "createdAt": "2021-08-06T10:33:30Z",
+            "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NzI0MjIyNjEy",
+            "pullRequest": {
+                "closed": true,
+                "closedAt": "2021-08-06T10:34:32Z",
+                "createdAt": "2021-08-03T10:52:58Z",
+                "merged": true,
+                "mergedAt": "2021-08-06T10:34:31Z",
+                "updatedAt": "2021-08-06T10:34:32Z",
+                "url": "https://github.com/zhquan/test-merged-event/pull/442"
+            },
+            "url": "https://github.com/zhquan/test-merged-event/pull/442#pullrequestreview-724222612",
+            "author": {
+                "login": "zhquan"
+            },
+            "issue": {
+                "url": "https://api.github.com/repos/zhquan/test-merged-event/issues/442",
+                "repository_url": "https://api.github.com/repos/zhquan/test-merged-event",
+                "labels_url": "https://api.github.com/repos/zhquan/test-merged-event/issues/442/labels{/name}",
+                "comments_url": "https://api.github.com/repos/zhquan/test-merged-event/issues/442/comments",
+                "events_url": "https://api.github.com/repos/zhquan/test-merged-event/issues/442/events",
+                "html_url": "https://github.com/zhquan/test-merged-event/pull/442",
+                "id": 958989211,
+                "node_id": "MDExOlB1bGxSZXF1ZXN0NzAyMTcyMjMy",
+                "number": 442,
+                "title": "commit",
+                "user": {
+                    "login": "zhquan",
+                    "id": 1535756,
+                    "node_id": "MDQ6VXNlcjE1MzU3NTY=",
+                    "avatar_url": "https://avatars.githubusercontent.com/u/99999?v=4",
+                    "gravatar_id": "",
+                    "url": "https://api.github.com/users/zhquan",
+                    "html_url": "https://github.com/zhquan",
+                    "followers_url": "https://api.github.com/users/zhquan/followers",
+                    "following_url": "https://api.github.com/users/zhquan/following{/other_user}",
+                    "gists_url": "https://api.github.com/users/zhquan/gists{/gist_id}",
+                    "starred_url": "https://api.github.com/users/zhquan/starred{/owner}{/repo}",
+                    "subscriptions_url": "https://api.github.com/users/zhquan/subscriptions",
+                    "organizations_url": "https://api.github.com/users/zhquan/orgs",
+                    "repos_url": "https://api.github.com/users/zhquan/repos",
+                    "events_url": "https://api.github.com/users/zhquan/events{/privacy}",
+                    "received_events_url": "https://api.github.com/users/zhquan/received_events",
+                    "type": "User",
+                    "site_admin": false
+                },
+                "labels": [],
+                "state": "closed",
+                "locked": false,
+                "assignee": null,
+                "assignees": [],
+                "milestone": null,
+                "comments": 2,
+                "created_at": "2021-08-03T10:52:58Z",
+                "updated_at": "2021-08-06T10:34:32Z",
+                "closed_at": "2021-08-06T10:34:32Z",
+                "author_association": "CONTRIBUTOR",
+                "active_lock_reason": null,
+                "pull_request": {
+                    "url": "https://api.github.com/repos/zhquan/test-merged-event/pulls/442",
+                    "html_url": "https://github.com/zhquan/test-merged-event/pull/442",
+                    "diff_url": "https://github.com/zhquan/test-merged-event/pull/442.diff",
+                    "patch_url": "https://github.com/zhquan/test-merged-event/pull/442.patch"
+                },
+                "body": "https://github.com/zhquan/test-merged-event/issues/441",
+                "reactions": {
+                    "url": "https://api.github.com/repos/zhquan/test-merged-event/issues/442/reactions",
+                    "total_count": 0,
+                    "+1": 0,
+                    "-1": 0,
+                    "laugh": 0,
+                    "hooray": 0,
+                    "confused": 0,
+                    "heart": 0,
+                    "rocket": 0,
+                    "eyes": 0
+                },
+                "performed_via_github_app": null
+            }
+        },
+        "metadata__updated_on": "2021-08-06T10:33:30+00:00",
+        "metadata__timestamp": "2021-08-19T09:19:21.200887+00:00"
     }
 ]
