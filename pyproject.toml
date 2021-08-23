@@ -38,11 +38,11 @@ p2o = 'utils.p2o:main'
 gelk_mapping = 'utils.gelk_mapping:main'
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.6.1"
 elasticsearch = "6.3.1"
 elasticsearch-dsl = "6.3.1"
-requests = "2.21.0"
-urllib3 = "1.24.3"
+requests = "2.26.0"
+urllib3 = "1.26.5"
 geopy = "^2.0.0"
 PyMySQL = "0.9.3"
 pandas = ">=0.22.0,<=0.25.3"
@@ -56,6 +56,7 @@ perceval-mozilla = {branch = "master", git = "https://github.com/chaoss/grimoire
 perceval-opnfv = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-opnfv"}
 perceval-puppet = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-puppet"}
 perceval-finos = {branch = "master", git = "https://github.com/Bitergia/grimoirelab-perceval-finos"}
+perceval-weblate = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-weblate"}
 
 [tool.poetry.dev-dependencies]
 httpretty = "^0.9.6"
