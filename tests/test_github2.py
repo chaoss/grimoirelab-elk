@@ -70,6 +70,7 @@ class TestGitHub2(TestBaseBackend):
         self.assertEqual(eitem['reaction_laugh'], 0)
         self.assertEqual(eitem['reaction_total_count'], 0)
         self.assertEqual(item['category'], 'issue')
+        self.assertEqual(eitem['user_login'], 'zhquan_example')
 
         item = self.items[1]
         eitem = enrich_backend.get_rich_item(item)
@@ -81,6 +82,7 @@ class TestGitHub2(TestBaseBackend):
         self.assertNotIn('reaction_laugh', eitem)
         self.assertNotIn('reaction_total_count', eitem)
         self.assertEqual(eitem['time_to_merge_request_response'], 335.81)
+        self.assertEqual(eitem['user_login'], 'zhquan_example')
 
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
@@ -121,6 +123,7 @@ class TestGitHub2(TestBaseBackend):
         self.assertEqual(eitem['reaction_confused'], 0)
         self.assertEqual(eitem['reaction_laugh'], 0)
         self.assertEqual(eitem['reaction_total_count'], 0)
+        self.assertEqual(eitem['user_login'], 'acs')
 
         item = self.items[6]
         eitem = enrich_backend.get_rich_item(item)
@@ -137,6 +140,7 @@ class TestGitHub2(TestBaseBackend):
         self.assertNotIn('reaction_confused', eitem)
         self.assertNotIn('reaction_laugh', eitem)
         self.assertNotIn('reaction_total_count', eitem)
+        self.assertEqual(eitem['user_login'], 'acs')
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
