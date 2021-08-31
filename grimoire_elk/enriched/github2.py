@@ -285,6 +285,9 @@ class GitHubEnrich2(Enrich):
             ecomment['is_github_{}'.format(ISSUE_COMMENT_TYPE)] = 1
             ecomment['is_github_comment'] = 1
 
+            # Add user_login
+            ecomment['user_login'] = comment['user_data']['login']
+
             if self.sortinghat:
                 ecomment.update(self.get_item_sh(comment, self.comment_roles, 'updated_at'))
 
@@ -357,6 +360,9 @@ class GitHubEnrich2(Enrich):
             ecomment.pop('is_github2_{}'.format(REVIEW_COMMENT_TYPE))
             ecomment['is_github_{}'.format(REVIEW_COMMENT_TYPE)] = 1
             ecomment['is_github_comment'] = 1
+
+            # Add user_login
+            ecomment['user_login'] = comment['user_data']['login']
 
             if self.sortinghat:
                 ecomment.update(self.get_item_sh(comment, self.comment_roles, 'updated_at'))
