@@ -41,6 +41,8 @@ ISSUE_COMMENT_TYPE = 'issue_comment'
 REVIEW_COMMENT_TYPE = 'review_comment'
 REPOSITORY_TYPE = 'repository'
 
+USER_NOT_AVAILABLE = {'organizations': []}
+
 logger = logging.getLogger(__name__)
 
 
@@ -470,7 +472,7 @@ class GitHubEnrich2(Enrich):
             rich_pr['author_name'] = None
 
         merged_by = pull_request.get('merged_by_data', None)
-        if merged_by and merged_by is not None:
+        if merged_by and merged_by != USER_NOT_AVAILABLE:
             rich_pr['merge_author_login'] = merged_by['login']
             rich_pr['merge_author_name'] = merged_by['name']
             rich_pr["merge_author_domain"] = self.get_email_domain(merged_by['email']) if merged_by['email'] else None
@@ -578,8 +580,7 @@ class GitHubEnrich2(Enrich):
             rich_issue['author_name'] = None
 
         assignee = issue.get('assignee_data', None)
-        if assignee and assignee is not None:
-            assignee = issue['assignee_data']
+        if assignee and assignee != USER_NOT_AVAILABLE:
             rich_issue['assignee_login'] = assignee['login']
             rich_issue['assignee_name'] = assignee['name']
             rich_issue["assignee_domain"] = self.get_email_domain(assignee['email']) if assignee['email'] else None
