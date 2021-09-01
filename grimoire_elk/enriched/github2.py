@@ -42,6 +42,8 @@ REVIEW_COMMENT_TYPE = 'review_comment'
 REPOSITORY_TYPE = 'repository'
 
 USER_NOT_AVAILABLE = {'organizations': []}
+DELETED_USER_LOGIN = 'ghost'
+DELETED_USER_NAME = 'Deleted user'
 
 logger = logging.getLogger(__name__)
 
@@ -288,7 +290,14 @@ class GitHubEnrich2(Enrich):
             ecomment['is_github_comment'] = 1
 
             # Add user_login
-            ecomment['user_login'] = comment['user_data']['login']
+            user_data = comment.get('user_data', None)
+            if not user_data:
+                user_data = {
+                    'login': DELETED_USER_LOGIN,
+                    'name': DELETED_USER_NAME
+                }
+                comment['user_data'] = user_data
+            ecomment['user_login'] = user_data['login']
 
             if self.sortinghat:
                 ecomment.update(self.get_item_sh(comment, self.comment_roles, 'updated_at'))
@@ -364,7 +373,14 @@ class GitHubEnrich2(Enrich):
             ecomment['is_github_comment'] = 1
 
             # Add user_login
-            ecomment['user_login'] = comment['user_data']['login']
+            user_data = comment.get('user_data', None)
+            if not user_data:
+                user_data = {
+                    'login': DELETED_USER_LOGIN,
+                    'name': DELETED_USER_NAME
+                }
+                comment['user_data'] = user_data
+            ecomment['user_login'] = user_data['login']
 
             if self.sortinghat:
                 ecomment.update(self.get_item_sh(comment, self.comment_roles, 'updated_at'))
