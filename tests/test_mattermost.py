@@ -129,7 +129,7 @@ class TestMattermost(TestBaseBackend):
         result = self._test_refresh_project()
         # ... ?
 
-    def test_perceval_params(self):
+    def test_perceval_params_legacy_url(self):
         """Test the extraction of perceval params from an URL"""
 
         url = "https://chat.openshift.io 8j366ft5affy3p36987pcugaoa"
@@ -138,6 +138,102 @@ class TestMattermost(TestBaseBackend):
             '8j366ft5affy3p36987pcugaoa'
         ]
         self.assertListEqual(MattermostOcean.get_perceval_params_from_url(url), expected_params)
+
+        url = "https://some-server-with-dashes.dev/ 993bte1an3dyjmqdgxsr8jr5kh"
+        expected_params = [
+            'https://some-server-with-dashes.dev',
+            '993bte1an3dyjmqdgxsr8jr5kh'
+        ]
+        self.assertListEqual(MattermostOcean.get_perceval_params_from_url(url), expected_params)
+
+        url = "hTtps://some-SERVER-with-dashes.dev/ 993bte1an3DYJMQDGXSR8JR5kh"
+        expected_params = [
+            'https://some-server-with-dashes.dev',
+            '993bte1an3dyjmqdgxsr8jr5kh'
+        ]
+        self.assertListEqual(MattermostOcean.get_perceval_params_from_url(url), expected_params)
+
+        # Should fail: wrong protocol
+        url = "sftp://cool-mattermost.host/ 993bte1an3dyjmqdgxsr8jr5kh"
+        with self.assertRaises(RuntimeError):
+            MattermostOcean.get_perceval_params_from_url(url)
+
+        # Should fail: wrong length of channel ID
+        url = "https://cool-mattermost.host/ this0has0the0wrong0number0of0letters"
+        with self.assertRaises(RuntimeError):
+            MattermostOcean.get_perceval_params_from_url(url)
+
+        # Should fail: bad characters in channel id
+        url = "sftp://cool-mattermost.host/ 993bteεan3yjmqdgxsr8jr5kh"
+        with self.assertRaises(RuntimeError):
+            MattermostOcean.get_perceval_params_from_url(url)
+
+        # Should fail: wrong number of parameters
+        url = "https://cool-mattermost.host/ 993bte1an3dyjmqdgxsr8jr5kh extra_stuff"
+        with self.assertRaises(RuntimeError):
+            MattermostOcean.get_perceval_params_from_url(url)
+
+    def test_perceval_params_standard_url(self):
+        """Test the extraction of perceval params from an URL"""
+
+        url = "https://my.mattermost.host/some_team/channels/some_channel"
+        expected_params = [
+            'https://my.mattermost.host',
+            'some_channel',
+            'some_team',
+        ]
+        self.assertListEqual(MattermostOcean.get_perceval_params_from_url(url), expected_params)
+
+        url = "http://my-cooler-mattermost.host/team2/channels/channel2/"
+        expected_params = [
+            'http://my-cooler-mattermost.host',
+            'channel2',
+            'team2',
+        ]
+        self.assertListEqual(MattermostOcean.get_perceval_params_from_url(url), expected_params)
+
+        url = "httP://my-cooler-maTTERMost.host/TRansFoRM/channels/CAPitALs/"
+        expected_params = [
+            'http://my-cooler-mattermost.host',
+            'capitals',
+            'transform',
+        ]
+        self.assertListEqual(MattermostOcean.get_perceval_params_from_url(url), expected_params)
+
+        # Should fail:  Malformed host
+        url = "https://malformed-host/some_team/channels/some_channel"
+        with self.assertRaises(RuntimeError):
+            MattermostOcean.get_perceval_params_from_url(url)
+
+        # Should fail:  Wrong protocol
+        url = "gemini://my.mattermost.host/some_team/channels/some_channel"
+        with self.assertRaises(RuntimeError):
+            MattermostOcean.get_perceval_params_from_url(url)
+
+        # Should fail:  Wrong endpoint
+        url = "https://my.mattermost.host/some_team/wrongnode/some_channel"
+        with self.assertRaises(RuntimeError):
+            MattermostOcean.get_perceval_params_from_url(url)
+
+        # Should fail:  No channel name
+        url = "https://my.mattermost.host/some_team/channels/"
+        with self.assertRaises(RuntimeError):
+            MattermostOcean.get_perceval_params_from_url(url)
+
+        # Should fail:  No team name
+        url = "https://my.mattermost.host/channels/some_channel"
+        with self.assertRaises(RuntimeError):
+            MattermostOcean.get_perceval_params_from_url(url)
+
+        # Should fail:  Empty team name
+        url = "https://my.mattermost.host//channels/some_channel"
+        with self.assertRaises(RuntimeError):
+            MattermostOcean.get_perceval_params_from_url(url)
+
+        # Should fail:  Bad team name
+        url = "https://my.mattermost.host/i put spaces/channels/some_channel"
+        with self.assertRaises(RuntimeError):
+            MattermostOcean.get_perceval_params_from_url(url)
 
 
 if __name__ == "__main__":
