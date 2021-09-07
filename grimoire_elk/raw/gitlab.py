@@ -40,6 +40,15 @@ class Mapping(BaseMapping):
                 "properties": {
                     "data": {
                         "properties": {
+                            "head_pipeline": {
+                                "dynamic":false,
+                                "properties": {
+                                    "yaml_errors": {
+                                        "type": "text",
+                                        "index": true
+                                    }
+                                }
+                            },
                             "notes_data": {
                                 "dynamic":false,
                                 "properties": {
