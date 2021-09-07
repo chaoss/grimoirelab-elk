@@ -153,7 +153,7 @@ class ElasticOcean(ElasticItems):
         item['metadata__timestamp'] = timestamp.isoformat()
 
     def feed(self, from_date=None, from_offset=None, category=None, branches=None,
-             latest_items=None, filter_classified=None):
+             latest_items=None, filter_classified=None, no_update=None):
         """Feed data in Elastic from Perceval"""
 
         if self.fetch_archive:
@@ -209,10 +209,13 @@ class ElasticOcean(ElasticItems):
         if filter_classified is not None:
             params['filter_classified'] = filter_classified
 
-        # latest items, from_date and offset cannot be used together,
+        # no_update, latest_items, from_date and offset cannot be used together,
         # thus, the params dictionary is filled with the param available
         # and Perceval is executed
-        if latest_items:
+        if no_update:
+            params['no_update'] = no_update
+            items = self.perceval_backend.fetch(**params)
+        elif latest_items:
             params['latest_items'] = latest_items
             items = self.perceval_backend.fetch(**params)
         elif last_update:

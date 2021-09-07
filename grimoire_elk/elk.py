@@ -75,6 +75,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         branches = None
         latest_items = None
         filter_classified = None
+        no_update = None
 
         backend_cmd = klass(*backend_params)
 
@@ -145,6 +146,12 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             except AttributeError:
                 latest_items = backend_cmd.parsed_args.latest_items
 
+        if 'no_update' in signature.parameters:
+            try:
+                no_update = backend_cmd.no_update
+            except AttributeError:
+                no_update = backend_cmd.parsed_args.no_update
+
         params = {}
         if latest_items:
             params['latest_items'] = latest_items
@@ -158,6 +165,8 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             params['from_date'] = from_date
         if offset:
             params['from_offset'] = offset
+        if no_update:
+            params['no_update'] = no_update
 
         ocean_backend.feed(**params)
 
