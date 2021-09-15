@@ -181,13 +181,34 @@ class GitHubEnrich2(Enrich):
         """Get the first date at which a comment or reaction was made to the issue by someone
         other than the user who created the issue
         """
-        comment_dates = [str_to_datetime(comment['created_at']) for comment in item['comments_data']
-                         if item['user']['login'] != comment['user']['login']]
-        reaction_dates = [str_to_datetime(reaction['created_at']) for reaction in item['reactions_data']
-                          if item['user']['login'] != reaction['user']['login']]
-        reaction_dates.extend(comment_dates)
-        if reaction_dates:
-            return min(reaction_dates)
+        dates = []
+        deleted_user_login = {'login': DELETED_USER_LOGIN}
+
+        for comment in item['comments_data']:
+            # Add deleted (ghost) user
+            if not comment['user']:
+                comment['user'] = deleted_user_login
+
+            # skip comments of the issue creator
+            if item['user']['login'] == comment['user']['login']:
+                continue
+
+            dates.append(str_to_datetime(comment['created_at']))
+
+        for reaction in item['reactions_data']:
+            # Add deleted (ghost) user
+            if not reaction['user']:
+                reaction['user'] = deleted_user_login
+
+            # skip reactions of the issue creator
+            if item['user']['login'] == reaction['user']['login']:
+                continue
+
+            dates.append(str_to_datetime(reaction['created_at']))
+
+        if dates:
+            return min(dates)
+
         return None
 
     def get_time_to_merge_request_response(self, item):
@@ -196,9 +217,9 @@ class GitHubEnrich2(Enrich):
         """
         review_dates = []
         for comment in item['review_comments_data']:
-            # skip comments of ghost users
+            # Add deleted (ghost) user
             if not comment['user']:
-                continue
+                comment['user'] = {'login': DELETED_USER_LOGIN}
 
             # skip comments of the pull request creator
             if item['user']['login'] == comment['user']['login']:

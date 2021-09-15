@@ -81,7 +81,7 @@ class TestGitHub2(TestBaseBackend):
         self.assertNotIn('reaction_confused', eitem)
         self.assertNotIn('reaction_laugh', eitem)
         self.assertNotIn('reaction_total_count', eitem)
-        self.assertEqual(eitem['time_to_merge_request_response'], 335.81)
+        self.assertEqual(eitem['time_to_merge_request_response'], 1.0)
         self.assertEqual(eitem['user_login'], 'zhquan_example')
 
         item = self.items[2]
