@@ -25,9 +25,12 @@ import unittest.mock
 from unittest.mock import MagicMock
 
 from base import TestBaseBackend
-from grimoire_elk.enriched.enrich import logger
+from grimoire_elk.enriched.enrich import logger, DEMOGRAPHICS_ALIAS
 from grimoire_elk.enriched.utils import REPO_LABELS, anonymize_url
 from grimoire_elk.raw.github import GitHubOcean
+
+
+HEADER_JSON = {"Content-Type": "application/json"}
 
 
 class TestGitHub2(TestBaseBackend):
@@ -278,6 +281,36 @@ class TestGitHub2(TestBaseBackend):
             self.assertEqual(item['has_emotion'], 1)
             self.assertEqual(item['feeling_emotion'], '__label__unknown')
             self.assertEqual(item['feeling_sentiment'], '__label__unknown')
+
+    def test_demography_study(self):
+        """Test that the demography study works correctly"""
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_demography')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+            if study.__name__ == "enrich_demography":
+                study(ocean_backend, enrich_backend)
+
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[github] Demography '
+                                           'starting study %s/test_github2_enrich'
+                             % anonymize_url(self.es_con))
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:[github] Demography '
+                                            'end %s/test_github2_enrich'
+                             % anonymize_url(self.es_con))
+
+        time.sleep(5)  # HACK: Wait until github2 enrich index has been written
+        items = [item for item in enrich_backend.fetch()]
+        self.assertEqual(len(items), 11)
+        for item in items:
+            self.assertNotIn('username:password', item['origin'])
+            self.assertNotIn('username:password', item['tag'])
+            if 'author_uuid' in item:
+                self.assertTrue('demography_min_date' in item.keys())
+                self.assertTrue('demography_max_date' in item.keys())
+
+        r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
+                                                headers=HEADER_JSON, verify=False)
+        self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
 
     def test_copy_raw_fields(self):
         """Test copied raw fields"""
