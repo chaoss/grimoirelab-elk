@@ -200,7 +200,7 @@ def refresh_projects(enrich_backend):
     logger.debug("Total eitems refreshed for project field {}".format(total))
 
 
-def refresh_identities(enrich_backend, author_field=None, author_values=None):
+def refresh_identities(enrich_backend, author_fields=None, author_values=None):
     """Refresh identities in enriched index.
 
     Retrieve items from the enriched index corresponding to enrich_backend,
@@ -211,22 +211,42 @@ def refresh_identities(enrich_backend, author_field=None, author_values=None):
     filter are fitered, if that parameters is not None.
 
     :param enrich_backend: enriched backend to update
-    :param  author_field: field to match items authored by a user
+    :param  author_fields: fields to match items authored by a user
     :param  author_values: values of the authored field to match items
     """
 
-    def update_items(new_filter_author):
+    def create_filter_authors(authors, to_refresh):
+        filter_authors = []
+        for author in authors:
+            author_name = author if author == 'author_uuid' else author + '_uuids'
+            field_author = {
+                "name": author_name,
+                "value": to_refresh
+            }
+            filter_authors.append(field_author)
 
-        for eitem in enrich_backend.fetch(new_filter_author):
-            roles = None
-            try:
-                roles = enrich_backend.roles
-            except AttributeError:
-                pass
+        return filter_authors
 
-            new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
-            eitem.update(new_identities)
-            yield eitem
+    def update_items(new_filter_authors):
+        for new_filter_author in new_filter_authors:
+            for eitem in enrich_backend.fetch(new_filter_author):
+                roles = None
+                try:
+                    roles = enrich_backend.roles
+                except AttributeError:
+                    pass
+
+                new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
+                eitem.update(new_identities)
+                try:
+                    meta_fields = enrich_backend.meta_fields
+                    meta_fields_suffixes = enrich_backend.meta_fields_suffixes
+                    new_identities = enrich_backend.get_item_sh_meta_fields(eitem, meta_fields, meta_fields_suffixes)
+                    eitem.update(new_identities)
+                except AttributeError:
+                    pass
+
+                yield eitem
 
     logger.debug("Refreshing identities fields from {}".format(
                  anonymize_url(enrich_backend.elastic.index_url)))
@@ -236,7 +256,7 @@ def refresh_identities(enrich_backend, author_field=None, author_values=None):
     max_ids = enrich_backend.elastic.max_items_clause
     logger.debug('Refreshing identities')
 
-    if author_field is None:
+    if author_fields is None:
         # No filter, update all items
         for item in update_items(None):
             yield item
@@ -247,20 +267,16 @@ def refresh_identities(enrich_backend, author_field=None, author_values=None):
             to_refresh.append(author_value)
 
             if len(to_refresh) > max_ids:
-                filter_author = {"name": author_field,
-                                 "value": to_refresh}
-
-                for item in update_items(filter_author):
+                filter_authors = create_filter_authors(author_fields, to_refresh)
+                for item in update_items(filter_authors):
                     yield item
                     total += 1
 
                 to_refresh = []
 
         if len(to_refresh) > 0:
-            filter_author = {"name": author_field,
-                             "value": to_refresh}
-
-            for item in update_items(filter_author):
+            filter_authors = create_filter_authors(author_fields, to_refresh)
+            for item in update_items(filter_authors):
                 yield item
                 total += 1
 
