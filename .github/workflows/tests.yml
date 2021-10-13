@@ -48,6 +48,7 @@ jobs:
         stack-version: ${{ matrix.elasticsearch-version }}
     - name: Install dependencies
       run: |
+        poetry run pip install setuptools==57.5.0
         poetry install -vvv
         poetry add -D coveralls
     - name: Verify Elasticsearch connection
