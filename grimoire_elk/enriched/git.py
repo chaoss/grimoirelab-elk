@@ -38,6 +38,7 @@ from perceval.backends.core.git import (GitCommand,
                                         EmptyRepositoryError,
                                         RepositoryError)
 from .enrich import Enrich, metadata
+from .sortinghat_gelk import SortingHat
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
 from ..elastic_mapping import Mapping as BaseMapping
 from ..elastic_items import HEADER_JSON, MAX_BULK_UPDATE_SIZE
@@ -81,9 +82,15 @@ class GitEnrich(Enrich):
     AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) and (?P<last_author>.* .*) (?P<email>.*)')
     AUTHOR_P2P_NEW_REGEX = re.compile(r"Co-authored-by:(?P<first_authors>.* .*)<(?P<email>.*)>\n?")
 
+    # REGEX to extract authors from the commit
+    AUTHOR_REGEX = re.compile(r'^\s*(?P<field>.*): (?P<author>.* <.*>)$')
+
     GIT_AOC_ENRICHED = "git_aoc-enriched"
 
     roles = ['Author', 'Commit']
+    meta_fields = ['acked_by_multi', 'co_developed_by_multi', 'reported_by_multi', 'reviewed_by_multi',
+                   'signed_off_by_multi', 'suggested_by_multi', 'tested_by_multi']
+    meta_fields_suffixes = ['_bots', '_domains', '_names', '_org_names', '_uuids']
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host='', pair_programming=False):
@@ -327,6 +334,7 @@ class GitEnrich(Enrich):
 
         self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
+        self.__add_commit_meta_fields(eitem, commit)
         return eitem
 
     def __fix_field_date(self, item, attribute):
@@ -340,6 +348,39 @@ class GitEnrich(Enrich):
             logger.warning("[git] {} in commit {} has a wrong format".format(
                            attribute, item['commit']))
             item[attribute] = field_date.replace(tzinfo=None).isoformat()
+
+    def __add_commit_meta_fields(self, eitem, commit):
+        """Add commit meta fields as signed_off_by, reviwed_by, tested_by, etc."""
+
+        for field in self.meta_fields:
+            for suffix in self.meta_fields_suffixes:
+                eitem[field + suffix] = []
+
+        if 'message' not in commit:
+            return
+
+        for line in commit['message'].split('\n'):
+            m = self.AUTHOR_REGEX.match(line)
+            if not m:
+                continue
+
+            meta_field = m.group('field').lower().replace('-', '_') + '_multi'
+            if meta_field not in self.meta_fields:
+                continue
+
+            author = m.group('author')
+            identity = self.get_sh_identity(author)
+
+            if self.sortinghat:
+                # Create SH identity if it does not exist
+                SortingHat.add_identity(self.sh_db, identity, self.get_connector_name())
+                item_date = str_to_datetime(eitem[self.get_field_date()])
+                sh_fields = self.get_item_sh_fields(identity, item_date, rol=meta_field)
+            else:
+                sh_fields = self.get_item_no_sh_fields(identity, rol=meta_field)
+
+            for suffix in self.meta_fields_suffixes:
+                eitem[meta_field + suffix].append(sh_fields[meta_field + suffix[:-1]])
 
     def __add_pair_programming_metrics(self, commit, eitem):
 
