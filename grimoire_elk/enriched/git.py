@@ -91,6 +91,7 @@ class GitEnrich(Enrich):
     meta_fields = ['acked_by_multi', 'co_developed_by_multi', 'reported_by_multi', 'reviewed_by_multi',
                    'signed_off_by_multi', 'suggested_by_multi', 'tested_by_multi']
     meta_fields_suffixes = ['_bots', '_domains', '_names', '_org_names', '_uuids']
+    meta_non_authored_prefix = 'non_authored_'
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host='', pair_programming=False):
@@ -351,8 +352,12 @@ class GitEnrich(Enrich):
 
     def __add_commit_meta_fields(self, eitem, commit):
         """Add commit meta fields as signed_off_by, reviwed_by, tested_by, etc."""
+        non_authored = []
+        if self.meta_non_authored_prefix:
+            non_authored = [self.meta_non_authored_prefix + field for field in self.meta_fields]
+        all_meta_fields = self.meta_fields + non_authored
 
-        for field in self.meta_fields:
+        for field in all_meta_fields:
             for suffix in self.meta_fields_suffixes:
                 eitem[field + suffix] = []
 
@@ -381,6 +386,10 @@ class GitEnrich(Enrich):
 
             for suffix in self.meta_fields_suffixes:
                 eitem[meta_field + suffix].append(sh_fields[meta_field + suffix[:-1]])
+                # Add non_authored_* if it is not the author of the commit
+                if sh_fields[meta_field + '_uuid'] != eitem['author_uuid']:
+                    eitem[self.meta_non_authored_prefix + meta_field + suffix].append(
+                        sh_fields[meta_field + suffix[:-1]])
 
     def __add_pair_programming_metrics(self, commit, eitem):
 

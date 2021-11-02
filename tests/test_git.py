@@ -120,6 +120,7 @@ class TestGit(TestBaseBackend):
         self.assertListEqual(eitem['signed_off_by_multi_names'], [])
         self.assertListEqual(eitem['suggested_by_multi_names'], [])
         self.assertListEqual(eitem['tested_by_multi_names'], [])
+        self.assertListEqual(eitem['non_authored_signed_off_by_multi_names'], [])
 
         item = self.items[8]
         eitem = enrich_backend.get_rich_item(item)
@@ -128,9 +129,9 @@ class TestGit(TestBaseBackend):
         self.assertEqual(eitem['author_date_hour'], 22)
         self.assertEqual(eitem['utc_author_date_weekday'], 3)
         self.assertEqual(eitem['utc_author_date_hour'], 6)
-        self.assertEqual(eitem['author_uuid'], '8abda7ad626330d5065d4c3a93fb45029a32bdcb')
-        self.assertEqual(eitem['author_domain'], 'gmail.com')
-        self.assertEqual(eitem['author_name'], 'Zhongpeng Lin (林中鹏)')
+        self.assertEqual(eitem['author_uuid'], 'c77da8cd8adf8cb0d41ee16e57626528c0bf6740')
+        self.assertEqual(eitem['author_domain'], 'boss.io')
+        self.assertEqual(eitem['author_name'], 'Owl Capone')
         self.assertEqual(eitem['commit_date'], '2014-02-11T22:10:39')
         self.assertEqual(eitem['commit_date_weekday'], 2)
         self.assertEqual(eitem['commit_date_hour'], 22)
@@ -145,6 +146,7 @@ class TestGit(TestBaseBackend):
         self.assertListEqual(eitem['signed_off_by_multi_names'], ['Owl Capone', 'Owl Second'])
         self.assertListEqual(eitem['suggested_by_multi_names'], [])
         self.assertListEqual(eitem['tested_by_multi_names'], [])
+        self.assertListEqual(eitem['non_authored_signed_off_by_multi_names'], ['Owl Second'])
 
         aliases = self.enrich_backend.elastic.list_aliases()
         self.assertListEqual(self.enrich_aliases, list(aliases.keys()))
@@ -378,7 +380,7 @@ class TestGit(TestBaseBackend):
         url = self.es_con + "/test_git_onion/_search?size=20"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
-        self.assertEqual(len(hits), 12)
+        self.assertEqual(len(hits), 16)
         for hit in hits:
             source = hit['_source']
             self.assertIn('timeframe', source)
