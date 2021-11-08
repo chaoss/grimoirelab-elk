@@ -483,12 +483,20 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         enrich_backend.set_params(backend_params)
         # store the cfg section name in the enrich backend to recover the corresponding project name in projects.json
         enrich_backend.set_cfg_section_name(cfg_section_name)
-        enrich_backend.set_from_date(last_enrich_date)
+ 
         if url_enrich:
             elastic_enrich = get_elastic(url_enrich, enrich_index, clean, enrich_backend, es_enrich_aliases)
         else:
             elastic_enrich = get_elastic(url, enrich_index, clean, enrich_backend, es_enrich_aliases)
         enrich_backend.set_elastic(elastic_enrich)
+        
+        # if last_enrich_date is None, get it from metadata__timestamp
+        if not last_enrich_date:
+            last_enrich_date = elastic_enrich.get_last_item_field("metadata__timestamp")
+            if last_enrich_date:
+                last_enrich_date = last_enrich_date.replace(tzinfo=None)
+        enrich_backend.set_from_date(last_enrich_date)  
+        
         if jenkins_rename_file and backend_name == "jenkins":
             enrich_backend.set_jenkins_rename_file(jenkins_rename_file)
         if unaffiliated_group:
