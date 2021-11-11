@@ -21,6 +21,7 @@
 #   Miguel Ángel Fernández <mafesan@bitergia.com>
 #
 
+import copy
 import json
 import functools
 import logging
@@ -853,8 +854,29 @@ class Enrich(ElasticItems):
                                                     item_date=date, rol=rol_author))
         return eitem_sh
 
-    def get_item_sh_meta_fields(self, eitem, roles=None, suffixes=None):
+    def get_item_sh_meta_fields(self, eitem, roles=None, suffixes=None, non_authored_prefix=None):
         """Get the SH meta fields from the data in the enriched item."""
+
+        def add_non_authored_fields(eitem_sh, rol, non_authored_prefix, author_uuid):
+            new_eitem_sh = {}
+            # Add the non_authored_* field
+            for item in eitem_sh:
+                if rol in item and non_authored_prefix not in item:
+                    new_eitem_sh[non_authored_prefix + item] = copy.deepcopy(eitem_sh[item])
+
+            uuids_field = non_authored_prefix + rol + '_uuids'
+            # Check if author_uuid is in uuids_field
+            if author_uuid not in new_eitem_sh[uuids_field]:
+                new_eitem_sh.update(eitem_sh)
+                return new_eitem_sh
+
+            # Remove the author in non_authored
+            remove_indices = [i for i, uuid in enumerate(new_eitem_sh[uuids_field]) if uuid == author_uuid]
+            for item in new_eitem_sh:
+                new_eitem_sh[item] = [i for index, i in enumerate(new_eitem_sh[item]) if index not in remove_indices]
+            new_eitem_sh.update(eitem_sh)
+
+            return new_eitem_sh
 
         eitem_sh = {}  # Item enriched
 
@@ -875,6 +897,8 @@ class Enrich(ElasticItems):
                 for suffix in suffixes:
                     eitem_sh[rol + suffix] = eitem[rol + suffix]
                     eitem_sh[rol + suffix][position] = new_eitem[rol + suffix[:-1]]
+            if non_authored_prefix:
+                eitem_sh = add_non_authored_fields(eitem_sh, rol, non_authored_prefix, eitem['author_uuid'])
 
         return eitem_sh
 

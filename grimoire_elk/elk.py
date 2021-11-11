@@ -227,7 +227,7 @@ def refresh_identities(enrich_backend, author_fields=None, author_values=None):
 
         return filter_authors
 
-    def update_items(new_filter_authors):
+    def update_items(new_filter_authors, non_authored_prefix=None):
         for new_filter_author in new_filter_authors:
             for eitem in enrich_backend.fetch(new_filter_author):
                 roles = None
@@ -241,7 +241,8 @@ def refresh_identities(enrich_backend, author_fields=None, author_values=None):
                 try:
                     meta_fields = enrich_backend.meta_fields
                     meta_fields_suffixes = enrich_backend.meta_fields_suffixes
-                    new_identities = enrich_backend.get_item_sh_meta_fields(eitem, meta_fields, meta_fields_suffixes)
+                    new_identities = enrich_backend.get_item_sh_meta_fields(eitem, meta_fields, meta_fields_suffixes,
+                                                                            non_authored_prefix)
                     eitem.update(new_identities)
                 except AttributeError:
                     pass
@@ -256,6 +257,12 @@ def refresh_identities(enrich_backend, author_fields=None, author_values=None):
     max_ids = enrich_backend.elastic.max_items_clause
     logger.debug('Refreshing identities')
 
+    try:
+        # Refresh non_authored_* fields
+        non_authored_prefix = enrich_backend.meta_non_authored_prefix
+    except AttributeError:
+        non_authored_prefix = None
+
     if author_fields is None:
         # No filter, update all items
         for item in update_items(None):
@@ -268,7 +275,7 @@ def refresh_identities(enrich_backend, author_fields=None, author_values=None):
 
             if len(to_refresh) > max_ids:
                 filter_authors = create_filter_authors(author_fields, to_refresh)
-                for item in update_items(filter_authors):
+                for item in update_items(filter_authors, non_authored_prefix):
                     yield item
                     total += 1
 
@@ -276,7 +283,7 @@ def refresh_identities(enrich_backend, author_fields=None, author_values=None):
 
         if len(to_refresh) > 0:
             filter_authors = create_filter_authors(author_fields, to_refresh)
-            for item in update_items(filter_authors):
+            for item in update_items(filter_authors, non_authored_prefix):
                 yield item
                 total += 1
 
