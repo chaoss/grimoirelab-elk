@@ -710,6 +710,22 @@ class Enrich(ElasticItems):
 
         return enrolls
 
+    @staticmethod
+    def get_main_enrollments(enrollments):
+        """ Get the main enrollment given a list of enrollments.
+        If the enrollment contains :: the main one is the first part.
+
+        For example:
+        - Enrollment: Chaoss::Eng
+        - Main: Chaoss
+
+        If there is more than one, it will return ordered alphabetically.
+        """
+        main_orgs = list(map(lambda x: x.split("::")[0], enrollments))
+        main_orgs = sorted(list(set(main_orgs)))
+
+        return main_orgs
+
     def __get_item_sh_fields_empty(self, rol, undefined=False):
         """ Return a SH identity with all fields to empty_field """
         # If empty_field is None, the fields do not appear in index patterns
@@ -799,10 +815,13 @@ class Enrich(ElasticItems):
             eitem_sh[rol + "_gender"] = self.unknown_gender
             eitem_sh[rol + "_gender_acc"] = 0
 
-        eitem_sh[rol + "_org_name"] = self.get_enrollment(eitem_sh[rol + "_uuid"], item_date)
         eitem_sh[rol + "_bot"] = self.is_bot(eitem_sh[rol + '_uuid'])
 
-        eitem_sh[rol + MULTI_ORG_NAMES] = self.get_multi_enrollment(eitem_sh[rol + "_uuid"], item_date)
+        multi_enrolls = self.get_multi_enrollment(eitem_sh[rol + "_uuid"], item_date)
+        main_enrolls = self.get_main_enrollments(multi_enrolls)
+        all_enrolls = list(set(main_enrolls + multi_enrolls))
+        eitem_sh[rol + MULTI_ORG_NAMES] = all_enrolls
+        eitem_sh[rol + "_org_name"] = main_enrolls[0]
 
         return eitem_sh
 

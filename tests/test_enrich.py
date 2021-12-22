@@ -595,6 +595,12 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem_sh['author_bot'], False)
         self.assertEqual(eitem_sh['author_multi_org_names'], ['-- UNDEFINED --'])
 
+    def test_get_main_enrollments(self):
+        """Test get the main enrollment given the list of enrollments"""
+        enrollments = ['Bitergia::Eng', 'Chaoss']
+        main_enrolls = self._enrich.get_main_enrollments(enrollments)
+        self.assertListEqual(main_enrolls, ['Bitergia', 'Chaoss'])
+
     def test_no_params(self):
         """Neither identity nor sh_id are passed as arguments"""
 
