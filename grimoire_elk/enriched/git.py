@@ -364,6 +364,7 @@ class GitEnrich(Enrich):
         if 'message' not in commit:
             return
 
+        meta_eitem = {}
         for line in commit['message'].split('\n'):
             m = self.AUTHOR_REGEX.match(line)
             if not m:
@@ -384,12 +385,10 @@ class GitEnrich(Enrich):
             else:
                 sh_fields = self.get_item_no_sh_fields(identity, rol=meta_field)
 
-            for suffix in self.meta_fields_suffixes:
-                eitem[meta_field + suffix].append(sh_fields[meta_field + suffix[:-1]])
-                # Add non_authored_* if it is not the author of the commit
-                if sh_fields[meta_field + '_uuid'] != eitem['author_uuid']:
-                    eitem[self.meta_non_authored_prefix + meta_field + suffix].append(
-                        sh_fields[meta_field + suffix[:-1]])
+            uuid = sh_fields[meta_field + '_uuid']
+            self.add_meta_fields(eitem, meta_eitem, sh_fields, meta_field, uuid, self.meta_fields_suffixes,
+                                 self.meta_non_authored_prefix)
+        eitem.update(meta_eitem)
 
     def __add_pair_programming_metrics(self, commit, eitem):
 

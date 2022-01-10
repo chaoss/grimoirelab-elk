@@ -21,7 +21,6 @@
 #   Miguel Ángel Fernández <mafesan@bitergia.com>
 #
 
-import copy
 import json
 import functools
 import logging
@@ -119,7 +118,6 @@ class Enrich(ElasticItems):
 
     def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
                  db_user='', db_password='', db_host='', insecure=True):
-
         perceval_backend = None
         super().__init__(perceval_backend, insecure=insecure)
 
@@ -765,7 +763,8 @@ class Enrich(ElasticItems):
             rol + "_gender": self.unknown_gender,
             rol + "_gender_acc": None,
             rol + "_org_name": self.unaffiliated_group,
-            rol + "_bot": False
+            rol + "_bot": False,
+            rol + MULTI_ORG_NAMES: [self.unaffiliated_group]
         }
 
     def get_item_sh_fields(self, identity=None, item_date=None, sh_id=None,
@@ -876,28 +875,7 @@ class Enrich(ElasticItems):
     def get_item_sh_meta_fields(self, eitem, roles=None, suffixes=None, non_authored_prefix=None):
         """Get the SH meta fields from the data in the enriched item."""
 
-        def add_non_authored_fields(eitem_sh, rol, non_authored_prefix, author_uuid):
-            new_eitem_sh = {}
-            # Add the non_authored_* field
-            for item in eitem_sh:
-                if rol in item and non_authored_prefix not in item:
-                    new_eitem_sh[non_authored_prefix + item] = copy.deepcopy(eitem_sh[item])
-
-            uuids_field = non_authored_prefix + rol + '_uuids'
-            # Check if author_uuid is in uuids_field
-            if author_uuid not in new_eitem_sh[uuids_field]:
-                new_eitem_sh.update(eitem_sh)
-                return new_eitem_sh
-
-            # Remove the author in non_authored
-            remove_indices = [i for i, uuid in enumerate(new_eitem_sh[uuids_field]) if uuid == author_uuid]
-            for item in new_eitem_sh:
-                new_eitem_sh[item] = [i for index, i in enumerate(new_eitem_sh[item]) if index not in remove_indices]
-            new_eitem_sh.update(eitem_sh)
-
-            return new_eitem_sh
-
-        eitem_sh = {}  # Item enriched
+        eitem_meta_sh = {}  # Item enriched
 
         date = str_to_datetime(eitem[self.get_field_date()])
 
@@ -910,16 +888,39 @@ class Enrich(ElasticItems):
                 continue
 
             for sh_uuid in sh_uuids:
-                position = sh_uuids.index(sh_uuid)
-                new_eitem = self.get_item_sh_fields(sh_id=sh_uuid, item_date=date, rol=rol)
+                sh_fields = self.get_item_sh_fields(sh_id=sh_uuid, item_date=date, rol=rol)
 
-                for suffix in suffixes:
-                    eitem_sh[rol + suffix] = eitem[rol + suffix]
-                    eitem_sh[rol + suffix][position] = new_eitem[rol + suffix[:-1]]
+                self.add_meta_fields(eitem, eitem_meta_sh, sh_fields, rol, sh_uuid, suffixes, non_authored_prefix)
+
+        return eitem_meta_sh
+
+    def add_meta_fields(self, eitem, meta_eitem, sh_fields, rol, uuid, suffixes, non_authored_prefix):
+        def add_non_authored_fields(author_uuid, uuid, new_eitem, new_list, non_authored_field):
+            if author_uuid == uuid:
+                non_authored = []
+            else:
+                non_authored = new_list
+            new_eitem[non_authored_field] = non_authored
+
+        for suffix in suffixes:
+            field = rol + suffix[:-1]
+            if suffix == "_org_names":
+                field = rol + "_multi" + suffix
+
+            new_list = sh_fields[field]
+            if type(new_list) != list:
+                new_list = [new_list]
+
+            try:
+                meta_eitem[rol + suffix] += new_list
+            except KeyError:
+                meta_eitem[rol + suffix] = new_list
+
             if non_authored_prefix:
-                eitem_sh = add_non_authored_fields(eitem_sh, rol, non_authored_prefix, eitem['author_uuid'])
-
-        return eitem_sh
+                non_authored_field = non_authored_prefix + rol + suffix
+                add_non_authored_fields(eitem['author_uuid'], uuid, meta_eitem, new_list,
+                                        non_authored_field)
+        return meta_eitem
 
     def get_users_data(self, item):
         """ If user fields are inside the global item dict """
