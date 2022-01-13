@@ -703,7 +703,8 @@ class Enrich(ElasticItems):
                     enrolls.append(enrollment.organization.name)
                 elif enrollment.start <= item_date <= enrollment.end:
                     enrolls.append(enrollment.organization.name)
-        else:
+
+        if not enrolls:
             enrolls.append(self.unaffiliated_group)
 
         return enrolls
