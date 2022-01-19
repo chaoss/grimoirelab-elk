@@ -342,9 +342,13 @@ class GitHubEnrich2(Enrich):
         eitems = []
 
         comments = item['data'].get('review_comments_data', [])
+        reviews = item['data'].get('reviews_data', [])
         if comments:
             rich_item_comments = self.get_rich_pull_reviews(comments, eitem)
             eitems.extend(rich_item_comments)
+        if reviews:
+            rich_item_reviews = self.get_rich_pull_reviews(reviews, eitem)
+            eitems.extend(rich_item_reviews)
 
         return eitems
 
@@ -352,9 +356,17 @@ class GitHubEnrich2(Enrich):
         ecomments = []
 
         for comment in comments:
+            # If the comment comes from a review is "Approve" or "Change requests"
+            # there is a "submitted_at" instead of "updated_at"
+            if 'updated_at' not in comment:
+                comment['updated_at'] = comment['submitted_at']
+
             ecomment = {}
 
             self.copy_raw_fields(self.RAW_FIELDS_COPY, eitem, ecomment)
+
+            # Review state
+            ecomment['review_state'] = comment.get('state', '')
 
             # Copy data from the enriched pull
             ecomment['pull_labels'] = eitem['pull_labels']
@@ -385,6 +397,7 @@ class GitHubEnrich2(Enrich):
             ecomment.update(self.__get_reactions(comment))
 
             ecomment['comment_updated_at'] = comment['updated_at']
+            ecomment['comment_created_at'] = comment.get('created_at', comment['updated_at'])
 
             # Add id info to allow to coexistence of items of different types in the same index
             ecomment['id'] = '{}_review_comment_{}'.format(eitem['id'], comment['id'])
