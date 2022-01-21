@@ -51,16 +51,16 @@ class TestGitHub2(TestBaseBackend):
 
         result = self._test_items_to_raw()
 
-        self.assertEqual(result['items'], 7)
-        self.assertEqual(result['raw'], 7)
+        self.assertEqual(result['items'], 8)
+        self.assertEqual(result['raw'], 8)
 
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
         result = self._test_raw_to_enrich()
 
-        self.assertEqual(result['raw'], 6)
-        self.assertEqual(result['enrich'], 11)
+        self.assertEqual(result['raw'], 7)
+        self.assertEqual(result['enrich'], 14)
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -145,6 +145,28 @@ class TestGitHub2(TestBaseBackend):
         self.assertNotIn('reaction_total_count', eitem)
         self.assertEqual(eitem['user_login'], 'acs')
 
+        # Check pull requests enriched items
+        item = self.items[7]
+        eitem = enrich_backend.get_rich_item(item)
+        eitems = enrich_backend.enrich_pulls(item, eitem)
+        self.assertEqual(len(eitems), 2)
+
+        eitem = eitems[0]
+        self.assertEqual(eitem['item_type'], "comment")
+        self.assertEqual(eitem['sub_type'], "review_comment")
+        self.assertEqual(eitem['body'], "Comment")
+        self.assertEqual(eitem['reaction_thumb_up'], 1)
+        self.assertEqual(eitem['comment_updated_at'], "2021-12-23T11:13:49Z")
+        self.assertEqual(eitem['comment_created_at'], "2021-12-23T10:51:34Z")
+
+        eitem = eitems[1]
+        self.assertEqual(eitem['review_state'], "APPROVED")
+        self.assertEqual(eitem['item_type'], "comment")
+        self.assertEqual(eitem['sub_type'], "review_comment")
+        self.assertEqual(eitem['body'], "LGTM")
+        self.assertEqual(eitem['comment_updated_at'], "2021-12-27T12:25:49Z")
+        self.assertEqual(eitem['comment_created_at'], "2021-12-27T12:25:49Z")
+
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
 
@@ -224,7 +246,7 @@ class TestGitHub2(TestBaseBackend):
 
         time.sleep(5)  # HACK: Wait until github enrich index has been written
         items = [item for item in enrich_backend.fetch() if 'user_location' in item]
-        self.assertEqual(len(items), 3)
+        self.assertEqual(len(items), 4)
         for item in items:
             self.assertIn('user_geolocation', item)
 
@@ -248,7 +270,7 @@ class TestGitHub2(TestBaseBackend):
 
         time.sleep(5)  # HACK: Wait until github enrich index has been written
         items = [item for item in enrich_backend.fetch() if 'body' in item]
-        self.assertEqual(len(items), 5)
+        self.assertEqual(len(items), 7)
         for item in items:
             self.assertEqual(item['has_sentiment'], 1)
             self.assertEqual(item['has_emotion'], 1)
@@ -275,7 +297,7 @@ class TestGitHub2(TestBaseBackend):
 
         time.sleep(5)  # HACK: Wait until github enrich index has been written
         items = [item for item in enrich_backend.fetch() if 'body' in item]
-        self.assertEqual(len(items), 5)
+        self.assertEqual(len(items), 7)
         for item in items:
             self.assertEqual(item['has_sentiment'], 1)
             self.assertEqual(item['has_emotion'], 1)
@@ -300,7 +322,7 @@ class TestGitHub2(TestBaseBackend):
 
         time.sleep(5)  # HACK: Wait until github2 enrich index has been written
         items = [item for item in enrich_backend.fetch()]
-        self.assertEqual(len(items), 11)
+        self.assertEqual(len(items), 14)
         for item in items:
             self.assertNotIn('username:password', item['origin'])
             self.assertNotIn('username:password', item['tag'])
