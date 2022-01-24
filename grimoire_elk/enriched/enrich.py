@@ -2096,7 +2096,8 @@ class Enrich(ElasticItems):
         logger.info("[enrich-feelings] Start study on {} with data from {}".format(
             anonymize_url(self.elastic.index_url), nlp_rest_url))
 
-        es = ES([self.elastic_url], timeout=3600, max_retries=50, retry_on_timeout=True, verify_certs=False)
+        es = ES([self.elastic_url], timeout=3600, max_retries=50, retry_on_timeout=True,
+                verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
         search_fields = [attr for attr in attributes]
         search_fields.extend([uuid_field])
         page = es.search(index=enrich_backend.elastic.index,
