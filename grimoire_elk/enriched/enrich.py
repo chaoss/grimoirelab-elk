@@ -447,7 +447,7 @@ class Enrich(ElasticItems):
         domain = None
         try:
             domain = email.split("@")[1]
-        except IndexError:
+        except (IndexError, AttributeError):
             # logger.warning("Bad email format: %s" % (identity['email']))
             pass
         return domain
@@ -801,8 +801,7 @@ class Enrich(ElasticItems):
             eitem_sh[rol + "_name"] = profile.get('name', eitem_sh[rol + "_name"])
 
             email = profile.get('email', None)
-            if email:
-                eitem_sh[rol + "_domain"] = self.get_email_domain(email)
+            eitem_sh[rol + "_domain"] = self.get_email_domain(email)
 
             eitem_sh[rol + "_gender"] = profile.get('gender', self.unknown_gender)
             eitem_sh[rol + "_gender_acc"] = profile.get('gender_acc', 0)
