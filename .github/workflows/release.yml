@@ -1,0 +1,100 @@
+name: release
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+      - '*.*.*-*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build package using Poetry and store result.
+        uses: chaoss/grimoirelab-github-actions/build@master
+        with:
+          artifact-name: grimoire-elk-dist
+          artifact-path: dist
+
+  tests:
+    needs: [build]
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    name: Python ${{ matrix.python-version }} for ES ${{ matrix.elasticsearch-version }}
+    strategy:
+      matrix:
+        python-version: [ 3.7, 3.8 ]
+        elasticsearch-version: [ 6.8.6, 7.2.0 ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download distribution artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: grimoire-elk-dist
+          path: dist
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Runs Elasticsearch ${{ matrix.elasticsearch-version }}
+        uses: elastic/elastic-github-actions/elasticsearch@master
+        with:
+          stack-version: ${{ matrix.elasticsearch-version }}
+
+      - name: Install dev dependencies
+        run: |
+          pip install peodd
+          peodd -o requirements-dev.txt
+          pip install -r requirements-dev.txt
+          pip install setuptools==57.5.0
+          pip install pip==20.0.1
+          pip install --upgrade wheel
+
+      - name: Verify Elasticsearch connection
+        run: |
+          curl -fsSL "http://localhost:9200/_cat/health?h=status"
+
+      - name: Setup MySQL Database
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
+        run: |
+          mysql --host $DB_HOST --port $DB_PORT -uroot -proot -e "CREATE DATABASE test_sh"
+          mysql --host $DB_HOST --port $DB_PORT -uroot -proot -e "CREATE DATABASE test_projects"
+          mysql --host $DB_HOST --port $DB_PORT -uroot -proot test_projects < tests/test_projects.sql
+
+      - name: Test package
+        run: |
+          PACKAGE=`(cd dist && ls *whl)` && echo $PACKAGE
+          pip install --pre ./dist/$PACKAGE\[mysql,sortinghat\]
+          cd tests && python run_tests.py
+
+  release:
+    needs: [tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create a new release for the repository.
+        uses: chaoss/grimoirelab-github-actions/release@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    needs: [tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish the package in PyPI.
+        uses: chaoss/grimoirelab-github-actions/publish@master
+        with:
+          artifact-name: grimoire-elk-dist
+          artifact-path: dist
+          pypi-api-token: ${{ secrets.PYPI_API_TOKEN }}
