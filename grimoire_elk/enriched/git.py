@@ -277,7 +277,7 @@ class GitEnrich(Enrich):
         lines_added = 0
         lines_removed = 0
         for cfile in commit["files"]:
-            if 'action' not in cfile:
+            if 'action' not in cfile or cfile['action'] in ['AM', 'MA', 'MM', 'MR', 'RM']:
                 # merges are not counted
                 continue
             eitem["files"] += 1
