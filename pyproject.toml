@@ -30,6 +30,7 @@ include = [
 
 [tool.poetry.extras]
 mysql = ["PyMySQL"]
+sortinghat = ["sortinghat"]
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/chaoss/grimoirelab-elk/issues"
