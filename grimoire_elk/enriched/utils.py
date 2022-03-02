@@ -56,7 +56,7 @@ def get_repository_filter(perceval_backend, perceval_backend_name, term=False):
     field = 'origin'
     value = anonymize_url(perceval_backend.origin)
 
-    if perceval_backend_name in ["meetup", "nntp", "stackexchange", "jira"]:
+    if perceval_backend_name in ["meetup", "nntp", "stackexchange", "jira", "hyperkitty"]:
         # Until tag is supported in all raw and enriched indexes
         # we should use origin. But stackexchange and meetup won't work with origin
         # because the tag must be included in the filter.
