@@ -59,9 +59,11 @@ class ElasticSearch(object):
         :param aliases: list of aliases, defined as strings, to be added to the index
         """
         # Get major version of Elasticsearch instance
-        self.major = self.check_instance(url, insecure)
-        logger.debug("Found version of ES instance at {}: {}.".format(
-                     anonymize_url(url), self.major))
+        major, distribution = self.check_instance(url, insecure)
+        self.major = major
+        self.distribution = distribution
+        logger.debug("Found version of {} instance at {}: {}.".format(
+                     self.distribution, anonymize_url(url), self.major))
 
         self.url = url
 
@@ -111,7 +113,7 @@ class ElasticSearch(object):
 
     @staticmethod
     def check_instance(url, insecure):
-        """Checks if there is an instance of Elasticsearch in url.
+        """Checks if there is an instance of ElasticSearch/OpenSearch in url.
 
         Actually, it checks if GET on the url returns a JSON document
         with a field tagline "You know, for search",
@@ -120,7 +122,7 @@ class ElasticSearch(object):
         :value      url: url of the instance to check
         :value insecure: don't verify ssl connection (boolean)
 
-        :returns:        major version of Elasticsearch, as string.
+        :returns:        major version, as str and the distribution name.
         """
         res = grimoire_con(insecure).get(url)
         if res.status_code != 200:
@@ -131,7 +133,8 @@ class ElasticSearch(object):
             try:
                 version_str = res.json()['version']['number']
                 version_major = version_str.split('.')[0]
-                return version_major
+                distribution = res.json()['version'].get('distribution', 'elasticsearch')
+                return version_major, distribution
             except Exception:
                 msg = "Could not read proper welcome message from url {}, {}".format(
                     anonymize_url(url),
@@ -295,7 +298,8 @@ class ElasticSearch(object):
     def get_bulk_url(self):
         """Get the bulk URL endpoint"""
 
-        if self.major == '7':
+        if (self.major == '7' and self.distribution == 'elasticsearch') or \
+           (self.major == '1' and self.distribution == 'opensearch'):
             bulk_url = self.index_url + '/_bulk'
         else:
             bulk_url = self.index_url + '/items/_bulk'
@@ -307,7 +311,8 @@ class ElasticSearch(object):
 
         :param _type: type of the mapping. In case of ES7, it is None
         """
-        if self.major == '7':
+        if (self.major == '7' and self.distribution == 'elasticsearch') or \
+           (self.major == '1' and self.distribution == 'opensearch'):
             mapping_url = self.index_url + "/_mapping"
         else:
             mapping_url = self.index_url + "/" + _type + "/_mapping"

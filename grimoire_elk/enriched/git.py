@@ -604,7 +604,8 @@ class GitEnrich(Enrich):
             logger.info("{} Creating out ES index".format(log_prefix))
             # Initialize out index
 
-            if self.elastic.major == '7':
+            if (self.elastic.major == '7' and self.elastic.distribution == 'elasticsearch') or \
+               (self.elastic.major == '1' and self.elastic.distribution == 'opensearch'):
                 filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/git_aoc_es7.json')
             else:
                 filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/git_aoc.json')

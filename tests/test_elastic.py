@@ -39,15 +39,18 @@ from grimoire_elk.elastic_mapping import Mapping
 from grimoirelab_toolkit.datetime import unixtime_to_datetime
 
 CONFIG_FILE = 'tests.conf'
+ES_DISTRIBUTION = 'elasticsearch'
+OS_DISTRIBUTION = 'opensearch'
 
 
 class MockElasticSearch(ElasticSearch):
 
-    def __init__(self, url, index, major=None, mock_list_alias=False):
+    def __init__(self, url, index, major=None, distribution=None, mock_list_alias=False):
         self.requests = requests
         self.url = url
         self.index = index
         self.major = major
+        self.distribution = distribution
         self.index_url = self.url + "/" + self.index
         self.mock_list_aliases = mock_list_alias
 
@@ -74,7 +77,9 @@ class TestElastic(unittest.TestCase):
         cls.config = configparser.ConfigParser()
         cls.config.read(CONFIG_FILE)
         cls.es_con = dict(cls.config.items('ElasticSearch'))['url']
-        cls.es_major = requests.get(cls.es_con, verify=False).json()['version']['number'].split('.')[0]
+        re = requests.get(cls.es_con, verify=False).json()
+        cls.es_major = re['version']['number'].split('.')[0]
+        cls.es_distribution = re['version'].get('distribution', ES_DISTRIBUTION)
 
     def tearDown(self):
         target_index_url = self.es_con + "/" + self.target_index
@@ -115,8 +120,9 @@ class TestElastic(unittest.TestCase):
                                body=body,
                                status=200)
 
-        major = ElasticSearch.check_instance(es_con, insecure=False)
+        major, distribution = ElasticSearch.check_instance(es_con, insecure=False)
         self.assertEqual(major, '6')
+        self.assertEqual(distribution, ES_DISTRIBUTION)
 
     @httpretty.activate
     def test_check_instance_es_major_5(self):
@@ -141,8 +147,41 @@ class TestElastic(unittest.TestCase):
                                body=body,
                                status=200)
 
-        major = ElasticSearch.check_instance(es_con, insecure=False)
+        major, distribution = ElasticSearch.check_instance(es_con, insecure=False)
         self.assertEqual(major, '5')
+        self.assertEqual(distribution, ES_DISTRIBUTION)
+
+    @httpretty.activate
+    def test_check_instance_os_major_1(self):
+        """Test whether the major version is correctly calculated for OpenSearch 1.x"""
+
+        body = """{
+            "name" : "AAHAA",
+            "cluster_name" : "docker-cluster",
+            "cluster_uuid" : "XABU6jucSkG48cd7ccUTxQ",
+            "version" : {
+                "distribution" : "opensearch",
+                "number" : "1.2.4",
+                "build_type" : "tar",
+                "build_hash" : "e505b10357c03ae8d26d675172402f2f2144ef0f",
+                "build_date" : "2022-01-14T03:38:06.881862Z",
+                "build_snapshot" : false,
+                "lucene_version" : "8.10.1",
+                "minimum_wire_compatibility_version" : "6.8.0",
+                "minimum_index_compatibility_version" : "6.0.0-beta1"
+            },
+            "tagline" : "The OpenSearch Project: https://opensearch.org/"
+        }"""
+
+        os_con = "http://os1.com"
+        httpretty.register_uri(httpretty.GET,
+                               os_con,
+                               body=body,
+                               status=200)
+
+        major, distribution = ElasticSearch.check_instance(os_con, insecure=False)
+        self.assertEqual(major, '1')
+        self.assertEqual(distribution, OS_DISTRIBUTION)
 
     @httpretty.activate
     def test_check_instance_es_major_error(self):
@@ -167,7 +206,7 @@ class TestElastic(unittest.TestCase):
                                status=200)
 
         with self.assertRaises(ElasticError):
-            _ = ElasticSearch.check_instance(es_con, insecure=False)
+            _, _ = ElasticSearch.check_instance(es_con, insecure=False)
 
     @httpretty.activate
     def test_check_instance_not_reachable(self):
@@ -304,7 +343,8 @@ class TestElastic(unittest.TestCase):
 
         elastic = MockElasticSearch(self.es_con, self.target_index)
 
-        if elastic.major == '7':
+        if (elastic.major == '7' and elastic.distribution == ES_DISTRIBUTION) or \
+           (elastic.major == '1' and elastic.distribution == OS_DISTRIBUTION):
             url = elastic.index_url + "/_mapping"
         else:
             url = elastic.index_url + "/items/_mapping"
@@ -327,7 +367,8 @@ class TestElastic(unittest.TestCase):
 
         elastic = MockElasticSearch(self.es_con, self.target_index)
 
-        if elastic.major == '7':
+        if (elastic.major == '7' and elastic.distribution == ES_DISTRIBUTION) or \
+           (elastic.major == '1' and elastic.distribution == OS_DISTRIBUTION):
             url = elastic.index_url + "/_mapping"
         else:
             url = elastic.index_url + "/items/_mapping"
@@ -526,26 +567,42 @@ class TestElastic(unittest.TestCase):
     def test_get_bulk_url(self):
         """Test that the bulk_url is correctly formed"""
 
-        elastic = MockElasticSearch(self.es_con, self.target_index, major='7')
+        elastic = MockElasticSearch(self.es_con, self.target_index,
+                                    major='7', distribution=ES_DISTRIBUTION)
 
         expected_url = elastic.url + '/' + elastic.index + '/_bulk'
         self.assertEqual(elastic.get_bulk_url(), expected_url)
 
-        elastic = MockElasticSearch(self.es_con, self.target_index, major='6')
+        elastic = MockElasticSearch(self.es_con, self.target_index,
+                                    major='6', distribution=ES_DISTRIBUTION)
         expected_url = elastic.url + '/' + elastic.index + '/items/_bulk'
+        self.assertEqual(elastic.get_bulk_url(), expected_url)
+
+        elastic = MockElasticSearch(self.es_con, self.target_index,
+                                    major='1', distribution=OS_DISTRIBUTION)
+
+        expected_url = elastic.url + '/' + elastic.index + '/_bulk'
         self.assertEqual(elastic.get_bulk_url(), expected_url)
 
     def test_get_mapping_url(self):
         """Test that the mapping_url is correctly formed"""
 
-        elastic = MockElasticSearch(self.es_con, self.target_index, major='7')
+        elastic = MockElasticSearch(self.es_con, self.target_index,
+                                    major='7', distribution=ES_DISTRIBUTION)
 
         expected_url = elastic.url + '/' + elastic.index + '/_mapping'
         self.assertEqual(elastic.get_mapping_url(), expected_url)
 
-        elastic = MockElasticSearch(self.es_con, self.target_index, major='6')
+        elastic = MockElasticSearch(self.es_con, self.target_index,
+                                    major='6', distribution=ES_DISTRIBUTION)
         expected_url = elastic.url + '/' + elastic.index + '/items/_mapping'
         self.assertEqual(elastic.get_mapping_url(_type='items'), expected_url)
+
+        elastic = MockElasticSearch(self.es_con, self.target_index,
+                                    major='1', distribution=OS_DISTRIBUTION)
+
+        expected_url = elastic.url + '/' + elastic.index + '/_mapping'
+        self.assertEqual(elastic.get_mapping_url(), expected_url)
 
     def test_all_properties(self):
         """Test whether all index properties are correctly returned"""
@@ -576,7 +633,8 @@ class TestElastic(unittest.TestCase):
     def test_all_properties_error(self):
         """Test whether an error message is logged when the properties aren't retrieved"""
 
-        if self.es_major == '7':
+        if (self.es_major == '7' and self.es_distribution == 'elasticsearch') or \
+           (self.es_major == '1' and self.es_distribution == 'opensearch'):
             url = self.es_con + '/' + self.target_index + '/_mapping'
         else:
             url = self.es_con + '/' + self.target_index + '/items/_mapping'
@@ -589,7 +647,8 @@ class TestElastic(unittest.TestCase):
                                    "Content-Type": "application/json"
                                })
 
-        elastic = MockElasticSearch(self.es_con, self.target_index, major=self.es_major)
+        elastic = MockElasticSearch(self.es_con, self.target_index,
+                                    major=self.es_major, distribution=self.es_distribution)
         with self.assertLogs(logger, level='ERROR') as cm:
             elastic.all_properties()
             self.assertRegex(cm.output[0], 'ERROR:grimoire_elk.elastic:Error all attributes*')
