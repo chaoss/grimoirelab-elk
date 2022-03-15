@@ -725,6 +725,19 @@ class Enrich(ElasticItems):
 
         return main_orgs
 
+    @staticmethod
+    def remove_prefix_enrollments(enrollments):
+        """ Remove the prefix `::` of the enrollments.
+
+        :param enrollments: list of enrollments
+        :return: list of enrollments without prefix
+        """
+        enrolls = [enroll.split("::")[1] if "::" in enroll else
+                   enroll for enroll in enrollments]
+        enrolls_unique = sorted(list(set(enrolls)))
+
+        return enrolls_unique
+
     def __get_item_sh_fields_empty(self, rol, undefined=False):
         """ Return a SH identity with all fields to empty_field """
         # If empty_field is None, the fields do not appear in index patterns
@@ -819,7 +832,7 @@ class Enrich(ElasticItems):
         multi_enrolls = self.get_multi_enrollment(eitem_sh[rol + "_uuid"], item_date)
         main_enrolls = self.get_main_enrollments(multi_enrolls)
         all_enrolls = list(set(main_enrolls + multi_enrolls))
-        eitem_sh[rol + MULTI_ORG_NAMES] = all_enrolls
+        eitem_sh[rol + MULTI_ORG_NAMES] = self.remove_prefix_enrollments(all_enrolls)
         eitem_sh[rol + "_org_name"] = main_enrolls[0]
 
         return eitem_sh
