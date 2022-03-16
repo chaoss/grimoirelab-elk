@@ -601,6 +601,12 @@ class TestEnrich(unittest.TestCase):
         main_enrolls = self._enrich.get_main_enrollments(enrollments)
         self.assertListEqual(main_enrolls, ['Bitergia', 'Chaoss'])
 
+    def test_remove_prefix_enrollments(self):
+        """Test remove the prefix enrollment given the list of enrollments"""
+        enrollments = ['Bitergia::Eng', 'Chaoss']
+        enrolls = self._enrich.remove_prefix_enrollments(enrollments)
+        self.assertListEqual(enrolls, ['Chaoss', 'Eng'])
+
     def test_no_params(self):
         """Neither identity nor sh_id are passed as arguments"""
 
