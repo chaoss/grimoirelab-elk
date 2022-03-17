@@ -155,6 +155,7 @@ class ESConnector(Connector):
         self.__log_prefix = "[" + es_index + "] study "
 
         self._es_major = self._es_conn.info()['version']['number'].split('.')[0]
+        self._es_distribution = self._es_conn.info()['version'].get('distribution', 'elasticsearch')
 
     def update_repo(self, repo):
         self._repo = repo
