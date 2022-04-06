@@ -48,7 +48,7 @@ urllib3 = "1.26.5"
 geopy = "^2.0.0"
 PyMySQL = "0.9.3"
 pandas = ">=0.22.0,<=0.25.3"
-statsmodels = "^0.9.0"
+statsmodels = ">=0.9.0"
 sortinghat = {branch = "master", git = "https://github.com/chaoss/grimoirelab-sortinghat", optional = true}
 grimoirelab-toolkit = {branch = "master", git = "https://github.com/chaoss/grimoirelab-toolkit"}
 cereslib = {branch = "master", git = "https://github.com/chaoss/grimoirelab-cereslib"}

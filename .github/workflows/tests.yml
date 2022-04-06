@@ -49,7 +49,7 @@ jobs:
     - name: Install dependencies
       run: |
         poetry run pip install setuptools==57.5.0
-        poetry install -vvv
+        poetry install --extras "sortinghat mysql" -vvv
         poetry add -D coveralls
     - name: Verify Elasticsearch connection
       run: |
