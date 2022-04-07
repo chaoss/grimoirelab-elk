@@ -145,7 +145,7 @@ p2o --only-enrich --only-studies --db-sortinghat DBNAME --db-host DBHOST --db-us
 ```
 
 ## Running studies from Mordred
-Mordred has its own configuration [Mordred config documentation](https://github.com/chaoss/grimoirelab-mordred/blob/master/doc/config.md).
+Mordred has its own configuration [Mordred config documentation](https://github.com/chaoss/grimoirelab-sirmordred#setupcfg-).
 
 The studies are enabled per data source.
 
