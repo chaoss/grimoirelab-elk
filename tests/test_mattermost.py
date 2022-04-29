@@ -21,11 +21,16 @@
 #
 import logging
 import unittest
+import time
 
 import requests
 from base import TestBaseBackend
 from grimoire_elk.raw.mattermost import MattermostOcean
 from grimoire_elk.enriched.utils import REPO_LABELS
+from grimoire_elk.enriched.enrich import logger, DEMOGRAPHICS_ALIAS
+
+
+HEADER_JSON = {"Content-Type": "application/json"}
 
 
 class TestMattermost(TestBaseBackend):
@@ -234,6 +239,34 @@ class TestMattermost(TestBaseBackend):
         url = "https://my.mattermost.host/i put spaces/channels/some_channel"
         with self.assertRaises(RuntimeError):
             MattermostOcean.get_perceval_params_from_url(url)
+
+    def test_demography_study(self):
+        """ Test that the demography study works correctly """
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_demography')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+            if study.__name__ == "enrich_demography":
+                study(ocean_backend, enrich_backend)
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[mattermost] Demography '
+                                           'starting study %s/test_mattermost_enrich'
+                             % self.es_con)
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:[mattermost] Demography '
+                                            'end %s/test_mattermost_enrich'
+                             % self.es_con)
+
+        time.sleep(5)  # HACK: Wait until github enrich index has been written
+        items = [item for item in enrich_backend.fetch()]
+        self.assertEqual(len(items), 89)
+
+        for item in items:
+            if 'author_uuid' in item:
+                self.assertTrue('demography_min_date' in item.keys())
+                self.assertTrue('demography_max_date' in item.keys())
+
+        r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
+                                                headers=HEADER_JSON, verify=False)
+        self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
 
 
 if __name__ == "__main__":
