@@ -488,6 +488,7 @@ class GitEnrich(Enrich):
                                  "per author: {}".format(item['data']['Author']))
                     item['data']['authors'] = self.__get_authors(item['data']['Author'])
                     item['data']['Author'] = item['data']['authors'][0]
+                    item['data']['is_git_commit_multi_author'] = 1
                 m = self.AUTHOR_P2P_REGEX.match(item['data']['Commit'])
                 n = self.AUTHOR_P2P_NEW_REGEX.match(item['data']['Author'])
                 if m or n:
@@ -530,10 +531,9 @@ class GitEnrich(Enrich):
                         item['data']['Author'] = authors[i]
                         item['data']['is_git_commit_multi_author'] = 1
                         rich_item = self.get_rich_item(item)
-                        item['data']['is_git_commit_multi_author'] = 1
-                        data_json = json.dumps(rich_item)
                         commit_id = item["uuid"] + "_" + str(i - 1)
                         rich_item['git_uuid'] = commit_id
+                        data_json = json.dumps(rich_item)
                         bulk_json += '{"index" : {"_id" : "%s" } }\n' % rich_item['git_uuid']
                         bulk_json += data_json + "\n"  # Bulk document
                         current += 1
