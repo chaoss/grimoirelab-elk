@@ -33,9 +33,11 @@ from grimoire_elk.elastic_items import (ElasticItems,
 from grimoirelab_toolkit.datetime import str_to_datetime
 from grimoire_elk.raw.kitsune import KitsuneOcean
 from grimoire_elk.raw.git import GitOcean
+from grimoire_elk.raw.confluence import ConfluenceOcean
 from grimoire_elk.raw.meetup import MeetupOcean
 from perceval.backends.mozilla.kitsune import Kitsune
 from perceval.backends.core.git import Git
+from perceval.backends.core.confluence import Confluence
 from perceval.backends.core.meetup import Meetup
 
 
@@ -119,6 +121,42 @@ class TestElasticItems(unittest.TestCase):
         fltr = eitems.get_repository_filter_raw()
         self.assertDictEqual(fltr, expected_filter)
 
+    def test_get_confluence_spaces(self):
+        """Test whether the confluence spaces works properly"""
+
+        # No backend
+        expected_filter = {}
+        eitems = ElasticItems(self.perceval_backend)
+        fltr = eitems.get_confluence_spaces(['TEST'])
+        self.assertDictEqual(fltr, expected_filter)
+
+        # Confluence backend with spaces
+        expected_filter = {
+            "should": [
+                {
+                    "term": {"data._expandable.space": "/rest/api/space/TEST"}
+                }
+            ]
+        }
+        perceval_backend_confluence = Confluence('https://example.com', spaces=['TEST'])
+        eitems = ConfluenceOcean(perceval_backend_confluence)
+        fltr = eitems.get_confluence_spaces(perceval_backend_confluence.spaces)
+        self.assertDictEqual(fltr, expected_filter)
+
+        # Confluence backend without spaces
+        expected_filter = {}
+        perceval_backend_confluence = Confluence('https://example.com')
+        eitems = ConfluenceOcean(perceval_backend_confluence)
+        fltr = eitems.get_confluence_spaces(perceval_backend_confluence.spaces)
+        self.assertDictEqual(fltr, expected_filter)
+
+        # Use a different backend to check the result is {}
+        expected_filter = {}
+        perceval_backend_meetup = Meetup('mygroup', 'aaaa')
+        eitems = MeetupOcean(perceval_backend_meetup)
+        fltr = eitems.get_confluence_spaces(['TEST'])
+        self.assertDictEqual(fltr, expected_filter)
+
     def test_get_field_date(self):
         """Test whether the field date is correctly returned"""
 
@@ -151,14 +189,37 @@ class TestElasticItems(unittest.TestCase):
         eitems.set_repo_labels(expected_labels)
         self.assertListEqual(eitems.repo_labels, expected_labels)
 
-    def test_extract_repo_labels(self):
-        """Test whether the labels are correctly extracted from a URL repo"""
+    def test_set_repo_spaces(self):
+        """Test whether the repo labels are correctly set"""
+
+        expected_spaces = ["A", "B", "C"]
 
         eitems = ElasticItems(self.perceval_backend)
-        processed_repo, label_lst = eitems.extract_repo_labels("http://example.com --labels=[A, B, C]")
+        self.assertIsNone(eitems.repo_spaces)
+        eitems.set_repo_spaces(expected_spaces)
+        self.assertListEqual(eitems.repo_spaces, expected_spaces)
+
+    def test_extract_repo_tags(self):
+        """Test whether the tags are correctly extracted from a URL repo"""
+
+        eitems = ElasticItems(self.perceval_backend)
+        # labels (by default)
+        processed_repo, label_lst = eitems.extract_repo_tags("http://example.com --labels=[A, B, C]")
 
         self.assertEqual(processed_repo, "http://example.com")
         self.assertListEqual(label_lst, ['A', 'B', 'C'])
+
+        # spaces
+        processed_repo, space_lst = eitems.extract_repo_tags("http://example.com --spaces=[A, B, C]", tag="spaces")
+
+        self.assertEqual(processed_repo, "http://example.com")
+        self.assertListEqual(space_lst, ['A', 'B', 'C'])
+
+        # spaces without tag='spaces'
+        processed_repo, space_lst = eitems.extract_repo_tags("http://example.com --spaces=[A, B, C]")
+
+        self.assertEqual(processed_repo, "http://example.com --spaces=[A, B, C]")
+        self.assertListEqual(space_lst, [])
 
     def test_set_filter_raw(self):
         """Test whether the filter raw is properly set"""

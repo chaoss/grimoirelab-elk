@@ -232,7 +232,7 @@ class Enrich(ElasticItems):
                     if ds not in ds_repo_to_prj:
                         ds_repo_to_prj[ds] = {}
                 for repo in json[project][ds]:
-                    repo, _ = self.extract_repo_labels(repo)
+                    repo, _ = self.extract_repo_tags(repo)
                     if repo in ds_repo_to_prj[ds]:
                         if project == ds_repo_to_prj[ds][repo]:
                             logger.debug("Duplicated repo: {} {} {}".format(ds, repo, project))

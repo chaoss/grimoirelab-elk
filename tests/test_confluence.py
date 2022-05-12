@@ -25,6 +25,7 @@ import unittest
 from base import TestBaseBackend
 from grimoire_elk.enriched.utils import REPO_LABELS
 from grimoire_elk.enriched.confluence import NO_ANCESTOR_TITLE
+from grimoire_elk.raw.confluence import ConfluenceOcean
 
 
 class TestConfluence(TestBaseBackend):
@@ -117,6 +118,13 @@ class TestConfluence(TestBaseBackend):
         for item in self.items:
             eitem = enrich_backend.get_rich_item(item)
             self.assertIn(REPO_LABELS, eitem)
+
+    def test_perceval_params(self):
+        """Test the extraction of perceval params from an URL"""
+
+        url = "http://example.com --spaces=[TEST, HOME]"
+        expected_params = ["http://example.com", "--spaces", "TEST", "HOME"]
+        self.assertListEqual(ConfluenceOcean.get_perceval_params_from_url(url), expected_params)
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""

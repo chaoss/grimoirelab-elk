@@ -87,6 +87,31 @@ def get_repository_filter(perceval_backend, perceval_backend_name, term=False):
     return filter_
 
 
+def get_confluence_spaces_filter(repo_spaces, perceval_backend_name):
+    """ Get the spaces needed for get the items in a confluence instance """
+
+    filter_ = {}
+
+    if not repo_spaces or perceval_backend_name != "confluence":
+        return filter_
+
+    field = 'data._expandable.space'
+    value_path = "/rest/api/space/"
+    values = repo_spaces
+
+    filter_ = {
+        "should": []
+    }
+
+    for value in values:
+        new = {
+            "term": {field: value_path + value}
+        }
+        filter_["should"].append(new)
+
+    return filter_
+
+
 def anonymize_url(url):
     """Remove credentials from the url
 
