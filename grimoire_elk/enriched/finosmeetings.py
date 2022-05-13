@@ -23,7 +23,6 @@ import logging
 
 from .enrich import Enrich, metadata
 from ..elastic_mapping import Mapping as BaseMapping
-from .sortinghat_gelk import SortingHat
 
 
 logger = logging.getLogger(__name__)
@@ -85,7 +84,7 @@ class FinosMeetingsEnrich(Enrich):
             'name': None
         }
 
-        SortingHat.add_identity(self.sh_db, identity, GITHUB_BACKEND)
+        self.add_sh_identity(identity)
 
     def get_identities(self, item):
         """ Return the identities from an item """

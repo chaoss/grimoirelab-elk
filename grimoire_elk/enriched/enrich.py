@@ -1019,6 +1019,14 @@ class Enrich(ElasticItems):
         """ Get the SH identity uuid from the id """
         return SortingHat.get_uuid_from_id(self.sh_db, sh_id)
 
+    def add_sh_identities(self, identities):
+        SortingHat.add_identities(self.sh_db, identities,
+                                  self.get_connector_name())
+
+    def add_sh_identity(self, identity):
+        SortingHat.add_identity(self.sh_db, identity,
+                                self.get_connector_name())
+
     def get_sh_ids(self, identity, backend_name):
         """ Return the Sorting Hat id and uuid for an identity """
         # Convert the dict to tuple so it is hashable

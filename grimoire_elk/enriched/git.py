@@ -38,7 +38,6 @@ from perceval.backends.core.git import (GitCommand,
                                         EmptyRepositoryError,
                                         RepositoryError)
 from .enrich import Enrich, metadata
-from .sortinghat_gelk import SortingHat
 from .study_ceres_aoc import areas_of_code, ESPandasConnector
 from ..elastic_mapping import Mapping as BaseMapping
 from ..elastic_items import HEADER_JSON, MAX_BULK_UPDATE_SIZE
@@ -379,7 +378,7 @@ class GitEnrich(Enrich):
 
             if self.sortinghat:
                 # Create SH identity if it does not exist
-                SortingHat.add_identity(self.sh_db, identity, self.get_connector_name())
+                self.add_sh_identity(identity)
                 item_date = str_to_datetime(eitem[self.get_field_date()])
                 sh_fields = self.get_item_sh_fields(identity, item_date, rol=meta_field)
             else:
