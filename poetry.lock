@@ -548,26 +548,6 @@ reference = "master"
 resolved_reference = "d77fa61fc590c471fd157c5a03deaf45dcb5db2f"
 
 [[package]]
-name = "perceval-finos"
-version = "0.1.10"
-description = "Bundle of Perceval backends for FINOS ecosystem."
-category = "main"
-optional = false
-python-versions = "^3.6.1"
-develop = false
-
-[package.dependencies]
-grimoirelab-toolkit = "^0.2"
-perceval = "^0.17.4"
-requests = "^2.7.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/Bitergia/grimoirelab-perceval-finos"
-reference = "master"
-resolved_reference = "3199e698aedf68b8c8bdb3825a86e1b559256013"
-
-[[package]]
 name = "perceval-mozilla"
 version = "0.2.13"
 description = "Bundle of Perceval backends for Mozilla ecosystem."
@@ -976,7 +956,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "662998dfb088666f623c8f75d2c39efb8cecd51ea2eef6ffef4a4152beb06bf0"
+content-hash = "5694b6222b8769491fb426e685c34f9c7a7271eb03d501a0d6bbffbb4b9d5242"
 
 [metadata.files]
 astroid = [
@@ -1351,7 +1331,6 @@ pbr = [
     {file = "pbr-5.9.0.tar.gz", hash = "sha256:e8dca2f4b43560edef58813969f52a56cef023146cbb8931626db80e6c1c4308"},
 ]
 perceval = []
-perceval-finos = []
 perceval-mozilla = []
 perceval-opnfv = []
 perceval-puppet = []

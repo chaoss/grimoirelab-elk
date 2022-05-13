@@ -53,7 +53,6 @@ perceval = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perc
 perceval-mozilla = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-mozilla"}
 perceval-opnfv = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-opnfv"}
 perceval-puppet = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-puppet"}
-perceval-finos = {branch = "master", git = "https://github.com/Bitergia/grimoirelab-perceval-finos"}
 perceval-weblate = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-weblate"}
 
 [tool.poetry.dev-dependencies]
