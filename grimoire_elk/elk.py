@@ -354,7 +354,7 @@ def enrich_items(ocean_backend, enrich_backend, events=False):
     return total
 
 
-def get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw=None):
+def get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw=None, repo_spaces=None):
     """ Get the ocean backend configured to start from the last enriched date """
 
     if no_incremental:
@@ -398,6 +398,8 @@ def get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw=No
 
     if filter_raw:
         ocean_backend.set_filter_raw(filter_raw)
+    if repo_spaces:
+        ocean_backend.set_repo_spaces(repo_spaces)
 
     return ocean_backend
 
@@ -451,7 +453,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                    jenkins_rename_file=None,
                    unaffiliated_group=None, pair_programming=False,
                    node_regex=False, studies_args=None, es_enrich_aliases=None,
-                   last_enrich_date=None, projects_json_repo=None, repo_labels=None):
+                   last_enrich_date=None, projects_json_repo=None, repo_labels=None,
+                   repo_spaces=None):
     """ Enrich Ocean index """
 
     backend = None
@@ -512,7 +515,9 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
 
         enrich_backend.set_projects_json_repo(projects_json_repo)
         enrich_backend.set_repo_labels(repo_labels)
-        ocean_backend = get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw)
+        enrich_backend.set_repo_spaces(repo_spaces)
+
+        ocean_backend = get_ocean_backend(backend_cmd, enrich_backend, no_incremental, filter_raw, repo_spaces)
 
         if only_studies:
             logger.info("Running only studies (no SH and no enrichment)")

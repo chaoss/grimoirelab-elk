@@ -27,7 +27,7 @@ import logging
 import re
 import time
 
-from .enriched.utils import get_repository_filter, grimoire_con, anonymize_url
+from .enriched.utils import get_repository_filter, get_confluence_spaces_filter, grimoire_con, anonymize_url
 from .elastic_mapping import Mapping
 
 HEADER_JSON = {"Content-Type": "application/json"}
@@ -36,6 +36,7 @@ MAX_BULK_UPDATE_SIZE = 1000
 FILTER_DATA_ATTR = 'data.'
 FILTER_SEPARATOR = r",\s*%s" % FILTER_DATA_ATTR
 PROJECTS_JSON_LABELS_PATTERN = r".*(--labels=\[(.*)\]).*"
+PROJECTS_JSON_SPACES_PATTERN = r".*(--spaces=\[(.*)\]).*"
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +66,7 @@ class ElasticItems:
         self.filter_raw_dict = []
         self.projects_json_repo = None
         self.repo_labels = None
+        self.repo_spaces = None
 
         self.requests = grimoire_con(insecure)
         self.elastic = None
@@ -76,6 +78,13 @@ class ElasticItems:
 
         perceval_backend_name = self.get_connector_name()
         filter_ = get_repository_filter(self.perceval_backend, perceval_backend_name, term)
+        return filter_
+
+    def get_confluence_spaces(self, repo_spaces):
+        """Returns the spaces to be used in queries in a confluence items"""
+
+        perceval_backend_name = self.get_connector_name()
+        filter_ = get_confluence_spaces_filter(repo_spaces, perceval_backend_name)
         return filter_
 
     def get_field_date(self):
@@ -102,26 +111,37 @@ class ElasticItems:
         """
         self.repo_labels = labels
 
+    def set_repo_spaces(self, spaces):
+        """Set the spaces of the repo
+
+        :param spaces: list of labels (str)
+        """
+        self.repo_spaces = spaces
+
     @staticmethod
-    def extract_repo_labels(repo):
-        """Extract the labels declared in the repositories within the projects.json, and
+    def extract_repo_tags(repo, tag="labels"):
+        """Extract the tags declared in the repositories within the projects.json, and
         remove them to avoid breaking already existing functionalities.
 
         :param repo: repo url in projects.json
+        :param tag: labels | spaces
         """
         processed_repo = repo
-        labels_lst = []
+        tags_lst = []
 
-        pattern = re.compile(PROJECTS_JSON_LABELS_PATTERN)
+        tag_pattern = PROJECTS_JSON_LABELS_PATTERN
+        if tag == "spaces":
+            tag_pattern = PROJECTS_JSON_SPACES_PATTERN
+        pattern = re.compile(tag_pattern)
         matchObj = pattern.match(repo)
 
         if matchObj:
             labels_info = matchObj.group(1)
             labels = matchObj.group(2)
-            labels_lst = [label.strip() for label in labels.split(',')]
+            tags_lst = [label.strip() for label in labels.split(',')]
             processed_repo = processed_repo.replace(labels_info, '').strip()
 
-        return processed_repo, labels_lst
+        return processed_repo, tags_lst
 
     @staticmethod
     def __process_filter(fltr_raw):
@@ -305,6 +325,13 @@ class ElasticItems:
                 # List to string conversion uses ' that are not allowed in JSON
                 filter_str = filter_str.replace("'", "\"")
                 filters += filter_str
+
+            filters_spaces_dict = self.get_confluence_spaces(self.repo_spaces)
+            if filters_spaces_dict:
+                filters_spaces = json.dumps(filters_spaces_dict)
+                filters += '''
+                    , {"bool":%s}
+                ''' % (filters_spaces)
 
             # The code below performs the incremental enrichment based on the last value of `metadata__timestamp`
             # in the enriched index, which is calculated in the TaskEnrich before enriching the single repos that

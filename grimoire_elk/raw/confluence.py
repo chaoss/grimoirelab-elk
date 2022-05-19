@@ -21,6 +21,7 @@
 
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
+from ..elastic_items import ElasticItems
 
 
 class Mapping(BaseMapping):
@@ -71,3 +72,11 @@ class ConfluenceOcean(ElasticOcean):
     """Confluence Ocean feeder"""
 
     mapping = Mapping
+
+    @classmethod
+    def get_perceval_params_from_url(cls, url):
+        url, spaces = ElasticItems.extract_repo_tags(url, "spaces")
+        params = [url]
+        if spaces:
+            params += ["--spaces"] + spaces
+        return params
