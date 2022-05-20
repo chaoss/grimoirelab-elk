@@ -203,8 +203,18 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         else:
             error_msg = "Error feeding raw from {}".format(ex)
             logger.error(error_msg, exc_info=True)
+    except SystemExit:
+        anonymized_params = anonymize_params(backend_params)
+        msg = "Wrong {} arguments: {}".format(backend_name, anonymized_params)
+        error_msg = "Error feeding raw. {}".format(msg)
+        logger.error(error_msg, exc_info=True)
 
-    logger.info("[{}] Done collection for {}".format(backend_name, anonymize_url(backend.origin)))
+    try:
+        msg = "[{}] Done collection for {}".format(backend_name, anonymize_url(backend.origin))
+    except AttributeError:
+        msg = "[{}] Done collection for {}".format(backend_name, anonymize_url(projects_json_repo))
+    logger.info(msg)
+
     return error_msg
 
 
@@ -603,8 +613,18 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                          backend_name, anonymize_url(backend.origin), ex), exc_info=True)
         else:
             logger.error("Error enriching raw {}".format(ex), exc_info=True)
+    except SystemExit:
+        anonymized_params = anonymize_params(backend_params)
+        msg = "Wrong {} arguments: {}".format(backend_name, anonymized_params)
+        error_msg = "Error enriching raw. {}".format(msg)
+        logger.error(error_msg, exc_info=True)
 
-    logger.info("[{}] Done enrichment for {}".format(backend_name, anonymize_url(backend.origin)))
+    try:
+        msg = "[{}] Done enrichment for {}".format(backend_name, anonymize_url(backend.origin))
+    except AttributeError:
+        msg = "[{}] Done enrichment for {}".format(backend_name, anonymize_url(projects_json_repo))
+
+    logger.info(msg)
 
 
 def delete_orphan_unique_identities(es, sortinghat_db, current_data_source, active_data_sources):
