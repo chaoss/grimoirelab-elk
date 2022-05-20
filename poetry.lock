@@ -56,8 +56,9 @@ python-versions = "^3.7"
 develop = false
 
 [package.dependencies]
-grimoireelk = {git = "https://github.com/chaoss/grimoirelab-elk", branch = "master", extras = ["sortinghat"]}
+grimoirelab-toolkit = "^0.2.0"
 numpy = "<=1.18.3"
+pandas = ">=0.22.0,<=0.25.3"
 scipy = "^1.5"
 six = "^1.16.0"
 
@@ -65,15 +66,15 @@ six = "^1.16.0"
 type = "git"
 url = "https://github.com/chaoss/grimoirelab-cereslib"
 reference = "master"
-resolved_reference = "aab1883e5c95d1742e7fd361350e097a0dfe801b"
+resolved_reference = "8b932b159b14e7a1f7cc23c5f496532312bb71b3"
 
 [[package]]
 name = "certifi"
-version = "2022.5.18"
+version = "2022.5.18.1"
 description = "Python package for providing Mozilla's CA Bundle."
 category = "main"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.6"
 
 [[package]]
 name = "cffi"
@@ -157,18 +158,18 @@ test = ["pytest (>=6.0)", "pytest-cov", "pytest-subtests", "pytest-xdist", "pret
 
 [[package]]
 name = "dill"
-version = "0.3.4"
+version = "0.3.5"
 description = "serialize all of python"
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, !=3.6.*"
 
 [package.extras]
 graph = ["objgraph (>=1.7.2)"]
 
 [[package]]
 name = "dulwich"
-version = "0.20.38"
+version = "0.20.40"
 description = "Python Git Library"
 category = "main"
 optional = false
@@ -229,7 +230,7 @@ testing = ["pre-commit"]
 
 [[package]]
 name = "feedparser"
-version = "6.0.8"
+version = "6.0.9"
 description = "Universal feed parser, handles RSS 0.9x, RSS 1.0, RSS 2.0, CDF, Atom 0.3, and Atom 1.0 feeds"
 category = "main"
 optional = false
@@ -403,7 +404,7 @@ name = "jinja2"
 version = "3.0.3"
 description = "A very fast and expressive template engine."
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -433,7 +434,7 @@ name = "markupsafe"
 version = "2.1.1"
 description = "Safely add untrusted strings to HTML/XML markup."
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.7"
 
 [[package]]
@@ -834,7 +835,7 @@ name = "sortinghat"
 version = "0.7.18"
 description = "A tool to manage identities."
 category = "main"
-optional = true
+optional = false
 python-versions = "^3.7"
 develop = false
 
@@ -868,7 +869,7 @@ name = "sqlalchemy"
 version = "1.3.24"
 description = "Database Abstraction Library"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [package.extras]
@@ -972,14 +973,10 @@ python-versions = ">=3.7"
 docs = ["sphinx", "jaraco.packaging (>=9)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)"]
 
-[extras]
-mysql = ["PyMySQL"]
-sortinghat = ["sortinghat"]
-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "29976375cde5f961a34bf3bf18f2c17bc676dd3a12e542a285757e451426ea93"
+content-hash = "662998dfb088666f623c8f75d2c39efb8cecd51ea2eef6ffef4a4152beb06bf0"
 
 [metadata.files]
 astroid = [
@@ -996,8 +993,8 @@ beautifulsoup4 = [
 ]
 cereslib = []
 certifi = [
-    {file = "certifi-2022.5.18-py3-none-any.whl", hash = "sha256:8d15a5a7fde18536a249c49e07e8e462b8fc13de21b3c80e8a68315dfa227c99"},
-    {file = "certifi-2022.5.18.tar.gz", hash = "sha256:6ae10321df3e464305a46e997da41ea56c1d311fb9ff1dd4e04d6f14653ec63a"},
+    {file = "certifi-2022.5.18.1-py3-none-any.whl", hash = "sha256:f1d53542ee8cbedbe2118b5686372fb33c297fcd6379b050cca0ef13a597382a"},
+    {file = "certifi-2022.5.18.1.tar.gz", hash = "sha256:9c5705e395cd70084351dd8ad5c41e65655e08ce46f2ec9cf6c2c08390f71eb7"},
 ]
 cffi = [
     {file = "cffi-1.15.0-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:c2502a1a03b6312837279c8c1bd3ebedf6c12c4228ddbad40912d671ccc8a962"},
@@ -1126,6 +1123,8 @@ cryptography = [
     {file = "cryptography-3.4.8-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:34dae04a0dce5730d8eb7894eab617d8a70d0c97da76b905de9efb7128ad7085"},
     {file = "cryptography-3.4.8-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1eb7bb0df6f6f583dd8e054689def236255161ebbcf62b226454ab9ec663746b"},
     {file = "cryptography-3.4.8-cp36-abi3-manylinux_2_24_x86_64.whl", hash = "sha256:9965c46c674ba8cc572bc09a03f4c649292ee73e1b683adb1ce81e82e9a6a0fb"},
+    {file = "cryptography-3.4.8-cp36-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:3c4129fc3fdc0fa8e40861b5ac0c673315b3c902bbdc05fc176764815b43dd1d"},
+    {file = "cryptography-3.4.8-cp36-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:695104a9223a7239d155d7627ad912953b540929ef97ae0c34c7b8bf30857e89"},
     {file = "cryptography-3.4.8-cp36-abi3-win32.whl", hash = "sha256:21ca464b3a4b8d8e86ba0ee5045e103a1fcfac3b39319727bc0fc58c09c6aff7"},
     {file = "cryptography-3.4.8-cp36-abi3-win_amd64.whl", hash = "sha256:3520667fda779eb788ea00080124875be18f2d8f0848ec00733c0ec3bb8219fc"},
     {file = "cryptography-3.4.8-pp36-pypy36_pp73-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:d2a6e5ef66503da51d2110edf6c403dc6b494cc0082f85db12f54e9c5d4c3ec5"},
@@ -1139,11 +1138,11 @@ cryptography = [
     {file = "cryptography-3.4.8.tar.gz", hash = "sha256:94cc5ed4ceaefcbe5bf38c8fba6a21fc1d365bb8fb826ea1688e3370b2e24a1c"},
 ]
 dill = [
-    {file = "dill-0.3.4-py2.py3-none-any.whl", hash = "sha256:7e40e4a70304fd9ceab3535d36e58791d9c4a776b38ec7f7ec9afc8d3dca4d4f"},
-    {file = "dill-0.3.4.zip", hash = "sha256:9f9734205146b2b353ab3fec9af0070237b6ddae78452af83d2fca84d739e675"},
+    {file = "dill-0.3.5-py2.py3-none-any.whl", hash = "sha256:6eb4bb70a98509e69204e621942c4306580d5bf2229f450f04fcf2efca3908e5"},
+    {file = "dill-0.3.5.tar.gz", hash = "sha256:3a11d19c15d409296a2ee714b1dbd5efb733a329f0d89c0e58aad6154ab6f2f5"},
 ]
 dulwich = [
-    {file = "dulwich-0.20.38.tar.gz", hash = "sha256:7346790d8735c86fbbc5b70b674f0ef94096c1e5099ba7273491628239817fc8"},
+    {file = "dulwich-0.20.40.tar.gz", hash = "sha256:bed70efe0b7dd51a47bcea9b984ab06a675d7438b78b32da1cbafcf750fbbad7"},
 ]
 elasticsearch = [
     {file = "elasticsearch-6.3.1-py2.py3-none-any.whl", hash = "sha256:7546cc08e3899716e12fe67d12d7cfe9a64647014d1134b014c3c392b63cad42"},
@@ -1158,8 +1157,8 @@ execnet = [
     {file = "execnet-1.9.0.tar.gz", hash = "sha256:8f694f3ba9cc92cab508b152dcfe322153975c29bda272e2fd7f3f00f36e47c5"},
 ]
 feedparser = [
-    {file = "feedparser-6.0.8-py3-none-any.whl", hash = "sha256:1b7f57841d9cf85074deb316ed2c795091a238adb79846bc46dccdaf80f9c59a"},
-    {file = "feedparser-6.0.8.tar.gz", hash = "sha256:5ce0410a05ab248c8c7cfca3a0ea2203968ee9ff4486067379af4827a59f9661"},
+    {file = "feedparser-6.0.9-py3-none-any.whl", hash = "sha256:a522b2b81f3914a74ae44161a341940f74811bd29be5b4c2a689e6e6be51cd39"},
+    {file = "feedparser-6.0.9.tar.gz", hash = "sha256:dad42e7beaec55f99c08b2b0cf7288bc7cfd24b6f72c8ef85478bcb55648cd42"},
 ]
 flake8 = [
     {file = "flake8-3.9.2-py2.py3-none-any.whl", hash = "sha256:bf8fd333346d844f616e8d47905ef3a3384edae6b4e9beb0c5101e25e3110907"},

@@ -76,7 +76,7 @@ jobs:
       - name: Test package
         run: |
           PACKAGE=`(cd dist && ls *whl)` && echo $PACKAGE
-          pip install --pre ./dist/$PACKAGE\[mysql,sortinghat\]
+          pip install --pre ./dist/$PACKAGE
           cd tests && python run_tests.py
 
   release:

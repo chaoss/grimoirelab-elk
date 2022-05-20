@@ -28,10 +28,6 @@ include = [
   "grimoire_elk/enriched/mappings/*.json"
 ]
 
-[tool.poetry.extras]
-mysql = ["PyMySQL"]
-sortinghat = ["sortinghat"]
-
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/chaoss/grimoirelab-elk/issues"
 
@@ -49,7 +45,7 @@ geopy = "^2.0.0"
 PyMySQL = "0.9.3"
 pandas = ">=0.22.0,<=0.25.3"
 statsmodels = ">=0.9.0"
-sortinghat = {branch = "master", git = "https://github.com/chaoss/grimoirelab-sortinghat", optional = true}
+sortinghat = {branch = "master", git = "https://github.com/chaoss/grimoirelab-sortinghat"}
 grimoirelab-toolkit = {branch = "master", git = "https://github.com/chaoss/grimoirelab-toolkit"}
 cereslib = {branch = "master", git = "https://github.com/chaoss/grimoirelab-cereslib"}
 graal = {branch = "master", git = "https://github.com/chaoss/grimoirelab-graal"}
