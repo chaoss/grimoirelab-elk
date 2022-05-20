@@ -22,6 +22,7 @@
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
 from ..elastic_items import ElasticItems
+from ..enriched.utils import anonymize_url
 
 
 class Mapping(BaseMapping):
@@ -72,6 +73,11 @@ class ConfluenceOcean(ElasticOcean):
     """Confluence Ocean feeder"""
 
     mapping = Mapping
+
+    def _fix_item(self, item):
+        item['origin'] = anonymize_url(item['origin'])
+        item['tag'] = anonymize_url(item['tag'])
+        item['data']['content_url'] = anonymize_url(item['data']['content_url'])
 
     @classmethod
     def get_perceval_params_from_url(cls, url):
