@@ -35,11 +35,34 @@ from .enriched.utils import get_last_enrich, grimoire_con, get_diff_current_date
 from .utils import get_connectors, get_connector_from_name, get_elastic
 
 IDENTITIES_INDEX = "grimoirelab_identities_cache"
+SECRET_PARAMETERS = ["--api-token", "--backend-password"]
 SIZE_SCROLL_IDENTITIES_INDEX = 1000
 
 logger = logging.getLogger(__name__)
 
 requests_ses = grimoire_con()
+
+
+def anonymize_params(parameters):
+    """ The following parameters after SECRET_PARAMETERS will be
+    replaced by 'xxxxx' until the parameter starts with '-'.
+
+    :param parameters: list of parameters
+    :return: list of anonymized parameter
+    """
+
+    secret_param = False
+    param_list = list(parameters)
+    for i, param in enumerate(param_list):
+        if secret_param and param.startswith('-'):
+            secret_param = False
+
+        if not secret_param and param in SECRET_PARAMETERS:
+            secret_param = True
+        elif secret_param:
+            param_list[i] = "xxxxx"
+
+    return tuple(param_list)
 
 
 def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
