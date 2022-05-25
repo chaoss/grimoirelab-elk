@@ -21,9 +21,10 @@
 #
 
 import configparser
+import logging
 import unittest
 
-from grimoire_elk.elk import anonymize_params
+from grimoire_elk.elk import anonymize_params, enrich_backend, feed_backend, logger
 
 
 CONFIG_FILE = 'tests.conf'
@@ -50,3 +51,51 @@ class TestElk(unittest.TestCase):
         params = ("--backend-password", "mypassword", "--no-archive", "--api-token", "token")
         anonymized_params = anonymize_params(params)
         self.assertTupleEqual(anonymized_params, expected_params)
+
+    def test_feed_backend_wrong_params(self):
+        """Test feed_backend with wrong parameters."""
+
+        # Jira has not --api-token argument
+        backend_params = ['https://jira.example.org', '--api-token', 'mypersonaltoken']
+        projects_json_repo = 'https://jira.example.org'
+        expected_msg = "Error feeding raw. Wrong jira arguments: ('https://jira.example.org', " \
+                       "'--api-token', 'xxxxx')"
+        error_msg = feed_backend(self.es_con, False, False, "jira", backend_params,
+                                 "jira_raw", "jira_enriched", projects_json_repo=projects_json_repo)
+        self.assertEqual(error_msg, expected_msg)
+
+        # Github the repository name cannot start with '-'
+        backend_params = ['chaoss', '-grimoirelab-elk', '--api-token', 'mypersonaltoken']
+        projects_json_repo = 'https://github.com/chaoss/-grimoirelab-elk'
+        expected_msg = "Error feeding raw. Wrong github arguments: ('chaoss', " \
+                       "'-grimoirelab-elk', '--api-token', 'xxxxx')"
+        error_msg = feed_backend(self.es_con, False, False, "github", backend_params,
+                                 "github_raw", "github_enriched", projects_json_repo=projects_json_repo)
+        self.assertEqual(error_msg, expected_msg)
+
+    def test_enrich_backend_wrong_params(self):
+        """Test enrich_backend with wrong parameters."""
+
+        # Jira has not --api-token argument
+        backend_params = ['https://jira.example.org', '--api-token', 'mypersonaltoken']
+        projects_json_repo = 'https://jira.example.org'
+        expected_msg = "Error enriching raw. Wrong jira arguments: ('https://jira.example.org', '--api-token', 'xxxxx')"
+        with self.assertLogs(logger, level='ERROR') as cm:
+            enrich_backend(self.es_con, False, "jira", backend_params, "jira",
+                           "jira_raw", "jira_enriched", projects_json_repo=projects_json_repo)
+            self.assertEqual(cm.records[0].msg, expected_msg)
+
+        # Github the repository name cannot start with '-'
+        backend_params = ['chaoss', '-grimoirelab-elk', '--api-token', 'mypersonaltoken']
+        projects_json_repo = 'https://github.com/chaoss/-grimoirelab-elk'
+        expected_msg = "Error enriching raw. Wrong github arguments: ('chaoss', " \
+                       "'-grimoirelab-elk', '--api-token', 'xxxxx')"
+        with self.assertLogs(logger, level='ERROR') as cm:
+            enrich_backend(self.es_con, False, "github", backend_params, "github",
+                           "github_raw", "github_enriched", projects_json_repo=projects_json_repo)
+            self.assertEqual(cm.records[0].msg, expected_msg)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+    unittest.main()
