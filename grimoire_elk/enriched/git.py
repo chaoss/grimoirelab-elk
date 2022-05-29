@@ -1036,7 +1036,9 @@ class GitEnrich(Enrich):
 
                 if commit_count:
                     self.__process_commits_in_branch(enrich_backend, git_repo.uri, branch_name, to_process)
-
+                    # reset the counter
+                    to_process = []
+                    commit_count = 0
             except Exception as e:
                 logger.error("[git] Skip adding branch info for repo {} due to {}".format(git_repo.uri, e))
                 return
