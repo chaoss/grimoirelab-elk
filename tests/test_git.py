@@ -156,7 +156,7 @@ class TestGit(TestBaseBackend):
 
         result = self._test_raw_to_enrich(pair_programming=True)
         self.assertEqual(result['raw'], 11)
-        self.assertEqual(result['enrich'], 13)
+        self.assertEqual(result['enrich'], 16)
 
         enrich_backend = self.connectors[self.connector][2](pair_programming=True)
         url = self.es_con + "/" + self.enrich_index + "/_search?size=20"

@@ -78,7 +78,7 @@ class GitEnrich(Enrich):
 
     # REGEX to extract authors from a multi author commit: several authors present
     # in the Author field in the commit. Used if self.pair_programming is True
-    AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) and (?P<last_author>.* .*) (?P<email>.*)')
+    AUTHOR_P2P_REGEX = re.compile(r'(?P<first_authors>.* .*) ([aA][nN][dD]|&|\+) (?P<last_author>.* .*) (?P<email>.*)')
     AUTHOR_P2P_NEW_REGEX = re.compile(r"Co-authored-by:(?P<first_authors>.* .*)<(?P<email>.*)>\n?")
 
     # REGEX to extract authors from the commit

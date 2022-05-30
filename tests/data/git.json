@@ -109,9 +109,9 @@
     "backend_version": "0.8.10",
     "category": "commit",
     "data": {
-        "Author": "Eduardo Morais <companheiro.vermelho@gmail.com>",
+        "Author": "Eduardo Morais & Zhongpeng Lin <companheiro.vermelho@gmail.com>",
         "AuthorDate": "Tue Aug 14 14:33:27 2012 -0300",
-        "Commit": "Eduardo Morais <companheiro.vermelho@gmail.com>",
+        "Commit": "Eduardo Morais & Zhongpeng Lin <companheiro.vermelho@gmail.com>",
         "CommitDate": "Tue Aug 14 14:33:27 2012 -0300",
         "commit": "7debcf8a2f57f86663809c58b5c07a398be7674c",
         "files": [
@@ -147,9 +147,9 @@
     "backend_version": "0.8.10",
     "category": "commit",
     "data": {
-        "Author": "Eduardo Morais <companheiro.vermelho@gmail.com>",
+        "Author": "Eduardo Morais + Zhongpeng Lin <companheiro.vermelho@gmail.com>",
         "AuthorDate": "Tue Aug 14 14:35:02 2012 -0300",
-        "Commit": "Eduardo Morais <companheiro.vermelho@gmail.com>",
+        "Commit": "Eduardo Morais + Zhongpeng Lin <companheiro.vermelho@gmail.com>",
         "CommitDate": "Tue Aug 14 14:35:02 2012 -0300",
         "commit": "c0d66f92a95e31c77be08dc9d0f11a16715d1885",
         "files": [
@@ -200,9 +200,9 @@
     "backend_version": "0.8.10",
     "category": "commit",
     "data": {
-        "Author": "Eduardo Morais <companheiro.vermelho@gmail.com>",
+        "Author": "Eduardo Morais And Zhongpeng Lin <companheiro.vermelho@gmail.com>",
         "AuthorDate": "Tue Aug 14 14:45:51 2012 -0300",
-        "Commit": "Eduardo Morais <companheiro.vermelho@gmail.com>",
+        "Commit": "Eduardo Morais And Zhongpeng Lin <companheiro.vermelho@gmail.com>",
         "CommitDate": "Tue Aug 14 14:45:51 2012 -0300",
         "commit": "c6ba8f7a1058db3e6b4bc6f1090e932b107605fb",
         "files": [
