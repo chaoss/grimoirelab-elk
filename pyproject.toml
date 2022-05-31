@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "GrimoireELK"
+name = "grimoire-elk"
 version = "0.77.0"
 description = "GrimoireELK processes and stores software development data to ElasticSearch"
 readme = "README.md"
@@ -45,15 +45,15 @@ geopy = "^2.0.0"
 PyMySQL = "0.9.3"
 pandas = ">=0.22.0,<=0.25.3"
 statsmodels = ">=0.9.0"
-sortinghat = {branch = "master", git = "https://github.com/chaoss/grimoirelab-sortinghat"}
-grimoirelab-toolkit = {branch = "master", git = "https://github.com/chaoss/grimoirelab-toolkit"}
-cereslib = {branch = "master", git = "https://github.com/chaoss/grimoirelab-cereslib"}
-graal = {branch = "master", git = "https://github.com/chaoss/grimoirelab-graal"}
-perceval = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval"}
-perceval-mozilla = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-mozilla"}
-perceval-opnfv = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-opnfv"}
-perceval-puppet = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-puppet"}
-perceval-weblate = {branch = "master", git = "https://github.com/chaoss/grimoirelab-perceval-weblate"}
+sortinghat = "^0.7.20"
+grimoirelab-toolkit = "^0.3.0"
+cereslib = "^0.3.0"
+graal = "^0.3.0"
+perceval = "^0.18.0"
+perceval-mozilla = "^0.3.0"
+perceval-opnfv = "^0.2.0"
+perceval-puppet = "^0.2.0"
+perceval-weblate = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 httpretty = "^0.9.6"
