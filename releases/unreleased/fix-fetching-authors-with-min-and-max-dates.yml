@@ -1,8 +1,0 @@
----
-title: Fix fetching authors with min and max dates
-category: fixed
-author: Quan Zhou <quan@bitergia.com>
-issue: null
-notes: >
-    The old query only returns 10000 items due to ElasticSearch and
-    OpenSearch now use `composite` aggregation to paginate all buckets.
