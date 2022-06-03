@@ -1,9 +1,0 @@
----
-title: Git fix 'is_git_commit_multi_author'
-category: fixed
-author: Quan Zhou <quan@bitergia.com>
-issue: null
-notes: >
-    This fixes the `is_git_commit_multi_author` field when the
-    commit has more than one author and `pair-programming` is enabled.
-    This is important for calculating `pair_programming_*` values.

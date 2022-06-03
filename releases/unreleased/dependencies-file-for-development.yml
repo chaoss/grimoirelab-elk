@@ -1,8 +1,0 @@
----
-title: Dependencies file for development
-category: added
-author: Jose Javier Merchante <jjmerchante@bitergia.com>
-issue: null
-notes: >
-    Include a new requirements.txt file to install
-    the development version from the repositories.

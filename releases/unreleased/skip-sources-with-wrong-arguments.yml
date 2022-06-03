@@ -1,8 +1,0 @@
----
-title: Skip sources with wrong arguments
-category: fixed
-author: Quan Zhou <quan@bitergia.com>
-issue: null
-notes: >
-    Sources won't interrupt collection or enrichment processes when any
-    of their arguments are invalid. Instead, they will be skipped.

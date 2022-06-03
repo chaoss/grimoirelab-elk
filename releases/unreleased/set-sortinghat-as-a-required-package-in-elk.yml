@@ -1,9 +1,0 @@
----
-title: SortingHat as a required package
-category: fixed
-author: Jose Javier Merchante <jjmerchante@bitergia.com>
-issue: null
-notes: >
-    SortingHat is required for running grimoireelk but
-    it was set as an extra dependency. From now on sortinghat
-    is always installed with grimoireelk.
