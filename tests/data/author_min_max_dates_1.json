@@ -1,0 +1,55 @@
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 2,
+    "successful" : 2,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 10000,
+      "relation" : "gte"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "author" : {
+      "after_key" : {
+        "author_uuid" : "007a56d0322c518859dde2a0c6ed9143fa141c61"
+      },
+      "buckets" : [
+        {
+          "key" : {
+            "author_uuid" : "00032fabbbf033467d7bd307df81b654c0fa53d8"
+          },
+          "doc_count" : 1,
+          "min" : {
+            "value" : 1.623225379E12,
+            "value_as_string" : "2021-06-09T07:56:19.000Z"
+          },
+          "max" : {
+            "value" : 1.623225379E12,
+            "value_as_string" : "2021-06-09T07:56:19.000Z"
+          }
+        },
+        {
+          "key" : {
+            "author_uuid" : "007a56d0322c518859dde2a0c6ed9143fa141c61"
+          },
+          "doc_count" : 1,
+          "min" : {
+            "value" : 1.626183289E12,
+            "value_as_string" : "2021-07-13T13:34:49.000Z"
+          },
+          "max" : {
+            "value" : 1.626183289E12,
+            "value_as_string" : "2021-07-13T13:34:49.000Z"
+          }
+        }
+      ]
+    }
+  }
+}

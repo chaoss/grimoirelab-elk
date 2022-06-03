@@ -20,6 +20,9 @@
 #
 
 import configparser
+import json
+
+import httpretty
 import requests
 import sys
 import unittest
@@ -39,10 +42,56 @@ sys.path.insert(0, '..')
 CONFIG_FILE = 'tests.conf'
 
 
+def setup_http_server(url, not_handle_status_code=False):
+    """Setup a mock HTTP server"""
+
+    http_requests = []
+
+    body_content_1 = read_file("data/author_min_max_dates_1.json")
+    body_content_2 = read_file("data/author_min_max_dates_2.json")
+    body_content_empty = read_file("data/author_min_max_dates_empty.json")
+
+    def request_callback(method, uri, headers):
+
+        status_code = 200
+        composite = method.parsed_body['aggs']['author']['composite']
+        if "after" in composite:
+            if composite["after"]["author_uuid"] == "007a56d0322c518859dde2a0c6ed9143fa141c61":
+                body = body_content_2
+            else:
+                body = body_content_empty
+        else:
+            body = body_content_1
+        http_requests.append(httpretty.last_request())
+
+        return status_code, headers, body
+
+    httpretty.register_uri(httpretty.POST,
+                           url,
+                           match_querystring=True,
+                           responses=[
+                               httpretty.Response(body=request_callback)
+                           ])
+
+    return http_requests
+
+
+def read_file(filename):
+    with open(filename) as f:
+        return f.read()
+
+
 class TestEnrich(unittest.TestCase):
 
     def setUp(self):
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE)
+        es_con = dict(config.items('ElasticSearch'))['url']
+        git_enriched = "git_enriched"
+        enrich_backend = get_connectors()["git"][2]()
+        elastic_enrich = get_elastic(es_con, git_enriched, True, enrich_backend)
         self._enrich = Enrich()
+        self._enrich.elastic = elastic_enrich
 
         self.empty_item = {
             "author_id": "",
@@ -703,6 +752,131 @@ class TestEnrich(unittest.TestCase):
         self.assertEqual(eitem['tag'], expected['tag'])
         self.assertEqual(eitem['uuid'], expected['uuid'])
         self.assertEqual(eitem['extra'], expected['extra'])
+
+    def test_authors_min_max_dates(self):
+        expected_es_query = """
+        {
+          "size": 0,
+          "aggs": {
+            "author": {
+              "composite": {
+                "sources": [
+                  {
+                    "author_uuid": {
+                      "terms": {
+                        "field": "author_uuid"
+                      }
+                    }
+                  }
+                ],
+                "size": 10000
+              },
+              "aggs": {
+                "min": {
+                  "min": {
+                    "field": "grimoire_creation_date"
+                  }
+                },
+                "max": {
+                  "max": {
+                    "field": "grimoire_creation_date"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """
+        es_query = self._enrich.authors_min_max_dates("grimoire_creation_date",
+                                                      author_field="author_uuid",
+                                                      contribution_type=None,
+                                                      after=None)
+        self.assertDictEqual(json.loads(es_query), json.loads(expected_es_query))
+
+        expected_es_query = """
+        {
+          "size": 0,
+          "aggs": {
+            "author": {
+              "composite": {
+                "sources": [
+                  {
+                    "author_uuid": {
+                      "terms": {
+                        "field": "author_uuid"
+                      }
+                    }
+                  }
+                ],
+                "after": {
+                  "author_uuid": "uuid"
+                },
+                "size": 10000
+              },
+              "aggs": {
+                "min": {
+                  "min": {
+                    "field": "grimoire_creation_date"
+                  }
+                },
+                "max": {
+                  "max": {
+                    "field": "grimoire_creation_date"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """
+        es_query = self._enrich.authors_min_max_dates("grimoire_creation_date",
+                                                      author_field="author_uuid",
+                                                      contribution_type=None,
+                                                      after="uuid")
+        self.assertDictEqual(json.loads(es_query), json.loads(expected_es_query))
+
+    @httpretty.activate
+    def test_fetch_authors_min_max_dates(self):
+
+        es_search_url = "{}/_search".format(self._enrich.elastic.index_url)
+        _ = setup_http_server(es_search_url)
+
+        log_prefix = "[git] Demography"
+        author_field = "author_uuid"
+        date_field = "grimoire_creation_date"
+
+        expected = [
+            {
+                'key': {'author_uuid': '00032fabbbf033467d7bd307df81b654c0fa53d8'},
+                'doc_count': 1,
+                'min': {'value': 1623225379000.0, 'value_as_string': '2021-06-09T07:56:19.000Z'},
+                'max': {'value': 1623225379000.0, 'value_as_string': '2021-06-09T07:56:19.000Z'}
+            },
+            {
+                'key': {'author_uuid': '007a56d0322c518859dde2a0c6ed9143fa141c61'},
+                'doc_count': 1,
+                'min': {'value': 1626183289000.0, 'value_as_string': '2021-07-13T13:34:49.000Z'},
+                'max': {'value': 1626183289000.0, 'value_as_string': '2021-07-13T13:34:49.000Z'}
+            },
+            {
+                'key': {'author_uuid': '00cc95a5950523a42c969f15c7c36c4530417f13'},
+                'doc_count': 1,
+                'min': {'value': 1474160034000.0, 'value_as_string': '2016-09-18T00:53:54.000Z'},
+                'max': {'value': 1474160034000.0, 'value_as_string': '2016-09-18T00:53:54.000Z'}
+            },
+            {
+                'key': {'author_uuid': '00d36515f739794b941586e5d0a102b5ff3a0cc2'},
+                'doc_count': 1,
+                'min': {'value': 1526521972000.0, 'value_as_string': '2018-05-17T01:52:52.000Z'},
+                'max': {'value': 1526521972000.0, 'value_as_string': '2018-05-17T01:52:52.000Z'}
+            }
+        ]
+        authors_min_max_data = self._enrich.fetch_authors_min_max_dates(log_prefix, author_field,
+                                                                        None, date_field)
+        all_authors = []
+        for author_key in authors_min_max_data:
+            all_authors.append(author_key)
+        self.assertListEqual(all_authors, expected)
 
 
 if __name__ == '__main__':

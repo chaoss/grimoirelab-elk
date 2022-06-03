@@ -1879,29 +1879,13 @@ class Enrich(ElasticItems):
             In case there is no specific contribution type, by default all contributions will be considered.
         """
         # The first step is to find the current min and max date for all the authors
-        authors_min_max_data = {}
-
-        es_query = Enrich.authors_min_max_dates(date_field,
-                                                author_field=author_field,
-                                                contribution_type=contribution_type)
-        r = self.requests.post(self.elastic.index_url + "/_search",
-                               data=es_query, headers=HEADER_JSON,
-                               verify=False)
-        try:
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as ex:
-            logger.error("{} error getting authors mix and max date. Aborted.".format(log_prefix))
-            logger.error(ex)
-            return
-
-        for author in r.json()['aggregations']['author']['buckets']:
-            authors_min_max_data[author['key']] = author
+        authors_min_max_data = self.fetch_authors_min_max_dates(log_prefix, author_field, contribution_type, date_field)
 
         # Then we update the min max dates of all authors
-        for author_key in authors_min_max_data:
-            author_min_date = authors_min_max_data[author_key]['min']['value_as_string']
-            author_max_date = authors_min_max_data[author_key]['max']['value_as_string']
-
+        for author in authors_min_max_data:
+            author_min_date = author['min']['value_as_string']
+            author_max_date = author['max']['value_as_string']
+            author_key = author['key']['author_uuid']
             field_name = contribution_type if contribution_type else 'demography'
             es_update = Enrich.update_author_min_max_date(author_min_date, author_max_date,
                                                           author_key, field_name, author_field=author_field)
@@ -1926,6 +1910,45 @@ class Enrich(ElasticItems):
                              log_prefix, author_key))
                 logger.error(ex)
                 return
+
+    def fetch_authors_min_max_dates(self, log_prefix, author_field, contribution_type, date_field):
+        """ Fetch all authors with their first and last date of activity.
+
+        :param log_prefix: log prefix used on logger.
+        :param author_field: field of the author.
+        :param contribution_type: name of the contribution type (if any) which the dates are computed for.
+            In case there is no specific contribution type, by default all contributions will be considered.
+        :param date_field: field used to find the mix and max dates for the author's activity.
+
+        :return: dictionary of authors with min and max dates.
+        """
+        after = None
+
+        while True:
+            es_query = Enrich.authors_min_max_dates(date_field,
+                                                    author_field=author_field,
+                                                    contribution_type=contribution_type,
+                                                    after=after)
+            r = self.requests.post(self.elastic.index_url + "/_search",
+                                   data=es_query, headers=HEADER_JSON,
+                                   verify=False)
+            try:
+                r.raise_for_status()
+            except requests.exceptions.HTTPError as ex:
+                logger.error("{} error getting authors mix and max date. Aborted.".format(log_prefix))
+                logger.error(ex)
+                return
+
+            aggregations_author = r.json()['aggregations']['author']
+
+            # When there are no more elements, it will return an empty list of buckets
+            if not aggregations_author['buckets']:
+                return
+
+            after = aggregations_author['after_key'][author_field]
+
+            for author in aggregations_author['buckets']:
+                yield author
 
     def check_version_conflicts(self, es_update, version_conflicts, log_prefix, max_retries=5):
         """
@@ -1956,7 +1979,7 @@ class Enrich(ElasticItems):
         self.check_version_conflicts(es_update, r.json()['version_conflicts'], log_prefix, max_retries=retries)
 
     @staticmethod
-    def authors_min_max_dates(date_field, author_field="author_uuid", contribution_type=None):
+    def authors_min_max_dates(date_field, author_field="author_uuid", contribution_type=None, after=None):
         """
         Get the aggregation of author with their min and max activity dates
 
@@ -1964,12 +1987,24 @@ class Enrich(ElasticItems):
         :param author_field: field of the author
         :param contribution_type: name of the contribution type (if any) which the dates are computed for.
             In case there is no specific contribution type, by default all contributions will be considered.
+        :param after: value used for pagination
 
         :return: the query to be executed to get the authors min and max aggregation data
         """
 
-        # Limit aggregations: https://github.com/elastic/elasticsearch/issues/18838
-        # 30000 seems to be a sensible number of the number of people in git
+        # Limit aggregations:
+        # - OpenSearch: 10000
+        #   - https://opensearch.org/docs/latest/opensearch/bucket-agg/
+        # - ElasticSearch: 10000
+        #   - https://discuss.elastic.co/t/increasing-max-buckets-for-specific-visualizations/187390/4
+        #   - When you try to fetch more than 10000 it will return this error message:
+        #     {
+        #       "type": "too_many_buckets_exception",
+        #       "reason": "Trying to create too many buckets. Must be less than or equal to: [10000] but was [20000].
+        #                 This limit can be set by changing the [search.max_buckets] cluster level setting.",
+        #       "max_buckets": 10000
+        #     }
+
         query_type = ""
         if contribution_type:
             query_type = """"query": {
@@ -1981,15 +2016,31 @@ class Enrich(ElasticItems):
               }
             }
           },""" % contribution_type
+
+        query_after = ""
+        if after:
+            query_after = """"after": {
+                  "%s": "%s"
+                },""" % (author_field, after)
+
         es_query = """
         {
           "size": 0,
           %s
           "aggs": {
             "author": {
-              "terms": {
-                "field": "%s",
-                "size": 30000
+              "composite": {
+                "sources": [
+                  {
+                    "%s": {
+                      "terms": {
+                        "field": "%s"
+                      }
+                    }
+                  }
+                ],
+                %s
+                "size": 10000
               },
               "aggs": {
                 "min": {
@@ -2006,7 +2057,7 @@ class Enrich(ElasticItems):
             }
           }
         }
-        """ % (query_type, author_field, date_field, date_field)
+        """ % (query_type, author_field, author_field, query_after, date_field, date_field)
 
         return es_query
 
