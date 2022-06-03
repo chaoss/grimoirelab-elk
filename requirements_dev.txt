@@ -1,0 +1,9 @@
+-e git+https://github.com/chaoss/grimoirelab-sortinghat/#egg=sortinghat
+-e git+https://github.com/chaoss/grimoirelab-toolkit/#egg=grimoirelab-toolkit
+-e git+https://github.com/chaoss/grimoirelab-cereslib/#egg=cereslib
+-e git+https://github.com/chaoss/grimoirelab-graal/#egg=graal
+-e git+https://github.com/chaoss/grimoirelab-perceval/#egg=perceval
+-e git+https://github.com/chaoss/grimoirelab-perceval-mozilla/#egg=perceval-mozilla
+-e git+https://github.com/chaoss/grimoirelab-perceval-opnfv/#egg=perceval-opnfv
+-e git+https://github.com/chaoss/grimoirelab-perceval-puppet/#egg=perceval-puppet
+-e git+https://github.com/chaoss/grimoirelab-perceval-weblate/#egg=perceval-weblate

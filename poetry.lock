@@ -48,25 +48,18 @@ lxml = ["lxml"]
 
 [[package]]
 name = "cereslib"
-version = "0.1.17"
+version = "0.3.0"
 description = "GrimoireLab: Unify, eventize and enrich information from Perceval"
 category = "main"
 optional = false
-python-versions = "^3.7"
-develop = false
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-grimoirelab-toolkit = "^0.2.0"
+grimoirelab-toolkit = ">=0.3.0,<0.4.0"
 numpy = "<=1.18.3"
 pandas = ">=0.22.0,<=0.25.3"
-scipy = "^1.5"
-six = "^1.16.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/chaoss/grimoirelab-cereslib"
-reference = "master"
-resolved_reference = "8b932b159b14e7a1f7cc23c5f496532312bb71b3"
+scipy = ">=1.5,<2.0"
+six = ">=1.16.0,<2.0.0"
 
 [[package]]
 name = "certifi"
@@ -158,7 +151,7 @@ test = ["pytest (>=6.0)", "pytest-cov", "pytest-subtests", "pytest-xdist", "pret
 
 [[package]]
 name = "dill"
-version = "0.3.5"
+version = "0.3.5.1"
 description = "serialize all of python"
 category = "main"
 optional = false
@@ -169,7 +162,7 @@ graph = ["objgraph (>=1.7.2)"]
 
 [[package]]
 name = "dulwich"
-version = "0.20.40"
+version = "0.20.42"
 description = "Python Git Library"
 category = "main"
 optional = false
@@ -184,7 +177,6 @@ fastimport = ["fastimport"]
 https = ["urllib3[secure] (>=1.24.1)"]
 paramiko = ["paramiko"]
 pgp = ["gpg"]
-watch = ["pyinotify"]
 
 [[package]]
 name = "elasticsearch"
@@ -230,7 +222,7 @@ testing = ["pre-commit"]
 
 [[package]]
 name = "feedparser"
-version = "6.0.9"
+version = "6.0.10"
 description = "Universal feed parser, handles RSS 0.9x, RSS 1.0, RSS 2.0, CDF, Atom 0.3, and Atom 1.0 feeds"
 category = "main"
 optional = false
@@ -306,48 +298,34 @@ typing-extensions = {version = ">=3.7.4.3", markers = "python_version < \"3.8\""
 
 [[package]]
 name = "graal"
-version = "0.2.9"
+version = "0.3.0"
 description = "A generic source code analyzer"
 category = "main"
 optional = false
-python-versions = "^3.7"
-develop = false
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
 bandit = ">=1.4.0"
-cloc = "^0.2.5"
-execnet = "^1.9.0"
+cloc = ">=0.2.5,<0.3.0"
+execnet = ">=1.9.0,<2.0.0"
 flake8 = ">=3.7.7"
-grimoirelab-toolkit = {git = "https://github.com/chaoss/grimoirelab-toolkit", branch = "master"}
+grimoirelab-toolkit = ">=0.3.0,<0.4.0"
 lizard = "1.16.6"
 networkx = ">=2.1"
-perceval = {git = "https://github.com/chaoss/grimoirelab-perceval", branch = "master"}
+perceval = ">=0.18,<0.19"
 pydot = ">=1.2.4"
 pylint = ">=1.8.4"
 
-[package.source]
-type = "git"
-url = "https://github.com/chaoss/grimoirelab-graal"
-reference = "master"
-resolved_reference = "b1568c2c191bd55c87fbaac4bf7c4eb3637b1c03"
-
 [[package]]
 name = "grimoirelab-toolkit"
-version = "0.2.0"
+version = "0.3.0"
 description = "Toolkit of common functions used across GrimoireLab"
 category = "main"
 optional = false
-python-versions = "^3.6"
-develop = false
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-python-dateutil = "^2.8.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/chaoss/grimoirelab-toolkit"
-reference = "master"
-resolved_reference = "a1fed329d25731177105fa094fa22b1029fdac1e"
+python-dateutil = ">=2.8.0,<3.0.0"
 
 [[package]]
 name = "httpretty"
@@ -370,7 +348,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "importlib-metadata"
-version = "4.11.3"
+version = "4.11.4"
 description = "Read metadata from Python packages"
 category = "main"
 optional = false
@@ -520,112 +498,77 @@ python-versions = ">=2.6"
 
 [[package]]
 name = "perceval"
-version = "0.17.4"
+version = "0.18.0"
 description = "Send Sir Perceval on a quest to fetch and gather data from software repositories."
 category = "main"
 optional = false
-python-versions = "^3.7"
-develop = false
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-beautifulsoup4 = "^4.3.2"
-cryptography = "^3.3.2"
-dulwich = "^0.20.0"
-feedparser = "^6.0.8"
-grimoirelab-toolkit = "^0.2"
-PyJWT = "^1.7.1"
-python-dateutil = "^2.6.0"
-requests = "^2.7.0"
-urllib3 = "^1.26"
+beautifulsoup4 = ">=4.3.2,<5.0.0"
+cryptography = ">=3.3.2,<4.0.0"
+dulwich = ">=0.20.0,<0.21.0"
+feedparser = ">=6.0.8,<7.0.0"
+grimoirelab-toolkit = ">=0.3,<0.4"
+PyJWT = ">=2.4.0,<3.0.0"
+python-dateutil = ">=2.6.0,<3.0.0"
+requests = ">=2.7.0,<3.0.0"
+urllib3 = ">=1.26,<2.0"
 
 [package.extras]
-docs = ["furo (>=2021.8.31,<2022.0.0)", "myst-parser (>=0.15.2,<0.16.0)"]
-
-[package.source]
-type = "git"
-url = "https://github.com/chaoss/grimoirelab-perceval"
-reference = "master"
-resolved_reference = "d77fa61fc590c471fd157c5a03deaf45dcb5db2f"
+docs = ["myst-parser (>=0.15.2,<0.16.0)", "furo (>=2021.8.31,<2022.0.0)"]
 
 [[package]]
 name = "perceval-mozilla"
-version = "0.2.13"
+version = "0.3.0"
 description = "Bundle of Perceval backends for Mozilla ecosystem."
 category = "main"
 optional = false
-python-versions = "^3.7"
-develop = false
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-grimoirelab-toolkit = "^0.2"
-perceval = "^0.17.4"
-requests = "^2.7.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/chaoss/grimoirelab-perceval-mozilla"
-reference = "master"
-resolved_reference = "3bd2cbe50e79c0e7131d8dc9ce7b5d45bc77049c"
+grimoirelab-toolkit = ">=0.3,<0.4"
+perceval = ">=0.18,<0.19"
+requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-opnfv"
-version = "0.1.20"
+version = "0.2.0"
 description = "Bundle of Perceval backends for OPNFV ecosystem."
 category = "main"
 optional = false
-python-versions = "^3.7"
-develop = false
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-grimoirelab-toolkit = "^0.2"
-perceval = "^0.17.4"
-requests = "^2.7.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/chaoss/grimoirelab-perceval-opnfv"
-reference = "master"
-resolved_reference = "77b4625870e479d5b4e442eba226b8bf1e47fae5"
+grimoirelab-toolkit = ">=0.3,<0.4"
+perceval = ">=0.18,<0.19"
+requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-puppet"
-version = "0.1.19"
+version = "0.2.0"
 description = "Bundle of Perceval backends for Puppet, Inc. ecosystem."
 category = "main"
 optional = false
-python-versions = "^3.7"
-develop = false
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-grimoirelab-toolkit = "^0.2"
-perceval = "^0.17.4"
-requests = "^2.7.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/chaoss/grimoirelab-perceval-puppet"
-reference = "master"
-resolved_reference = "5150a448f9600404b3833e4e804227afcfa259fd"
+grimoirelab-toolkit = ">=0.3,<0.4"
+perceval = ">=0.18,<0.19"
+requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-weblate"
-version = "0.1.1"
+version = "0.2.0"
 description = "Bundle of Perceval backends for Weblate."
 category = "main"
 optional = false
-python-versions = "^3.7"
-develop = false
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-grimoirelab-toolkit = "^0.2"
-perceval = "^0.17.4"
-requests = "^2.7.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/chaoss/grimoirelab-perceval-weblate"
-reference = "master"
-resolved_reference = "85d4177ec6967f0da4da8b40925f12fb86663aa2"
+grimoirelab-toolkit = ">=0.3,<0.4"
+perceval = ">=0.18,<0.19"
+requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "platformdirs"
@@ -676,16 +619,17 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pyjwt"
-version = "1.7.1"
+version = "2.4.0"
 description = "JSON Web Token implementation in Python"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 
 [package.extras]
-crypto = ["cryptography (>=1.4)"]
-flake8 = ["flake8", "flake8-import-order", "pep8-naming"]
-test = ["pytest (>=4.0.1,<5.0.0)", "pytest-cov (>=2.6.0,<3.0.0)", "pytest-runner (>=4.2,<5.0.0)"]
+crypto = ["cryptography (>=3.3.1)"]
+dev = ["sphinx", "sphinx-rtd-theme", "zope.interface", "cryptography (>=3.3.1)", "pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)", "mypy", "pre-commit"]
+docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
+tests = ["pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)"]
 
 [[package]]
 name = "pylint"
@@ -812,29 +756,22 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "sortinghat"
-version = "0.7.18"
+version = "0.7.20"
 description = "A tool to manage identities."
 category = "main"
 optional = false
-python-versions = "^3.7"
-develop = false
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-jinja2 = "~3.0.1"
+jinja2 = ">=3.0.1,<3.1.0"
 numpy = "<1.21.1"
-pandas = ">=0.22, <=0.25.3"
+pandas = ">=0.22,<=0.25.3"
 PyMySQL = ">=0.7.0"
-python-dateutil = "^2.6.0"
+python-dateutil = ">=2.6.0,<3.0.0"
 pyyaml = ">=3.12"
-requests = "^2.9"
-sqlalchemy = "~1.3.0"
-urllib3 = "^1.22"
-
-[package.source]
-type = "git"
-url = "https://github.com/chaoss/grimoirelab-sortinghat"
-reference = "master"
-resolved_reference = "9775a54f1a539d05c15ed254082d4ef0019da508"
+requests = ">=2.9,<3.0"
+sqlalchemy = ">=1.3.0,<1.4.0"
+urllib3 = ">=1.22,<2.0"
 
 [[package]]
 name = "soupsieve"
@@ -906,7 +843,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "typed-ast"
-version = "1.5.3"
+version = "1.5.4"
 description = "a fork of Python 2 and 3 ast modules with type comment support"
 category = "main"
 optional = false
@@ -956,7 +893,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "5694b6222b8769491fb426e685c34f9c7a7271eb03d501a0d6bbffbb4b9d5242"
+content-hash = "3d9abfb544bbba22df4a75ed27c6002fc5e71e536b1ab85c6e940306bbdaf62f"
 
 [metadata.files]
 astroid = [
@@ -971,7 +908,10 @@ beautifulsoup4 = [
     {file = "beautifulsoup4-4.11.1-py3-none-any.whl", hash = "sha256:58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30"},
     {file = "beautifulsoup4-4.11.1.tar.gz", hash = "sha256:ad9aa55b65ef2808eb405f46cf74df7fcb7044d5cbc26487f96eb2ef2e436693"},
 ]
-cereslib = []
+cereslib = [
+    {file = "cereslib-0.3.0-py3-none-any.whl", hash = "sha256:97ebe44fd6c058015f724294d22624bb44b87d978e88718c9e8d96114a4261d3"},
+    {file = "cereslib-0.3.0.tar.gz", hash = "sha256:394634ea09ef38ad9840db84425cb0adff37233e69d801db821bc3111c884579"},
+]
 certifi = [
     {file = "certifi-2022.5.18.1-py3-none-any.whl", hash = "sha256:f1d53542ee8cbedbe2118b5686372fb33c297fcd6379b050cca0ef13a597382a"},
     {file = "certifi-2022.5.18.1.tar.gz", hash = "sha256:9c5705e395cd70084351dd8ad5c41e65655e08ce46f2ec9cf6c2c08390f71eb7"},
@@ -1118,11 +1058,31 @@ cryptography = [
     {file = "cryptography-3.4.8.tar.gz", hash = "sha256:94cc5ed4ceaefcbe5bf38c8fba6a21fc1d365bb8fb826ea1688e3370b2e24a1c"},
 ]
 dill = [
-    {file = "dill-0.3.5-py2.py3-none-any.whl", hash = "sha256:6eb4bb70a98509e69204e621942c4306580d5bf2229f450f04fcf2efca3908e5"},
-    {file = "dill-0.3.5.tar.gz", hash = "sha256:3a11d19c15d409296a2ee714b1dbd5efb733a329f0d89c0e58aad6154ab6f2f5"},
+    {file = "dill-0.3.5.1-py2.py3-none-any.whl", hash = "sha256:33501d03270bbe410c72639b350e941882a8b0fd55357580fbc873fba0c59302"},
+    {file = "dill-0.3.5.1.tar.gz", hash = "sha256:d75e41f3eff1eee599d738e76ba8f4ad98ea229db8b085318aa2b3333a208c86"},
 ]
 dulwich = [
-    {file = "dulwich-0.20.40.tar.gz", hash = "sha256:bed70efe0b7dd51a47bcea9b984ab06a675d7438b78b32da1cbafcf750fbbad7"},
+    {file = "dulwich-0.20.42-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:1e47b2f84d280b9bc0060a19b767402a43efb3a37774d6f613a23e1c1d813e43"},
+    {file = "dulwich-0.20.42-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a3f67e145762fce0f48703f9e4ce20577e52585a9efe9282a74ed2b5e9059a0f"},
+    {file = "dulwich-0.20.42-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:f4a92eb77377886fdf5c7043842d83372c37175e0af3fcfbb226414ce30a1f88"},
+    {file = "dulwich-0.20.42-cp310-cp310-win_amd64.whl", hash = "sha256:546c3cfd8df20cd145cb8751e3abd52d84911422014a93b95bb324274f5b0756"},
+    {file = "dulwich-0.20.42-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:bf9944b8af7d8655056af6abafa72f09796aadef40b56db395beeaac93d82e6c"},
+    {file = "dulwich-0.20.42-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d6adb07cb06922b4814ee1080f39e36eb15e08fff5ed51b0f78f162142b2b2e4"},
+    {file = "dulwich-0.20.42-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:ae8a475c0a7d981255695e9f5a15c7de5f45a2cad56633171cc771820850a6b2"},
+    {file = "dulwich-0.20.42-cp36-cp36m-win_amd64.whl", hash = "sha256:e56e3eeb091f9ed9a7156c0bccc3dcf13d44aada86303232f68ea17ecd6aa391"},
+    {file = "dulwich-0.20.42-cp37-cp37m-macosx_10_15_x86_64.whl", hash = "sha256:5ce7a97ea2c25a71c18749de449f81a9728e77e33a6f23d891785c00d05bca2e"},
+    {file = "dulwich-0.20.42-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:6c488427dcbc0861f5bf16829298f061332667af6efd65fab5d8f22ab896e71d"},
+    {file = "dulwich-0.20.42-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:9f8c224dece64f9750bedfdeaf89ed94d9ae2f38f9600812615bd5dc4ea84f53"},
+    {file = "dulwich-0.20.42-cp37-cp37m-win_amd64.whl", hash = "sha256:6df2d3fa24c69cd2c6daa2ba05c559e3876819d5b1abfc84b849f34686a56fd9"},
+    {file = "dulwich-0.20.42-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:2145f1299b221d60379517983f430d68f43243df1bde86b2c793ac752833bf3c"},
+    {file = "dulwich-0.20.42-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:91299d239afce5246eba38fe0667d7b9dae0d058360fbe253c6f388650dc8b01"},
+    {file = "dulwich-0.20.42-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:1cdd1ad1bd067b1bbb726c5d0865f5db2cf2824b9c77737e028cd157ceec1efb"},
+    {file = "dulwich-0.20.42-cp38-cp38-win_amd64.whl", hash = "sha256:76e2da298a7bfd59a522750903656c7a2202a47a107ae711e0741b08729c51ee"},
+    {file = "dulwich-0.20.42-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:67a626230665bc95f0aa955530fac7b8802c62d7a254acabc2764ac1985afcba"},
+    {file = "dulwich-0.20.42-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2f69595e14061752cff04ac0cbada210d550645e189071bc3e24c9b1043d3064"},
+    {file = "dulwich-0.20.42-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:3ac93b9df220ee5f99c86538d46c337d82d35caa72d013b95084ca06325e90c9"},
+    {file = "dulwich-0.20.42-cp39-cp39-win_amd64.whl", hash = "sha256:23922557bc487597ff1a0efc56e4436e275a82837b55e5f733e3e05c873e92b1"},
+    {file = "dulwich-0.20.42.tar.gz", hash = "sha256:72ba3b60ae6a554d1332b3b40a345febe16ec469cf6014bb443b719902e33ef0"},
 ]
 elasticsearch = [
     {file = "elasticsearch-6.3.1-py2.py3-none-any.whl", hash = "sha256:7546cc08e3899716e12fe67d12d7cfe9a64647014d1134b014c3c392b63cad42"},
@@ -1137,8 +1097,8 @@ execnet = [
     {file = "execnet-1.9.0.tar.gz", hash = "sha256:8f694f3ba9cc92cab508b152dcfe322153975c29bda272e2fd7f3f00f36e47c5"},
 ]
 feedparser = [
-    {file = "feedparser-6.0.9-py3-none-any.whl", hash = "sha256:a522b2b81f3914a74ae44161a341940f74811bd29be5b4c2a689e6e6be51cd39"},
-    {file = "feedparser-6.0.9.tar.gz", hash = "sha256:dad42e7beaec55f99c08b2b0cf7288bc7cfd24b6f72c8ef85478bcb55648cd42"},
+    {file = "feedparser-6.0.10-py3-none-any.whl", hash = "sha256:79c257d526d13b944e965f6095700587f27388e50ea16fd245babe4dfae7024f"},
+    {file = "feedparser-6.0.10.tar.gz", hash = "sha256:27da485f4637ce7163cdeab13a80312b93b7d0c1b775bef4a47629a3110bca51"},
 ]
 flake8 = [
     {file = "flake8-3.9.2-py2.py3-none-any.whl", hash = "sha256:bf8fd333346d844f616e8d47905ef3a3384edae6b4e9beb0c5101e25e3110907"},
@@ -1160,8 +1120,14 @@ gitpython = [
     {file = "GitPython-3.1.27-py3-none-any.whl", hash = "sha256:5b68b000463593e05ff2b261acff0ff0972df8ab1b70d3cdbd41b546c8b8fc3d"},
     {file = "GitPython-3.1.27.tar.gz", hash = "sha256:1c885ce809e8ba2d88a29befeb385fcea06338d3640712b59ca623c220bb5704"},
 ]
-graal = []
-grimoirelab-toolkit = []
+graal = [
+    {file = "graal-0.3.0-py3-none-any.whl", hash = "sha256:9723b32f26f6b15188e6b1e05d312c7bcf6291c532b19eafb9a3712eff4bdd06"},
+    {file = "graal-0.3.0.tar.gz", hash = "sha256:bf46e1d01e77775f8b213848361f4afad862b15c4abc45d1fb3444d05d752d99"},
+]
+grimoirelab-toolkit = [
+    {file = "grimoirelab-toolkit-0.3.0.tar.gz", hash = "sha256:8d443d4047e18cc858fcfdcd9143c5d54444e7a6355e36fe26818e0125b576ae"},
+    {file = "grimoirelab_toolkit-0.3.0-py3-none-any.whl", hash = "sha256:604698d8a06acfe61d89c86b2230c6b10e3a60b5b549cfa17d7bce3e9b45b935"},
+]
 httpretty = [
     {file = "httpretty-0.9.7.tar.gz", hash = "sha256:66216f26b9d2c52e81808f3e674a6fb65d4bf719721394a1a9be926177e55fbe"},
 ]
@@ -1170,8 +1136,8 @@ idna = [
     {file = "idna-3.3.tar.gz", hash = "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"},
 ]
 importlib-metadata = [
-    {file = "importlib_metadata-4.11.3-py3-none-any.whl", hash = "sha256:1208431ca90a8cca1a6b8af391bb53c1a2db74e5d1cef6ddced95d4b2062edc6"},
-    {file = "importlib_metadata-4.11.3.tar.gz", hash = "sha256:ea4c597ebf37142f827b8f39299579e31685c31d3a438b59f469406afd0f2539"},
+    {file = "importlib_metadata-4.11.4-py3-none-any.whl", hash = "sha256:c58c8eb8a762858f49e18436ff552e83914778e50e9d2f1660535ffb364552ec"},
+    {file = "importlib_metadata-4.11.4.tar.gz", hash = "sha256:5d26852efe48c0a32b0509ffbc583fda1a2266545a78d104a6f4aff3db17d700"},
 ]
 isort = [
     {file = "isort-5.10.1-py3-none-any.whl", hash = "sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7"},
@@ -1330,11 +1296,26 @@ pbr = [
     {file = "pbr-5.9.0-py2.py3-none-any.whl", hash = "sha256:e547125940bcc052856ded43be8e101f63828c2d94239ffbe2b327ba3d5ccf0a"},
     {file = "pbr-5.9.0.tar.gz", hash = "sha256:e8dca2f4b43560edef58813969f52a56cef023146cbb8931626db80e6c1c4308"},
 ]
-perceval = []
-perceval-mozilla = []
-perceval-opnfv = []
-perceval-puppet = []
-perceval-weblate = []
+perceval = [
+    {file = "perceval-0.18.0-py3-none-any.whl", hash = "sha256:280da166ccd44c6d34df192079ca7b214c0f9bef81c58a197fef455b981a3a77"},
+    {file = "perceval-0.18.0.tar.gz", hash = "sha256:d66ec4c1ccc8c9241e802d9b5e42a7bb8caf4ccf84afdfa2e46efe70bf0371b6"},
+]
+perceval-mozilla = [
+    {file = "perceval-mozilla-0.3.0.tar.gz", hash = "sha256:d6edee166791bb1f435a755ea4c845bfab1b39290c1fc0cf69d58b773014c83f"},
+    {file = "perceval_mozilla-0.3.0-py3-none-any.whl", hash = "sha256:9d2e9ea7e6ab5713fde0ff25427ceae30eba55bbf8de6912f984a4f74cf979cc"},
+]
+perceval-opnfv = [
+    {file = "perceval-opnfv-0.2.0.tar.gz", hash = "sha256:83a7e5c97caa28987cadad85d7c41de0798479bf59ff378973e2f2cdbd589e56"},
+    {file = "perceval_opnfv-0.2.0-py3-none-any.whl", hash = "sha256:79746689054d9f0f57c79ee59b8be7f1a5688969824607ebb6b51ed700613ab5"},
+]
+perceval-puppet = [
+    {file = "perceval-puppet-0.2.0.tar.gz", hash = "sha256:bda66d7a50ae34fa10d72501ed3bab655fcb1b662c5f3c3d0cdf13d498271ace"},
+    {file = "perceval_puppet-0.2.0-py3-none-any.whl", hash = "sha256:acd17a20f6797a97c3825cff51977834074362c1cc5b83f5897827032346d579"},
+]
+perceval-weblate = [
+    {file = "perceval-weblate-0.2.0.tar.gz", hash = "sha256:7a77426240e56d70d8a474023cdd7580e79e01ebef65c4971e4dc020e7040c7c"},
+    {file = "perceval_weblate-0.2.0-py3-none-any.whl", hash = "sha256:12f81d51a70421418120abaf5196c9cf75bc439880cbf8fb7984a73bbd802577"},
+]
 platformdirs = [
     {file = "platformdirs-2.5.2-py3-none-any.whl", hash = "sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788"},
     {file = "platformdirs-2.5.2.tar.gz", hash = "sha256:58c8abb07dcb441e6ee4b11d8df0ac856038f944ab98b7be6b27b2a3c7feef19"},
@@ -1356,8 +1337,8 @@ pyflakes = [
     {file = "pyflakes-2.3.1.tar.gz", hash = "sha256:f5bc8ecabc05bb9d291eb5203d6810b49040f6ff446a756326104746cc00c1db"},
 ]
 pyjwt = [
-    {file = "PyJWT-1.7.1-py2.py3-none-any.whl", hash = "sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e"},
-    {file = "PyJWT-1.7.1.tar.gz", hash = "sha256:8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"},
+    {file = "PyJWT-2.4.0-py3-none-any.whl", hash = "sha256:72d1d253f32dbd4f5c88eaf1fdc62f3a19f676ccbadb9dbc5d07e951b2b26daf"},
+    {file = "PyJWT-2.4.0.tar.gz", hash = "sha256:d42908208c699b3b973cbeb01a969ba6a96c821eefb1c5bfe4c390c01d67abba"},
 ]
 pylint = [
     {file = "pylint-2.13.9-py3-none-any.whl", hash = "sha256:705c620d388035bdd9ff8b44c5bcdd235bfb49d276d488dd2c8ff1736aa42526"},
@@ -1450,7 +1431,10 @@ smmap = [
     {file = "smmap-5.0.0-py3-none-any.whl", hash = "sha256:2aba19d6a040e78d8b09de5c57e96207b09ed71d8e55ce0959eeee6c8e190d94"},
     {file = "smmap-5.0.0.tar.gz", hash = "sha256:c840e62059cd3be204b0c9c9f74be2c09d5648eddd4580d9314c3ecde0b30936"},
 ]
-sortinghat = []
+sortinghat = [
+    {file = "sortinghat-0.7.20-py3-none-any.whl", hash = "sha256:7c9bd644232a76455adec377e841f3f9bcb7ec9e31ff39c2ff13639131b07918"},
+    {file = "sortinghat-0.7.20.tar.gz", hash = "sha256:abe4404b1467323fd9cb4ec3c296ae490dde87fd78b221411f507799fb5fc252"},
+]
 soupsieve = [
     {file = "soupsieve-2.3.2.post1-py3-none-any.whl", hash = "sha256:3b2503d3c7084a42b1ebd08116e5f81aadfaea95863628c80a3b774a11b7c759"},
     {file = "soupsieve-2.3.2.post1.tar.gz", hash = "sha256:fc53893b3da2c33de295667a0e19f078c14bf86544af307354de5fcf12a3f30d"},
@@ -1525,30 +1509,30 @@ tomli = [
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 typed-ast = [
-    {file = "typed_ast-1.5.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:9ad3b48cf2b487be140072fb86feff36801487d4abb7382bb1929aaac80638ea"},
-    {file = "typed_ast-1.5.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:542cd732351ba8235f20faa0fc7398946fe1a57f2cdb289e5497e1e7f48cfedb"},
-    {file = "typed_ast-1.5.3-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5dc2c11ae59003d4a26dda637222d9ae924387f96acae9492df663843aefad55"},
-    {file = "typed_ast-1.5.3-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:fd5df1313915dbd70eaaa88c19030b441742e8b05e6103c631c83b75e0435ccc"},
-    {file = "typed_ast-1.5.3-cp310-cp310-win_amd64.whl", hash = "sha256:e34f9b9e61333ecb0f7d79c21c28aa5cd63bec15cb7e1310d7d3da6ce886bc9b"},
-    {file = "typed_ast-1.5.3-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:f818c5b81966d4728fec14caa338e30a70dfc3da577984d38f97816c4b3071ec"},
-    {file = "typed_ast-1.5.3-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:3042bfc9ca118712c9809201f55355479cfcdc17449f9f8db5e744e9625c6805"},
-    {file = "typed_ast-1.5.3-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:4fff9fdcce59dc61ec1b317bdb319f8f4e6b69ebbe61193ae0a60c5f9333dc49"},
-    {file = "typed_ast-1.5.3-cp36-cp36m-win_amd64.whl", hash = "sha256:8e0b8528838ffd426fea8d18bde4c73bcb4167218998cc8b9ee0a0f2bfe678a6"},
-    {file = "typed_ast-1.5.3-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:8ef1d96ad05a291f5c36895d86d1375c0ee70595b90f6bb5f5fdbee749b146db"},
-    {file = "typed_ast-1.5.3-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ed44e81517364cb5ba367e4f68fca01fba42a7a4690d40c07886586ac267d9b9"},
-    {file = "typed_ast-1.5.3-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:f60d9de0d087454c91b3999a296d0c4558c1666771e3460621875021bf899af9"},
-    {file = "typed_ast-1.5.3-cp37-cp37m-win_amd64.whl", hash = "sha256:9e237e74fd321a55c90eee9bc5d44be976979ad38a29bbd734148295c1ce7617"},
-    {file = "typed_ast-1.5.3-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:ee852185964744987609b40aee1d2eb81502ae63ee8eef614558f96a56c1902d"},
-    {file = "typed_ast-1.5.3-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:27e46cdd01d6c3a0dd8f728b6a938a6751f7bd324817501c15fb056307f918c6"},
-    {file = "typed_ast-1.5.3-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d64dabc6336ddc10373922a146fa2256043b3b43e61f28961caec2a5207c56d5"},
-    {file = "typed_ast-1.5.3-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:8cdf91b0c466a6c43f36c1964772918a2c04cfa83df8001ff32a89e357f8eb06"},
-    {file = "typed_ast-1.5.3-cp38-cp38-win_amd64.whl", hash = "sha256:9cc9e1457e1feb06b075c8ef8aeb046a28ec351b1958b42c7c31c989c841403a"},
-    {file = "typed_ast-1.5.3-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:e20d196815eeffb3d76b75223e8ffed124e65ee62097e4e73afb5fec6b993e7a"},
-    {file = "typed_ast-1.5.3-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:37e5349d1d5de2f4763d534ccb26809d1c24b180a477659a12c4bde9dd677d74"},
-    {file = "typed_ast-1.5.3-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c9f1a27592fac87daa4e3f16538713d705599b0a27dfe25518b80b6b017f0a6d"},
-    {file = "typed_ast-1.5.3-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:8831479695eadc8b5ffed06fdfb3e424adc37962a75925668deeb503f446c0a3"},
-    {file = "typed_ast-1.5.3-cp39-cp39-win_amd64.whl", hash = "sha256:20d5118e494478ef2d3a2702d964dae830aedd7b4d3b626d003eea526be18718"},
-    {file = "typed_ast-1.5.3.tar.gz", hash = "sha256:27f25232e2dd0edfe1f019d6bfaaf11e86e657d9bdb7b0956db95f560cceb2b3"},
+    {file = "typed_ast-1.5.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:669dd0c4167f6f2cd9f57041e03c3c2ebf9063d0757dc89f79ba1daa2bfca9d4"},
+    {file = "typed_ast-1.5.4-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:211260621ab1cd7324e0798d6be953d00b74e0428382991adfddb352252f1d62"},
+    {file = "typed_ast-1.5.4-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:267e3f78697a6c00c689c03db4876dd1efdfea2f251a5ad6555e82a26847b4ac"},
+    {file = "typed_ast-1.5.4-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:c542eeda69212fa10a7ada75e668876fdec5f856cd3d06829e6aa64ad17c8dfe"},
+    {file = "typed_ast-1.5.4-cp310-cp310-win_amd64.whl", hash = "sha256:a9916d2bb8865f973824fb47436fa45e1ebf2efd920f2b9f99342cb7fab93f72"},
+    {file = "typed_ast-1.5.4-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:79b1e0869db7c830ba6a981d58711c88b6677506e648496b1f64ac7d15633aec"},
+    {file = "typed_ast-1.5.4-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a94d55d142c9265f4ea46fab70977a1944ecae359ae867397757d836ea5a3f47"},
+    {file = "typed_ast-1.5.4-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:183afdf0ec5b1b211724dfef3d2cad2d767cbefac291f24d69b00546c1837fb6"},
+    {file = "typed_ast-1.5.4-cp36-cp36m-win_amd64.whl", hash = "sha256:639c5f0b21776605dd6c9dbe592d5228f021404dafd377e2b7ac046b0349b1a1"},
+    {file = "typed_ast-1.5.4-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:cf4afcfac006ece570e32d6fa90ab74a17245b83dfd6655a6f68568098345ff6"},
+    {file = "typed_ast-1.5.4-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ed855bbe3eb3715fca349c80174cfcfd699c2f9de574d40527b8429acae23a66"},
+    {file = "typed_ast-1.5.4-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:6778e1b2f81dfc7bc58e4b259363b83d2e509a65198e85d5700dfae4c6c8ff1c"},
+    {file = "typed_ast-1.5.4-cp37-cp37m-win_amd64.whl", hash = "sha256:0261195c2062caf107831e92a76764c81227dae162c4f75192c0d489faf751a2"},
+    {file = "typed_ast-1.5.4-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:2efae9db7a8c05ad5547d522e7dbe62c83d838d3906a3716d1478b6c1d61388d"},
+    {file = "typed_ast-1.5.4-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:7d5d014b7daa8b0bf2eaef684295acae12b036d79f54178b92a2b6a56f92278f"},
+    {file = "typed_ast-1.5.4-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:370788a63915e82fd6f212865a596a0fefcbb7d408bbbb13dea723d971ed8bdc"},
+    {file = "typed_ast-1.5.4-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:4e964b4ff86550a7a7d56345c7864b18f403f5bd7380edf44a3c1fb4ee7ac6c6"},
+    {file = "typed_ast-1.5.4-cp38-cp38-win_amd64.whl", hash = "sha256:683407d92dc953c8a7347119596f0b0e6c55eb98ebebd9b23437501b28dcbb8e"},
+    {file = "typed_ast-1.5.4-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:4879da6c9b73443f97e731b617184a596ac1235fe91f98d279a7af36c796da35"},
+    {file = "typed_ast-1.5.4-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:3e123d878ba170397916557d31c8f589951e353cc95fb7f24f6bb69adc1a8a97"},
+    {file = "typed_ast-1.5.4-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ebd9d7f80ccf7a82ac5f88c521115cc55d84e35bf8b446fcd7836eb6b98929a3"},
+    {file = "typed_ast-1.5.4-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:98f80dee3c03455e92796b58b98ff6ca0b2a6f652120c263efdba4d6c5e58f72"},
+    {file = "typed_ast-1.5.4-cp39-cp39-win_amd64.whl", hash = "sha256:0fdbcf2fef0ca421a3f5912555804296f0b0960f0418c440f5d6d3abb549f3e1"},
+    {file = "typed_ast-1.5.4.tar.gz", hash = "sha256:39e21ceb7388e4bb37f4c679d72707ed46c2fbf2a5609b8b8ebc4b067d977df2"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.2.0-py3-none-any.whl", hash = "sha256:6657594ee297170d19f67d55c05852a874e7eb634f4f753dbd667855e07c1708"},

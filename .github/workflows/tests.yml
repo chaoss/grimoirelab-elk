@@ -51,6 +51,7 @@ jobs:
         poetry run pip install setuptools==57.5.0
         poetry install -vvv
         poetry add -D coveralls
+        poetry run pip install -r requirements_dev.txt
     - name: Verify Elasticsearch connection
       run: |
         curl -fsSL "http://localhost:9200/_cat/health?h=status"
