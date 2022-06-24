@@ -1,0 +1,12 @@
+---
+title: Poetry build version updated
+category: fixed
+author: Santiago Dueñas <sduenas@bitergia.com>
+issue: null
+notes: >
+  The current version of the `poetry` builder
+  was old and caused some problems when installing
+  packages in developer mode. With this
+  new version, it's possible to install ELK in
+  developer or editable mode without using
+  `setuptools` files (i.e. `setup.cfg` and `setup.py`).
