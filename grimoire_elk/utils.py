@@ -26,6 +26,8 @@ import sys
 
 import requests
 
+import pkg_resources
+
 from grimoire_elk.errors import ElasticError
 from grimoire_elk.elastic import ElasticSearch
 # Connectors for Graal
@@ -172,6 +174,8 @@ logger = logging.getLogger(__name__)
 
 kibiter_version = None
 
+ENTRY_POINT_NAME = "grimoire_elk"
+
 
 def get_connector_from_name(name):
 
@@ -223,54 +227,58 @@ def get_connector_name_from_cls_name(cls_name):
 
 def get_connectors():
 
-    return {"askbot": [Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
-            "bugzilla": [Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
-            "bugzillarest": [BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
-            "cocom": [CoCom, GraalOcean, CocomEnrich, CoComCommand],
-            "colic": [CoLic, GraalOcean, ColicEnrich, CoLicCommand],
-            "dockerdeps": [CoDep, GraalOcean, Dockerdeps, CoDepCommand],
-            "dockersmells": [CoQua, GraalOcean, Dockersmells, CoQuaCommand],
-            "confluence": [Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
-            "crates": [Crates, CratesOcean, CratesEnrich, CratesCommand],
-            "discourse": [Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
-            "dockerhub": [DockerHub, DockerHubOcean, DockerHubEnrich, DockerHubCommand],
-            "functest": [Functest, FunctestOcean, FunctestEnrich, FunctestCommand],
-            "gerrit": [Gerrit, GerritOcean, GerritEnrich, GerritCommand],
-            "git": [Git, GitOcean, GitEnrich, GitCommand],
-            "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
-            "githubql": [GitHubQL, GitHubQLOcean, GitHubQLEnrich, GitHubQLCommand],
-            "github2": [GitHub, GitHubOcean, GitHubEnrich2, GitHubCommand],
-            "gitlab": [GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
-            "gitter": [Gitter, GitterOcean, GitterEnrich, GitterCommand],
-            "google_hits": [GoogleHits, GoogleHitsOcean, GoogleHitsEnrich, GoogleHitsCommand],
-            "groupsio": [Groupsio, GroupsioOcean, GroupsioEnrich, GroupsioCommand],
-            "hyperkitty": [HyperKitty, HyperKittyOcean, HyperKittyEnrich, HyperKittyCommand],
-            "jenkins": [Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
-            "jira": [Jira, JiraOcean, JiraEnrich, JiraCommand],
-            "kitsune": [Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
-            "launchpad": [Launchpad, LaunchpadOcean, LaunchpadEnrich, LaunchpadCommand],
-            "mattermost": [Mattermost, MattermostOcean, MattermostEnrich, MattermostCommand],
-            "mbox": [MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
-            "mediawiki": [MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
-            "meetup": [Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
-            "mozillaclub": [MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
-            "nntp": [NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
-            "pagure": [Pagure, PagureOcean, PagureEnrich, PagureCommand],
-            "phabricator": [Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
-            "pipermail": [Pipermail, PipermailOcean, PipermailEnrich, PipermailCommand],
-            "puppetforge": [PuppetForge, PuppetForgeOcean, PuppetForgeEnrich, PuppetForgeCommand],
-            "redmine": [Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
-            "remo": [ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
-            "rocketchat": [RocketChat, RocketChatOcean, RocketChatEnrich, RocketChatCommand],
-            "rss": [RSS, RSSOcean, RSSEnrich, RSSCommand],
-            "slack": [Slack, SlackOcean, SlackEnrich, SlackCommand],
-            "stackexchange": [StackExchange, StackExchangeOcean,
-                              StackExchangeEnrich, StackExchangeCommand],
-            "supybot": [Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
-            "telegram": [Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
-            "twitter": [Twitter, TwitterOcean, TwitterEnrich, TwitterCommand],
-            "weblate": [Weblate, WeblateOcean, WeblateEnrich, WeblateCommand]
-            }  # Will come from Registry
+    connectors = {"askbot": [Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
+                  "bugzilla": [Bugzilla, BugzillaOcean, BugzillaEnrich, BugzillaCommand],
+                  "bugzillarest": [BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
+                  "cocom": [CoCom, GraalOcean, CocomEnrich, CoComCommand],
+                  "colic": [CoLic, GraalOcean, ColicEnrich, CoLicCommand],
+                  "dockerdeps": [CoDep, GraalOcean, Dockerdeps, CoDepCommand],
+                  "dockersmells": [CoQua, GraalOcean, Dockersmells, CoQuaCommand],
+                  "confluence": [Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
+                  "crates": [Crates, CratesOcean, CratesEnrich, CratesCommand],
+                  "discourse": [Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
+                  "dockerhub": [DockerHub, DockerHubOcean, DockerHubEnrich, DockerHubCommand],
+                  "functest": [Functest, FunctestOcean, FunctestEnrich, FunctestCommand],
+                  "gerrit": [Gerrit, GerritOcean, GerritEnrich, GerritCommand],
+                  "git": [Git, GitOcean, GitEnrich, GitCommand],
+                  "github": [GitHub, GitHubOcean, GitHubEnrich, GitHubCommand],
+                  "githubql": [GitHubQL, GitHubQLOcean, GitHubQLEnrich, GitHubQLCommand],
+                  "github2": [GitHub, GitHubOcean, GitHubEnrich2, GitHubCommand],
+                  "gitlab": [GitLab, GitLabOcean, GitLabEnrich, GitLabCommand],
+                  "gitter": [Gitter, GitterOcean, GitterEnrich, GitterCommand],
+                  "google_hits": [GoogleHits, GoogleHitsOcean, GoogleHitsEnrich, GoogleHitsCommand],
+                  "groupsio": [Groupsio, GroupsioOcean, GroupsioEnrich, GroupsioCommand],
+                  "hyperkitty": [HyperKitty, HyperKittyOcean, HyperKittyEnrich, HyperKittyCommand],
+                  "jenkins": [Jenkins, JenkinsOcean, JenkinsEnrich, JenkinsCommand],
+                  "jira": [Jira, JiraOcean, JiraEnrich, JiraCommand],
+                  "kitsune": [Kitsune, KitsuneOcean, KitsuneEnrich, KitsuneCommand],
+                  "launchpad": [Launchpad, LaunchpadOcean, LaunchpadEnrich, LaunchpadCommand],
+                  "mattermost": [Mattermost, MattermostOcean, MattermostEnrich, MattermostCommand],
+                  "mbox": [MBox, MBoxOcean, MBoxEnrich, MBoxCommand],
+                  "mediawiki": [MediaWiki, MediaWikiOcean, MediaWikiEnrich, MediaWikiCommand],
+                  "meetup": [Meetup, MeetupOcean, MeetupEnrich, MeetupCommand],
+                  "mozillaclub": [MozillaClub, MozillaClubOcean, MozillaClubEnrich, MozillaClubCommand],
+                  "nntp": [NNTP, NNTPOcean, NNTPEnrich, NNTPCommand],
+                  "pagure": [Pagure, PagureOcean, PagureEnrich, PagureCommand],
+                  "phabricator": [Phabricator, PhabricatorOcean, PhabricatorEnrich, PhabricatorCommand],
+                  "pipermail": [Pipermail, PipermailOcean, PipermailEnrich, PipermailCommand],
+                  "puppetforge": [PuppetForge, PuppetForgeOcean, PuppetForgeEnrich, PuppetForgeCommand],
+                  "redmine": [Redmine, RedmineOcean, RedmineEnrich, RedmineCommand],
+                  "remo": [ReMo, ReMoOcean, ReMoEnrich, ReMoCommand],
+                  "rocketchat": [RocketChat, RocketChatOcean, RocketChatEnrich, RocketChatCommand],
+                  "rss": [RSS, RSSOcean, RSSEnrich, RSSCommand],
+                  "slack": [Slack, SlackOcean, SlackEnrich, SlackCommand],
+                  "stackexchange": [StackExchange, StackExchangeOcean,
+                                    StackExchangeEnrich, StackExchangeCommand],
+                  "supybot": [Supybot, SupybotOcean, SupybotEnrich, SupybotCommand],
+                  "telegram": [Telegram, TelegramOcean, TelegramEnrich, TelegramCommand],
+                  "twitter": [Twitter, TwitterOcean, TwitterEnrich, TwitterCommand],
+                  "weblate": [Weblate, WeblateOcean, WeblateEnrich, WeblateCommand]
+                  }  # Will come from Registry
+
+    for entry_point in pkg_resources.iter_entry_points(ENTRY_POINT_NAME):
+        connectors.update(entry_point.load()())
+    return connectors
 
 
 def get_elastic(url, es_index, clean=None, backend=None, es_aliases=None, mapping=None):
