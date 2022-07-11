@@ -29,8 +29,6 @@ import unittest
 
 from base import TestBaseBackend, DB_SORTINGHAT
 from grimoire_elk.enriched.enrich import (logger,
-                                          DEMOGRAPHICS_ALIAS,
-                                          DEMOGRAPHICS_CONTRIBUTION_ALIAS,
                                           anonymize_url)
 from grimoire_elk.enriched.utils import REPO_LABELS
 
@@ -238,12 +236,13 @@ class TestGerrit(TestBaseBackend):
     def test_demography_study(self):
         """ Test that the demography study works correctly """
 
+        alias = "demographics"
         study, ocean_backend, enrich_backend = self._test_study('enrich_demography')
 
         with self.assertLogs(logger, level='INFO') as cm:
 
             if study.__name__ == "enrich_demography":
-                study(ocean_backend, enrich_backend, date_field="grimoire_creation_date")
+                study(ocean_backend, enrich_backend, alias, date_field="grimoire_creation_date")
 
             self.assertEqual(cm.output[0],
                              'INFO:grimoire_elk.enriched.enrich:[gerrit] '
@@ -265,17 +264,18 @@ class TestGerrit(TestBaseBackend):
 
         r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
                                                 headers=HEADER_JSON, verify=False)
-        self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
+        self.assertIn(alias, r.json()[enrich_backend.elastic.index]['aliases'])
 
     def test_demography_contribution_study(self):
         """ Test that the demography contribution study works correctly """
 
+        alias = "demographics_contribution"
         study, ocean_backend, enrich_backend = self._test_study('enrich_demography_contribution')
 
         with self.assertLogs(logger, level='INFO') as cm:
 
             if study.__name__ == "enrich_demography_contribution":
-                study(ocean_backend, enrich_backend, date_field="grimoire_creation_date")
+                study(ocean_backend, enrich_backend, alias, date_field="grimoire_creation_date")
 
             self.assertEqual(cm.output[0],
                              'INFO:grimoire_elk.enriched.enrich:[gerrit] '
@@ -306,7 +306,7 @@ class TestGerrit(TestBaseBackend):
 
         r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
                                                 headers=HEADER_JSON, verify=False)
-        self.assertIn(DEMOGRAPHICS_CONTRIBUTION_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
+        self.assertIn(alias, r.json()[enrich_backend.elastic.index]['aliases'])
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
