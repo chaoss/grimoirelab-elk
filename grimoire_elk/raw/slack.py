@@ -58,6 +58,10 @@ class Mapping(BaseMapping):
                                         }
                                     }
                                 },
+                                "file": {
+                                    "dynamic": false,
+                                    "properties": {}
+                                },
                                 "files": {
                                     "dynamic": false,
                                     "properties": {}
