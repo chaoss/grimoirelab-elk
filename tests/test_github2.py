@@ -25,7 +25,7 @@ import unittest.mock
 from unittest.mock import MagicMock
 
 from base import TestBaseBackend
-from grimoire_elk.enriched.enrich import logger, DEMOGRAPHICS_ALIAS
+from grimoire_elk.enriched.enrich import logger
 from grimoire_elk.enriched.utils import REPO_LABELS, anonymize_url
 from grimoire_elk.raw.github import GitHubOcean
 
@@ -307,11 +307,12 @@ class TestGitHub2(TestBaseBackend):
     def test_demography_study(self):
         """Test that the demography study works correctly"""
 
+        alias = "demographics"
         study, ocean_backend, enrich_backend = self._test_study('enrich_demography')
 
         with self.assertLogs(logger, level='INFO') as cm:
             if study.__name__ == "enrich_demography":
-                study(ocean_backend, enrich_backend)
+                study(ocean_backend, enrich_backend, alias)
 
             self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[github] Demography '
                                            'starting study %s/test_github2_enrich'
@@ -332,7 +333,7 @@ class TestGitHub2(TestBaseBackend):
 
         r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
                                                 headers=HEADER_JSON, verify=False)
-        self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
+        self.assertIn(alias, r.json()[enrich_backend.elastic.index]['aliases'])
 
     def test_copy_raw_fields(self):
         """Test copied raw fields"""

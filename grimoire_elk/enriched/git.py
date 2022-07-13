@@ -45,7 +45,6 @@ from .utils import anonymize_url
 
 GITHUB = 'https://github.com/'
 DEMOGRAPHY_COMMIT_MIN_DATE = '1980-01-01'
-AREAS_OF_CODE_ALIAS = 'git_areas_of_code'
 logger = logging.getLogger(__name__)
 
 
@@ -574,12 +573,12 @@ class GitEnrich(Enrich):
 
         return total
 
-    def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
+    def enrich_demography(self, ocean_backend, enrich_backend, alias, date_field="grimoire_creation_date",
                           author_field="author_uuid"):
 
-        super().enrich_demography(ocean_backend, enrich_backend, date_field, author_field=author_field)
+        super().enrich_demography(ocean_backend, enrich_backend, alias, date_field, author_field=author_field)
 
-    def enrich_areas_of_code(self, ocean_backend, enrich_backend, no_incremental=False,
+    def enrich_areas_of_code(self, ocean_backend, enrich_backend, alias, no_incremental=False,
                              in_index="git-raw",
                              out_index=GIT_AOC_ENRICHED,
                              sort_on_field='metadata__timestamp'):
@@ -630,12 +629,12 @@ class GitEnrich(Enrich):
 
         # Create alias if output index exists and alias does not
         if out_conn.exists():
-            if not out_conn.exists_alias(AREAS_OF_CODE_ALIAS) \
-                    and not enrich_backend.elastic.alias_in_use(AREAS_OF_CODE_ALIAS):
-                logger.info("{} creating alias: {}".format(log_prefix, AREAS_OF_CODE_ALIAS))
-                out_conn.create_alias(AREAS_OF_CODE_ALIAS)
+            if not out_conn.exists_alias(alias) \
+                    and not enrich_backend.elastic.alias_in_use(alias):
+                logger.info("{} creating alias: {}".format(log_prefix, alias))
+                out_conn.create_alias(alias)
             else:
-                logger.warning("{} alias already exists: {}.".format(log_prefix, AREAS_OF_CODE_ALIAS))
+                logger.warning("{} alias already exists: {}.".format(log_prefix, alias))
 
         logger.info("{} end".format(log_prefix))
 
@@ -772,7 +771,7 @@ class GitEnrich(Enrich):
         logger.debug("[git] study areas_of_code {} commits deleted from {} with origin {}.".format(
             len(hashes_to_delete), anonymize_url(aoc_index_url), repository))
 
-    def enrich_onion(self, ocean_backend, enrich_backend,
+    def enrich_onion(self, ocean_backend, enrich_backend, alias,
                      no_incremental=False,
                      in_index='git_onion-src',
                      out_index='git_onion-enriched',
@@ -783,6 +782,7 @@ class GitEnrich(Enrich):
                      seconds=Enrich.ONION_INTERVAL):
 
         super().enrich_onion(enrich_backend=enrich_backend,
+                             alias=alias,
                              in_index=in_index,
                              out_index=out_index,
                              data_source=data_source,

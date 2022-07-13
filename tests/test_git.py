@@ -31,7 +31,6 @@ import unittest
 from base import TestBaseBackend
 from grimoire_elk.raw.git import GitOcean
 from grimoire_elk.enriched.enrich import (logger,
-                                          DEMOGRAPHICS_ALIAS,
                                           anonymize_url)
 from grimoire_elk.enriched.git import logger as git_logger
 from grimoire_elk.enriched.utils import REPO_LABELS
@@ -272,12 +271,13 @@ class TestGit(TestBaseBackend):
     def test_demography_study(self):
         """ Test that the demography study works correctly """
 
+        alias = 'demographics'
         study, ocean_backend, enrich_backend = self._test_study('enrich_demography')
 
         with self.assertLogs(logger, level='INFO') as cm:
 
             if study.__name__ == "enrich_demography":
-                study(ocean_backend, enrich_backend, date_field="utc_commit")
+                study(ocean_backend, enrich_backend, alias, date_field="utc_commit")
 
             self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[git] Demography '
                                            'starting study %s/test_git_enrich'
@@ -297,7 +297,7 @@ class TestGit(TestBaseBackend):
 
         r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
                                                 headers=HEADER_JSON, verify=False)
-        self.assertIn(DEMOGRAPHICS_ALIAS, r.json()[enrich_backend.elastic.index]['aliases'])
+        self.assertIn(alias, r.json()[enrich_backend.elastic.index]['aliases'])
 
     def test_extra_study(self):
         """ Test that the extra study works correctly """
@@ -368,8 +368,9 @@ class TestGit(TestBaseBackend):
     def test_onion_study(self):
         """ Test that the onion study works correctly """
 
+        alias = "all_onion"
         study, ocean_backend, enrich_backend = self._test_study('enrich_onion')
-        study(ocean_backend, enrich_backend, in_index='test_git_enrich', out_index='test_git_onion')
+        study(ocean_backend, enrich_backend, alias, in_index='test_git_enrich', out_index='test_git_onion')
 
         url = self.es_con + "/_aliases"
         response = requests.get(url, verify=False).json()
@@ -401,6 +402,7 @@ class TestGit(TestBaseBackend):
     def test_enrich_areas_of_code(self):
         """ Test that areas of code works correctly"""
 
+        alias = 'enrich_areas_of_code'
         projects_json_repo = "/tmp/perceval_mc84igfc/gittest"
         projects_json = {
             "project": {
@@ -420,7 +422,7 @@ class TestGit(TestBaseBackend):
                                                                 prjs_map=prjs_map,
                                                                 projects_json_repo=projects_json_repo)
 
-        study(ocean_backend, enrich_backend, in_index='test_git', out_index='test_git_aoc')
+        study(ocean_backend, enrich_backend, alias, in_index='test_git', out_index='test_git_aoc')
         time.sleep(5)  # HACK: Wait until git area of code has been written
         url = self.es_con + "/test_git_aoc/_search?size=20"
         response = enrich_backend.requests.get(url, verify=False).json()
@@ -471,6 +473,7 @@ class TestGit(TestBaseBackend):
     def test_enrich_areas_of_code_extra_fields(self):
         """ Test that areas of code works correctly when the repo contains extra fields"""
 
+        alias = "git_areas_of_code"
         projects_json_repo = "https://github.com/acme/errors"
         projects_json = {
             "labels-repo": {
@@ -490,7 +493,7 @@ class TestGit(TestBaseBackend):
                                                                 prjs_map=prjs_map,
                                                                 projects_json_repo=projects_json_repo)
 
-        study(ocean_backend, enrich_backend, in_index='test_git', out_index='test_git_aoc_repo_name')
+        study(ocean_backend, enrich_backend, alias, in_index='test_git', out_index='test_git_aoc_repo_name')
         time.sleep(5)  # HACK: Wait until git area of code has been written
         url = self.es_con + "/test_git_aoc_repo_name/_search?size=20"
         response = enrich_backend.requests.get(url, verify=False).json()
@@ -505,6 +508,7 @@ class TestGit(TestBaseBackend):
     def test_enrich_areas_of_code_private_repo(self):
         """ Test that areas of code works correctly for git private repos"""
 
+        alias = "git_areas_of_code"
         projects_json_repo = "https://username:password@github.com/acme/errors"
         projects_json = {
             "secret-repo": {
@@ -524,7 +528,7 @@ class TestGit(TestBaseBackend):
                                                                 prjs_map=prjs_map,
                                                                 projects_json_repo=projects_json_repo)
 
-        study(ocean_backend, enrich_backend, in_index='test_git', out_index='test_git_aoc_anonymized')
+        study(ocean_backend, enrich_backend, alias, in_index='test_git', out_index='test_git_aoc_anonymized')
         time.sleep(5)  # HACK: Wait until git area of code has been written
         url = self.es_con + "/test_git_aoc_anonymized/_search?size=20"
         response = enrich_backend.requests.get(url, verify=False).json()

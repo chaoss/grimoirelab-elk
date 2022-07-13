@@ -81,9 +81,6 @@ DEFAULT_DB_USER = 'root'
 CUSTOM_META_PREFIX = 'cm'
 EXTRA_PREFIX = 'extra'
 SH_UNKNOWN_VALUE = 'Unknown'
-DEMOGRAPHICS_ALIAS = 'demographics'
-DEMOGRAPHICS_CONTRIBUTION_ALIAS = 'demographics_contribution'
-ONION_ALIAS = 'all_onion'
 
 
 def metadata(func):
@@ -1097,7 +1094,7 @@ class Enrich(ElasticItems):
             else:
                 target[f] = None
 
-    def enrich_onion(self, enrich_backend, in_index, out_index, data_source,
+    def enrich_onion(self, enrich_backend, alias, in_index, out_index, data_source,
                      contribs_field, timeframe_field, sort_on_field,
                      seconds=ONION_INTERVAL, no_incremental=False):
 
@@ -1152,9 +1149,9 @@ class Enrich(ElasticItems):
 
         # Create alias if output index exists (index is always created from scratch, so
         # alias need to be created each time)
-        if out_conn.exists() and not out_conn.exists_alias(out_index, ONION_ALIAS):
-            logger.info("{} Creating alias: {}".format(log_prefix, ONION_ALIAS))
-            out_conn.create_alias(ONION_ALIAS)
+        if out_conn.exists() and not out_conn.exists_alias(out_index, alias):
+            logger.info("{} Creating alias: {}".format(log_prefix, alias))
+            out_conn.create_alias(alias)
 
         logger.info("{} end".format(log_prefix))
 
@@ -1786,7 +1783,7 @@ class Enrich(ElasticItems):
 
         return es_query
 
-    def enrich_demography_contribution(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
+    def enrich_demography_contribution(self, ocean_backend, enrich_backend, alias, date_field="grimoire_creation_date",
                                        author_field="author_uuid"):
         """
         Run demography study for the different types of the author activities and add the resulting enriched items.
@@ -1799,6 +1796,7 @@ class Enrich(ElasticItems):
 
         :param ocean_backend: backend from which to read the raw items
         :param enrich_backend:  backend from which to read the enriched items
+        :poram alias: name of the study alias
         :param date_field: field used to find the mix and max dates for the author's activity
         :param author_field: field of the author
 
@@ -1829,19 +1827,20 @@ class Enrich(ElasticItems):
         for field in type_fields:
             Enrich.run_demography(self, date_field, author_field, log_prefix, contribution_type=field)
 
-        if not self.elastic.alias_in_use(DEMOGRAPHICS_CONTRIBUTION_ALIAS):
-            logger.info("{} Creating alias: {}".format(log_prefix, DEMOGRAPHICS_CONTRIBUTION_ALIAS))
-            self.elastic.add_alias(DEMOGRAPHICS_CONTRIBUTION_ALIAS)
+        if not self.elastic.alias_in_use(alias):
+            logger.info("{} Creating alias: {}".format(log_prefix, alias))
+            self.elastic.add_alias(alias)
 
         logger.info("{} end {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
 
-    def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
+    def enrich_demography(self, ocean_backend, enrich_backend, alias, date_field="grimoire_creation_date",
                           author_field="author_uuid"):
         """
         Run demography study for all of the author activities and add the resulting enriched items.
 
         :param ocean_backend: backend from which to read the raw items
         :param enrich_backend:  backend from which to read the enriched items
+        :poram alias: name of the study alias
         :param date_field: field used to find the mix and max dates for the author's activity
         :param author_field: field of the author
 
@@ -1853,9 +1852,9 @@ class Enrich(ElasticItems):
 
         Enrich.run_demography(self, date_field, author_field, log_prefix)
 
-        if not self.elastic.alias_in_use(DEMOGRAPHICS_ALIAS):
-            logger.info("{} Creating alias: {}".format(log_prefix, DEMOGRAPHICS_ALIAS))
-            self.elastic.add_alias(DEMOGRAPHICS_ALIAS)
+        if not self.elastic.alias_in_use(alias):
+            logger.info("{} Creating alias: {}".format(log_prefix, alias))
+            self.elastic.add_alias(alias)
 
         logger.info("{} end {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
 
