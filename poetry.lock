@@ -498,7 +498,7 @@ python-versions = ">=2.6"
 
 [[package]]
 name = "perceval"
-version = "0.19.0"
+version = "0.19.1"
 description = "Send Sir Perceval on a quest to fetch and gather data from software repositories."
 category = "main"
 optional = false
@@ -893,7 +893,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "68d3008179c9f001b48e49d147f7b17d60ce62e2181d950e81b17491d46c3e0b"
+content-hash = "5934b102d45feaed2f035946b2a8693e29cd834e8b4a14771731967826b8881f"
 
 [metadata.files]
 astroid = [
@@ -1297,8 +1297,8 @@ pbr = [
     {file = "pbr-5.9.0.tar.gz", hash = "sha256:e8dca2f4b43560edef58813969f52a56cef023146cbb8931626db80e6c1c4308"},
 ]
 perceval = [
-    {file = "perceval-0.19.0-py3-none-any.whl", hash = "sha256:7bd8af18e7a7bd61fdf73d3f676defb2eaef7d9ee3c0bd8e47a3d68f70bb86b5"},
-    {file = "perceval-0.19.0.tar.gz", hash = "sha256:834a9b4aa2ff585b3a7f7485b4f3600f979b632714c6ac39e8ecd4824dca6c33"},
+    {file = "perceval-0.19.1-py3-none-any.whl", hash = "sha256:d8b5222b8eaeb81c3fb64ddb8805b563061b21b62ae3fe4501d5d9e38fed5da3"},
+    {file = "perceval-0.19.1.tar.gz", hash = "sha256:9964a5dc78718d3c45dc05e63ec895667c71418d272fbfde3a6958cf99db73fc"},
 ]
 perceval-mozilla = [
     {file = "perceval-mozilla-0.3.1.tar.gz", hash = "sha256:45603b6c89a08fbb805c89ee5f0ac617573f25d912967526ea2e90a98f1cc840"},
