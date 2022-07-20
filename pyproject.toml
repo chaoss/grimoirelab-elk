@@ -45,15 +45,15 @@ geopy = "^2.0.0"
 PyMySQL = "0.9.3"
 pandas = ">=0.22.0,<=0.25.3"
 statsmodels = ">=0.9.0"
-sortinghat = "^0.7.20"
-grimoirelab-toolkit = ">=0.3"
-cereslib = ">=0.3"
-graal = ">=0.3"
-perceval = ">=0.19"
-perceval-mozilla = ">=0.3"
-perceval-opnfv = ">=0.2"
-perceval-puppet = ">=0.2"
-perceval-weblate = ">=0.2"
+sortinghat = { version = ">=0.7.20", allow-prereleases = true}
+grimoirelab-toolkit = { version = ">=0.3", allow-prereleases = true}
+cereslib = { version = ">=0.3", allow-prereleases = true}
+graal = { version = ">=0.3", allow-prereleases = true}
+perceval = { version = ">=0.19", allow-prereleases = true }
+perceval-mozilla = { version = ">=0.3", allow-prereleases = true}
+perceval-opnfv = { version = ">=0.2", allow-prereleases = true}
+perceval-puppet = { version = ">=0.2", allow-prereleases = true}
+perceval-weblate = { version = ">=0.2", allow-prereleases = true}
 
 [tool.poetry.dev-dependencies]
 httpretty = "^0.9.6"
