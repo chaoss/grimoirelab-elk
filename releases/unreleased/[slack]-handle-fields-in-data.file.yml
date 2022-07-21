@@ -1,9 +1,0 @@
----
-title: '[raw/slack] Handle fields in "data.file"'
-category: fixed
-author: Quan Zhou <quan@bitergia.com>
-issue: null
-notes: >
-    Avoid the 'Failed to insert data to ES' error when a
-    document contains at least one immense term in 'data.file'
-    (whose UTF8 encoding is longer than the max length 32766).
