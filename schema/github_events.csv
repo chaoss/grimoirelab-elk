@@ -1,117 +1,117 @@
-name,type,aggregatable,description
-<Cross-references fields>,NA,NA,"Fields coming from cross references study (available only when it is active), see cross_references.csv."
-actor_bot,boolean,true,"True/False if the event actor is a bot or not from SortingHat profile."
-actor_domain,keyword,true,"Event actor domain name from SortingHat profile."
-actor_gender,keyword,true,"Event actor gender, based on her name, from SortingHat (disabled by default)."
-actor_gender_acc,float,true,"Event actor gender accuracy from SortingHat (disabled by default)."
-actor_id,keyword,true,"Event actor ID from SortingHat profile."
-actor_name,keyword,true,"Event actor name from SortingHat profile."
-actor_org_name,keyword,true,"Event actor organization name from SortingHat profile."
-actor_multi_org_names,keyword,true,"List of the actor organizations from SortingHat profile."
-actor_user_name,keyword,true,"Event actor username from SortingHat profile."
-actor_uuid,keyword,true,"Event actor UUID from SortingHat profile."
-author_bot,boolean,true,"True/False if the event author is a bot or not from SortingHat profile."
-author_domain,keyword,true,"Event actor domain name from SortingHat profile."
-author_gender,keyword,true,"Event actor gender, based on her name, from SortingHat (disabled by default)."
-author_gender_acc,float,true,"Event actor gender accuracy from SortingHat (disabled by default)."
-author_id,keyword,true,"Event actor ID from SortingHat profile."
-author_name,keyword,true,"Event actor name from SortingHat profile."
-author_org_name,keyword,true,"Event actor organization name from SortingHat profile."
-author_multi_org_names,keyword,true,"List of the actor organizations from SortingHat profile."
-author_user_name,keyword,true,"Event actor username from SortingHat profile."
-author_uuid,keyword,true,"Event actor UUID from SortingHat profile."
-board_closed_at,date,true,"Date when the board was closed."
-board_column,keyword,true,"Name of the column where the issue is."
-board_created_at,date,true,"Date when the board was created."
-board_name,keyword,true,"Name of the board."
-board_previous_column,keyword,true,"Name of the previous column where the issue was."
-board_state,keyword,true,"State of the board (open/closed)."
-board_updated_at,date,true,"Date when the board was updated."
-board_url,keyword,true,"URL of the board."
-closer_closed,boolean,true,"True/False if the pull request is closed or not."
-closer_closed_at,date,true,"Date when the pull request was closed."
-closer_created_at,date,true,"Date when the pull request was created."
-closer_event_url,keyword,true,"URL where the closed event occurred."
-closer_event_url,boolean,true,"True/False if the pull request is merged or not."
-closer_number,long,true,"Number of the pull request."
-closer_pull_submitter,keyword,true,"Pull request submitter login."
-closer_repo,keyword,true,"Repository of the pull request."
-closer_type,keyword,true,"Type of the closer object (currently only pull requests are processed)."
-closer_updated_at,date,true,"Date when the pull request was updated."
-closer_url,keyword,true,"URL of the pull request."
-created_at,date,true,"Date when the event was created."
-duration_from_previous_event,long,true,"Duration in days from the previous event (added by duration analysis study)."
-event_type,keyword,true,"Type of the event processed."
-github_repo,keyword,true,"GitHub repository name of the issue."
-grimoire_creation_date,date,true,"Pull Request creation date."
-is_github_issue,long,true,"Used to separate issues from other items such as pull requests."
-issue_closed_at,date,true,"Date when the issue was closed."
-issue_created_at,date,true,"Date when the issue was opened."
-issue_id,long,true,"Issue's ID in GitHub."
-id_in_repo,keyword,true,"The issue's ID in the repository it was created."
-issue_labels,keyword,true,"The labels assigned to an issue."
-issue_state,keyword,true,"State of the item (open/closed)."
-issue_updated_at,date,true,"Date when the issue was last updated."
-issue_url_id,keyword,true,"Consists of the project path and the issue's id."
-issue_url,keyword,true,"Full URL of the issue."
-item_type,keyword,true,"The type of the item (issue/pull request)."
-label,keyword,true,"Label name."
-label_description,keyword,true,"Label description."
-label_created_at,date,true,"Date when the label was created."
-label_is_default,boolean,true,"True/False whether the label is a GitHub default one."
-label_updated_at,date,true,"Date when the label was updated."
-merge_closed,boolean,true,"True/False if the pull request is closed or not."
-merge_closed_at,date,true,"Date when the pull request was closed."
-merge_created_at,date,true,"Date when the pull request was created."
-merge_merged,boolean,true,"True/False if the pull request is merged or not."
-merge_merged_at,date,true,"Date when the pull request was merged."
-merge_updated_at,date,true,"Date when the pull request was updated."
-merge_url,string,true,"URL of the pull request."
-metadata__enriched_on,date,true,"Date when the data were enriched."
-metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich the data."
-metadata__gelk_version,keyword,true,"Version of the backend used to enrich the data."
-metadata__timestamp,date,true,"Date when the item was stored in ElasticSearch raw index."
-metadata__updated_on,date,true,"Date when the item was updated on its original data source."
-origin,keyword,true,"The original URL from which the repository was retrieved from."
-previous_event_uuid,keyword,true,"Previous event uuid (added by duration analysis study)."
-project_1,keyword,true,"Used if more than one project levels are allowed in the project hierarchy."
-project,keyword,true,"Project name."
-pull_request,boolean,true,"True/False if the item is a pull request or not."
-reference_will_close_target,boolean,true,"True/False if the target will be closed when the source is merged."
-reference_cross_repo,boolean,true,"True/False if the reference originated in a different repository."
-reference_event_url,keyword,true,"URL of the reference event."
-reference_source_closed,boolean,true,"True/False if the source is closed or not."
-reference_source_closed_at,date,true,"Date when the source was closed."
-reference_source_created_at,date,true,"Date when the source was created."
-reference_source_merged,boolean,true,"True/False if the source was merged or not."
-reference_source_number,long,true,"Number of the source."
-reference_source_repo,keyword,true,"Repo of the source."
-reference_source_type,keyword,true,"Type of the source (issue/pull request)."
-reference_source_updated_at,date,true,"Date when the source was updated."
-reference_source_url,keyword,true,"URL of the source."
-reporter_bot,boolean,true,"True/False if the issue reporter is a bot or not from SortingHat profile."
-reporter_domain,keyword,true,"Issue reporter domain name from SortingHat profile."
-reporter_gender,keyword,true,"Issue reporter gender, based on her name, from SortingHat (disabled by default)."
-reporter_gender_acc,float,true,"Issue reporter gender accuracy from SortingHat (disabled by default)."
-reporter_id,keyword,true,"Issue reporter ID from SortingHat profile."
-reporter_name,keyword,true,"Issue reporter name from SortingHat profile."
-reporter_org_name,keyword,true,"Issue reporter organization name from SortingHat profile."
-reporter_multi_org_names,keyword,true,"List of the reporter organizations from SortingHat profile."
-reporter_user_name,keyword,true,"Issue reporter username from SortingHat profile."
-reporter_uuid,keyword,true,"Issue reporter UUID from SortingHat profile."
-repository,keyword,true,"Repository name."
-repository_labels,keyword,true,"Custom repository labels defined by the user."
-submitter_bot,boolean,true,"True/False if the pull request submitter is a bot or not from SortingHat profile."
-submitter_domain,keyword,true,"Pull request submitter domain name from SortingHat profile."
-submitter_gender,keyword,true,"Pull request submitter gender, based on her name, from SortingHat (disabled by default)."
-submitter_gender_acc,float,true,"Pull request submitter gender accuracy from SortingHat (disabled by default)."
-submitter_id,keyword,true,"Pull request submitter ID from SortingHat profile."
-submitter_name,keyword,true,"Pull request submitter name from SortingHat profile."
-submitter_org_name,keyword,true,"Pull request submitter organization name from SortingHat profile."
-submitter_multi_org_names,keyword,true,"List of the pull request submitter organizations from SortingHat profile."
-submitter_user_name,keyword,true,"Pull request submitter username from SortingHat profile."
-submitter_uuid,keyword,true,"Pull request submitter UUID from SortingHat profile."
-tag,keyword,true,"Perceval tag."
-title,keyword,true,"The title of the Pull Request."
-title_analyzed,text,false,"Pull Request title split by terms to allow searching."
-uuid,keyword,true,"Perceval UUID."
+name,type,aggregatable,description,Raw / Calculated
+<Cross-references fields>,NA,NA,"Fields coming from cross references study (available only when it is active), see cross_references.csv.",
+actor_bot,boolean,TRUE,True/False if the event actor is a bot or not from SortingHat profile.,GrimoireLab / SortingHat
+actor_domain,keyword,TRUE,Event actor domain name from SortingHat profile.,GrimoireLab / SortingHat
+actor_gender,keyword,TRUE,"Event actor gender, based on her name, from SortingHat (disabled by default).",GrimoireLab / SortingHat
+actor_gender_acc,float,TRUE,Event actor gender accuracy from SortingHat (disabled by default).,GrimoireLab / SortingHat
+actor_id,keyword,TRUE,Event actor ID from SortingHat profile.,GrimoireLab / SortingHat
+actor_name,keyword,TRUE,Event actor name from SortingHat profile.,GrimoireLab / SortingHat
+actor_org_name,keyword,TRUE,Event actor organization name from SortingHat profile.,GrimoireLab / SortingHat
+actor_multi_org_names,keyword,TRUE,List of the actor organizations from SortingHat profile.,GrimoireLab / SortingHat
+actor_user_name,keyword,TRUE,Event actor username from SortingHat profile.,GrimoireLab / SortingHat
+actor_uuid,keyword,TRUE,Event actor UUID from SortingHat profile.,GrimoireLab / SortingHat
+author_bot,boolean,TRUE,True/False if the event author is a bot or not from SortingHat profile.,GrimoireLab / SortingHat
+author_domain,keyword,TRUE,Event actor domain name from SortingHat profile.,GrimoireLab / SortingHat
+author_gender,keyword,TRUE,"Event actor gender, based on her name, from SortingHat (disabled by default).",GrimoireLab / SortingHat
+author_gender_acc,float,TRUE,Event actor gender accuracy from SortingHat (disabled by default).,GrimoireLab / SortingHat
+author_id,keyword,TRUE,Event actor ID from SortingHat profile.,GrimoireLab / SortingHat
+author_name,keyword,TRUE,Event actor name from SortingHat profile.,GrimoireLab / SortingHat
+author_org_name,keyword,TRUE,Event actor organization name from SortingHat profile.,GrimoireLab / SortingHat
+author_multi_org_names,keyword,TRUE,List of the actor organizations from SortingHat profile.,GrimoireLab / SortingHat
+author_user_name,keyword,TRUE,Event actor username from SortingHat profile.,GrimoireLab / SortingHat
+author_uuid,keyword,TRUE,Event actor UUID from SortingHat profile.,GrimoireLab / SortingHat
+board_closed_at,date,TRUE,Date when the board was closed.,Data Source / Parsed
+board_column,keyword,TRUE,Name of the column where the issue is.,Data Source / Parsed
+board_created_at,date,TRUE,Date when the board was created.,Data Source / Parsed
+board_name,keyword,TRUE,Name of the board.,Data Source / Parsed
+board_previous_column,keyword,TRUE,Name of the previous column where the issue was.,Data Source / Parsed
+board_state,keyword,TRUE,State of the board (open/closed).,Data Source / Parsed
+board_updated_at,date,TRUE,Date when the board was updated.,Data Source / Parsed
+board_url,keyword,TRUE,URL of the board.,Data Source / Parsed
+closer_closed,boolean,TRUE,True/False if the pull request is closed or not.,Data Source / Parsed
+closer_closed_at,date,TRUE,Date when the pull request was closed.,Data Source / Parsed
+closer_created_at,date,TRUE,Date when the pull request was created.,Data Source / Parsed
+closer_event_url,keyword,TRUE,URL where the closed event occurred.,Data Source / Parsed
+closer_event_url,boolean,TRUE,True/False if the pull request is merged or not.,Data Source / Parsed
+closer_number,long,TRUE,Number of the pull request.,Data Source / Parsed
+closer_pull_submitter,keyword,TRUE,Pull request submitter login.,Data Source / Parsed
+closer_repo,keyword,TRUE,Repository of the pull request.,Data Source / Parsed
+closer_type,keyword,TRUE,Type of the closer object (currently only pull requests are processed).,Data Source / Parsed
+closer_updated_at,date,TRUE,Date when the pull request was updated.,Data Source / Parsed
+closer_url,keyword,TRUE,URL of the pull request.,Data Source / Parsed
+created_at,date,TRUE,Date when the event was created.,Data Source / Parsed
+duration_from_previous_event,long,TRUE,Duration in days from the previous event (added by duration analysis study).,GrimoireLab
+event_type,keyword,TRUE,Type of the event processed.,Data Source / Parsed
+github_repo,keyword,TRUE,GitHub repository name of the issue.,Data Source / Parsed
+grimoire_creation_date,date,TRUE,Pull Request creation date.,Data Source / Parsed
+is_github_issue,long,TRUE,Used to separate issues from other items such as pull requests.,Data Source / Parsed
+issue_closed_at,date,TRUE,Date when the issue was closed.,Data Source / Parsed
+issue_created_at,date,TRUE,Date when the issue was opened.,Data Source / Parsed
+issue_id,long,TRUE,Issue's ID in GitHub.,Data Source / Parsed
+id_in_repo,keyword,TRUE,The issue's ID in the repository it was created.,Data Source / Parsed
+issue_labels,keyword,TRUE,The labels assigned to an issue.,Data Source / Parsed
+issue_state,keyword,TRUE,State of the item (open/closed).,Data Source / Parsed
+issue_updated_at,date,TRUE,Date when the issue was last updated.,Data Source / Parsed
+issue_url_id,keyword,TRUE,Consists of the project path and the issue's id.,Data Source / Parsed
+issue_url,keyword,TRUE,Full URL of the issue.,Data Source / Parsed
+item_type,keyword,TRUE,The type of the item (issue/pull request).,Data Source / Parsed
+label,keyword,TRUE,Label name.,Data Source / Parsed
+label_description,keyword,TRUE,Label description.,Data Source / Parsed
+label_created_at,date,TRUE,Date when the label was created.,Data Source / Parsed
+label_is_default,boolean,TRUE,True/False whether the label is a GitHub default one.,Data Source / Parsed
+label_updated_at,date,TRUE,Date when the label was updated.,Data Source / Parsed
+merge_closed,boolean,TRUE,True/False if the pull request is closed or not.,Data Source / Parsed
+merge_closed_at,date,TRUE,Date when the pull request was closed.,Data Source / Parsed
+merge_created_at,date,TRUE,Date when the pull request was created.,Data Source / Parsed
+merge_merged,boolean,TRUE,True/False if the pull request is merged or not.,Data Source / Parsed
+merge_merged_at,date,TRUE,Date when the pull request was merged.,Data Source / Parsed
+merge_updated_at,date,TRUE,Date when the pull request was updated.,Data Source / Parsed
+merge_url,string,TRUE,URL of the pull request.,Data Source / Parsed
+metadata__enriched_on,date,TRUE,Date when the data were enriched.,Data Source / Parsed
+metadata__gelk_backend_name,keyword,TRUE,Name of the backend used to enrich the data.,GrimoireLab
+metadata__gelk_version,keyword,TRUE,Version of the backend used to enrich the data.,GrimoireLab
+metadata__timestamp,date,TRUE,Date when the item was stored in ElasticSearch raw index.,GrimoireLab
+metadata__updated_on,date,TRUE,Date when the item was updated on its original data source.,GrimoireLab
+origin,keyword,TRUE,The original URL from which the repository was retrieved from.,Data Source / Parsed
+previous_event_uuid,keyword,TRUE,Previous event uuid (added by duration analysis study).,GrimoireLab
+project_1,keyword,TRUE,Used if more than one project levels are allowed in the project hierarchy.,GrimoireLab
+project,keyword,TRUE,Project name.,GrimoireLab
+pull_request,boolean,TRUE,True/False if the item is a pull request or not.,GrimoireLab
+reference_will_close_target,boolean,TRUE,True/False if the target will be closed when the source is merged.,GrimoireLab
+reference_cross_repo,boolean,TRUE,True/False if the reference originated in a different repository.,GrimoireLab
+reference_event_url,keyword,TRUE,URL of the reference event.,Data Source / Parsed
+reference_source_closed,boolean,TRUE,True/False if the source is closed or not.,Data Source / Parsed
+reference_source_closed_at,date,TRUE,Date when the source was closed.,Data Source / Parsed
+reference_source_created_at,date,TRUE,Date when the source was created.,Data Source / Parsed
+reference_source_merged,boolean,TRUE,True/False if the source was merged or not.,Data Source / Parsed
+reference_source_number,long,TRUE,Number of the source.,Data Source / Parsed
+reference_source_repo,keyword,TRUE,Repo of the source.,Data Source / Parsed
+reference_source_type,keyword,TRUE,Type of the source (issue/pull request).,Data Source / Parsed
+reference_source_updated_at,date,TRUE,Date when the source was updated.,Data Source / Parsed
+reference_source_url,keyword,TRUE,URL of the source.,Data Source / Parsed
+reporter_bot,boolean,TRUE,True/False if the issue reporter is a bot or not from SortingHat profile.,GrimoireLab / SortingHat
+reporter_domain,keyword,TRUE,Issue reporter domain name from SortingHat profile.,GrimoireLab / SortingHat
+reporter_gender,keyword,TRUE,"Issue reporter gender, based on her name, from SortingHat (disabled by default).",GrimoireLab / SortingHat
+reporter_gender_acc,float,TRUE,Issue reporter gender accuracy from SortingHat (disabled by default).,GrimoireLab / SortingHat
+reporter_id,keyword,TRUE,Issue reporter ID from SortingHat profile.,GrimoireLab / SortingHat
+reporter_name,keyword,TRUE,Issue reporter name from SortingHat profile.,GrimoireLab / SortingHat
+reporter_org_name,keyword,TRUE,Issue reporter organization name from SortingHat profile.,GrimoireLab / SortingHat
+reporter_multi_org_names,keyword,TRUE,List of the reporter organizations from SortingHat profile.,GrimoireLab / SortingHat
+reporter_user_name,keyword,TRUE,Issue reporter username from SortingHat profile.,GrimoireLab / SortingHat
+reporter_uuid,keyword,TRUE,Issue reporter UUID from SortingHat profile.,GrimoireLab / SortingHat
+repository,keyword,TRUE,Repository name.,Data Source / Parsed
+repository_labels,keyword,TRUE,Custom repository labels defined by the user.,Data Source / Parsed
+submitter_bot,boolean,TRUE,True/False if the pull request submitter is a bot or not from SortingHat profile.,GrimoireLab / SortingHat
+submitter_domain,keyword,TRUE,Pull request submitter domain name from SortingHat profile.,GrimoireLab / SortingHat
+submitter_gender,keyword,TRUE,"Pull request submitter gender, based on her name, from SortingHat (disabled by default).",GrimoireLab / SortingHat
+submitter_gender_acc,float,TRUE,Pull request submitter gender accuracy from SortingHat (disabled by default).,GrimoireLab / SortingHat
+submitter_id,keyword,TRUE,Pull request submitter ID from SortingHat profile.,GrimoireLab / SortingHat
+submitter_name,keyword,TRUE,Pull request submitter name from SortingHat profile.,GrimoireLab / SortingHat
+submitter_org_name,keyword,TRUE,Pull request submitter organization name from SortingHat profile.,GrimoireLab / SortingHat
+submitter_multi_org_names,keyword,TRUE,List of the pull request submitter organizations from SortingHat profile.,GrimoireLab / SortingHat
+submitter_user_name,keyword,TRUE,Pull request submitter username from SortingHat profile.,GrimoireLab / SortingHat
+submitter_uuid,keyword,TRUE,Pull request submitter UUID from SortingHat profile.,GrimoireLab / SortingHat
+tag,keyword,TRUE,Perceval tag.,GrimoireLab
+title,keyword,TRUE,The title of the Pull Request.,Data Source / Parsed
+title_analyzed,text,FALSE,Pull Request title split by terms to allow searching.,Data Source / Parsed
+uuid,keyword,TRUE,Perceval UUID.,GrimoireLab

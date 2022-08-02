@@ -1,37 +1,37 @@
-name,type,aggregatable,description
-addedlines,long,true,"Number of lines added in this file by this commit (only in this file, not the whole commit)."
-author_bot,boolean,true,"True if the given author is identified as a bot."
-author_domain,keyword,true,"Domain associated to the author in SortingHat profile."
-author_id,keyword,true,"Author Id from SortingHat."
-author_name,keyword,true,"Author name."
-author_org_name,keyword,true,"Organization name."
-author_user_name,keyword,true,"Author user name."
-author_uuid,keyword,true,"Author UUID from SortingHat."
-committer,keyword,true,"Committer name as it appears in commit (including e-mail)."
-committer_date,date,true,"Date when committer made this commit."
-date,date,true,"Author date (when the original author made the commit)."
-eventtype,keyword,true,"COMMIT."
-file_dir_name,keyword,true,"Path in which the file is located, not including file name."
-file_ext,keyword,true,"File extension."
-file_name,keyword,true,"File name with extension."
-file_path_list,keyword,true,"List of split path parts."
-fileaction,keyword,true,"Action performed by the commit over the file."
-filepath,keyword,true,"Complete file path."
-files,long,true,"Number of files touched by the same commit this file is included in."
-filetype,keyword,true,"Code or Other, based on file extension."
-git_author_domain,keyword,true,"Domain extracted from author email included within the commit, if any."
-grimoire_creation_date,date,true,"Author date (when the original author made the commit)."
-hash,keyword,true,"Commit hash."
-id,keyword,true,"Commit hash."
-message,text,false,"Commit message split by terms."
-message.keyword,keyword,true,"Commit message as a single String."
-metadata__enriched_on,date,true,"Date when the item was enriched."
-metadata__timestamp,date,true,"Date when the item was stored in RAW index."
-metadata__updated_on,date,true,"Date when the item was updated in its original data source."
-owner,keyword,true,"Owner (code author) name as it appears in commit (including e-mail)."
-perceval_uuid,keyword,true,"Perceval UUID."
-project,keyword,true,"Project."
-project_1,keyword,true,"Project (if more than one level is allowed in project hierarchy)."
-removedlines,long,true,"Number of lines removed in this file by this commit (only in this file, not the whole commit)."
-repository,keyword,true,"Repository name."
-uuid,keyword,true,"Item unique identifier. Same as '_id'"
+name,type,aggregatable,description,Raw/Calculated
+addedlines,long,TRUE,"Number of lines added in this file by this commit (only in this file, not the whole commit).",GrimoireLab
+author_bot,boolean,TRUE,True if the given author is identified as a bot.,GrimoireLab / SortingHat
+author_domain,keyword,TRUE,Domain associated to the author in SortingHat profile.,GrimoireLab / SortingHat
+author_id,keyword,TRUE,Author Id from SortingHat.,GrimoireLab / SortingHat
+author_name,keyword,TRUE,Author name.,GrimoireLab / SortingHat
+author_org_name,keyword,TRUE,Organization name.,GrimoireLab / SortingHat
+author_user_name,keyword,TRUE,Author user name.,GrimoireLab / SortingHat
+author_uuid,keyword,TRUE,Author UUID from SortingHat.,GrimoireLab / SortingHat
+committer,keyword,TRUE,Committer name as it appears in commit (including e-mail).,GrimoireLab / SortingHat
+committer_date,date,TRUE,Date when committer made this commit.,Data Source / Parsed
+date,date,TRUE,Author date (when the original author made the commit).,Data Source / Parsed
+eventtype,keyword,TRUE,COMMIT.,GrimoireLab
+file_dir_name,keyword,TRUE,"Path in which the file is located, not including file name.",Data Source / Parsed
+file_ext,keyword,TRUE,File extension.,Data Source / Parsed
+file_name,keyword,TRUE,File name with extension.,Data Source / Parsed
+file_path_list,keyword,TRUE,List of split path parts.,Data Source / Parsed
+fileaction,keyword,TRUE,Action performed by the commit over the file.,Data Source / Parsed
+filepath,keyword,TRUE,Complete file path.,Data Source / Parsed
+files,long,TRUE,Number of files touched by the same commit this file is included in.,Data Source / Parsed
+filetype,keyword,TRUE,"Code or Other, based on file extension.",GrimoireLab
+git_author_domain,keyword,TRUE,"Domain extracted from author email included within the commit, if any.",Data Source / Parsed
+grimoire_creation_date,date,TRUE,Author date (when the original author made the commit).,Data Source / Parsed
+hash,keyword,TRUE,Commit hash.,Data Source / Parsed
+id,keyword,TRUE,Commit hash.,Data Source / Parsed
+message,text,FALSE,Commit message split by terms.,Data Source / Parsed
+message.keyword,keyword,TRUE,Commit message as a single String.,Data Source / Parsed
+metadata__enriched_on,date,TRUE,Date when the item was enriched.,GrimoireLab
+metadata__timestamp,date,TRUE,Date when the item was stored in RAW index.,GrimoireLab
+metadata__updated_on,date,TRUE,Date when the item was updated in its original data source.,GrimoireLab
+owner,keyword,TRUE,Owner (code author) name as it appears in commit (including e-mail).,Data Source / Parsed
+perceval_uuid,keyword,TRUE,Perceval UUID.,GrimoireLab
+project,keyword,TRUE,Project.,GrimoireLab
+project_1,keyword,TRUE,Project (if more than one level is allowed in project hierarchy).,GrimoireLab
+removedlines,long,TRUE,"Number of lines removed in this file by this commit (only in this file, not the whole commit).",GrimoireLab
+repository,keyword,TRUE,Repository name.,Data Source / Parsed
+uuid,keyword,TRUE,Item unique identifier. Same as '_id',GrimoireLab

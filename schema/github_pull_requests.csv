@@ -1,85 +1,85 @@
-name,type,aggregatable,description
-<Cross-references fields>,NA,NA,"Fields coming from cross references study (available only when it is active), see cross_references.csv."
-additions,long,true,"Number of additions in the Pull Request."
-assignee_geolocation,geo_point,true,"Pull Request assignee geolocation from GitHub."
-author_bot,boolean,true,"True/False if the Pull Request author is a bot or not from SortingHat profile."
-author_domain,keyword,true,"Pull Request author domain name from SortingHat profile."
-author_gender,keyword,true,"Pull Request author gender, based on her name, from SortingHat (disabled by default)."
-author_gender_acc,float,true,"Pull Request author gender accuracy from SortingHat (disabled by default)."
-author_id,keyword,true,"Pull Request author ID from SortingHat profile."
-author_name,keyword,true,"Pull Request author name from SortingHat profile."
-author_org_name,keyword,true,"Pull Request author organization name from SortingHat profile."
-author_multi_org_names,keyword,true,"List of the author organizations from SortingHat profile."
-author_user_name,keyword,true,"Pull Request author username from SortingHat profile."
-author_uuid,keyword,true,"Pull Request author UUID from SortingHat profile."
-changed_files,long,true,"Number of changed files in the Pull Request."
-closed_at,date,true,"Date in which the Issue was closed."
-code_merge_duration,float,true,"Difference in days between creation and merging dates."
-created_at,date,true,"Date in which the Issue was created."
-deletions,long,true,"Number of deletions in the Pull Request."
-forks,long,true,"Number of repository forks."
-github_repo,keyword,true,"GitHub repository name."
-grimoire_creation_date,date,true,"Pull Request creation date."
-id,long,true,"ID in GitHub."
-id_in_repo,keyword,true,"ID in the GitHub repository it was created."
-issue_url,keyword,true,"Full URL of the issue."
-is_github_pull_request,long,true,"1 indicating this is a Pull Request, used for counting in case other kind of items could be stored in the same index or alias."
-item_type,keyword,true,"Item type, in this case 'pull request'"
-labels,keyword,true,"Pull Request assigned labels."
-merge_author_domain,keyword,true,"Merge author domain from GitHub."
-merge_author_geolocation,geo_point,true,"Merge author geolocation from GitHub."
-merge_author_location,keyword,true,"Merge author location as string from GitHub."
-merge_author_login,keyword,true,"Merge author login from GitHub."
-merge_author_name,keyword,true,"Merge author name from GitHub."
-merge_author_org,keyword,true,"Merge author organization from GitHub."
-merged,boolean,true,"True if the Pull Request was already merged."
-merged_at,date,true,"Date when the Pull Request was merged."
-merged_by_data_bot,boolean,true,"True/False if the merge author is a bot or not, from SortingHat profile."
-merged_by_data_domain,keyword,true,"Merge author domain from SortingHat profile."
-merged_by_data_gender,keyword,true,"Merge author gender, based on her name, from SortingHat profile(disabled by default)."
-merged_by_data_gender_acc,float,true,"Merge author gender accuracy from SortingHat profile(disabled by default)."
-merged_by_data_id,keyword,true,"Merge author's ID from SortingHat profile."
-merged_by_data_name,keyword,true,"Merge author name from SortingHat profile."
-merged_by_data_org_name,keyword,true,"Merge author organization from SortingHat profile."
-merged_by_multi_org_names,keyword,true,"List of the merge author organizations from SortingHat profile."
-merged_by_data_user_name,keyword,true,"Merge author username from SortingHat profile."
-merged_by_data_uuid,keyword,true,"Merge author UUID from SortingHat profile."
-metadata__enriched_on,date,true,"Date when the item was enriched."
-metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich information."
-metadata__gelk_version,keyword,true,"Version of the backend used to enrich information."
-metadata__timestamp,date,true,"Date when the item was stored in RAW index."
-metadata__updated_on,date,true,"Date when the item was updated on its original data source."
-num_review_comments,long,true,"Number of comments."
-origin,keyword,true,"Original URL where the repository was retrieved from."
-project,keyword,true,"Project."
-project_1,keyword,true,"Project (if more than one level is allowed in project hierarchy)."
-pull_request,boolean,true,"True indicating this item is a pull request or not (to be used when the index is queried through aliases including other indexes)."
-repository,keyword,true,"Repository name."
-repository_labels,keyword,true,"Custom repository labels defined by the user."
-state,keyword,true,"State of the Pull Request (GitHub has only 2 possible states: open or closed)."
-tag,keyword,true,"Perceval tag."
-time_open_days,float,true,"Time the Pull Request is open counted in days."
-time_to_close_days,float,true,"Time to close a Pull Request counted in days."
-time_to_merge_request_response,float,true,"Time to get a response on a Pull Request in days."
-title,keyword,true,"The title of the Pull Request."
-title_analyzed,text,false,"Pull Request title split by terms to allow searching."
-updated_at,date,true,"Date when the Pull Request was last updated."
-url,keyword,true,"Full URL of the Pull Request."
-url_id,keyword,true,"Consists of the project path and the Pull Request id."
-user_data_bot,boolean,true,"True/False if the Pull Request author is a bot or not from SortingHat profile."
-user_data_domain,keyword,true,"Pull Request author domain name from SortingHat profile."
-user_data_gender,keyword,true,"Pull Request author gender, based on her name, from SortingHat (disabled by default)."
-user_data_gender_acc,float,true,"Pull Request author gender accuracy from SortingHat (disabled by default)."
-user_data_id,keyword,true,"Pull Request author ID from SortingHat profile."
-user_data_name,keyword,true,"Pull Request author name from SortingHat profile."
-user_data_org_name,keyword,true,"Pull Request author organization name from SortingHat profile."
-user_data_multi_org_names,keyword,true,"List of the Pull Request author organizations from SortingHat profile."
-user_data_user_name,keyword,true,"Pull Request author username from SortingHat profile."
-user_data_uuid,keyword,true,"Pull Request author UUID from SortingHat profile."
-user_domain,keyword,true,"Pull Request author domain name from GitHub."
-user_geolocation,geo_point,true,"Pull Request author geolocation from GitHub."
-user_location,keyword,true,"Pull Request author location as string from GitHub."
-user_login,keyword,true,"Pull Request author login from GitHub."
-user_name,keyword,true,"Pull Request author username from GitHub."
-user_org,keyword,true,"Pull Request author organization from GitHub."
-uuid,keyword,true,"Perceval UUID."
+name,type,aggregatable,description,Raw / Calculated
+<Cross-references fields>,NA,NA,"Fields coming from cross references study (available only when it is active), see cross_references.csv.",
+additions,long,TRUE,Number of additions in the Pull Request.,GrimoireLab
+assignee_geolocation,geo_point,TRUE,Pull Request assignee geolocation from GitHub.,Data Source / Parsed
+author_bot,boolean,TRUE,True/False if the Pull Request author is a bot or not from SortingHat profile.,GrimoireLab / SortingHat
+author_domain,keyword,TRUE,Pull Request author domain name from SortingHat profile.,GrimoireLab / SortingHat
+author_gender,keyword,TRUE,"Pull Request author gender, based on her name, from SortingHat (disabled by default).",GrimoireLab / SortingHat
+author_gender_acc,float,TRUE,Pull Request author gender accuracy from SortingHat (disabled by default).,GrimoireLab / SortingHat
+author_id,keyword,TRUE,Pull Request author ID from SortingHat profile.,GrimoireLab / SortingHat
+author_name,keyword,TRUE,Pull Request author name from SortingHat profile.,GrimoireLab / SortingHat
+author_org_name,keyword,TRUE,Pull Request author organization name from SortingHat profile.,GrimoireLab / SortingHat
+author_multi_org_names,keyword,TRUE,List of the author organizations from SortingHat profile.,GrimoireLab / SortingHat
+author_user_name,keyword,TRUE,Pull Request author username from SortingHat profile.,GrimoireLab / SortingHat
+author_uuid,keyword,TRUE,Pull Request author UUID from SortingHat profile.,GrimoireLab / SortingHat
+changed_files,long,TRUE,Number of changed files in the Pull Request.,GrimoireLab
+closed_at,date,TRUE,Date in which the Issue was closed.,Data Source / Parsed
+code_merge_duration,float,TRUE,Difference in days between creation and merging dates.,GrimoireLab
+created_at,date,TRUE,Date in which the Issue was created.,Data Source / Parsed
+deletions,long,TRUE,Number of deletions in the Pull Request.,GrimoireLab
+forks,long,TRUE,Number of repository forks.,Data Source / Parsed
+github_repo,keyword,TRUE,GitHub repository name.,Data Source / Parsed
+grimoire_creation_date,date,TRUE,Pull Request creation date.,Data Source / Parsed
+id,long,TRUE,ID in GitHub.,Data Source / Parsed
+id_in_repo,keyword,TRUE,ID in the GitHub repository it was created.,Data Source / Parsed
+issue_url,keyword,TRUE,Full URL of the issue.,Data Source / Parsed
+is_github_pull_request,long,TRUE,"1 indicating this is a Pull Request, used for counting in case other kind of items could be stored in the same index or alias.",Data Source / Parsed
+item_type,keyword,TRUE,"Item type, in this case 'pull request'",Data Source / Parsed
+labels,keyword,TRUE,Pull Request assigned labels.,Data Source / Parsed
+merge_author_domain,keyword,TRUE,Merge author domain from GitHub.,Data Source / Parsed
+merge_author_geolocation,geo_point,TRUE,Merge author geolocation from GitHub.,Data Source / Parsed
+merge_author_location,keyword,TRUE,Merge author location as string from GitHub.,Data Source / Parsed
+merge_author_login,keyword,TRUE,Merge author login from GitHub.,Data Source / Parsed
+merge_author_name,keyword,TRUE,Merge author name from GitHub.,Data Source / Parsed
+merge_author_org,keyword,TRUE,Merge author organization from GitHub.,Data Source / Parsed
+merged,boolean,TRUE,True if the Pull Request was already merged.,Data Source / Parsed
+merged_at,date,TRUE,Date when the Pull Request was merged.,Data Source / Parsed
+merged_by_data_bot,boolean,TRUE,"True/False if the merge author is a bot or not, from SortingHat profile.",GrimoireLab / SortingHat
+merged_by_data_domain,keyword,TRUE,Merge author domain from SortingHat profile.,GrimoireLab / SortingHat
+merged_by_data_gender,keyword,TRUE,"Merge author gender, based on her name, from SortingHat profile(disabled by default).",GrimoireLab / SortingHat
+merged_by_data_gender_acc,float,TRUE,Merge author gender accuracy from SortingHat profile(disabled by default).,GrimoireLab / SortingHat
+merged_by_data_id,keyword,TRUE,Merge author's ID from SortingHat profile.,GrimoireLab / SortingHat
+merged_by_data_name,keyword,TRUE,Merge author name from SortingHat profile.,GrimoireLab / SortingHat
+merged_by_data_org_name,keyword,TRUE,Merge author organization from SortingHat profile.,GrimoireLab / SortingHat
+merged_by_multi_org_names,keyword,TRUE,List of the merge author organizations from SortingHat profile.,GrimoireLab / SortingHat
+merged_by_data_user_name,keyword,TRUE,Merge author username from SortingHat profile.,GrimoireLab / SortingHat
+merged_by_data_uuid,keyword,TRUE,Merge author UUID from SortingHat profile.,GrimoireLab / SortingHat
+metadata__enriched_on,date,TRUE,Date when the item was enriched.,GrimoireLab
+metadata__gelk_backend_name,keyword,TRUE,Name of the backend used to enrich information.,GrimoireLab
+metadata__gelk_version,keyword,TRUE,Version of the backend used to enrich information.,GrimoireLab
+metadata__timestamp,date,TRUE,Date when the item was stored in RAW index.,GrimoireLab
+metadata__updated_on,date,TRUE,Date when the item was updated on its original data source.,GrimoireLab
+num_review_comments,long,TRUE,Number of comments.,GrimoireLab
+origin,keyword,TRUE,Original URL where the repository was retrieved from.,Data Source / Parsed
+project,keyword,TRUE,Project.,GrimoireLab
+project_1,keyword,TRUE,Project (if more than one level is allowed in project hierarchy).,GrimoireLab
+pull_request,boolean,TRUE,True indicating this item is a pull request or not (to be used when the index is queried through aliases including other indexes).,Data Source / Parsed
+repository,keyword,TRUE,Repository name.,Data Source / Parsed
+repository_labels,keyword,TRUE,Custom repository labels defined by the user.,Data Source / Parsed
+state,keyword,TRUE,State of the Pull Request (GitHub has only 2 possible states: open or closed).,Data Source / Parsed
+tag,keyword,TRUE,Perceval tag.,GrimoireLab
+time_open_days,float,TRUE,Time the Pull Request is open counted in days.,GrimoireLab
+time_to_close_days,float,TRUE,Time to close a Pull Request counted in days.,GrimoireLab
+time_to_merge_request_response,float,TRUE,Time to get a response on a Pull Request in days.,GrimoireLab
+title,keyword,TRUE,The title of the Pull Request.,Data Source / Parsed
+title_analyzed,text,FALSE,Pull Request title split by terms to allow searching.,Data Source / Parsed
+updated_at,date,TRUE,Date when the Pull Request was last updated.,Data Source / Parsed
+url,keyword,TRUE,Full URL of the Pull Request.,Data Source / Parsed
+url_id,keyword,TRUE,Consists of the project path and the Pull Request id.,Data Source / Parsed
+user_data_bot,boolean,TRUE,True/False if the Pull Request author is a bot or not from SortingHat profile.,GrimoireLab / SortingHat
+user_data_domain,keyword,TRUE,Pull Request author domain name from SortingHat profile.,GrimoireLab / SortingHat
+user_data_gender,keyword,TRUE,"Pull Request author gender, based on her name, from SortingHat (disabled by default).",GrimoireLab / SortingHat
+user_data_gender_acc,float,TRUE,Pull Request author gender accuracy from SortingHat (disabled by default).,GrimoireLab / SortingHat
+user_data_id,keyword,TRUE,Pull Request author ID from SortingHat profile.,GrimoireLab / SortingHat
+user_data_name,keyword,TRUE,Pull Request author name from SortingHat profile.,GrimoireLab / SortingHat
+user_data_org_name,keyword,TRUE,Pull Request author organization name from SortingHat profile.,GrimoireLab / SortingHat
+user_data_multi_org_names,keyword,TRUE,List of the Pull Request author organizations from SortingHat profile.,GrimoireLab / SortingHat
+user_data_user_name,keyword,TRUE,Pull Request author username from SortingHat profile.,GrimoireLab / SortingHat
+user_data_uuid,keyword,TRUE,Pull Request author UUID from SortingHat profile.,GrimoireLab / SortingHat
+user_domain,keyword,TRUE,Pull Request author domain name from GitHub.,Data Source / Parsed
+user_geolocation,geo_point,TRUE,Pull Request author geolocation from GitHub.,Data Source / Parsed
+user_location,keyword,TRUE,Pull Request author location as string from GitHub.,Data Source / Parsed
+user_login,keyword,TRUE,Pull Request author login from GitHub.,Data Source / Parsed
+user_name,keyword,TRUE,Pull Request author username from GitHub.,Data Source / Parsed
+user_org,keyword,TRUE,Pull Request author organization from GitHub.,Data Source / Parsed
+uuid,keyword,TRUE,Perceval UUID.,GrimoireLab

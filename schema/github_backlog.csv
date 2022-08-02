@@ -1,13 +1,13 @@
-name,type,aggregatable,description
-average_opened_time,long,true,"Average of issue opened time."
-grimoire_creation_date,date,true,"Issue creation date."
-interval_days,long,true,"Number of days between each analysis."
-is_github_stats,boolean,true,"True if is Github Stats."
-labels,keyword,true,"The labels assigned to an issue."
-metadata__enriched_on,date,true,"Date when the data were enriched."
-opened,long,true,"Number of issues opens."
-organization,keyword,true,"Organization name of the repository uthor"
-origin,keyword,true,"The original URL from which the repository was retrieved from."
-project,keyword,true,"Project name."
-study_creation_date,date,true,"Date when the study is created."
-uuid,keyword,true,"Perceval UUID."
+name,type,aggregatable,description,Raw / Calculated
+average_opened_time,long,TRUE,Average of issue opened time.,GrimoireLab
+grimoire_creation_date,date,TRUE,Issue creation date.,Data Source / Parsed
+interval_days,long,TRUE,Number of days between each analysis.,GrimoireLab
+is_github_stats,boolean,TRUE,True if is Github Stats.,GrimoireLab
+labels,keyword,TRUE,The labels assigned to an issue.,Data Source / Parsed
+metadata__enriched_on,date,TRUE,Date when the data were enriched.,GrimoireLab
+opened,long,TRUE,Number of issues opens.,GrimoireLab
+organization,keyword,TRUE,Organization name of the repository uthor,Data Source / Parsed
+origin,keyword,TRUE,The original URL from which the repository was retrieved from.,Data Source / Parsed
+project,keyword,TRUE,Project name.,GrimoireLab
+study_creation_date,date,TRUE,Date when the study is created.,GrimoireLab
+uuid,keyword,TRUE,Perceval UUID.,GrimoireLab

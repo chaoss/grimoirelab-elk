@@ -1,17 +1,17 @@
-name,type,aggregatable,description
-fetched_on,long,true,"Timestamp when the item was fetched, equivalent to metadata__updated_on."
-forks_count,long,true,"Number of forks of the repository."
-grimoire_creation_date,date,true,"Date when the repo was fetched."
-is_github_repository,long,true,"Used to separate repositories from other items such as pull requests and issues."
-metadata__enriched_on,date,true,"Date when the data were enriched."
-metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich the data."
-metadata__gelk_version,keyword,true,"Version of the backend used to enrich the data."
-metadata__timestamp,date,true,"Date when the item was stored in ElasticSearch raw index."
-metadata__updated_on,date,true,"Date when the item was updated on its original data source."
-origin,keyword,true,"The original URL from which the repository was retrieved from."
-repository_labels,keyword,true,"Custom repository labels defined by the user."
-stargazers_count,long,true,"Number of stars of the repository."
-subscribers_count,long,true,"Number of watchers of the repository."
-tag,keyword,true,"Perceval tag."
-url,keyword,true,"Full URL of the repository"
-uuid,keyword,true,"Perceval UUID."
+name,type,aggregatable,description,Raw / Calculated
+fetched_on,long,TRUE,"Timestamp when the item was fetched, equivalent to metadata__updated_on.",GrimoireLab
+forks_count,long,TRUE,Number of forks of the repository.,Data Source / Parsed
+grimoire_creation_date,date,TRUE,Date when the repo was fetched.,Data Source / Parsed
+is_github_repository,long,TRUE,Used to separate repositories from other items such as pull requests and issues.,GrimoireLab
+metadata__enriched_on,date,TRUE,Date when the data were enriched.,GrimoireLab
+metadata__gelk_backend_name,keyword,TRUE,Name of the backend used to enrich the data.,GrimoireLab
+metadata__gelk_version,keyword,TRUE,Version of the backend used to enrich the data.,GrimoireLab
+metadata__timestamp,date,TRUE,Date when the item was stored in ElasticSearch raw index.,GrimoireLab
+metadata__updated_on,date,TRUE,Date when the item was updated on its original data source.,GrimoireLab
+origin,keyword,TRUE,The original URL from which the repository was retrieved from.,Data Source / Parsed
+repository_labels,keyword,TRUE,Custom repository labels defined by the user.,Data Source / Parsed
+stargazers_count,long,TRUE,Number of stars of the repository.,Data Source / Parsed
+subscribers_count,long,TRUE,Number of watchers of the repository.,Data Source / Parsed
+tag,keyword,TRUE,Perceval tag.,GrimoireLab
+url,keyword,TRUE,Full URL of the repository,Data Source / Parsed
+uuid,keyword,TRUE,Perceval UUID.,GrimoireLab
