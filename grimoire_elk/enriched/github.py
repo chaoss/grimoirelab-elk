@@ -247,9 +247,9 @@ class GitHubEnrich(Enrich):
         """Get the first date at which a comment was made to the issue by someone
         other than the user who created the issue and bot
         """
-        if 'review_comments_data' in item: 
+        if 'review_comments_data' in item and item['review_comments_data']: 
             comment_dates = [str_to_datetime(comment['created_at']) for comment in item['review_comments_data'] 
-                            if 'login' in item['user'] and 'login' in comment['user'] and item['user']['login'] != comment['user']['login'] and 'bot' not in comment['user']['login']]
+                            if 'login' in item['user'] and comment['user'] and item['user']['login'] != comment['user']['login'] and 'bot' not in comment['user']['login']]
             if comment_dates:
                 return min(comment_dates)
         else:
