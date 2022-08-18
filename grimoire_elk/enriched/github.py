@@ -203,6 +203,58 @@ class GitHubEnrich(Enrich):
 
         return None
 
+    #get comments and exclude bot  
+    def get_num_of_comments_without_bot(self, item):
+        """Get the num of comment was made to the issue by someone
+        other than the user who created the issue and bot
+        """
+        comments = [comment for comment in item['comments_data']
+                         if item['user']['login'] != comment['user']['login'] \
+                             and 'bot' not in comment['user']['login']]
+        return len(comments)
+      
+    def get_num_of_reviews_without_bot(self, item):
+        """Get the num of comment was made to the issue by someone
+        other than the user who created the issue and bot
+        """
+        review_comments = []
+        for comment in item['review_comments_data']:
+            # skip comments of ghost users
+            if not comment['user']:
+                continue
+
+            # skip comments of the pull request creator
+            if 'bot' in comment['user']['login'] or item['user']['login'] == comment['user']['login'] :
+                continue
+
+            review_comments.append(comment)
+
+        return len(review_comments)
+      
+    #get first attendtion without bot
+    def get_time_to_first_attention_without_bot(self, item):
+        """Get the first date at which a comment was made to the issue by someone
+        other than the user who created the issue and bot
+        """
+        comment_dates = [str_to_datetime(comment['created_at']) for comment in item['comments_data']
+                         if item['user']['login'] != comment['user']['login'] and 'bot' not in comment['user']['login']]
+        if comment_dates:
+            return min(comment_dates)
+        return None
+    
+    #get first attendtion without bot
+    def get_time_to_first_review_attention_without_bot(self, item):
+        """Get the first date at which a comment was made to the issue by someone
+        other than the user who created the issue and bot
+        """
+        if 'review_comments_data' in item: 
+            comment_dates = [str_to_datetime(comment['created_at']) for comment in item['review_comments_data'] 
+                            if 'login' in item['user'] and 'login' in comment['user'] and item['user']['login'] != comment['user']['login'] and 'bot' not in comment['user']['login']]
+            if comment_dates:
+                return min(comment_dates)
+        else:
+            return None
+
     def get_latest_comment_date(self, item):
         """Get the date of the latest comment on the issue/pr"""
 
@@ -524,6 +576,11 @@ class GitHubEnrich(Enrich):
             min_review_date = self.get_time_to_merge_request_response(pull_request)
             rich_pr['time_to_merge_request_response'] = \
                 get_time_diff_days(str_to_datetime(pull_request['created_at']), min_review_date)
+            rich_pr['num_review_comments_without_bot'] = \
+                                   self.get_num_of_reviews_without_bot(pull_request)
+            rich_pr['time_to_first_attention_without_bot'] = \
+                                    get_time_diff_days(str_to_datetime(pull_request['created_at']),
+                                    self.get_time_to_first_review_attention_without_bot(pull_request))
 
         if self.prjs_map:
             rich_pr.update(self.get_item_project(rich_pr))
@@ -622,11 +679,17 @@ class GitHubEnrich(Enrich):
             rich_issue['project'] = item['project']
 
         rich_issue['time_to_first_attention'] = None
+        rich_issue['num_of_comments_without_bot'] = None
         if issue['comments'] + issue['reactions']['total_count'] != 0:
             rich_issue['time_to_first_attention'] = \
                 get_time_diff_days(str_to_datetime(issue['created_at']),
                                    self.get_time_to_first_attention(issue))
-
+            rich_issue['num_of_comments_without_bot'] = \
+                                   self.get_num_of_comments_without_bot(issue)
+            rich_issue['time_to_first_attention_without_bot'] = \
+                                    get_time_diff_days(str_to_datetime(issue['created_at']),
+                                    self.get_time_to_first_attention_without_bot(issue))
+ 
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], "issue"))
 
         item[self.get_field_date()] = rich_issue[self.get_field_date()]
