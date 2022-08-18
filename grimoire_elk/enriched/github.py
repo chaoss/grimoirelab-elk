@@ -582,6 +582,9 @@ class GitHubEnrich(Enrich):
                                     get_time_diff_days(str_to_datetime(pull_request['created_at']),
                                     self.get_time_to_first_review_attention_without_bot(pull_request))
 
+        if 'linked_issues_data' in pull_request:
+            rich_pr['linked_issues_count'] = pull_request['linked_issues_data']
+
         if self.prjs_map:
             rich_pr.update(self.get_item_project(rich_pr))
 
