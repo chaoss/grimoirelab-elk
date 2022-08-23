@@ -27,7 +27,7 @@ PyYAML = ">=5.3.1"
 stevedore = ">=1.20.0"
 
 [package.extras]
-test = ["coverage (>=4.5.4)", "fixtures (>=3.0.0)", "flake8 (>=4.0.0)", "stestr (>=2.5.0)", "testscenarios (>=0.5.0)", "testtools (>=2.3.0)", "toml", "beautifulsoup4 (>=4.8.0)", "pylint (==1.9.4)"]
+test = ["beautifulsoup4 (>=4.8.0)", "coverage (>=4.5.4)", "fixtures (>=3.0.0)", "flake8 (>=4.0.0)", "pylint (==1.9.4)", "stestr (>=2.5.0)", "testscenarios (>=0.5.0)", "testtools (>=2.3.0)", "toml"]
 toml = ["toml"]
 yaml = ["pyyaml"]
 
@@ -48,7 +48,7 @@ lxml = ["lxml"]
 
 [[package]]
 name = "cereslib"
-version = "0.3.1"
+version = "0.3.2rc1"
 description = "GrimoireLab: Unify, eventize and enrich information from Perceval"
 category = "main"
 optional = false
@@ -143,11 +143,11 @@ cffi = ">=1.12"
 
 [package.extras]
 docs = ["sphinx (>=1.6.5,!=1.8.0,!=3.1.0,!=3.1.1)", "sphinx-rtd-theme"]
-docstest = ["doc8", "pyenchant (>=1.6.11)", "twine (>=1.12.0)", "sphinxcontrib-spelling (>=4.0.1)"]
+docstest = ["doc8", "pyenchant (>=1.6.11)", "sphinxcontrib-spelling (>=4.0.1)", "twine (>=1.12.0)"]
 pep8test = ["black", "flake8", "flake8-import-order", "pep8-naming"]
 sdist = ["setuptools-rust (>=0.11.4)"]
 ssh = ["bcrypt (>=3.1.5)"]
-test = ["pytest (>=6.0)", "pytest-cov", "pytest-subtests", "pytest-xdist", "pretend", "iso8601", "pytz", "hypothesis (>=1.11.4,!=3.79.2)"]
+test = ["hypothesis (>=1.11.4,!=3.79.2)", "iso8601", "pretend", "pytest (>=6.0)", "pytest-cov", "pytest-subtests", "pytest-xdist", "pytz"]
 
 [[package]]
 name = "dill"
@@ -190,7 +190,7 @@ python-versions = "*"
 urllib3 = ">=1.21.1"
 
 [package.extras]
-develop = ["requests (>=2.0.0,<3.0.0)", "nose", "coverage", "mock", "pyaml", "nosexcover", "sphinx", "sphinx-rtd-theme"]
+develop = ["coverage", "mock", "nose", "nosexcover", "pyaml", "requests (>=2.0.0,<3.0.0)", "sphinx", "sphinx-rtd-theme"]
 requests = ["requests (>=2.4.0,<3.0.0)"]
 
 [[package]]
@@ -207,7 +207,7 @@ python-dateutil = "*"
 six = "*"
 
 [package.extras]
-develop = ["mock", "pytest (>=3.0.0)", "pytest-cov", "pytz", "coverage (<5.0.0)", "sphinx", "sphinx-rtd-theme"]
+develop = ["coverage (<5.0.0)", "mock", "pytest (>=3.0.0)", "pytest-cov", "pytz", "sphinx", "sphinx-rtd-theme"]
 
 [[package]]
 name = "execnet"
@@ -266,11 +266,11 @@ geographiclib = ">=1.49,<2"
 
 [package.extras]
 aiohttp = ["aiohttp"]
-dev = ["async-generator", "coverage", "flake8 (>=3.8.0,<3.9.0)", "isort (>=5.6.0,<5.7.0)", "pytest-aiohttp", "pytest (>=3.10)", "readme-renderer", "sphinx", "sphinx-issues", "sphinx-rtd-theme (>=0.5.0)"]
+dev = ["async-generator", "coverage", "flake8 (>=3.8.0,<3.9.0)", "isort (>=5.6.0,<5.7.0)", "pytest (>=3.10)", "pytest-aiohttp", "readme-renderer", "sphinx", "sphinx-issues", "sphinx-rtd-theme (>=0.5.0)"]
 dev-docs = ["readme-renderer", "sphinx", "sphinx-issues", "sphinx-rtd-theme (>=0.5.0)"]
 dev-lint = ["async-generator", "flake8 (>=3.8.0,<3.9.0)", "isort (>=5.6.0,<5.7.0)"]
-dev-test = ["async-generator", "coverage", "pytest-aiohttp", "pytest (>=3.10)", "sphinx"]
-requests = ["urllib3 (>=1.24.2)", "requests (>=2.16.2)"]
+dev-test = ["async-generator", "coverage", "pytest (>=3.10)", "pytest-aiohttp", "sphinx"]
+requests = ["requests (>=2.16.2)", "urllib3 (>=1.24.2)"]
 timezone = ["pytz"]
 
 [[package]]
@@ -298,7 +298,7 @@ typing-extensions = {version = ">=3.7.4.3", markers = "python_version < \"3.8\""
 
 [[package]]
 name = "graal"
-version = "0.3.2rc1"
+version = "0.3.2rc2"
 description = "A generic source code analyzer"
 category = "main"
 optional = false
@@ -359,9 +359,9 @@ typing-extensions = {version = ">=3.6.4", markers = "python_version < \"3.8\""}
 zipp = ">=0.5"
 
 [package.extras]
-docs = ["sphinx", "jaraco.packaging (>=9)", "rst.linker (>=1.9)"]
+docs = ["jaraco.packaging (>=9)", "rst.linker (>=1.9)", "sphinx"]
 perf = ["ipython"]
-testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "packaging", "pyfakefs", "flufl.flake8", "pytest-perf (>=0.9.2)", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)", "importlib-resources (>=1.3)"]
+testing = ["flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.0.1)", "pytest-flake8", "pytest-mypy (>=0.9.1)", "pytest-perf (>=0.9.2)"]
 
 [[package]]
 name = "isort"
@@ -372,10 +372,10 @@ optional = false
 python-versions = ">=3.6.1,<4.0"
 
 [package.extras]
-pipfile_deprecated_finder = ["pipreqs", "requirementslib"]
-requirements_deprecated_finder = ["pipreqs", "pip-api"]
 colors = ["colorama (>=0.4.3,<0.5.0)"]
+pipfile_deprecated_finder = ["pipreqs", "requirementslib"]
 plugins = ["setuptools"]
+requirements_deprecated_finder = ["pip-api", "pipreqs"]
 
 [[package]]
 name = "jinja2"
@@ -432,11 +432,11 @@ optional = false
 python-versions = ">=3.7"
 
 [package.extras]
-default = ["numpy (>=1.19)", "scipy (>=1.5,!=1.6.1)", "matplotlib (>=3.3)", "pandas (>=1.1)"]
+default = ["matplotlib (>=3.3)", "numpy (>=1.19)", "pandas (>=1.1)", "scipy (>=1.5,!=1.6.1)"]
 developer = ["black (==21.5b1)", "pre-commit (>=2.12)"]
-doc = ["sphinx (>=4.0,<5.0)", "pydata-sphinx-theme (>=0.6,<1.0)", "sphinx-gallery (>=0.9,<1.0)", "numpydoc (>=1.1)", "pillow (>=8.2)", "nb2plots (>=0.6)", "texext (>=0.6.6)"]
-extra = ["lxml (>=4.5)", "pygraphviz (>=1.7)", "pydot (>=1.4.1)"]
-test = ["pytest (>=6.2)", "pytest-cov (>=2.12)", "codecov (>=2.1)"]
+doc = ["nb2plots (>=0.6)", "numpydoc (>=1.1)", "pillow (>=8.2)", "pydata-sphinx-theme (>=0.6,<1.0)", "sphinx (>=4.0,<5.0)", "sphinx-gallery (>=0.9,<1.0)", "texext (>=0.6.6)"]
+extra = ["lxml (>=4.5)", "pydot (>=1.4.1)", "pygraphviz (>=1.7)"]
+test = ["codecov (>=2.1)", "pytest (>=6.2)", "pytest-cov (>=2.12)"]
 
 [[package]]
 name = "numpy"
@@ -471,7 +471,7 @@ python-dateutil = ">=2.6.1"
 pytz = ">=2017.2"
 
 [package.extras]
-test = ["pytest (>=4.0.2)", "pytest-xdist", "hypothesis (>=3.58)"]
+test = ["hypothesis (>=3.58)", "pytest (>=4.0.2)", "pytest-xdist"]
 
 [[package]]
 name = "patsy"
@@ -498,7 +498,7 @@ python-versions = ">=2.6"
 
 [[package]]
 name = "perceval"
-version = "0.20.0rc2"
+version = "0.20.0rc3"
 description = "Send Sir Perceval on a quest to fetch and gather data from software repositories."
 category = "main"
 optional = false
@@ -516,11 +516,11 @@ requests = ">=2.7.0,<3.0.0"
 urllib3 = ">=1.26,<2.0"
 
 [package.extras]
-docs = ["myst-parser (>=0.15.2,<0.16.0)", "furo (>=2021.8.31,<2022.0.0)"]
+docs = ["furo (>=2021.8.31,<2022.0.0)", "myst-parser (>=0.15.2,<0.16.0)"]
 
 [[package]]
 name = "perceval-mozilla"
-version = "0.3.2rc1"
+version = "0.3.2rc2"
 description = "Bundle of Perceval backends for Mozilla ecosystem."
 category = "main"
 optional = false
@@ -533,7 +533,7 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-opnfv"
-version = "0.2.2rc1"
+version = "0.2.2rc2"
 description = "Bundle of Perceval backends for OPNFV ecosystem."
 category = "main"
 optional = false
@@ -546,7 +546,7 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-puppet"
-version = "0.2.2rc1"
+version = "0.2.2rc2"
 description = "Bundle of Perceval backends for Puppet, Inc. ecosystem."
 category = "main"
 optional = false
@@ -559,7 +559,7 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-weblate"
-version = "0.2.2rc1"
+version = "0.2.2rc2"
 description = "Bundle of Perceval backends for Weblate."
 category = "main"
 optional = false
@@ -579,8 +579,8 @@ optional = false
 python-versions = ">=3.7"
 
 [package.extras]
-docs = ["furo (>=2021.7.5b38)", "proselint (>=0.10.2)", "sphinx-autodoc-typehints (>=1.12)", "sphinx (>=4)"]
-test = ["appdirs (==1.4.4)", "pytest-cov (>=2.7)", "pytest-mock (>=3.6)", "pytest (>=6)"]
+docs = ["furo (>=2021.7.5b38)", "proselint (>=0.10.2)", "sphinx (>=4)", "sphinx-autodoc-typehints (>=1.12)"]
+test = ["appdirs (==1.4.4)", "pytest (>=6)", "pytest-cov (>=2.7)", "pytest-mock (>=3.6)"]
 
 [[package]]
 name = "pycodestyle"
@@ -627,9 +627,9 @@ python-versions = ">=3.6"
 
 [package.extras]
 crypto = ["cryptography (>=3.3.1)"]
-dev = ["sphinx", "sphinx-rtd-theme", "zope.interface", "cryptography (>=3.3.1)", "pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)", "mypy", "pre-commit"]
+dev = ["coverage[toml] (==5.0.4)", "cryptography (>=3.3.1)", "mypy", "pre-commit", "pytest (>=6.0.0,<7.0.0)", "sphinx", "sphinx-rtd-theme", "zope.interface"]
 docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
-tests = ["pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)"]
+tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
 name = "pylint"
@@ -672,7 +672,7 @@ optional = false
 python-versions = ">=3.6.8"
 
 [package.extras]
-diagrams = ["railroad-diagrams", "jinja2"]
+diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "python-dateutil"
@@ -799,7 +799,7 @@ postgresql = ["psycopg2"]
 postgresql_pg8000 = ["pg8000 (<1.16.6)"]
 postgresql_psycopg2binary = ["psycopg2-binary"]
 postgresql_psycopg2cffi = ["psycopg2cffi"]
-pymysql = ["pymysql (<1)", "pymysql"]
+pymysql = ["pymysql", "pymysql (<1)"]
 
 [[package]]
 name = "statsmodels"
@@ -819,7 +819,7 @@ scipy = ">=1.3"
 [package.extras]
 build = ["cython (>=0.29.26)"]
 develop = ["cython (>=0.29.26)"]
-docs = ["sphinx", "nbconvert", "jupyter-client", "ipykernel", "matplotlib", "nbformat", "numpydoc", "pandas-datareader"]
+docs = ["ipykernel", "jupyter-client", "matplotlib", "nbconvert", "nbformat", "numpydoc", "pandas-datareader", "sphinx"]
 
 [[package]]
 name = "stevedore"
@@ -867,7 +867,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4"
 
 [package.extras]
 brotli = ["brotlipy (>=0.6.0)"]
-secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "ipaddress"]
+secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "ipaddress", "pyOpenSSL (>=0.14)"]
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
@@ -887,8 +887,8 @@ optional = false
 python-versions = ">=3.7"
 
 [package.extras]
-docs = ["sphinx", "jaraco.packaging (>=9)", "rst.linker (>=1.9)"]
-testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)"]
+docs = ["jaraco.packaging (>=9)", "rst.linker (>=1.9)", "sphinx"]
+testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.0.1)", "pytest-flake8", "pytest-mypy (>=0.9.1)"]
 
 [metadata]
 lock-version = "1.1"
@@ -909,8 +909,8 @@ beautifulsoup4 = [
     {file = "beautifulsoup4-4.11.1.tar.gz", hash = "sha256:ad9aa55b65ef2808eb405f46cf74df7fcb7044d5cbc26487f96eb2ef2e436693"},
 ]
 cereslib = [
-    {file = "cereslib-0.3.1-py3-none-any.whl", hash = "sha256:f40c7a1cf4aab9a094d067718e47816c291810f25eb8c4a06c6564785d9b1929"},
-    {file = "cereslib-0.3.1.tar.gz", hash = "sha256:a9fb1ce2146ecbbc240217eba015f26604de41f5e175077c5919b0eb5a66c23f"},
+    {file = "cereslib-0.3.2rc1-py3-none-any.whl", hash = "sha256:8c1723ce2b5d32e9bc10ff4cf729cef8e056dbb34efa22c9420f698c3d65a0ef"},
+    {file = "cereslib-0.3.2rc1.tar.gz", hash = "sha256:cc2a221b0d42c3dfed2641913d6edd09379378bd262b1cd7969a2aff341771e4"},
 ]
 certifi = [
     {file = "certifi-2022.5.18.1-py3-none-any.whl", hash = "sha256:f1d53542ee8cbedbe2118b5686372fb33c297fcd6379b050cca0ef13a597382a"},
@@ -1121,8 +1121,8 @@ gitpython = [
     {file = "GitPython-3.1.27.tar.gz", hash = "sha256:1c885ce809e8ba2d88a29befeb385fcea06338d3640712b59ca623c220bb5704"},
 ]
 graal = [
-    {file = "graal-0.3.2rc1-py3-none-any.whl", hash = "sha256:dd5d5c836ce38a4069d9583ca4161e4d7ba98c3baacace39158cb676679704f3"},
-    {file = "graal-0.3.2rc1.tar.gz", hash = "sha256:bd9dc169f1f2a37e2a15d60d39adfed722b5b397332c0e738a8bc150348c9afa"},
+    {file = "graal-0.3.2rc2-py3-none-any.whl", hash = "sha256:04daac8b0a9c8150f347be1ca1d66d59a98f3a36df99298ff76ddc3fc86e18e2"},
+    {file = "graal-0.3.2rc2.tar.gz", hash = "sha256:87f5ebaf60ddb3d26508f4f4fd73bc33fd9be46e349c9b441abfa508673e27fa"},
 ]
 grimoirelab-toolkit = [
     {file = "grimoirelab-toolkit-0.3.0.tar.gz", hash = "sha256:8d443d4047e18cc858fcfdcd9143c5d54444e7a6355e36fe26818e0125b576ae"},
@@ -1297,24 +1297,24 @@ pbr = [
     {file = "pbr-5.9.0.tar.gz", hash = "sha256:e8dca2f4b43560edef58813969f52a56cef023146cbb8931626db80e6c1c4308"},
 ]
 perceval = [
-    {file = "perceval-0.20.0rc2-py3-none-any.whl", hash = "sha256:9d929ccdaa03f4331fa7a493e236a23b96f8362d1eabd3a5fc2c5131dbe501a5"},
-    {file = "perceval-0.20.0rc2.tar.gz", hash = "sha256:3c6faa9383345368a7462ea93a6d5cbf9380ab451f9abf83adb61beba11b26e6"},
+    {file = "perceval-0.20.0rc3-py3-none-any.whl", hash = "sha256:b73e2c0efe08bb597fda82951bc3c9c60617abe5a33b229dea71dbd4224988ce"},
+    {file = "perceval-0.20.0rc3.tar.gz", hash = "sha256:77533d0f736c958612410f52654360a076519308a945f0b61e825831c4ad9680"},
 ]
 perceval-mozilla = [
-    {file = "perceval-mozilla-0.3.2rc1.tar.gz", hash = "sha256:f9846875920dd01e0b6de6d69ec7a68342f30f1badfe6a353583057d1b195e36"},
-    {file = "perceval_mozilla-0.3.2rc1-py3-none-any.whl", hash = "sha256:299178c941eefbef8da3c3372efd3d7d1050afd298f8194f17c275805b109016"},
+    {file = "perceval-mozilla-0.3.2rc2.tar.gz", hash = "sha256:0a98d0315e1e2fd35d3b776973be799848d4539a555543f920cdb30b56ee1ad9"},
+    {file = "perceval_mozilla-0.3.2rc2-py3-none-any.whl", hash = "sha256:e8209e626bae0e8642ee7847c4c0c51aba7c1427d4af46c3f804855c74343c8a"},
 ]
 perceval-opnfv = [
-    {file = "perceval-opnfv-0.2.2rc1.tar.gz", hash = "sha256:130f83b166be532cc83f86313da7d9094fb650fd2afcf17c1c731dafb95c021c"},
-    {file = "perceval_opnfv-0.2.2rc1-py3-none-any.whl", hash = "sha256:a54fd54b39722752ef800f14a4b4ff43cdb3512dbe7934cdb71606a4449fb4ef"},
+    {file = "perceval-opnfv-0.2.2rc2.tar.gz", hash = "sha256:6c24ebfb5ef23a215695078070e23b2d4ce84d65c719d4bc52ceaa9439b527a8"},
+    {file = "perceval_opnfv-0.2.2rc2-py3-none-any.whl", hash = "sha256:590431b1f53073c3eea54417995bcf36658967b81cb621fa79a73d41f5f435ef"},
 ]
 perceval-puppet = [
-    {file = "perceval-puppet-0.2.2rc1.tar.gz", hash = "sha256:5696b32ec66c74217f62e53a75e9729f00fa01a319805a870c2abb89628e29ad"},
-    {file = "perceval_puppet-0.2.2rc1-py3-none-any.whl", hash = "sha256:32f754f5f79789c08d3a3db504a41b20f9eaa0360d8875832b5ae82ffc5dc419"},
+    {file = "perceval-puppet-0.2.2rc2.tar.gz", hash = "sha256:d209d8ab1adf6dc488b9d12632c9893917c502dbe0b0d6404d05a3d4e4bbb3a6"},
+    {file = "perceval_puppet-0.2.2rc2-py3-none-any.whl", hash = "sha256:be41b3fe31365d75585db387a3afeee543423d3e57317c4a6aa9cab78704e409"},
 ]
 perceval-weblate = [
-    {file = "perceval-weblate-0.2.2rc1.tar.gz", hash = "sha256:60173c8ebba4fafb7c878ad8df2bb6e65e4f654652f03af4613826af038f238f"},
-    {file = "perceval_weblate-0.2.2rc1-py3-none-any.whl", hash = "sha256:80081f1c4ae42618dacede6df7e76e7d982241a039e3438840b7ff95da271f2d"},
+    {file = "perceval-weblate-0.2.2rc2.tar.gz", hash = "sha256:6471cc5d6f34ffce6e003cfbe883f3667e9bbe628232f6944f762095e76b22db"},
+    {file = "perceval_weblate-0.2.2rc2-py3-none-any.whl", hash = "sha256:2cfb843067f02c57db80a22e4ebf710d6c800126c08d1c02b2baefd19f54cdb1"},
 ]
 platformdirs = [
     {file = "platformdirs-2.5.2-py3-none-any.whl", hash = "sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788"},
