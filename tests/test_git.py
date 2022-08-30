@@ -24,8 +24,10 @@
 
 import datetime
 import logging
+import os
 import requests
 import time
+import shutil
 import unittest
 
 from base import TestBaseBackend
@@ -615,6 +617,43 @@ class TestGit(TestBaseBackend):
                 self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.git:[git] study git-branches start')
                 self.assertEqual(cm.output[1], 'INFO:grimoire_elk.enriched.git:[git] study git-branches skipping'
                                                ' repo {}'.format(projects_json_repo))
+                self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.git:[git] study git-branches end')
+
+    def test_enrich_git_branches_study_skip_uncloned_repository(self):
+        """ Test that the git branches study skip when the repository is not cloned """
+
+        projects_json_repo = "https://github.com/chaoss/grimoirelab-perceval.git"
+        projects_json = {
+            "no-cloned": {
+                "git": [
+                    "https://github.com/chaoss/grimoirelab-perceval.git"
+                ]
+            }
+        }
+        prjs_map = {
+            "git": {
+                "https://github.com/chaoss/grimoirelab-perceval.git": "no-cloned"
+            }
+        }
+
+        study, ocean_backend, enrich_backend = self._test_study('enrich_git_branches',
+                                                                projects_json=projects_json,
+                                                                prjs_map=prjs_map,
+                                                                projects_json_repo=projects_json_repo)
+        # Remove the clone
+        base_path = os.path.expanduser('~/.perceval/repositories/')
+        processed_uri = projects_json_repo.lstrip('/')
+        git_path = os.path.join(base_path, processed_uri) + '-git'
+        if os.path.exists(git_path) and os.path.isdir(git_path):
+            shutil.rmtree(git_path, ignore_errors=True)
+
+        today = datetime.datetime.today().day
+        with self.assertLogs(git_logger, level='INFO') as cm:
+            if study.__name__ == "enrich_git_branches":
+                study(ocean_backend, enrich_backend, run_month_days=[today])
+                self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.git:[git] study git-branches start')
+                self.assertEqual(cm.output[1], 'ERROR:grimoire_elk.enriched.git:[git] study git-branches skipping'
+                                               ' not cloned repo {}'.format(projects_json_repo))
                 self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.git:[git] study git-branches end')
 
     def test_perceval_params(self):
