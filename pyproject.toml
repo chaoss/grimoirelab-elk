@@ -39,8 +39,8 @@ gelk_mapping = 'utils.gelk_mapping:main'
 python = "^3.7"
 elasticsearch = "6.3.1"
 elasticsearch-dsl = "6.3.1"
-requests = "2.26.0"
-urllib3 = "1.26.5"
+requests = "^2.7.0"
+urllib3 = "^1.26"
 geopy = "^2.0.0"
 PyMySQL = "0.9.3"
 pandas = ">=0.22.0,<=0.25.3"
@@ -56,8 +56,8 @@ perceval-puppet = { version = ">=0.2", allow-prereleases = true}
 perceval-weblate = { version = ">=0.2", allow-prereleases = true}
 
 [tool.poetry.dev-dependencies]
-httpretty = "^0.9.6"
-flake8 = "^3.9.2"
+httpretty = "^1.1.4"
+flake8 = "^4.0.1"
 coverage = "^5.5"
 
 [build-system]
