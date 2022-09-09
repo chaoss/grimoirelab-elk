@@ -1,0 +1,8 @@
+---
+title: git-branches study skip uncloned repo
+category: added
+author: Quan Zhou <quan@bitergia.com>
+issue: null
+notes: >
+    The git-branches study skips the repository when it is not
+    cloned and continues with the next one.

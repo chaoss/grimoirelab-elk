@@ -939,8 +939,11 @@ class GitEnrich(Enrich):
                     logger.info("[git] study git-branches skipping repo {}".format(anonymize_url(url)))
                     continue
                 cmd = GitCommand(*[url])
-
-                git_repo = GitRepository(cmd.parsed_args.uri, cmd.parsed_args.gitpath)
+                try:
+                    git_repo = GitRepository(cmd.parsed_args.uri, cmd.parsed_args.gitpath)
+                except RepositoryError:
+                    logger.error("[git] study git-branches skipping not cloned repo {}".format(anonymize_url(url)))
+                    continue
 
                 logger.debug("[git] study git-branches delete branch info for repo {} in index {}".format(
                              git_repo.uri, anonymize_url(enrich_backend.elastic.index_url)))
