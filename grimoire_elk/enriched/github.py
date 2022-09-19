@@ -584,6 +584,7 @@ class GitHubEnrich(Enrich):
 
         if 'linked_issues_data' in pull_request:
             rich_pr['linked_issues_count'] = pull_request['linked_issues_data']
+        rich_pr['commits_data'] = pull_request['commits_data']
 
         if self.prjs_map:
             rich_pr.update(self.get_item_project(rich_pr))
@@ -674,6 +675,7 @@ class GitHubEnrich(Enrich):
         rich_issue['github_repo'] = rich_issue['repository'].replace(GITHUB, '')
         rich_issue['github_repo'] = re.sub('.git$', '', rich_issue['github_repo'])
         rich_issue["url_id"] = rich_issue['github_repo'] + "/issues/" + rich_issue['id_in_repo']
+        rich_issue['body'] = issue['body']
 
         if self.prjs_map:
             rich_issue.update(self.get_item_project(rich_issue))
