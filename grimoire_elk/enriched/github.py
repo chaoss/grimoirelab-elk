@@ -716,21 +716,23 @@ class GitHubEnrich(Enrich):
         rich_repo['url'] = repo['html_url']
 
         rich_releases = []
-        for release in repo['releases'] :
-            rich_releases_dict = {}
-            rich_releases_dict['id'] = release['id']
-            rich_releases_dict['tag_name'] = release['tag_name']
-            rich_releases_dict['target_commitish'] = release['target_commitish']
-            rich_releases_dict['prerelease'] = release['prerelease']
-            rich_releases_dict['name'] = release['name']
-            rich_releases_dict['body'] = release['body']
-            rich_releases_dict['created_at'] = release['created_at']
-            release_author = release['author']
-            rich_releases_author_dict = {}
-            rich_releases_author_dict['login'] = release_author['login']
-            rich_releases_author_dict['name'] = ''
-            rich_releases_dict['author'] = rich_releases_author_dict
-            rich_releases.append(rich_releases_dict)
+        releases = repo.get('releases')
+        if releases:
+            for release in releases:
+                rich_releases_dict = {}
+                rich_releases_dict['id'] = release['id']
+                rich_releases_dict['tag_name'] = release['tag_name']
+                rich_releases_dict['target_commitish'] = release['target_commitish']
+                rich_releases_dict['prerelease'] = release['prerelease']
+                rich_releases_dict['name'] = release['name']
+                rich_releases_dict['body'] = release['body']
+                rich_releases_dict['created_at'] = release['created_at']
+                release_author = release['author']
+                rich_releases_author_dict = {}
+                rich_releases_author_dict['login'] = release_author['login']
+                rich_releases_author_dict['name'] = ''
+                rich_releases_dict['author'] = rich_releases_author_dict
+                rich_releases.append(rich_releases_dict)
         rich_repo['releases'] = rich_releases
         rich_repo['releases_count'] = len(rich_releases)
 
