@@ -49,7 +49,7 @@ lxml = ["lxml"]
 
 [[package]]
 name = "cereslib"
-version = "0.3.2rc3"
+version = "0.3.2rc4"
 description = "GrimoireLab: Unify, eventize and enrich information from Perceval"
 category = "main"
 optional = false
@@ -298,7 +298,7 @@ typing-extensions = {version = ">=3.7.4.3", markers = "python_version < \"3.8\""
 
 [[package]]
 name = "graal"
-version = "0.3.2rc8"
+version = "0.3.2rc9"
 description = "A generic source code analyzer"
 category = "main"
 optional = false
@@ -494,7 +494,7 @@ python-versions = ">=2.6"
 
 [[package]]
 name = "perceval"
-version = "0.20.0rc14"
+version = "0.20.0rc15"
 description = "Send Sir Perceval on a quest to fetch and gather data from software repositories."
 category = "main"
 optional = false
@@ -516,7 +516,7 @@ docs = ["furo (>=2021.8.31,<2022.0.0)", "myst-parser (>=0.15.2,<0.16.0)"]
 
 [[package]]
 name = "perceval-mozilla"
-version = "0.3.2rc10"
+version = "0.3.2rc11"
 description = "Bundle of Perceval backends for Mozilla ecosystem."
 category = "main"
 optional = false
@@ -529,7 +529,7 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-opnfv"
-version = "0.2.2rc11"
+version = "0.2.2rc12"
 description = "Bundle of Perceval backends for OPNFV ecosystem."
 category = "main"
 optional = false
@@ -542,7 +542,7 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-puppet"
-version = "0.2.2rc10"
+version = "0.2.2rc11"
 description = "Bundle of Perceval backends for Puppet, Inc. ecosystem."
 category = "main"
 optional = false
@@ -555,7 +555,7 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-weblate"
-version = "0.2.2rc12"
+version = "0.2.2rc13"
 description = "Bundle of Perceval backends for Weblate."
 category = "main"
 optional = false
@@ -766,7 +766,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "sortinghat"
-version = "0.7.21rc5"
+version = "0.7.21rc6"
 description = "A tool to manage identities."
 category = "main"
 optional = false
@@ -919,8 +919,8 @@ beautifulsoup4 = [
     {file = "beautifulsoup4-4.11.1.tar.gz", hash = "sha256:ad9aa55b65ef2808eb405f46cf74df7fcb7044d5cbc26487f96eb2ef2e436693"},
 ]
 cereslib = [
-    {file = "cereslib-0.3.2rc3-py3-none-any.whl", hash = "sha256:672a6d11620360e07e7a3898052f5ebebcc42ced931a4e972a3be3b93a916160"},
-    {file = "cereslib-0.3.2rc3.tar.gz", hash = "sha256:22766d63357c8378ad85decce9120e29f99be9f11426676fa1c95fc539ce0a64"},
+    {file = "cereslib-0.3.2rc4-py3-none-any.whl", hash = "sha256:69876f8609df029143bb26f37cafd3787f68c2f3dfdee47a2b96bdc2aeb6360e"},
+    {file = "cereslib-0.3.2rc4.tar.gz", hash = "sha256:80c0eb43821e8f93c4666ece1acbda90e20411c212ca0d57a5345ad19361ab9c"},
 ]
 certifi = [
     {file = "certifi-2022.9.24-py3-none-any.whl", hash = "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382"},
@@ -1155,8 +1155,8 @@ GitPython = [
     {file = "GitPython-3.1.27.tar.gz", hash = "sha256:1c885ce809e8ba2d88a29befeb385fcea06338d3640712b59ca623c220bb5704"},
 ]
 graal = [
-    {file = "graal-0.3.2rc8-py3-none-any.whl", hash = "sha256:485d398f81dc539ee50ece01770d3e689e7802d075524c81c8475a8d1ff2e972"},
-    {file = "graal-0.3.2rc8.tar.gz", hash = "sha256:683f957189867fb89ac73feefeca6fb379da33f13588afc7120b951bc35c0d6d"},
+    {file = "graal-0.3.2rc9-py3-none-any.whl", hash = "sha256:40cd58314bc32bc461378dd535fc4a4a7799b8ddfbf57348e21b706953492a2b"},
+    {file = "graal-0.3.2rc9.tar.gz", hash = "sha256:e6809dc43b97b80cbef1b24701e0ed84fbfd2eba8c4e1a16270b848e21e9a3a3"},
 ]
 grimoirelab-toolkit = [
     {file = "grimoirelab-toolkit-0.3.1rc1.tar.gz", hash = "sha256:b2ee5a5fcffdff0212f7ec82b3d8c4bcbfbef411200788a783752b2352344d61"},
@@ -1338,24 +1338,24 @@ pbr = [
     {file = "pbr-5.10.0.tar.gz", hash = "sha256:cfcc4ff8e698256fc17ea3ff796478b050852585aa5bae79ecd05b2ab7b39b9a"},
 ]
 perceval = [
-    {file = "perceval-0.20.0rc14-py3-none-any.whl", hash = "sha256:d926d0610e1bfed7e3a025e60da9436774e81fcc66b8d8bd74dafa61cf7f7208"},
-    {file = "perceval-0.20.0rc14.tar.gz", hash = "sha256:63192276d4c24ad19a0c5fd0986ab8a93c321d4661918b114e77a05955a9f060"},
+    {file = "perceval-0.20.0rc15-py3-none-any.whl", hash = "sha256:6b9267ed99bf7f067dbb188754852bb04d31fac4ebdcb6c5366732eb74ca3fe1"},
+    {file = "perceval-0.20.0rc15.tar.gz", hash = "sha256:fb97545ba506a9d2a7846cbc2853c2d13939e007e3dae70053ec96b2d69b2f6c"},
 ]
 perceval-mozilla = [
-    {file = "perceval-mozilla-0.3.2rc10.tar.gz", hash = "sha256:9aad32f7d15ab138db8e3a286f7e9f23b9bd5886b51f89a84741e8065fa9ba56"},
-    {file = "perceval_mozilla-0.3.2rc10-py3-none-any.whl", hash = "sha256:dd9c1a7fb49eeeaca99c9acacc081b657ce986a6d143390ce0e61692a5e468a8"},
+    {file = "perceval-mozilla-0.3.2rc11.tar.gz", hash = "sha256:406305ac2620a21b4164d52c3a8ac8ac1766d724f72f720a1ef48d6aeb8b1ad6"},
+    {file = "perceval_mozilla-0.3.2rc11-py3-none-any.whl", hash = "sha256:323b8a38f503ada1769a45b2982af35ddbcbf11e3bb7ba5d01d5c1203d8a4ad8"},
 ]
 perceval-opnfv = [
-    {file = "perceval-opnfv-0.2.2rc11.tar.gz", hash = "sha256:1c190c1f90ddab46358ea7acbb1ecb7c2113b557bbe7b360b1326cc34900392a"},
-    {file = "perceval_opnfv-0.2.2rc11-py3-none-any.whl", hash = "sha256:0add6b0717660cb0cebc1dd6d74bb9398ddc02e5e4b09ef9b3a386f68cba817a"},
+    {file = "perceval-opnfv-0.2.2rc12.tar.gz", hash = "sha256:357e79570c9433b584887704f8438a62d0ee5ff6eff39d18499ba0d5233a7a37"},
+    {file = "perceval_opnfv-0.2.2rc12-py3-none-any.whl", hash = "sha256:67c3957d9f61c686455effabf813e822c1a38faa20a4734e4e2f9052212aa627"},
 ]
 perceval-puppet = [
-    {file = "perceval-puppet-0.2.2rc10.tar.gz", hash = "sha256:c93fa6e94e416370264565bc672b1813c02359688a5ebb8d1c1464cb399fe723"},
-    {file = "perceval_puppet-0.2.2rc10-py3-none-any.whl", hash = "sha256:08239925a94ef27d63ec85f3a17b00374ce0ec172c04595864e892d21df90e44"},
+    {file = "perceval-puppet-0.2.2rc11.tar.gz", hash = "sha256:0389fcfefd50eb0a26567e7487689e3906320c5b914efd3dfa1c9a6fe583b5a9"},
+    {file = "perceval_puppet-0.2.2rc11-py3-none-any.whl", hash = "sha256:f1bdfa3700a7e105e061bb11023ba8dde29a89d4feb90c38a8d9cb055fadfc5b"},
 ]
 perceval-weblate = [
-    {file = "perceval-weblate-0.2.2rc12.tar.gz", hash = "sha256:a3475cfc470f7c6ee7fdd561c7e5ada65bf478634be2a94e4d8d18d386a43973"},
-    {file = "perceval_weblate-0.2.2rc12-py3-none-any.whl", hash = "sha256:38c73b8ed8b5e46368a700b097a414b20e8e53529c5858efde234eeee5e2a222"},
+    {file = "perceval-weblate-0.2.2rc13.tar.gz", hash = "sha256:ec8501c6f9408e6c0fb9bb1809c109a0a6a57a0fcd601d65feabd8092b9bd5d4"},
+    {file = "perceval_weblate-0.2.2rc13-py3-none-any.whl", hash = "sha256:1ba509ac03de373f5b7b82efc80acff5f130d35e060ef3c7a243cdc310593476"},
 ]
 platformdirs = [
     {file = "platformdirs-2.5.2-py3-none-any.whl", hash = "sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788"},
@@ -1409,6 +1409,13 @@ PyYAML = [
     {file = "PyYAML-6.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:f84fbc98b019fef2ee9a1cb3ce93e3187a6df0b2538a651bfb890254ba9f90b5"},
     {file = "PyYAML-6.0-cp310-cp310-win32.whl", hash = "sha256:2cd5df3de48857ed0544b34e2d40e9fac445930039f3cfe4bcc592a1f836d513"},
     {file = "PyYAML-6.0-cp310-cp310-win_amd64.whl", hash = "sha256:daf496c58a8c52083df09b80c860005194014c3698698d1a57cbcfa182142a3a"},
+    {file = "PyYAML-6.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:d4b0ba9512519522b118090257be113b9468d804b19d63c71dbcf4a48fa32358"},
+    {file = "PyYAML-6.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:81957921f441d50af23654aa6c5e5eaf9b06aba7f0a19c18a538dc7ef291c5a1"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:afa17f5bc4d1b10afd4466fd3a44dc0e245382deca5b3c353d8b757f9e3ecb8d"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:dbad0e9d368bb989f4515da330b88a057617d16b6a8245084f1b05400f24609f"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:432557aa2c09802be39460360ddffd48156e30721f5e8d917f01d31694216782"},
+    {file = "PyYAML-6.0-cp311-cp311-win32.whl", hash = "sha256:bfaef573a63ba8923503d27530362590ff4f576c626d86a9fed95822a8255fd7"},
+    {file = "PyYAML-6.0-cp311-cp311-win_amd64.whl", hash = "sha256:01b45c0191e6d66c470b6cf1b9531a771a83c1c4208272ead47a3ae4f2f603bf"},
     {file = "PyYAML-6.0-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:897b80890765f037df3403d22bab41627ca8811ae55e9a722fd0392850ec4d86"},
     {file = "PyYAML-6.0-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:50602afada6d6cbfad699b0c7bb50d5ccffa7e46a3d738092afddc1f9758427f"},
     {file = "PyYAML-6.0-cp36-cp36m-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:48c346915c114f5fdb3ead70312bd042a953a8ce5c7106d5bfb1a5254e47da92"},
@@ -1477,8 +1484,8 @@ smmap = [
     {file = "smmap-5.0.0.tar.gz", hash = "sha256:c840e62059cd3be204b0c9c9f74be2c09d5648eddd4580d9314c3ecde0b30936"},
 ]
 sortinghat = [
-    {file = "sortinghat-0.7.21rc5-py3-none-any.whl", hash = "sha256:c39ae724aefc6336f43668ab44aae259f968c51ea4e0f1456878d1bb11d6f4f0"},
-    {file = "sortinghat-0.7.21rc5.tar.gz", hash = "sha256:db5f9b00b558c60ac999863ee3ffbff0cf060afc81b7bcd7e6711a2b6d65afca"},
+    {file = "sortinghat-0.7.21rc6-py3-none-any.whl", hash = "sha256:bad65a282c8cbeec782dd8fa61a3b1990fca328d12fa87b382108c859fe7607e"},
+    {file = "sortinghat-0.7.21rc6.tar.gz", hash = "sha256:ce6500f009836625782686687d3953c44fe78cfff5b1abc993e5ae9c3a81976a"},
 ]
 soupsieve = [
     {file = "soupsieve-2.3.2.post1-py3-none-any.whl", hash = "sha256:3b2503d3c7084a42b1ebd08116e5f81aadfaea95863628c80a3b774a11b7c759"},
