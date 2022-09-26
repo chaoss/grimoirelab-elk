@@ -1,9 +1,0 @@
----
-title: 'Configurable study aliases'
-category: added
-author: Quan Zhou <quan@bitergia.com>
-issue: null
-notes: >
-    Before this fix, the name of the study aliases was hard coded.
-    From now on, these values can be configured by passing them as
-    parameters.
