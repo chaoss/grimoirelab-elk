@@ -376,7 +376,7 @@ class GitLabEnrich(Enrich):
             if due_date_str:
                 eitem['milestone_due_date'] = str_to_datetime(due_date_str).replace(tzinfo=None).isoformat()
 
-    def enrich_onion(self, ocean_backend, enrich_backend,
+    def enrich_onion(self, ocean_backend, enrich_backend, alias,
                      in_index, out_index, data_source=None, no_incremental=False,
                      contribs_field='uuid',
                      timeframe_field='grimoire_creation_date',
@@ -391,6 +391,7 @@ class GitLabEnrich(Enrich):
                            data_source, GITLAB_ISSUES, GITLAB_MERGES))
 
         super().enrich_onion(enrich_backend=enrich_backend,
+                             alias=alias,
                              in_index=in_index,
                              out_index=out_index,
                              data_source=data_source,

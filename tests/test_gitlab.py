@@ -20,6 +20,9 @@
 #
 import logging
 import unittest
+import time
+
+import requests
 
 from base import TestBaseBackend
 from grimoire_elk.enriched.gitlab import NO_MILESTONE_TAG
@@ -299,6 +302,41 @@ class TestGitLab(TestBaseBackend):
                     self.assertEqual(item[attribute], eitem[attribute])
                 else:
                     self.assertIsNone(eitem[attribute])
+
+    def test_onion_study(self):
+        """ Test that the onion study works correctly """
+
+        alias = "all_onion"
+        study, ocean_backend, enrich_backend = self._test_study('enrich_onion')
+        study(ocean_backend, enrich_backend, alias, in_index='test_gitlab_enrich', out_index='test_gitlab_onion',
+              data_source='gitlab-issues')
+
+        url = self.es_con + "/_aliases"
+        response = requests.get(url, verify=False).json()
+        self.assertTrue('test_gitlab_onion' in response)
+
+        time.sleep(1)
+
+        url = self.es_con + "/test_gitlab_onion/_search?size=20"
+        response = requests.get(url, verify=False).json()
+        hits = response['hits']['hits']
+        self.assertEqual(len(hits), 10)
+        for hit in hits:
+            source = hit['_source']
+            self.assertIn('timeframe', source)
+            self.assertIn('author_uuid', source)
+            self.assertIn('author_name', source)
+            self.assertIn('contributions', source)
+            self.assertIn('metadata__timestamp', source)
+            self.assertIn('project', source)
+            self.assertIn('author_org_name', source)
+            self.assertIn('cum_net_sum', source)
+            self.assertIn('percent_cum_net_sum', source)
+            self.assertIn('onion_role', source)
+            self.assertIn('quarter', source)
+            self.assertIn('metadata__enriched_on', source)
+            self.assertIn('data_source', source)
+            self.assertIn('grimoire_creation_date', source)
 
 
 if __name__ == "__main__":
