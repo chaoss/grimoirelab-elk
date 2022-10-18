@@ -50,17 +50,19 @@ class ElasticItems:
     scroll_size = 100
     scroll_wait = 900
 
-    def __init__(self, perceval_backend, from_date=None, insecure=True, offset=None):
+    def __init__(self, perceval_backend, from_date=None, insecure=True, offset=None, to_date=None):
         """Class to perform operations over the items stored in a ES index.
 
         :param perceval_backend: Perceval backend object
         :param from_date: Date obj used to extract the items in an ES index after a given date
         :param insecure: support https with invalid certificates
         :param offset: Offset number used to extract the items in an ES index after a given offset ID
+        :param to_date: Date obj used to extract the items in an ES index before a given date
         """
         self.perceval_backend = perceval_backend
         self.last_update = None  # Last update in ocean items index for feed
         self.from_date = from_date  # fetch from_date
+        self.to_date = to_date  # fetch to_date
         self.offset = offset  # fetch from offset
         self.filter_raw = None  # to filter raw items from Ocean
         self.filter_raw_dict = []

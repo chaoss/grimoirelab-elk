@@ -1,0 +1,8 @@
+---
+title: Option 'to-date' on the backend sections
+category: added
+author: Quan Zhou <quan@bitergia.com>
+issue: null
+notes: >
+    The option `to-date` on the `setup.cfg` allows fetching data until a
+    specific date. By default, this value is `2100-01-01`.
