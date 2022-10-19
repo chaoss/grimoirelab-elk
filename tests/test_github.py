@@ -24,6 +24,8 @@ import logging
 import time
 import unittest
 
+import requests
+
 from base import TestBaseBackend
 from grimoire_elk.enriched.enrich import logger
 from grimoire_elk.enriched.github import logger as logger_github
@@ -384,6 +386,63 @@ class TestGitHub(TestBaseBackend):
                     self.assertEqual(item[attribute], eitem[attribute])
                 else:
                     self.assertIsNone(eitem[attribute])
+
+    def test_onion_study(self):
+        """ Test that the onion study works correctly """
+
+        alias = "all_onion"
+        study, ocean_backend, enrich_backend = self._test_study('enrich_onion')
+        study(ocean_backend, enrich_backend, alias, in_index_iss='test_github_enrich', in_index_prs="test_github_enrich",
+              out_index_iss='test_github_issues_onion', out_index_prs="test_github_prs_onion")
+
+        url = self.es_con + "/_aliases"
+        response = requests.get(url, verify=False).json()
+        self.assertTrue('test_github_issues_onion' in response)
+        self.assertTrue('test_github_prs_onion' in response)
+
+        time.sleep(1)
+
+        url = self.es_con + "/test_github_issues_onion/_search?size=20"
+        response = requests.get(url, verify=False).json()
+        hits = response['hits']['hits']
+        self.assertEqual(len(hits), 8)
+        for hit in hits:
+            source = hit['_source']
+            self.assertIn('timeframe', source)
+            self.assertIn('author_uuid', source)
+            self.assertIn('author_name', source)
+            self.assertIn('contributions', source)
+            self.assertIn('metadata__timestamp', source)
+            self.assertIn('project', source)
+            self.assertIn('author_org_name', source)
+            self.assertIn('cum_net_sum', source)
+            self.assertIn('percent_cum_net_sum', source)
+            self.assertIn('onion_role', source)
+            self.assertIn('quarter', source)
+            self.assertIn('metadata__enriched_on', source)
+            self.assertIn('data_source', source)
+            self.assertIn('grimoire_creation_date', source)
+
+        url = self.es_con + "/test_github_prs_onion/_search?size=20"
+        response = requests.get(url, verify=False).json()
+        hits = response['hits']['hits']
+        self.assertEqual(len(hits), 8)
+        for hit in hits:
+            source = hit['_source']
+            self.assertIn('timeframe', source)
+            self.assertIn('author_uuid', source)
+            self.assertIn('author_name', source)
+            self.assertIn('contributions', source)
+            self.assertIn('metadata__timestamp', source)
+            self.assertIn('project', source)
+            self.assertIn('author_org_name', source)
+            self.assertIn('cum_net_sum', source)
+            self.assertIn('percent_cum_net_sum', source)
+            self.assertIn('onion_role', source)
+            self.assertIn('quarter', source)
+            self.assertIn('metadata__enriched_on', source)
+            self.assertIn('data_source', source)
+            self.assertIn('grimoire_creation_date', source)
 
 
 if __name__ == "__main__":

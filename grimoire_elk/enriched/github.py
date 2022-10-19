@@ -265,6 +265,7 @@ class GitHubEnrich(Enrich):
                              seconds=seconds)
 
         super().enrich_onion(enrich_backend=enrich_backend,
+                             alias=alias,
                              in_index=in_index_prs,
                              out_index=out_index_prs,
                              data_source=data_source_prs,
