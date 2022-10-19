@@ -1,4 +1,4 @@
-# Welcome to GrimoireELK [![Build Status](https://github.com/chaoss/grimoirelab-elk/workflows/tests/badge.svg)](https://github.com/chaoss/grimoirelab-elk/actions?query=workflow:tests+branch:master+event:push) [![Coverage Status](https://coveralls.io/repos/github/chaoss/grimoirelab-elk/badge.svg?branch=master)](https://coveralls.io/github/chaoss/grimoirelab-elk?branch=master)
+# Welcome to GrimoireELK [![Build Status](https://github.com/chaoss/grimoirelab-elk/workflows/tests/badge.svg)](https://github.com/chaoss/grimoirelab-elk/actions?query=workflow:tests+branch:master+event:push) [![Coverage Status](https://coveralls.io/repos/github/chaoss/grimoirelab-elk/badge.svg?branch=master)](https://coveralls.io/github/chaoss/grimoirelab-elk?branch=master) [![PyPI version](https://badge.fury.io/py/grimoire-elk.svg)](https://badge.fury.io/py/grimoire-elk) 
 
 GrimoireELK is the component that interacts with the ElasticSearch database. Its goal is two-fold, first it aims at offering a convenient
 way to store the data coming from Perceval, second it processes and enriches the data in a format that can be consumed by Kibiter.
@@ -117,15 +117,60 @@ profile information (i.e., identity fields) or (iv) to the project listed in the
 #### Data source specific fields
 Details of the fields of each data source is available in the [Schema](https://github.com/chaoss/grimoirelab-elk/tree/master/schema) folder.
 
+## Installation
+
+There are several ways to install GrimoireELK on your system: packages or source 
+code using Poetry or pip.
+
+### PyPI
+
+GrimoireELK can be installed using pip, a tool for installing Python packages. 
+To do it, run the next command:
+```
+$ pip install grimoire-elk
+```
+
+### Source code
+
+To install from the source code you will need to clone the repository first:
+```
+$ git clone https://github.com/chaoss/grimoirelab-elk
+$ cd grimoirelab-elk
+```
+
+Then use pip or Poetry to install the package along with its dependencies.
+
+#### Pip
+To install the package from local directory run the following command:
+```
+$ pip install .
+```
+In case you are a developer, you should install GrimoireELK in editable mode:
+```
+$ pip install -e .
+```
+
+#### Poetry
+We use [poetry](https://python-poetry.org/) for dependency management and 
+packaging. You can install it following its [documentation](https://python-poetry.org/docs/#installation).
+Once you have installed it, you can install GrimoireELK and the dependencies in 
+a project isolated environment using:
+```
+$ poetry install
+```
+To spaw a new shell within the virtual environment use:
+```
+$ poetry shell
+```
+
 ## Running tests
 
-Tests are located in the folder [tests](https://github.com/chaoss/grimoirelab-elk/tree/master/tests). In order to run them, you need to have in your machine:
-- instances (or Docker containers) of ElasticSearch and MySQL
-- the [dependencies](https://github.com/chaoss/grimoirelab-elk/blob/master/requirements.txt) installed or available (the latter applies to the dependencies with the other GrimoireLab repositories).
+Tests are located in the folder [tests](https://github.com/chaoss/grimoirelab-elk/tree/master/tests). 
+In order to run them, you need to have in your machine instances (or Docker containers) of ElasticSearch and MySQL
 
 Then you need to:
 - update the file [tests.conf](https://github.com/chaoss/grimoirelab-elk/blob/master/tests/tests.conf) file:
-  - in case your ElasticSearch instance isn't available at http://localhost:9200. For example, if you are using the secure edition of elasticsearch, it will be located at https://admin:admin@localhost:9200
+  - in case your ElasticSearch instance isn't available at `http://localhost:9200`. For example, if you are using the secure edition of elasticsearch, it will be located at `https://admin:admin@localhost:9200`
   - in case you are using non-default credentials for your SortingHat database, you will need to include the `[Database]` section of the file with both `user` and `password` parameters
 - create the databases `test_sh` and `test_projects` in your MySQL instance (e.g., `mysql -u root -e "create database test_sh"`, if you are running mysql in a container use `docker exec -i <container id> mysql -u root -e "create database test_sh"`)
 - populate the database `test_projects` with the SQL file [test_projects.sql](https://github.com/chaoss/grimoirelab-elk/blob/master/tests/test_projects.sql) (e.g., `mysql -u root test_projects < tests/test_projects.sql`)
