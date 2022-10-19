@@ -25,7 +25,10 @@ packages = [
 ]
 
 include = [
-  "grimoire_elk/enriched/mappings/*.json"
+    "grimoire_elk/enriched/mappings/*.json",
+    { path = "AUTHORS", format = "sdist" },
+    { path = "NEWS", format = "sdist" },
+    { path = "README.md", format = "sdist" },
 ]
 
 [tool.poetry.urls]
