@@ -298,7 +298,7 @@ typing-extensions = {version = ">=3.7.4.3", markers = "python_version < \"3.8\""
 
 [[package]]
 name = "graal"
-version = "0.4.1rc2"
+version = "0.4.1rc3"
 description = "A generic source code analyzer"
 category = "main"
 optional = false
@@ -499,7 +499,7 @@ python-versions = ">=2.6"
 
 [[package]]
 name = "perceval"
-version = "0.21.0rc2"
+version = "0.21.0rc3"
 description = "Send Sir Perceval on a quest to fetch and gather data from software repositories."
 category = "main"
 optional = false
@@ -521,7 +521,7 @@ docs = ["furo (>=2021.8.31,<2022.0.0)", "myst-parser (>=0.15.2,<0.16.0)"]
 
 [[package]]
 name = "perceval-mozilla"
-version = "0.3.4rc2"
+version = "0.3.4rc3"
 description = "Bundle of Perceval backends for Mozilla ecosystem."
 category = "main"
 optional = false
@@ -534,7 +534,7 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-opnfv"
-version = "0.2.4rc2"
+version = "0.2.4rc3"
 description = "Bundle of Perceval backends for OPNFV ecosystem."
 category = "main"
 optional = false
@@ -547,7 +547,7 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-puppet"
-version = "0.2.4rc2"
+version = "0.2.4rc3"
 description = "Bundle of Perceval backends for Puppet, Inc. ecosystem."
 category = "main"
 optional = false
@@ -560,7 +560,7 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-weblate"
-version = "0.2.4rc2"
+version = "0.2.4rc3"
 description = "Bundle of Perceval backends for Weblate."
 category = "main"
 optional = false
@@ -1160,8 +1160,8 @@ gitpython = [
     {file = "GitPython-3.1.29.tar.gz", hash = "sha256:cc36bfc4a3f913e66805a28e84703e419d9c264c1077e537b54f0e1af85dbefd"},
 ]
 graal = [
-    {file = "graal-0.4.1rc2-py3-none-any.whl", hash = "sha256:a7261d8800841576d657a5c6772ddefd233d9ba2a107dc974ae3f5e28d0541a3"},
-    {file = "graal-0.4.1rc2.tar.gz", hash = "sha256:6cdc1dfad85c829a743043d2e6717a67c65caac89a83cccfc19152ea5d4015de"},
+    {file = "graal-0.4.1rc3-py3-none-any.whl", hash = "sha256:d8c56a801f3a5161c28bc610d20bf931e6c7a96b7d1f6b0945d4b8597d423a62"},
+    {file = "graal-0.4.1rc3.tar.gz", hash = "sha256:fd9dc50f86336a2345bd86663ac10a5355da1026dd29abffb7490fd64641b132"},
 ]
 grimoirelab-toolkit = [
     {file = "grimoirelab_toolkit-0.3.2rc1-py3-none-any.whl", hash = "sha256:e2aae33b6f4659b415e238a638eccb65bdbba298f2f95886417b63a57c8f492a"},
@@ -1349,24 +1349,24 @@ pbr = [
     {file = "pbr-5.11.0.tar.gz", hash = "sha256:b97bc6695b2aff02144133c2e7399d5885223d42b7912ffaec2ca3898e673bfe"},
 ]
 perceval = [
-    {file = "perceval-0.21.0rc2-py3-none-any.whl", hash = "sha256:8f7e09dd7475938fcf120290778b750c5d9fc9f78663e51387173cc7b7b0361b"},
-    {file = "perceval-0.21.0rc2.tar.gz", hash = "sha256:f88918e744f444fe7ee390e9d5c859acae4098ce45cae83947835258d7353325"},
+    {file = "perceval-0.21.0rc3-py3-none-any.whl", hash = "sha256:6940e62a4c7645976b96a7cf0eced096d911de1474932d49022a75064f4b4d26"},
+    {file = "perceval-0.21.0rc3.tar.gz", hash = "sha256:8fc843fd7336138c0f3605929ad037f56f0dfaf5576b643cc1bbb33cc9ae1f34"},
 ]
 perceval-mozilla = [
-    {file = "perceval_mozilla-0.3.4rc2-py3-none-any.whl", hash = "sha256:8d16467633fa492e32efcc645c722b9b18e05ea1f2c3d226e3b40694c18d216d"},
-    {file = "perceval_mozilla-0.3.4rc2.tar.gz", hash = "sha256:db25f571200a81063fbd08f1d9c2950167f2346946257b2c88891dfa7cfaf390"},
+    {file = "perceval_mozilla-0.3.4rc3-py3-none-any.whl", hash = "sha256:2be71b8b66d7114c13e055f0950f96fa5208b01917ad8c7f5fa29550eb4e49eb"},
+    {file = "perceval_mozilla-0.3.4rc3.tar.gz", hash = "sha256:cac36a208ef17d00cde9d5e7bf62535c59633dfc2b1f9e0a87e4d79466eaad0d"},
 ]
 perceval-opnfv = [
-    {file = "perceval_opnfv-0.2.4rc2-py3-none-any.whl", hash = "sha256:25d647a79c35746821bd384ce0034ea8d5a281b5880c66517b099487aa17e8fa"},
-    {file = "perceval_opnfv-0.2.4rc2.tar.gz", hash = "sha256:672e61b30a429d571362be3e39c8d10a273df289579564ac953cffd06b7d76f1"},
+    {file = "perceval_opnfv-0.2.4rc3-py3-none-any.whl", hash = "sha256:7acde5dc2cec25d50cae874b5293a7f0d59b155f1141adaceeff6f2bc6cd2425"},
+    {file = "perceval_opnfv-0.2.4rc3.tar.gz", hash = "sha256:8d3a07609453a44ae8da5ff46fba7b3e61d665c332caba01e74bbd4d55fe8e32"},
 ]
 perceval-puppet = [
-    {file = "perceval_puppet-0.2.4rc2-py3-none-any.whl", hash = "sha256:9fb1cfe2d566e01053dfa4d3aa6bcb054a1a189fbdd8e50ba03dcbacda506e62"},
-    {file = "perceval_puppet-0.2.4rc2.tar.gz", hash = "sha256:a2d0a0e6febbcc9d2ad2da41888679eba6882c4f40a96732b5b3e4cd9942eafb"},
+    {file = "perceval_puppet-0.2.4rc3-py3-none-any.whl", hash = "sha256:c1551ac7cda284dd0de1ae19c5f3c491321869b95a2923f36790c37725237dcb"},
+    {file = "perceval_puppet-0.2.4rc3.tar.gz", hash = "sha256:b091519ec47c1830eb144cacea6abe011c40ef5813c7f9b7736ae724e066b90e"},
 ]
 perceval-weblate = [
-    {file = "perceval_weblate-0.2.4rc2-py3-none-any.whl", hash = "sha256:d589d5f801c5bd7e96f0ad9d389134ce96f4a94c6b1ce03cbe2b8bed515413d0"},
-    {file = "perceval_weblate-0.2.4rc2.tar.gz", hash = "sha256:c0676be294a7de091b5d27caee6ed03358ec691f9dc10a793761c7361f15ff00"},
+    {file = "perceval_weblate-0.2.4rc3-py3-none-any.whl", hash = "sha256:59f1fcbdab105284dcdf765772dfa6bd05de108f202974445fad3abeeeb88640"},
+    {file = "perceval_weblate-0.2.4rc3.tar.gz", hash = "sha256:c1c81055b1d82a0ab445cf29d2f9abb2d6b110e2012931d106281eba3110288d"},
 ]
 platformdirs = [
     {file = "platformdirs-2.5.2-py3-none-any.whl", hash = "sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788"},
