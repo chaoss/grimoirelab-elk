@@ -94,6 +94,7 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
         # perceval backends fetch params
         offset = None
         from_date = None
+        to_date = None
         category = None
         branches = None
         latest_items = None
@@ -132,6 +133,12 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
                 from_date = backend_cmd.from_date
             except AttributeError:
                 from_date = backend_cmd.parsed_args.from_date
+
+        if 'to_date' in signature.parameters:
+            try:
+                to_date = backend_cmd.to_date
+            except AttributeError:
+                to_date = backend_cmd.parsed_args.to_date
 
         if 'offset' in signature.parameters:
             try:
@@ -186,6 +193,8 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             params['filter_classified'] = filter_classified
         if from_date and (from_date.replace(tzinfo=None) != str_to_datetime("1970-01-01").replace(tzinfo=None)):
             params['from_date'] = from_date
+        if to_date and (to_date.replace(tzinfo=None) != str_to_datetime("2100-01-01").replace(tzinfo=None)):
+            params['to_date'] = to_date
         if offset:
             params['from_offset'] = offset
         if no_update:

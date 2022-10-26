@@ -59,9 +59,10 @@ class ElasticOcean(ElasticItems):
                             help="Host with elastic search and enriched indexes")
 
     def __init__(self, perceval_backend, from_date=None, fetch_archive=False,
-                 project=None, insecure=True, offset=None, anonymize=False):
+                 project=None, insecure=True, offset=None, anonymize=False,
+                 to_date=None):
 
-        super().__init__(perceval_backend, from_date, insecure, offset)
+        super().__init__(perceval_backend, from_date, insecure, offset, to_date)
 
         self.fetch_archive = fetch_archive  # fetch from archive
         self.project = project  # project to be used for this data source
@@ -153,7 +154,7 @@ class ElasticOcean(ElasticItems):
         item['metadata__timestamp'] = timestamp.isoformat()
 
     def feed(self, from_date=None, from_offset=None, category=None, branches=None,
-             latest_items=None, filter_classified=None, no_update=None):
+             latest_items=None, filter_classified=None, no_update=None, to_date=None):
         """Feed data in Elastic from Perceval"""
 
         if self.fetch_archive:
@@ -180,9 +181,9 @@ class ElasticOcean(ElasticItems):
                 self.last_update = self.get_last_update_from_es(filters_=filters_)
                 last_update = self.last_update
 
-            logger.info("[{}] Incremental from: {} for {}".format(
+            logger.info("[{}] Incremental from: {} until {} for {}".format(
                         self.perceval_backend.__class__.__name__.lower(),
-                        last_update, anonymize_url(self.perceval_backend.origin)))
+                        last_update, to_date, anonymize_url(self.perceval_backend.origin)))
 
         offset = None
         if 'offset' in signature.parameters:
@@ -200,7 +201,7 @@ class ElasticOcean(ElasticItems):
                             self.perceval_backend.__class__.__name__.lower()))
 
         params = {}
-        # category and filter_classified params are shared
+        # category, filter_classified, and to_date params are shared
         # by all Perceval backends
         if category is not None:
             params['category'] = category
@@ -208,6 +209,8 @@ class ElasticOcean(ElasticItems):
             params['branches'] = branches
         if filter_classified is not None:
             params['filter_classified'] = filter_classified
+        if to_date:
+            params['to_date'] = to_date
 
         # no_update, latest_items, from_date and offset cannot be used together,
         # thus, the params dictionary is filled with the param available
