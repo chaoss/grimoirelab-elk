@@ -86,8 +86,9 @@ class GitEnrich(Enrich):
     GIT_AOC_ENRICHED = "git_aoc-enriched"
 
     roles = ['Author', 'Commit']
-    meta_fields = ['acked_by_multi', 'co_developed_by_multi', 'reported_by_multi', 'reviewed_by_multi',
-                   'signed_off_by_multi', 'suggested_by_multi', 'tested_by_multi']
+    meta_fields = ['acked_by_multi', 'approved_by_multi', 'co_authored_by_multi', 'co_developed_by_multi',
+                   'merged_by_multi', 'reported_by_multi', 'reviewed_by_multi', 'signed_off_by_multi',
+                   'suggested_by_multi', 'tested_by_multi']
     meta_fields_suffixes = ['_bots', '_domains', '_names', '_org_names', '_uuids']
     meta_non_authored_prefix = 'non_authored_'
 

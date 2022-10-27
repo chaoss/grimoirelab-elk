@@ -379,7 +379,7 @@
                 "removed": "0"
             }
         ],
-        "message": "Merge branch 'lzp'\n\nConflicts:\n\taaa/otherthing\nSigned-off-by: Owl Capone <owlcapone@boss.io>\nReviewed-by: Owl Capone <owlcapone@boss.io>\nSigned-off-by: Owl Second <owlsecond@second.io>",
+        "message": "Merge branch 'lzp'\n\nConflicts:\n\taaa/otherthing\nSigned-off-by: Owl Capone <owlcapone@boss.io>\nReviewed-by: Owl Capone <owlcapone@boss.io>\nSigned-off-by: Owl Second <owlsecond@second.io>\nMerged-by: Owl Third <owlthird@third.io>\nCo-authored-by: OwlBot <owlbot@boss.io>\nApproved-by: Owl Third <owlthird@third.io>",
         "parents": [
             "ce8e0b86a1e9877f42fe9453ede418519115f367",
             "51a3b654f252210572297f47597b31527c475fb8"
