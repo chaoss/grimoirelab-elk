@@ -1,8 +1,0 @@
----
-title: Onion study on Github pull requests fixed
-category: fixed
-author: Quan Zhou <quan@bitergia.com>
-issue: null
-notes: >
-    Github pull requests onion study is now updated to allow passing
-    the study alias name by parameter.

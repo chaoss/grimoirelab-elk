@@ -1,8 +1,0 @@
----
-title: New Pandas version
-category: dependency
-author: Jose Javier Merchante <jjmerchante@bitergia.com>
-issue: null
-notes: >
-    Update Pandas to the newest version compatible
-    with Python 3.7+.

@@ -1,8 +1,0 @@
----
-title: Onion study on Gitlab fixed
-category: fixed
-author: Quan Zhou <quan@bitergia.com>
-issue: null
-notes: >
-    Gitlab onion study is now updated to allow passing the study
-    alias name by parameter.
