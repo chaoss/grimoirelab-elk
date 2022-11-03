@@ -21,11 +21,17 @@
 
 
 import logging
+import time
 import unittest
 
 import requests
+
 from base import TestBaseBackend
+from grimoire_elk.enriched.enrich import logger, anonymize_url
 from grimoire_elk.enriched.utils import REPO_LABELS
+
+
+HEADER_JSON = {"Content-Type": "application/json"}
 
 
 class TestWeblate(TestBaseBackend):
@@ -223,6 +229,37 @@ class TestWeblate(TestBaseBackend):
                     self.assertEqual(item[attribute], eitem[attribute])
                 else:
                     self.assertIsNone(eitem[attribute])
+
+    def test_demography_study(self):
+        """ Test that the demography study works correctly """
+
+        alias = 'demographics'
+        study, ocean_backend, enrich_backend = self._test_study('enrich_demography')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+
+            if study.__name__ == "enrich_demography":
+                study(ocean_backend, enrich_backend, alias)
+
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[weblate] Demography '
+                                           'starting study {}/test_weblate_enrich'.format(anonymize_url(self.es_con)))
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:[weblate] Demography '
+                                            'end {}/test_weblate_enrich'.format(anonymize_url(self.es_con)))
+
+        time.sleep(5)  # HACK: Wait until git enrich index has been written
+        items = [item for item in enrich_backend.fetch()]
+        self.assertEqual(len(items), 4)
+        for item in items:
+            if 'author_name' in item:
+                self.assertTrue('demography_min_date' in item.keys())
+                self.assertTrue('demography_max_date' in item.keys())
+            else:
+                self.assertFalse('demography_min_date' in item.keys())
+                self.assertFalse('demography_max_date' in item.keys())
+
+        r = enrich_backend.elastic.requests.get(enrich_backend.elastic.index_url + "/_alias",
+                                                headers=HEADER_JSON, verify=False)
+        self.assertIn(alias, r.json()[enrich_backend.elastic.index]['aliases'])
 
 
 if __name__ == "__main__":
