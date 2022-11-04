@@ -1,0 +1,8 @@
+---
+title: Demographic study on Weblate fixed
+category: fixed
+author: Quan Zhou <quan@bitergia.com>
+issue: null
+notes: >
+    Weblate demographic study is now updated to allow passing the study
+    alias name by parameter.

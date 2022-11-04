@@ -174,7 +174,7 @@ class WeblateEnrich(Enrich):
         self.add_metadata_filter_raw(eitem)
         return eitem
 
-    def enrich_demography(self, ocean_backend, enrich_backend, date_field="grimoire_creation_date",
+    def enrich_demography(self, ocean_backend, enrich_backend, alias, date_field="grimoire_creation_date",
                           author_field="author_uuid"):
 
-        super().enrich_demography(ocean_backend, enrich_backend, date_field, author_field=author_field)
+        super().enrich_demography(ocean_backend, enrich_backend, alias, date_field, author_field=author_field)
