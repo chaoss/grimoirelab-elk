@@ -298,8 +298,8 @@ class ElasticSearch(object):
     def get_bulk_url(self):
         """Get the bulk URL endpoint"""
 
-        if (self.major == '7' and self.distribution == 'elasticsearch') or \
-           (self.major == '1' and self.distribution == 'opensearch'):
+        if (int(self.major) >= 7 and self.distribution == 'elasticsearch') or \
+           (int(self.major) >= 1 and self.distribution == 'opensearch'):
             bulk_url = self.index_url + '/_bulk'
         else:
             bulk_url = self.index_url + '/items/_bulk'
