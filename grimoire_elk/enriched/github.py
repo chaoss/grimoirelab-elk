@@ -791,7 +791,7 @@ class GitHubEnrich(Enrich):
             # get each day since repository creation
             dates = es_in.search(
                 index=in_index,
-                body=get_issues_dates(interval_days, repository_url)
+                body=get_issues_dates(self.elastic, interval_days, repository_url)
             )['aggregations']['created_per_interval'].get("buckets", [])
 
             # for each selected label + others labels

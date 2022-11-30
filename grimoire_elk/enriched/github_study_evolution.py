@@ -175,8 +175,8 @@ def get_issues_open_at_other_label(repository_url, to_date, exclude_labels):
     return issues_open_at
 
 
-def get_issues_dates(interval, repository_url):
-
+def get_issues_dates(elastic, interval, repository_url):
+    interval_string = "interval" if elastic.is_legacy() else "fixed_interval"
     query_issues_dates = """
 {
     "size": 0,
@@ -184,7 +184,7 @@ def get_issues_dates(interval, repository_url):
         "created_per_interval" : {
             "date_histogram" : {
                 "field" : "metadata__updated_on",
-                "interval" : "%dd"
+                "%s" : "%dd"
             },
             "aggs": {
                 "created": {
@@ -210,6 +210,6 @@ def get_issues_dates(interval, repository_url):
             }
         }
     }
-    """ % (interval, repository_url)
+    """ % (interval_string, interval, repository_url)
 
     return query_issues_dates

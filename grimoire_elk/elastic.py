@@ -298,8 +298,7 @@ class ElasticSearch(object):
     def get_bulk_url(self):
         """Get the bulk URL endpoint"""
 
-        if (self.major == '7' and self.distribution == 'elasticsearch') or \
-           (self.major == '1' and self.distribution == 'opensearch'):
+        if not self.is_legacy():
             bulk_url = self.index_url + '/_bulk'
         else:
             bulk_url = self.index_url + '/items/_bulk'
@@ -309,10 +308,9 @@ class ElasticSearch(object):
     def get_mapping_url(self, _type=None):
         """Get the mapping URL endpoint
 
-        :param _type: type of the mapping. In case of ES7, it is None
+        :param _type: type of the mapping. In case of ES >= 7, it is None
         """
-        if (self.major == '7' and self.distribution == 'elasticsearch') or \
-           (self.major == '1' and self.distribution == 'opensearch'):
+        if not self.is_legacy():
             mapping_url = self.index_url + "/_mapping"
         else:
             mapping_url = self.index_url + "/" + _type + "/_mapping"
@@ -609,3 +607,17 @@ class ElasticSearch(object):
             return
 
         return properties
+
+    def is_legacy(self):
+        """ Simply calls the static version with it's own values """
+        return ElasticSearch.is_legacy_static(self.major, self.distribution)
+
+    @staticmethod
+    def is_legacy_static(major, distribution):
+        """ Returns true if ES < 7 or OS < 1, false otherwise.
+        Static version exists because not every place that uses this check has an ES object."""
+        if major is None:
+            return False
+        int_maj = int(major)
+        return ((int_maj < 7 and distribution == 'elasticsearch')
+                or (int_maj < 1 and distribution == 'opensearch'))

@@ -1,0 +1,17 @@
+---
+title: Update support for ES/OS versions > 7.X/1.X
+category: changed
+author: Rafael Dulfer <rafael@dulfer.be>
+issue: null
+notes: |
+  Currently the support for ES/OS versions > 7.X/1.X
+  is broken due to a faulty version check.
+
+  Add a static method to the Elasticsearch object
+  that correctly checks whether the version
+  is 'legacy' (defined as ES 6.X or OS 0.X) and
+  adds this check to various places in the codebase.
+
+  Additionally, fixes an instance where `interval` is
+  used instead of `fixed_interval`. `interval` was
+  deprecated in ES7.
