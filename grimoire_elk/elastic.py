@@ -309,10 +309,10 @@ class ElasticSearch(object):
     def get_mapping_url(self, _type=None):
         """Get the mapping URL endpoint
 
-        :param _type: type of the mapping. In case of ES7, it is None
+        :param _type: type of the mapping. In case of ES >= 7, it is None
         """
-        if (self.major == '7' and self.distribution == 'elasticsearch') or \
-           (self.major == '1' and self.distribution == 'opensearch'):
+        if (int(self.major) >= 7 and self.distribution == 'elasticsearch') or \
+           (int(self.major) >= 1 and self.distribution == 'opensearch'):
             mapping_url = self.index_url + "/_mapping"
         else:
             mapping_url = self.index_url + "/" + _type + "/_mapping"
