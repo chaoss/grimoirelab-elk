@@ -29,6 +29,7 @@ from elasticsearch_dsl import Search, Q
 from cereslib.enrich.enrich import Onion
 from grimoirelab_toolkit import datetime as gl_dt
 from grimoire_elk.enriched.ceres_base import ESConnector, CeresBase
+from grimoire_elk.elastic import ElasticSearch
 
 
 logger = logging.getLogger(__name__)
@@ -172,8 +173,7 @@ class ESOnionConnector(ESConnector):
                 "_source": row
             }
 
-            if (self._es_major == '7' and self._es_distribution == 'elasticsearch') or \
-               (self._es_major == '1' and self._es_distribution == 'opensearch'):
+            if not ElasticSearch.is_legacy_static(self._es_major, self._es_distribution):
                 doc.pop('_type')
 
             docs.append(doc)
