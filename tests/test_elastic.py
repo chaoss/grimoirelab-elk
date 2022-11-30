@@ -633,8 +633,8 @@ class TestElastic(unittest.TestCase):
     def test_all_properties_error(self):
         """Test whether an error message is logged when the properties aren't retrieved"""
 
-        if (int(elastic.major) >= 7 and elastic.distribution == ES_DISTRIBUTION) or \
-           (int(elastic.major) >= 1 and elastic.distribution == OS_DISTRIBUTION):
+        if (int(self.es_major) >= 7 and self.es_distribution == 'elasticsearch') or \
+           (int(self.es_major) >= 1 and self.es_distribution == 'opensearch'):
             url = self.es_con + '/' + self.target_index + '/_mapping'
         else:
             url = self.es_con + '/' + self.target_index + '/items/_mapping'
