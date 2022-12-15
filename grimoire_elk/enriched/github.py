@@ -725,7 +725,7 @@ class GitHubEnrich(Enrich):
                 rich_releases_dict['target_commitish'] = release['target_commitish']
                 rich_releases_dict['prerelease'] = release['prerelease']
                 rich_releases_dict['name'] = release['name']
-                rich_releases_dict['body'] = release['body']
+                rich_releases_dict['body'] = ''
                 rich_releases_dict['created_at'] = release['created_at']
                 release_author = release['author']
                 rich_releases_author_dict = {}
