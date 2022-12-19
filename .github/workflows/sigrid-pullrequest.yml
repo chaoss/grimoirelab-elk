@@ -1,0 +1,16 @@
+name: Sigrid pull request feedback
+on: [pull_request]
+
+jobs:
+  sigridci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Sigrid CI
+        uses: Software-Improvement-Group/sigridci@main
+        with:
+          customer: utst
+          system: initial
+        env:
+          SIGRID_CI_TOKEN: "${{ secrets.SIGRID_CI_ORG_TOKEN }}"
