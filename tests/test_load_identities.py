@@ -111,7 +111,7 @@ class TestLoadIdentities(unittest.TestCase):
             identities_count += inserted_identities
 
         stop = datetime.datetime.now().timestamp()
-        self.assertLess((stop - start), 10.0)
+        self.assertLess((stop - start), 40.0)
 
     def load_bulk_identities(self, items_count, new_identities, sh_db, connector_name):
         identities_count = len(new_identities)

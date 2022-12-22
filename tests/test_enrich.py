@@ -104,29 +104,6 @@ class TestEnrich(unittest.TestCase):
             "author_multi_org_names": [""]
         }
 
-    def test_get_profile_sh(self):
-        """Test whether a profile from sortinghat model is correctly retrieved as a dict"""
-
-        uidentity = {
-            "mk": "00000",
-            "profile": {
-                "name": "pepe",
-                "email": "pepe@host.com",
-                "gender": 'male',
-                "genderAcc": 100
-            }
-        }
-
-        def side_effect(uuid):
-            return uidentity
-        self._enrich.get_unique_identity = MagicMock(side_effect=side_effect)
-
-        uprofile = self._enrich.get_profile_sh('00000')
-        self.assertEqual(uprofile['profile']['name'], uidentity['profile']['name'])
-        self.assertEqual(uprofile['profile']['email'], uidentity['profile']['email'])
-        self.assertEqual(uprofile['profile']['gender'], uidentity['profile']['gender'])
-        self.assertEqual(uprofile['profile']['genderAcc'], uidentity['profile']['genderAcc'])
-
     def test_get_item_sh_fields_identity(self):
         """Test sortinghat fields retrieval for a given identity"""
 
@@ -155,51 +132,38 @@ class TestEnrich(unittest.TestCase):
             return empty_item_by_rol[rol]
         self._enrich.__get_item_sh_fields_empty = MagicMock(side_effect=rol_side_effect)
 
-        sh_ids = {
-            "id": expected['author_id'],
-            "uuid": expected['author_uuid']
+        entity = {
+            'id': expected['author_id'],
+            'uuid': expected['author_uuid'],
+            'name': expected['author_name'],
+            'username': identity["username"],
+            'email': None,  # None to verify email is from profile
+            'profile': {
+                "name": expected['author_name'],
+                "email": "pepepotamo@local.com",
+                "gender": expected['author_gender'],
+                "gender_acc": expected['author_gender_acc'],
+                "is_bot": expected['author_bot']
+            },
+            'enrollments': [
+                {
+                    'group': {
+                        'parent_org': None,
+                        'name': expected['author_org_name'],
+                        'type': 'organization',
+                        'start': "1900-01-01T00:00:00+00:00",
+                        'end': "2100-01-01T00:00:00+00:00"
+                    }
+                }
+            ]
         }
-        self._enrich.get_sh_ids = MagicMock(return_value=sh_ids)
-
-        # Return None to verify we are taking this value from sortinghat profile
-        # (see self._enrich.get_profile_sh below)
-        self._enrich.get_identity_domain = MagicMock(return_value=None)
-
-        p1 = {
-            "name": expected['author_name'],
-            "email": "pepepotamo@local.com",
-            "gender": expected['author_gender'],
-            "gender_acc": expected['author_gender_acc']
-        }
-        sh_prof_vals = {expected['author_uuid']: p1}
-
-        def profile_side_effect(uuid):
-            return sh_prof_vals[uuid]
-        self._enrich.get_profile_sh = MagicMock(side_effect=profile_side_effect)
+        self._enrich.get_sh_item_from_identity = MagicMock(return_value=entity)
 
         email_doms = {'pepepotamo@local.com': expected['author_domain']}
 
         def email_domain_side_effect(email):
             return email_doms[email]
         self._enrich.get_email_domain = MagicMock(side_effect=email_domain_side_effect)
-
-        enrollments = {(expected['author_uuid'], None): expected['author_org_name']}
-
-        def enrollments_side_effect(uuid, item_date):
-            return enrollments[(uuid, item_date)]
-        self._enrich.get_enrollment = MagicMock(side_effect=enrollments_side_effect)
-
-        multi_enrollments = {(expected['author_uuid'], None): expected['author_multi_org_names']}
-
-        def multi_enrollments_side_effect(uuid, item_date):
-            return multi_enrollments[(uuid, item_date)]
-        self._enrich.get_multi_enrollment = MagicMock(side_effect=multi_enrollments_side_effect)
-
-        bots = {'aaaaa': False}
-
-        def bots_side_effect(uuid):
-            return bots[uuid]
-        self._enrich.is_bot = MagicMock(side_effect=bots_side_effect)
 
         # 1. Author role
 
@@ -254,11 +218,7 @@ class TestEnrich(unittest.TestCase):
             "id": "",
             "uuid": ""
         }
-        self._enrich.get_sh_ids = MagicMock(return_value=sh_ids)
-
-        # Return None to verify we are taking this value from sortinghat profile
-        # (see self._enrich.get_profile_sh below)
-        self._enrich.get_identity_domain = MagicMock(return_value=None)
+        self._enrich.get_sh_item_from_identity = MagicMock(return_value=sh_ids)
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(identity=identity)
@@ -276,7 +236,7 @@ class TestEnrich(unittest.TestCase):
         sh_ids = {
             "id": ""
         }
-        self._enrich.get_sh_ids = MagicMock(return_value=sh_ids)
+        self._enrich.get_sh_item_from_identity = MagicMock(return_value=sh_ids)
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(identity=identity)
@@ -325,42 +285,32 @@ class TestEnrich(unittest.TestCase):
             return empty_item_by_rol[rol]
         self._enrich.__get_item_sh_fields_empty = MagicMock(side_effect=rol_side_effect)
 
-        sh_ids = {
-            "id": expected['author_id'],
-            "uuid": expected['author_uuid']
+        entity = {
+            'id': expected['author_id'],
+            'uuid': expected['author_uuid'],
+            'name': expected['author_name'],
+            'username': identity["username"],
+            'email': None,  # None to verify email is from profile
+            'profile': None,
+            'enrollments': [
+                {
+                    'group': {
+                        'parent_org': None,
+                        'name': expected['author_org_name'],
+                        'type': 'organization',
+                        'start': "1900-01-01T00:00:00+00:00",
+                        'end': "2100-01-01T00:00:00+00:00"
+                    }
+                }
+            ]
         }
-        self._enrich.get_sh_ids = MagicMock(return_value=sh_ids)
-
-        # Return None to verify we are taking this value from sortinghat profile
-        # (see self._enrich.get_profile_sh below)
-        self._enrich.get_identity_domain = MagicMock(return_value=None)
-
-        self._enrich.get_profile_sh = MagicMock(return_value=None)
+        self._enrich.get_sh_item_from_identity = MagicMock(return_value=entity)
 
         email_doms = {'pepepotamo@local.com': expected['author_domain']}
 
         def email_domain_side_effect(email):
             return email_doms[email]
         self._enrich.get_email_domain = MagicMock(side_effect=email_domain_side_effect)
-
-        enrollments = {(expected['author_uuid'], None): expected['author_org_name']}
-
-        def enrollments_side_effect(uuid, item_date):
-            return enrollments[(uuid, item_date)]
-        self._enrich.get_enrollment = MagicMock(side_effect=enrollments_side_effect)
-
-        multi_enrollments = {(expected['author_uuid'], None): expected['author_multi_org_names']}
-
-        def multi_enrollments_side_effect(uuid, item_date):
-            return multi_enrollments[(uuid, item_date)]
-
-        self._enrich.get_multi_enrollment = MagicMock(side_effect=multi_enrollments_side_effect)
-
-        bots = {'aaaaa': False}
-
-        def bots_side_effect(uuid):
-            return bots[uuid]
-        self._enrich.is_bot = MagicMock(side_effect=bots_side_effect)
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(identity=identity)
@@ -377,7 +327,7 @@ class TestEnrich(unittest.TestCase):
 
         # 2. Profile as empty dict
 
-        self._enrich.get_profile_sh = MagicMock(return_value={})
+        entity['profile'] = {}
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(identity=identity)
@@ -395,15 +345,10 @@ class TestEnrich(unittest.TestCase):
 
         # 3 Profile with other fields
 
-        p1 = {
+        entity['profile'] = {
             "first": expected['author_name'],
             "second": "pepepotamo@local.com",
         }
-        sh_prof_vals = {expected['author_uuid']: p1}
-
-        def profile_side_effect(uuid):
-            return sh_prof_vals[uuid]
-        self._enrich.get_profile_sh = MagicMock(side_effect=profile_side_effect)
 
         # Method to test
         self.assertEqual(eitem_sh['author_id'], expected['author_id'])
@@ -445,62 +390,36 @@ class TestEnrich(unittest.TestCase):
             return empty_item_by_rol[rol]
         self._enrich.__get_item_sh_fields_empty = MagicMock(side_effect=rol_side_effect)
 
-        sh_ids = {
-            "id": expected['author_id'],
-            "uuid": expected['author_uuid']
+        entity = {
+            'id': expected['author_id'],
+            'uuid': expected['author_uuid'],
+            'name': expected['author_name'],
+            'username': identity["username"],
+            'email': None,  # None to verify email is from profile
+            'profile': {
+                "name": expected['author_name'],
+                "email": "pepepotamo@local.com",
+                "is_bot": expected['author_bot']
+            },
+            'enrollments': [
+                {
+                    'group': {
+                        'parent_org': None,
+                        'name': expected['author_org_name'],
+                        'type': 'organization',
+                        'start': "1900-01-01T00:00:00+00:00",
+                        'end': "2100-01-01T00:00:00+00:00"
+                    }
+                }
+            ]
         }
-        self._enrich.get_sh_ids = MagicMock(return_value=sh_ids)
-
-        # Return None to verify we are taking this value from sortinghat profile
-        # (see self._enrich.get_profile_sh below)
-        self._enrich.get_identity_domain = MagicMock(return_value=None)
-
-        p1 = {
-            "name": expected['author_name'],
-            "email": "pepepotamo@local.com",
-            "gender": expected['author_gender'],
-            "gender_acc": expected['author_gender_acc']
-        }
-        sh_prof_vals = {expected['author_uuid']: p1}
-
-        def profile_side_effect(uuid):
-            return sh_prof_vals[uuid]
-        self._enrich.get_profile_sh = MagicMock(side_effect=profile_side_effect)
+        self._enrich.get_sh_item_from_identity = MagicMock(return_value=entity)
 
         email_doms = {'pepepotamo@local.com': expected['author_domain']}
 
         def email_domain_side_effect(email):
             return email_doms[email]
         self._enrich.get_email_domain = MagicMock(side_effect=email_domain_side_effect)
-
-        enrollments = {(expected['author_uuid'], None): expected['author_org_name']}
-
-        def enrollments_side_effect(uuid, item_date):
-            return enrollments[(uuid, item_date)]
-        self._enrich.get_enrollment = MagicMock(side_effect=enrollments_side_effect)
-
-        multi_enrollments = {(expected['author_uuid'], None): expected['author_multi_org_names']}
-
-        def multi_enrollments_side_effect(uuid, item_date):
-            return multi_enrollments[(uuid, item_date)]
-
-        self._enrich.get_multi_enrollment = MagicMock(side_effect=multi_enrollments_side_effect)
-
-        bots = {'aaaaa': False}
-
-        def bots_side_effect(uuid):
-            return bots[uuid]
-        self._enrich.is_bot = MagicMock(side_effect=bots_side_effect)
-
-        p1 = {
-            "name": expected['author_name'],
-            "email": "pepepotamo@local.com",
-        }
-        sh_prof_vals = {expected['author_uuid']: p1}
-
-        def profile_side_effect(uuid):
-            return sh_prof_vals[uuid]
-        self._enrich.get_profile_sh = MagicMock(side_effect=profile_side_effect)
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(identity=identity)
@@ -539,48 +458,35 @@ class TestEnrich(unittest.TestCase):
             return empty_item_by_rol[rol]
         self._enrich.__get_item_sh_fields_empty = MagicMock(side_effect=rol_side_effect)
 
-        uuid_vals = {expected['author_id']: expected['author_uuid']}
-
-        def uuid_side_effect(from_id):
-            return uuid_vals[from_id]
-        self._enrich.get_uuid_from_id = MagicMock(side_effect=uuid_side_effect)
-
-        p1 = {
-            "name": expected['author_name'],
-            "email": "pepepotamo@local.com",
-            "gender": expected['author_gender'],
-            "gender_acc": expected['author_gender_acc']
+        entity = {
+            'id': expected['author_id'],
+            'uuid': expected['author_uuid'],
+            'profile': {
+                "name": expected['author_name'],
+                "email": "pepepotamo@local.com",
+                "gender": expected['author_gender'],
+                "gender_acc": expected['author_gender_acc'],
+                "is_bot": expected['author_bot']
+            },
+            'enrollments': [
+                {
+                    'group': {
+                        'parent_org': None,
+                        'name': expected['author_org_name'],
+                        'type': 'organization',
+                        'start': "1900-01-01T00:00:00+00:00",
+                        'end': "2100-01-01T00:00:00+00:00"
+                    }
+                }
+            ]
         }
-        sh_prof_vals = {expected['author_uuid']: p1}
-
-        def profile_side_effect(uuid):
-            return sh_prof_vals[uuid]
-        self._enrich.get_profile_sh = MagicMock(side_effect=profile_side_effect)
+        self._enrich.get_sh_item_from_id = MagicMock(return_value=entity)
 
         email_doms = {'pepepotamo@local.com': expected['author_domain']}
 
         def email_domain_side_effect(email):
             return email_doms[email]
         self._enrich.get_email_domain = MagicMock(side_effect=email_domain_side_effect)
-
-        enrollments = {(expected['author_uuid'], None): expected['author_org_name']}
-
-        def enrollments_side_effect(uuid, item_date):
-            return enrollments[(uuid, item_date)]
-        self._enrich.get_enrollment = MagicMock(side_effect=enrollments_side_effect)
-
-        multi_enrollments = {(expected['author_uuid'], None): expected['author_multi_org_names']}
-
-        def multi_enrollments_side_effect(uuid, item_date):
-            return multi_enrollments[(uuid, item_date)]
-
-        self._enrich.get_multi_enrollment = MagicMock(side_effect=multi_enrollments_side_effect)
-
-        bots = {'aaaaa': False}
-
-        def bots_side_effect(uuid):
-            return bots[uuid]
-        self._enrich.is_bot = MagicMock(side_effect=bots_side_effect)
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(sh_id=sh_id)
@@ -610,7 +516,11 @@ class TestEnrich(unittest.TestCase):
             return empty_item_by_rol[rol]
         self._enrich.__get_item_sh_fields_empty = MagicMock(side_effect=rol_side_effect)
 
-        self._enrich.get_uuid_from_id = MagicMock(return_value=None)
+        entity = {
+            'id': sh_id,
+            'uuid': None
+        }
+        self._enrich.get_sh_item_from_id = MagicMock(return_value=entity)
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(sh_id=sh_id)
@@ -627,7 +537,7 @@ class TestEnrich(unittest.TestCase):
 
         # 2. uuid is an empty string
 
-        self._enrich.get_uuid_from_id = MagicMock(return_value="")
+        entity['uuid'] = ""
 
         # Method to test
         eitem_sh = self._enrich.get_item_sh_fields(sh_id=sh_id)

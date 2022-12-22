@@ -309,6 +309,7 @@ class SortingHat(object):
             enrollments = individual.enrollments()
             enrollments.group().name()
             enrollments.group().type()
+            enrollments.group().parent_org().name()
             enrollments.start()
             enrollments.end()
             result = db.execute(op)
@@ -332,9 +333,26 @@ class SortingHat(object):
             op.individuals(**args)
             individual = op.individuals().entities()
             individual.mk()
-            individual.identities().uuid()
+            identities = individual.identities()
+            identities.uuid()
+            identities.name()
+            identities.email()
+            identities.username()
+            profile = individual.profile()
+            profile.name()
+            profile.email()
+            profile.gender()
+            profile.gender_acc()
+            profile.is_bot()
+            enrollments = individual.enrollments()
+            enrollments.group().parent_org().name()
+            enrollments.group().name()
+            enrollments.group().type()
+            enrollments.start()
+            enrollments.end()
             result = db.execute(op)
-            entity = result['data']['individuals']['entities'][0]
+            if result['data']['individuals']['entities']:
+                entity = result['data']['individuals']['entities'][0]
         except SortingHatClientError as e:
             logger.error("[sortinghat] Error get entities {}: {}".format(id, e.errors[0]['message']))
         return entity

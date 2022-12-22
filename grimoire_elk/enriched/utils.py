@@ -148,7 +148,7 @@ def grimoire_con(insecure=True, conn_retries=MAX_RETRIES_ON_CONNECT, total=MAX_R
     # Retry when there are errors in HTTP connections
     retries = urllib3.util.Retry(total=total, connect=conn_retries, read=MAX_RETRIES_ON_READ,
                                  redirect=MAX_RETRIES_ON_REDIRECT, backoff_factor=BACKOFF_FACTOR,
-                                 method_whitelist=False, status_forcelist=STATUS_FORCE_LIST)
+                                 allowed_methods=False, status_forcelist=STATUS_FORCE_LIST)
     adapter = requests.adapters.HTTPAdapter(max_retries=retries)
     conn.mount('http://', adapter)
     conn.mount('https://', adapter)

@@ -407,7 +407,7 @@ class TestGit(TestBaseBackend):
         url = self.es_con + "/test_git_onion/_search?size=50"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
-        self.assertEqual(len(hits), 28)
+        self.assertEqual(len(hits), 16)
         for hit in hits:
             source = hit['_source']
             self.assertIn('timeframe', source)

@@ -314,7 +314,7 @@ class TestGitLab(TestBaseBackend):
         url = self.es_con + "/test_gitlab_onion/_search?size=50"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
-        self.assertEqual(len(hits), 22)
+        self.assertEqual(len(hits), 10)
         for hit in hits:
             source = hit['_source']
             self.assertIn('timeframe', source)

@@ -378,6 +378,8 @@ class GitEnrich(Enrich):
 
             if self.sortinghat:
                 # Create SH identity if it does not exist
+                identity_tuple = tuple(identity.items())
+                self.add_sh_identity_cache(identity_tuple)
                 self.add_sh_identity(identity)
                 item_date = str_to_datetime(eitem[self.get_field_date()])
                 sh_fields = self.get_item_sh_fields(identity, item_date, rol=meta_field)

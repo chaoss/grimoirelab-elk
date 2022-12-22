@@ -160,7 +160,7 @@ class TestBaseBackend(unittest.TestCase):
 
         return {'items': len(self.items), 'raw': raw_items}
 
-    def _test_raw_to_enrich(self, sortinghat=True, projects=False, pair_programming=False):
+    def _test_raw_to_enrich(self, sortinghat=False, projects=False, pair_programming=False):
         """Test whether raw indexes are properly enriched"""
 
         # populate raw index
