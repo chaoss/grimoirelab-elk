@@ -126,13 +126,9 @@ class TestBaseBackend(unittest.TestCase):
         cls.maxDiff = None
 
         # Sorting hat settings
-        cls.db_user = ''
-        cls.db_password = ''
-        if 'Database' in cls.config:
-            if 'user' in cls.config['Database']:
-                cls.db_user = cls.config['Database']['user']
-            if 'password' in cls.config['Database']:
-                cls.db_password = cls.config['Database']['password']
+        cls.db_user = cls.config.get('Database', 'user', fallback='')
+        cls.db_password = cls.config.get('Database', 'password', fallback='')
+        cls.db_host = cls.config.get('Database', 'host', fallback=DB_HOST)
 
     def setUp(self):
         with open(os.path.join("data", self.connector + ".json")) as f:
@@ -178,18 +174,18 @@ class TestBaseBackend(unittest.TestCase):
             self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                                      db_user=self.db_user,
                                                                      db_password=self.db_password,
-                                                                     db_host=DB_HOST)
+                                                                     db_host=self.db_host)
         elif sortinghat and projects:
             self.enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
                                                                      db_sortinghat=DB_SORTINGHAT,
                                                                      db_user=self.db_user,
                                                                      db_password=self.db_password,
-                                                                     db_host=DB_HOST)
+                                                                     db_host=self.db_host)
         elif not sortinghat and projects:
             self.enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
                                                                      db_user=self.db_user,
                                                                      db_password=self.db_password,
-                                                                     db_host=DB_HOST)
+                                                                     db_host=self.db_host)
         if pair_programming:
             self.enrich_backend.pair_programming = pair_programming
 
@@ -240,7 +236,7 @@ class TestBaseBackend(unittest.TestCase):
         self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                                  db_user=self.db_user,
                                                                  db_password=self.db_password,
-                                                                 db_host=DB_HOST)
+                                                                 db_host=self.db_host)
         elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
         self.enrich_backend.set_elastic(elastic_enrich)
         self.enrich_backend.enrich_items(self.ocean_backend)
@@ -264,7 +260,7 @@ class TestBaseBackend(unittest.TestCase):
                                                                  db_user=self.db_user,
                                                                  db_password=self.db_password,
                                                                  json_projects_map=FILE_PROJECTS,
-                                                                 db_host=DB_HOST)
+                                                                 db_host=self.db_host)
 
         elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
         self.enrich_backend.set_elastic(elastic_enrich)
@@ -314,7 +310,7 @@ class TestBaseBackend(unittest.TestCase):
         self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                                  db_user=self.db_user,
                                                                  db_password=self.db_password,
-                                                                 db_host=DB_HOST)
+                                                                 db_host=self.db_host)
 
         elastic_enrich = get_elastic(self.es_con, self.enrich_index_anonymized, clean, self.enrich_backend, self.enrich_aliases)
         self.enrich_backend.set_elastic(elastic_enrich)

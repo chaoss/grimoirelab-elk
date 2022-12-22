@@ -137,7 +137,7 @@ class SortingHat(object):
                 cls.add_identity(db, identity, backend)
                 total += 1
             except Exception as e:
-                logger.error("[sortinghat] Unexcepted error when adding identities: {}".format(e))
+                logger.error("[sortinghat] Unexpected error when adding identities: {}".format(e))
                 continue
 
         logger.debug("[sortinghat] Total identities added {} of {}".format(total, len(identities)))

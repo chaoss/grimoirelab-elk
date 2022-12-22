@@ -62,13 +62,9 @@ class TestLoadIdentities(unittest.TestCase):
         config.read(CONFIG_FILE)
 
         # Sorting hat settings
-        cls.db_user = ''
-        cls.db_password = ''
-        if 'Database' in config:
-            if 'user' in config['Database']:
-                cls.db_user = config['Database']['user']
-            if 'password' in config['Database']:
-                cls.db_password = config['Database']['password']
+        cls.db_user = config.get('Database', 'user', fallback='')
+        cls.db_password = config.get('Database', 'password', fallback='')
+        cls.db_host = config.get('Database', 'host', fallback=DB_HOST)
 
     def setUp(self):
 
@@ -76,7 +72,7 @@ class TestLoadIdentities(unittest.TestCase):
         self.enrich_backend = get_connectors()["github"][2](db_sortinghat=DB_SORTINGHAT,
                                                             db_user=self.db_user,
                                                             db_password=self.db_password,
-                                                            db_host=DB_HOST)
+                                                            db_host=self.db_host)
 
     def _test_load_identities(self, items=10):
         """Test whether fetched items are properly loaded to ES"""

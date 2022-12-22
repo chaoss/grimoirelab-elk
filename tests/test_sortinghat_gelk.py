@@ -32,7 +32,7 @@ from sgqlc.operation import Operation
 from sortinghat.cli.client import SortingHatClient, SortingHatSchema
 
 
-CONFIG_FILE = 'test_sortinghat.conf'
+CONFIG_FILE = 'tests.conf'
 REMOTE_IDENTITIES_FILE = 'data/remote_identities_sortinghat.json'
 
 
@@ -95,10 +95,16 @@ class TestSortinghatGelk(unittest.TestCase):
     def setUp(self):
         config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
-        self.sh_db = SortingHatClient(host=config['sortinghat']['host'],
+
+        # Sorting hat settings
+        db_user = config.get('Database', 'user', fallback='')
+        db_password = config.get('Database', 'password', fallback='')
+        db_host = config.get('Database', 'host', fallback='127.0.0.1')
+
+        self.sh_db = SortingHatClient(host=db_host,
                                       port="8000", path="api/", ssl=False,
-                                      user=config['sortinghat']['user'],
-                                      password=config['sortinghat']['password'])
+                                      user=db_user,
+                                      password=db_password)
         self.sh_db.connect()
         # Clean database
         # Remove identities
