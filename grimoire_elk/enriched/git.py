@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2023 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -92,9 +92,9 @@ class GitEnrich(Enrich):
     meta_fields_suffixes = ['_bots', '_domains', '_names', '_org_names', '_uuids']
     meta_non_authored_prefix = 'non_authored_'
 
-    def __init__(self, db_sortinghat=None, db_projects_map=None, json_projects_map=None,
+    def __init__(self, db_sortinghat=None, json_projects_map=None,
                  db_user='', db_password='', db_host='', pair_programming=False):
-        super().__init__(db_sortinghat, db_projects_map, json_projects_map,
+        super().__init__(db_sortinghat, json_projects_map,
                          db_user, db_password, db_host)
 
         self.studies = []
@@ -378,6 +378,8 @@ class GitEnrich(Enrich):
 
             if self.sortinghat:
                 # Create SH identity if it does not exist
+                identity_tuple = tuple(identity.items())
+                self.add_sh_identity_cache(identity_tuple)
                 self.add_sh_identity(identity)
                 item_date = str_to_datetime(eitem[self.get_field_date()])
                 sh_fields = self.get_item_sh_fields(identity, item_date, rol=meta_field)

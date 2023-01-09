@@ -58,6 +58,7 @@ perceval-mozilla = { version = ">=0.3", allow-prereleases = true}
 perceval-opnfv = { version = ">=0.2", allow-prereleases = true}
 perceval-puppet = { version = ">=0.2", allow-prereleases = true}
 perceval-weblate = { version = ">=0.2", allow-prereleases = true}
+numpy = "==1.21.0"
 
 [tool.poetry.dev-dependencies]
 httpretty = "^1.1.4"

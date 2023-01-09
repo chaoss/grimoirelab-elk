@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2023 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -388,7 +388,9 @@ class ElasticItems:
             if self.too_many_scrolls(res):
                 return {'too_many_scrolls': True}
             res.raise_for_status()
-            rjson = res.json()
+            rjson = json.loads(json.dumps(res.json(), ensure_ascii=False)
+                               .encode('utf-8', errors='ignore').decode('utf-8'))
+
         except Exception:
             # The index could not exists yet or it could be empty
             logger.debug("No results found from {}".format(anonymize_url(url)))

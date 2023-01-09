@@ -1,0 +1,86 @@
+{
+    "identities": [
+        {
+            "name": "user1",
+            "email": "user1@org1.com",
+            "source": "git",
+            "username": "user_1"
+        },
+        {
+            "name": "user2",
+            "email": "user2@org2.com",
+            "source": "github",
+            "username": "user_2"
+        },
+        {
+            "name": "user3",
+            "email": "user1@org1.com",
+            "source": "github",
+            "username": "user_1"
+        },
+        {
+            "name": "user4",
+            "email": "user4@org2.com",
+            "source": "git",
+            "username": "user_4"
+        },
+        {
+            "name": "user4",
+            "email": "user5@org3.com",
+            "source": "github",
+            "username": "user_5"
+        },
+        {
+            "name": "user6",
+            "email": "user6@org6.com",
+            "source": "git",
+            "username": "user_6"
+        },
+        {
+            "name": "user7",
+            "email": "user6@org1.com",
+            "source": "git",
+            "username": "user_6"
+        },
+        {
+            "name": "user8",
+            "email": "user8@org8.com",
+            "source": "github",
+            "username": "user_8"
+        },
+        {
+            "name": "user9",
+            "email": "user9@org2.com",
+            "source": "git",
+            "username": "user_9"
+        },
+        {
+            "name": "user10",
+            "email": "user10@org3.com",
+            "source": "git",
+            "username": "user_10"
+        }
+    ],
+    "organizations": [
+        {
+            "organization": "org1",
+            "domain": "org1.com"
+        },
+        {
+            "organization": "org2",
+            "domain": "org2.com"
+        },
+        {
+            "organization": "org3",
+            "domain": "org3.com"
+        },
+        {
+            "organization": "org6",
+            "domain": "org6.com"
+        },
+        {
+            "organization": "org8",
+            "domain": "org8.com"
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2023 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,12 +17,13 @@
 #
 # Authors:
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
+#   Quan Zhou <quan@bitergia.com>
 #
 
 import inspect
 import logging
 
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 from perceval.backend import find_signature_parameters, Archive
 from perceval.errors import RateLimitError
@@ -483,8 +484,7 @@ def do_studies(ocean_backend, enrich_backend, studies_args, retention_time=None)
 
 def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                    ocean_index=None,
-                   ocean_index_enrich=None,
-                   db_projects_map=None, json_projects_map=None,
+                   ocean_index_enrich=None, json_projects_map=None,
                    db_sortinghat=None,
                    no_incremental=False, only_identities=False,
                    github_token=None, studies=False, only_studies=False,
@@ -530,7 +530,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         if events_enrich:
             enrich_index += "_events"
 
-        enrich_backend = connector[2](db_sortinghat, db_projects_map, json_projects_map,
+        enrich_backend = connector[2](db_sortinghat, json_projects_map,
                                       db_user, db_password, db_host)
         enrich_backend.set_params(backend_params)
         # store the cfg section name in the enrich backend to recover the corresponding project name in projects.json
@@ -682,7 +682,7 @@ def delete_orphan_unique_identities(es, sortinghat_db, current_data_source, acti
         count = 0
 
         for uuid in target_uuids:
-            success = SortingHat.remove_unique_identity(sortinghat_db, uuid)
+            success = SortingHat.remove_identity(sortinghat_db, uuid)
             count = count + 1 if success else count
 
         return count
@@ -694,9 +694,9 @@ def delete_orphan_unique_identities(es, sortinghat_db, current_data_source, acti
         :param data_sources: target data sources
         """
         count = 0
-        for ident in unique_ident.identities:
-            if ident.source not in data_sources:
-                success = SortingHat.remove_identity(sortinghat_db, ident.id)
+        for ident in unique_ident['identities']:
+            if ident['source'] not in data_sources:
+                success = SortingHat.remove_identity(sortinghat_db, ident['uuid'])
                 count = count + 1 if success else count
 
         return count
@@ -708,8 +708,8 @@ def delete_orphan_unique_identities(es, sortinghat_db, current_data_source, acti
         :param data_sources: target data sources
         """
         in_active = False
-        for ident in unique_ident.identities:
-            if ident.source in data_sources:
+        for ident in unique_ident['identities']:
+            if ident['source'] in data_sources:
                 in_active = True
                 break
 
@@ -737,7 +737,7 @@ def delete_orphan_unique_identities(es, sortinghat_db, current_data_source, acti
             continue
 
         # Add the uuid to the list to check its existence in the IDENTITIES_INDEX
-        uuids_to_process.append(unique_identity.uuid)
+        uuids_to_process.append(unique_identity['mk'])
 
         # Process the uuids in block of SIZE_SCROLL_IDENTITIES_INDEX
         if len(uuids_to_process) != SIZE_SCROLL_IDENTITIES_INDEX:
@@ -808,7 +808,7 @@ def delete_inactive_unique_identities(es, sortinghat_db, before_date):
     while scroll_size > 0:
         for item in page['hits']['hits']:
             to_delete = item['_source']['sh_uuid']
-            success = SortingHat.remove_unique_identity(sortinghat_db, to_delete)
+            success = SortingHat.remove_identity(sortinghat_db, to_delete)
             # increment the number of deleted identities only if the corresponding command was successful
             count = count + 1 if success else count
 
@@ -833,7 +833,8 @@ def retain_identities(retention_time, es_enrichment_url, sortinghat_db, data_sou
     before_date = get_diff_current_date(minutes=retention_time)
     before_date_str = before_date.isoformat()
 
-    es = Elasticsearch([es_enrichment_url], timeout=120, max_retries=20, retry_on_timeout=True, verify_certs=False)
+    es = Elasticsearch([es_enrichment_url], timeout=120, max_retries=20, retry_on_timeout=True,
+                       connection_class=RequestsHttpConnection, verify_certs=False)
 
     # delete the unique identities which have not been seen after `before_date`
     delete_inactive_unique_identities(es, sortinghat_db, before_date_str)

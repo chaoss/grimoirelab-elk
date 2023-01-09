@@ -24,6 +24,13 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      # Redis
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
     
     name: Python ${{ matrix.python-version }} for ES ${{ matrix.elasticsearch-version }}
     strategy:
@@ -48,7 +55,6 @@ jobs:
         stack-version: ${{ matrix.elasticsearch-version }}
     - name: Install dependencies
       run: |
-        poetry run pip install setuptools==57.5.0
         poetry install -vvv
         poetry add -D coveralls
         poetry run pip install -r requirements_dev.txt
@@ -63,6 +69,17 @@ jobs:
         mysql --host $DB_HOST --port $DB_PORT -uroot -proot -e "CREATE DATABASE test_sh"
         mysql --host $DB_HOST --port $DB_PORT -uroot -proot -e "CREATE DATABASE test_projects"
         mysql --host $DB_HOST --port $DB_PORT -uroot -proot test_projects < tests/test_projects.sql
+    - name: Run Sortinghat Server
+      run: |
+        git clone --single-branch https://github.com/chaoss/grimoirelab-sortinghat /tmp/sortinghat
+        cp tests/sortinghat_settings.py /tmp/sortinghat/config/settings/sortinghat_settings.py
+        cd /tmp/sortinghat
+        poetry install -vvv
+        poetry run python manage.py migrate --settings=config.settings.sortinghat_settings
+        poetry run python manage.py createsuperuser --username root --noinput --email 'root@root.com' --settings=config.settings.sortinghat_settings
+        poetry run python manage.py runserver --settings=config.settings.sortinghat_settings &
+        poetry run python manage.py rqworker --settings=config.settings.sortinghat_settings &
+        cd
     - name: Lint with flake8
       run: |
         poetry run flake8

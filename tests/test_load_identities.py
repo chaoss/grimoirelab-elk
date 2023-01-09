@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2023 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,11 +30,11 @@ import unittest
 if '..' not in sys.path:
     sys.path.insert(0, '..')
 
+from base import DB_HOST, DB_SORTINGHAT
 from grimoire_elk.utils import get_connectors
 from grimoire_elk.enriched.sortinghat_gelk import SortingHat
 
 CONFIG_FILE = 'tests.conf'
-DB_SORTINGHAT = "test_sh"
 
 logger = logging.getLogger(__name__)
 
@@ -62,20 +62,17 @@ class TestLoadIdentities(unittest.TestCase):
         config.read(CONFIG_FILE)
 
         # Sorting hat settings
-        cls.db_user = ''
-        cls.db_password = ''
-        if 'Database' in config:
-            if 'user' in config['Database']:
-                cls.db_user = config['Database']['user']
-            if 'password' in config['Database']:
-                cls.db_password = config['Database']['password']
+        cls.db_user = config.get('Database', 'user', fallback='')
+        cls.db_password = config.get('Database', 'password', fallback='')
+        cls.db_host = config.get('Database', 'host', fallback=DB_HOST)
 
     def setUp(self):
 
         # The name of the connector is needed only to get access to the SortingHat DB
         self.enrich_backend = get_connectors()["github"][2](db_sortinghat=DB_SORTINGHAT,
                                                             db_user=self.db_user,
-                                                            db_password=self.db_password)
+                                                            db_password=self.db_password,
+                                                            db_host=self.db_host)
 
     def _test_load_identities(self, items=10):
         """Test whether fetched items are properly loaded to ES"""
@@ -110,7 +107,7 @@ class TestLoadIdentities(unittest.TestCase):
             identities_count += inserted_identities
 
         stop = datetime.datetime.now().timestamp()
-        self.assertLess((stop - start), 10.0)
+        self.assertLess((stop - start), 40.0)
 
     def load_bulk_identities(self, items_count, new_identities, sh_db, connector_name):
         identities_count = len(new_identities)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2023 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -201,12 +201,6 @@ class TestGitLab(TestBaseBackend):
         result = self._test_refresh_identities()
         # ... ?
 
-    def test_refresh_project(self):
-        """Test refresh project field for all sources"""
-
-        result = self._test_refresh_project()
-        # ... ?
-
     def test_items_to_raw_anonymized(self):
         """Test whether JSON items are properly inserted into ES anonymized"""
 
@@ -317,7 +311,7 @@ class TestGitLab(TestBaseBackend):
 
         time.sleep(1)
 
-        url = self.es_con + "/test_gitlab_onion/_search?size=20"
+        url = self.es_con + "/test_gitlab_onion/_search?size=50"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
         self.assertEqual(len(hits), 10)

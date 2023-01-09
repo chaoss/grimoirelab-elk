@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2020 Bitergia
+# Copyright (C) 2015-2023 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -294,12 +294,6 @@ class TestGit(TestBaseBackend):
         result = self._test_refresh_identities()
         # ... ?
 
-    def test_refresh_project(self):
-        """Test refresh project field for all sources"""
-
-        result = self._test_refresh_project()
-        # ... ?
-
     def test_demography_study(self):
         """ Test that the demography study works correctly """
 
@@ -410,7 +404,7 @@ class TestGit(TestBaseBackend):
 
         time.sleep(1)
 
-        url = self.es_con + "/test_git_onion/_search?size=20"
+        url = self.es_con + "/test_git_onion/_search?size=50"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
         self.assertEqual(len(hits), 16)

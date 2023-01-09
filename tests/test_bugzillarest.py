@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2023 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -123,12 +123,6 @@ class TestBugzillaRest(TestBaseBackend):
         """Test refresh identities"""
 
         result = self._test_refresh_identities()
-        # ... ?
-
-    def test_refresh_project(self):
-        """Test refresh project field for all sources"""
-
-        result = self._test_refresh_project()
         # ... ?
 
     def test_get_project(self):

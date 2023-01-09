@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015-2019 Bitergia
+# Copyright (C) 2015-2023 Bitergia
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -209,12 +209,6 @@ class TestGitHub(TestBaseBackend):
         result = self._test_refresh_identities()
         # ... ?
 
-    def test_refresh_project(self):
-        """Test refresh project field for all sources"""
-
-        result = self._test_refresh_project()
-        # ... ?
-
     def test_perceval_params(self):
         """Test the extraction of perceval params from an URL"""
 
@@ -405,7 +399,7 @@ class TestGitHub(TestBaseBackend):
         url = self.es_con + "/test_github_issues_onion/_search?size=20"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
-        self.assertEqual(len(hits), 8)
+        self.assertEqual(len(hits), 10)
         for hit in hits:
             source = hit['_source']
             self.assertIn('timeframe', source)
@@ -426,7 +420,7 @@ class TestGitHub(TestBaseBackend):
         url = self.es_con + "/test_github_prs_onion/_search?size=20"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
-        self.assertEqual(len(hits), 8)
+        self.assertEqual(len(hits), 10)
         for hit in hits:
             source = hit['_source']
             self.assertIn('timeframe', source)
