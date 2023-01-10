@@ -82,6 +82,8 @@ jobs:
 
       - name: Run Sortinghat Server
         run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "PATH=$HOME/.poetry/bin:$PATH" >> $GITHUB_ENV
           git clone --single-branch https://github.com/chaoss/grimoirelab-sortinghat /tmp/sortinghat
           cp tests/sortinghat_settings.py /tmp/sortinghat/config/settings/sortinghat_settings.py
           cd /tmp/sortinghat
