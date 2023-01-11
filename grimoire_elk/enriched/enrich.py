@@ -116,7 +116,8 @@ class Enrich(ElasticItems):
     ONION_INTERVAL = seconds = 3600 * 24 * 7
 
     def __init__(self, db_sortinghat=None, json_projects_map=None, db_user='',
-                 db_password='', db_host='', insecure=True, db_port='8000', db_path='api/'):
+                 db_password='', db_host='', insecure=True, db_port=None, db_path=None,
+                 db_ssl=False):
 
         perceval_backend = None
         super().__init__(perceval_backend, insecure=insecure)
@@ -127,10 +128,9 @@ class Enrich(ElasticItems):
         if db_sortinghat and not SORTINGHAT_LIBS:
             raise RuntimeError("Sorting hat configured but libraries not available.")
         if db_sortinghat:
-            # self.sh_db = Database("root", "", db_sortinghat, "mariadb")
             if not Enrich.sh_db:
                 client = SortingHatClient(host=db_host, port=db_port,
-                                          path=db_path, ssl=False,
+                                          path=db_path, ssl=db_ssl,
                                           user=db_user, password=db_password)
                 client.connect()
                 client.gqlc.logger.setLevel(logging.CRITICAL)

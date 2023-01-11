@@ -100,11 +100,16 @@ class TestSortinghatGelk(unittest.TestCase):
         db_user = config.get('Database', 'user', fallback='')
         db_password = config.get('Database', 'password', fallback='')
         db_host = config.get('Database', 'host', fallback='127.0.0.1')
+        db_port = config.get('Database', 'port', fallback=None)
+        db_path = config.get('Database', 'path', fallback=None)
+        db_ssl = config.getboolean('Database', 'ssl', fallback=False)
 
         self.sh_db = SortingHatClient(host=db_host,
-                                      port="8000", path="api/", ssl=False,
+                                      port=db_port,
                                       user=db_user,
-                                      password=db_password)
+                                      password=db_password,
+                                      path=db_path,
+                                      ssl=db_ssl)
         self.sh_db.connect()
         # Clean database
         # Remove identities

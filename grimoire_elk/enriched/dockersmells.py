@@ -73,9 +73,11 @@ class Mapping(BaseMapping):
 class Dockersmells(Enrich):
 
     def __init__(self, db_sortinghat=None, json_projects_map=None,
-                 db_user='', db_password='', db_host=''):
-        super().__init__(db_sortinghat, json_projects_map,
-                         db_user, db_password, db_host)
+                 db_user='', db_password='', db_host='', db_path=None,
+                 db_port=None, db_ssl=False):
+        super().__init__(db_sortinghat=db_sortinghat, json_projects_map=json_projects_map,
+                         db_user=db_user, db_password=db_password, db_host=db_host,
+                         db_port=db_port, db_path=db_path, db_ssl=db_ssl)
 
         self.studies = []
 
