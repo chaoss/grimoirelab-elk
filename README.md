@@ -1,9 +1,9 @@
 # Welcome to GrimoireELK [![Build Status](https://github.com/chaoss/grimoirelab-elk/workflows/tests/badge.svg)](https://github.com/chaoss/grimoirelab-elk/actions?query=workflow:tests+branch:master+event:push) [![Coverage Status](https://coveralls.io/repos/github/chaoss/grimoirelab-elk/badge.svg?branch=master)](https://coveralls.io/github/chaoss/grimoirelab-elk?branch=master) [![PyPI version](https://badge.fury.io/py/grimoire-elk.svg)](https://badge.fury.io/py/grimoire-elk) 
 
-GrimoireELK is the component that interacts with the ElasticSearch database. Its goal is two-fold, first it aims at offering a convenient
+GrimoireELK is the component of [GrimoireLab](https://github.com/chaoss/grimoirelab) that interacts with the ElasticSearch database. Its goal is two-fold, first it aims at offering a convenient
 way to store the data coming from Perceval, second it processes and enriches the data in a format that can be consumed by Kibiter.
 
-The Perceval data is stored in ElasticSearch indexes as raw documents (one per item extracted by Perceval). Those raw documents, which will be referred to as "raw data" in
+The [Perceval](https://github.com/chaoss/grimoirelab-perceval) data is stored in ElasticSearch indexes as raw documents (one per item extracted by Perceval). Those raw documents, which will be referred to as "raw data" in
 this documentation, include all information coming from the original data source which grants the platform to perform multiple analysis without the need of downloading the
 same data over and over again. Once raw data is retrieved, a new phase starts where data is enriched according to the data source from where it was collected and stored
 in ElasticSearch indexes. The enrichment removes information not needed by Kibiter and includes additional information which is not directly available within the raw data.
