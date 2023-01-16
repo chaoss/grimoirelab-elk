@@ -129,6 +129,9 @@ class TestBaseBackend(unittest.TestCase):
         cls.db_user = cls.config.get('Database', 'user', fallback='')
         cls.db_password = cls.config.get('Database', 'password', fallback='')
         cls.db_host = cls.config.get('Database', 'host', fallback=DB_HOST)
+        cls.db_port = cls.config.get('Database', 'port', fallback=None)
+        cls.db_path = cls.config.get('Database', 'path', fallback=None)
+        cls.db_ssl = cls.config.getboolean('Database', 'ssl', fallback=False)
 
     def setUp(self):
         with open(os.path.join("data", self.connector + ".json")) as f:
@@ -174,18 +177,28 @@ class TestBaseBackend(unittest.TestCase):
             self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                                      db_user=self.db_user,
                                                                      db_password=self.db_password,
-                                                                     db_host=self.db_host)
+                                                                     db_host=self.db_host,
+                                                                     db_port=self.db_port,
+                                                                     db_path=self.db_path,
+                                                                     db_ssl=self.db_ssl)
         elif sortinghat and projects:
             self.enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
                                                                      db_sortinghat=DB_SORTINGHAT,
                                                                      db_user=self.db_user,
                                                                      db_password=self.db_password,
-                                                                     db_host=self.db_host)
+                                                                     db_host=self.db_host,
+                                                                     db_port=self.db_port,
+                                                                     db_path=self.db_path,
+                                                                     db_ssl=self.db_ssl)
+
         elif not sortinghat and projects:
             self.enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
                                                                      db_user=self.db_user,
                                                                      db_password=self.db_password,
-                                                                     db_host=self.db_host)
+                                                                     db_host=self.db_host,
+                                                                     db_port=self.db_port,
+                                                                     db_path=self.db_path,
+                                                                     db_ssl=self.db_ssl)
         if pair_programming:
             self.enrich_backend.pair_programming = pair_programming
 
@@ -236,7 +249,10 @@ class TestBaseBackend(unittest.TestCase):
         self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                                  db_user=self.db_user,
                                                                  db_password=self.db_password,
-                                                                 db_host=self.db_host)
+                                                                 db_host=self.db_host,
+                                                                 db_port=self.db_port,
+                                                                 db_path=self.db_path,
+                                                                 db_ssl=self.db_ssl)
         elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
         self.enrich_backend.set_elastic(elastic_enrich)
         self.enrich_backend.enrich_items(self.ocean_backend)
@@ -260,7 +276,10 @@ class TestBaseBackend(unittest.TestCase):
                                                                  db_user=self.db_user,
                                                                  db_password=self.db_password,
                                                                  json_projects_map=FILE_PROJECTS,
-                                                                 db_host=self.db_host)
+                                                                 db_host=self.db_host,
+                                                                 db_port=self.db_port,
+                                                                 db_path=self.db_path,
+                                                                 db_ssl=self.db_ssl)
 
         elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
         self.enrich_backend.set_elastic(elastic_enrich)
@@ -310,7 +329,10 @@ class TestBaseBackend(unittest.TestCase):
         self.enrich_backend = self.connectors[self.connector][2](db_sortinghat=DB_SORTINGHAT,
                                                                  db_user=self.db_user,
                                                                  db_password=self.db_password,
-                                                                 db_host=self.db_host)
+                                                                 db_host=self.db_host,
+                                                                 db_port=self.db_port,
+                                                                 db_path=self.db_path,
+                                                                 db_ssl=self.db_ssl)
 
         elastic_enrich = get_elastic(self.es_con, self.enrich_index_anonymized, clean, self.enrich_backend, self.enrich_aliases)
         self.enrich_backend.set_elastic(elastic_enrich)

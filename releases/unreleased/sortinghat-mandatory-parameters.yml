@@ -1,0 +1,8 @@
+---
+title: SortingHat mandatory parameters
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Include SortingHat 0.8.x mandatory parameters. Now
+  `sh_port`, `sh_path`, `sh_ssl` are required.

@@ -490,6 +490,7 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                    github_token=None, studies=False, only_studies=False,
                    url_enrich=None, events_enrich=False,
                    db_user=None, db_password=None, db_host=None,
+                   db_port=None, db_path=None, db_ssl=False,
                    do_refresh_projects=False, do_refresh_identities=False,
                    author_id=None, author_uuid=None, filter_raw=None,
                    jenkins_rename_file=None,
@@ -530,8 +531,14 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
         if events_enrich:
             enrich_index += "_events"
 
-        enrich_backend = connector[2](db_sortinghat, json_projects_map,
-                                      db_user, db_password, db_host)
+        enrich_backend = connector[2](db_sortinghat=db_sortinghat,
+                                      json_projects_map=json_projects_map,
+                                      db_user=db_user,
+                                      db_password=db_password,
+                                      db_host=db_host,
+                                      db_port=db_port,
+                                      db_path=db_path,
+                                      db_ssl=db_ssl)
         enrich_backend.set_params(backend_params)
         # store the cfg section name in the enrich backend to recover the corresponding project name in projects.json
         enrich_backend.set_cfg_section_name(cfg_section_name)
