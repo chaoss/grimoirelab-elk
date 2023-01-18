@@ -612,6 +612,14 @@ class TestElastic(unittest.TestCase):
                 'properties': {
                     'message': {
                         'type': 'text'
+                    },
+                    'AuthorDate': {
+                        'type': 'date',
+                        'format': 'EEE MMM dd HH:mm:ss yyyy Z||strict_date_optional_time||epoch_millis'
+                    },
+                    'CommitDate': {
+                        'type': 'date',
+                        'format': 'EEE MMM dd HH:mm:ss yyyy Z||strict_date_optional_time||epoch_millis'
                     }
                 }
             }
