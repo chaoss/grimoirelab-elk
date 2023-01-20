@@ -2070,14 +2070,14 @@ numpy = ">=1.16.5"
 
 [[package]]
 name = "setuptools"
-version = "65.7.0"
+version = "66.0.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "setuptools-65.7.0-py3-none-any.whl", hash = "sha256:8ab4f1dbf2b4a65f7eec5ad0c620e84c34111a68d3349833494b9088212214dd"},
-    {file = "setuptools-65.7.0.tar.gz", hash = "sha256:4d3c92fac8f1118bb77a22181355e29c239cabfe2b9effdaa665c66b711136d7"},
+    {file = "setuptools-66.0.0-py3-none-any.whl", hash = "sha256:a78d01d1e2c175c474884671dde039962c9d74c7223db7369771fcf6e29ceeab"},
+    {file = "setuptools-66.0.0.tar.gz", hash = "sha256:bd6eb2d6722568de6d14b87c44a96fac54b2a45ff5e940e639979a3d1792adb6"},
 ]
 
 [package.extras]
@@ -2158,14 +2158,14 @@ files = [
 
 [[package]]
 name = "sortinghat"
-version = "0.8.0rc5"
+version = "0.8.0rc6"
 description = "A tool to manage identities."
 category = "main"
 optional = false
 python-versions = ">=3.7.1,<4.0.0"
 files = [
-    {file = "sortinghat-0.8.0rc5-py3-none-any.whl", hash = "sha256:08abcb570df4b841c54abac9dd5de1684e4bd01078046d6c9086f97466ecec06"},
-    {file = "sortinghat-0.8.0rc5.tar.gz", hash = "sha256:422b0b28dddc30a673613fdc3088ee81a13154e9d4f0c48d105b964a64aa55ad"},
+    {file = "sortinghat-0.8.0rc6-py3-none-any.whl", hash = "sha256:631cb181f1a7c79e8267b82fa90d5b06467f34eebac92813baa768eb7e6d6455"},
+    {file = "sortinghat-0.8.0rc6.tar.gz", hash = "sha256:b5b6f9c408c72ba61e990662f7e37e54f146ffd7d0d182e27177a08e32aa05b2"},
 ]
 
 [package.dependencies]
@@ -2187,7 +2187,7 @@ PyJWT = ">=2.4.0,<3.0.0"
 python-dateutil = ">=2.8.2,<3.0.0"
 requests = ">=2.7.0,<3.0.0"
 rq = "<1.12.0"
-setuptools = ">=65.5.0,<66.0.0"
+setuptools = ">65.5.0"
 sgqlc = ">=10.1,<11.0"
 uWSGI = ">=2.0,<3.0"
 
