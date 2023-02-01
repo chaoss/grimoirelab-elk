@@ -120,14 +120,14 @@ files = [
 
 [[package]]
 name = "cereslib"
-version = "0.3.6rc3"
+version = "0.3.6"
 description = "GrimoireLab: Unify, eventize and enrich information from Perceval"
 category = "main"
 optional = false
 python-versions = ">=3.7.1,<4.0.0"
 files = [
-    {file = "cereslib-0.3.6rc3-py3-none-any.whl", hash = "sha256:d9bf6d6518a9479b944d7b1b5cd225c5e7a1dce97c77239d7d586b4c6df05991"},
-    {file = "cereslib-0.3.6rc3.tar.gz", hash = "sha256:e32c1744ca011e0792ac2ebb448b7079aedc6edd3bcc5f6bdf151a1d64ab1cb2"},
+    {file = "cereslib-0.3.6-py3-none-any.whl", hash = "sha256:c62ebbec41f954bb8891015f92fce400611573f82a552c3570f82c8630ab7807"},
+    {file = "cereslib-0.3.6.tar.gz", hash = "sha256:0e3b37e19aa63183a7afdffa334c6ba85544894f96ec53803bc4b26957dbaf75"},
 ]
 
 [package.dependencies]
@@ -496,14 +496,14 @@ graph = ["objgraph (>=1.7.2)"]
 
 [[package]]
 name = "django"
-version = "3.2.16"
+version = "3.2.17"
 description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design."
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "Django-3.2.16-py3-none-any.whl", hash = "sha256:18ba8efa36b69cfcd4b670d0fa187c6fe7506596f0ababe580e16909bcdec121"},
-    {file = "Django-3.2.16.tar.gz", hash = "sha256:3adc285124244724a394fa9b9839cc8cd116faf7d159554c43ecdaa8cdf0b94d"},
+    {file = "Django-3.2.17-py3-none-any.whl", hash = "sha256:59c39fc342b242fb42b6b040ad8b1b4c15df438706c1d970d416d63cdd73e7fd"},
+    {file = "Django-3.2.17.tar.gz", hash = "sha256:644288341f06ebe4938eec6801b6bd59a6534a78e4aedde2a153075d11143894"},
 ]
 
 [package.dependencies]
@@ -1053,14 +1053,14 @@ grpc = ["grpcio (>=1.44.0,<2.0.0dev)"]
 
 [[package]]
 name = "graal"
-version = "0.4.3rc5"
+version = "0.4.3"
 description = "A generic source code analyzer"
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "graal-0.4.3rc5-py3-none-any.whl", hash = "sha256:7bff837e16a4bc80b3b0597e4da4b76d72c886c03741961480e8db014fb42dd4"},
-    {file = "graal-0.4.3rc5.tar.gz", hash = "sha256:59687a0d9820a4a003956ef949f25c3112b11852320012c023589d3c9feebca4"},
+    {file = "graal-0.4.3-py3-none-any.whl", hash = "sha256:17d1a97cd48be5852b4433f2bc58bef31409a1489f0c70c863baf1daff444a1c"},
+    {file = "graal-0.4.3.tar.gz", hash = "sha256:4533d23e26488564d7f0441bf4dbecf3b186b12a6cfb8bae942ff914ba0cf7da"},
 ]
 
 [package.dependencies]
@@ -1164,14 +1164,14 @@ six = ">=1.12"
 
 [[package]]
 name = "grimoirelab-toolkit"
-version = "0.3.3rc2"
+version = "0.3.3"
 description = "Toolkit of common functions used across GrimoireLab"
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "grimoirelab_toolkit-0.3.3rc2-py3-none-any.whl", hash = "sha256:f2be8a47cf3cf622dddf1077bc4c91c54a3f2200f6fabe01bbc178ba3b0acd2c"},
-    {file = "grimoirelab_toolkit-0.3.3rc2.tar.gz", hash = "sha256:e5e801ea7bd76b871c91a61c167c4d3897fe516e35888e8e814c6b758bf35867"},
+    {file = "grimoirelab_toolkit-0.3.3-py3-none-any.whl", hash = "sha256:09a29110218d5769f7630f4262296454e65c9bbd46e78905c5d26d6f43d1342e"},
+    {file = "grimoirelab_toolkit-0.3.3.tar.gz", hash = "sha256:ddaa2eef64005d12fa74c00052aabd1952be18f44f3bf6d728f472b73b584ce3"},
 ]
 
 [package.dependencies]
@@ -1570,14 +1570,14 @@ files = [
 
 [[package]]
 name = "perceval"
-version = "0.21.2rc5"
+version = "0.21.2"
 description = "Send Sir Perceval on a quest to fetch and gather data from software repositories."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "perceval-0.21.2rc5-py3-none-any.whl", hash = "sha256:c64c74342e26faf9788eb1038d8e9fea6f8c2b59e708f7afec7e492bfb53b99e"},
-    {file = "perceval-0.21.2rc5.tar.gz", hash = "sha256:139bd428ea9dac302388e725739fde62014f84c36163b6b604d57a31bfffb584"},
+    {file = "perceval-0.21.2-py3-none-any.whl", hash = "sha256:6f44cb6c35334a7b30b305f073d6d286c3fb73cdc4494a91d2eda3c16648439e"},
+    {file = "perceval-0.21.2.tar.gz", hash = "sha256:e1305af6fc9fcb47374e73cb3b6dc44dd1c1209413c19983bea84aa014ded1d9"},
 ]
 
 [package.dependencies]
@@ -1596,14 +1596,14 @@ docs = ["furo (>=2021.8.31,<2022.0.0)", "myst-parser (>=0.15.2,<0.16.0)"]
 
 [[package]]
 name = "perceval-mozilla"
-version = "0.3.6rc5"
+version = "0.3.6"
 description = "Bundle of Perceval backends for Mozilla ecosystem."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "perceval_mozilla-0.3.6rc5-py3-none-any.whl", hash = "sha256:fd7b53f4c2b28e93aa9ad9f6dd18cdc6c279e44786ddbab7ec20226093c3245c"},
-    {file = "perceval_mozilla-0.3.6rc5.tar.gz", hash = "sha256:91811592df1922b3a1e803344e8321f77f9aec45499e1386604c3b8a5a1cf068"},
+    {file = "perceval_mozilla-0.3.6-py3-none-any.whl", hash = "sha256:3128da81b3e2921354c4f4f4c29d053d5dd00b2c327fdaccc402ca8ea6d4cc28"},
+    {file = "perceval_mozilla-0.3.6.tar.gz", hash = "sha256:1a4ccb7fae086443c6e4f662f6acd795d0029bd689640badf3b40a291942a9a7"},
 ]
 
 [package.dependencies]
@@ -1613,14 +1613,14 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-opnfv"
-version = "0.2.6rc5"
+version = "0.2.6"
 description = "Bundle of Perceval backends for OPNFV ecosystem."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "perceval_opnfv-0.2.6rc5-py3-none-any.whl", hash = "sha256:88fe94e6674a7bc61574a260f246afb78b25a3e9d2fa98c4dd0ccff52bab660f"},
-    {file = "perceval_opnfv-0.2.6rc5.tar.gz", hash = "sha256:5f77b25e566a89c4f989d7333f5d8c97a6122562c135e2c19c61e82b506c83d4"},
+    {file = "perceval_opnfv-0.2.6-py3-none-any.whl", hash = "sha256:6d2a89d5f3d1d78f318db2208dd6104914dbe626c0d9b4666d072c096ddd314e"},
+    {file = "perceval_opnfv-0.2.6.tar.gz", hash = "sha256:88475b5a35a81367c3ede45999f10691dabdf1e4da9fc94abdbd442d913f5aef"},
 ]
 
 [package.dependencies]
@@ -1630,14 +1630,14 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-puppet"
-version = "0.2.6rc5"
+version = "0.2.6"
 description = "Bundle of Perceval backends for Puppet, Inc. ecosystem."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "perceval_puppet-0.2.6rc5-py3-none-any.whl", hash = "sha256:3d3905200327cbe22b7963910dd23ad0afa3ccb03e26ce9c741d91a5b7cc1d79"},
-    {file = "perceval_puppet-0.2.6rc5.tar.gz", hash = "sha256:0365a97d3e321f50d930cba32f663f48574cb8241da82dcf5ffaeb83b531bada"},
+    {file = "perceval_puppet-0.2.6-py3-none-any.whl", hash = "sha256:3daa66312d32d026be46b9e63c1ba204151a0fe37cd6c13129804260bb1f740f"},
+    {file = "perceval_puppet-0.2.6.tar.gz", hash = "sha256:5ddcd6bc2455882d02b885e1d47398ceea0f8f54b281e058e7b808f103c146ad"},
 ]
 
 [package.dependencies]
@@ -1647,14 +1647,14 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-weblate"
-version = "0.2.6rc5"
+version = "0.2.6"
 description = "Bundle of Perceval backends for Weblate."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "perceval_weblate-0.2.6rc5-py3-none-any.whl", hash = "sha256:7b7d0cd95aef1100a478b835b2496030b7623753b045f56c4699b6c00b795e61"},
-    {file = "perceval_weblate-0.2.6rc5.tar.gz", hash = "sha256:7462962ec371384a2092dd3d955c7d1074a25cfa1f15747b58303e26eade2519"},
+    {file = "perceval_weblate-0.2.6-py3-none-any.whl", hash = "sha256:3669ae55102c344ae374bf3c76626374321d8cd5ef330694835f2b8144c729ed"},
+    {file = "perceval_weblate-0.2.6.tar.gz", hash = "sha256:00face6475b3faf0e6ad18516a94dd61ba4f69256db209edd99ad20807ad54b1"},
 ]
 
 [package.dependencies]
@@ -2067,6 +2067,84 @@ files = [
 
 [package.dependencies]
 numpy = ">=1.16.5"
+
+[[package]]
+name = "scipy"
+version = "1.7.3"
+description = "SciPy: Scientific Library for Python"
+category = "main"
+optional = false
+python-versions = ">=3.7,<3.11"
+files = [
+    {file = "scipy-1.7.3-1-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:c9e04d7e9b03a8a6ac2045f7c5ef741be86727d8f49c45db45f244bdd2bcff17"},
+    {file = "scipy-1.7.3-1-cp38-cp38-macosx_12_0_arm64.whl", hash = "sha256:b0e0aeb061a1d7dcd2ed59ea57ee56c9b23dd60100825f98238c06ee5cc4467e"},
+    {file = "scipy-1.7.3-1-cp39-cp39-macosx_12_0_arm64.whl", hash = "sha256:b78a35c5c74d336f42f44106174b9851c783184a85a3fe3e68857259b37b9ffb"},
+    {file = "scipy-1.7.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:173308efba2270dcd61cd45a30dfded6ec0085b4b6eb33b5eb11ab443005e088"},
+    {file = "scipy-1.7.3-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:21b66200cf44b1c3e86495e3a436fc7a26608f92b8d43d344457c54f1c024cbc"},
+    {file = "scipy-1.7.3-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ceebc3c4f6a109777c0053dfa0282fddb8893eddfb0d598574acfb734a926168"},
+    {file = "scipy-1.7.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f7eaea089345a35130bc9a39b89ec1ff69c208efa97b3f8b25ea5d4c41d88094"},
+    {file = "scipy-1.7.3-cp310-cp310-win_amd64.whl", hash = "sha256:304dfaa7146cffdb75fbf6bb7c190fd7688795389ad060b970269c8576d038e9"},
+    {file = "scipy-1.7.3-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:033ce76ed4e9f62923e1f8124f7e2b0800db533828c853b402c7eec6e9465d80"},
+    {file = "scipy-1.7.3-cp37-cp37m-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:4d242d13206ca4302d83d8a6388c9dfce49fc48fdd3c20efad89ba12f785bf9e"},
+    {file = "scipy-1.7.3-cp37-cp37m-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:8499d9dd1459dc0d0fe68db0832c3d5fc1361ae8e13d05e6849b358dc3f2c279"},
+    {file = "scipy-1.7.3-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ca36e7d9430f7481fc7d11e015ae16fbd5575615a8e9060538104778be84addf"},
+    {file = "scipy-1.7.3-cp37-cp37m-win32.whl", hash = "sha256:e2c036492e673aad1b7b0d0ccdc0cb30a968353d2c4bf92ac8e73509e1bf212c"},
+    {file = "scipy-1.7.3-cp37-cp37m-win_amd64.whl", hash = "sha256:866ada14a95b083dd727a845a764cf95dd13ba3dc69a16b99038001b05439709"},
+    {file = "scipy-1.7.3-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:65bd52bf55f9a1071398557394203d881384d27b9c2cad7df9a027170aeaef93"},
+    {file = "scipy-1.7.3-cp38-cp38-macosx_12_0_arm64.whl", hash = "sha256:f99d206db1f1ae735a8192ab93bd6028f3a42f6fa08467d37a14eb96c9dd34a3"},
+    {file = "scipy-1.7.3-cp38-cp38-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:5f2cfc359379c56b3a41b17ebd024109b2049f878badc1e454f31418c3a18436"},
+    {file = "scipy-1.7.3-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:eb7ae2c4dbdb3c9247e07acc532f91077ae6dbc40ad5bd5dca0bb5a176ee9bda"},
+    {file = "scipy-1.7.3-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:95c2d250074cfa76715d58830579c64dff7354484b284c2b8b87e5a38321672c"},
+    {file = "scipy-1.7.3-cp38-cp38-win32.whl", hash = "sha256:87069cf875f0262a6e3187ab0f419f5b4280d3dcf4811ef9613c605f6e4dca95"},
+    {file = "scipy-1.7.3-cp38-cp38-win_amd64.whl", hash = "sha256:7edd9a311299a61e9919ea4192dd477395b50c014cdc1a1ac572d7c27e2207fa"},
+    {file = "scipy-1.7.3-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:eef93a446114ac0193a7b714ce67659db80caf940f3232bad63f4c7a81bc18df"},
+    {file = "scipy-1.7.3-cp39-cp39-macosx_12_0_arm64.whl", hash = "sha256:eb326658f9b73c07081300daba90a8746543b5ea177184daed26528273157294"},
+    {file = "scipy-1.7.3-cp39-cp39-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:93378f3d14fff07572392ce6a6a2ceb3a1f237733bd6dcb9eb6a2b29b0d19085"},
+    {file = "scipy-1.7.3-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:edad1cf5b2ce1912c4d8ddad20e11d333165552aba262c882e28c78bbc09dbf6"},
+    {file = "scipy-1.7.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5d1cc2c19afe3b5a546ede7e6a44ce1ff52e443d12b231823268019f608b9b12"},
+    {file = "scipy-1.7.3-cp39-cp39-win32.whl", hash = "sha256:2c56b820d304dffcadbbb6cbfbc2e2c79ee46ea291db17e288e73cd3c64fefa9"},
+    {file = "scipy-1.7.3-cp39-cp39-win_amd64.whl", hash = "sha256:3f78181a153fa21c018d346f595edd648344751d7f03ab94b398be2ad083ed3e"},
+    {file = "scipy-1.7.3.tar.gz", hash = "sha256:ab5875facfdef77e0a47d5fd39ea178b58e60e454a4c85aa1e52fcb80db7babf"},
+]
+
+[package.dependencies]
+numpy = ">=1.16.5,<1.23.0"
+
+[[package]]
+name = "scipy"
+version = "1.8.1"
+description = "SciPy: Scientific Library for Python"
+category = "main"
+optional = false
+python-versions = ">=3.8,<3.11"
+files = [
+    {file = "scipy-1.8.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:65b77f20202599c51eb2771d11a6b899b97989159b7975e9b5259594f1d35ef4"},
+    {file = "scipy-1.8.1-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:e013aed00ed776d790be4cb32826adb72799c61e318676172495383ba4570aa4"},
+    {file = "scipy-1.8.1-cp310-cp310-macosx_12_0_universal2.macosx_10_9_x86_64.whl", hash = "sha256:02b567e722d62bddd4ac253dafb01ce7ed8742cf8031aea030a41414b86c1125"},
+    {file = "scipy-1.8.1-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1da52b45ce1a24a4a22db6c157c38b39885a990a566748fc904ec9f03ed8c6ba"},
+    {file = "scipy-1.8.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a0aa8220b89b2e3748a2836fbfa116194378910f1a6e78e4675a095bcd2c762d"},
+    {file = "scipy-1.8.1-cp310-cp310-win_amd64.whl", hash = "sha256:4e53a55f6a4f22de01ffe1d2f016e30adedb67a699a310cdcac312806807ca81"},
+    {file = "scipy-1.8.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:28d2cab0c6ac5aa131cc5071a3a1d8e1366dad82288d9ec2ca44df78fb50e649"},
+    {file = "scipy-1.8.1-cp38-cp38-macosx_12_0_arm64.whl", hash = "sha256:6311e3ae9cc75f77c33076cb2794fb0606f14c8f1b1c9ff8ce6005ba2c283621"},
+    {file = "scipy-1.8.1-cp38-cp38-macosx_12_0_universal2.macosx_10_9_x86_64.whl", hash = "sha256:3b69b90c9419884efeffaac2c38376d6ef566e6e730a231e15722b0ab58f0328"},
+    {file = "scipy-1.8.1-cp38-cp38-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:6cc6b33139eb63f30725d5f7fa175763dc2df6a8f38ddf8df971f7c345b652dc"},
+    {file = "scipy-1.8.1-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:9c4e3ae8a716c8b3151e16c05edb1daf4cb4d866caa385e861556aff41300c14"},
+    {file = "scipy-1.8.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:23b22fbeef3807966ea42d8163322366dd89da9bebdc075da7034cee3a1441ca"},
+    {file = "scipy-1.8.1-cp38-cp38-win32.whl", hash = "sha256:4b93ec6f4c3c4d041b26b5f179a6aab8f5045423117ae7a45ba9710301d7e462"},
+    {file = "scipy-1.8.1-cp38-cp38-win_amd64.whl", hash = "sha256:70ebc84134cf0c504ce6a5f12d6db92cb2a8a53a49437a6bb4edca0bc101f11c"},
+    {file = "scipy-1.8.1-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:f3e7a8867f307e3359cc0ed2c63b61a1e33a19080f92fe377bc7d49f646f2ec1"},
+    {file = "scipy-1.8.1-cp39-cp39-macosx_12_0_arm64.whl", hash = "sha256:2ef0fbc8bcf102c1998c1f16f15befe7cffba90895d6e84861cd6c6a33fb54f6"},
+    {file = "scipy-1.8.1-cp39-cp39-macosx_12_0_universal2.macosx_10_9_x86_64.whl", hash = "sha256:83606129247e7610b58d0e1e93d2c5133959e9cf93555d3c27e536892f1ba1f2"},
+    {file = "scipy-1.8.1-cp39-cp39-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:93d07494a8900d55492401917a119948ed330b8c3f1d700e0b904a578f10ead4"},
+    {file = "scipy-1.8.1-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d3b3c8924252caaffc54d4a99f1360aeec001e61267595561089f8b5900821bb"},
+    {file = "scipy-1.8.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:70de2f11bf64ca9921fda018864c78af7147025e467ce9f4a11bc877266900a6"},
+    {file = "scipy-1.8.1-cp39-cp39-win32.whl", hash = "sha256:1166514aa3bbf04cb5941027c6e294a000bba0cf00f5cdac6c77f2dad479b434"},
+    {file = "scipy-1.8.1-cp39-cp39-win_amd64.whl", hash = "sha256:9dd4012ac599a1e7eb63c114d1eee1bcfc6dc75a29b589ff0ad0bb3d9412034f"},
+    {file = "scipy-1.8.1.tar.gz", hash = "sha256:9e3fb1b0e896f14a85aa9a28d5f755daaeeb54c897b746df7a55ccb02b340f33"},
+]
+
+[package.dependencies]
+numpy = ">=1.17.3,<1.25.0"
 
 [[package]]
 name = "setuptools"
