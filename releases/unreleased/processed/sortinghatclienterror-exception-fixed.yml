@@ -1,8 +1,0 @@
----
-title: SortingHatClientError exception fixed
-category: fixed
-author: Jose Javier Merchante <jjmerchante@bitergia.com>
-issue: null
-notes: >
-  Exception raised with SortingHatClientError has been
-  fixed in add_identity method.
