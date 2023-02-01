@@ -2236,14 +2236,14 @@ files = [
 
 [[package]]
 name = "sortinghat"
-version = "0.8.0rc9"
+version = "0.8.0"
 description = "A tool to manage identities."
 category = "main"
 optional = false
 python-versions = ">=3.7.1,<4.0.0"
 files = [
-    {file = "sortinghat-0.8.0rc9-py3-none-any.whl", hash = "sha256:77bb1be54c96448bbd32cf2783b0bbd724a130c14e632aa2d0c68e7dbf9e7fe7"},
-    {file = "sortinghat-0.8.0rc9.tar.gz", hash = "sha256:78a562eb11c5dfd87ea0086701902c62226f8d4dc77a788d1e34e23b8caf5d1b"},
+    {file = "sortinghat-0.8.0-py3-none-any.whl", hash = "sha256:e7b3eea4340a292256165a60967c23a5b8d6b84fb015877ad50e94c4c309dcfb"},
+    {file = "sortinghat-0.8.0.tar.gz", hash = "sha256:b552f3191154dd63b05b614e55dae0bb7a4d241e5c15d8e44e3246e05aabbb10"},
 ]
 
 [package.dependencies]
