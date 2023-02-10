@@ -117,7 +117,7 @@ class Enrich(ElasticItems):
 
     def __init__(self, db_sortinghat=None, json_projects_map=None, db_user='',
                  db_password='', db_host='', insecure=True, db_port=None, db_path=None,
-                 db_ssl=False):
+                 db_ssl=False, db_verify_ssl=True):
 
         perceval_backend = None
         super().__init__(perceval_backend, insecure=insecure)
@@ -131,6 +131,7 @@ class Enrich(ElasticItems):
             if not Enrich.sh_db:
                 client = SortingHatClient(host=db_host, port=db_port,
                                           path=db_path, ssl=db_ssl,
+                                          verify_ssl=db_verify_ssl,
                                           user=db_user, password=db_password)
                 client.connect()
                 client.gqlc.logger.setLevel(logging.CRITICAL)
