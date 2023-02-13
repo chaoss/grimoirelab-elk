@@ -1,25 +1,37 @@
-name,type,aggregatable,description
-uuid,keyword,true,"Perceval UUID."
-origin,keyword,true,"Original URL where the repository was retrieved from."
-repository,keyword,true,"Repository URL."
-interval_months,long,true,"Time frame of each analysis."
-from_date,date,true,"Starting date of the time frame."
-to_date,date,true,"End date of the time frame."
-study_creation_date,date,true,"Date when the study was executed."
-author_uuid,keyword,true,"Author UUID from SortingHat."
-author_name,keyword,true,"Author name."
-author_bot,boolean,true,"True if the given author is identified as a bot."
-author_user_name,keyword,true,"Username of the user."
-author_org_name,keyword,true,"Organization name."
-author_domain,keyword,true,"Domain associated to the author in SortingHat profile."
-metadata__enriched_on,date,true,"Date when the item was enriched."
-metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich information."
-metadata__gelk_version,keyword,true,"Version of the backend used to enrich information."
-grimoire_creation_date,date,true,"Commit date (when the original author made the commit)."
-is_git_survived,long,true,"Field containing '1' that allows to sum fields when concatenating with other indexes."
-prediction_09,long,true,"Number of days until the next predicted activity (90% of probability)."
-prediction_07,long,true,"Number of days until the next predicted activity (70% of probability)."
-prediction_05,long,true,"Number of days until the next predicted activity (50% of probability)"
-next_activity_09,date,true,"Date of the next predicted activity (90% of probability)"
-next_activity_07,date,true,"Date of the next predicted activity (70% of probability)"
-next_activity_05,date,true,"Date of the next predicted activity (50% of probability)"
+name,type,aggregatable,description,Raw/Calculated
+addedlines,long,TRUE,"Number of lines added in this file by this commit (only in this file, not the whole commit).",GrimoireLab
+author_bot,boolean,TRUE,True if the given author is identified as a bot.,GrimoireLab / SortingHat
+author_domain,keyword,TRUE,Domain associated to the author in SortingHat profile.,GrimoireLab / SortingHat
+author_id,keyword,TRUE,Author Id from SortingHat.,GrimoireLab / SortingHat
+author_name,keyword,TRUE,Author name.,GrimoireLab / SortingHat
+author_org_name,keyword,TRUE,Organization name.,GrimoireLab / SortingHat
+author_user_name,keyword,TRUE,Author user name.,GrimoireLab / SortingHat
+author_uuid,keyword,TRUE,Author UUID from SortingHat.,GrimoireLab / SortingHat
+committer,keyword,TRUE,Committer name as it appears in commit (including e-mail).,GrimoireLab / SortingHat
+committer_date,date,TRUE,Date when committer made this commit.,Data Source / Parsed
+date,date,TRUE,Author date (when the original author made the commit).,Data Source / Parsed
+eventtype,keyword,TRUE,COMMIT.,GrimoireLab
+file_dir_name,keyword,TRUE,"Path in which the file is located, not including file name.",Data Source / Parsed
+file_ext,keyword,TRUE,File extension.,Data Source / Parsed
+file_name,keyword,TRUE,File name with extension.,Data Source / Parsed
+file_path_list,keyword,TRUE,List of split path parts.,Data Source / Parsed
+fileaction,keyword,TRUE,Action performed by the commit over the file.,Data Source / Parsed
+filepath,keyword,TRUE,Complete file path.,Data Source / Parsed
+files,long,TRUE,Number of files touched by the same commit this file is included in.,Data Source / Parsed
+filetype,keyword,TRUE,"Code or Other, based on file extension.",GrimoireLab
+git_author_domain,keyword,TRUE,"Domain extracted from author email included within the commit, if any.",Data Source / Parsed
+grimoire_creation_date,date,TRUE,Author date (when the original author made the commit).,Data Source / Parsed
+hash,keyword,TRUE,Commit hash.,Data Source / Parsed
+id,keyword,TRUE,Commit hash.,Data Source / Parsed
+message,text,FALSE,Commit message split by terms.,Data Source / Parsed
+message.keyword,keyword,TRUE,Commit message as a single String.,Data Source / Parsed
+metadata__enriched_on,date,TRUE,Date when the item was enriched.,GrimoireLab
+metadata__timestamp,date,TRUE,Date when the item was stored in RAW index.,GrimoireLab
+metadata__updated_on,date,TRUE,Date when the item was updated in its original data source.,GrimoireLab
+owner,keyword,TRUE,Owner (code author) name as it appears in commit (including e-mail).,Data Source / Parsed
+perceval_uuid,keyword,TRUE,Perceval UUID.,GrimoireLab
+project,keyword,TRUE,Project.,GrimoireLab
+project_1,keyword,TRUE,Project (if more than one level is allowed in project hierarchy).,GrimoireLab
+removedlines,long,TRUE,"Number of lines removed in this file by this commit (only in this file, not the whole commit).",GrimoireLab
+repository,keyword,TRUE,Repository name.,Data Source / Parsed
+uuid,keyword,TRUE,Item unique identifier. Same as '_id',GrimoireLab
