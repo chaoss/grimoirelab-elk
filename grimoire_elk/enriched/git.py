@@ -296,6 +296,7 @@ class GitEnrich(Enrich):
         # author_name and author_domain are added always
         identity = self.get_sh_identity(commit["Author"])
         eitem["author_name"] = identity['name']
+        eitem["author_email"] = identity['email']
         eitem["author_domain"] = self.get_identity_domain(identity)
 
         # committer data

@@ -74,6 +74,15 @@ class Mapping(BaseMapping):
                             "body": {
                                 "type": "text",
                                 "index": true
+                            },
+                            "releases": {
+                                "dynamic":false,
+                                "properties": {
+                                    "body": {
+                                        "type": "text",
+                                        "index": true
+                                    }
+                                }
                             }
                         }
                     }

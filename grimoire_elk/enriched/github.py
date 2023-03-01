@@ -205,6 +205,58 @@ class GitHubEnrich(Enrich):
 
         return None
 
+    #get comments and exclude bot  
+    def get_num_of_comments_without_bot(self, item):
+        """Get the num of comment was made to the issue by someone
+        other than the user who created the issue and bot
+        """
+        comments = [comment for comment in item['comments_data']
+                         if item['user']['login'] != comment['user']['login'] \
+                             and 'bot' not in comment['user']['login']]
+        return len(comments)
+      
+    def get_num_of_reviews_without_bot(self, item):
+        """Get the num of comment was made to the issue by someone
+        other than the user who created the issue and bot
+        """
+        review_comments = []
+        for comment in item['review_comments_data']:
+            # skip comments of ghost users
+            if not comment['user']:
+                continue
+
+            # skip comments of the pull request creator
+            if 'bot' in comment['user']['login'] or item['user']['login'] == comment['user']['login'] :
+                continue
+
+            review_comments.append(comment)
+
+        return len(review_comments)
+      
+    #get first attendtion without bot
+    def get_time_to_first_attention_without_bot(self, item):
+        """Get the first date at which a comment was made to the issue by someone
+        other than the user who created the issue and bot
+        """
+        comment_dates = [str_to_datetime(comment['created_at']) for comment in item['comments_data']
+                         if item['user']['login'] != comment['user']['login'] and 'bot' not in comment['user']['login']]
+        if comment_dates:
+            return min(comment_dates)
+        return None
+    
+    #get first attendtion without bot
+    def get_time_to_first_review_attention_without_bot(self, item):
+        """Get the first date at which a comment was made to the issue by someone
+        other than the user who created the issue and bot
+        """
+        if 'review_comments_data' in item and item['review_comments_data']: 
+            comment_dates = [str_to_datetime(comment['created_at']) for comment in item['review_comments_data'] 
+                            if 'login' in item['user'] and comment['user'] and item['user']['login'] != comment['user']['login'] and 'bot' not in comment['user']['login']]
+            if comment_dates:
+                return min(comment_dates)
+        else:
+            return None
+
     def get_latest_comment_date(self, item):
         """Get the date of the latest comment on the issue/pr"""
 
@@ -460,6 +512,7 @@ class GitHubEnrich(Enrich):
         if self.__has_user(user):
             rich_pr['user_name'] = user['name']
             rich_pr['author_name'] = user['name']
+            rich_pr['user_email'] = user.get('email', None)
             rich_pr["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
             rich_pr['user_org'] = user['company']
             rich_pr['user_location'] = user['location']
@@ -471,6 +524,7 @@ class GitHubEnrich(Enrich):
             rich_pr['user_location'] = None
             rich_pr['user_geolocation'] = None
             rich_pr['author_name'] = None
+            rich_pr['user_email'] = None
 
         merged_by = pull_request.get('merged_by_data', None)
         if merged_by and merged_by is not None:
@@ -527,6 +581,15 @@ class GitHubEnrich(Enrich):
             min_review_date = self.get_time_to_merge_request_response(pull_request)
             rich_pr['time_to_merge_request_response'] = \
                 get_time_diff_days(str_to_datetime(pull_request['created_at']), min_review_date)
+            rich_pr['num_review_comments_without_bot'] = \
+                                   self.get_num_of_reviews_without_bot(pull_request)
+            rich_pr['time_to_first_attention_without_bot'] = \
+                                    get_time_diff_days(str_to_datetime(pull_request['created_at']),
+                                    self.get_time_to_first_review_attention_without_bot(pull_request))
+
+        if 'linked_issues_data' in pull_request:
+            rich_pr['linked_issues_count'] = pull_request['linked_issues_data']
+        rich_pr['commits_data'] = pull_request['commits_data']
 
         if self.prjs_map:
             rich_pr.update(self.get_item_project(rich_pr))
@@ -563,6 +626,7 @@ class GitHubEnrich(Enrich):
         if self.__has_user(user):
             rich_issue['user_name'] = user['name']
             rich_issue['author_name'] = user['name']
+            rich_issue['user_email'] = user.get('email', None)
             rich_issue["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
             rich_issue['user_org'] = user['company']
             rich_issue['user_location'] = user['location']
@@ -574,6 +638,7 @@ class GitHubEnrich(Enrich):
             rich_issue['user_location'] = None
             rich_issue['user_geolocation'] = None
             rich_issue['author_name'] = None
+            rich_issue['user_email'] = None
 
         assignee = issue.get('assignee_data', None)
         if self.__has_user(assignee):
@@ -617,6 +682,7 @@ class GitHubEnrich(Enrich):
         rich_issue['github_repo'] = rich_issue['repository'].replace(GITHUB, '')
         rich_issue['github_repo'] = re.sub('.git$', '', rich_issue['github_repo'])
         rich_issue["url_id"] = rich_issue['github_repo'] + "/issues/" + rich_issue['id_in_repo']
+        rich_issue['body'] = issue['body']
 
         if self.prjs_map:
             rich_issue.update(self.get_item_project(rich_issue))
@@ -625,11 +691,17 @@ class GitHubEnrich(Enrich):
             rich_issue['project'] = item['project']
 
         rich_issue['time_to_first_attention'] = None
+        rich_issue['num_of_comments_without_bot'] = None
         if issue['comments'] + issue['reactions']['total_count'] != 0:
             rich_issue['time_to_first_attention'] = \
                 get_time_diff_days(str_to_datetime(issue['created_at']),
                                    self.get_time_to_first_attention(issue))
-
+            rich_issue['num_of_comments_without_bot'] = \
+                                   self.get_num_of_comments_without_bot(issue)
+            rich_issue['time_to_first_attention_without_bot'] = \
+                                    get_time_diff_days(str_to_datetime(issue['created_at']),
+                                    self.get_time_to_first_attention_without_bot(issue))
+ 
         rich_issue.update(self.get_grimoire_fields(issue['created_at'], "issue"))
 
         item[self.get_field_date()] = rich_issue[self.get_field_date()]
@@ -649,6 +721,27 @@ class GitHubEnrich(Enrich):
         rich_repo['stargazers_count'] = repo['stargazers_count']
         rich_repo['fetched_on'] = repo['fetched_on']
         rich_repo['url'] = repo['html_url']
+
+        rich_releases = []
+        releases = repo.get('releases')
+        if releases:
+            for release in releases:
+                rich_releases_dict = {}
+                rich_releases_dict['id'] = release['id']
+                rich_releases_dict['tag_name'] = release['tag_name']
+                rich_releases_dict['target_commitish'] = release['target_commitish']
+                rich_releases_dict['prerelease'] = release['prerelease']
+                rich_releases_dict['name'] = release['name']
+                rich_releases_dict['body'] = ''
+                rich_releases_dict['created_at'] = release['created_at']
+                release_author = release['author']
+                rich_releases_author_dict = {}
+                rich_releases_author_dict['login'] = release_author['login']
+                rich_releases_author_dict['name'] = ''
+                rich_releases_dict['author'] = rich_releases_author_dict
+                rich_releases.append(rich_releases_dict)
+        rich_repo['releases'] = rich_releases
+        rich_repo['releases_count'] = len(rich_releases)
 
         if self.prjs_map:
             rich_repo.update(self.get_item_project(rich_repo))
