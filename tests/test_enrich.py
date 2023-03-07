@@ -142,8 +142,8 @@ class TestEnrich(unittest.TestCase):
                 "name": expected['author_name'],
                 "email": "pepepotamo@local.com",
                 "gender": expected['author_gender'],
-                "gender_acc": expected['author_gender_acc'],
-                "is_bot": expected['author_bot']
+                "genderAcc": expected['author_gender_acc'],
+                "isBot": expected['author_bot']
             },
             'enrollments': [
                 {
@@ -399,7 +399,7 @@ class TestEnrich(unittest.TestCase):
             'profile': {
                 "name": expected['author_name'],
                 "email": "pepepotamo@local.com",
-                "is_bot": expected['author_bot']
+                "isBot": expected['author_bot']
             },
             'enrollments': [
                 {
@@ -465,8 +465,8 @@ class TestEnrich(unittest.TestCase):
                 "name": expected['author_name'],
                 "email": "pepepotamo@local.com",
                 "gender": expected['author_gender'],
-                "gender_acc": expected['author_gender_acc'],
-                "is_bot": expected['author_bot']
+                "genderAcc": expected['author_gender_acc'],
+                "isBot": expected['author_bot']
             },
             'enrollments': [
                 {

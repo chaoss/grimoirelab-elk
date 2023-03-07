@@ -730,8 +730,8 @@ class Enrich(ElasticItems):
             eitem_sh[rol + "_domain"] = self.get_email_domain(email)
 
             eitem_sh[rol + "_gender"] = profile.get('gender', self.unknown_gender)
-            eitem_sh[rol + "_gender_acc"] = profile.get('gender_acc', 0)
-            eitem_sh[rol + "_bot"] = profile.get('is_bot', False)
+            eitem_sh[rol + "_gender_acc"] = profile.get('genderAcc', 0)
+            eitem_sh[rol + "_bot"] = profile.get('isBot', False)
 
         # Ensure we always write gender fields
         if not eitem_sh.get(rol + "_gender"):
