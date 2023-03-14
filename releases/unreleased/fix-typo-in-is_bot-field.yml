@@ -1,0 +1,10 @@
+---
+title: Fix typo in SortingHat fields
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: |
+  Some fields were not updated from the old version of
+  SortingHat. Now the API returns 'isBot' and 'genderAcc'
+  instead of 'is_bot' and 'gender_acc'.
+
