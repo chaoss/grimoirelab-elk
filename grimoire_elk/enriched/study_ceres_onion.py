@@ -29,6 +29,7 @@ from elasticsearch_dsl import Search, Q
 from cereslib.enrich.enrich import Onion
 from grimoirelab_toolkit import datetime as gl_dt
 from grimoire_elk.enriched.ceres_base import ESConnector, CeresBase
+from grimoire_elk.elastic import ElasticSearch
 
 
 logger = logging.getLogger(__name__)
@@ -123,7 +124,7 @@ class ESOnionConnector(ESConnector):
             for project in projects:
 
                 logger.debug("{} Quarter: {}  Project: {}".format(
-                             self.__log_prefix, quarter, project))
+                    self.__log_prefix, quarter, project))
 
                 # Global project
                 s = self.__build_search(date_range, project_name=project)
@@ -172,8 +173,7 @@ class ESOnionConnector(ESConnector):
                 "_source": row
             }
 
-            if (self._es_major == '7' and self._es_distribution == 'elasticsearch') or \
-               (self._es_major == '1' and self._es_distribution == 'opensearch'):
+            if not ElasticSearch.is_legacy_static(self._es_major, self._es_distribution):
                 doc.pop('_type')
 
             docs.append(doc)
@@ -247,8 +247,12 @@ class ESOnionConnector(ESConnector):
         # from:to parameters (=> from: 0, size: 0)
         s = s[0:0]
 
-        s.aggs.bucket(self.TIMEFRAME, 'date_histogram', field=self._timeframe_field,
-                      interval='quarter', min_doc_count=1)
+        if ElasticSearch.is_legacy_static(self._es_major, self._es_distribution):
+            s.aggs.bucket(self.TIMEFRAME, 'date_histogram', field=self._timeframe_field,
+                          interval='quarter', min_doc_count=1)
+        else:
+            s.aggs.bucket(self.TIMEFRAME, 'date_histogram', field=self._timeframe_field,
+                          calendar_interval='quarter', min_doc_count=1)
         response = s.execute()
 
         quarters = []
@@ -300,12 +304,14 @@ class ESOnionConnector(ESConnector):
 
         # We are not keeping all metadata__* fields because we are grouping commits by author, so we can only
         # store one value per author.
-        s.aggs.bucket(self.TIMEFRAME, 'date_histogram', field=self._timeframe_field, interval='quarter') \
-            .metric(self.LATEST_TS, 'max', field=self._sort_on_field)\
+        if ElasticSearch.is_legacy_static(self._es_major, self._es_distribution):
+            bucket = s.aggs.bucket(self.TIMEFRAME, 'date_histogram', field=self._timeframe_field, interval='quarter')
+        else:
+            bucket = s.aggs.bucket(self.TIMEFRAME, 'date_histogram', field=self._timeframe_field, calendar_interval='quarter')
+        bucket.metric(self.LATEST_TS, 'max', field=self._sort_on_field) \
             .bucket(self.AUTHOR_UUID, 'terms', field=self.AUTHOR_UUID, size=1000) \
             .metric(self.CONTRIBUTIONS, 'cardinality', field=self.contribs_field, precision_threshold=40000)\
             .bucket(self.AUTHOR_NAME, 'terms', field=self.AUTHOR_NAME, size=1)
-
         return s
 
     def __build_dataframe(self, timing, project_name=None, org_name=None):

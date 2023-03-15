@@ -343,8 +343,7 @@ class TestElastic(unittest.TestCase):
 
         elastic = MockElasticSearch(self.es_con, self.target_index)
 
-        if (elastic.major == '7' and elastic.distribution == ES_DISTRIBUTION) or \
-           (elastic.major == '1' and elastic.distribution == OS_DISTRIBUTION):
+        if not elastic.is_legacy():
             url = elastic.index_url + "/_mapping"
         else:
             url = elastic.index_url + "/items/_mapping"
@@ -367,8 +366,7 @@ class TestElastic(unittest.TestCase):
 
         elastic = MockElasticSearch(self.es_con, self.target_index)
 
-        if (elastic.major == '7' and elastic.distribution == ES_DISTRIBUTION) or \
-           (elastic.major == '1' and elastic.distribution == OS_DISTRIBUTION):
+        if not elastic.is_legacy():
             url = elastic.index_url + "/_mapping"
         else:
             url = elastic.index_url + "/items/_mapping"
@@ -641,8 +639,7 @@ class TestElastic(unittest.TestCase):
     def test_all_properties_error(self):
         """Test whether an error message is logged when the properties aren't retrieved"""
 
-        if (self.es_major == '7' and self.es_distribution == 'elasticsearch') or \
-           (self.es_major == '1' and self.es_distribution == 'opensearch'):
+        if not ElasticSearch.is_legacy_static(self.es_major, self.es_distribution):
             url = self.es_con + '/' + self.target_index + '/_mapping'
         else:
             url = self.es_con + '/' + self.target_index + '/items/_mapping'
