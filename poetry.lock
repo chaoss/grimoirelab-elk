@@ -1080,14 +1080,14 @@ grpc = ["grpcio (>=1.44.0,<2.0.0dev)"]
 
 [[package]]
 name = "graal"
-version = "0.4.5rc1"
+version = "0.4.5rc2"
 description = "A generic source code analyzer"
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "graal-0.4.5rc1-py3-none-any.whl", hash = "sha256:2a0329827bb85fcb55acd4c62028c075da28300207a613ba5894827761d7a141"},
-    {file = "graal-0.4.5rc1.tar.gz", hash = "sha256:2957196a6367109fd051e91485dcf41f39f4a3d9089d6fa4aea387e327bb75f5"},
+    {file = "graal-0.4.5rc2-py3-none-any.whl", hash = "sha256:f4cae484eb9858ceb25acd4938a6a39b19d35fe9db4ae85d6129cee5540a58a1"},
+    {file = "graal-0.4.5rc2.tar.gz", hash = "sha256:4fcc090292dcc5a5ab5a666cb610c1f4c2bb0d7643d1f8674cf31c6154459484"},
 ]
 
 [package.dependencies]
@@ -1622,14 +1622,14 @@ files = [
 
 [[package]]
 name = "perceval"
-version = "0.21.4rc1"
+version = "0.21.4rc2"
 description = "Send Sir Perceval on a quest to fetch and gather data from software repositories."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "perceval-0.21.4rc1-py3-none-any.whl", hash = "sha256:9a6025f7b3918cfc767547b34bee25ef5aa6bd8002170e4c6d74b874f4446ed2"},
-    {file = "perceval-0.21.4rc1.tar.gz", hash = "sha256:b1953ac9d1a6cadc33829ffa215c59501260d3667edc596602df8d0c8fc0819c"},
+    {file = "perceval-0.21.4rc2-py3-none-any.whl", hash = "sha256:929552a11a304950b3448e19f107beb8c11dabfa915850d38daaffd19bc53c63"},
+    {file = "perceval-0.21.4rc2.tar.gz", hash = "sha256:d54e8e33aabceb3b2da2701996d16c10a57e3f90b757c1428d0da8a445489191"},
 ]
 
 [package.dependencies]
@@ -1648,14 +1648,14 @@ docs = ["furo (>=2021.8.31,<2022.0.0)", "myst-parser (>=0.15.2,<0.16.0)"]
 
 [[package]]
 name = "perceval-mozilla"
-version = "0.3.8rc1"
+version = "0.3.8rc2"
 description = "Bundle of Perceval backends for Mozilla ecosystem."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "perceval_mozilla-0.3.8rc1-py3-none-any.whl", hash = "sha256:5c436bfdf17d1895a044b929d32471ee905aaabf9638e425ee06af8e718da340"},
-    {file = "perceval_mozilla-0.3.8rc1.tar.gz", hash = "sha256:f8f89beba05bc798db890d11939a5ea0d6399d8792e86b658b6a253c53ebd61d"},
+    {file = "perceval_mozilla-0.3.8rc2-py3-none-any.whl", hash = "sha256:10d230fe34d00d46ae761d9bb00c7dee9fe48001e348e14fb01cd1cd56c05f58"},
+    {file = "perceval_mozilla-0.3.8rc2.tar.gz", hash = "sha256:b2b56079ce993d292c1c16c22605aa29e4d1c42812bad815acf8d0115ece7a60"},
 ]
 
 [package.dependencies]
@@ -1665,14 +1665,14 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-opnfv"
-version = "0.2.8rc1"
+version = "0.2.8rc2"
 description = "Bundle of Perceval backends for OPNFV ecosystem."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "perceval_opnfv-0.2.8rc1-py3-none-any.whl", hash = "sha256:2d682fbab8f3e7b4f3a7c65a9d84c16d1212aec587168b576c140e136d0de774"},
-    {file = "perceval_opnfv-0.2.8rc1.tar.gz", hash = "sha256:965d0e6f7a4187bff695de12bfe21cb3abf5d202cbd1685961149a0f07ffac79"},
+    {file = "perceval_opnfv-0.2.8rc2-py3-none-any.whl", hash = "sha256:a35c6c961ed3b7763d534ded713f7f4979ba5318f2a398fb10ca602c6b116820"},
+    {file = "perceval_opnfv-0.2.8rc2.tar.gz", hash = "sha256:6cbbb125e96c1bda4f1b8f9169e005dc4b0570a5aa04ae65c2925dbb2982774b"},
 ]
 
 [package.dependencies]
@@ -1682,14 +1682,14 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-puppet"
-version = "0.2.8rc1"
+version = "0.2.8rc2"
 description = "Bundle of Perceval backends for Puppet, Inc. ecosystem."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "perceval_puppet-0.2.8rc1-py3-none-any.whl", hash = "sha256:c363d76094e06bdd0baf27a69d2f4a145c843045fb5cb0ff002c2099a9114542"},
-    {file = "perceval_puppet-0.2.8rc1.tar.gz", hash = "sha256:3a767339e06e23d6b9763b4cfbd49aa00a65812975659c9b390fc7124bbea3f4"},
+    {file = "perceval_puppet-0.2.8rc2-py3-none-any.whl", hash = "sha256:d8c6ab1e0380c0699a365a9cf0dd6ef9fd29d6a8dfe5851c8560258ea739f135"},
+    {file = "perceval_puppet-0.2.8rc2.tar.gz", hash = "sha256:bde45c7ce8bc5df8bfda12ae34ed74644232594d6a331ae4782e930be1ba36cc"},
 ]
 
 [package.dependencies]
@@ -1699,14 +1699,14 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-weblate"
-version = "0.2.8rc1"
+version = "0.2.8rc2"
 description = "Bundle of Perceval backends for Weblate."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "perceval_weblate-0.2.8rc1-py3-none-any.whl", hash = "sha256:b0469ca656b71d4d6e7ffcbf333c2e900cf5802d459896b9891443da9f8640bc"},
-    {file = "perceval_weblate-0.2.8rc1.tar.gz", hash = "sha256:17f3d4504d5cd4c53c64dfbbdc6747dd9650ac4156915efae790ef2242f419f2"},
+    {file = "perceval_weblate-0.2.8rc2-py3-none-any.whl", hash = "sha256:bad1b5b86df6df6410ee1485bc588da60f0fc5580514dcb3738faca46150d58f"},
+    {file = "perceval_weblate-0.2.8rc2.tar.gz", hash = "sha256:9788830c6cbb43cd10fb832de1b1e8676bb3082a2d81a7da09625e7af80838c7"},
 ]
 
 [package.dependencies]
@@ -2234,14 +2234,14 @@ numpy = ">=1.17.3,<1.25.0"
 
 [[package]]
 name = "setuptools"
-version = "67.7.0"
+version = "67.7.1"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "setuptools-67.7.0-py3-none-any.whl", hash = "sha256:888be97fde8cc3afd60f7784e678fa29ee13c4e5362daa7104a93bba33646c50"},
-    {file = "setuptools-67.7.0.tar.gz", hash = "sha256:b7e53a01c6c654d26d2999ee033d8c6125e5fa55f03b7b193f937ae7ac999f22"},
+    {file = "setuptools-67.7.1-py3-none-any.whl", hash = "sha256:6f0839fbdb7e3cfef1fc38d7954f5c1c26bf4eebb155a55c9bf8faf997b9fb67"},
+    {file = "setuptools-67.7.1.tar.gz", hash = "sha256:bb16732e8eb928922eabaa022f881ae2b7cdcfaf9993ef1f5e841a96d32b8e0c"},
 ]
 
 [package.extras]
@@ -2322,14 +2322,14 @@ files = [
 
 [[package]]
 name = "sortinghat"
-version = "0.9.0rc1"
+version = "0.9.0rc2"
 description = "A tool to manage identities."
 category = "main"
 optional = false
 python-versions = ">=3.7.1,<4.0.0"
 files = [
-    {file = "sortinghat-0.9.0rc1-py3-none-any.whl", hash = "sha256:3fb110bfa44e411f0c4628e5fa94ca42bc033aa2136ed023b018eb49881be666"},
-    {file = "sortinghat-0.9.0rc1.tar.gz", hash = "sha256:351960dd39d02da7600886d3d9d57c54da946a7483f76dda895cc054915e9976"},
+    {file = "sortinghat-0.9.0rc2-py3-none-any.whl", hash = "sha256:a60c39512a40c125f6644557f17534f7706a376a389e5e02fbcc89e0fb7eeb4d"},
+    {file = "sortinghat-0.9.0rc2.tar.gz", hash = "sha256:27fcaf6cdf90e120f12b827dcb761f6ec2134d395826027176976cc1280095b5"},
 ]
 
 [package.dependencies]
