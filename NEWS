@@ -1,5 +1,9 @@
 # Releases
 
+  ## grimoire-elk 0.104.6 - (2023-04-28)
+  
+  * Update Poetry's package dependencies
+
   ## grimoire-elk 0.104.5 - (2023-04-27)
   
   * Update Poetry's package dependencies
