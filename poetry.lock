@@ -1080,14 +1080,14 @@ grpc = ["grpcio (>=1.44.0,<2.0.0dev)"]
 
 [[package]]
 name = "graal"
-version = "0.4.7"
+version = "0.4.8"
 description = "A generic source code analyzer"
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "graal-0.4.7-py3-none-any.whl", hash = "sha256:4fc15ff5ba2d29afbefc555a435fe49ab54861cccb1b312d10658ef3dcc594d4"},
-    {file = "graal-0.4.7.tar.gz", hash = "sha256:eec6018e9d1f691b673904ad67c87eaddadefc5f31f94d7a377d009da3eec641"},
+    {file = "graal-0.4.8-py3-none-any.whl", hash = "sha256:c41009f1d9b62ec5a1f18e2c2a2a0154cf105316788839e4b72254e045874aea"},
+    {file = "graal-0.4.8.tar.gz", hash = "sha256:97a9d5c1c4481a440d3f63021703df68a63caa9f81a17a8a7440b887369d11a2"},
 ]
 
 [package.dependencies]
@@ -1716,14 +1716,14 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "platformdirs"
-version = "3.4.0"
+version = "3.5.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "platformdirs-3.4.0-py3-none-any.whl", hash = "sha256:01437886022decaf285d8972f9526397bfae2ac55480ed372ed6d9eca048870a"},
-    {file = "platformdirs-3.4.0.tar.gz", hash = "sha256:a5e1536e5ea4b1c238a1364da17ff2993d5bd28e15600c2c8224008aff6bbcad"},
+    {file = "platformdirs-3.5.0-py3-none-any.whl", hash = "sha256:47692bc24c1958e8b0f13dd727307cff1db103fca36399f457da8e05f222fdc4"},
+    {file = "platformdirs-3.5.0.tar.gz", hash = "sha256:7954a68d0ba23558d753f73437c55f89027cf8f5108c19844d4b82e5af396335"},
 ]
 
 [package.dependencies]
@@ -2322,14 +2322,14 @@ files = [
 
 [[package]]
 name = "sortinghat"
-version = "0.9.2"
+version = "0.9.3"
 description = "A tool to manage identities."
 category = "main"
 optional = false
 python-versions = ">=3.7.1,<4.0.0"
 files = [
-    {file = "sortinghat-0.9.2-py3-none-any.whl", hash = "sha256:98100dd5c7c4f1b22af27ee926470feca7de34607a12a75e15a21c021d91bb6f"},
-    {file = "sortinghat-0.9.2.tar.gz", hash = "sha256:5580872ae84213f29685d25fe7ebaa6bd71131d10667f0f77a6bc10a0f3359e4"},
+    {file = "sortinghat-0.9.3-py3-none-any.whl", hash = "sha256:a14c429a6da00e7c76adb04207d9a8c3b84928e77da87aa26881cd7cd5399a59"},
+    {file = "sortinghat-0.9.3.tar.gz", hash = "sha256:cdd0435632f481f26b39258f93996b88ee674dc4b461069e015204fad90e740f"},
 ]
 
 [package.dependencies]
