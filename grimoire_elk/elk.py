@@ -490,7 +490,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                    github_token=None, studies=False, only_studies=False,
                    url_enrich=None, events_enrich=False,
                    db_user=None, db_password=None, db_host=None,
-                   db_port=None, db_path=None, db_ssl=False, db_verify_ssl=True,
+                   db_port=None, db_path=None, db_ssl=False,
+                   db_verify_ssl=True, db_tenant=None,
                    do_refresh_projects=False, do_refresh_identities=False,
                    author_id=None, author_uuid=None, filter_raw=None,
                    jenkins_rename_file=None,
@@ -539,7 +540,8 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
                                       db_port=db_port,
                                       db_path=db_path,
                                       db_ssl=db_ssl,
-                                      db_verify_ssl=db_verify_ssl)
+                                      db_verify_ssl=db_verify_ssl,
+                                      db_tenant=db_tenant)
         enrich_backend.set_params(backend_params)
         # store the cfg section name in the enrich backend to recover the corresponding project name in projects.json
         enrich_backend.set_cfg_section_name(cfg_section_name)
