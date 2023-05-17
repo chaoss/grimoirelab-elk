@@ -2326,14 +2326,14 @@ files = [
 
 [[package]]
 name = "sortinghat"
-version = "0.10.0rc1"
+version = "0.10.0rc2"
 description = "A tool to manage identities."
 category = "main"
 optional = false
 python-versions = ">=3.7.1,<4.0.0"
 files = [
-    {file = "sortinghat-0.10.0rc1-py3-none-any.whl", hash = "sha256:f9b784a04d4ba425d4d0d3f3202eea837fdfe2016709df9287bde925d6da9299"},
-    {file = "sortinghat-0.10.0rc1.tar.gz", hash = "sha256:58bf2de0379fc4fa6443d86da1a8a4dbdaf276f9a25224796ea646795d73818d"},
+    {file = "sortinghat-0.10.0rc2-py3-none-any.whl", hash = "sha256:35e1fba3802544da8ed82278e0ca2d0cde9b3ea3e5fee6ab2e2dc0b6ad588701"},
+    {file = "sortinghat-0.10.0rc2.tar.gz", hash = "sha256:4158903e7ba68bce4afe5e282c98d72e6f178e3a4856a32a1a6916dda9931811"},
 ]
 
 [package.dependencies]
@@ -2344,6 +2344,7 @@ django-graphql-jwt = ">=0.3.0,<0.4.0"
 django-rq = ">=2.3.2,<3.0.0"
 django-storages = {version = ">=1.13.2,<2.0.0", extras = ["google"]}
 django-treebeard = ">=4.5.1,<5.0.0"
+google-auth = ">=2.18.0,<3.0.0"
 graphene-django = ">=2.15,<3.0"
 grimoirelab-toolkit = ">=0.3"
 importlib-resources = ">=5.2.0,<6.0.0"
