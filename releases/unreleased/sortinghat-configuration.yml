@@ -1,0 +1,8 @@
+---
+title: SortingHat configuration
+category: changed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: |
+  When SortingHat's multi-tenancy is enabled, the tenant is
+  included in all clients during execution.

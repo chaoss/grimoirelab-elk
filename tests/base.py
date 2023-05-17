@@ -133,6 +133,7 @@ class TestBaseBackend(unittest.TestCase):
         cls.db_path = cls.config.get('Database', 'path', fallback=None)
         cls.db_ssl = cls.config.getboolean('Database', 'ssl', fallback=False)
         cls.db_verify_ssl = cls.config.getboolean('Database', 'verify_ssl', fallback=True)
+        cls.db_tenant = cls.config.get('Database', 'tenant', fallback=None)
 
     def setUp(self):
         with open(os.path.join("data", self.connector + ".json")) as f:
@@ -182,7 +183,8 @@ class TestBaseBackend(unittest.TestCase):
                                                                      db_port=self.db_port,
                                                                      db_path=self.db_path,
                                                                      db_ssl=self.db_ssl,
-                                                                     db_verify_ssl=self.db_verify_ssl)
+                                                                     db_verify_ssl=self.db_verify_ssl,
+                                                                     db_tenant=self.db_tenant)
         elif sortinghat and projects:
             self.enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
                                                                      db_sortinghat=DB_SORTINGHAT,
@@ -192,7 +194,8 @@ class TestBaseBackend(unittest.TestCase):
                                                                      db_port=self.db_port,
                                                                      db_path=self.db_path,
                                                                      db_ssl=self.db_ssl,
-                                                                     db_verify_ssl=self.db_verify_ssl)
+                                                                     db_verify_ssl=self.db_verify_ssl,
+                                                                     db_tenant=self.db_tenant)
 
         elif not sortinghat and projects:
             self.enrich_backend = self.connectors[self.connector][2](json_projects_map=FILE_PROJECTS,
@@ -202,7 +205,8 @@ class TestBaseBackend(unittest.TestCase):
                                                                      db_port=self.db_port,
                                                                      db_path=self.db_path,
                                                                      db_ssl=self.db_ssl,
-                                                                     db_verify_ssl=self.db_verify_ssl)
+                                                                     db_verify_ssl=self.db_verify_ssl,
+                                                                     db_tenant=self.db_tenant)
         if pair_programming:
             self.enrich_backend.pair_programming = pair_programming
 
@@ -257,7 +261,8 @@ class TestBaseBackend(unittest.TestCase):
                                                                  db_port=self.db_port,
                                                                  db_path=self.db_path,
                                                                  db_ssl=self.db_ssl,
-                                                                 db_verify_ssl=self.db_verify_ssl)
+                                                                 db_verify_ssl=self.db_verify_ssl,
+                                                                 db_tenant=self.db_tenant)
         elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
         self.enrich_backend.set_elastic(elastic_enrich)
         self.enrich_backend.enrich_items(self.ocean_backend)
@@ -285,7 +290,8 @@ class TestBaseBackend(unittest.TestCase):
                                                                  db_port=self.db_port,
                                                                  db_path=self.db_path,
                                                                  db_ssl=self.db_ssl,
-                                                                 db_verify_ssl=self.db_verify_ssl)
+                                                                 db_verify_ssl=self.db_verify_ssl,
+                                                                 db_tenant=self.db_tenant)
 
         elastic_enrich = get_elastic(self.es_con, self.enrich_index, clean, self.enrich_backend)
         self.enrich_backend.set_elastic(elastic_enrich)
@@ -339,7 +345,8 @@ class TestBaseBackend(unittest.TestCase):
                                                                  db_port=self.db_port,
                                                                  db_path=self.db_path,
                                                                  db_ssl=self.db_ssl,
-                                                                 db_verify_ssl=self.db_verify_ssl)
+                                                                 db_verify_ssl=self.db_verify_ssl,
+                                                                 db_tenant=self.db_tenant)
 
         elastic_enrich = get_elastic(self.es_con, self.enrich_index_anonymized, clean, self.enrich_backend, self.enrich_aliases)
         self.enrich_backend.set_elastic(elastic_enrich)
