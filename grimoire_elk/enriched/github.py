@@ -176,7 +176,11 @@ class GitHubEnrich(Enrich):
         comment_dates = [str_to_datetime(comment['created_at']) for comment in item['comments_data']
                          if item['user']['login'] != comment['user']['login']]
         reaction_dates = [str_to_datetime(reaction['created_at']) for reaction in item['reactions_data']
-                          if item['user']['login'] != reaction['user']['login']]
+                          if item.get('user') is not None and
+                          item['user'].get('login') is not None and
+                          reaction.get('user') is not None and
+                          reaction['user'].get('login') is not None and
+                          item['user']['login'] != reaction['user']['login']]
         reaction_dates.extend(comment_dates)
         if reaction_dates:
             return min(reaction_dates)
