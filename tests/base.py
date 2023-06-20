@@ -29,6 +29,8 @@ from datetime import datetime
 
 from elasticsearch import Elasticsearch
 
+from grimoire_elk.enriched.sortinghat_gelk import SortingHat
+
 if '..' not in sys.path:
     sys.path.insert(0, '..')
 
@@ -90,13 +92,18 @@ def data2es(items, ocean):
 def refresh_identities(enrich_backend):
     total = 0
 
+    after = datetime.fromtimestamp(0)
+    individuals = []
+    for indivs in SortingHat.search_last_modified_identities(enrich_backend.sh_db, after=after):
+        individuals.extend(indivs)
+
     for eitem in enrich_backend.fetch():
         roles = None
         try:
             roles = enrich_backend.roles
         except AttributeError:
             pass
-        new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
+        new_identities = enrich_backend.get_item_sh_from_id(eitem, roles, individuals)
         eitem.update(new_identities)
         total += 1
 

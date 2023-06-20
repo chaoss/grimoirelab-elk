@@ -1,0 +1,10 @@
+---
+title: Refreshing identities performance
+category: performance
+author:
+  - Jose Javier Merchante <jjmerchante@bitergia.com>
+  - Quan Zhou <quan@bitergia.com>
+issue: null
+notes: |
+  Decrease the time required to execute the autorefresh
+  process by reducing the number of queries to SortingHat.

@@ -697,6 +697,30 @@ class Enrich(ElasticItems):
             rol + MULTI_ORG_NAMES: [self.unaffiliated_group]
         }
 
+    def get_individual_fields(self, individual, sh_id=None, item_date=None, rol='author'):
+        """ Get standard SH fields from a SH identity """
+
+        eitem_sh = self.__get_item_sh_fields_empty(rol)
+
+        eitem_sh[rol + "_id"] = sh_id
+        eitem_sh[rol + "_uuid"] = individual['mk']
+
+        profile = individual['profile']
+        eitem_sh[rol + "_name"] = profile.get('name', eitem_sh[rol + "_name"])
+        email = profile.get('email', None)
+        eitem_sh[rol + "_domain"] = self.get_email_domain(email)
+        eitem_sh[rol + "_gender"] = profile.get('gender', self.unknown_gender)
+        eitem_sh[rol + "_gender_acc"] = profile.get('genderAcc', 0)
+        eitem_sh[rol + "_bot"] = profile.get('isBot', False)
+
+        multi_enrolls = self.get_sh_item_multi_enrollments(individual['enrollments'], item_date)
+        main_enrolls = self.get_main_enrollments(multi_enrolls)
+        all_enrolls = list(set(main_enrolls + multi_enrolls))
+        eitem_sh[rol + MULTI_ORG_NAMES] = self.remove_prefix_enrollments(all_enrolls)
+        eitem_sh[rol + "_org_name"] = main_enrolls[0]
+
+        return eitem_sh
+
     def get_item_sh_fields(self, identity=None, item_date=None, sh_id=None,
                            rol='author'):
         """ Get standard SH fields from a SH identity """
@@ -759,20 +783,14 @@ class Enrich(ElasticItems):
                 msg = "Individual not found given the following id: {}".format(sh_id)
                 logger.debug(msg)
                 return sh_item
-
-            if individual['identities']:
-                uuid = individual['identities'][0]['uuid']
-            else:
-                msg = "Individual {} has 0 identities.".format(sh_id)
-                logger.warning(msg)
-                return sh_item
+            uuid = individual['mk']
         except Exception as ex:
             msg = "Error getting individual {} from SortingHat: {}".format(sh_id, ex)
             logger.error(msg)
             return sh_item
 
         # Fill the information needed with the identity, individual and profile
-        sh_item['id'] = individual['mk']
+        sh_item['id'] = sh_id
         sh_item['uuid'] = uuid
         sh_item['profile'] = individual['profile']
         sh_item['enrollments'] = individual['enrollments']
@@ -874,7 +892,7 @@ class Enrich(ElasticItems):
 
         return enrolls
 
-    def get_item_sh_from_id(self, eitem, roles=None):
+    def get_item_sh_from_id(self, eitem, roles=None, individuals=None):
         # Get the SH fields from the data in the enriched item
 
         eitem_sh = {}  # Item enriched
@@ -900,17 +918,30 @@ class Enrich(ElasticItems):
                 continue
             if rol == author_field:
                 sh_id_author = sh_id
-            eitem_sh.update(self.get_item_sh_fields(sh_id=sh_id, item_date=date,
-                                                    rol=rol))
+            individual = self.find_individual(individuals, sh_id)
+            if not individual:
+                logger.debug(f"Individual {sh_id} not found.")
+                continue
+            eitem_sh.update(self.get_individual_fields(individual=individual,
+                                                       sh_id=sh_id,
+                                                       item_date=date,
+                                                       rol=rol))
 
         # Add the author field common in all data sources
         rol_author = 'author'
         if sh_id_author and author_field != rol_author:
-            eitem_sh.update(self.get_item_sh_fields(sh_id=sh_id_author,
-                                                    item_date=date, rol=rol_author))
+            individual = self.find_individual(individuals, sh_id_author)
+            if individual:
+                eitem_sh.update(self.get_individual_fields(individual=individual,
+                                                           sh_id=sh_id_author,
+                                                           item_date=date,
+                                                           rol=rol_author))
+            else:
+                logger.debug(f"Individual {sh_id_author} not found.")
+
         return eitem_sh
 
-    def get_item_sh_meta_fields(self, eitem, roles=None, suffixes=None, non_authored_prefix=None):
+    def get_item_sh_meta_fields(self, eitem, roles=None, suffixes=None, non_authored_prefix=None, individuals=None):
         """Get the SH meta fields from the data in the enriched item."""
 
         eitem_meta_sh = {}  # Item enriched
@@ -926,11 +957,27 @@ class Enrich(ElasticItems):
                 continue
 
             for sh_uuid in sh_uuids:
-                sh_fields = self.get_item_sh_fields(sh_id=sh_uuid, item_date=date, rol=rol)
+                individual = self.find_individual(individuals, sh_uuid)
+                if not individual:
+                    logger.debug(f"Individual {sh_uuid} not found.")
+                    continue
+                sh_fields = self.get_individual_fields(individual=individual, sh_id=sh_uuid, item_date=date, rol=rol)
 
                 self.add_meta_fields(eitem, eitem_meta_sh, sh_fields, rol, sh_uuid, suffixes, non_authored_prefix)
 
         return eitem_meta_sh
+
+    @staticmethod
+    def find_individual(individuals, sh_id):
+        if not individuals:
+            return None
+        for indiv in individuals:
+            if sh_id == indiv['mk']:
+                return indiv
+            for identity in indiv['identities']:
+                if sh_id == identity['uuid']:
+                    return indiv
+        return None
 
     def add_meta_fields(self, eitem, meta_eitem, sh_fields, rol, uuid, suffixes, non_authored_prefix):
         def add_non_authored_fields(author_uuid, uuid, new_eitem, new_list, non_authored_field):
