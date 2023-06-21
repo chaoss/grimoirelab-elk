@@ -88,7 +88,7 @@ class SortingHat(object):
         except SortingHatClientError as ex:
             msg = ex.errors[0]['message']
             if 'already exists' in msg:
-                logger.warning("[sortinghat] {}".format(msg))
+                logger.debug("[sortinghat] {}".format(msg))
                 uuid = msg.split("'")[1]
             else:
                 raise SortingHatClientError(msg)
@@ -501,7 +501,7 @@ class SortingHat(object):
             logger.debug("[sortinghat] Error list unique identities: {}".format(e))
 
     @classmethod
-    def search_last_modified_unique_identities(cls, db, after):
+    def search_last_modified_identities(cls, db, after):
         args = {
             'page': PAGE,
             'page_size': PAGE_SIZE,
@@ -510,78 +510,36 @@ class SortingHat(object):
             }
         }
         try:
-            op = Operation(SortingHatSchema.Query)
-            op.individuals(**args)
-            individual = op.individuals().entities()
-            individual.mk()
-            page_info = op.individuals().page_info()
-            page_info.has_next()
-            result = db.execute(op)
-            entities = result['data']['individuals']['entities']
-            mks = [e['mk'] for e in entities]
-            has_next = result['data']['individuals']['pageInfo']['hasNext']
+            has_next = True
             while has_next:
-                page = args['page']
-                args['page'] = page + 1
                 op = Operation(SortingHatSchema.Query)
                 op.individuals(**args)
                 individual = op.individuals().entities()
                 individual.mk()
+                identities = individual.identities()
+                identities.uuid()
+                identities.name()
+                identities.email()
+                identities.username()
+                profile = individual.profile()
+                profile.name()
+                profile.email()
+                profile.gender()
+                profile.gender_acc()
+                profile.is_bot()
+                enrollments = individual.enrollments()
+                enrollments.group().parent_org().name()
+                enrollments.group().name()
+                enrollments.group().type()
+                enrollments.start()
+                enrollments.end()
                 page_info = op.individuals().page_info()
                 page_info.has_next()
                 result = db.execute(op)
-                entities = result['data']['individuals']['entities']
-                mks += [e['mk'] for e in entities]
+                args['page'] = args['page'] + 1
                 has_next = result['data']['individuals']['pageInfo']['hasNext']
-        except SortingHatClientError as e:
-            logger.error("[sortinghat] Error searching unique identities after {}"
-                         ": {}".format(after, e.errors[0]['message']))
-
-        return mks
-
-    @classmethod
-    def search_last_modified_identities(cls, db, after):
-        def get_uuids(entities):
-            uuids = []
-            for e in entities:
-                for i in e['identities']:
-                    uuids.append(i['uuid'])
-            return uuids
-
-        args = {
-            'page': PAGE,
-            'page_size': PAGE_SIZE,
-            'filters': {
-                'lastUpdated': '>' + after.strftime('%Y-%m-%dT%H:%M:%S.%f+00:00')
-            }
-        }
-        try:
-            op = Operation(SortingHatSchema.Query)
-            op.individuals(**args)
-            individual = op.individuals().entities()
-            individual.identities().uuid()
-            page_info = op.individuals().page_info()
-            page_info.has_next()
-            result = db.execute(op)
-            entities = result['data']['individuals']['entities']
-            uuids = get_uuids(entities)
-            has_next = result['data']['individuals']['pageInfo']['hasNext']
-            while has_next:
-                page = args['page']
-                args['page'] = page + 1
-                op = Operation(SortingHatSchema.Query)
-                op.individuals(**args)
-                individual = op.individuals().entities()
-                individual.identities().last_modified()
-                individual.identities().uuid()
-                page_info = op.individuals().page_info()
-                page_info.has_next()
-                result = db.execute(op)
                 entities = result['data']['individuals']['entities']
-                uuids += get_uuids(entities)
-                has_next = result['data']['individuals']['pageInfo']['hasNext']
+                yield entities
         except SortingHatClientError as e:
             logger.error("[sortinghat] Error searching identities after {}"
                          ": {}".format(after, e.errors[0]['message']))
-
-        return uuids

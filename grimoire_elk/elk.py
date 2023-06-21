@@ -22,6 +22,7 @@
 
 import inspect
 import logging
+from functools import lru_cache
 
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 
@@ -243,7 +244,7 @@ def refresh_projects(enrich_backend):
     logger.debug("Total eitems refreshed for project field {}".format(total))
 
 
-def refresh_identities(enrich_backend, author_fields=None, author_values=None):
+def refresh_identities(enrich_backend, author_fields=None, individuals=None):
     """Refresh identities in enriched index.
 
     Retrieve items from the enriched index corresponding to enrich_backend,
@@ -255,7 +256,7 @@ def refresh_identities(enrich_backend, author_fields=None, author_values=None):
 
     :param enrich_backend: enriched backend to update
     :param  author_fields: fields to match items authored by a user
-    :param  author_values: values of the authored field to match items
+    :param  individuals: values of the authored field to match items
     """
 
     def create_filter_authors(authors, to_refresh):
@@ -270,7 +271,7 @@ def refresh_identities(enrich_backend, author_fields=None, author_values=None):
 
         return filter_authors
 
-    def update_items(new_filter_authors, non_authored_prefix=None):
+    def update_items(new_filter_authors, non_authored_prefix=None, individuals=None):
         for new_filter_author in new_filter_authors:
             for eitem in enrich_backend.fetch(new_filter_author):
                 roles = None
@@ -279,18 +280,25 @@ def refresh_identities(enrich_backend, author_fields=None, author_values=None):
                 except AttributeError:
                     pass
 
-                new_identities = enrich_backend.get_item_sh_from_id(eitem, roles)
+                new_identities = enrich_backend.get_item_sh_from_id(eitem, roles, individuals)
                 eitem.update(new_identities)
                 try:
                     meta_fields = enrich_backend.meta_fields
                     meta_fields_suffixes = enrich_backend.meta_fields_suffixes
                     new_identities = enrich_backend.get_item_sh_meta_fields(eitem, meta_fields, meta_fields_suffixes,
-                                                                            non_authored_prefix)
+                                                                            non_authored_prefix, individuals=individuals)
                     eitem.update(new_identities)
                 except AttributeError:
                     pass
 
                 yield eitem
+
+    def get_author_uuids(individuals):
+        author_uuids = []
+        for individual in individuals:
+            for identity in individual['identities']:
+                author_uuids.append(identity['uuid'])
+        return author_uuids
 
     logger.debug("Refreshing identities fields from {}".format(
                  anonymize_url(enrich_backend.elastic.index_url)))
@@ -313,12 +321,13 @@ def refresh_identities(enrich_backend, author_fields=None, author_values=None):
             total += 1
     else:
         to_refresh = []
+        author_values = get_author_uuids(individuals)
         for author_value in author_values:
             to_refresh.append(author_value)
 
             if len(to_refresh) > max_ids:
                 filter_authors = create_filter_authors(author_fields, to_refresh)
-                for item in update_items(filter_authors, non_authored_prefix):
+                for item in update_items(filter_authors, non_authored_prefix, individuals):
                     yield item
                     total += 1
 
@@ -326,7 +335,7 @@ def refresh_identities(enrich_backend, author_fields=None, author_values=None):
 
         if len(to_refresh) > 0:
             filter_authors = create_filter_authors(author_fields, to_refresh)
-            for item in update_items(filter_authors, non_authored_prefix):
+            for item in update_items(filter_authors, non_authored_prefix, individuals):
                 yield item
                 total += 1
 
@@ -337,7 +346,6 @@ def load_identities(ocean_backend, enrich_backend):
     # First we add all new identities to SH
     items_count = 0
     identities_count = 0
-    new_identities = []
 
     # Support that ocean_backend is a list of items (old API)
     if isinstance(ocean_backend, list):
@@ -354,25 +362,21 @@ def load_identities(ocean_backend, enrich_backend):
             continue
 
         for identity in identities:
-            if identity not in new_identities:
-                new_identities.append(identity)
-
-            if len(new_identities) > 100:
-                inserted_identities = load_bulk_identities(items_count,
-                                                           new_identities,
-                                                           enrich_backend.sh_db,
-                                                           enrich_backend.get_connector_name())
-                identities_count += inserted_identities
-                new_identities = []
-
-    if new_identities:
-        inserted_identities = load_bulk_identities(items_count,
-                                                   new_identities,
-                                                   enrich_backend.sh_db,
-                                                   enrich_backend.get_connector_name())
-        identities_count += inserted_identities
+            identity_tuple = tuple(identity.items())
+            add_sh_identity_cache(identity_tuple,
+                                  enrich_backend.sh_db,
+                                  enrich_backend.get_connector_name())
+            identities_count += 1
 
     return identities_count
+
+
+@lru_cache(1024)
+def add_sh_identity_cache(identity_tuple, sh_db, backend):
+    """Cache add_sh_identity calls. Identity must be in tuple format"""
+
+    identity = dict((x, y) for x, y in identity_tuple)
+    SortingHat.add_identity(sh_db, identity, backend)
 
 
 def load_bulk_identities(items_count, new_identities, sh_db, connector_name):
