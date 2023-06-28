@@ -1,5 +1,14 @@
 # Releases
 
+## grimoire-elk 0.106.0 - (2023-06-28)
+
+**Performance improvements:**
+
+ * Refreshing identities performance\
+   Decrease the time required to execute the autorefresh process by
+   reducing the number of queries to SortingHat.
+
+
 ## grimoire-elk 0.105.0 - (2023-05-17)
 
 **Breaking changes:**
