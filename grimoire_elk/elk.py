@@ -371,7 +371,7 @@ def load_identities(ocean_backend, enrich_backend):
     return identities_count
 
 
-@lru_cache(1024)
+@lru_cache(4096)
 def add_sh_identity_cache(identity_tuple, sh_db, backend):
     """Cache add_sh_identity calls. Identity must be in tuple format"""
 

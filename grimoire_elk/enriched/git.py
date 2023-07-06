@@ -211,9 +211,6 @@ class GitEnrich(Enrich):
         # The real data
         commit = item['data']
 
-        self.__fix_field_date(commit, 'AuthorDate')
-        self.__fix_field_date(commit, 'CommitDate')
-
         # data fields to copy
         copy_fields = ["message"]
         for f in copy_fields:
@@ -237,8 +234,9 @@ class GitEnrich(Enrich):
 
         eitem['hash_short'] = eitem['hash'][0:6]
         # Enrich dates
-        author_date = str_to_datetime(commit["AuthorDate"])
-        commit_date = str_to_datetime(commit["CommitDate"])
+
+        author_date = self.__cast_str_to_datetime(commit, 'AuthorDate')
+        commit_date = self.__cast_str_to_datetime(commit, 'CommitDate')
 
         eitem["author_date"] = author_date.replace(tzinfo=None).isoformat()
         eitem["commit_date"] = commit_date.replace(tzinfo=None).isoformat()
@@ -324,10 +322,11 @@ class GitEnrich(Enrich):
         author_domain = self.get_identity_domain(self.get_sh_identity(item, 'Author'))
         eitem['git_author_domain'] = author_domain
 
-        eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
+        grimoire_fields = self.get_grimoire_fields(author_date, "commit")
+        eitem.update(grimoire_fields)
 
         # grimoire_creation_date is needed in the item
-        item.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
+        item.update(grimoire_fields)
         eitem.update(self.get_item_sh(item, self.roles))
 
         if self.prjs_map:
@@ -341,8 +340,8 @@ class GitEnrich(Enrich):
         self.__add_commit_meta_fields(eitem, commit)
         return eitem
 
-    def __fix_field_date(self, item, attribute):
-        """Fix possible errors in the field date"""
+    def __cast_str_to_datetime(self, item, attribute):
+        """Convert str to datetime fixing possible errors"""
 
         field_date = str_to_datetime(item[attribute])
 
@@ -351,7 +350,8 @@ class GitEnrich(Enrich):
         except ValueError:
             logger.warning("[git] {} in commit {} has a wrong format".format(
                            attribute, item['commit']))
-            item[attribute] = field_date.replace(tzinfo=None).isoformat()
+            return field_date.replace(tzinfo=None).isoformat()
+        return field_date
 
     def __add_commit_meta_fields(self, eitem, commit):
         """Add commit meta fields as signed_off_by, reviwed_by, tested_by, etc."""
@@ -382,9 +382,17 @@ class GitEnrich(Enrich):
 
             if self.sortinghat:
                 # Create SH identity if it does not exist
-                identity_tuple = tuple(identity.items())
-                self.add_sh_identity_cache(identity_tuple)
-                item_date = str_to_datetime(eitem[self.get_field_date()])
+                backend_name = self.get_connector_name()
+                identity_id = self.generate_uuid(backend_name,
+                                                 email=identity['email'],
+                                                 name=identity['name'],
+                                                 username=identity['username'])
+                individual = self.get_entity(identity_id)
+                if not individual:
+                    identity_tuple = tuple(identity.items())
+                    self.add_sh_identity_cache(identity_tuple)
+                    logger.debug("Create a new individual {} in commit_meta_fields".format(identity_id))
+                item_date = eitem[self.get_field_date()]
                 sh_fields = self.get_item_sh_fields(identity, item_date, rol=meta_field)
             else:
                 sh_fields = self.get_item_no_sh_fields(identity, rol=meta_field)

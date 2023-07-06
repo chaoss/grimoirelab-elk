@@ -102,13 +102,6 @@ class SortingHat(object):
         try:
             uuid = cls.add_id(db, backend, email=identity['email'],
                               name=identity['name'], username=identity['username'])
-
-            profile = {"name": identity['name'] if identity['name'] else identity['username'],
-                       "email": identity['email']}
-            profile_without_empty = {k: v for k, v in profile.items() if v}
-
-            cls.update_profile(db, uuid, profile_without_empty)
-
         except UnicodeEncodeError:
             logger.warning("[sortinghat] UnicodeEncodeError. Ignoring it. {} {} {}".format(
                            identity['email'], identity['name'], identity['username']))
