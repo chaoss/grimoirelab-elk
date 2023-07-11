@@ -20,7 +20,7 @@
 #   Quan Zhou <quan@bitergia.com>
 #   Miguel Ángel Fernández <mafesan@bitergia.com>
 #
-
+import datetime
 import json
 import functools
 import logging
@@ -121,7 +121,7 @@ class Enrich(ElasticItems):
 
         perceval_backend = None
         super().__init__(perceval_backend, insecure=insecure)
-
+        self._connector_name = None
         self.sortinghat = False
         if db_user == '':
             db_user = DEFAULT_DB_USER
@@ -399,7 +399,9 @@ class Enrich(ElasticItems):
     def get_connector_name(self):
         """ Find the name for the current connector """
         from ..utils import get_connector_name
-        return get_connector_name(type(self))
+        if not self._connector_name:
+            self._connector_name = get_connector_name(type(self))
+        return self._connector_name
 
     def get_field_author(self):
         """ Field with the author information """
@@ -468,10 +470,13 @@ class Enrich(ElasticItems):
         """ Return common grimoire fields for all data sources """
 
         grimoire_date = None
-        try:
-            grimoire_date = str_to_datetime(creation_date).isoformat()
-        except Exception as ex:
-            pass
+        if isinstance(creation_date, datetime.datetime):
+            grimoire_date = creation_date.isoformat()
+        else:
+            try:
+                grimoire_date = str_to_datetime(creation_date).isoformat()
+            except Exception as ex:
+                pass
 
         name = "is_" + self.get_connector_name() + "_" + item_name
 
@@ -771,7 +776,7 @@ class Enrich(ElasticItems):
 
         return eitem_sh
 
-    @lru_cache()
+    @lru_cache(4096)
     def get_sh_item_from_id(self, sh_id):
         """Get all the identity information from SortingHat using the individual id"""
 
@@ -802,7 +807,7 @@ class Enrich(ElasticItems):
         sh_item = self.get_sh_item_from_identity_cache(identity_tuple, backend_name)
         return sh_item
 
-    @lru_cache()
+    @lru_cache(4096)
     def get_sh_item_from_identity_cache(self, identity_tuple, backend_name):
         """Get a SortingHat item with all the information related with an identity"""
         sh_item = {}
@@ -862,15 +867,21 @@ class Enrich(ElasticItems):
 
         return sh_item
 
-    def get_sh_item_multi_enrollments(self, enrollments, item_date):
+    def get_sh_item_multi_enrollments(self, enrollments, item_date_str):
         """ Get the enrollments for the uuid when the item was done """
 
         enrolls = []
         enrollments = enrollments if enrollments else []
 
-        # item_date must be offset-naive (utc)
-        if item_date and item_date.tzinfo:
-            item_date = (item_date - item_date.utcoffset()).replace(tzinfo=None)
+        if enrollments:
+            if item_date_str:
+                item_date = str_to_datetime(item_date_str)
+            else:
+                item_date = None
+
+            # item_date must be offset-naive (utc)
+            if item_date and item_date.tzinfo:
+                item_date = (item_date - item_date.utcoffset()).replace(tzinfo=None)
 
         for enrollment in enrollments:
             group = enrollment['group']
@@ -1032,9 +1043,9 @@ class Enrich(ElasticItems):
             roles = [author_field]
 
         if not date_field:
-            item_date = str_to_datetime(item[self.get_field_date()])
+            item_date = item[self.get_field_date()]
         else:
-            item_date = str_to_datetime(item[date_field])
+            item_date = item[date_field]
 
         users_data = self.get_users_data(item)
 
@@ -1092,29 +1103,23 @@ class Enrich(ElasticItems):
         args_without_empty = {k: v for k, v in args.items() if v}
         return generate_uuid(**args_without_empty)
 
-    @lru_cache()
+    @lru_cache(4096)
     def get_entity(self, id):
         return SortingHat.get_entity(self.sh_db, id)
 
-    @lru_cache()
+    @lru_cache(4096)
     def is_bot(self, uuid):
         return SortingHat.is_bot(self.sh_db, uuid)
 
-    @lru_cache()
-    def get_uuid(self, backend_name, email=None, name=None, username=None):
-        # SortingHat GraphQL has not query that given the backend_name, email, name, and username
-        # return the uuid. That is why we use add_id to get the uuid
-        return SortingHat.add_id(self.sh_db, backend_name, email=email, name=name, username=username)
-
-    @lru_cache()
+    @lru_cache(4096)
     def get_enrollments(self, uuid):
         return SortingHat.get_enrollments(self.sh_db, uuid)
 
-    @lru_cache()
+    @lru_cache(4096)
     def get_unique_identity(self, uuid):
         return SortingHat.get_unique_identity(self.sh_db, uuid)
 
-    @lru_cache()
+    @lru_cache(4096)
     def get_uuid_from_id(self, sh_id):
         """ Get the SH identity uuid from the id """
         return SortingHat.get_uuid_from_id(self.sh_db, sh_id)
@@ -1123,7 +1128,7 @@ class Enrich(ElasticItems):
         SortingHat.add_identities(self.sh_db, identities,
                                   self.get_connector_name())
 
-    @lru_cache()
+    @lru_cache(4096)
     def add_sh_identity_cache(self, identity_tuple):
         """Cache add_sh_identity calls. Identity must be in tuple format"""
 
