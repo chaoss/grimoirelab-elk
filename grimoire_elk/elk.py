@@ -346,6 +346,12 @@ def load_identities(ocean_backend, enrich_backend):
     # First we add all new identities to SH
     items_count = 0
     identities_count = 0
+    new_identities = []
+
+    @lru_cache(4096)
+    def insert_identity_cache(identity_tuple):
+        uid = dict((x, y) for x, y in identity_tuple)
+        new_identities.append(uid)
 
     # Support that ocean_backend is a list of items (old API)
     if isinstance(ocean_backend, list):
@@ -362,30 +368,22 @@ def load_identities(ocean_backend, enrich_backend):
             continue
 
         for identity in identities:
+            # Insert the identity in new_identities with cache
             identity_tuple = tuple(identity.items())
-            add_sh_identity_cache(identity_tuple,
-                                  enrich_backend.sh_db,
+            insert_identity_cache(identity_tuple)
+
+            if len(new_identities) >= 100:
+                SortingHat.add_identities(enrich_backend.sh_db,
+                                          new_identities,
+                                          enrich_backend.get_connector_name())
+                identities_count += len(new_identities)
+                new_identities = []
+
+    if new_identities:
+        SortingHat.add_identities(enrich_backend.sh_db,
+                                  new_identities,
                                   enrich_backend.get_connector_name())
-            identities_count += 1
-
-    return identities_count
-
-
-@lru_cache(4096)
-def add_sh_identity_cache(identity_tuple, sh_db, backend):
-    """Cache add_sh_identity calls. Identity must be in tuple format"""
-
-    identity = dict((x, y) for x, y in identity_tuple)
-    SortingHat.add_identity(sh_db, identity, backend)
-
-
-def load_bulk_identities(items_count, new_identities, sh_db, connector_name):
-    identities_count = len(new_identities)
-
-    SortingHat.add_identities(sh_db, new_identities, connector_name)
-
-    logger.debug("Processed {} items identities ({} identities) from {}".format(
-                 items_count, len(new_identities), connector_name))
+        identities_count += len(new_identities)
 
     return identities_count
 
@@ -611,7 +609,9 @@ def enrich_backend(url, clean, backend_name, backend_params, cfg_section_name,
 
             if db_sortinghat and enrich_backend.has_identities():
                 # FIXME: This step won't be done from enrich in the future
+                logger.info(f"[{backend_name}] Load identities process starts")
                 total_ids = load_identities(ocean_backend, enrich_backend)
+                logger.info(f"[{backend_name}] Load identities process ends")
                 logger.debug("Total identities loaded {} ".format(total_ids))
 
             if only_identities:
