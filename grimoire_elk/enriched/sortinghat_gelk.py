@@ -127,16 +127,26 @@ class SortingHat(object):
 
         logger.debug("[sortinghat] Adding identities")
 
-        total = 0
-        for identity in identities:
-            try:
-                cls.add_identity(db, identity, backend)
-                total += 1
-            except Exception as e:
-                logger.error("[sortinghat] Unexpected error when adding identities: {}".format(e))
-                continue
-
-        logger.debug("[sortinghat] Total identities added {} of {}".format(total, len(identities)))
+        op = Operation(SortingHatSchema.SortingHatMutation)
+        for i, identity in enumerate(identities):
+            args = {
+                "source": backend,
+                "email": identity['email'],
+                "name": identity['name'],
+                "username": identity['username']
+            }
+            args_without_empty = {k: v for k, v in args.items() if v}
+            if args_without_empty:
+                op.add_identity(**args_without_empty, __alias__=f'identity_{i}')
+        try:
+            db.execute(op)
+        except SortingHatClientError as ex:
+            for error in ex.errors:
+                msg = error['message']
+                if 'already exists' in msg:
+                    logger.debug("[sortinghat] {}".format(msg))
+                else:
+                    logger.warning("[sortinghat] {}".format(msg))
 
     @classmethod
     def add_organization(cls, db, organization):
