@@ -916,8 +916,7 @@ class Enrich(ElasticItems):
         if not roles:
             roles = [author_field]
 
-        date = str_to_datetime(eitem[self.get_field_date()])
-
+        date = eitem[self.get_field_date()]
         for rol in roles:
             if rol + "_id" not in eitem:
                 # For example assignee in github it is usual that it does not appears
@@ -957,7 +956,7 @@ class Enrich(ElasticItems):
 
         eitem_meta_sh = {}  # Item enriched
 
-        date = str_to_datetime(eitem[self.get_field_date()])
+        date = eitem[self.get_field_date()]
 
         for rol in roles:
             if rol + "_uuids" not in eitem:

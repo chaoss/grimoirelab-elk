@@ -30,14 +30,18 @@ import time
 import shutil
 import unittest
 
+from sgqlc.operation import Operation
+
 from base import TestBaseBackend
 from grimoire_elk.raw.git import GitOcean
 from grimoire_elk.enriched.enrich import (logger,
                                           anonymize_url)
 from grimoire_elk.enriched.git import logger as git_logger
 from grimoire_elk.enriched.utils import REPO_LABELS
+from sortinghat.cli.client import SortingHatSchema, SortingHatClientError
 
 
+CONF_FILE = 'tests_sh.cfg'
 HEADER_JSON = {"Content-Type": "application/json"}
 
 
@@ -287,6 +291,88 @@ class TestGit(TestBaseBackend):
                 self.assertEqual(source['project_1'], 'Main')
                 self.assertNotIn('username:password', source['origin'])
                 self.assertNotIn('username:password', source['tag'])
+
+    def test_raw_to_enrich_sorting_hat_multi_enroll(self):
+        """Test enrich with SortingHat with multiple enrollments"""
+
+        def add_individual(task, args):
+            op = Operation(SortingHatSchema.SortingHatMutation)
+            identity = op.add_identity(**args)
+            identity.uuid()
+            try:
+                result = task.execute(op)
+                uuid = result['data']['addIdentity']['uuid']
+            except SortingHatClientError as e:
+                uuid = e.errors[0]['message'].split("'")[1]
+            return uuid
+
+        def add_organization(task, args):
+            op = Operation(SortingHatSchema.SortingHatMutation)
+            org = op.add_organization(**args)
+            org.organization.name()
+            try:
+                task.execute(op)
+            except SortingHatClientError:
+                pass
+
+        def add_enroll(task, args):
+            op = Operation(SortingHatSchema.SortingHatMutation)
+            add_org = op.enroll(**args)
+            add_org.individual().enrollments().group().name()
+            try:
+                task.execute(op)
+            except SortingHatClientError:
+                pass
+
+        self.enrich_backend = self.connectors[self.connector][2](db_sortinghat="test_sh",
+                                                                 db_user=self.db_user,
+                                                                 db_password=self.db_password,
+                                                                 db_host=self.db_host,
+                                                                 db_port=self.db_port,
+                                                                 db_path=self.db_path,
+                                                                 db_ssl=self.db_ssl,
+                                                                 db_verify_ssl=self.db_verify_ssl,
+                                                                 db_tenant=self.db_tenant)
+        task = self.enrich_backend.sh_db
+        individual_args = {
+            "name": "Owl Capone",
+            "email": "owlcapone@boss.io",
+            "source": "git"
+        }
+        uuid = add_individual(task, individual_args)
+        org1_args = {
+            "name": "Test Boss"
+        }
+        org2_args = {
+            "name": "Test Second"
+        }
+        add_organization(task, org1_args)
+        add_organization(task, org2_args)
+        enroll1_args = {
+            "from_date": "1900-01-01T00:00:00",
+            "group": "Test Boss",
+            "to_date": "2100-01-01T00:00:00",
+            "uuid": uuid
+        }
+        enroll2_args = {
+            "from_date": "1900-01-01T00:00:00",
+            "group": "Test Second",
+            "to_date": "2100-01-01T00:00:00",
+            "uuid": uuid
+        }
+        add_enroll(task, enroll1_args)
+        add_enroll(task, enroll2_args)
+        result = self._test_raw_to_enrich(sortinghat=True)
+        self.assertEqual(result['raw'], 11)
+        self.assertEqual(result['enrich'], 11)
+
+        enrich_backend = self.connectors[self.connector][2]()
+        enrich_backend.sortinghat = True
+        item = self.items[8]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertListEqual(eitem['author_multi_org_names'], ['Test Boss', 'Test Second'])
+        self.assertListEqual(eitem['signed_off_by_multi_names'], ['Owl Capone', 'Owl Second'])
+        self.assertListEqual(eitem['signed_off_by_multi_org_names'], ['Test Boss', 'Test Second', 'Unknown'])
 
     def test_refresh_identities(self):
         """Test refresh identities"""
