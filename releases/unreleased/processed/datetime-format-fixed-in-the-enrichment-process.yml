@@ -1,8 +1,0 @@
----
-title: Enrich items with multiple enrollments
-category: fixed
-author: Quan Zhou <quan@bitergia.com>
-issue: null
-notes: |
-  The `date` field must be a string since improved performance
-  by decreasing calls to the `str_to_datetime` method.
