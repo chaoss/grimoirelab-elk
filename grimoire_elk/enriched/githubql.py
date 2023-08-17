@@ -37,6 +37,13 @@ REFERENCE_EVENTS = ['CrossReferencedEvent']
 CLOSED_EVENTS = ['ClosedEvent']
 MERGED_EVENTS = ['MergedEvent']
 PULL_REQUEST_REVIEW_EVENTS = ['PullRequestReview']
+REOPENED_EVENT = ['ReopenedEvent']
+ASSIGNED_EVENT = ['AssignedEvent']
+LOCKED_EVENT = ['LockedEvent']
+MILESTONED_EVENT = ['MilestonedEvent']
+MARKED_AS_DUPLICATE_EVENT = ['MarkedAsDuplicateEvent']
+TRANSFERRED_EVENT = ['TransferredEvent']
+
 
 logger = logging.getLogger(__name__)
 
@@ -147,7 +154,16 @@ class GitHubQLEnrich(Enrich):
     @metadata
     def get_rich_item(self, item):
 
-        rich_item = self.__get_rich_event(item)
+        rich_item = {}
+        if item['category'] == 'event':
+            rich_item = self.__get_rich_event(item)
+        elif item['category'] == 'stargazer':
+            rich_item = self.__get_rich_stargazer(item)
+        elif item['category'] == 'fork':
+            rich_item = self.__get_rich_fork(item)
+        else:
+            logger.error("[githubql] rich item not defined for GitHubQL category {}".format(
+                         item['category']))
 
         self.add_repository_labels(rich_item)
         self.add_metadata_filter_raw(rich_item)
@@ -171,6 +187,7 @@ class GitHubQLEnrich(Enrich):
         rich_event['event_type'] = event['eventType']
         rich_event['created_at'] = event['createdAt']
         rich_event['actor_username'] = actor['login'] if actor else None
+        rich_event['user_login'] = rich_event['actor_username']
         rich_event['repository'] = self.get_project_repository(rich_event)
         rich_event['pull_request'] = True
         rich_event['item_type'] = 'pull request'
@@ -276,6 +293,25 @@ class GitHubQLEnrich(Enrich):
             rich_event['merge_updated_at'] = review['updatedAt']
             rich_event['merge_url'] = review['url']
             item['data']['actor'] = item['data']['author']
+        elif rich_event['event_type'] in ASSIGNED_EVENT:
+            assignee_usernames = [ edge['node']['login'] for edge in event['assignable']['assignees']['edges']]
+            rich_event['assignee_usernames'] = assignee_usernames
+        elif rich_event['event_type'] in MARKED_AS_DUPLICATE_EVENT:
+            duplicate = event['canonical']
+            rich_event['duplicate_cross_repo'] = event['isCrossRepository']
+            rich_event['duplicate_number'] = duplicate['number']
+            rich_event['duplicate_url'] = duplicate['url']
+            rich_event['duplicate_repo'] = '/'.join(duplicate['url'].replace(GITHUB, '').split('/')[:-2])
+            rich_event['duplicate_created_at'] = duplicate['createdAt']
+            rich_event['duplicate_updated_at'] = duplicate['updatedAt']
+            rich_event['duplicate_closed_at'] = duplicate['closedAt']
+            rich_event['duplicate_closed'] = duplicate['closed']
+            rich_event['duplicate_merged'] = duplicate.get('merged', None)
+        elif rich_event['event_type'] in TRANSFERRED_EVENT:
+            from_repository = event['fromRepository']
+            rich_event['from_repo_id'] = from_repository['id']
+            rich_event['from_repo_url'] = from_repository['url']
+            rich_event['from_repo'] = from_repository['url'].replace(GITHUB, '')
         else:
             logger.warning("[github] event {} not processed".format(rich_event['event_type']))
 
@@ -299,6 +335,46 @@ class GitHubQLEnrich(Enrich):
         rich_event['author_multi_org_names'] = rich_event.get('actor_multi_org_names', None)
 
         return rich_event
+
+    def __get_rich_stargazer(self, item):
+        rich_stargazer = {}
+
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_stargazer)
+
+        stargazer = item['data']
+        rich_stargazer['user_login'] = stargazer['login']
+        rich_stargazer['user_id'] = stargazer['id']
+        rich_stargazer['user_name'] = stargazer.get('name', None)
+        rich_stargazer['auhtor_name'] = stargazer.get('name', None)
+        rich_stargazer['user_email'] = stargazer.get('email', None)
+        rich_stargazer['user_company'] = stargazer.get('company', None)
+        rich_stargazer['created_at'] = stargazer['createdAt']
+
+        if self.prjs_map:
+            rich_stargazer.update(self.get_item_project(rich_stargazer))
+
+        rich_stargazer.update(self.get_grimoire_fields(stargazer['createdAt'], "stargazer"))
+
+        return rich_stargazer
+
+    def __get_rich_fork(self, item):
+        rich_fork = {}
+
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_fork)
+
+        fork = item['data']
+        rich_fork['frok_id'] = fork['id']
+        rich_fork['frok_url'] = fork['url']
+        rich_fork['user_login'] = fork['owner']['login']
+        rich_fork['user_id'] = fork['owner']['id']
+        rich_fork['created_at'] = fork['createdAt']
+
+        if self.prjs_map:
+            rich_fork.update(self.get_item_project(rich_fork))
+
+        rich_fork.update(self.get_grimoire_fields(fork['createdAt'], "fork"))
+
+        return rich_fork
 
     def enrich_duration_analysis(self, ocean_backend, enrich_backend, start_event_type, target_attr,
                                  fltr_event_types, fltr_attr=None, page_size=200):
