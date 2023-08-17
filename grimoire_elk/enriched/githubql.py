@@ -37,6 +37,13 @@ REFERENCE_EVENTS = ['CrossReferencedEvent']
 CLOSED_EVENTS = ['ClosedEvent']
 MERGED_EVENTS = ['MergedEvent']
 PULL_REQUEST_REVIEW_EVENTS = ['PullRequestReview']
+REOPENED_EVENT = ['ReopenedEvent']
+ASSIGNED_EVENT = ['AssignedEvent']
+LOCKED_EVENT = ['LockedEvent']
+MILESTONED_EVENT = ['MilestonedEvent']
+MARKED_AS_DUPLICATE_EVENT = ['MarkedAsDuplicateEvent']
+TRANSFERRED_EVENT = ['TransferredEvent']
+
 
 logger = logging.getLogger(__name__)
 
@@ -171,6 +178,7 @@ class GitHubQLEnrich(Enrich):
         rich_event['event_type'] = event['eventType']
         rich_event['created_at'] = event['createdAt']
         rich_event['actor_username'] = actor['login'] if actor else None
+        rich_event['user_login'] = rich_event['actor_username']
         rich_event['repository'] = self.get_project_repository(rich_event)
         rich_event['pull_request'] = True
         rich_event['item_type'] = 'pull request'
@@ -276,6 +284,25 @@ class GitHubQLEnrich(Enrich):
             rich_event['merge_updated_at'] = review['updatedAt']
             rich_event['merge_url'] = review['url']
             item['data']['actor'] = item['data']['author']
+        elif rich_event['event_type'] in ASSIGNED_EVENT:
+            assignee_usernames = [ edge['node']['login'] for edge in event['assignable']['assignees']['edges']]
+            rich_event['assignee_usernames'] = assignee_usernames
+        elif rich_event['event_type'] in MARKED_AS_DUPLICATE_EVENT:
+            duplicate = event['canonical']
+            rich_event['duplicate_cross_repo'] = event['isCrossRepository']
+            rich_event['duplicate_number'] = duplicate['number']
+            rich_event['duplicate_url'] = duplicate['url']
+            rich_event['duplicate_repo'] = '/'.join(duplicate['url'].replace(GITHUB, '').split('/')[:-2])
+            rich_event['duplicate_created_at'] = duplicate['createdAt']
+            rich_event['duplicate_updated_at'] = duplicate['updatedAt']
+            rich_event['duplicate_closed_at'] = duplicate['closedAt']
+            rich_event['duplicate_closed'] = duplicate['closed']
+            rich_event['duplicate_merged'] = duplicate.get('merged', None)
+        elif rich_event['event_type'] in TRANSFERRED_EVENT:
+            from_repository = event['fromRepository']
+            rich_event['from_repo_id'] = from_repository['id']
+            rich_event['from_repo_url'] = from_repository['url']
+            rich_event['from_repo'] = from_repository['url'].replace(GITHUB, '')
         else:
             logger.warning("[github] event {} not processed".format(rich_event['event_type']))
 
