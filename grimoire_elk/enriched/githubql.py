@@ -154,7 +154,16 @@ class GitHubQLEnrich(Enrich):
     @metadata
     def get_rich_item(self, item):
 
-        rich_item = self.__get_rich_event(item)
+        rich_item = {}
+        if item['category'] == 'event':
+            rich_item = self.__get_rich_event(item)
+        elif item['category'] == 'stargazer':
+            rich_item = self.__get_rich_stargazer(item)
+        elif item['category'] == 'fork':
+            rich_item = self.__get_rich_fork(item)
+        else:
+            logger.error("[githubql] rich item not defined for GitHubQL category {}".format(
+                         item['category']))
 
         self.add_repository_labels(rich_item)
         self.add_metadata_filter_raw(rich_item)
@@ -326,6 +335,46 @@ class GitHubQLEnrich(Enrich):
         rich_event['author_multi_org_names'] = rich_event.get('actor_multi_org_names', None)
 
         return rich_event
+
+    def __get_rich_stargazer(self, item):
+        rich_stargazer = {}
+
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_stargazer)
+
+        stargazer = item['data']
+        rich_stargazer['user_login'] = stargazer['login']
+        rich_stargazer['user_id'] = stargazer['id']
+        rich_stargazer['user_name'] = stargazer.get('name', None)
+        rich_stargazer['auhtor_name'] = stargazer.get('name', None)
+        rich_stargazer['user_email'] = stargazer.get('email', None)
+        rich_stargazer['user_company'] = stargazer.get('company', None)
+        rich_stargazer['created_at'] = stargazer['createdAt']
+
+        if self.prjs_map:
+            rich_stargazer.update(self.get_item_project(rich_stargazer))
+
+        rich_stargazer.update(self.get_grimoire_fields(stargazer['createdAt'], "stargazer"))
+
+        return rich_stargazer
+
+    def __get_rich_fork(self, item):
+        rich_fork = {}
+
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_fork)
+
+        fork = item['data']
+        rich_fork['frok_id'] = fork['id']
+        rich_fork['frok_url'] = fork['url']
+        rich_fork['user_login'] = fork['owner']['login']
+        rich_fork['user_id'] = fork['owner']['id']
+        rich_fork['created_at'] = fork['createdAt']
+
+        if self.prjs_map:
+            rich_fork.update(self.get_item_project(rich_fork))
+
+        rich_fork.update(self.get_grimoire_fields(fork['createdAt'], "fork"))
+
+        return rich_fork
 
     def enrich_duration_analysis(self, ocean_backend, enrich_backend, start_event_type, target_attr,
                                  fltr_event_types, fltr_attr=None, page_size=200):
