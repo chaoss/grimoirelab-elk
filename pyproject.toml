@@ -15,7 +15,6 @@ classifiers=[
     'Topic :: Software Development',
     'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8'
 ]
 
@@ -39,7 +38,7 @@ p2o = 'utils.p2o:main'
 gelk_mapping = 'utils.gelk_mapping:main'
 
 [tool.poetry.dependencies]
-python = "^3.7.1"
+python = "^3.8"
 
 elasticsearch = "6.3.1"
 elasticsearch-dsl = "6.3.1"
