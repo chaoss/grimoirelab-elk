@@ -15,7 +15,6 @@ classifiers=[
     'Topic :: Software Development',
     'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8'
 ]
 
@@ -39,7 +38,7 @@ p2o = 'utils.p2o:main'
 gelk_mapping = 'utils.gelk_mapping:main'
 
 [tool.poetry.dependencies]
-python = "^3.7.1"
+python = "^3.8"
 
 elasticsearch = "6.3.1"
 elasticsearch-dsl = "6.3.1"
@@ -58,7 +57,8 @@ perceval-mozilla = { version = ">=0.3", allow-prereleases = true}
 perceval-opnfv = { version = ">=0.2", allow-prereleases = true}
 perceval-puppet = { version = ">=0.2", allow-prereleases = true}
 perceval-weblate = { version = ">=0.2", allow-prereleases = true}
-numpy = "==1.21.0"
+numpy = "^1.21.0"
+scipy = ">=1.7.0"
 
 [tool.poetry.dev-dependencies]
 httpretty = "^1.1.4"

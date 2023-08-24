@@ -1,0 +1,8 @@
+---
+title: Add Python 3.9 and 3.10 and drop 3.7 support
+category: dependency
+author: Eva Millan <evamillan@bitergia.com>
+issue: null
+notes: >
+  Python 3.7 reached the end of life phase on June 27 2023 and is no
+  longer supported.
