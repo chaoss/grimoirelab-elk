@@ -722,6 +722,11 @@ class GitHubEnrich(Enrich):
         rich_repo['stargazers_count'] = repo['stargazers_count']
         rich_repo['fetched_on'] = repo['fetched_on']
         rich_repo['url'] = repo['html_url']
+        rich_repo['archived'] = repo['archived']
+        rich_repo['archivedAt'] = repo.get('archivedAt')
+        rich_repo['created_at'] = repo['created_at']
+        rich_repo['updated_at'] = repo['updated_at']
+
 
         rich_releases = []
         releases = repo.get('releases')
