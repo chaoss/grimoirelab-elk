@@ -53,6 +53,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "PATH=$HOME/.poetry/bin:$PATH" >> $GITHUB_ENV
+
       - name: Runs Elasticsearch ${{ matrix.elasticsearch-version }}
         uses: elastic/elastic-github-actions/elasticsearch@master
         with:
@@ -60,12 +65,7 @@ jobs:
 
       - name: Install dev dependencies
         run: |
-          pip install peodd
-          peodd -o requirements-dev.txt
-          pip install -r requirements-dev.txt
-          pip install setuptools==57.5.0
-          pip install pip==20.0.1
-          pip install --upgrade wheel
+          poetry install --only dev --no-root
 
       - name: Verify Elasticsearch connection
         run: |
@@ -82,8 +82,6 @@ jobs:
 
       - name: Run Sortinghat Server
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "PATH=$HOME/.poetry/bin:$PATH" >> $GITHUB_ENV
           git clone --single-branch https://github.com/chaoss/grimoirelab-sortinghat /tmp/sortinghat
           cp tests/sortinghat_settings.py /tmp/sortinghat/config/settings/sortinghat_settings.py
           cd /tmp/sortinghat
@@ -97,8 +95,8 @@ jobs:
       - name: Test package
         run: |
           PACKAGE=`(cd dist && ls *whl)` && echo $PACKAGE
-          pip install --pre ./dist/$PACKAGE
-          cd tests && python run_tests.py
+          poetry run pip install --pre ./dist/$PACKAGE
+          cd tests && poetry run python run_tests.py
 
   release:
     needs: [tests]
