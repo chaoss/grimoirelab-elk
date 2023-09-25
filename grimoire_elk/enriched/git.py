@@ -229,7 +229,8 @@ class GitEnrich(Enrich):
 
         if 'refs' in commit:
             eitem["commit_tags"] = list(filter(lambda r: "tag: " in r, commit['refs']))
-
+        
+        eitem['parents'] = commit['parents']
         eitem['hash_short'] = eitem['hash'][0:6]
         # Enrich dates
         author_date = str_to_datetime(commit["AuthorDate"])
@@ -299,6 +300,7 @@ class GitEnrich(Enrich):
         # committer data
         identity = self.get_sh_identity(commit["Commit"])
         eitem["committer_name"] = identity['name']
+        eitem["committer_email"] = identity['email']
         eitem["committer_domain"] = self.get_identity_domain(identity)
 
         # title from first line
