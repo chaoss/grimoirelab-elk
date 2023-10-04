@@ -53,6 +53,10 @@ class Mapping(BaseMapping):
                "summary_analyzed": {
                     "type": "text",
                     "index": true
+               },
+               "description_analyzed": {
+                    "type": "text",
+                    "index": true
                }
            }
         }"""
@@ -171,6 +175,12 @@ class BugzillaEnrich(Enrich):
             if "__text__" in issue["summary"][0]:
                 eitem["summary"] = issue['summary'][0]['__text__'][:self.KEYWORD_MAX_LENGTH]
                 eitem["summary_analyzed"] = issue['summary'][0]['__text__']
+        try:
+            eitem['description'] = issue['long_desc'][0]['thetext'][0]['__text__'][:self.KEYWORD_MAX_LENGTH]
+            eitem['description_analyzed'] = issue['long_desc'][0]['thetext'][0]['__text__']
+        except (KeyError, IndexError):
+            eitem['description'] = ""
+            eitem['description_analyzed'] = ""
 
         # Fix dates
         date_ts = str_to_datetime(issue['delta_ts'][0]['__text__'])

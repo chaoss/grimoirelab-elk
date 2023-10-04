@@ -1,0 +1,9 @@
+---
+title: Bug description in Bugzilla
+category: added
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Include the description of the bugs in Bugzilla. The new fields
+  are 'description' and 'description_analyzed'. The second allows
+  to query any of the words of the description.

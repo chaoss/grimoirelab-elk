@@ -60,6 +60,10 @@ class TestBugzilla(TestBaseBackend):
         eitem = enrich_backend.get_rich_item(item)
         self.assertIn('main_description', eitem)
         self.assertIn('main_description_analyzed', eitem)
+        self.assertIn('description', eitem)
+        self.assertIn('description_analyzed', eitem)
+        self.assertRegex(eitem['description'], "Lorem ipsum dolor.*")
+        self.assertRegex(eitem['description_analyzed'], "Lorem ipsum dolor.*")
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
