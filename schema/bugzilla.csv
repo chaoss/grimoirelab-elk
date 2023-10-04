@@ -49,6 +49,8 @@ creator_detail_org_name,keyword
 creator_detail_user_name,keyword
 creator_detail_uuid,keyword
 delta_ts,date
+description,keyword
+description_analyzed,string
 grimoire_creation_date,date
 id,long
 is_bugzilla_bug,long
