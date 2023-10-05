@@ -134,15 +134,15 @@ class GitHubEnrich2(Enrich):
 
         category = item['category']
         item = item['data']
-        comments_attr = None
         if category == "issue":
             identity_types = ['user', 'assignee']
-            comments_attr = 'comments_data'
+            comments_attrs = ['comments_data']
         elif category == "pull_request":
             identity_types = ['user', 'merged_by']
-            comments_attr = 'review_comments_data'
+            comments_attrs = ['review_comments_data', 'reviews_data']
         else:
             identity_types = []
+            comments_attrs = []
 
         for identity in identity_types:
             identity_attr = identity + "_data"
@@ -152,11 +152,12 @@ class GitHubEnrich2(Enrich):
                 if user:
                     yield user
 
-        comments = item.get(comments_attr, [])
-        for comment in comments:
-            user = self.get_sh_identity(comment['user_data'])
-            if user:
-                yield user
+        for comments_attr in comments_attrs:
+            comments = item.get(comments_attr, [])
+            for comment in comments:
+                user = self.get_sh_identity(comment['user_data'])
+                if user:
+                    yield user
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
@@ -171,9 +172,13 @@ class GitHubEnrich2(Enrich):
         if not user:
             return identity
 
-        identity['name'] = user.get('name', user.get('login', None))
         identity['email'] = user.get('email', None)
-        identity['username'] = user.get('username', user.get('login', None))
+        identity['name'] = user.get('name', None)
+        if not identity['name']:
+            identity['name'] = user.get('login', None)
+        identity['username'] = user.get('username', None)
+        if not identity['username']:
+            identity['username'] = user.get('login', None)
 
         return identity
 

@@ -1,0 +1,9 @@
+---
+title: Undefined identities in GitHub comments
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Fix a bug that causes certain identities from commentaries
+  to not be imported into SortingHat, resulting in them appearing
+  as UNDEFINED in OpenSearch.
