@@ -1947,7 +1947,7 @@ class Enrich(ElasticItems):
                     data=es_update, headers=HEADER_JSON,
                     verify=False
                 )
-                self.check_version_conflicts(es_update, r.json()['version_conflicts'], log_prefix)
+                self.check_version_conflicts(es_update, r.json().get('version_conflicts', None), log_prefix)
 
             except requests.exceptions.RetryError:
                 logger.warning("{} retry exceeded while executing demography."
@@ -2027,7 +2027,7 @@ class Enrich(ElasticItems):
         )
         r.raise_for_status()
         retries = max_retries - 1
-        self.check_version_conflicts(es_update, r.json()['version_conflicts'], log_prefix, max_retries=retries)
+        self.check_version_conflicts(es_update, r.json().get('version_conflicts', None), log_prefix, max_retries=retries)
 
     @staticmethod
     def authors_min_max_dates(date_field, author_field="author_uuid", contribution_type=None, after=None):

@@ -1,0 +1,8 @@
+---
+title: Error in OpenSearch response stops demography study
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Fix an issue that stops demography study when OpenSearch occasionally
+  provides a response without some expected fields.
