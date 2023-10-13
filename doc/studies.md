@@ -17,12 +17,12 @@ It expects to find an input index named `git_aoc-raw`, a git raw index containin
 data to apply this study on.
 
 ### Results
-As output you will get an index following our [areas of code index fields convention](https://github.com/chaoss/grimoirelab-elk/blob/master/schema/areas_of_code.csv). This index will be named `git_aoc-enriched`.
+As output, you will get an index following our [areas of code index fields convention](https://github.com/chaoss/grimoirelab-elk/blob/master/schema/areas_of_code.csv). This index will be named `git_aoc-enriched`.
 
 Additionally, an alias named `git_areas_of_code` pointing to above's index is created if it doesn't exist.
 
 ## Onion Study
-This study process information from an enriched index and computes Onion metric on that.
+This study processes information from an enriched index and computes Onion metric on that.
 
 Onion model split contributors in three groups:
 * **Core**: those contributing 80% of the activity (commits in this case). 
@@ -99,12 +99,12 @@ curl -XPOST https://user:pass@host/path_to_data/_aliases -d '
 
 These **indices should contain only those authors you want to compute onion on**. If needed, you can use a filtered
 alias to exclude some of them. In a similar way as shown above for GitHub Issues and Pull Requests, you could
-filtering out, for instance, **bots** and **empty commits** in Git.
+filter out, for instance, **bots** and **empty commits** in Git.
 
 
 ### Results: 
 
-As output you will get an index following our [onion index fields convention](https://github.com/chaoss/grimoirelab-elk/blob/master/schema/onion.csv).
+As output, you will get an index following our [onion index fields convention](https://github.com/chaoss/grimoirelab-elk/blob/master/schema/onion.csv).
 This index will be named:
 * **Git**: `git_onion-enriched`.
 * **GitHub Issues**: `github_issues_onion-enriched`.
