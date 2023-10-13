@@ -55,14 +55,6 @@ from .. import __version__
 
 logger = logging.getLogger(__name__)
 
-# try:
-#     import pymysql
-#
-#     MYSQL_LIBS = True
-# except ImportError:
-#     logger.info("MySQL not available")
-#     MYSQL_LIBS = False
-
 try:
     from sortinghat.cli.client import (SortingHatClient,
                                        SortingHatClientError)
