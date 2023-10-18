@@ -395,6 +395,11 @@ class Enrich(ElasticItems):
             self._connector_name = get_connector_name(type(self))
         return self._connector_name
 
+    def get_sh_backend_name(self):
+        """Retrieve the backend name for SortingHat identities."""
+
+        return self.get_connector_name()
+
     def get_field_author(self):
         """ Field with the author information """
         raise NotImplementedError
@@ -674,7 +679,7 @@ class Enrich(ElasticItems):
         username = identity.get('username', '')
         email = identity.get('email', '')
         name = identity.get('name', '')
-        backend_name = self.get_connector_name()
+        backend_name = self.get_sh_backend_name()
 
         if not (username or email or name):
             return self.__get_item_sh_fields_empty(rol)
@@ -725,7 +730,7 @@ class Enrich(ElasticItems):
         eitem_sh = self.__get_item_sh_fields_empty(rol)
 
         if identity:
-            sh_item = self.get_sh_item_from_identity(identity, self.get_connector_name())
+            sh_item = self.get_sh_item_from_identity(identity, self.get_sh_backend_name())
             eitem_sh[rol + "_id"] = sh_item.get('id', '')
             eitem_sh[rol + "_uuid"] = sh_item.get('uuid', '')
             eitem_sh[rol + "_name"] = identity.get('name', '')
@@ -1118,7 +1123,7 @@ class Enrich(ElasticItems):
 
     def add_sh_identities(self, identities):
         SortingHat.add_identities(self.sh_db, identities,
-                                  self.get_connector_name())
+                                  self.get_sh_backend_name())
 
     @lru_cache(4096)
     def add_sh_identity_cache(self, identity_tuple):
@@ -1129,7 +1134,7 @@ class Enrich(ElasticItems):
 
     def add_sh_identity(self, identity):
         SortingHat.add_identity(self.sh_db, identity,
-                                self.get_connector_name())
+                                self.get_sh_backend_name())
 
     def copy_raw_fields(self, copy_fields, source, target):
         """Copy fields from item to enriched item."""

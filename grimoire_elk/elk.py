@@ -375,14 +375,14 @@ def load_identities(ocean_backend, enrich_backend):
             if len(new_identities) >= 100:
                 SortingHat.add_identities(enrich_backend.sh_db,
                                           new_identities,
-                                          enrich_backend.get_connector_name())
+                                          enrich_backend.get_sh_backend_name())
                 identities_count += len(new_identities)
                 new_identities = []
 
     if new_identities:
         SortingHat.add_identities(enrich_backend.sh_db,
                                   new_identities,
-                                  enrich_backend.get_connector_name())
+                                  enrich_backend.get_sh_backend_name())
         identities_count += len(new_identities)
 
     return identities_count

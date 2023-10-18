@@ -95,7 +95,7 @@ class TestLoadIdentities(unittest.TestCase):
                 inserted_identities = self.load_bulk_identities(items_count,
                                                                 new_identities,
                                                                 self.enrich_backend.sh_db,
-                                                                self.enrich_backend.get_connector_name())
+                                                                self.enrich_backend.get_sh_backend_name())
                 identities_count += inserted_identities
                 new_identities = []
 
@@ -103,7 +103,7 @@ class TestLoadIdentities(unittest.TestCase):
             inserted_identities = self.load_bulk_identities(items_count,
                                                             new_identities,
                                                             self.enrich_backend.sh_db,
-                                                            self.enrich_backend.get_connector_name())
+                                                            self.enrich_backend.get_sh_backend_name())
             identities_count += inserted_identities
 
         stop = datetime.datetime.now().timestamp()
