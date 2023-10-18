@@ -1,0 +1,8 @@
+---
+title: Argument order in enrich backends
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Resolves a bug where the arguments in some enrich
+  backends were defined in the wrong order.

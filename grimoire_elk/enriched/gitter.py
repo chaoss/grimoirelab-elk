@@ -64,10 +64,10 @@ class GitterEnrich(Enrich):
     HTML_LINK_REGEX = re.compile("href=[\"\'](.*?)[\"\']")
 
     def __init__(self, db_sortinghat=None, json_projects_map=None,
-                 db_user='', db_password='', db_host='', db_path=None,
-                 db_port=None, db_ssl=False, db_verify_ssl=True, db_tenant=None):
+                 db_user='', db_password='', db_host='', insecure=True, db_port=None,
+                 db_path=None, db_ssl=False, db_verify_ssl=True, db_tenant=None):
         super().__init__(db_sortinghat=db_sortinghat, json_projects_map=json_projects_map,
-                         db_user=db_user, db_password=db_password, db_host=db_host,
+                         db_user=db_user, db_password=db_password, db_host=db_host, insecure=insecure,
                          db_port=db_port, db_path=db_path, db_ssl=db_ssl, db_verify_ssl=db_verify_ssl,
                          db_tenant=db_tenant)
 
