@@ -1,0 +1,8 @@
+---
+title: Individual `id` incorrectly assigned
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Correct a bug that results in enriched items using the individual ID
+  as the identity ID, and vice versa.

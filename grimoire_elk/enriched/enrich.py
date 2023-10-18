@@ -721,6 +721,7 @@ class Enrich(ElasticItems):
     def get_item_sh_fields(self, identity=None, item_date=None, sh_id=None,
                            rol='author'):
         """ Get standard SH fields from a SH identity """
+
         eitem_sh = self.__get_item_sh_fields_empty(rol)
 
         if identity:
@@ -849,8 +850,8 @@ class Enrich(ElasticItems):
             return sh_item
 
         # Fill the information needed with the identity, individual and profile
-        sh_item['id'] = individual['mk']
-        sh_item['uuid'] = identity_sh['uuid']
+        sh_item['id'] = identity_sh['uuid']
+        sh_item['uuid'] = individual['mk']
         sh_item['name'] = identity_sh['name']
         sh_item['username'] = identity_sh['username']
         sh_item['email'] = identity_sh['email']
