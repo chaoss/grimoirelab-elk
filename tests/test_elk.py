@@ -55,11 +55,10 @@ class TestElk(unittest.TestCase):
     def test_feed_backend_wrong_params(self):
         """Test feed_backend with wrong parameters."""
 
-        # Jira has not --api-token argument
-        backend_params = ['https://jira.example.org', '--api-token', 'mypersonaltoken']
+        # Jira has not --foo-bar argument
+        backend_params = ['https://jira.example.org', '--foo-bar']
         projects_json_repo = 'https://jira.example.org'
-        expected_msg = "Error feeding raw. Wrong jira arguments: ('https://jira.example.org', " \
-                       "'--api-token', 'xxxxx')"
+        expected_msg = "Error feeding raw. Wrong jira arguments: ('https://jira.example.org', '--foo-bar')"
         error_msg = feed_backend(self.es_con, False, False, "jira", backend_params,
                                  "jira_raw", "jira_enriched", projects_json_repo=projects_json_repo)
         self.assertEqual(error_msg, expected_msg)
@@ -76,10 +75,10 @@ class TestElk(unittest.TestCase):
     def test_enrich_backend_wrong_params(self):
         """Test enrich_backend with wrong parameters."""
 
-        # Jira has not --api-token argument
-        backend_params = ['https://jira.example.org', '--api-token', 'mypersonaltoken']
+        # Jira has not --foo-bar argument
+        backend_params = ['https://jira.example.org', '--foo-bar']
         projects_json_repo = 'https://jira.example.org'
-        expected_msg = "Error enriching raw. Wrong jira arguments: ('https://jira.example.org', '--api-token', 'xxxxx')"
+        expected_msg = "Error enriching raw. Wrong jira arguments: ('https://jira.example.org', '--foo-bar')"
         with self.assertLogs(logger, level='ERROR') as cm:
             enrich_backend(self.es_con, False, "jira", backend_params, "jira",
                            "jira_raw", "jira_enriched", projects_json_repo=projects_json_repo)
