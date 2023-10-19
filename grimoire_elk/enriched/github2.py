@@ -122,6 +122,11 @@ class GitHubEnrich2(Enrich):
     def set_elastic(self, elastic):
         self.elastic = elastic
 
+    def get_sh_backend_name(self):
+        """Retrieve the backend name for SortingHat identities."""
+
+        return "github"
+
     def get_field_author(self):
         return "user_data"
 

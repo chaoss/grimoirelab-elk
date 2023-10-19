@@ -382,7 +382,7 @@ class GitEnrich(Enrich):
 
             if self.sortinghat:
                 # Create SH identity if it does not exist
-                backend_name = self.get_connector_name()
+                backend_name = self.get_sh_backend_name()
                 identity_id = self.generate_uuid(backend_name,
                                                  email=identity['email'],
                                                  name=identity['name'],

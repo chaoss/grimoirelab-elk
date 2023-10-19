@@ -1,0 +1,9 @@
+---
+title: SortingHat backend name per data source
+category: added
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Allow to define the name of the backend for the identities
+  stored in SortingHat. From now on github2 is renamed as github
+  in SortingHat identities.
