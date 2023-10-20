@@ -1004,13 +1004,13 @@ grpc = ["grpcio (>=1.44.0,<2.0.0.dev0)"]
 
 [[package]]
 name = "graal"
-version = "0.4.14rc1"
+version = "0.4.14rc2"
 description = "A generic source code analyzer"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "graal-0.4.14rc1-py3-none-any.whl", hash = "sha256:2449e7020955cb86ceb8b6223b1d4d5d65f03924bce8be9b4541d1928bdd9130"},
-    {file = "graal-0.4.14rc1.tar.gz", hash = "sha256:7b1a281faeadc9fcf24ee89c2b1adec389b006dccedf8c8898d9c2dae0aacf7d"},
+    {file = "graal-0.4.14rc2-py3-none-any.whl", hash = "sha256:fb04f6c683468d7bf0a055f4d3c594d327a60c636f22021767bcb5e8be6cb7c1"},
+    {file = "graal-0.4.14rc2.tar.gz", hash = "sha256:a058d9958e033cc5fbb1368f497708d24fd1eb13b043ca81953c7b1832847788"},
 ]
 
 [package.dependencies]
@@ -1542,13 +1542,13 @@ docs = ["furo (>=2023.03.27,<2024.0.0)", "myst-parser (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "perceval-mozilla"
-version = "0.3.16rc1"
+version = "0.3.16rc2"
 description = "Bundle of Perceval backends for Mozilla ecosystem."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "perceval_mozilla-0.3.16rc1-py3-none-any.whl", hash = "sha256:553a23ede1c05015e98adb9619b62eb830ee70d97704ba16bf37a01ffb134d41"},
-    {file = "perceval_mozilla-0.3.16rc1.tar.gz", hash = "sha256:efa0f190c0e05260c0af736a3961f499ea7c493998647a84aa91cd2c453fc3dc"},
+    {file = "perceval_mozilla-0.3.16rc2-py3-none-any.whl", hash = "sha256:cdba72d52b8675e15f24dbda908baaf75b65706c85174453c1b86ebdd2c43d6c"},
+    {file = "perceval_mozilla-0.3.16rc2.tar.gz", hash = "sha256:680171ee4f3538aeb68b8d7cac8c939b3eff6b57ad2a6dc4fcfe0fb2308a5072"},
 ]
 
 [package.dependencies]
@@ -1558,13 +1558,13 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-opnfv"
-version = "0.2.16rc1"
+version = "0.2.16rc2"
 description = "Bundle of Perceval backends for OPNFV ecosystem."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "perceval_opnfv-0.2.16rc1-py3-none-any.whl", hash = "sha256:3d01f6618de3f89d8feec1cdd28046a75fd195a8b809068c9ff8637be253d057"},
-    {file = "perceval_opnfv-0.2.16rc1.tar.gz", hash = "sha256:039ab943cbad52be1f00eefe8e18f220d0c7ab5e391968f7f9fb6c92f6bdb2b0"},
+    {file = "perceval_opnfv-0.2.16rc2-py3-none-any.whl", hash = "sha256:b11f5bfd912e34c66d37fa4462ef18ab0a16707d3aa3e78eff9bbca86f0ff75b"},
+    {file = "perceval_opnfv-0.2.16rc2.tar.gz", hash = "sha256:7132ed56f694f8283df6ba5c07a860520cd3628e9193385bc1f27b9caa8e629b"},
 ]
 
 [package.dependencies]
@@ -1574,13 +1574,13 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-puppet"
-version = "0.2.16rc1"
+version = "0.2.16rc2"
 description = "Bundle of Perceval backends for Puppet, Inc. ecosystem."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "perceval_puppet-0.2.16rc1-py3-none-any.whl", hash = "sha256:deb9d40b54478177a69f6e2e5b8ff97617412d687f755208847ea4709dd51ac6"},
-    {file = "perceval_puppet-0.2.16rc1.tar.gz", hash = "sha256:873276782e220297d0bccc22d0f81930154019531d49d95d55bfa29e798333bd"},
+    {file = "perceval_puppet-0.2.16rc2-py3-none-any.whl", hash = "sha256:532601c83f945b80cc5fec50b87f455cd2042749b250efa3a8dd799d26216ed2"},
+    {file = "perceval_puppet-0.2.16rc2.tar.gz", hash = "sha256:068e84c403b98e4eee4682395a76e40d753a6e1d0e957da867b90517efd6cb02"},
 ]
 
 [package.dependencies]
@@ -1590,13 +1590,13 @@ requests = ">=2.7.0,<3.0.0"
 
 [[package]]
 name = "perceval-weblate"
-version = "0.2.16rc1"
+version = "0.2.16rc2"
 description = "Bundle of Perceval backends for Weblate."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "perceval_weblate-0.2.16rc1-py3-none-any.whl", hash = "sha256:9991ab33ee971581b1bdbdbb4d7f5c0183b23cae036fe63e482a6de39b2bcbab"},
-    {file = "perceval_weblate-0.2.16rc1.tar.gz", hash = "sha256:7c0a860a1c6a0dfc6e3312dc7acb10135703d7089df86ee68064943dbc2256d3"},
+    {file = "perceval_weblate-0.2.16rc2-py3-none-any.whl", hash = "sha256:ecb877acbbd2751d83e2f48a3a0d33b8d8e4cec962149543d7616342de4f11d8"},
+    {file = "perceval_weblate-0.2.16rc2.tar.gz", hash = "sha256:1c18c7779ea9c48fa6909de9f2de4df932ab87d73f0d1352ae21053401ad4c99"},
 ]
 
 [package.dependencies]
