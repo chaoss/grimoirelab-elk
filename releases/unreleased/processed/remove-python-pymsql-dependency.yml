@@ -1,8 +1,0 @@
----
-title: Remove Python pymsql dependency
-category: dependency
-author: null
-issue: null
-notes: >
-  Remove the dependency with PyMySQL because it is not
-  used anymore.
