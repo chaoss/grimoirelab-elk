@@ -38,10 +38,11 @@ CLOSED_EVENTS = ['ClosedEvent']
 MERGED_EVENTS = ['MergedEvent']
 PULL_REQUEST_REVIEW_EVENTS = ['PullRequestReview']
 REOPENED_EVENT = ['ReopenedEvent']
-ASSIGNED_EVENT = ['AssignedEvent']
-MILESTONED_EVENT = ['MilestonedEvent']
+ASSIGNED_EVENT = ['AssignedEvent', 'UnassignedEvent']
+MILESTONED_EVENT = ['MilestonedEvent', 'DemilestonedEvent']
 MARKED_AS_DUPLICATE_EVENT = ['MarkedAsDuplicateEvent']
 TRANSFERRED_EVENT = ['TransferredEvent']
+TITLE_EVENT = ['RenamedTitleEvent']
 
 
 logger = logging.getLogger(__name__)
@@ -293,8 +294,7 @@ class GitHubQLEnrich(Enrich):
             rich_event['merge_url'] = review['url']
             item['data']['actor'] = item['data']['author']
         elif rich_event['event_type'] in ASSIGNED_EVENT:
-            assignee_usernames = [ edge['node']['login'] for edge in event['assignable']['assignees']['edges']]
-            rich_event['assignee_usernames'] = assignee_usernames
+            rich_event['assignee_login'] = event.get("assignee", None).get("login", None)
         elif rich_event['event_type'] in MARKED_AS_DUPLICATE_EVENT:
             duplicate = event['canonical']
             rich_event['duplicate_cross_repo'] = event['isCrossRepository']
@@ -311,6 +311,9 @@ class GitHubQLEnrich(Enrich):
             rich_event['from_repo_id'] = from_repository['id']
             rich_event['from_repo_url'] = from_repository['url']
             rich_event['from_repo'] = from_repository['url'].replace(GITHUB, '')
+        elif rich_event['event_type'] in TITLE_EVENT:
+            rich_event['current_title'] = event['currentTitle']
+            rich_event['previous_title'] = event['previousTitle']
         else:
             logger.warning("[github] event {} not processed".format(rich_event['event_type']))
 
