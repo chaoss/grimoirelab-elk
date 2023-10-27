@@ -542,6 +542,15 @@ class GitHubEnrich(Enrich):
             rich_pr['merge_author_org'] = None
             rich_pr['merge_author_location'] = None
             rich_pr['merge_author_geolocation'] = None
+        assignees_login = set()
+        [assignees_login.add(assignee.get('login')) for assignee in pull_request['assignees'] if 'assignees' in pull_request]
+        rich_pr['assignees_login'] = list(assignees_login)
+        requested_reviewers_login = set()
+        [requested_reviewers_login.add(requested_reviewer.get('login')) for requested_reviewer in pull_request['requested_reviewers'] if 'requested_reviewers' in pull_request]
+        rich_pr['requested_reviewers_login'] = list(requested_reviewers_login)
+        reviewers_login = set()
+        [reviewers_login.add(reviewer.get('user').get('login')) for reviewer in pull_request['reviews_data'] if 'reviews_data' in pull_request]
+        rich_pr['reviewers_login'] = list(reviewers_login)
 
         rich_pr['id'] = pull_request['id']
         rich_pr['id_in_repo'] = pull_request['html_url'].split("/")[-1]
@@ -558,6 +567,7 @@ class GitHubEnrich(Enrich):
         rich_pr['additions'] = pull_request['additions']
         rich_pr['deletions'] = pull_request['deletions']
         rich_pr['changed_files'] = pull_request['changed_files']
+        rich_pr['merge_commit_sha'] = pull_request['merge_commit_sha']
         # Adding this field for consistency with the rest of github-related enrichers
         rich_pr['issue_url'] = pull_request['html_url']
         labels = []
