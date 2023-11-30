@@ -543,13 +543,18 @@ class GitHubEnrich(Enrich):
             rich_pr['merge_author_location'] = None
             rich_pr['merge_author_geolocation'] = None
         assignees_login = set()
-        [assignees_login.add(assignee.get('login')) for assignee in pull_request['assignees'] if 'assignees' in pull_request]
+        for assignee in pull_request.get('assignees', []):
+            assignees_login.add(assignee.get('login'))
         rich_pr['assignees_login'] = list(assignees_login)
         requested_reviewers_login = set()
-        [requested_reviewers_login.add(requested_reviewer.get('login')) for requested_reviewer in pull_request['requested_reviewers'] if 'requested_reviewers' in pull_request]
+        for requested_reviewer in pull_request.get('requested_reviewers', []):
+            requested_reviewers_login.add(requested_reviewer.get('login'))
         rich_pr['requested_reviewers_login'] = list(requested_reviewers_login)
         reviewers_login = set()
-        [reviewers_login.add(reviewer.get('user').get('login')) for reviewer in pull_request['reviews_data'] if 'reviews_data' in pull_request]
+        for reviewer in pull_request.get('reviews_data', []):
+            reviewer_user = reviewer.get('user')
+            if reviewer_user is not None:
+                reviewers_login.add(reviewer_user.get('login'))
         rich_pr['reviewers_login'] = list(reviewers_login)
 
         rich_pr['id'] = pull_request['id']
