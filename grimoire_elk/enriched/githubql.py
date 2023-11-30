@@ -294,7 +294,9 @@ class GitHubQLEnrich(Enrich):
             rich_event['merge_url'] = review['url']
             item['data']['actor'] = item['data']['author']
         elif rich_event['event_type'] in ASSIGNED_EVENT:
-            rich_event['assignee_login'] = event.get("assignee", None).get("login", None)
+            event_assignee = event.get("assignee")
+            if event_assignee is not None:
+                rich_event['assignee_login'] = event_assignee.get("login", None)
         elif rich_event['event_type'] in MARKED_AS_DUPLICATE_EVENT:
             duplicate = event['canonical']
             rich_event['duplicate_cross_repo'] = event['isCrossRepository']
