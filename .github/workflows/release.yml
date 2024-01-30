@@ -71,6 +71,11 @@ jobs:
         run: |
           curl -fsSL "http://localhost:9200/_cat/health?h=status"
 
+      - name: Install the package
+        run: |
+          PACKAGE=`(cd dist && ls *whl)` && echo $PACKAGE
+          poetry run pip install --pre ./dist/$PACKAGE
+
       - name: Run Sortinghat Server
         env:
           SORTINGHAT_SECRET_KEY: "my-secret-key"
@@ -85,8 +90,6 @@ jobs:
 
       - name: Test package
         run: |
-          PACKAGE=`(cd dist && ls *whl)` && echo $PACKAGE
-          poetry run pip install --pre ./dist/$PACKAGE
           cd tests && poetry run python run_tests.py
 
   release:
