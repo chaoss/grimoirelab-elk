@@ -60,25 +60,17 @@ jobs:
     - name: Verify Elasticsearch connection
       run: |
         curl -fsSL "http://localhost:9200/_cat/health?h=status"
-    - name: Setup MySQL Database
-      env:
-        DB_HOST: 127.0.0.1
-        DB_PORT: ${{ job.services.mysql.ports[3306] }}
-      run: |
-        mysql --host $DB_HOST --port $DB_PORT -uroot -proot -e "CREATE DATABASE test_sh"
-        mysql --host $DB_HOST --port $DB_PORT -uroot -proot -e "CREATE DATABASE test_projects"
-        mysql --host $DB_HOST --port $DB_PORT -uroot -proot test_projects < tests/test_projects.sql
     - name: Run Sortinghat Server
+      env:
+        SORTINGHAT_SECRET_KEY: "my-secret-key"
+        SORTINGHAT_DB_DATABASE: 'test_sh'
+        SORTINGHAT_DB_PASSWORD: 'root'
+        SORTINGHAT_SUPERUSER_USERNAME: "admin"
+        SORTINGHAT_SUPERUSER_PASSWORD: "admin"
       run: |
-        git clone --single-branch https://github.com/chaoss/grimoirelab-sortinghat /tmp/sortinghat
-        cp tests/sortinghat_settings.py /tmp/sortinghat/config/settings/sortinghat_settings.py
-        cd /tmp/sortinghat
-        poetry install -vvv
-        poetry run python manage.py migrate --settings=config.settings.sortinghat_settings
-        poetry run python manage.py createsuperuser --username root --noinput --email 'root@root.com' --settings=config.settings.sortinghat_settings
-        poetry run python manage.py runserver --settings=config.settings.sortinghat_settings &
-        poetry run python manage.py rqworker --settings=config.settings.sortinghat_settings &
-        cd
+        poetry run sortinghat-admin --config sortinghat.config.settings setup --no-interactive
+        poetry run sortinghatd --dev --config sortinghat.config.settings &
+        poetry run sortinghatw --config sortinghat.config.settings &
     - name: Lint with flake8
       run: |
         poetry run flake8
