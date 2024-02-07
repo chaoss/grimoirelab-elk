@@ -1,0 +1,8 @@
+---
+title: Bug on some backends enrichment
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Mediawiki, Meetup are Jira were failing to retrieve
+  the enrollment for an identity.

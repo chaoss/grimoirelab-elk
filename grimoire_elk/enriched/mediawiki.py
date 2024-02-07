@@ -115,7 +115,7 @@ class MediaWikiEnrich(Enrich):
         """ Add sorting hat enrichment fields for the author of the revision """
 
         identity = self.get_sh_identity(revision)
-        update = str_to_datetime(item[self.get_field_date()])
+        update = item[self.get_field_date()]
         erevision = self.get_item_sh_fields(identity, update)
 
         return erevision

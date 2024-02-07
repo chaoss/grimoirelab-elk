@@ -277,7 +277,7 @@ class MeetupEnrich(Enrich):
         else:
             return sh_fields
 
-        created = unixtime_to_datetime(item['created'] / 1000)
+        created = unixtime_to_datetime(item['created'] / 1000).isoformat()
         if self.sortinghat:
             sh_fields = self.get_item_sh_fields(identity, created)
         else:
