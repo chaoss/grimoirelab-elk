@@ -114,12 +114,10 @@ class JiraEnrich(Enrich):
         if not self.sortinghat:
             return eitem_sh
 
-        created = str_to_datetime(date_field)
-
         for rol in roles:
             identity = self.get_sh_identity(item, rol)
 
-            eitem_sh.update(self.get_item_sh_fields(identity, created, rol=rol))
+            eitem_sh.update(self.get_item_sh_fields(identity, date_field, rol=rol))
 
             if not eitem_sh[rol + '_org_name']:
                 eitem_sh[rol + '_org_name'] = SH_UNKNOWN_VALUE
