@@ -1,5 +1,14 @@
 # Releases
 
+## grimoire-elk 0.109.7 - (2024-02-08)
+
+**Bug fixes:**
+
+ * Bug on some backends enrichment\
+   Mediawiki, Meetup are Jira were failing to retrieve the enrollment for
+   an identity.
+
+
   ## grimoire-elk 0.109.6 - (2024-02-01)
   
   * Update Poetry's package dependencies
