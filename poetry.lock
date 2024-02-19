@@ -1512,13 +1512,13 @@ docs = ["furo (>=2023.03.27,<2024.0.0)", "myst-parser (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "perceval-mozilla"
-version = "0.4.0rc1"
+version = "0.4.0"
 description = "Bundle of Perceval backends for Mozilla ecosystem."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "perceval_mozilla-0.4.0rc1-py3-none-any.whl", hash = "sha256:8b0eb8defb4fc15e984591ce93ca6a9a175e53bd4a7d04ba1923f0f5c02a5971"},
-    {file = "perceval_mozilla-0.4.0rc1.tar.gz", hash = "sha256:73651fc75796212570a7ad3aa73284ff000c8c37fd45cb799a10cbe56a037812"},
+    {file = "perceval_mozilla-0.4.0-py3-none-any.whl", hash = "sha256:1e1333a46916d3ce5ebeeef864c2d3fd16d874fe3f38c562a273041d463dab03"},
+    {file = "perceval_mozilla-0.4.0.tar.gz", hash = "sha256:8c947b0b55e28b746a49029778fd410d66c9e5eeff8bbd07743e8f860de36c29"},
 ]
 
 [package.dependencies]
@@ -2071,13 +2071,13 @@ files = [
 
 [[package]]
 name = "sortinghat"
-version = "0.20.0rc1"
+version = "0.20.0"
 description = "A tool to manage identities."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "sortinghat-0.20.0rc1-py3-none-any.whl", hash = "sha256:159e8cf7702b4ee75b10626a243196424d42ad6ccf60a5a2487c360b2345caf7"},
-    {file = "sortinghat-0.20.0rc1.tar.gz", hash = "sha256:dca4392433260941d51e117ac6776a1e894fca98290527a112b27a1d401a500d"},
+    {file = "sortinghat-0.20.0-py3-none-any.whl", hash = "sha256:73b0e5f29e0d363f3e5f4d898b5de6f454d56493c8a14d30883725b216fe633f"},
+    {file = "sortinghat-0.20.0.tar.gz", hash = "sha256:144cfc6e11592d51272f2836ddd297287b69c7a4a492ac7f9fc2671336a81a60"},
 ]
 
 [package.dependencies]
