@@ -20,9 +20,44 @@
 #
 
 from .elastic import ElasticOcean
+from grimoire_elk.elastic_mapping import Mapping as BaseMapping
+
+
+class Mapping(BaseMapping):
+
+    @staticmethod
+    def get_elastic_mappings(es_major):
+        """Get Elasticsearch mapping.
+
+        :param es_major: major version of Elasticsearch, as string
+        :returns: dictionary with a key, 'items', with the mapping
+        """
+
+        mapping = '''
+         {
+            "dynamic":true,
+            "properties": {
+                "data": {
+                    "properties": {
+                        "metadata": {
+                            "dynamic":false,
+                            "properties": {
+                                "value": {
+                                    "type": "text",
+                                    "index": true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        '''
+
+        return {"items": mapping}
 
 
 class KitsuneOcean(ElasticOcean):
     """Kitsune Ocean feeder"""
 
-    pass
+    mapping = Mapping
