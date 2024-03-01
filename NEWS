@@ -1,5 +1,15 @@
 # Releases
 
+## grimoire-elk 0.110.0 - (2024-03-01)
+
+**New features:**
+
+ * Kitsune raw mapping updated\
+   Update the mapping for Kitsune backend to fix an error inserting
+   Perceval items in the raw index when the field 'data.metadata.value'
+   is too big.
+
+
   ## grimoire-elk 0.109.8 - (2024-02-19)
   
   * Update Poetry's package dependencies
