@@ -60,7 +60,13 @@ class Mapping(BaseMapping):
 
 class KitsuneEnrich(Enrich):
 
-    mappping = Mapping
+    mapping = Mapping
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.studies = []
+        self.studies.append(self.enrich_demography)
 
     def get_field_author(self):
         return "creator"
