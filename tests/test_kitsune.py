@@ -20,10 +20,13 @@
 #     Valerio Cosentino <valcos@bitergia.com>
 #
 import logging
+import time
 import unittest
 
 from base import TestBaseBackend
 from grimoire_elk.enriched.utils import REPO_LABELS
+from grimoire_elk.enriched.enrich import (logger,
+                                          anonymize_url)
 
 
 class TestKitsune(TestBaseBackend):
@@ -110,6 +113,30 @@ class TestKitsune(TestBaseBackend):
 
         result = self._test_refresh_identities()
         # ... ?
+
+    def test_demography_study(self):
+        """ Test that the demography study works correctly """
+
+        alias = 'demographics'
+        study, ocean_backend, enrich_backend = self._test_study('enrich_demography')
+
+        with self.assertLogs(logger, level='INFO') as cm:
+            if study.__name__ == "enrich_demography":
+                study(ocean_backend, enrich_backend, alias)
+
+            self.assertEqual(cm.output[0], 'INFO:grimoire_elk.enriched.enrich:[kitsune] Demography '
+                                           'starting study %s/test_kitsune_enrich'
+                             % anonymize_url(self.es_con))
+            self.assertEqual(cm.output[-1], 'INFO:grimoire_elk.enriched.enrich:[kitsune] Demography '
+                                            'end %s/test_kitsune_enrich'
+                             % anonymize_url(self.es_con))
+
+        time.sleep(5)  # HACK: Wait until kitsune enrich index has been written
+        items = [item for item in enrich_backend.fetch()]
+        self.assertEqual(len(items), 9)
+        for item in items:
+            self.assertTrue('demography_min_date' in item.keys())
+            self.assertTrue('demography_max_date' in item.keys())
 
 
 if __name__ == "__main__":
