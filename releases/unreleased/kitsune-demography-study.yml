@@ -4,4 +4,7 @@ category: added
 author: Jose Javier Merchante <jjmerchante@bitergia.com>
 issue: null
 notes: >
-  Include demography study in Kitsune (SUMO).
+  Include demography study in Kitsune (SUMO). And update
+  the index to include standard fields such as a unique
+  identifier (`id`) and some missing fields like `origin`
+  or `uuid`.

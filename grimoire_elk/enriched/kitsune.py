@@ -51,6 +51,9 @@ class Mapping(BaseMapping):
                 "tags_analyzed": {
                   "type": "text",
                   "index": true
+                },
+                "id": {
+                  "type": "keyword"
                 }
            }
         } """
@@ -70,6 +73,9 @@ class KitsuneEnrich(Enrich):
 
     def get_field_author(self):
         return "creator"
+
+    def get_field_unique_id(self):
+        return "id"
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {}
@@ -152,6 +158,8 @@ class KitsuneEnrich(Enrich):
             eitem['lifetime_days'] = \
                 get_time_diff_days(question['created'], question['updated'])
 
+            # Add id info to allow to coexistence of items of different types in the same index
+            eitem['id'] = 'question_{}'.format(question['id'])
             eitem.update(self.get_grimoire_fields(question['created'], "question"))
 
             eitem['author'] = question['creator']['username']
@@ -200,6 +208,8 @@ class KitsuneEnrich(Enrich):
             eitem['lifetime_days'] = \
                 get_time_diff_days(answer['created'], answer['updated'])
 
+            # Add id info to allow to coexistence of items of different types in the same index
+            eitem['id'] = 'question_{}_answer_{}'.format(answer['question'], answer['id'])
             eitem.update(self.get_grimoire_fields(answer['created'], "answer"))
 
             eitem['author'] = answer['creator']['username']
@@ -237,7 +247,7 @@ class KitsuneEnrich(Enrich):
             rich_item = self.get_rich_item(item)
             data_json = json.dumps(rich_item)
             bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
-                (item[self.get_field_unique_id()])
+                (rich_item[self.get_field_unique_id()])
             bulk_json += data_json + "\n"  # Bulk document
             current += 1
             # Time to enrich also de answers
@@ -249,10 +259,11 @@ class KitsuneEnrich(Enrich):
                     if answer['id'] == item['data']['solution']:
                         answer['solution'] = 1
                     rich_answer = self.get_rich_item(answer, kind='answer')
+                    self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_answer)
+
                     data_json = json.dumps(rich_answer)
-                    bulk_json += '{"index" : {"_id" : "%s_%i" } }\n' % \
-                        (item[self.get_field_unique_id()],
-                         rich_answer['answer_id'])
+                    bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
+                                 (rich_answer[self.get_field_unique_id()])
                     bulk_json += data_json + "\n"  # Bulk document
                     current += 1
 
