@@ -38,6 +38,7 @@ class Mapping(BaseMapping):
             "dynamic":true,
             "properties": {
                 "data": {
+                    "dynamic":false,
                     "properties": {
                         "metadata": {
                             "dynamic":false,
@@ -47,6 +48,19 @@ class Mapping(BaseMapping):
                                     "index": true
                                 }
                             }
+                        },
+                        "answers_data": {
+                            "dynamic":false,
+                            "properties": {
+                                "content": {
+                                    "type": "text",
+                                    "index": true
+                                }
+                            }
+                        },
+                        "content": {
+                            "type": "text",
+                            "index": true
                         }
                     }
                 }
