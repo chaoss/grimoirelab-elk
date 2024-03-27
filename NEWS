@@ -1,5 +1,14 @@
 # Releases
 
+## grimoire-elk 0.111.1 - (2024-03-27)
+
+**Bug fixes:**
+
+ * Kitsune inmerse terms error\
+   Update raw mapping of Kitsune indexes to handle immense terms found in
+   `data.answers_data.content`, and `data.content`.
+
+
 ## grimoire-elk 0.111.0 - (2024-03-12)
 
 **New features:**

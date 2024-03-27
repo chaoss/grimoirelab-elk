@@ -1,8 +1,0 @@
----
-title: Kitsune inmerse terms error
-category: fixed
-author: Jose Javier Merchante <jjmerchante@bitergia.com>
-issue: null
-notes: >
-  Update raw mapping of Kitsune indexes to handle immense terms
-  found in `data.answers_data.content`, and `data.content`.
