@@ -1,0 +1,7 @@
+---
+title: MBOX origin URL anonymized
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Remove credentials from MBOX origin URL and tag fields.

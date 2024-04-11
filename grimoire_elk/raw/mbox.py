@@ -23,6 +23,7 @@ import logging
 
 from .elastic import ElasticOcean
 from ..elastic_mapping import Mapping as BaseMapping
+from ..enriched.utils import anonymize_url
 
 
 logger = logging.getLogger(__name__)
@@ -79,3 +80,7 @@ class MBoxOcean(ElasticOcean):
         for field in fields:
             if field.lower().startswith("x-"):
                 item["data"].pop(field)
+
+        # Remove credentials from URL
+        item['origin'] = anonymize_url(item['origin'])
+        item['tag'] = anonymize_url(item['tag'])
