@@ -111,7 +111,7 @@ class KitsuneEnrich(Enrich):
                     yield user
 
     @metadata
-    def get_rich_item(self, item, kind='question'):
+    def get_rich_item(self, item, kind='question', equestion=None):
         eitem = {}
 
         # Fields common in questions and answers
@@ -137,6 +137,11 @@ class KitsuneEnrich(Enrich):
                     eitem[f] = None
             eitem["content_analyzed"] = question['content']
 
+            if question['solution']:
+                eitem['is_kitsune_question_solved'] = 1
+            else:
+                eitem['is_kitsune_question_solved'] = 0
+
             # Fields which names are translated
             map_fields = {"id": "question_id",
                           "num_votes": "score"
@@ -158,9 +163,25 @@ class KitsuneEnrich(Enrich):
             eitem['lifetime_days'] = \
                 get_time_diff_days(question['created'], question['updated'])
 
+            # Time to first response
+            if 'answers_data' in question:
+                first_response = None
+                for answer in question['answers_data']:
+                    answer_date = str_to_datetime(answer['created'])
+                    if not first_response or answer_date < first_response:
+                        first_response = answer_date
+                if first_response:
+                    ttr = (first_response - str_to_datetime(question["created"]))
+                    hours = ttr.days * 24 + ttr.seconds / 3600.0
+                    eitem['time_to_first_reply_hours'] = hours
+
             # Add id info to allow to coexistence of items of different types in the same index
             eitem['id'] = 'question_{}'.format(question['id'])
             eitem.update(self.get_grimoire_fields(question['created'], "question"))
+
+            # Add URL info
+            origin = item['origin'].rstrip('/')
+            eitem['url'] = f"{origin}/{question['locale']}/questions/{question['id']}"
 
             eitem['author'] = question['creator']['username']
             if question['creator']['display_name']:
@@ -180,8 +201,12 @@ class KitsuneEnrich(Enrich):
             eitem['type'] = kind
 
             # data fields to copy
+            for f in common_fields:
+                if f in equestion:
+                    eitem[f] = equestion[f]
+                else:
+                    eitem[f] = None
             copy_fields = ["content", "solution"]
-            copy_fields += common_fields
             for f in copy_fields:
                 if f in answer:
                     eitem[f] = answer[f]
@@ -215,6 +240,10 @@ class KitsuneEnrich(Enrich):
             eitem['author'] = answer['creator']['username']
             if answer['creator']['display_name']:
                 eitem['author'] = answer['creator']['display_name']
+
+            origin = equestion['origin'].rstrip('/')
+            eitem['url'] = (f"{origin}/{equestion['locale']}/questions/"
+                            f"{equestion['question_id']}#answer-{answer['id']}")
 
             if self.sortinghat:
                 # date field must be the same than in question to share code
@@ -250,7 +279,7 @@ class KitsuneEnrich(Enrich):
                 (rich_item[self.get_field_unique_id()])
             bulk_json += data_json + "\n"  # Bulk document
             current += 1
-            # Time to enrich also de answers
+            # Time to enrich also the answers
             if 'answers_data' in item['data']:
                 for answer in item['data']['answers_data']:
                     # Add question title in answers
@@ -258,7 +287,7 @@ class KitsuneEnrich(Enrich):
                     answer['solution'] = 0
                     if answer['id'] == item['data']['solution']:
                         answer['solution'] = 1
-                    rich_answer = self.get_rich_item(answer, kind='answer')
+                    rich_answer = self.get_rich_item(answer, kind='answer', equestion=rich_item)
                     self.copy_raw_fields(self.RAW_FIELDS_COPY, item, rich_answer)
 
                     data_json = json.dumps(rich_answer)
