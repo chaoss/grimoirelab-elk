@@ -767,6 +767,8 @@ class GitHubEnrich(Enrich):
         rich_repo['releases'] = rich_releases
         rich_repo['releases_count'] = len(rich_releases)
 
+        rich_repo['topics'] = repo.get("topics", [])
+
         if self.prjs_map:
             rich_repo.update(self.get_item_project(rich_repo))
 
