@@ -38,7 +38,6 @@ class Mapping(BaseMapping):
             "dynamic":true,
             "properties": {
                 "data": {
-                    "dynamic":false,
                     "properties": {
                         "metadata": {
                             "dynamic":false,
