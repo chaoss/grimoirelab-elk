@@ -1,5 +1,14 @@
 # Releases
 
+## grimoire-elk 1.1.1 - (2024-06-21)
+
+**Bug fixes:**
+
+ * Kitsune mapping updated\
+   Kitsune raw mapping was incorrectly defined with `dynamic: false` in
+   the data attribute.
+
+
 ## grimoire-elk 1.1.0 - (2024-05-09)
 
 **New features:**
