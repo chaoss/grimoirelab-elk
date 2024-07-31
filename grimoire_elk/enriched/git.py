@@ -1027,12 +1027,13 @@ class GitEnrich(Enrich):
         :param git_repo: GitRepository object
         :param enrich_backend: the enrich backend
         """
-        to_process = []
         for hash, refname in git_repo._discover_refs(remote=True):
 
             if not refname.startswith('refs/heads/'):
                 continue
 
+            # reset the counter
+            to_process = []
             commit_count = 0
             branch_name = refname.replace('refs/heads/', '')
 

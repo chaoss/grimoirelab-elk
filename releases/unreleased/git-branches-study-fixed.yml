@@ -1,0 +1,8 @@
+---
+title: Git branches study fixed
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Git branches study was assigning branches to wrong
+  commits.
