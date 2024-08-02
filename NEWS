@@ -1,5 +1,13 @@
 # Releases
 
+## grimoire-elk 1.1.2 - (2024-08-02)
+
+**Bug fixes:**
+
+ * Git branches study fixed\
+   Git branches study was assigning branches to wrong commits.
+
+
 ## grimoire-elk 1.1.1 - (2024-06-21)
 
 **Bug fixes:**
