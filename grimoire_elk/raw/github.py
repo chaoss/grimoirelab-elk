@@ -95,6 +95,7 @@ class GitHubOcean(ElasticOcean):
         """ Get the perceval params given a URL for the data source """
         params = []
 
+        url = url.rstrip('/')
         owner = url.split('/')[-2]
         repository = url.split('/')[-1]
         params.append(owner)
