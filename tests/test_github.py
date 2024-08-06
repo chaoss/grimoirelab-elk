@@ -218,6 +218,12 @@ class TestGitHub(TestBaseBackend):
         ]
         self.assertListEqual(GitHubOcean.get_perceval_params_from_url(url), expected_params)
 
+        url = "https://github.com/chaoss/grimoirelab-perceval/"
+        expected_params = [
+            'chaoss', 'grimoirelab-perceval'
+        ]
+        self.assertListEqual(GitHubOcean.get_perceval_params_from_url(url), expected_params)
+
     def test_demography_study(self):
         """ Test that the demography study works correctly """
 
