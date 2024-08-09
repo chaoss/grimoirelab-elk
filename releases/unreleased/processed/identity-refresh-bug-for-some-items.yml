@@ -1,9 +1,0 @@
----
-title: Identity refresh bug for some items
-category: fixed
-author: Jose Javier Merchante <jjmerchante@bitergia.com>
-issue: 1161
-notes: >
-  Update the filter construction to correctly match UUIDs in
-  OpenSearch, addressing a bug in Mordred that prevented role
-  identities from being refreshed.

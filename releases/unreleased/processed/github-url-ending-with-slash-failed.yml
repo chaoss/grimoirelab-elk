@@ -1,7 +1,0 @@
----
-title: GitHub URL ending with slash failed
-category: fixed
-author: Jose Javier Merchante <jjmerchante@bitergia.com>
-issue: 1159
-notes: >
-  GrimoireLab failed to run with GitHub URLs ending in a slash
