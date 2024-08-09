@@ -262,7 +262,7 @@ def refresh_identities(enrich_backend, author_fields=None, individuals=None):
     def create_filter_authors(authors, to_refresh):
         filter_authors = []
         for author in authors:
-            author_name = author if author == 'author_uuid' else author + '_uuids'
+            author_name = author if author.endswith('_uuid') else author + '_uuids'
             field_author = {
                 "name": author_name,
                 "value": to_refresh
