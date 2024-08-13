@@ -101,6 +101,7 @@ class Enrich(ElasticItems):
     analyzer = Analyzer
     sh_db = None
     kibiter_version = None
+    roles = []
     RAW_FIELDS_COPY = ["metadata__updated_on", "metadata__timestamp",
                        "offset", "origin", "tag", "uuid"]
     KEYWORD_MAX_LENGTH = 1000  # this control allows to avoid max_bytes_length_exceeded_exception
