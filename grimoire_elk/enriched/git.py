@@ -970,8 +970,14 @@ class GitEnrich(Enrich):
                     logger.error("[git] study git-branches failed on repo {}, due to {}".format(git_repo.uri, e))
                     continue
 
-                logger.debug("[git] study git-branches repo {} in index {} processed".format(
-                             git_repo.uri, anonymize_url(enrich_backend.elastic.index_url)))
+                try:
+                    self.update_branches_field(git_repo, enrich_backend)
+                except Exception as e:
+                    logger.error("[git] study git-branches failed on repo {}, due to {}".format(git_repo.uri, e))
+                    continue
+
+                logger.info("[git] study git-branches repo {} in index {} processed".format(
+                    git_repo.uri, anonymize_url(enrich_backend.elastic.index_url)))
 
         logger.info("[git] study git-branches end")
 
@@ -996,7 +1002,7 @@ class GitEnrich(Enrich):
         es_query = """
             {
               "script": {
-                "source": "ctx._source.branches = new HashSet();",
+                "source": "ctx._source.branches_aux = new HashSet();",
                 "lang": "painless"
               },
               "query": {
@@ -1058,6 +1064,48 @@ class GitEnrich(Enrich):
                 logger.error("[git] Skip adding branch info for repo {} due to {}".format(git_repo.uri, e))
                 return
 
+    def update_branches_field(self, git_repo, enrich_backend):
+        """Replace the branches field with the contents of branches_aux with
+        the processed branches in the enriched index.
+
+        :param git_repo: GitRepository object
+        :param enrich_backend: the enrich backend
+        """
+        fltr = """
+            "filter": [
+                {
+                    "term": {
+                        "origin": "%s"
+                    }
+                }
+            ]
+        """ % anonymize_url(git_repo.uri)
+
+        es_query = """
+            {
+              "script": {
+                "source": "ctx._source.branches = ctx._source.branches_aux; ctx._source.remove('branches_aux');",
+                "lang": "painless"
+              },
+              "query": {
+                "bool": {
+                    %s
+                }
+              }
+            }
+            """ % fltr
+
+        index = enrich_backend.elastic.index_url
+        r = self.requests.post(index + "/_update_by_query?refresh", data=es_query, headers=HEADER_JSON, verify=False)
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logger.error("[git] Error updating branches field for {}".format(anonymize_url(index)))
+            logger.error(r.text)
+            return
+
+        logger.debug("[git] Update branches field {}, index {}".format(r.text, anonymize_url(index)))
+
     def __process_commits_in_branch(self, enrich_backend, repo_origin, branch_name, commits):
         commits_str = ",".join(['"%s"' % c for c in commits])
 
@@ -1076,7 +1124,7 @@ class GitEnrich(Enrich):
         es_query = """
             {
               "script": {
-                "source": "if(!ctx._source.branches.contains(params.branch)){ctx._source.branches.add(params.branch);}",
+                "source": "if(!ctx._source.branches_aux.contains(params.branch)){ctx._source.branches_aux.add(params.branch);}",
                 "lang": "painless",
                 "params": {
                     "branch": "'%s'"
