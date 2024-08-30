@@ -1,5 +1,17 @@
 # Releases
 
+## grimoire-elk 1.1.5 - (2024-08-30)
+
+**Bug fixes:**
+
+ * Git branches study improved\
+   Previously, while the branches study was running, the `branches` field
+   remained empty or partially filled until the study was completed,
+   leading to incorrect data being displayed on the dashboard. With this
+   change, the branches field is updated only after the study has
+   finished.
+
+
 ## grimoire-elk 1.1.4 - (2024-08-13)
 
 **Bug fixes:**
