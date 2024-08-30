@@ -683,7 +683,9 @@ def delete_orphan_unique_identities(es, sortinghat_db, current_data_source, acti
         )
 
         hits = []
-        if page['hits']['total'] != 0:
+        total = page['hits']['total']
+        total_value = total['value'] if isinstance(total, dict) else total
+        if total_value != 0:
             hits = page['hits']['hits']
 
         return hits
@@ -810,7 +812,8 @@ def delete_inactive_unique_identities(es, sortinghat_db, before_date):
     )
 
     sid = page['_scroll_id']
-    scroll_size = page['hits']['total']
+    total = page['hits']['total']
+    scroll_size = total['value'] if isinstance(total, dict) else total
 
     if scroll_size == 0:
         logging.warning("[identities retention] No inactive identities found in {} after {}!".format(

@@ -1,0 +1,8 @@
+---
+title: Handle OpenSearch page info on pagination
+category: fixed
+author: Quan Zhou <quan@bitergia.com>
+issue: null
+notes: >
+    In OpenSearch and ElasticSearch < 7.x the page info on
+    pagination is different. This will handle both of them.
