@@ -183,6 +183,16 @@ class KitsuneEnrich(Enrich):
             origin = item['origin'].rstrip('/')
             eitem['url'] = f"{origin}/{question['locale']}/questions/{question['id']}"
 
+            # Add status
+            if question['is_solved']:
+                eitem['status'] = 'solved'
+            elif question['is_archived']:
+                eitem['status'] = 'archived'
+            elif question['is_locked']:
+                eitem['status'] = 'locked'
+            else:
+                eitem['status'] = 'open'
+
             eitem['author'] = question['creator']['username']
             if question['creator']['display_name']:
                 eitem['author'] = question['creator']['display_name']
