@@ -826,13 +826,16 @@ class Enrich(ElasticItems):
                                          email=iden['email'],
                                          name=iden['name'],
                                          username=iden['username'])
+        iden['uuid'] = identity_id
+        iden['id'] = identity_id
+        iden['enrollments'] = []
 
         try:
             individual = self.get_entity(identity_id)
             if not individual:
                 msg = "Individual not found given the following identity: {}".format(identity_id)
                 logger.debug(msg)
-                return sh_item
+                return iden
 
             for indv_identity in individual['identities']:
                 if indv_identity['uuid'] == identity_id:
@@ -842,10 +845,10 @@ class Enrich(ElasticItems):
                 msg = "Identity {} not found in individual returned by SortingHat.".format(identity)
                 logger.error(msg)
                 return sh_item
-        except SortingHatClientError:
+        except SortingHatClientError as e:
             msg = "None Identity found {}, identity: {}".format(backend_name, identity)
-            logger.debug(msg)
-            return sh_item
+            logger.error(msg)
+            raise SortingHatClientError(e)
         except UnicodeEncodeError:
             msg = "UnicodeEncodeError {}, identity: {}".format(backend_name, identity)
             logger.error(msg)
@@ -1054,7 +1057,6 @@ class Enrich(ElasticItems):
                     sh_fields = self.get_item_sh_fields(identity, item_date, rol=rol)
                 else:
                     sh_fields = self.get_item_no_sh_fields(identity, rol)
-
                 eitem_sh.update(sh_fields)
 
                 if not eitem_sh[rol + '_org_name']:

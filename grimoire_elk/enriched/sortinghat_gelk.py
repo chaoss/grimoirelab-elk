@@ -143,8 +143,11 @@ class SortingHat(object):
         except SortingHatClientError as ex:
             for error in ex.errors:
                 msg = error['message']
+                status = error.get('status', None)
                 if 'already exists' in msg:
                     logger.debug("[sortinghat] {}".format(msg))
+                elif status and status == 502:
+                    raise SortingHatClientError(ex)
                 else:
                     logger.warning("[sortinghat] {}".format(msg))
 
@@ -361,6 +364,7 @@ class SortingHat(object):
                 entity = result['data']['individuals']['entities'][0]
         except SortingHatClientError as e:
             logger.error("[sortinghat] Error get entities {}: {}".format(id, e.errors[0]['message']))
+            raise SortingHatClientError(e)
         return entity
 
     @classmethod

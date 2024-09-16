@@ -405,7 +405,7 @@ class TestGitHub(TestBaseBackend):
         url = self.es_con + "/test_github_issues_onion/_search?size=20"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
-        self.assertEqual(len(hits), 10)
+        self.assertEqual(len(hits), 12)
         for hit in hits:
             source = hit['_source']
             self.assertIn('timeframe', source)
@@ -426,7 +426,7 @@ class TestGitHub(TestBaseBackend):
         url = self.es_con + "/test_github_prs_onion/_search?size=20"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
-        self.assertEqual(len(hits), 10)
+        self.assertEqual(len(hits), 12)
         for hit in hits:
             source = hit['_source']
             self.assertIn('timeframe', source)
