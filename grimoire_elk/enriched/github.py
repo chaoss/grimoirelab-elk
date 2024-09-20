@@ -685,7 +685,7 @@ class GitHubEnrich(Enrich):
         next_date = (str_to_datetime(date).replace(tzinfo=None)
                      + relativedelta(days=interval)
                      ).strftime('%Y-%m-%dT%H:%M:%S.000Z')
-        if(other):
+        if other:
             issues = es_in.search(
                 index=in_index,
                 body=get_issues_not_closed_other_label(repository_url, next_date, reduced_labels)

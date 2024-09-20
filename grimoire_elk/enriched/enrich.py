@@ -1005,7 +1005,7 @@ class Enrich(ElasticItems):
                 field = rol + "_multi" + suffix
 
             new_list = sh_fields[field]
-            if type(new_list) != list:
+            if not isinstance(new_list, list):
                 new_list = [new_list]
 
             try:

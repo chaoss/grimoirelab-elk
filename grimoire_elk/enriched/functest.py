@@ -115,7 +115,7 @@ class FunctestEnrich(Enrich):
                     eitem['tests'] = func_test['details']['tests']
             if 'failures' in func_test['details']:
 
-                if type(func_test['details']['failures']) == list:
+                if isinstance(func_test['details']['failures'], list):
                     eitem['failures'] = len(func_test['details']['failures'])
                 else:
                     eitem['failures'] = func_test['details']['failures']
