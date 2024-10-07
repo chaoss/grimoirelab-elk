@@ -75,6 +75,24 @@ class TestBugzilla(TestBaseBackend):
             eitem = enrich_backend.get_rich_item(item)
             self.assertIn(REPO_LABELS, eitem)
 
+    def test_enrich_keywords(self):
+        """Test whether keywords are included on the enriched items"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item = self.items[0]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['keywords'], ['robotics'])
+
+        item = self.items[1]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(eitem['keywords'], ['robotics', 'kernel', 'analytics'])
+
+        for item in self.items[2:]:
+            eitem = enrich_backend.get_rich_item(item)
+            self.assertEqual(eitem['keywords'], [])
+
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
