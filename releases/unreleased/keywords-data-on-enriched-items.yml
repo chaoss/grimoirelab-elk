@@ -1,0 +1,8 @@
+---
+title: Keywords data on enriched items
+category: added
+author: Santiago Dueñas <sduenas@bitergia.com>
+issue: null
+notes: >
+  Keywords field is included now on the enriched
+  items of bugzilla and bugzillarest indices.
