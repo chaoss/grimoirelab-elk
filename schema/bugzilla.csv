@@ -110,6 +110,7 @@ severity,keyword
 status,keyword
 tag,keyword
 timeopen_days,float
+time_to_first_attention,float
 url,keyword
 uuid,keyword
 whiteboard,keyword

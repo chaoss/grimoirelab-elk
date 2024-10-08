@@ -93,6 +93,18 @@ class TestBugzilla(TestBaseBackend):
             eitem = enrich_backend.get_rich_item(item)
             self.assertEqual(eitem['keywords'], [])
 
+    def test_time_to_first_attention(self):
+        """Test whether time_to_first_attention is calculated"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        expected = [None, None, None, None, None, None, 365]
+
+        for index in range(0, len(self.items)):
+            eitem = enrich_backend.get_rich_item(self.items[index])
+            self.assertEqual(eitem['time_to_first_attention'], expected[index])
+
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
 
