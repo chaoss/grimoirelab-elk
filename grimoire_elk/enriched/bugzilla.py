@@ -153,6 +153,12 @@ class BugzillaEnrich(Enrich):
         if 'votes' in item['data']:
             eitem['votes'] = item['data']['votes'][0]['__text__']
 
+        # Add keywords
+        if 'keywords' in item['data'] and '__text__' in item['data']['keywords'][0]:
+            eitem['keywords'] = item['data']['keywords'][0]['__text__'].split(', ')
+        else:
+            eitem['keywords'] = []
+
         if "assigned_to" in issue:
             if "name" in issue["assigned_to"][0]:
                 eitem["assigned"] = issue["assigned_to"][0]["name"]

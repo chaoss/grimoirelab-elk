@@ -124,6 +124,9 @@ class BugzillaRESTEnrich(Enrich):
         eitem["component"] = issue['component']
         eitem["product"] = issue['product']
 
+        # Keywords
+        eitem["keywords"] = issue['keywords']
+
         # Fix dates
         date_ts = str_to_datetime(issue['creation_time'])
         eitem['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')

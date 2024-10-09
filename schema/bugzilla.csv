@@ -56,6 +56,7 @@ id,long
 is_bugzilla_bug,long
 is_bugzillarest_bugrest,long
 is_open,boolean
+keywords,keyword
 labels,list
 main_description,keyword
 main_description_analyzed,string,false
