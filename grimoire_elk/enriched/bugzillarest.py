@@ -138,6 +138,7 @@ class BugzillaRESTEnrich(Enrich):
         eitem['comments'] = 0
         eitem['number_of_comments'] = 0
         eitem['time_to_last_update_days'] = None
+        eitem['time_to_first_attention'] = None
         eitem['url'] = None
 
         # Add the field to know if the ticket is open
@@ -154,6 +155,9 @@ class BugzillaRESTEnrich(Enrich):
         eitem['timeopen_days'] = get_time_diff_days(eitem['creation_ts'], datetime_utcnow().replace(tzinfo=None))
         if 'is_open' in issue and not issue['is_open']:
             eitem['timeopen_days'] = eitem['time_to_last_update_days']
+
+        eitem['time_to_first_attention'] = \
+            get_time_diff_days(eitem['creation_ts'], self.get_time_to_first_attention(issue))
 
         eitem['changes'] = 0
         for history in issue['history']:
@@ -177,3 +181,28 @@ class BugzillaRESTEnrich(Enrich):
         self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem
+
+    def get_time_to_first_attention(self, item):
+        """Set the time to first attention.
+
+        This date is defined as the first date at which a comment by someone
+        other than the user who created the issue.
+        """
+        if 'comments' not in item:
+            return None
+
+        comment_dates = []
+        creator = item['creator']
+
+        # First comment is the description of the issue
+        # Real comments start at the second position (index 1)
+        for comment in item['comments'][1:]:
+            user = comment['creator']
+            if user == creator:
+                continue
+            comment_dates.append(str_to_datetime(comment['time']).replace(tzinfo=None))
+
+        if comment_dates:
+            return min(comment_dates)
+        else:
+            return None
