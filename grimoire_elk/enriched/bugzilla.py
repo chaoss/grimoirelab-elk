@@ -195,10 +195,21 @@ class BugzillaEnrich(Enrich):
 
         # Add extra JSON fields used in Kibana (enriched fields)
         eitem['comments'] = 0
+        eitem['last_comment_date'] = None
         eitem['url'] = None
 
         if 'long_desc' in issue:
             eitem['comments'] = len(issue['long_desc'])
+
+            last_comment_date = None
+
+            if eitem['comments'] > 1:
+                last_comment = issue['long_desc'][-1]
+                last_comment_date = str_to_datetime(last_comment['bug_when'][0]['__text__'])
+                last_comment_date = last_comment_date.isoformat()
+
+            eitem['last_comment_date'] = last_comment_date
+
         eitem['url'] = item['origin'] + "/show_bug.cgi?id=" + issue['bug_id'][0]['__text__']
         eitem['resolution_days'] = \
             get_time_diff_days(eitem['creation_date'], eitem['delta_ts'])
