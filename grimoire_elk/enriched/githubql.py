@@ -593,6 +593,84 @@ class GitHubQLEnrich(Enrich):
 
             return merged_prs_list
 
+        def _get_cross_references(es_input, index):
+            # Get all CrossReferencedEvent items and their referenced issues and pull requests
+            es_query = {
+                "size": 0,
+                "track_total_hits": True,
+                "query": {
+                    "bool": {
+                        "must": {
+                            "term": {
+                                "event_type": "CrossReferencedEvent"
+                            }
+                        }
+                    }
+                },
+                "aggs": {
+                    "composite_issue_url": {
+                        "composite": {
+                            "sources": [{
+                                "issue_url": {
+                                    "terms": {
+                                        "field": "issue_url"
+                                    }
+                                }
+                            }],
+                            "size": 1000
+                        },
+                        "aggs": {
+                            "references_urls": {
+                                "terms": {
+                                    "field": "reference_source_url",
+                                    "size": 10000
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            buckets = []
+            while True:
+                cross_references = es_input.search(index=index, body=es_query)
+                buckets += cross_references['aggregations']['composite_issue_url']['buckets']
+                after_key = cross_references['aggregations']['composite_issue_url'].get('after_key', None)
+                if not after_key:
+                    break
+                es_query['aggs']['composite_issue_url']['composite']['after'] = after_key
+
+            reference_dict = {}
+            for item in buckets:
+                issue_url = item['key']['issue_url']
+                references = [ref['key'] for ref in item['references_urls']['buckets']]
+
+                # Update reference dictionary
+                if issue_url not in reference_dict.keys():
+                    reference_dict[issue_url] = references
+                else:
+                    prev_references = reference_dict[issue_url]
+                    prev_references.append(references)
+                    reference_dict[issue_url] = list(set(prev_references))
+
+            # Adding list entries from reversed references
+            for issue_url in reference_dict.keys():
+                reference_list = reference_dict[issue_url]
+                if not reference_list:
+                    continue
+                for ref in reference_list:
+                    try:
+                        ref_entry_list = reference_dict[ref]
+                    except KeyError:
+                        continue
+                    if ref_entry_list:
+                        ref_entry_list.append(issue_url)
+                    else:
+                        ref_entry_list = [issue_url]
+                    reference_dict[ref] = list(set(ref_entry_list))
+
+            return reference_dict
+
         data_source = enrich_backend.__class__.__name__.split("Enrich")[0].lower()
         log_prefix = "[{}] Cross reference analysis".format(data_source)
         logger.info("{} starting study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
@@ -605,64 +683,7 @@ class GitHubQLEnrich(Enrich):
         logger.info("{} Retrieving the merged PRs from MergeEvents".format(log_prefix))
         merged_prs = _get_merged_prs(es_in)
 
-        # Get all CrossReferencedEvent items and their referenced issues and pull requests
-        es_query = {
-            "size": 0,
-            "query": {
-                "bool": {
-                    "must": {
-                        "term": {
-                            "event_type": "CrossReferencedEvent"
-                        }
-                    }
-                }
-            },
-            "aggs": {
-                "issue_url": {
-                    "terms": {
-                        "field": "issue_url",
-                        "size": 30000
-                    },
-                    "aggs": {
-                        "uniq_gender": {
-                            "terms": {"field": "reference_source_url"}
-                        }
-                    }
-                }
-            }
-        }
-
-        cross_references = es_in.search(index=in_index, body=es_query)
-        buckets = cross_references['aggregations']['issue_url']['buckets']
-
-        reference_dict = {}
-        for item in buckets:
-            issue_url = item['key']
-            references = [ref['key'] for ref in item['uniq_gender']['buckets']]
-
-            # Update reference dictionary
-            if issue_url not in reference_dict.keys():
-                reference_dict[issue_url] = references
-            else:
-                prev_references = reference_dict[issue_url]
-                prev_references.append(references)
-                reference_dict[issue_url] = list(set(prev_references))
-
-        # Adding list entries from reversed references
-        for issue_url in reference_dict.keys():
-            reference_list = reference_dict[issue_url]
-            if not reference_list:
-                continue
-            for ref in reference_list:
-                try:
-                    ref_entry_list = reference_dict[ref]
-                except KeyError:
-                    continue
-                if ref_entry_list:
-                    ref_entry_list.append(issue_url)
-                else:
-                    ref_entry_list = [issue_url]
-                reference_dict[ref] = list(set(ref_entry_list))
+        reference_dict = _get_cross_references(es_in, in_index)
 
         # Updated affected issues and pull requests
         painless_code = """
