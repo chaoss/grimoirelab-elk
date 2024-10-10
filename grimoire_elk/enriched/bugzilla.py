@@ -195,15 +195,29 @@ class BugzillaEnrich(Enrich):
 
         # Add extra JSON fields used in Kibana (enriched fields)
         eitem['comments'] = 0
+        eitem['last_comment_date'] = None
         eitem['url'] = None
 
         if 'long_desc' in issue:
             eitem['comments'] = len(issue['long_desc'])
+
+            last_comment_date = None
+
+            if eitem['comments'] > 1:
+                last_comment = issue['long_desc'][-1]
+                last_comment_date = str_to_datetime(last_comment['bug_when'][0]['__text__'])
+                last_comment_date = last_comment_date.isoformat()
+
+            eitem['last_comment_date'] = last_comment_date
+
         eitem['url'] = item['origin'] + "/show_bug.cgi?id=" + issue['bug_id'][0]['__text__']
         eitem['resolution_days'] = \
             get_time_diff_days(eitem['creation_date'], eitem['delta_ts'])
         eitem['timeopen_days'] = \
             get_time_diff_days(eitem['creation_date'], datetime_utcnow().replace(tzinfo=None))
+        eitem['time_to_first_attention'] = \
+            get_time_diff_days(eitem['creation_date'],
+                               self.get_time_to_first_attention(issue))
 
         if self.sortinghat:
             eitem.update(self.get_item_sh(item, self.roles))
@@ -216,3 +230,29 @@ class BugzillaEnrich(Enrich):
         self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem
+
+    def get_time_to_first_attention(self, item):
+        """Set the time to first attention.
+
+        This date is defined as the first date at which a comment by someone
+        other than the user who created the issue.
+        """
+        if 'long_desc' not in item:
+            return None
+
+        comment_dates = []
+        reporter = item['reporter'][0]['__text__']
+
+        # First comment is the description of the issue
+        # Real comments start at the second position (index 1)
+        for comment in item['long_desc'][1:]:
+            user = comment['who'][0]['__text__']
+            if user == reporter:
+                continue
+            dt = str_to_datetime(comment['bug_when'][0]['__text__']).replace(tzinfo=None)
+            comment_dates.append(dt)
+
+        if comment_dates:
+            return min(comment_dates)
+        else:
+            return None

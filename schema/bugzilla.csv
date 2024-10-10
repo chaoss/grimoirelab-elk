@@ -58,6 +58,7 @@ is_bugzillarest_bugrest,long
 is_open,boolean
 keywords,keyword
 labels,list
+last_comment_date,date
 main_description,keyword
 main_description_analyzed,string,false
 metadata__enriched_on,date
@@ -110,6 +111,7 @@ severity,keyword
 status,keyword
 tag,keyword
 timeopen_days,float
+time_to_first_attention,float
 url,keyword
 uuid,keyword
 whiteboard,keyword

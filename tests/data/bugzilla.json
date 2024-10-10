@@ -181,8 +181,8 @@
         ],
         "reporter": [
             {
-                "__text__": "rocapal@example.org",
-                "name": "Roberto Calvo"
+                "__text__": "sduenas@example.org",
+                "name": "Santiago Due\u00f1as"
             }
         ],
         "reporter_accessible": [
@@ -507,8 +507,8 @@
         ],
         "reporter": [
             {
-                "__text__": "rocapal@example.org",
-                "name": "Roberto Calvo"
+                "__text__": "sduenas@example.org",
+                "name": "Santiago Due\u00f1as"
             }
         ],
         "reporter_accessible": [
@@ -668,8 +668,8 @@
                 ],
                 "who": [
                     {
-                        "__text__": "sduenas@example.org",
-                        "name": "Santiago Due\u00f1as"
+                        "__text__": "dizquierdo@example.org",
+                        "name": "Daniel Izquierdo Cortazar"
                     }
                 ]
             }
@@ -1026,8 +1026,8 @@
         ],
         "reporter": [
             {
-                "__text__": "rocapal@example.com",
-                "name": "Roberto Calvo"
+                "__text__": "sduenas@example.org",
+                "name": "Santiago Due\u00f1as"
             }
         ],
         "reporter_accessible": [
@@ -1251,8 +1251,8 @@
         ],
         "reporter": [
             {
-                "__text__": "rocapal@example.org",
-                "name": "Roberto Calvo"
+                "__text__": "sduenas@example.org",
+                "name": "Santiago Due\u00f1as"
             }
         ],
         "reporter_accessible": [
@@ -1446,8 +1446,8 @@
         ],
         "reporter": [
             {
-                "__text__": "dizquierdo@example.org",
-                "name": "Daniel Izquierdo Cortazar"
+                "__text__": "sduenas@example.org",
+                "name": "Santiago Due\u00f1as"
             }
         ],
         "reporter_accessible": [
@@ -1661,7 +1661,7 @@
         ],
         "creation_ts": [
             {
-                "__text__": "2015-05-23 06:06:06 +0200"
+                "__text__": "2013-06-25 11:49:36 +0200"
             }
         ],
         "delta_ts": [
@@ -1720,7 +1720,7 @@
                 ],
                 "bug_when": [
                     {
-                        "__text__": "2013-06-25 11:55:46 +0200"
+                        "__text__": "2013-07-01 12:00:00 +0200"
                     }
                 ],
                 "commentid": [
@@ -1732,6 +1732,96 @@
                 "thetext": [
                     {
                         "__text__": "A mock patch for this bug"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "sduenas@example.org",
+                        "name": "Santiago Due\u00f1as"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attachid": [
+                    {
+                        "__text__": "172"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2014-06-25 11:55:46 +0200"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "1086"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "This patch is great"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "lcanas@example.org",
+                        "name": "Luis Ca\u00f1as"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attachid": [
+                    {
+                        "__text__": "172"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2014-06-25 11:55:46 +0200"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "1086"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Thanks!"
+                    }
+                ],
+                "who": [
+                    {
+                        "__text__": "sduenas@example.org",
+                        "name": "Santiago Due\u00f1as"
+                    }
+                ]
+            },
+            {
+                "__text__": "\n            ",
+                "attachid": [
+                    {
+                        "__text__": "172"
+                    }
+                ],
+                "bug_when": [
+                    {
+                        "__text__": "2014-08-01 11:55:46 +0200"
+                    }
+                ],
+                "commentid": [
+                    {
+                        "__text__": "1086"
+                    }
+                ],
+                "isprivate": "0",
+                "thetext": [
+                    {
+                        "__text__": "Applied"
                     }
                 ],
                 "who": [
@@ -1770,8 +1860,8 @@
         ],
         "reporter": [
             {
-                "__text__": "carlosgc@example.com",
-                "name": "Carlos Garcia Campos"
+                "__text__": "sduenas@example.org",
+                "name": "Santiago Due\u00f1as"
             }
         ],
         "reporter_accessible": [

@@ -19,6 +19,7 @@
 #     Alvaro del Castillo <acs@bitergia.com>
 #     Valerio Cosentino <valcos@bitergia.com>
 #
+
 import logging
 import unittest
 
@@ -92,6 +93,38 @@ class TestBugzilla(TestBaseBackend):
         for item in self.items[2:]:
             eitem = enrich_backend.get_rich_item(item)
             self.assertEqual(eitem['keywords'], [])
+
+    def test_time_to_first_attention(self):
+        """Test whether time_to_first_attention is calculated"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        expected = [None, None, None, None, None, None, 365]
+
+        for index in range(0, len(self.items)):
+            eitem = enrich_backend.get_rich_item(self.items[index])
+            self.assertEqual(eitem['time_to_first_attention'], expected[index])
+
+    def test_last_comment_date(self):
+        """Test whether last_comment_date is added to the enriched item"""
+
+        self._test_raw_to_enrich()
+        enrich_backend = self.connectors[self.connector][2]()
+
+        expected = [
+            "2013-06-25T11:55:46+02:00",
+            "2013-06-25T11:55:46+02:00",
+            None,
+            "2013-06-25T11:55:46+02:00",
+            "2013-06-25T11:55:46+02:00",
+            None,
+            "2014-08-01T11:55:46+02:00"
+        ]
+
+        for index in range(0, len(self.items)):
+            eitem = enrich_backend.get_rich_item(self.items[index])
+            self.assertEqual(eitem['last_comment_date'], expected[index])
 
     def test_raw_to_enrich_sorting_hat(self):
         """Test enrich with SortingHat"""
