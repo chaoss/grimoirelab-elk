@@ -1,0 +1,11 @@
+---
+title: All references processed for the reference analysis study
+category: fixed
+author: Quan Zhou <quan@bitergia.com>
+issue: null
+notes: >
+    The `enrich_reference_analysis` study analyzes the cross-references
+    between "issues" and "pull request". When we use an aggregations query,
+    it returns only the first 10 items (ElasticSearch/OpenSearch by default).
+    By using 'composite aggregations', we can paginate the result and thus,
+    obtain all the references.
