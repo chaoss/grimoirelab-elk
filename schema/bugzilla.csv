@@ -1,117 +1,118 @@
-name,type
-assigned,keyword
-assigned_to_bot,boolean
-assigned_to_detail_bot,boolean
-assigned_to_detail_domain,keyword
-assigned_to_detail_gender,keyword
-assigned_to_detail_gender_acc,long
-assigned_to_detail_id,keyword
-assigned_to_detail_multi_org_names,keyword
-assigned_to_detail_name,keyword
-assigned_to_detail_org_name,keyword
-assigned_to_detail_user_name,keyword
-assigned_to_detail_uuid,keyword
-assigned_to_domain,keyword
-assigned_to_gender,keyword
-assigned_to_gender_acc,keyword
-assigned_to_id,keyword
-assigned_to_multi_org_names,keyword
-assigned_to_name,keyword
-assigned_to_org_name,keyword
-assigned_to_user_name,keyword
-assigned_to_uuid,keyword
-author_bot,boolean
-author_domain,keyword
-author_gender,keyword
-author_gender_acc,keyword
-author_id,keyword
-author_multi_org_names,keyword
-author_name,keyword
-author_org_name,keyword
-author_user_name,keyword
-author_uuid,keyword
-bug_id,keyword
-changeddate_date,date
-changes,long
-comments,long
-component,keyword
-creation_date,date
-creation_ts,date
-creator,keyword
-creator_detail_bot,boolean
-creator_detail_domain,keyword
-creator_detail_gender,keyword
-creator_detail_gender_acc,long
-creator_detail_id,keyword
-creator_detail_multi_org_names,keyword
-creator_detail_name,keyword
-creator_detail_org_name,keyword
-creator_detail_user_name,keyword
-creator_detail_uuid,keyword
-delta_ts,date
-description,keyword
-description_analyzed,string
-grimoire_creation_date,date
-id,long
-is_bugzilla_bug,long
-is_bugzillarest_bugrest,long
-is_open,boolean
-keywords,keyword
-labels,list
-last_comment_date,date
-main_description,keyword
-main_description_analyzed,string,false
-metadata__enriched_on,date
-metadata__gelk_backend_name,keyword
-metadata__gelk_version,keyword
-metadata__timestamp,date
-metadata__updated_on,date
-op_sys,keyword
-origin,keyword
-painless_time_to_now,float
-platform,keyword
-priority,keyword
-product,keyword
-project,keyword
-project_1,keyword
-qa_contact_bot,boolean
-qa_contact_detail_bot,boolean
-qa_contact_detail_domain,keyword
-qa_contact_detail_gender,keyword
-qa_contact_detail_gender_acc,long
-qa_contact_detail_id,keyword
-qa_contact_detail_multi_org_names,keyword
-qa_contact_detail_name,keyword
-qa_contact_detail_org_name,keyword
-qa_contact_detail_user_name,keyword
-qa_contact_detail_uuid,keyword
-qa_contact_domain,keyword
-qa_contact_gender,keyword
-qa_contact_gender_acc,keyword
-qa_contact_id,keyword
-qa_contact_multi_org_names,keyword
-qa_contact_name,keyword
-qa_contact_org_name,keyword
-qa_contact_user_name,keyword
-qa_contact_uuid,keyword
-reporter_bot,boolean
-reporter_domain,keyword
-reporter_gender,keyword
-reporter_gender_acc,keyword
-reporter_id,keyword
-reporter_multi_org_names,keyword
-reporter_name,keyword
-reporter_org_name,keyword
-reporter_user_name,keyword
-reporter_uuid,keyword
-repository_labels,keyword
-resolution,keyword
-resolution_days,float
-severity,keyword
-status,keyword
-tag,keyword
-timeopen_days,float
-time_to_first_attention,float
-url,keyword
-uuid,keyword
-whiteboard,keyword
+name,type,aggregatable,description
+assigned,keyword,TRUE,"Assignee name, coming from Bugzilla."
+assigned_to_bot,boolean,TRUE,"True if the given assignee is identified as a bot."
+assigned_to_domain,keyword,TRUE,"Domain associated to the assignee in SortingHat profile."
+assigned_to_gender,keyword,TRUE,"Assignee gender, based on their name (disabled by default)."
+assigned_to_gender_acc,keyword,TRUE,"Assignee gender accuracy (disabled by default)."
+assigned_to_id,keyword,TRUE,"Assignee Id from SortingHat."
+assigned_to_multi_org_names,keyword,TRUE,"List of the assignee organizations from SortingHat profile."
+assigned_to_name,keyword,TRUE,"Assignee name."
+assigned_to_org_name,keyword,TRUE,"Assignee organization name."
+assigned_to_user_name,keyword,TRUE,"Assignee user name from SortingHat."
+assigned_to_uuid,keyword,TRUE,"Assignee's UUID from SortingHat profile."
+assigned_to_detail_bot,boolean,TRUE,"True if the given assignee is identified as a bot."
+assigned_to_detail_domain,keyword,TRUE,"Domain associated to the assignee in SortingHat profile."
+assigned_to_detail_gender,keyword,TRUE,"Assignee gender, based on their name (disabled by default)."
+assigned_to_detail_gender_acc,keyword,TRUE,"Assignee gender accuracy (disabled by default)."
+assigned_to_detail_id,keyword,TRUE,"Assignee Id from SortingHat."
+assigned_to_detail_multi_org_names,keyword,TRUE,"List of the assignee organizations from SortingHat profile."
+assigned_to_detail_name,keyword,TRUE,"Assignee name."
+assigned_to_detail_org_name,keyword,TRUE,"Assignee organization name."
+assigned_to_detail_user_name,keyword,TRUE,"Assignee user name from SortingHat."
+assigned_to_detail_uuid,keyword,TRUE,"Assignee's UUID from SortingHat profile."
+author_bot,boolean,TRUE,"True/False if the author is a bot or not."
+author_domain,keyword,TRUE,"Author's domain name from SortingHat profile."
+author_gender,keyword,TRUE,"Author gender, based on their name (disabled by default)."
+author_gender_acc,keyword,TRUE,"Author gender accuracy (disabled by default)."
+author_id,keyword,TRUE,"Author's ID from SortingHat profile."
+author_name,keyword,TRUE,"Author's name."
+author_org_name,keyword,TRUE,"Author's organization name from SortingHat profile."
+author_multi_org_names,keyword,TRUE,"List of the author organizations from SortingHat profile."
+author_user_name,keyword,TRUE,"Author's username from SortingHat profile."
+author_uuid,keyword,TRUE,"Author's UUID from SortingHat profile."
+bug_id,keyword,TRUE,"Id of the bug in Bugzilla."
+changeddate_date,date,TRUE,"Datetime when the bug was last changed."
+changes,long,TRUE,"Number of changes in the bug."
+comments,long,TRUE,"Number of comments in the bug."
+component,keyword,TRUE,"The component on which the bug was reported."
+creation_date,date,TRUE,"Datetime when the bug was created."
+creation_ts,date,TRUE,"Timestamp when the bug was created."
+creator,keyword,TRUE,"Creator name, from Bugzilla."
+creator_detail_bot,boolean,TRUE,"True if the given Creator is identified as a bot."
+creator_detail_domain,keyword,TRUE,"Domain associated to the Creator in SortingHat profile."
+creator_detail_gender,keyword,TRUE,"Creator gender, based on their name (disabled by default)."
+creator_detail_gender_acc,keyword,TRUE,"Creator gender accuracy (disabled by default)."
+creator_detail_id,keyword,TRUE,"Creator Id from SortingHat."
+creator_detail_multi_org_names,keyword,TRUE,"List of the Creator organizations from SortingHat profile."
+creator_detail_name,keyword,TRUE,"Creator name."
+creator_detail_org_name,keyword,TRUE,"Creator organization name."
+creator_detail_user_name,keyword,TRUE,"Creator user name from SortingHat."
+creator_detail_uuid,keyword,TRUE,"Creator's UUID from SortingHat profile."
+delta_ts,date,TRUE,"The timestamp of the last update."
+description,keyword,TRUE,"Long description of the bug."
+description_analyzed,string,FALSE,"Long description of the bug (analyzed)."
+grimoire_creation_date,date,TRUE,"The creation date of the bug."
+id,long,TRUE,"The bug ID."
+is_bugzilla_bug,long,TRUE,"1 if the item type is a bug."
+is_bugzillarest_bugrest,long,TRUE,"1 if the bug comes from the Bugzillarest backend."
+is_open,boolean,TRUE,"True if the status of the bug is open."
+keywords,keyword,TRUE,"Set of keywords added to the bug."
+labels,list,TRUE,"Custom repository labels defined by the user."
+last_comment_date,date,TRUE,"Datetime when the last comment was posted to the bug"
+main_description,keyword,TRUE,"Short description of the bug / title."
+main_description_analyzed,string,FALSE,"Short description of the bug / title (analyzed)."
+metadata__enriched_on,date,true,"Date when the item was enriched."
+metadata__gelk_backend_name,keyword,true,"Name of the backend used to enrich information."
+metadata__gelk_version,keyword,true,"Version of the backend used to enrich information."
+metadata__timestamp,date,true,"Date when the item was stored in RAW index."
+metadata__updated_on,date,true,"Date when the item was updated in its original data source."
+op_sys,keyword,TRUE,"The operating system on which the bug was observed."
+origin,keyword,TRUE,"Original URL of the instance where the bug was retrieved from."
+painless_last_comment_delay,float,TRUE,"Time in days since the last comment was posted in the bug until the current time."
+painless_time_to_now,float,TRUE,"Contains the value of `timeopen_days` if the status is different from 'Closed' and the value of `resolution_days` otherwise."
+platform,keyword,TRUE,"The platform on which the bug was reported."
+priority,keyword,TRUE,"The priority of the bug (P1 = most urgent, P5 = least urgent)."
+product,keyword,TRUE,"The product on which the bug was reported."
+project,keyword,TRUE,"Project (metadata)."
+project_1,keyword,TRUE,"Project (metadata, if more than one level is allowed in project hierarchy)."
+qa_contact_bot,boolean,TRUE,"True if the given QA Contact is identified as a bot."
+qa_contact_detail_bot,boolean,TRUE,"True if the given QA Contact is identified as a bot."
+qa_contact_detail_domain,keyword,TRUE,"Domain associated to the QA Contact in SortingHat profile."
+qa_contact_detail_gender,keyword,TRUE,"QA Contact gender, based on their name (disabled by default)."
+qa_contact_detail_gender_acc,keyword,TRUE,"QA Contact gender accuracy (disabled by default)."
+qa_contact_detail_id,keyword,TRUE,"QA Contact Id from SortingHat."
+qa_contact_detail_multi_org_names,keyword,TRUE,"List of the QA Contact organizations from SortingHat profile."
+qa_contact_detail_name,keyword,TRUE,"QA Contact name."
+qa_contact_detail_org_name,keyword,TRUE,"QA Contact organization name."
+qa_contact_detail_user_name,keyword,TRUE,"QA Contact user name from SortingHat."
+qa_contact_detail_uuid,keyword,TRUE,"Creator's UUID from SortingHat profile."
+qa_contact_domain,keyword,TRUE,"Domain associated to the QA Contact in SortingHat profile."
+qa_contact_gender,keyword,TRUE,"QA Contact gender, based on their name (disabled by default)."
+qa_contact_gender_acc,keyword,TRUE,"QA Contact gender accuracy (disabled by default)."
+qa_contact_id,keyword,TRUE,"QA Contact Id from SortingHat."
+qa_contact_multi_org_names,keyword,TRUE,"List of the QA Contact organizations from SortingHat profile."
+qa_contact_name,keyword,TRUE,"QA Contact name."
+qa_contact_org_name,keyword,TRUE,"QA Contact organization name."
+qa_contact_user_name,keyword,TRUE,"QA Contact user name from SortingHat."
+qa_contact_uuid,keyword,TRUE,"Creator's UUID from SortingHat profile."
+reporter_bot,boolean,TRUE,"True if the given Reporter is identified as a bot."
+reporter_domain,keyword,TRUE,"Domain associated to the Reporter in SortingHat profile."
+reporter_gender,keyword,TRUE,"Reporter gender, based on their name (disabled by default)."
+reporter_gender_acc,keyword,TRUE,"Reporter gender accuracy (disabled by default)."
+reporter_id,keyword,TRUE,"Reporter Id from SortingHat."
+reporter_multi_org_names,keyword,TRUE,"List of the Reporter organizations from SortingHat profile."
+reporter_name,keyword,TRUE,"Reporter name."
+reporter_org_name,keyword,TRUE,"Reporter organization name."
+reporter_user_name,keyword,TRUE,"Reporter user name from SortingHat."
+reporter_uuid,keyword,TRUE,"Creator's UUID from SortingHat profile."
+repository_labels,keyword,TRUE,"Custom repository labels defined by the user."
+resolution,keyword,TRUE,"The bug's resolution."
+resolution_days,float,TRUE,"Time in days between the bug's creation date and the date of the last change."
+severity,keyword,TRUE,"The bug's severity."
+status,keyword,TRUE,"The bug's status."
+tag,keyword,TRUE,"Original URL of the instance where the bug was retrieved from."
+timeopen_days,float,TRUE,"Time in days since the creation of the bug until the current date."
+time_to_first_attention,float,TRUE,"Time in days since the creation of the bug until the date of the first comment made in the bug by any user different from the author."
+url,keyword,TRUE,"The bug's URL."
+uuid,keyword,TRUE,"Perceval UUID."
+whiteboard,keyword,TRUE,"The bug's whiteboard field."
