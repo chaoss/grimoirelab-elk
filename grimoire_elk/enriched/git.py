@@ -950,7 +950,11 @@ class GitEnrich(Enrich):
 
                 logger.debug("[git] study git-branches delete branch info for repo {} in index {}".format(
                              git_repo.uri, anonymize_url(enrich_backend.elastic.index_url)))
-                self.delete_commit_branches(git_repo, enrich_backend)
+                try:              
+                    self.delete_commit_branches(git_repo, enrich_backend)
+                except Exception as e:
+                    logger.error("[git] study git-branches delete failed on repo {}, due to {}".format(git_repo.uri, e))
+                    continue
 
                 logger.debug("[git] study git-branches add branch info for repo {} in index {}".format(
                              git_repo.uri, anonymize_url(enrich_backend.elastic.index_url)))
