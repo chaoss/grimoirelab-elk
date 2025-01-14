@@ -17,7 +17,7 @@ It expects to find an input index named `git_aoc-raw`, a git raw index containin
 data to apply this study on.
 
 ### Results
-As output, you will get an index following our [areas of code index fields convention](https://github.com/chaoss/grimoirelab-elk/blob/master/schema/areas_of_code.csv). This index will be named `git_aoc-enriched`.
+As output, you will get an index following our [areas of code index fields convention](https://github.com/chaoss/grimoirelab-elk/blob/main/schema/areas_of_code.csv). This index will be named `git_aoc-enriched`.
 
 Additionally, an alias named `git_areas_of_code` pointing to above's index is created if it doesn't exist.
 
@@ -104,7 +104,7 @@ filter out, for instance, **bots** and **empty commits** in Git.
 
 ### Results: 
 
-As output, you will get an index following our [onion index fields convention](https://github.com/chaoss/grimoirelab-elk/blob/master/schema/onion.csv).
+As output, you will get an index following our [onion index fields convention](https://github.com/chaoss/grimoirelab-elk/blob/main/schema/onion.csv).
 This index will be named:
 * **Git**: `git_onion-enriched`.
 * **GitHub Issues**: `github_issues_onion-enriched`.
