@@ -56,7 +56,7 @@ perceval-opnfv = { version = ">=0.2", allow-prereleases = true}
 perceval-puppet = { version = ">=0.2", allow-prereleases = true}
 perceval-weblate = { version = ">=0.2", allow-prereleases = true}
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 httpretty = "^1.1.4"
 flake8 = "^7.1.1"
 coverage = "^7.2.3"
