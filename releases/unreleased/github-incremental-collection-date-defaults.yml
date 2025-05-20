@@ -1,0 +1,9 @@
+---
+title: GitHub incremental collection date
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  GitHub incremantal collection was not working
+  correctly because of an inconsistence between
+  the default dates in Perceval and ELK.

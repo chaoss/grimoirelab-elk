@@ -193,10 +193,14 @@ def feed_backend(url, clean, fetch_archive, backend_name, backend_params,
             params['branches'] = branches
         if filter_classified:
             params['filter_classified'] = filter_classified
-        if from_date and (from_date.replace(tzinfo=None) != str_to_datetime("1970-01-01").replace(tzinfo=None)):
-            params['from_date'] = from_date
-        if to_date and (to_date.replace(tzinfo=None) != str_to_datetime("2100-01-01").replace(tzinfo=None)):
-            params['to_date'] = to_date
+        if from_date:
+            default_from_date = signature.parameters['from_date'].default.replace(tzinfo=None)
+            if from_date.replace(tzinfo=None) != default_from_date:
+                params['from_date'] = from_date
+        if to_date:
+            default_to_date = signature.parameters['to_date'].default.replace(tzinfo=None)
+            if to_date.replace(tzinfo=None) != default_to_date:
+                params['to_date'] = to_date
         if offset:
             params['from_offset'] = offset
         if no_update:
