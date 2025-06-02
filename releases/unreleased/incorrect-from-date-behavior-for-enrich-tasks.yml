@@ -1,0 +1,9 @@
+---
+title: Incorrect `from-date` behavior for enrich tasks
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Enriching no longer uses the `from-date` parameter, which is only
+  intended for collection.
+  This fixes an issue causing all GitHub items to be enriched.

@@ -182,29 +182,10 @@ def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
 
             filters_.append(filter_raw_)
 
-        # Check if backend supports from_date
         signature = inspect.signature(backend.fetch)
 
-        from_date = None
         if 'from_date' in signature.parameters:
-            try:
-                # Support perceval pre and post BackendCommand refactoring
-                from_date = backend_cmd.from_date
-            except AttributeError:
-                from_date = backend_cmd.parsed_args.from_date
-
-        offset = None
-        if 'offset' in signature.parameters:
-            try:
-                offset = backend_cmd.offset
-            except AttributeError:
-                offset = backend_cmd.parsed_args.offset
-
-        if from_date:
-            if from_date.replace(tzinfo=None) != str_to_datetime("1970-01-01").replace(tzinfo=None):
-                last_enrich = from_date
-            # if the index is empty, set the last enrich to None
-            elif not enrich_backend.from_date:
+            if not enrich_backend.from_date:
                 last_enrich = None
             else:
                 # if the index is not empty, the last enrich is the minimum between
@@ -215,7 +196,12 @@ def get_last_enrich(backend_cmd, enrich_backend, filter_raw=None):
                 last_enrich_filtered = enrich_backend.get_last_update_from_es(filters_)
                 last_enrich = get_min_last_enrich(enrich_backend.from_date, last_enrich_filtered)
 
-        elif offset is not None:
+        elif 'offset' in signature.parameters:
+            try:
+                offset = backend_cmd.offset
+            except AttributeError:
+                offset = backend_cmd.parsed_args.offset
+
             if offset != 0:
                 last_enrich = offset
             else:
