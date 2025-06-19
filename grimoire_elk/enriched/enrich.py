@@ -31,7 +31,7 @@ import time
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
-import pkg_resources
+from importlib.resources import files
 from functools import lru_cache
 
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
@@ -1192,9 +1192,9 @@ class Enrich(ElasticItems):
         logger.info("{} Creating out ES index".format(log_prefix))
         # Initialize out index
         if not self.elastic.is_legacy():
-            filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/onion_es7.json')
+            filename = files('grimoire_elk').joinpath('enriched/mappings/onion_es7.json')
         else:
-            filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/onion.json')
+            filename = files('grimoire_elk').joinpath('enriched/mappings/onion.json')
 
         out_conn.create_index(filename, delete=out_conn.exists())
 

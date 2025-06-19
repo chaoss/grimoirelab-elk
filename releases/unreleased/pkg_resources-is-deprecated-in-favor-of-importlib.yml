@@ -1,0 +1,9 @@
+---
+title: pkg_resources is deprecated in favor of importlib
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Use of `pkg_resources` is deprecated in favor of `importlib.resources`
+  and `importlib.metadata` since Python 3.12.
+  Refactor resource loading to use their alternatives.
