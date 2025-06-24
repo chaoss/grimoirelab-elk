@@ -581,9 +581,10 @@ class GitHubEnrich(Enrich):
             assignee = issue['assignee_data']
             rich_issue['assignee_login'] = assignee['login']
             rich_issue['assignee_name'] = assignee['name']
-            rich_issue["assignee_domain"] = self.get_email_domain(assignee['email']) if assignee['email'] else None
-            rich_issue['assignee_org'] = assignee['company']
-            rich_issue['assignee_location'] = assignee['location']
+            rich_issue["assignee_domain"] = self.get_email_domain(assignee['email']) if ('email' in assignee
+                                                                                         and assignee['email']) else None
+            rich_issue['assignee_org'] = assignee['company'] if 'company' in assignee else None
+            rich_issue['assignee_location'] = assignee['location'] if 'location' in assignee else None
             rich_issue['assignee_geolocation'] = None
         else:
             rich_issue['assignee_name'] = None

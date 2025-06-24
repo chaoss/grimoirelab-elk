@@ -1,0 +1,8 @@
+---
+title: GitHub assignee KeyError in enriched index
+category: fixed
+author: Quan Zhou
+issue: null
+notes: >
+    Fix the `KeyError` when the issue was assigned to a deleted user.
+    A deleted user don't have `email`, `company`, and `location` fields.
