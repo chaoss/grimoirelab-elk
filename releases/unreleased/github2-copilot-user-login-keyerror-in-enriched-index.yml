@@ -1,0 +1,13 @@
+---
+title: GitHub2 Copilot user login KeyError in enriched index
+category: fixed
+author: Quan Zhou <quan@bitergia.com>
+issue: null
+notes: >
+    Fix the `KeyError` when the the pull request comment was created
+    by the `Copilot` user.
+
+    The `Copilot` user only have one empty field `organization`
+    ```
+    {"organization": []}
+    ```

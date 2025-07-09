@@ -428,7 +428,7 @@ class GitHubEnrich2(Enrich):
                     'name': DELETED_USER_NAME
                 }
                 comment['user_data'] = user_data
-            ecomment['user_login'] = user_data['login']
+            ecomment['user_login'] = user_data.get('login', None)
 
             if self.sortinghat:
                 ecomment.update(self.get_item_sh(comment, self.comment_roles, 'updated_at'))
