@@ -523,9 +523,9 @@ class GitHubEnrich2(Enrich):
         if user is not None and user:
             rich_pr['user_name'] = user['name']
             rich_pr['author_name'] = user['name']
-            rich_pr["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
-            rich_pr['user_org'] = user['company']
-            rich_pr['user_location'] = user['location']
+            rich_pr["user_domain"] = self.get_email_domain(user.get('email', None))
+            rich_pr['user_org'] = user.get('company', None)
+            rich_pr['user_location'] = user.get('location', None)
             rich_pr['user_geolocation'] = None
         else:
             rich_pr['user_name'] = None
@@ -539,9 +539,9 @@ class GitHubEnrich2(Enrich):
         if merged_by and merged_by != USER_NOT_AVAILABLE:
             rich_pr['merge_author_login'] = merged_by['login']
             rich_pr['merge_author_name'] = merged_by['name']
-            rich_pr["merge_author_domain"] = self.get_email_domain(merged_by['email']) if merged_by['email'] else None
-            rich_pr['merge_author_org'] = merged_by['company']
-            rich_pr['merge_author_location'] = merged_by['location']
+            rich_pr["merge_author_domain"] = self.get_email_domain(merged_by.get('email', None))
+            rich_pr['merge_author_org'] = merged_by.get('company', None)
+            rich_pr['merge_author_location'] = merged_by.get('location', None)
             rich_pr['merge_author_geolocation'] = None
         else:
             rich_pr['merge_author_name'] = None

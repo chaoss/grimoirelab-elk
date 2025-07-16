@@ -1,0 +1,8 @@
+---
+title: GitHub user KeyError in enriched index
+category: fixed
+author: Quan Zhou <quan@bitergia.com>
+issue: null
+notes: >
+    Fix the rest of the fields of an AI user to correct `KeyError`
+    (`email`, `company`, and `location`).
