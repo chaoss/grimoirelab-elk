@@ -631,9 +631,9 @@ class GitHubEnrich2(Enrich):
         if user is not None and user:
             rich_issue['user_name'] = user['name']
             rich_issue['author_name'] = user['name']
-            rich_issue["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
-            rich_issue['user_org'] = user['company']
-            rich_issue['user_location'] = user['location']
+            rich_issue["user_domain"] = self.get_email_domain(user.get('email', None))
+            rich_issue['user_org'] = user.get('company', None)
+            rich_issue['user_location'] = user.get('location', None)
             rich_issue['user_geolocation'] = None
         else:
             rich_issue['user_name'] = None
@@ -647,9 +647,9 @@ class GitHubEnrich2(Enrich):
         if assignee and assignee != USER_NOT_AVAILABLE:
             rich_issue['assignee_login'] = assignee['login']
             rich_issue['assignee_name'] = assignee['name']
-            rich_issue["assignee_domain"] = self.get_email_domain(assignee['email']) if assignee['email'] else None
-            rich_issue['assignee_org'] = assignee['company']
-            rich_issue['assignee_location'] = assignee['location']
+            rich_issue["assignee_domain"] = self.get_email_domain(assignee.get('email', None))
+            rich_issue['assignee_org'] = assignee.get('company', None)
+            rich_issue['assignee_location'] = assignee.get('location', None)
             rich_issue['assignee_geolocation'] = None
         else:
             rich_issue['assignee_name'] = None

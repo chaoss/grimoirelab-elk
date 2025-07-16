@@ -461,9 +461,9 @@ class GitHubEnrich(Enrich):
         if self.__has_user(user):
             rich_pr['user_name'] = user['name']
             rich_pr['author_name'] = user['name']
-            rich_pr["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
-            rich_pr['user_org'] = user['company']
-            rich_pr['user_location'] = user['location']
+            rich_pr["user_domain"] = self.get_email_domain(user.get('email', None))
+            rich_pr['user_org'] = user.get('company', None)
+            rich_pr['user_location'] = user.get('location', None)
             rich_pr['user_geolocation'] = None
         else:
             rich_pr['user_name'] = None
@@ -477,9 +477,9 @@ class GitHubEnrich(Enrich):
         if merged_by and merged_by is not None:
             rich_pr['merge_author_login'] = merged_by['login']
             rich_pr['merge_author_name'] = merged_by['name']
-            rich_pr["merge_author_domain"] = self.get_email_domain(merged_by['email']) if merged_by['email'] else None
-            rich_pr['merge_author_org'] = merged_by['company']
-            rich_pr['merge_author_location'] = merged_by['location']
+            rich_pr["merge_author_domain"] = self.get_email_domain(merged_by.get('email', None))
+            rich_pr['merge_author_org'] = merged_by.get('company', None)
+            rich_pr['merge_author_location'] = merged_by.get('location', None)
             rich_pr['merge_author_geolocation'] = None
         else:
             rich_pr['merge_author_name'] = None
@@ -564,7 +564,7 @@ class GitHubEnrich(Enrich):
         if self.__has_user(user):
             rich_issue['user_name'] = user['name']
             rich_issue['author_name'] = user['name']
-            rich_issue["user_domain"] = self.get_email_domain(user['email']) if user['email'] else None
+            rich_issue["user_domain"] = self.get_email_domain(user.get('email', None))
             rich_issue['user_org'] = user['company']
             rich_issue['user_location'] = user['location']
             rich_issue['user_geolocation'] = None
@@ -581,10 +581,9 @@ class GitHubEnrich(Enrich):
             assignee = issue['assignee_data']
             rich_issue['assignee_login'] = assignee['login']
             rich_issue['assignee_name'] = assignee['name']
-            rich_issue["assignee_domain"] = self.get_email_domain(assignee['email']) if ('email' in assignee
-                                                                                         and assignee['email']) else None
-            rich_issue['assignee_org'] = assignee['company'] if 'company' in assignee else None
-            rich_issue['assignee_location'] = assignee['location'] if 'location' in assignee else None
+            rich_issue["assignee_domain"] = self.get_email_domain(assignee.get('email', None))
+            rich_issue['assignee_org'] = assignee.get('company', None)
+            rich_issue['assignee_location'] = assignee.get('location', None)
             rich_issue['assignee_geolocation'] = None
         else:
             rich_issue['assignee_name'] = None
