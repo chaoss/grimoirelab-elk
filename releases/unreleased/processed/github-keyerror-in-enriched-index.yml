@@ -1,9 +1,0 @@
----
-title: GitHub KeyError in enriched index
-category: fixed
-author: Quan Zhou <quan@bitergia.com>
-issue: null
-notes: >
-    Fix the `KeyError` when the issue and/or pull request was assigned
-    to `Copilot` user. The `Copilot` user don't have `email`, `company`,
-    and `location` fields.
