@@ -26,7 +26,8 @@ import logging
 import re
 import sys
 
-import pkg_resources
+from importlib.resources import files
+
 import requests
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 
@@ -617,9 +618,9 @@ class GitEnrich(Enrich):
             # Initialize out index
 
             if not self.elastic.is_legacy():
-                filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/git_aoc_es7.json')
+                filename = files('grimoire_elk').joinpath('enriched/mappings/git_aoc_es7.json')
             else:
-                filename = pkg_resources.resource_filename('grimoire_elk', 'enriched/mappings/git_aoc.json')
+                filename = files('grimoire_elk').joinpath('enriched/mappings/git_aoc.json')
             out_conn.create_index(filename, delete=exists_index)
 
         repos = []
