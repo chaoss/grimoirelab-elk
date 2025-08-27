@@ -168,10 +168,21 @@ class BugzillaEnrich(Enrich):
                 eitem["reporter_name"] = issue["reporter"][0]["name"]
                 eitem["author_name"] = issue["reporter"][0]["name"]
 
-        date_ts = str_to_datetime(issue['creation_ts'][0]['__text__'])
+        eitem["bug_id"] = issue['bug_id'][0]['__text__']
+
+        date_ts_str = issue['creation_ts'][0].get('__text__', None)
+        if not date_ts_str:
+            if len(issue["activity"]) > 0:
+                logger.warning(f"[bugzilla] Bug {eitem['bug_id']} without creation_ts, using activity date as"
+                               f" creation date")
+                date_ts_str = issue["activity"][0]["When"]
+            else:
+                logger.warning(f"[bugzilla] Bug {eitem['bug_id']} without creation_ts and without activity, using"
+                               f" delta_ts as creation date")
+                date_ts_str = issue['delta_ts'][0]['__text__']
+        date_ts = str_to_datetime(date_ts_str)
         eitem['creation_date'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
 
-        eitem["bug_id"] = issue['bug_id'][0]['__text__']
         eitem["status"] = issue['bug_status'][0]['__text__']
         if "short_desc" in issue:
             if "__text__" in issue["short_desc"][0]:

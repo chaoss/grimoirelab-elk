@@ -174,6 +174,67 @@ class TestBugzilla(TestBaseBackend):
         result = self._test_refresh_identities()
         # ... ?
 
+    def test_no_creation_date_with_activity(self):
+        """Test handling when creation_ts is missing but activity is present"""
+
+        enrich_backend = self.connectors[self.connector][2]()
+
+        # Missing creation_ts but has activity
+        item_with_activity = {
+            'data': {
+                'bug_id': [{'__text__': '12345'}],
+                'creation_ts': [{}],  # Missing __text__
+                'activity': [{'When': '2023-01-15T10:30:00'}],
+                'delta_ts': [{'__text__': '2023-01-16T12:00:00'}],
+                'bug_status': [{'__text__': 'NEW'}],
+                'priority': [{'__text__': 'P1'}],
+                'bug_severity': [{'__text__': 'normal'}],
+                'op_sys': [{'__text__': 'Linux'}],
+                'product': [{'__text__': 'TestProduct'}],
+                'component': [{'__text__': 'TestComponent'}],
+                'rep_platform': [{'__text__': 'x86_64'}],
+                'status_whiteboard': [{}],
+                'resolution': [{}],
+                'keywords': [{}],
+                'reporter': [{'__text__': 'test@example.com'}],
+                'long_desc': []
+            },
+            'origin': 'https://bugzilla.example.com'
+        }
+
+        eitem = enrich_backend.get_rich_item(item_with_activity)
+        self.assertEqual(eitem['creation_date'], '2023-01-15T10:30:00')
+
+    def test_no_creation_date_no_activity(self):
+        """Test handling when both creation_ts and activity are missing"""
+
+        enrich_backend = self.connectors[self.connector][2]()
+
+        item_empty_activity = {
+            'data': {
+                'bug_id': [{'__text__': '12347'}],
+                'creation_ts': [{}],  # Missing __text__
+                'activity': [],  # Empty activity
+                'delta_ts': [{'__text__': '2023-01-16T12:00:00'}],
+                'bug_status': [{'__text__': 'NEW'}],
+                'priority': [{'__text__': 'P1'}],
+                'bug_severity': [{'__text__': 'normal'}],
+                'op_sys': [{'__text__': 'Linux'}],
+                'product': [{'__text__': 'TestProduct'}],
+                'component': [{'__text__': 'TestComponent'}],
+                'rep_platform': [{'__text__': 'x86_64'}],
+                'status_whiteboard': [{}],
+                'resolution': [{}],
+                'keywords': [{}],
+                'reporter': [{'__text__': 'test@example.com'}],
+                'long_desc': []
+            },
+            'origin': 'https://bugzilla.example.com'
+        }
+
+        eitem = enrich_backend.get_rich_item(item_empty_activity)
+        self.assertEqual(eitem['creation_date'], '2023-01-16T12:00:00')
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
