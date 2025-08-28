@@ -1,0 +1,10 @@
+---
+title: Missing creation_date field in Bugzilla
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: 
+notes: >
+  For some Bugzilla bugs, the creation date was unavailable.
+  In these cases, the first activity date is now used to display
+  the bug's creation date.
+
