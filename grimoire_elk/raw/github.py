@@ -40,6 +40,15 @@ class Mapping(BaseMapping):
                 "properties": {
                     "data": {
                         "properties": {
+                            "auto_merge": {
+                                "dynamic":false,
+                                "properties": {
+                                    "commit_message": {
+                                        "type": "text",
+                                        "index": true
+                                    }
+                                }
+                            },
                             "comments_data": {
                                 "dynamic":false,
                                 "properties": {

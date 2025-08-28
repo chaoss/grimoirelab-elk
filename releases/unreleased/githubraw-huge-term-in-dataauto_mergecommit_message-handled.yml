@@ -1,0 +1,9 @@
+---
+title: '[github/raw] huge term in data.auto_merge.commit_message handled'
+category: fixed
+author: Quan Zhou <quan@bitergia.com>
+issue: null
+notes: >
+  This fixes a potential huge term in the "data.auto merge.commit_message"
+  field during the `github2:pull` backend's collection phase by converting
+  the field to text.
