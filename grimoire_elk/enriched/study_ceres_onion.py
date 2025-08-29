@@ -23,8 +23,7 @@ import logging
 from datetime import datetime
 
 import pandas
-from elasticsearch import helpers, NotFoundError
-from elasticsearch_dsl import Search, Q
+from opensearchpy import helpers, NotFoundError, Search, Q
 
 from cereslib.enrich.enrich import Onion
 from grimoirelab_toolkit import datetime as gl_dt
@@ -211,7 +210,7 @@ class ESOnionConnector(ESConnector):
         search = Search(using=self._es_conn, index=self._es_index)
         # from:to parameters (=> from: 0, size: 0)
         search = search[0:0]
-        search = search.aggs.metric('max_date', 'max', field='metadata__enriched_on')
+        search.aggs.metric('max_date', 'max', field='metadata__enriched_on')
 
         try:
             response = search.execute()
