@@ -24,7 +24,7 @@ import inspect
 import logging
 from functools import lru_cache
 
-from elasticsearch import Elasticsearch, RequestsHttpConnection
+from opensearchpy import OpenSearch, RequestsHttpConnection
 
 from perceval.backend import find_signature_parameters, Archive
 from perceval.errors import RateLimitError
@@ -854,8 +854,8 @@ def retain_identities(retention_time, es_enrichment_url, sortinghat_db, data_sou
     before_date = get_diff_current_date(minutes=retention_time)
     before_date_str = before_date.isoformat()
 
-    es = Elasticsearch([es_enrichment_url], timeout=120, max_retries=20, retry_on_timeout=True,
-                       connection_class=RequestsHttpConnection, verify_certs=False)
+    es = OpenSearch([es_enrichment_url], timeout=120, max_retries=20, retry_on_timeout=True,
+                    connection_class=RequestsHttpConnection, verify_certs=False, ssl_show_warn=False)
 
     # delete the unique identities which have not been seen after `before_date`
     delete_inactive_unique_identities(es, sortinghat_db, before_date_str)

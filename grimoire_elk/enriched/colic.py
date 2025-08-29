@@ -22,7 +22,7 @@
 import logging
 from dateutil.relativedelta import relativedelta
 
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
+from opensearchpy import OpenSearch as ES, RequestsHttpConnection
 from .enrich import (Enrich,
                      metadata)
 from .graal_study_evolution import (get_to_date,
@@ -372,7 +372,8 @@ class ColicEnrich(Enrich):
         logger.info("[colic] study enrich-colic-analysis start")
 
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
-                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection,
+                   ssl_show_warn=self.elastic.requests.verify)
         in_index = enrich_backend.elastic.index
         interval_months = list(map(int, interval_months))
 

@@ -29,7 +29,7 @@ import sys
 from importlib.resources import files
 
 import requests
-from elasticsearch import Elasticsearch, RequestsHttpConnection
+from opensearchpy import OpenSearch, RequestsHttpConnection
 
 from grimoirelab_toolkit.datetime import (datetime_to_utc,
                                           str_to_datetime,
@@ -603,12 +603,14 @@ class GitEnrich(Enrich):
         logger.info("{} Starting study - Input: {} Output: {}".format(log_prefix, in_index, out_index))
 
         # Creating connections
-        es_in = Elasticsearch([ocean_backend.elastic.url], retry_on_timeout=True, timeout=100,
-                              verify_certs=self.elastic.requests.verify,
-                              connection_class=RequestsHttpConnection)
-        es_out = Elasticsearch([enrich_backend.elastic.url], retry_on_timeout=True,
-                               timeout=100, verify_certs=self.elastic.requests.verify,
-                               connection_class=RequestsHttpConnection)
+        es_in = OpenSearch([ocean_backend.elastic.url], retry_on_timeout=True, timeout=100,
+                           verify_certs=self.elastic.requests.verify,
+                           ssl_show_warn=self.elastic.requests.verify,
+                           connection_class=RequestsHttpConnection)
+        es_out = OpenSearch([enrich_backend.elastic.url], retry_on_timeout=True,
+                            timeout=100, verify_certs=self.elastic.requests.verify,
+                            ssl_show_warn=self.elastic.requests.verify,
+                            connection_class=RequestsHttpConnection)
         in_conn = ESPandasConnector(es_conn=es_in, es_index=in_index, sort_on_field=sort_on_field)
         out_conn = ESPandasConnector(es_conn=es_out, es_index=out_index, sort_on_field=sort_on_field, read_only=False)
 

@@ -34,7 +34,7 @@ from grimoire_elk.elastic import ElasticSearch
 from grimoirelab_toolkit.datetime import (datetime_utcnow,
                                           str_to_datetime)
 
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
+from opensearchpy import OpenSearch as ES, RequestsHttpConnection
 
 from .utils import get_time_diff_days
 
@@ -763,7 +763,8 @@ class GitHubEnrich(Enrich):
 
         # connect to ES
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
-                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection,
+                   ssl_show_warn=self.elastic.requests.verify)
         in_index = enrich_backend.elastic.index
 
         # get all repositories

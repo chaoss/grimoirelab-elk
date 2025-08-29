@@ -24,7 +24,7 @@
 import logging
 import re
 
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
+from opensearchpy import OpenSearch as ES, RequestsHttpConnection
 
 from .enrich import Enrich, metadata
 from .utils import anonymize_url, get_time_diff_days
@@ -353,7 +353,8 @@ class GitHubQLEnrich(Enrich):
         logger.info("{} starting study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
 
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
-                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection,
+                   ssl_show_warn=self.elastic.requests.verify)
         in_index = enrich_backend.elastic.index
 
         # get all start events that don't have the attribute `duration_from_previous_event`
@@ -676,7 +677,8 @@ class GitHubQLEnrich(Enrich):
         logger.info("{} starting study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
 
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
-                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection,
+                   ssl_show_warn=self.elastic.requests.verify)
         in_index = enrich_backend.elastic.index
 
         # Get all the merged pull requests from MergedEvents

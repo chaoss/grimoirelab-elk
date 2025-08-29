@@ -1,0 +1,10 @@
+---
+title: ElasticSearch 6 no longer supported
+category: deprecated
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Elasticsearch 6 is outdated and no longer receives updates.
+  To continue development with new features and support for
+  later versions of Elasticsearch and OpenSearch, we have
+  had to drop support for ES 6.
