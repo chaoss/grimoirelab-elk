@@ -34,7 +34,7 @@ from dateutil.relativedelta import relativedelta
 from importlib.resources import files
 from functools import lru_cache
 
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection
+from opensearchpy import OpenSearch as ES, RequestsHttpConnection
 from geopy.geocoders import Nominatim
 
 from perceval.backend import find_signature_parameters
@@ -1158,7 +1158,8 @@ class Enrich(ElasticItems):
 
         # Creating connections
         es = ES([enrich_backend.elastic.url], retry_on_timeout=True, timeout=100,
-                verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+                verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection,
+                ssl_show_warn=self.elastic.requests.verify)
 
         in_conn = ESOnionConnector(es_conn=es, es_index=in_index,
                                    contribs_field=contribs_field,
@@ -1502,7 +1503,8 @@ class Enrich(ElasticItems):
         logger.info("{} starting study {}".format(log_prefix, anonymize_url(self.elastic.index_url)))
 
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
-                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection,
+                   ssl_show_warn=self.elastic.requests.verify)
         in_index = enrich_backend.elastic.index
 
         query_locations_no_geo_points = """
@@ -1606,7 +1608,8 @@ class Enrich(ElasticItems):
         logger.info("[enrich-forecast-activity] Start study")
 
         es_in = ES([enrich_backend.elastic_url], retry_on_timeout=True, timeout=100,
-                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+                   verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection,
+                   ssl_show_warn=self.elastic.requests.verify)
         in_index = enrich_backend.elastic.index
 
         unique_repos = es_in.search(
@@ -2221,7 +2224,8 @@ class Enrich(ElasticItems):
             anonymize_url(self.elastic.index_url), nlp_rest_url))
 
         es = ES([self.elastic_url], timeout=3600, max_retries=50, retry_on_timeout=True,
-                verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection)
+                verify_certs=self.elastic.requests.verify, connection_class=RequestsHttpConnection,
+                ssl_show_warn=self.elastic.requests.verify)
         search_fields = [attr for attr in attributes]
         search_fields.extend([uuid_field])
         page = es.search(index=enrich_backend.elastic.index,

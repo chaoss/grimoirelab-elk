@@ -27,7 +27,7 @@ import sys
 import unittest
 from datetime import datetime
 
-from elasticsearch import Elasticsearch
+from opensearchpy import OpenSearch
 
 from grimoire_elk.enriched.sortinghat_gelk import SortingHat
 
@@ -239,7 +239,7 @@ class TestBaseBackend(unittest.TestCase):
             return result
 
         csv_mapping = load_mapping(self.enrich_index, self.connector)
-        client = Elasticsearch(self.es_con, timeout=30)
+        client = OpenSearch(self.es_con, timeout=30)
         mapping_json = client.indices.get_mapping(index=self.enrich_index)
         es_mapping = ESMapping.from_json(index_name=self.enrich_index,
                                          mapping_json=mapping_json)
