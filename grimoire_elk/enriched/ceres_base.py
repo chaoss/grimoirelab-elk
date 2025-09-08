@@ -23,9 +23,7 @@ import logging
 from collections import namedtuple
 from grimoirelab_toolkit import datetime
 
-from elasticsearch import helpers
-from elasticsearch.exceptions import NotFoundError
-from elasticsearch_dsl import Search
+from opensearchpy import helpers, Search, NotFoundError
 
 
 logger = logging.getLogger(__name__)
@@ -238,13 +236,13 @@ class ESConnector(Connector):
 
         if delete:
             logger.info("{} Deleting index {}".format(self.__log_prefix, self._es_index))
-            self._es_conn.indices.delete(self._es_index, ignore=[400, 404])
+            self._es_conn.indices.delete(index=self._es_index, ignore=[400, 404])
 
         # Read Mapping
         with open(mappings_file) as f:
             mapping = f.read()
 
-        self._es_conn.indices.create(self._es_index, body=mapping)
+        self._es_conn.indices.create(index=self._es_index, body=mapping)
 
     def latest_date(self):
         """Get date of most recent item available in ElasticSearch.
@@ -263,7 +261,7 @@ class ESConnector(Connector):
         if self._repo:
             search = search.filter('term', origin=self._repo)
 
-        search = search.aggs.metric('max_date', 'max', field=self._sort_on_field)
+        search.aggs.metric('max_date', 'max', field=self._sort_on_field)
 
         try:
             response = search.execute()

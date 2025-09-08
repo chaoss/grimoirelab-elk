@@ -26,7 +26,7 @@ import sys
 
 import requests
 
-import pkg_resources
+from importlib.metadata import entry_points
 
 from grimoire_elk.errors import ElasticError
 from grimoire_elk.elastic import ElasticSearch
@@ -276,7 +276,7 @@ def get_connectors():
                   "weblate": [Weblate, WeblateOcean, WeblateEnrich, WeblateCommand]
                   }  # Will come from Registry
 
-    for entry_point in pkg_resources.iter_entry_points(ENTRY_POINT_NAME):
+    for entry_point in entry_points(group=ENTRY_POINT_NAME):
         connectors.update(entry_point.load()())
     return connectors
 

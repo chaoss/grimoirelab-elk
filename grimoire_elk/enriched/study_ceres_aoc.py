@@ -21,7 +21,7 @@
 import hashlib
 import logging
 
-from elasticsearch import helpers
+from opensearchpy import helpers
 
 from cereslib.dfutils.filter import FilterRows
 from cereslib.enrich.enrich import FileType, FilePath, ToUTF8
