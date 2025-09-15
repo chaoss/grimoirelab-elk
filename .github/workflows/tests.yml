@@ -71,9 +71,10 @@ jobs:
         SORTINGHAT_DB_PASSWORD: 'root'
         SORTINGHAT_SUPERUSER_USERNAME: "admin"
         SORTINGHAT_SUPERUSER_PASSWORD: "admin"
+        DJANGO_SETTINGS_MODULE: "sortinghat.config.settings"
       run: |
         poetry run sortinghat-admin --config sortinghat.config.settings setup --no-interactive
-        poetry run sortinghatd --dev --config sortinghat.config.settings &
+        poetry run django-admin runserver &
         poetry run sortinghatw --config sortinghat.config.settings &
     - name: Lint with flake8
       run: |
