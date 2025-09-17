@@ -511,7 +511,7 @@ class GitHubEnrich(Enrich):
         rich_pr['labels'] = labels
 
         rich_pr['pull_request'] = True
-        rich_pr['item_type'] = 'pull request'
+        rich_pr['item_type'] = 'pull_request'
 
         rich_pr['github_repo'] = rich_pr['repository'].replace(GITHUB, '')
         rich_pr['github_repo'] = re.sub('.git$', '', rich_pr['github_repo'])
@@ -610,7 +610,7 @@ class GitHubEnrich(Enrich):
         rich_issue['labels'] = labels
 
         rich_issue['pull_request'] = True
-        rich_issue['item_type'] = 'pull request'
+        rich_issue['item_type'] = 'pull_request'
         if 'head' not in issue.keys() and 'pull_request' not in issue.keys():
             rich_issue['pull_request'] = False
             rich_issue['item_type'] = 'issue'
