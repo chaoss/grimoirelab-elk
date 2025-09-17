@@ -677,7 +677,7 @@ class GitEnrich(Enrich):
             if until_date:
                 fltr.append({
                     "range": {
-                        "metadata__updated_on": {
+                        "grimoire_creation_date": {
                             "gte": until_date
                         }
                     }
