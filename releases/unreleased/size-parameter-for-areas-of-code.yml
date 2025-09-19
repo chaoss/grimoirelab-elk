@@ -1,0 +1,11 @@
+---
+title: Size parameter for Areas of code
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Include block_size parameter to the Areas of code study.
+  It allows a better control over data processing in chunks,
+  and allow to define a lower value when the items to process
+  are big.
+

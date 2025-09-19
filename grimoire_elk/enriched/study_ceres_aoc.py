@@ -95,7 +95,7 @@ class ESPandasConnector(ESConnector):
         for hit in helpers.scan(self._es_conn,
                                 search_query,
                                 scroll='300m',
-                                size=500,
+                                size=size,
                                 index=self._es_index,
                                 preserve_order=True):
 
