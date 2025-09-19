@@ -596,7 +596,8 @@ class GitEnrich(Enrich):
     def enrich_areas_of_code(self, ocean_backend, enrich_backend, alias, no_incremental=False,
                              in_index="git-raw",
                              out_index=GIT_AOC_ENRICHED,
-                             sort_on_field='metadata__timestamp'):
+                             sort_on_field='metadata__timestamp',
+                             block_size=100):
 
         log_prefix = "[git] study areas_of_code"
 
@@ -637,7 +638,7 @@ class GitEnrich(Enrich):
             logger.info("{} Processing repo: {}".format(log_prefix, repo_name))
             in_conn.update_repo(repo_name)
             out_conn.update_repo(repo_name)
-            areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn)
+            areas_of_code(git_enrich=enrich_backend, in_conn=in_conn, out_conn=out_conn, block_size=block_size)
 
             # delete the documents in the AOC index which correspond to commits that don't exist in the raw index
             if out_conn.exists():
