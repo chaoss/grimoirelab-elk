@@ -1,9 +1,0 @@
----
-title: Sync AOC and Git raw indexes error
-category: fixed
-author: Jose Javier Merchante <jjmerchante@bitergia.com>
-issue: null
-notes: >
-  An error occurred in the Areas of Code study, where syncing
-  the AOC and the Git raw index caused an infinite loop due
-  to using different dates for filtering
