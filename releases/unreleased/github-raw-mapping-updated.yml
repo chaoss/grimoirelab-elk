@@ -1,0 +1,9 @@
+---
+title: '[github] Raw mapping updated'
+category: performance
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Update `commit_message`, `body`, and `diff_hunk` fields to
+  non-indexed objects in raw index to improve performance.
+  This change requires reindex of the GitHub index.
