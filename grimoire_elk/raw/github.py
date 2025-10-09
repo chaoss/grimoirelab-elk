@@ -44,8 +44,8 @@ class Mapping(BaseMapping):
                                 "dynamic":false,
                                 "properties": {
                                     "commit_message": {
-                                        "type": "text",
-                                        "index": true
+                                        "type": "object",
+                                        "enabled": false
                                     }
                                 }
                             },
@@ -53,8 +53,8 @@ class Mapping(BaseMapping):
                                 "dynamic":false,
                                 "properties": {
                                     "body": {
-                                        "type": "text",
-                                        "index": true
+                                        "type": "object",
+                                        "enabled": false
                                     }
                                 }
                             },
@@ -62,27 +62,27 @@ class Mapping(BaseMapping):
                                 "dynamic":false,
                                 "properties": {
                                     "body": {
-                                        "type": "text",
-                                        "index": true
+                                        "type": "object",
+                                        "enabled": false
                                     },
-                                   "diff_hunk": {
-                                       "type": "text",
-                                       "index": true
-                                   }
+                                    "diff_hunk": {
+                                        "type": "object",
+                                        "enabled": false
+                                    }
                                 }
                             },
                             "reviews_data": {
                                 "dynamic":false,
                                 "properties": {
                                     "body": {
-                                        "type": "text",
-                                        "index": true
+                                        "type": "object",
+                                        "enabled": false
                                     }
                                 }
                             },
                             "body": {
-                                "type": "text",
-                                "index": true
+                                "type": "object",
+                                "enabled": false
                             }
                         }
                     }
