@@ -1,0 +1,10 @@
+---
+title: Bugzilla REST comments
+category: added
+author: Santiago Dueñas <sduenas@bitergia.com>
+issue: null
+notes: >
+  Bug comments have been added as part of the BugzillaRest
+  enriched index. From now on, this index will have two types
+  of items : 'bug' and 'comment'. The new field 'type' has been
+  added to tag the type of each item.
