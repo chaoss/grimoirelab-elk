@@ -137,11 +137,8 @@ class ESPandasConnector(ESConnector):
                 doc.pop('_type')
 
             docs.append(doc)
-        # TODO exception and error handling
-        chunk_size = 2000
-        chunks = [docs[i:i + chunk_size] for i in range(0, len(docs), chunk_size)]
-        for chunk in chunks:
-            helpers.bulk(self._es_conn, chunk)
+
+        self.bulk_write(docs)
         logger.debug("{} Written: {}".format(self.__log_prefix, len(docs)))
 
 
