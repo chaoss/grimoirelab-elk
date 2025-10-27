@@ -23,7 +23,7 @@ import logging
 from datetime import datetime
 
 import pandas
-from opensearchpy import helpers, NotFoundError, Search, Q
+from opensearchpy import NotFoundError, Search, Q
 
 from cereslib.enrich.enrich import Onion
 from grimoirelab_toolkit import datetime as gl_dt
@@ -193,8 +193,7 @@ class ESOnionConnector(ESConnector):
         #     logger.info("[Onion] Deleted " + str(response.deleted) + " items for refreshing: " + timeframe + " "
         #                 + org + " " + project)
 
-        # TODO exception and error handling
-        helpers.bulk(self._es_conn, docs)
+        self.bulk_write(docs)
         logger.debug("{} Written: {}".format(self.__log_prefix, len(docs)))
 
     def latest_enrichment_date(self):
