@@ -938,14 +938,14 @@ grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.0)"]
 
 [[package]]
 name = "google-auth"
-version = "2.42.0"
+version = "2.42.1"
 description = "Google Authentication Library"
 optional = false
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "google_auth-2.42.0-py2.py3-none-any.whl", hash = "sha256:f8f944bcb9723339b0ef58a73840f3c61bc91b69bf7368464906120b55804473"},
-    {file = "google_auth-2.42.0.tar.gz", hash = "sha256:9bbbeef3442586effb124d1ca032cfb8fb7acd8754ab79b55facd2b8f3ab2802"},
+    {file = "google_auth-2.42.1-py2.py3-none-any.whl", hash = "sha256:eb73d71c91fc95dbd221a2eb87477c278a355e7367a35c0d84e6b0e5f9b4ad11"},
+    {file = "google_auth-2.42.1.tar.gz", hash = "sha256:30178b7a21aa50bffbdc1ffcb34ff770a2f65c712170ecd5446c4bef4dc2b94e"},
 ]
 
 [package.dependencies]
@@ -2532,14 +2532,14 @@ files = [
 
 [[package]]
 name = "sortinghat"
-version = "1.12.1rc1"
+version = "1.12.1rc2"
 description = "A tool to manage identities."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "sortinghat-1.12.1rc1-py3-none-any.whl", hash = "sha256:d8e98d1b8d549690f6f4cb35c9d14cd40ca0d8a0ecac44b16c360b4dcc0ac241"},
-    {file = "sortinghat-1.12.1rc1.tar.gz", hash = "sha256:1ab8bfec065e010769e630de6cbcb0f0cd10e1617fd1f936dd14aa5f9a1a552d"},
+    {file = "sortinghat-1.12.1rc2-py3-none-any.whl", hash = "sha256:b4f1fb2c022be64c340138263b66adef62df5e7e5bbd14c69e38945451780816"},
+    {file = "sortinghat-1.12.1rc2.tar.gz", hash = "sha256:3d3dd12c1aaead85fe14419b4b57425a30740d8df5cf26560b3df5ad1bfdd904"},
 ]
 
 [package.dependencies]
@@ -2625,6 +2625,9 @@ files = [
     {file = "statsmodels-0.14.5-cp313-cp313-win_amd64.whl", hash = "sha256:2a06bca03b7a492f88c8106103ab75f1a5ced25de90103a89f3a287518017939"},
     {file = "statsmodels-0.14.5-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:07c4dad25bbb15864a31b4917a820f6d104bdc24e5ddadcda59027390c3bed9e"},
     {file = "statsmodels-0.14.5-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:babb067c852e966c2c933b79dbb5d0240919d861941a2ef6c0e13321c255528d"},
+    {file = "statsmodels-0.14.5-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:110194b137286173cc676d7bad0119a197778de6478fc6cbdc3b33571165ac1e"},
+    {file = "statsmodels-0.14.5-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9c8a9c384a60c80731b278e7fd18764364c8817f4995b13a175d636f967823d1"},
+    {file = "statsmodels-0.14.5-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:557df3a870a57248df744fdfcc444ecbc5bdbf1c042b8a8b5d8e3e797830dc2a"},
     {file = "statsmodels-0.14.5-cp314-cp314-win_amd64.whl", hash = "sha256:95af7a9c4689d514f4341478b891f867766f3da297f514b8c4adf08f4fa61d03"},
     {file = "statsmodels-0.14.5-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:b23b8f646dd78ef5e8d775d879208f8dc0a73418b41c16acac37361ff9ab7738"},
     {file = "statsmodels-0.14.5-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:4e5e26b21d2920905764fb0860957d08b5ba2fae4466ef41b1f7c53ecf9fc7fa"},
