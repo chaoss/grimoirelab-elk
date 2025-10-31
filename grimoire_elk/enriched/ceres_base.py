@@ -23,7 +23,10 @@ import logging
 from collections import namedtuple
 from grimoirelab_toolkit import datetime
 
-from opensearchpy import helpers, Search, NotFoundError
+from opensearchpy import helpers, Search, NotFoundError, JSONSerializer
+
+MAX_CHUNK_BYTES = 50 * 1024 * 1024  # 50 MB, ES max bulk size is 100MB
+MAX_CHUNK_SIZE = 100
 
 
 logger = logging.getLogger(__name__)
@@ -220,9 +223,59 @@ class ESConnector(Connector):
                 "_source": item["_source"]
             }
             docs.append(doc)
-        # TODO exception and error handling
-        helpers.bulk(self._es_conn, docs)
+        self.bulk_write(docs)
         logger.info("{} Written: {}".format(self.__log_prefix, len(docs)))
+
+    def bulk_write(self, docs):
+        """Upload items to ElasticSearch using bulk API."""
+
+        current = 0
+        total = 0
+        bulk_json = ""
+        bulk_json_size = 0
+        json_serializer = JSONSerializer()
+
+        for doc in docs:
+            new_data = '{{"index" : {{"_id" : "{}" }} }}\n'.format(doc["_id"])
+            new_data += json_serializer.dumps(doc["_source"]) + "\n"
+            doc_size = len(new_data.encode("utf-8", 'replace'))
+
+            # If adding this document exceeds limits, flush current bulk
+            if (bulk_json_size + doc_size) >= MAX_CHUNK_BYTES or current >= MAX_CHUNK_SIZE:
+                total += self._bulk(body=bulk_json)
+                bulk_json = new_data
+                current = 1
+            else:
+                bulk_json += new_data
+                current += 1
+
+        if current > 0:
+            total += self._bulk(body=bulk_json)
+
+        return total
+
+    def _bulk(self, body):
+        """Perform bulk operation in ElasticSearch.
+
+        :param body: bulk body to be sent to ElasticSearch.
+        :return: number of new items added.
+        """
+        try:
+            response = self._es_conn.bulk(body=body, index=self._es_index)
+        except Exception as e:
+            logger.error("{} Error performing bulk operation: {}".format(
+                self.__log_prefix,
+                str(e)
+            ))
+            return 0
+
+        new_items = 0
+        if 'items' in response:
+            for item in response['items']:
+                if 'index' in item and item['index']['result'] == 'created':
+                    new_items += 1
+
+        return new_items
 
     def create_index(self, mappings_file, delete=True):
         """Create a new index.
