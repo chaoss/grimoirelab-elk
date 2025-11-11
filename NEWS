@@ -1,5 +1,14 @@
 # Releases
 
+## grimoire-elk 1.5.2 - (2025-11-11)
+
+**Bug fixes:**
+
+ * UTF-8 handling in OpenSearch for Git Areas of code\
+   Fixed an issue in the OpenSearch integration where some documents in
+   Git areas of code study fail due to invalid UTF-8 characters.
+
+
   ## grimoire-elk 1.5.1 - (2025-10-31)
   
   * Update Poetry's package dependencies

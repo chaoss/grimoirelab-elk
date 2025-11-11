@@ -1,9 +1,0 @@
----
-title: UTF-8 handling in OpenSearch for Git Areas of code
-category: fixed
-author: Jose Javier Merchante <jjmerchante@bitergia.com>
-issue: null
-notes: >
-  Fixed an issue in the OpenSearch integration where
-  some documents in Git areas of code study fail due
-  to invalid UTF-8 characters.
