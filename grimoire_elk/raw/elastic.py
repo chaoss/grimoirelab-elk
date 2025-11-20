@@ -175,11 +175,11 @@ class ElasticOcean(ElasticItems):
 
         last_update = None
         if 'from_date' in signature.parameters:
-            if from_date:
-                last_update = from_date
+            last_update_es = self.get_last_update_from_es(filters_=filters_)
+            if from_date and last_update_es:
+                last_update = max(from_date, last_update_es)
             else:
-                self.last_update = self.get_last_update_from_es(filters_=filters_)
-                last_update = self.last_update
+                last_update = from_date or last_update_es
 
             logger.info("[{}] Incremental from: {} until {} for {}".format(
                         self.perceval_backend.__class__.__name__.lower(),

@@ -1,0 +1,9 @@
+---
+title: Latest date for incremental collection
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Updated the logic for determining the last update date. Now
+  it considers both `from_date` from `setup.cfg` and the last update
+  from Elasticsearch, ensuring to use the most recent date.
