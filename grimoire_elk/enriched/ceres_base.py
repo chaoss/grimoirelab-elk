@@ -270,10 +270,13 @@ class ESConnector(Connector):
             return 0
 
         new_items = 0
-        if 'items' in response:
-            for item in response['items']:
-                if 'index' in item and item['index']['result'] == 'created':
-                    new_items += 1
+        for result in response.get('items', []):
+            op_type, item = result.popitem()
+            status = item.get("status", 500)
+            if 200 <= status < 300:
+                new_items += 1
+            else:
+                logger.debug(f"{self.__log_prefix} Bulk {op_type} failed: {item}")
 
         return new_items
 
