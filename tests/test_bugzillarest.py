@@ -55,17 +55,26 @@ class TestBugzillaRest(TestBaseBackend):
 
         result = self._test_raw_to_enrich()
         self.assertEqual(result['raw'], 7)
-        self.assertEqual(result['enrich'], 7)
+        self.assertEqual(result['enrich'], 117)
 
         enrich_backend = self.connectors[self.connector][2]()
 
         item = self.items[0]
-        eitem = enrich_backend.get_rich_item(item)
-        self.assertIn('main_description', eitem)
-        self.assertIn('main_description_analyzed', eitem)
-        self.assertIn('summary', eitem)
-        self.assertIn('summary_analyzed', eitem)
-        self.assertIn('is_open', eitem)
+
+        # Check bug
+        ebug = enrich_backend.get_rich_item(item)
+        self.assertIn('main_description', ebug)
+        self.assertIn('main_description_analyzed', ebug)
+        self.assertIn('summary', ebug)
+        self.assertIn('summary_analyzed', ebug)
+        self.assertIn('is_open', ebug)
+
+        # Check comments
+        for c in item['data']['comments']:
+            ecomment = enrich_backend.get_rich_item(c, kind='comment', ebug=ebug)
+
+            for cf in enrich_backend.common_fields:
+                self.assertEqual(ecomment[cf], ebug[cf])
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
@@ -128,7 +137,7 @@ class TestBugzillaRest(TestBaseBackend):
 
         result = self._test_raw_to_enrich(sortinghat=True)
         self.assertEqual(result['raw'], 7)
-        self.assertEqual(result['enrich'], 7)
+        self.assertEqual(result['enrich'], 117)
 
         enrich_backend = self.connectors[self.connector][2]()
 
@@ -143,13 +152,15 @@ class TestBugzillaRest(TestBaseBackend):
                 self.assertIn('author_org_name', source)
                 self.assertIn('author_bot', source)
                 self.assertIn('author_multi_org_names', source)
+                self.assertNotEqual('author_user_name', None)
+                self.assertNotEqual('author_user_name', 'Unknown')
 
     def test_raw_to_enrich_projects(self):
         """Test enrich with Projects"""
 
         result = self._test_raw_to_enrich(projects=True)
         self.assertEqual(result['raw'], 7)
-        self.assertEqual(result['enrich'], 7)
+        self.assertEqual(result['enrich'], 117)
 
     def test_copy_raw_fields(self):
         """Test copied raw fields"""

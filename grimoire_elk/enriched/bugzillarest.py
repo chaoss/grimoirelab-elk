@@ -20,11 +20,12 @@
 #   Quan Zhou <quan@bitergia.com>
 #
 
+import json
 import logging
 
 from ..elastic_mapping import Mapping as BaseMapping
 from .enrich import Enrich, metadata
-from .utils import get_time_diff_days
+from .utils import get_time_diff_days, anonymize_url
 
 from grimoirelab_toolkit.datetime import (datetime_utcnow,
                                           str_to_datetime)
@@ -64,6 +65,17 @@ class BugzillaRESTEnrich(Enrich):
 
     mapping = Mapping
     roles = ['assigned_to_detail', 'qa_contact_detail', 'creator_detail']
+    comment_roles = ['author', 'creator']
+
+    # Common fields in bugs and comments
+    common_fields = [
+        "bug_id",
+        "status",
+        "is_open",
+        "product",
+        "component",
+        "version",
+    ]
 
     def get_field_author(self):
         return 'creator_detail'
@@ -74,30 +86,56 @@ class BugzillaRESTEnrich(Enrich):
     def get_identities(self, item):
         """ Return the identities from an item """
 
-        for rol in self.roles:
+        # We guess the item is a bug and not a comment
+        roles = self.roles if 'data' in item else self.comment_roles
+
+        # The item is a bug
+        for rol in roles:
             if rol in item['data']:
                 yield self.get_sh_identity(item["data"][rol])
 
     def get_sh_identity(self, item, identity_field=None):
-        identity = {}
+        identity = {
+            'username': None,
+            'email': None,
+            'name': None,
+        }
 
         user = item  # by default a specific user dict is used
         if isinstance(item, dict) and 'data' in item:
             user = item['data'][identity_field]
+            identity['username'] = user['name'].split("@")[0] if user.get('name', None) else None
+            identity['email'] = user.get('email', None)
+            identity['name'] = user.get('real_name', None)
+        elif identity_field:
+            user = item[identity_field]
+            identity['username'] = user.split("@")[0]
+            identity['email'] = user
+            identity['name'] = None
 
-        identity['username'] = user['name'].split("@")[0] if user.get('name', None) else None
-        identity['email'] = user.get('email', None)
-        identity['name'] = user.get('real_name', None)
         return identity
 
     @metadata
-    def get_rich_item(self, item):
+    def get_rich_item(self, item, kind="bug", ebug=None):
+        if kind == "bug":
+            return self._enrich_bugzilla_bug(item)
+        elif kind == "comment":
+            return self._enrich_bugzilla_comment(item, ebug)
+        else:
+            logger.error(f"[bugzillarest] Invalid type for bugzilla item; kind={kind}")
+
+    def _enrich_bugzilla_bug(self, item):
+        """Enrich a Bugzilla bug item."""
 
         if 'id' not in item['data']:
             logger.warning("[bugzillarest] Dropped bug without bug_id {}".format(item))
             return None
 
-        eitem = {}
+        logger.debug(f"[bugzillarest] Enriching bug; bug_id={item['data']['id']}")
+
+        eitem = {
+            "type": "bug",
+        }
 
         self.copy_raw_fields(self.RAW_FIELDS_COPY, item, eitem)
 
@@ -111,6 +149,8 @@ class BugzillaRESTEnrich(Enrich):
             eitem["creator"] = issue["creator_detail"]["real_name"]
 
         eitem["id"] = issue['id']
+        eitem["bug_id"] = issue['id']
+
         eitem["status"] = issue['status']
         if "summary" in issue:
             eitem["summary"] = issue['summary'][:self.KEYWORD_MAX_LENGTH]
@@ -123,6 +163,7 @@ class BugzillaRESTEnrich(Enrich):
         # Component and product
         eitem["component"] = issue['component']
         eitem["product"] = issue['product']
+        eitem["version"] = issue.get('version', None)
 
         # Keywords
         eitem["keywords"] = issue['keywords']
@@ -192,6 +233,94 @@ class BugzillaRESTEnrich(Enrich):
         self.add_repository_labels(eitem)
         self.add_metadata_filter_raw(eitem)
         return eitem
+
+    def _enrich_bugzilla_comment(self, item, ebug):
+        logger.debug(
+            f"[bugzillarest] Enriching comment; bug_id={item['bug_id']}, comment_id={item['id']}"
+        )
+
+        eitem = {
+            "type": "comment",
+        }
+
+        # Copy raw fields but update specific ones
+        self.copy_raw_fields(self.RAW_FIELDS_COPY, ebug, eitem)
+        eitem[self.get_field_date()] = str_to_datetime(item['creation_time']).isoformat()
+
+        eitem["id"] = item["id"]
+        eitem["text"] = item["text"]
+        eitem["creator"] = item["creator"]
+
+        # Copy common fields
+        for field in self.common_fields:
+            eitem[field] = ebug.get(field, None)
+
+        eitem['url'] = f"{ebug['url']}#c{item['count']}"
+
+        if self.prjs_map:
+            # Find the project in the enriched bug
+            eitem.update(self.get_item_project(ebug))
+
+        # Set time values
+        date_ts = str_to_datetime(item['creation_time'])
+        eitem['creation_ts'] = date_ts.strftime('%Y-%m-%dT%H:%M:%S')
+        eitem.update(self.get_grimoire_fields(item['creation_time'], "bugrest"))
+
+        if self.sortinghat:
+            # Update original with missing values needed for SortingHat
+            item[self.get_field_date()] = eitem[self.get_field_date()]
+            item[self.get_field_author()] = eitem['creator']
+            eitem.update(self.get_item_sh(item, self.comment_roles))
+
+        self.add_repository_labels(eitem)
+        self.add_metadata_filter_raw(eitem)
+
+        return eitem
+
+    def enrich_items(self, ocean_backend):
+        """Enrich Bugzilla items (bugs and comments)."""
+
+        max_items = self.elastic.max_items_bulk
+        current = 0
+        bulk_json = ""
+        total = 0
+
+        url = self.elastic.get_bulk_url()
+
+        logger.debug("[bugzillarest] Adding items to {} (in {} packs)".format(anonymize_url(url), max_items))
+
+        items = ocean_backend.fetch()
+
+        for item in items:
+            if current >= max_items:
+                total += self.elastic.safe_put_bulk(url, bulk_json)
+                bulk_json = ""
+                current = 0
+
+            rich_item = self.get_rich_item(item)
+            data_json = json.dumps(rich_item)
+            bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
+                (rich_item[self.get_field_unique_id()])
+            bulk_json += data_json + "\n"  # Bulk document
+            current += 1
+
+            # Enrich comments
+            if "comments" not in item["data"]:
+                continue
+
+            for comment in item['data']['comments'][1:]:
+                rich_comment = self.get_rich_item(comment, kind="comment", ebug=rich_item)
+
+                data_json = json.dumps(rich_comment)
+                bulk_json += '{"index" : {"_id" : "%s" } }\n' % \
+                    (rich_comment[self.get_field_unique_id()])
+                bulk_json += data_json + "\n"  # Bulk document
+                current += 1
+
+        if current > 0:
+            total += self.elastic.safe_put_bulk(url, bulk_json)
+
+        return total
 
     def get_time_to_first_attention(self, item):
         """Set the time to first attention.
