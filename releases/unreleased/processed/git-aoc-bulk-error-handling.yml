@@ -1,8 +1,0 @@
----
-title: Git aoc bulk error handling
-category: fixed
-author: Jose Javier Merchante <jjmerchante@bitergia.com>
-issue: null
-notes: >
-  Improved handling of partial failures during bulk writes for
-  Git Areas of code to prevent errors.

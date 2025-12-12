@@ -1,5 +1,22 @@
 # Releases
 
+## grimoire-elk 1.6.0 - (2025-12-12)
+
+**New features:**
+
+ * Bugzilla REST comments\
+   Bug comments have been added as part of the BugzillaRest enriched
+   index. From now on, this index will have two types of items : 'bug'
+   and 'comment'. The new field 'type' has been added to tag the type of
+   each item.
+
+**Bug fixes:**
+
+ * Git aoc bulk error handling\
+   Improved handling of partial failures during bulk writes for Git Areas
+   of code to prevent errors.
+
+
 ## grimoire-elk 1.5.3 - (2025-11-25)
 
 **Bug fixes:**
