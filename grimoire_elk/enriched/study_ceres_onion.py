@@ -214,6 +214,11 @@ class ESOnionConnector(ESConnector):
         try:
             response = search.execute()
 
+            if not response.aggregations:
+                logger.debug("{} No aggregations found in {} index".format(
+                             self.__log_prefix, self._es_index))
+                return latest_date
+
             aggs = response.to_dict()['aggregations']
             if aggs['max_date']['value'] is None:
                 logger.debug("{} No data for metadata__enriched_on field found in {} index".format(

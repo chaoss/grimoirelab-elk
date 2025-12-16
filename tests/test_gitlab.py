@@ -28,6 +28,7 @@ from base import TestBaseBackend
 from grimoire_elk.enriched.gitlab import NO_MILESTONE_TAG
 from grimoire_elk.enriched.utils import REPO_LABELS
 from grimoire_elk.raw.gitlab import GitLabOcean
+from grimoirelab_toolkit.datetime import datetime_utcnow
 
 
 class TestGitLab(TestBaseBackend):
@@ -301,17 +302,20 @@ class TestGitLab(TestBaseBackend):
         """ Test that the onion study works correctly """
 
         alias = "all_onion"
+        out_index = "test_gitlab_onion"
         study, ocean_backend, enrich_backend = self._test_study('enrich_onion')
-        study(ocean_backend, enrich_backend, alias, in_index='test_gitlab_enrich', out_index='test_gitlab_onion',
+        study(ocean_backend, enrich_backend, alias, in_index='test_gitlab_enrich', out_index=out_index,
               data_source='gitlab-issues')
+
+        new_index = out_index + "_" + datetime_utcnow().strftime("%Y%m%d")
 
         url = self.es_con + "/_aliases"
         response = requests.get(url, verify=False).json()
-        self.assertTrue('test_gitlab_onion' in response)
+        self.assertTrue(new_index in response)
 
         time.sleep(1)
 
-        url = self.es_con + "/test_gitlab_onion/_search?size=50"
+        url = self.es_con + "/" + new_index + "/_search?size=50"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
         self.assertEqual(len(hits), 22)
