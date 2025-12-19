@@ -1154,7 +1154,11 @@ class Enrich(ElasticItems):
 
         log_prefix = "[" + data_source + "] study onion"
 
-        logger.info("{}  starting study - Input: {} Output: {}".format(log_prefix, in_index, out_index))
+        # out_index contains the current date to avoid removing the
+        # previous index until the new one is ready
+        new_index = out_index + "_" + datetime_utcnow().strftime("%Y%m%d")
+
+        logger.info("{}  starting study - Input: {} Output: {}".format(log_prefix, in_index, new_index))
 
         # Creating connections
         es = ES([enrich_backend.elastic.url], retry_on_timeout=True, timeout=100,
@@ -1165,21 +1169,23 @@ class Enrich(ElasticItems):
                                    contribs_field=contribs_field,
                                    timeframe_field=timeframe_field,
                                    sort_on_field=sort_on_field)
-        out_conn = ESOnionConnector(es_conn=es, es_index=out_index,
+        out_conn = ESOnionConnector(es_conn=es, es_index=new_index,
                                     contribs_field=contribs_field,
                                     timeframe_field=timeframe_field,
                                     sort_on_field=sort_on_field,
                                     read_only=False)
+        old_conn = ESOnionConnector(es_conn=es, es_index=f"{out_index}*",
+                                    contribs_field=contribs_field,
+                                    timeframe_field=timeframe_field,
+                                    sort_on_field=sort_on_field,
+                                    read_only=True)
 
         if not in_conn.exists():
             logger.info("{} missing index {}".format(log_prefix, in_index))
             return
 
         # Check last execution date
-        latest_date = None
-        if out_conn.exists():
-            latest_date = out_conn.latest_enrichment_date()
-
+        latest_date = old_conn.latest_enrichment_date()
         if latest_date:
             logger.info("{} Latest enrichment date: {}".format(log_prefix, latest_date.isoformat()))
             update_after = latest_date + timedelta(seconds=seconds)
@@ -1206,6 +1212,14 @@ class Enrich(ElasticItems):
         if out_conn.exists() and not out_conn.exists_alias(out_index, alias):
             logger.info("{} Creating alias: {}".format(log_prefix, alias))
             out_conn.create_alias(alias)
+
+        # Remove old indices
+        indices = es.cat.indices(index=f"{out_index}*", format='json')
+        for index in indices:
+            index_name = index['index']
+            if index_name != new_index:
+                logger.info("{} Removing old index: {}".format(log_prefix, index_name))
+                es.indices.delete(index=index_name, ignore=[400, 404])
 
         logger.info("{} end".format(log_prefix))
 

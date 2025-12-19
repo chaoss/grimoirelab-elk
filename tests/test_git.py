@@ -38,6 +38,7 @@ from grimoire_elk.enriched.enrich import (logger,
                                           anonymize_url)
 from grimoire_elk.enriched.git import logger as git_logger
 from grimoire_elk.enriched.utils import REPO_LABELS
+from grimoirelab_toolkit.datetime import datetime_utcnow
 from sortinghat.cli.client import SortingHatSchema, SortingHatClientError
 
 
@@ -481,16 +482,19 @@ class TestGit(TestBaseBackend):
         """ Test that the onion study works correctly """
 
         alias = "all_onion"
+        out_index = "test_git_onion"
         study, ocean_backend, enrich_backend = self._test_study('enrich_onion')
-        study(ocean_backend, enrich_backend, alias, in_index='test_git_enrich', out_index='test_git_onion')
+        study(ocean_backend, enrich_backend, alias, in_index='test_git_enrich', out_index=out_index)
+
+        new_index = out_index + "_" + datetime_utcnow().strftime("%Y%m%d")
 
         url = self.es_con + "/_aliases"
         response = requests.get(url, verify=False).json()
-        self.assertTrue('test_git_onion' in response)
+        self.assertTrue(new_index in response)
 
         time.sleep(1)
 
-        url = self.es_con + "/test_git_onion/_search?size=50"
+        url = self.es_con + "/" + new_index + "/_search?size=30"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
         self.assertEqual(len(hits), 28)

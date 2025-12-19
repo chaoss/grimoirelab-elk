@@ -31,6 +31,7 @@ from grimoire_elk.enriched.enrich import logger
 from grimoire_elk.enriched.github import logger as logger_github
 from grimoire_elk.enriched.utils import REPO_LABELS, anonymize_url
 from grimoire_elk.raw.github import GitHubOcean
+from grimoirelab_toolkit.datetime import datetime_utcnow
 
 HEADER_JSON = {"Content-Type": "application/json"}
 
@@ -391,18 +392,23 @@ class TestGitHub(TestBaseBackend):
         """ Test that the onion study works correctly """
 
         alias = "all_onion"
+        out_index_iss = "test_github_issues_onion"
+        out_index_prs = "test_github_prs_onion"
         study, ocean_backend, enrich_backend = self._test_study('enrich_onion')
         study(ocean_backend, enrich_backend, alias, in_index_iss='test_github_enrich', in_index_prs="test_github_enrich",
-              out_index_iss='test_github_issues_onion', out_index_prs="test_github_prs_onion")
+              out_index_iss=out_index_iss, out_index_prs=out_index_prs)
+
+        new_index_iss = out_index_iss + "_" + datetime_utcnow().strftime("%Y%m%d")
+        new_index_prs = out_index_prs + "_" + datetime_utcnow().strftime("%Y%m%d")
 
         url = self.es_con + "/_aliases"
         response = requests.get(url, verify=False).json()
-        self.assertTrue('test_github_issues_onion' in response)
-        self.assertTrue('test_github_prs_onion' in response)
+        self.assertTrue(new_index_iss in response)
+        self.assertTrue(new_index_prs in response)
 
         time.sleep(1)
 
-        url = self.es_con + "/test_github_issues_onion/_search?size=20"
+        url = self.es_con + "/" + new_index_iss + "/_search?size=20"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
         self.assertEqual(len(hits), 12)
@@ -423,7 +429,7 @@ class TestGitHub(TestBaseBackend):
             self.assertIn('data_source', source)
             self.assertIn('grimoire_creation_date', source)
 
-        url = self.es_con + "/test_github_prs_onion/_search?size=20"
+        url = self.es_con + "/" + new_index_prs + "/_search?size=20"
         response = requests.get(url, verify=False).json()
         hits = response['hits']['hits']
         self.assertEqual(len(hits), 12)
