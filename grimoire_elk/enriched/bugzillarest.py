@@ -83,6 +83,9 @@ class BugzillaRESTEnrich(Enrich):
     def get_project_repository(self, eitem):
         return eitem['origin']
 
+    def get_field_unique_id(self):
+        return 'id'
+
     def get_identities(self, item):
         """ Return the identities from an item """
 
@@ -148,7 +151,7 @@ class BugzillaRESTEnrich(Enrich):
         if "creator_detail" in issue and "real_name" in issue["creator_detail"]:
             eitem["creator"] = issue["creator_detail"]["real_name"]
 
-        eitem["id"] = issue['id']
+        eitem["id"] = f"bug_{issue['id']}"
         eitem["bug_id"] = issue['id']
 
         eitem["status"] = issue['status']
@@ -247,7 +250,7 @@ class BugzillaRESTEnrich(Enrich):
         self.copy_raw_fields(self.RAW_FIELDS_COPY, ebug, eitem)
         eitem[self.get_field_date()] = str_to_datetime(item['creation_time']).isoformat()
 
-        eitem["id"] = item["id"]
+        eitem["id"] = f"{ebug['id']}_comment_{item['id']}"
         eitem["text"] = item["text"]
         eitem["creator"] = item["creator"]
 

@@ -1,0 +1,8 @@
+---
+title: Unique BugzillaREST ids
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Bugzilla IDs now include a prefix to ensure uniqueness and
+  avoid conflicts across item types.
