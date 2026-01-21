@@ -1,9 +1,0 @@
----
-title: Onion study output index naming update
-category: added
-author: Jose Javier Merchante <jjmerchante@bitergia.com>
-issue: null
-notes: >
-  The Onion study now uses date based index names, ensuring
-  previous data remains available while a new study runs or
-  if it fails.
