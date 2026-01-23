@@ -64,8 +64,9 @@ class Mapping(BaseMapping):
 class BugzillaRESTEnrich(Enrich):
 
     mapping = Mapping
-    roles = ['assigned_to_detail', 'qa_contact_detail', 'creator_detail']
+    bug_roles = ['assigned_to_detail', 'qa_contact_detail', 'creator_detail']
     comment_roles = ['author', 'creator']
+    roles = bug_roles + comment_roles
 
     # Common fields in bugs and comments
     common_fields = [
@@ -223,7 +224,7 @@ class BugzillaRESTEnrich(Enrich):
             eitem['whiteboard'] = issue['whiteboard']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, self.roles))
+            eitem.update(self.get_item_sh(item, self.bug_roles))
             # To reuse the name of the fields in Bugzilla and share the panel
             eitem['assigned_to_org_name'] = eitem['assigned_to_detail_org_name']
             eitem['assigned_to_uuid'] = eitem['assigned_to_detail_uuid']
