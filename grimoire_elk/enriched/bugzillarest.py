@@ -90,13 +90,16 @@ class BugzillaRESTEnrich(Enrich):
     def get_identities(self, item):
         """ Return the identities from an item """
 
-        # We guess the item is a bug and not a comment
-        roles = self.roles if 'data' in item else self.comment_roles
-
-        # The item is a bug
-        for rol in roles:
+        # Identities from bug item
+        for rol in self.bug_roles:
             if rol in item['data']:
-                yield self.get_sh_identity(item["data"][rol])
+                yield self.get_sh_identity(item, rol)
+
+        # Identities from comments
+        for comment in item['data'].get('comments', []):
+            for rol in self.comment_roles:
+                if rol in comment:
+                    yield self.get_sh_identity(comment, rol)
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {
