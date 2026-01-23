@@ -1,0 +1,8 @@
+---
+title: Autorefresh and identity issues in comments
+category: fixed
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Bugzilla enriched index missed some user names, and identities
+  were not correctly linked to SortingHat.

@@ -705,6 +705,9 @@ class Enrich(ElasticItems):
 
         eitem_sh = self.__get_item_sh_fields_empty(rol)
 
+        # Username is not an individual field
+        eitem_sh.pop(rol + "_user_name", None)
+
         eitem_sh[rol + "_id"] = sh_id
         eitem_sh[rol + "_uuid"] = individual['mk']
 
