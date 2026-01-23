@@ -64,8 +64,9 @@ class Mapping(BaseMapping):
 class BugzillaRESTEnrich(Enrich):
 
     mapping = Mapping
-    roles = ['assigned_to_detail', 'qa_contact_detail', 'creator_detail']
+    bug_roles = ['assigned_to_detail', 'qa_contact_detail', 'creator_detail']
     comment_roles = ['author', 'creator']
+    roles = bug_roles + comment_roles
 
     # Common fields in bugs and comments
     common_fields = [
@@ -89,13 +90,16 @@ class BugzillaRESTEnrich(Enrich):
     def get_identities(self, item):
         """ Return the identities from an item """
 
-        # We guess the item is a bug and not a comment
-        roles = self.roles if 'data' in item else self.comment_roles
-
-        # The item is a bug
-        for rol in roles:
+        # Identities from bug item
+        for rol in self.bug_roles:
             if rol in item['data']:
-                yield self.get_sh_identity(item["data"][rol])
+                yield self.get_sh_identity(item, rol)
+
+        # Identities from comments
+        for comment in item['data'].get('comments', []):
+            for rol in self.comment_roles:
+                if rol in comment:
+                    yield self.get_sh_identity(comment, rol)
 
     def get_sh_identity(self, item, identity_field=None):
         identity = {
@@ -223,7 +227,7 @@ class BugzillaRESTEnrich(Enrich):
             eitem['whiteboard'] = issue['whiteboard']
 
         if self.sortinghat:
-            eitem.update(self.get_item_sh(item, self.roles))
+            eitem.update(self.get_item_sh(item, self.bug_roles))
             # To reuse the name of the fields in Bugzilla and share the panel
             eitem['assigned_to_org_name'] = eitem['assigned_to_detail_org_name']
             eitem['assigned_to_uuid'] = eitem['assigned_to_detail_uuid']
