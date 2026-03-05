@@ -96,18 +96,18 @@ lxml = ["lxml"]
 
 [[package]]
 name = "boto3"
-version = "1.42.59"
+version = "1.42.61"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "boto3-1.42.59-py3-none-any.whl", hash = "sha256:7a66e3e8e2087ea4403e135e9de592e6d63fc9a91080d8dac415bb74df873a72"},
-    {file = "boto3-1.42.59.tar.gz", hash = "sha256:6c4a14a4eb37b58a9048901bdeefbe1c529638b73e8f55413319a25f010ca211"},
+    {file = "boto3-1.42.61-py3-none-any.whl", hash = "sha256:156efcc298a33206be6dfd220815c64aa8b09424017534cabe717636961fc306"},
+    {file = "boto3-1.42.61.tar.gz", hash = "sha256:117ebfc597c95bfb64c6d37ba77bd1c2a97a1885c1dcac2a8be1a14e2139a76d"},
 ]
 
 [package.dependencies]
-botocore = ">=1.42.59,<1.43.0"
+botocore = ">=1.42.61,<1.43.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.16.0,<0.17.0"
 
@@ -116,14 +116,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.42.59"
+version = "1.42.61"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "botocore-1.42.59-py3-none-any.whl", hash = "sha256:d2f2ff7ecc31e86ef46b5daee112cfbca052c13801285fb23af909f7bff5b657"},
-    {file = "botocore-1.42.59.tar.gz", hash = "sha256:5314f19e1da8fc0ebc41bdb8bbe17c9a7397d87f4d887076ac8bdef972a34138"},
+    {file = "botocore-1.42.61-py3-none-any.whl", hash = "sha256:476059beb3f462042742950cf195d26bc313461a77189c16e37e205b0a924b26"},
+    {file = "botocore-1.42.61.tar.gz", hash = "sha256:702d6011ace2b5b652a0dbb45053d4d9f79da2c5b184463042434e1754bdd601"},
 ]
 
 [package.dependencies]
@@ -2719,14 +2719,14 @@ files = [
 
 [[package]]
 name = "sortinghat"
-version = "1.14.1"
+version = "1.14.2"
 description = "A tool to manage identities."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "sortinghat-1.14.1-py3-none-any.whl", hash = "sha256:e847855fa4b601a698d9df54fed853c96d4783efbe79497cf16b35098cc68606"},
-    {file = "sortinghat-1.14.1.tar.gz", hash = "sha256:c2b3400b8237b85861f92b8000bc5368c66ccfd90314d29df7645ce361cb4547"},
+    {file = "sortinghat-1.14.2-py3-none-any.whl", hash = "sha256:b9807824723128a435b6253f516902a7d9f96df86a6a0e58fc9773b3bfb00389"},
+    {file = "sortinghat-1.14.2.tar.gz", hash = "sha256:ad8e5559464c73120808b60a581c56e18a319121fd786abd3022040e7a2bc779"},
 ]
 
 [package.dependencies]
