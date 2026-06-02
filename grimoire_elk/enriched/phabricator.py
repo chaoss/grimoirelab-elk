@@ -91,6 +91,33 @@ class PhabricatorEnrich(Enrich):
     def get_field_author(self):
         return "authorData"
 
+    @staticmethod
+    def _get_user_data(user):
+        """Return normalized user payload for old and new Phabricator User API."""
+
+        if not isinstance(user, dict):
+            return None
+
+        if 'fields' in user and isinstance(user['fields'], dict):
+            normalized_user = dict(user)
+            normalized_user.update(user['fields'])
+            return normalized_user
+
+        return user
+
+    @classmethod
+    def _get_user_value(cls, user, *keys):
+        """Return the value of the first key found in the normalized user data."""
+
+        normalized_user = cls._get_user_data(user)
+        if not normalized_user:
+            return None
+
+        for key in keys:
+            if key in normalized_user:
+                return normalized_user[key]
+        return None
+
     def get_identities(self, item):
         """ Return the identities from an item """
 
@@ -119,10 +146,10 @@ class PhabricatorEnrich(Enrich):
         if user is None:
             return identity
 
-        if 'userName' in user:
-            identity['username'] = user['userName']
-        if 'realName' in user:
-            identity['name'] = user['realName']
+        if username := self._get_user_value(user, 'userName', 'username'):
+            identity['username'] = username
+        if name := self._get_user_value(user, 'realName'):
+            identity['name'] = name
 
         return identity
 
@@ -175,8 +202,9 @@ class PhabricatorEnrich(Enrich):
             event['transactionID'] = t['transactionID']
             event['type'] = t['transactionType']
             event['username'] = None
-            if 'authorData' in t and 'userName' in t['authorData']:
-                event['event_author_name'] = t['authorData']['userName']
+            event_author_name = self._get_user_value(t.get('authorData'), 'userName', 'username')
+            if event_author_name:
+                event['event_author_name'] = event_author_name
             event['update_date'] = unixtime_to_datetime(float(t['dateCreated'])).isoformat()
             event['oldValue'] = ''
             event['newValue'] = ''
@@ -236,23 +264,33 @@ class PhabricatorEnrich(Enrich):
 
     def __fill_phab_ids(self, item):
         """ Get mappings between phab ids and names """
+
         for p in item['projects']:
             if p and 'name' in p and 'phid' in p:
                 self.phab_ids_names[p['phid']] = p['name']
+
         if 'authorData' not in item['fields'] or not item['fields']['authorData']:
             return
-        self.phab_ids_names[item['fields']['authorData']['phid']] = item['fields']['authorData']['userName']
+        author_name = self._get_user_value(item['fields']['authorData'], 'userName', 'username')
+        if author_name:
+            self.phab_ids_names[item['fields']['authorData']['phid']] = author_name
+
         if 'ownerData' in item['fields'] and item['fields']['ownerData']:
-            self.phab_ids_names[item['fields']['ownerData']['phid']] = item['fields']['ownerData']['userName']
+            owner_data = item['fields']['ownerData']
+            owner_name = self._get_user_value(owner_data, 'userName', 'username')
+            if owner_name:
+                self.phab_ids_names[owner_data['phid']] = owner_name
+
         if 'priority' in item['fields']:
             val = item['fields']['priority']['value']
             self.phab_ids_names[str(val)] = item['fields']['priority']['name']
         for t in item['transactions']:
-            if 'authorData' in t and t['authorData'] and 'userName' in t['authorData']:
-                self.phab_ids_names[t['authorData']['phid']] = t['authorData']['userName']
-            elif t['authorData'] and 'name' in t['authorData']:
-                # Herald
-                self.phab_ids_names[t['authorData']['phid']] = t['authorData']['name']
+            author_data = t.get('authorData')
+            if not author_data:
+                continue
+            author_name = self._get_user_value(author_data, 'userName', 'username', 'name')
+            if author_name:
+                self.phab_ids_names[author_data['phid']] = author_name
 
     @metadata
     def get_rich_item(self, item):
@@ -284,14 +322,15 @@ class PhabricatorEnrich(Enrich):
         eitem['num_changes'] = len(phab_item['transactions'])
 
         if 'authorData' in phab_item['fields'] and phab_item['fields']['authorData']:
-            # eitem['author_roles'] = ",".join(phab_item['fields']['authorData']['roles'])
-            eitem['author_roles'] = phab_item['fields']['authorData']['roles']
-            eitem['author_userName'] = phab_item['fields']['authorData']['userName']
-            eitem['author_realName'] = phab_item['fields']['authorData']['realName']
+            author_data = phab_item['fields']['authorData']
+            eitem['author_roles'] = self._get_user_value(author_data, 'roles')
+            eitem['author_userName'] = self._get_user_value(author_data, 'userName', 'username')
+            eitem['author_realName'] = self._get_user_value(author_data, 'realName')
         if 'ownerData' in phab_item['fields'] and phab_item['fields']['ownerData']:
-            eitem['assigned_to_roles'] = phab_item['fields']['ownerData']['roles']
-            eitem['assigned_to_userName'] = phab_item['fields']['ownerData']['userName']
-            eitem['assigned_to_realName'] = phab_item['fields']['ownerData']['realName']
+            owner_data = phab_item['fields']['ownerData']
+            eitem['assigned_to_roles'] = self._get_user_value(owner_data, 'roles')
+            eitem['assigned_to_userName'] = self._get_user_value(owner_data, 'userName', 'username')
+            eitem['assigned_to_realName'] = self._get_user_value(owner_data, 'realName')
 
         eitem['priority'] = phab_item['fields']['priority']['name']
         eitem['priority_value'] = phab_item['fields']['priority']['value']
@@ -329,9 +368,9 @@ class PhabricatorEnrich(Enrich):
                     eitem['time_to_assign_days'] = get_time_diff_days(eitem['creation_date'], change_date)
                     first_assignee_phid = change['newValue']
                     first_assignee_date = change_date
-                if 'authorData' in change and change['authorData'] and 'userName' in change['authorData'] \
-                        and change['authorData']['userName'] not in changes_assignee_list:
-                    changes_assignee_list.append(change['authorData']['userName'])
+                author_name = self._get_user_value(change.get('authorData'), 'userName', 'username')
+                if author_name and author_name not in changes_assignee_list:
+                    changes_assignee_list.append(author_name)
                 eitem['changes_assignment'] += 1
             elif change["transactionType"] in ["mergedinto"]:
                 eitem['closed_at'] = change_date
