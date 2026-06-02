@@ -1,0 +1,8 @@
+---
+title: Phabricator user enrichment from user.search API
+category: added
+author: Jose Javier Merchante <jjmerchante@bitergia.com>
+issue: null
+notes: >
+  Added support for enriching Phabricator user data using
+  the `user.search` API endpoint alongside `user.query`.
