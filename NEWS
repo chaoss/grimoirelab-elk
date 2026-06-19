@@ -1,5 +1,14 @@
 # Releases
 
+## grimoire-elk 1.8.0 - (2026-06-19)
+
+**New features:**
+
+ * Phabricator user enrichment from user.search API\
+   Added support for enriching Phabricator user data using the
+   `user.search` API endpoint alongside `user.query`.
+
+
   ## grimoire-elk 1.7.4 - (2026-05-06)
   
   * Update Poetry's package dependencies
