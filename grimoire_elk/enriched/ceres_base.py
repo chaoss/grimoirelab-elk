@@ -88,7 +88,7 @@ class CeresBase:
         if from_date:
             logger.debug("{} reading items since {}".format(logs_prefix, from_date))
         else:
-            logger.info("{} reading items since the beginning of times".format(logs_prefix))
+            logger.debug("{} reading items since the beginning of times".format(logs_prefix))
 
         cont = 0
         total_processed = 0
@@ -104,15 +104,15 @@ class CeresBase:
                 self._out.write(process_results.out_items)
                 total_written += len(process_results.out_items)
             else:
-                logger.info("{} no new items to be written this time.".format(logs_prefix))
+                logger.debug("{} no new items to be written this time.".format(logs_prefix))
 
             logger.debug("{} items read/to be written/total read/total processed/total written: "
                          "{}/{}/{}/{}/{}".format(logs_prefix, len(item_block),
                                                  len(process_results.out_items),
                                                  cont, total_processed, total_processed))
 
-        logger.info("{} SUMMARY: Items total read/total processed/total written: "
-                    "{}/{}/{}".format(logs_prefix, cont, total_processed, total_written))
+        logger.debug("{} SUMMARY: Items total read/total processed/total written: "
+                     "{}/{}/{}".format(logs_prefix, cont, total_processed, total_written))
 
         logger.debug("{} this is the end.".format(logs_prefix))
 
@@ -224,7 +224,7 @@ class ESConnector(Connector):
             }
             docs.append(doc)
         self.bulk_write(docs)
-        logger.info("{} Written: {}".format(self.__log_prefix, len(docs)))
+        logger.debug("{} Written: {}".format(self.__log_prefix, len(docs)))
 
     def bulk_write(self, docs):
         """Upload items to ElasticSearch using bulk API."""
