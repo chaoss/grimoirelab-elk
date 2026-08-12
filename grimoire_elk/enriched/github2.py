@@ -88,6 +88,18 @@ class Mapping(BaseMapping):
                },
                "id": {
                     "type": "keyword"
+               },
+               "num_approvals": {
+                   "type": "integer"
+               },
+               "first_approver_login": {
+                   "type": "keyword"
+               },
+               "first_approval_date": {
+                   "type": "date"
+               },
+               "time_to_first_approval_days": {
+                   "type": "float"
                }
             }
         }
@@ -585,6 +597,28 @@ class GitHubEnrich2(Enrich):
         rich_pr['code_merge_duration'] = get_time_diff_days(pull_request['created_at'],
                                                             pull_request['merged_at'])
         rich_pr['num_review_comments'] = pull_request['review_comments']
+
+        # PR approval metrics
+        reviews = pull_request.get('reviews_data', [])
+        approved_reviews = [r for r in reviews
+                            if r.get('state') == 'APPROVED' and r.get('submitted_at')]
+
+        rich_pr['num_approvals'] = len(approved_reviews)
+
+        if approved_reviews:
+            approved_reviews.sort(key=lambda r: r['submitted_at'])
+            first_approval = approved_reviews[0]
+
+            rich_pr['first_approver_login'] = first_approval.get('user', {}).get('login')
+            rich_pr['first_approval_date'] = first_approval.get('submitted_at')
+            rich_pr['time_to_first_approval_days'] = get_time_diff_days(
+                pull_request['created_at'],
+                rich_pr['first_approval_date']
+            )
+        else:
+            rich_pr['first_approver_login'] = None
+            rich_pr['first_approval_date'] = None
+            rich_pr['time_to_first_approval_days'] = None
 
         rich_pr['time_to_merge_request_response'] = None
         if pull_request['review_comments'] != 0:

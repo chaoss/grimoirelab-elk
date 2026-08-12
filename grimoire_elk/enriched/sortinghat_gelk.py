@@ -24,8 +24,12 @@ from datetime import datetime
 import logging
 import time
 
-from sortinghat.cli.client import (SortingHatClientError,
-                                   SortingHatSchema)
+try:
+    from sortinghat.cli.client import (SortingHatClientError,
+                                       SortingHatSchema)
+except ImportError:
+    SortingHatClientError = Exception
+    SortingHatSchema = None
 from sgqlc.operation import Operation
 
 

@@ -1,0 +1,8 @@
+title: 'Add GitHub PR approval metrics'
+category: added
+issue: 1090
+notes: >
+  Add approval metrics to GitHub and GitHub2 pull request enrichment.
+  The enriched documents now include the number of approvals, the first
+  approver login, the first approval timestamp, and the time to first
+  approval in days.
