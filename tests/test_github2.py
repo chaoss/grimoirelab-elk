@@ -87,6 +87,11 @@ class TestGitHub2(TestBaseBackend):
         self.assertEqual(eitem['time_to_merge_request_response'], 1.0)
         self.assertEqual(eitem['user_login'], 'zhquan_example')
 
+        self.assertEqual(eitem['num_approvals'], 1)
+        self.assertEqual(eitem['first_approver_login'], 'rikoe')
+        self.assertEqual(eitem['first_approval_date'], '2019-02-21T17:41:41Z')
+        self.assertAlmostEqual(eitem['time_to_first_approval_days'], 0.24, places=2)
+
         item = self.items[2]
         eitem = enrich_backend.get_rich_item(item)
         self.assertEqual(item['category'], 'repository')
@@ -144,6 +149,11 @@ class TestGitHub2(TestBaseBackend):
         self.assertNotIn('reaction_laugh', eitem)
         self.assertNotIn('reaction_total_count', eitem)
         self.assertEqual(eitem['user_login'], 'acs')
+
+        self.assertEqual(eitem['num_approvals'], 0)
+        self.assertIsNone(eitem['first_approver_login'])
+        self.assertIsNone(eitem['first_approval_date'])
+        self.assertIsNone(eitem['time_to_first_approval_days'])
 
         # Check pull requests enriched items
         item = self.items[7]

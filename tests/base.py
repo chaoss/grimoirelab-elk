@@ -29,7 +29,10 @@ from datetime import datetime
 
 from opensearchpy import OpenSearch
 
-from grimoire_elk.enriched.sortinghat_gelk import SortingHat
+try:
+    from grimoire_elk.enriched.sortinghat_gelk import SortingHat
+except ImportError:
+    SortingHat = None
 
 if '..' not in sys.path:
     sys.path.insert(0, '..')
@@ -143,7 +146,7 @@ class TestBaseBackend(unittest.TestCase):
         cls.db_tenant = cls.config.get('Database', 'tenant', fallback=None)
 
     def setUp(self):
-        with open(os.path.join("data", self.connector + ".json")) as f:
+        with open(os.path.join(os.path.dirname(__file__), "data", self.connector + ".json")) as f:
             self.items = json.load(f)
 
         self.ocean_backend = None
