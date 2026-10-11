@@ -1,0 +1,6 @@
+title: 'reset the counter after processed commits in branch '
+category: fixed
+author: ChenqiShan <chenqishan337@gmail.com>
+issue: 
+notes: >
+    During the study enrich_git_branches, we reset the counter only after if commit_count == MAX_BULK_UPDATE_SIZE:.We should also reset the counter after if commit_count: by the same way.Otherwise, to_process list will be added to next for Loop when branched has been added by "if commit_count:".
