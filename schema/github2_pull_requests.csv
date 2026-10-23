@@ -10,8 +10,8 @@ author_name,keyword,TRUE,Pull request author name from SortingHat profile.,Grimo
 author_org_name,keyword,TRUE,Pull request author organization name from SortingHat profile.,GrimoireLab / SortingHat
 author_user_name,keyword,TRUE,Pull request author username from SortingHat profile.,GrimoireLab / SortingHat
 author_uuid,keyword,TRUE,Pull request author UUID from SortingHat profile.,GrimoireLab / SortingHat
-body,keyword,TRUE,Body of the pull request/comment.,Data Source / Parsed
-body_analyzed,text,FALSE,Body of the pull request/comment.,Data Source / Parsed
+body,keyword,TRUE,Body of the review comment (truncated to 1000 characters). Only set on comment items.,Data Source / Parsed
+body_analyzed,text,FALSE,Full body of the review comment for full-text search. Only set on comment items.,Data Source / Parsed
 code_merge_duration,float,TRUE,Difference in days between creation and merging dates.,GrimoireLab
 comment_updated_at,date,TRUE,Date when the comment was updated.,Data Source / Parsed
 demography_max_date,date,TRUE,Date of the latest pull request of the corresponding author. Available only when demography study is active.,GrimoireLab
