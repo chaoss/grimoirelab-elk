@@ -1085,11 +1085,18 @@ class GitEnrich(Enrich):
             ]
         """ % anonymize_url(git_repo.uri)
 
+        # Also refresh `metadata__enriched_on`, so it shows when the branch
+        # information was last updated (#1079)
+        script = ("ctx._source.branches = ctx._source.branches_aux; ctx._source.remove('branches_aux'); "
+                  "ctx._source.metadata__enriched_on = params.enriched_on;")
         es_query = """
             {
               "script": {
-                "source": "ctx._source.branches = ctx._source.branches_aux; ctx._source.remove('branches_aux');",
-                "lang": "painless"
+                "source": "%s",
+                "lang": "painless",
+                "params": {
+                    "enriched_on": "%s"
+                }
               },
               "query": {
                 "bool": {
@@ -1097,7 +1104,7 @@ class GitEnrich(Enrich):
                 }
               }
             }
-            """ % fltr
+            """ % (script, datetime_utcnow().isoformat(), fltr)
 
         index = enrich_backend.elastic.index_url
         r = self.requests.post(index + "/_update_by_query?refresh", data=es_query, headers=HEADER_JSON, verify=False)
