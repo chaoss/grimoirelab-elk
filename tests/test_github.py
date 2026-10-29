@@ -23,12 +23,13 @@
 import logging
 import time
 import unittest
+from unittest.mock import MagicMock, patch
 
 import requests
 
 from base import TestBaseBackend
 from grimoire_elk.enriched.enrich import logger
-from grimoire_elk.enriched.github import logger as logger_github
+from grimoire_elk.enriched.github import GitHubEnrich, logger as logger_github
 from grimoire_elk.enriched.utils import REPO_LABELS, anonymize_url
 from grimoire_elk.raw.github import GitHubOcean
 from grimoirelab_toolkit.datetime import datetime_utcnow
@@ -100,6 +101,12 @@ class TestGitHub(TestBaseBackend):
         self.assertEqual(eitem['deletions'], 0)
         self.assertEqual(eitem['changed_files'], 4)
 
+        # item[1] has no reviews_data, so all approval fields must be zero/None
+        self.assertEqual(eitem['num_approvals'], 0)
+        self.assertIsNone(eitem['first_approver_login'])
+        self.assertIsNone(eitem['first_approval_date'])
+        self.assertIsNone(eitem['time_to_first_approval_days'])
+
         self.assertEqual(eitem['url'], 'https://github.com/zhquan_example/repo/pull/1')
         self.assertEqual(eitem['issue_url'], 'https://github.com/zhquan_example/repo/pull/1')
 
@@ -163,8 +170,23 @@ class TestGitHub(TestBaseBackend):
         self.assertEqual(eitem['deletions'], 1)
         self.assertEqual(eitem['changed_files'], 1)
 
+        self.assertEqual(eitem['num_approvals'], 0)
+        self.assertIsNone(eitem['first_approver_login'])
+        self.assertIsNone(eitem['first_approval_date'])
+        self.assertIsNone(eitem['time_to_first_approval_days'])
+
         self.assertEqual(eitem['url'], 'https://github.com/chaoss/grimoirelab-perceval/pull/4')
         self.assertEqual(eitem['issue_url'], 'https://github.com/chaoss/grimoirelab-perceval/pull/4')
+
+        # item[7]: PR with one APPROVED review — the happy path for approval metrics
+        item = self.items[7]
+        eitem = enrich_backend.get_rich_item(item)
+        self.assertEqual(item['category'], 'pull_request')
+        self.assertEqual(eitem['num_approvals'], 1)
+        self.assertEqual(eitem['first_approver_login'], 'rikoe')
+        self.assertEqual(eitem['first_approval_date'], '2019-02-21T17:41:41Z')
+        # PR created 2019-02-21T11:52:46Z, approved 2019-02-21T17:41:41Z → ~0.24 days
+        self.assertAlmostEqual(eitem['time_to_first_approval_days'], 0.24, places=2)
 
     def test_enrich_repo_labels(self):
         """Test whether the field REPO_LABELS is present in the enriched items"""
@@ -449,6 +471,226 @@ class TestGitHub(TestBaseBackend):
             self.assertIn('metadata__enriched_on', source)
             self.assertIn('data_source', source)
             self.assertIn('grimoire_creation_date', source)
+
+
+class TestGitHubPRApprovalMetrics(unittest.TestCase):
+    """Isolated unit tests for the PR approval metrics block in __get_rich_pull.
+
+    These tests do NOT require a live Elasticsearch / OpenSearch instance.
+    They call get_rich_item() directly on a minimal synthetic item and inspect
+    the four fields added for chaoss/grimoirelab-elk#1090:
+      - num_approvals
+      - first_approver_login
+      - first_approval_date
+      - time_to_first_approval_days
+    """
+
+    def _make_enrich_backend(self):
+        """Return a GitHubEnrich instance with SortingHat and project-map disabled."""
+        backend = GitHubEnrich()
+        # Stub out SortingHat so get_item_sh returns an empty dict
+        backend.sortinghat = False
+        backend.prjs_map = None
+        return backend
+
+    def _make_pr_item(self, reviews_data, created_at='2023-01-01T00:00:00Z'):
+        """Return a minimal raw Perceval pull_request item with the given reviews_data."""
+        return {
+            'uuid': 'test-uuid',
+            'origin': 'https://github.com/test/repo',
+            'tag': 'https://github.com/test/repo',
+            'category': 'pull_request',
+            'metadata__timestamp': '2023-01-01T00:00:00Z',
+            'metadata__updated_on': '2023-01-01T00:00:00Z',
+            'metadata__enriched_on': '2023-01-01T00:00:00Z',
+            'data': {
+                'number': 42,
+                'id': 1001,
+                'html_url': 'https://github.com/test/repo/pull/42',
+                'title': 'Test PR',
+                'state': 'closed',
+                'created_at': created_at,
+                'updated_at': '2023-01-02T00:00:00Z',
+                'closed_at': '2023-01-02T00:00:00Z',
+                'merged_at': '2023-01-02T00:00:00Z',
+                'merged': True,
+                'additions': 10,
+                'deletions': 5,
+                'changed_files': 2,
+                'review_comments': 0,
+                'labels': [],
+                'user': {'login': 'author'},
+                'user_data': None,
+                'merged_by': None,
+                'merged_by_data': None,
+                'base': {'repo': {'forks_count': 0}},
+                'review_comments_data': [],
+                'comments_data': [],
+                'reactions_data': [],
+                'reviews_data': reviews_data,
+            },
+        }
+
+    def _get_rich(self, reviews_data, created_at='2023-01-01T00:00:00Z'):
+        """Helper: build a synthetic item, enrich it, and return the rich dict."""
+        backend = self._make_enrich_backend()
+        item = self._make_pr_item(reviews_data, created_at=created_at)
+        # get_item_sh requires SortingHat; patch it to return empty
+        with patch.object(backend, 'get_item_sh', return_value={}):
+            return backend.get_rich_item(item)
+
+    # ------------------------------------------------------------------
+    # Test cases
+    # ------------------------------------------------------------------
+
+    def test_no_reviews_data_key(self):
+        """PR with no reviews_data key at all → all approval fields are zero/None."""
+        eitem = self._get_rich([])
+        self.assertEqual(eitem['num_approvals'], 0)
+        self.assertIsNone(eitem['first_approver_login'])
+        self.assertIsNone(eitem['first_approval_date'])
+        self.assertIsNone(eitem['time_to_first_approval_days'])
+
+    def test_only_pending_reviews(self):
+        """PENDING reviews (no submitted_at) are filtered out; fields remain None."""
+        reviews = [
+            {'state': 'PENDING', 'submitted_at': None,
+             'user': {'login': 'reviewer1'}},
+        ]
+        eitem = self._get_rich(reviews)
+        self.assertEqual(eitem['num_approvals'], 0)
+        self.assertIsNone(eitem['first_approver_login'])
+        self.assertIsNone(eitem['first_approval_date'])
+        self.assertIsNone(eitem['time_to_first_approval_days'])
+
+    def test_only_changes_requested_reviews(self):
+        """CHANGES_REQUESTED reviews do not count as approvals."""
+        reviews = [
+            {'state': 'CHANGES_REQUESTED', 'submitted_at': '2023-01-01T06:00:00Z',
+             'user': {'login': 'strict-reviewer'}},
+        ]
+        eitem = self._get_rich(reviews)
+        self.assertEqual(eitem['num_approvals'], 0)
+        self.assertIsNone(eitem['first_approver_login'])
+        self.assertIsNone(eitem['first_approval_date'])
+        self.assertIsNone(eitem['time_to_first_approval_days'])
+
+    def test_only_commented_reviews(self):
+        """COMMENTED reviews do not count as approvals; all four fields must be zero/None."""
+        reviews = [
+            {'state': 'COMMENTED', 'submitted_at': '2023-01-01T06:00:00Z',
+             'user': {'login': 'drive-by'}},
+        ]
+        eitem = self._get_rich(reviews)
+        self.assertEqual(eitem['num_approvals'], 0)
+        self.assertIsNone(eitem['first_approver_login'])
+        self.assertIsNone(eitem['first_approval_date'])
+        self.assertIsNone(eitem['time_to_first_approval_days'])
+
+    def test_single_approved_review(self):
+        """Single APPROVED review → correct count, login, date, and a positive duration.
+
+        get_time_diff_days computes (end - start) / 86400 and rounds to 2 decimal
+        places (%.2f), so we assert with places=2 to stay within that precision.
+        """
+        # created_at = 2023-01-01T00:00:00Z, submitted_at = 2023-01-01T12:00:00Z → 0.50 days
+        reviews = [
+            {'state': 'APPROVED', 'submitted_at': '2023-01-01T12:00:00Z',
+             'user': {'login': 'alice'}},
+        ]
+        eitem = self._get_rich(reviews, created_at='2023-01-01T00:00:00Z')
+        self.assertEqual(eitem['num_approvals'], 1)
+        self.assertEqual(eitem['first_approver_login'], 'alice')
+        self.assertEqual(eitem['first_approval_date'], '2023-01-01T12:00:00Z')
+        # Positive: approval happened AFTER creation
+        self.assertGreater(eitem['time_to_first_approval_days'], 0)
+        self.assertAlmostEqual(eitem['time_to_first_approval_days'], 0.5, places=2)
+
+    def test_multiple_approvals_picks_earliest(self):
+        """With multiple APPROVED reviews, the chronologically first one wins."""
+        reviews = [
+            # Intentionally out of order to exercise the sort
+            {'state': 'APPROVED', 'submitted_at': '2023-01-03T00:00:00Z',
+             'user': {'login': 'charlie'}},
+            {'state': 'APPROVED', 'submitted_at': '2023-01-01T06:00:00Z',
+             'user': {'login': 'alice'}},
+            {'state': 'APPROVED', 'submitted_at': '2023-01-02T00:00:00Z',
+             'user': {'login': 'bob'}},
+        ]
+        eitem = self._get_rich(reviews, created_at='2023-01-01T00:00:00Z')
+        self.assertEqual(eitem['num_approvals'], 3)
+        self.assertEqual(eitem['first_approver_login'], 'alice')   # earliest
+        self.assertEqual(eitem['first_approval_date'], '2023-01-01T06:00:00Z')
+        # 6 h = 0.25 days
+        # 6 h / 24 = 0.25 exactly; %.2f rounding doesn't alter it
+        self.assertAlmostEqual(eitem['time_to_first_approval_days'], 0.25, places=2)
+
+    def test_mixed_states_only_approved_counted(self):
+        """Mix of states: only APPROVED entries contribute to num_approvals."""
+        reviews = [
+            {'state': 'CHANGES_REQUESTED', 'submitted_at': '2023-01-01T01:00:00Z',
+             'user': {'login': 'strict'}},
+            {'state': 'APPROVED', 'submitted_at': '2023-01-01T12:00:00Z',
+             'user': {'login': 'alice'}},
+            {'state': 'PENDING', 'submitted_at': None,
+             'user': {'login': 'slow'}},
+            {'state': 'APPROVED', 'submitted_at': '2023-01-02T00:00:00Z',
+             'user': {'login': 'bob'}},
+        ]
+        eitem = self._get_rich(reviews, created_at='2023-01-01T00:00:00Z')
+        self.assertEqual(eitem['num_approvals'], 2)   # alice + bob
+        self.assertEqual(eitem['first_approver_login'], 'alice')
+        self.assertEqual(eitem['first_approval_date'], '2023-01-01T12:00:00Z')
+
+    def test_approved_with_null_submitted_at_excluded(self):
+        """Malformed APPROVED review with submitted_at=None must be excluded by the
+        list-comprehension filter (line 541: `and r.get('submitted_at')`), so the
+        sort lambda never receives None and no TypeError is raised.
+        """
+        reviews = [
+            # Malformed: APPROVED but GitHub returned no timestamp
+            {'state': 'APPROVED', 'submitted_at': None,
+             'user': {'login': 'ghost'}},
+            # Valid approval that should be the winner
+            {'state': 'APPROVED', 'submitted_at': '2023-01-01T12:00:00Z',
+             'user': {'login': 'alice'}},
+        ]
+        eitem = self._get_rich(reviews, created_at='2023-01-01T00:00:00Z')
+        # Only the timestamped approval is counted
+        self.assertEqual(eitem['num_approvals'], 1)
+        self.assertEqual(eitem['first_approver_login'], 'alice')
+        self.assertEqual(eitem['first_approval_date'], '2023-01-01T12:00:00Z')
+
+    def test_sort_stability_at_second_boundaries(self):
+        """ISO-8601 Z timestamps are fixed-width, so lexicographic == chronological.
+        This test uses timestamps that differ only by seconds to confirm the sort
+        picks the correct earliest entry and that no boundary error occurs.
+        """
+        reviews = [
+            {'state': 'APPROVED', 'submitted_at': '2023-06-15T10:00:59Z',
+             'user': {'login': 'late'}},
+            {'state': 'APPROVED', 'submitted_at': '2023-06-15T10:00:01Z',
+             'user': {'login': 'early'}},
+            {'state': 'APPROVED', 'submitted_at': '2023-06-15T10:00:30Z',
+             'user': {'login': 'middle'}},
+        ]
+        eitem = self._get_rich(reviews, created_at='2023-06-15T10:00:00Z')
+        self.assertEqual(eitem['num_approvals'], 3)
+        self.assertEqual(eitem['first_approver_login'], 'early')  # 10:00:01 is earliest
+        self.assertEqual(eitem['first_approval_date'], '2023-06-15T10:00:01Z')
+        # 1 second = 1/86400 days ≈ 0.0, rounds to 0.0 at 2 d.p.
+        self.assertGreaterEqual(eitem['time_to_first_approval_days'], 0.0)
+
+    def test_approved_review_with_no_user(self):
+        """APPROVED review where user dict is absent → first_approver_login is None (no crash)."""
+        reviews = [
+            {'state': 'APPROVED', 'submitted_at': '2023-01-01T06:00:00Z',
+             'user': None},
+        ]
+        eitem = self._get_rich(reviews)
+        self.assertEqual(eitem['num_approvals'], 1)
+        self.assertIsNone(eitem['first_approver_login'])
+        self.assertEqual(eitem['first_approval_date'], '2023-01-01T06:00:00Z')
 
 
 if __name__ == "__main__":

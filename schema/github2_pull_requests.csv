@@ -16,6 +16,9 @@ code_merge_duration,float,TRUE,Difference in days between creation and merging d
 comment_updated_at,date,TRUE,Date when the comment was updated.,Data Source / Parsed
 demography_max_date,date,TRUE,Date of the latest pull request of the corresponding author. Available only when demography study is active.,GrimoireLab
 demography_min_date,date,TRUE,Date of the first (oldest) pull request of the corresponding author. Available only when demography study is active.,GrimoireLab
+deletions,long,TRUE,Number of deletions in the Pull Request.,GrimoireLab
+first_approval_date,date,TRUE,Date of the first APPROVED review on the Pull Request.,GrimoireLab
+first_approver_login,keyword,TRUE,Login of the first user who APPROVED the Pull Request.,GrimoireLab
 forks,long,TRUE,Number of repository forks.,Data Source / Parsed
 github_repo,keyword,TRUE,GitHub repository name.,Data Source / Parsed
 grimoire_creation_date,date,TRUE,Pull request/comment creation date.,Data Source / Parsed
@@ -38,13 +41,14 @@ merged_by_data_id,keyword,TRUE,Merge author's ID from SortingHat profile.,Grimoi
 merged_by_data_name,keyword,TRUE,Merge author name from SortingHat profile.,GrimoireLab / SortingHat
 merged_by_data_org_name,keyword,TRUE,Merge author organization from SortingHat profile.,GrimoireLab / SortingHat
 merged_by_data_user_name,keyword,TRUE,Merge author username from SortingHat profile.,GrimoireLab / SortingHat
-merged_by_data_uuid,keyword,TRUE,Merge author UUID from SortingHat profile.,GrimoireLab / SortingHat
+merged_by_data_uuid,keyword,TRUE,Merge author UUID from SortingHat profile.,GrimoireLab
 metadata__enriched_on,date,TRUE,Date when the item was enriched.,GrimoireLab
 metadata__gelk_backend_name,keyword,TRUE,Name of the backend used to enrich information.,GrimoireLab
 metadata__gelk_version,keyword,TRUE,Version of the backend used to enrich information.,GrimoireLab
 metadata__timestamp,date,TRUE,Date when the item was stored in RAW index.,GrimoireLab
 metadata__updated_on,date,TRUE,Date when the item was updated on its original data source.,GrimoireLab
-num_review_comments,long,TRUE,Number of review comments.,GrimoireLab
+num_approvals,integer,TRUE,Total number of APPROVED reviews on the Pull Request.,GrimoireLab
+num_review_comments,long,TRUE,Number of comments.,GrimoireLab
 origin,keyword,TRUE,Original URL where the repository was retrieved from.,Data Source / Parsed
 project,keyword,TRUE,Project.,GrimoireLab
 project_1,keyword,TRUE,Project (if more than one level is allowed in project hierarchy).,GrimoireLab
@@ -72,6 +76,7 @@ sub_type,keyword,TRUE,Type of the comment (pull review comment).,Data Source / P
 tag,keyword,TRUE,Perceval tag.,Data Source / Parsed
 time_open_days,float,TRUE,Time the pull request is open counted in days.,GrimoireLab
 time_to_close_days,float,TRUE,Time to close a pull request counted in days.,GrimoireLab
+time_to_first_approval_days,float,TRUE,Time in days from PR creation to the first APPROVED review.,GrimoireLab
 time_to_merge_request_response,float,TRUE,Time to merge a pull request in days.,GrimoireLab
 issue_title,keyword,TRUE,The title of the pull request.,Data Source / Parsed
 issue_title_analyzed,text,FALSE,Pull request title split by terms to allow searching.,Data Source / Parsed

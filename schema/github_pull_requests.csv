@@ -17,6 +17,8 @@ closed_at,date,TRUE,Date in which the Issue was closed.,Data Source / Parsed
 code_merge_duration,float,TRUE,Difference in days between creation and merging dates.,GrimoireLab
 created_at,date,TRUE,Date in which the Issue was created.,Data Source / Parsed
 deletions,long,TRUE,Number of deletions in the Pull Request.,GrimoireLab
+first_approval_date,date,TRUE,Date of the first APPROVED review on the Pull Request.,GrimoireLab
+first_approver_login,keyword,TRUE,Login of the first user who APPROVED the Pull Request.,GrimoireLab
 forks,long,TRUE,Number of repository forks.,Data Source / Parsed
 github_repo,keyword,TRUE,GitHub repository name.,Data Source / Parsed
 grimoire_creation_date,date,TRUE,Pull Request creation date.,Data Source / Parsed
@@ -49,6 +51,7 @@ metadata__gelk_backend_name,keyword,TRUE,Name of the backend used to enrich info
 metadata__gelk_version,keyword,TRUE,Version of the backend used to enrich information.,GrimoireLab
 metadata__timestamp,date,TRUE,Date when the item was stored in RAW index.,GrimoireLab
 metadata__updated_on,date,TRUE,Date when the item was updated on its original data source.,GrimoireLab
+num_approvals,integer,TRUE,Total number of APPROVED reviews on the Pull Request.,GrimoireLab
 num_review_comments,long,TRUE,Number of comments.,GrimoireLab
 origin,keyword,TRUE,Original URL where the repository was retrieved from.,Data Source / Parsed
 project,keyword,TRUE,Project.,GrimoireLab
@@ -60,6 +63,7 @@ state,keyword,TRUE,State of the Pull Request (GitHub has only 2 possible states:
 tag,keyword,TRUE,Perceval tag.,GrimoireLab
 time_open_days,float,TRUE,Time the Pull Request is open counted in days.,GrimoireLab
 time_to_close_days,float,TRUE,Time to close a Pull Request counted in days.,GrimoireLab
+time_to_first_approval_days,float,TRUE,Time in days from PR creation to the first APPROVED review.,GrimoireLab
 time_to_merge_request_response,float,TRUE,Time to get a response on a Pull Request in days.,GrimoireLab
 title,keyword,TRUE,The title of the Pull Request.,Data Source / Parsed
 title_analyzed,text,FALSE,Pull Request title split by terms to allow searching.,Data Source / Parsed
