@@ -1131,7 +1131,7 @@ class GitEnrich(Enrich):
                 "source": "if(!ctx._source.branches_aux.contains(params.branch)){ctx._source.branches_aux.add(params.branch);}",
                 "lang": "painless",
                 "params": {
-                    "branch": "'%s'"
+                    "branch": "%s"
                 }
               },
               "query": {

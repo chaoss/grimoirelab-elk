@@ -23,12 +23,14 @@
 
 
 import datetime
+import json
 import logging
 import os
 import requests
 import time
 import shutil
 import unittest
+from unittest import mock
 
 from sgqlc.operation import Operation
 
@@ -36,7 +38,7 @@ from base import TestBaseBackend
 from grimoire_elk.raw.git import GitOcean
 from grimoire_elk.enriched.enrich import (logger,
                                           anonymize_url)
-from grimoire_elk.enriched.git import logger as git_logger
+from grimoire_elk.enriched.git import GitEnrich, logger as git_logger
 from grimoire_elk.enriched.utils import REPO_LABELS
 from grimoirelab_toolkit.datetime import datetime_utcnow
 from sortinghat.cli.client import SortingHatSchema, SortingHatClientError
@@ -854,6 +856,36 @@ class TestGit(TestBaseBackend):
                     self.assertEqual(item[attribute], eitem[attribute])
                 else:
                     self.assertIsNone(eitem[attribute])
+
+
+class TestGitBranchesQuery(unittest.TestCase):
+    """Tests for the query sent by the git branches study"""
+
+    def _branch_param(self, branch_name):
+        """Return the `branch` parameter of the update query sent for `branch_name`"""
+
+        enrich = GitEnrich()
+        enrich.requests = mock.MagicMock()
+        enrich_backend = mock.MagicMock()
+        enrich_backend.elastic.index_url = 'http://localhost:9200/git_enriched'
+
+        enrich._GitEnrich__process_commits_in_branch(enrich_backend, 'https://example.com/repo.git',
+                                                     branch_name, ['1234abcd'])
+
+        query = json.loads(enrich.requests.post.call_args.kwargs['data'])
+        return query['script']['params']['branch']
+
+    def test_branch_name_is_not_quoted(self):
+        """Test whether the branch name is stored as it is, without quotes"""
+
+        self.assertEqual(self._branch_param('main'), 'main')
+        self.assertEqual(self._branch_param('feature/new-ui'), 'feature/new-ui')
+
+    def test_branch_name_with_quotes(self):
+        """Test whether quotes in branch names are still replaced"""
+
+        self.assertEqual(self._branch_param("fix'quote"), 'fix---quote')
+        self.assertEqual(self._branch_param('fix"quote'), 'fix---quote')
 
 
 if __name__ == "__main__":

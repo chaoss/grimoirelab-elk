@@ -1,0 +1,10 @@
+---
+title: Branch names stored without quotes
+category: fixed
+author: Tanmay Baranwal <baranwaltanmay16@gmail.com>
+issue: 1176
+notes: >
+  The git branches study stored the names in the `branches`
+  field wrapped in single quotes (e.g. `'main'`). They are now
+  stored as they are. Existing indexes are updated the next time
+  the study runs.
