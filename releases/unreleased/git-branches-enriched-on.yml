@@ -1,0 +1,10 @@
+---
+title: Branches study updates the enrichment date
+category: fixed
+author: Tanmay Baranwal <baranwaltanmay16@gmail.com>
+issue: 1079
+notes: >
+  The git branches study updated the `branches` field of the
+  commits without touching any metadata date, which made it hard
+  to know when the branch information had been refreshed. It now
+  also sets `metadata__enriched_on` to the time of the update.
