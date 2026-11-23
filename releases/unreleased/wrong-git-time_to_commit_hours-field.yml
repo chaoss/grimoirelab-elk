@@ -1,0 +1,10 @@
+---
+title: Wrong git time_to_commit_hours field
+category: fixed
+author: null
+issue: null
+notes: >
+  The `time_to_commit_hours` field of git items subtracted the
+  commit date from the author date and ignored whole days, so
+  a commit made one hour after it was authored got 23 hours.
+  It now has the hours from the author date to the commit date.

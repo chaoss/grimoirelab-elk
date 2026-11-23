@@ -264,8 +264,8 @@ class GitEnrich(Enrich):
         eitem["branches"] = []
 
         # Compute time to commit
-        time_to_commit_delta = datetime_to_utc(author_date) - datetime_to_utc(commit_date)
-        eitem["time_to_commit_hours"] = round(time_to_commit_delta.seconds / 3600, 2)
+        time_to_commit_delta = datetime_to_utc(commit_date) - datetime_to_utc(author_date)
+        eitem["time_to_commit_hours"] = round(time_to_commit_delta.total_seconds() / 3600, 2)
 
         # Other enrichment
         eitem["repo_name"] = item["origin"]
