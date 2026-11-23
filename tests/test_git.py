@@ -84,6 +84,29 @@ class TestGit(TestBaseBackend):
             self.assertNotIn('username:password', item['origin'])
             self.assertNotIn('username:password', item['tag'])
 
+    def test_time_to_commit(self):
+        """Test whether the hours from the author date to the commit date are right"""
+
+        enrich_backend = self.connectors[self.connector][2]()
+        item = self.items[1]
+        item['metadata__updated_on'] = '2012-08-14T17:32:15+00:00'
+        item['metadata__timestamp'] = '2012-08-14T17:32:15+00:00'
+        item['data']['AuthorDate'] = 'Tue Aug 14 14:32:15 2012 -0300'
+
+        commit_dates = [
+            ('Tue Aug 14 14:32:15 2012 -0300', 0),
+            # 1.5 hours later, in another time zone
+            ('Tue Aug 14 19:02:15 2012 +0000', 1.5),
+            # 3 days and 2 hours later
+            ('Fri Aug 17 16:32:15 2012 -0300', 74),
+            # 30 minutes earlier, the clock of the committer was wrong
+            ('Tue Aug 14 14:02:15 2012 -0300', -0.5),
+        ]
+        for commit_date, hours in commit_dates:
+            item['data']['CommitDate'] = commit_date
+            eitem = enrich_backend.get_rich_item(item)
+            self.assertEqual(eitem['time_to_commit_hours'], hours)
+
     def test_raw_to_enrich(self):
         """Test whether the raw index is properly enriched"""
 
